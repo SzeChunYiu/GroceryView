@@ -221,8 +221,38 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
+    storeAccountId: '1004589',
+    storeName: 'ICA Kvantum Mölndal',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
     storeAccountId: '1003954',
     storeName: 'Maxi ICA Stormarknad Högsbo, Göteborg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003825',
+    storeName: 'Maxi ICA Stormarknad Torslanda',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003932',
+    storeName: 'ICA Kvantum Hovås',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004392',
+    storeName: 'Maxi ICA Stormarknad Kungälv',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004185',
+    storeName: 'Maxi ICA Stormarknad Kungsbacka',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003398',
+    storeName: 'ICA Kvantum Stenungsund',
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
@@ -236,18 +266,8 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
-    storeAccountId: '1003825',
-    storeName: 'Maxi ICA Stormarknad Torslanda',
-    regionId: DEFAULT_ICA_REGION_ID
-  },
-  {
     storeAccountId: '1003383',
     storeName: 'ICA Kvantum Lerum',
-    regionId: DEFAULT_ICA_REGION_ID
-  },
-  {
-    storeAccountId: '1004392',
-    storeName: 'Maxi ICA Stormarknad Kungälv',
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
@@ -256,13 +276,158 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
-    storeAccountId: '1004185',
-    storeName: 'Maxi ICA Stormarknad Kungsbacka',
+    storeAccountId: '1003917',
+    storeName: 'ICA Kvantum Kungsbacka',
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
-    storeAccountId: '1003917',
-    storeName: 'ICA Kvantum Kungsbacka',
+    storeAccountId: '1004291',
+    storeName: 'ICA Supermarket Nordeviks',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004520',
+    storeName: 'ICA Supermarket Noltorp',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004490',
+    storeName: 'ICA Kvantum Malmborgs Caroli',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003569',
+    storeName: 'Maxi ICA Stormarknad Västra Hamnen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004037',
+    storeName: 'ICA Kvantum Malmborgs Mobilia',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004492',
+    storeName: 'Maxi ICA Stormarknad Malmö',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003428',
+    storeName: 'Maxi ICA Stormarknad Burlöv',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1088004',
+    storeName: 'Maxi ICA Stormarknad Gunnesbo, Lund',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004060',
+    storeName: 'Maxi ICA Stormarknad Löddeköpinge',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003612',
+    storeName: 'ICA Kvantum Karlssons',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003452',
+    storeName: 'ICA Kvantum Södra Sandby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003620',
+    storeName: 'Maxi ICA Stormarknad Trelleborg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004360',
+    storeName: 'ICA Kvantum Sjöbo',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003916',
+    storeName: 'Maxi ICA Stormarknad Råå Helsingborg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003793',
+    storeName: 'ICA Kvantum Hörby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004458',
+    storeName: 'ICA Supermarket Luthagens Livs',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004181',
+    storeName: 'ICA Folkes Livs',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003386',
+    storeName: 'ICA Nära Stabby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003426',
+    storeName: 'ICA Supermarket Årstahallen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003871',
+    storeName: 'ICA Kvantum Uppsala',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004488',
+    storeName: 'Maxi ICA Stormarknad Stenhagen Uppsala',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003521',
+    storeName: 'ICA Supermarket Sigtuna',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004562',
+    storeName: 'ICA Kvantum Märsta',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004504',
+    storeName: 'ICA Supermarket Bro',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003501',
+    storeName: 'ICA Kvantum Väsby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004501',
+    storeName: 'ICA Kvantum Vallentuna',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003415',
+    storeName: 'Maxi ICA Stormarknad Häggvik',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003673',
+    storeName: 'ICA Kvantum Sollentuna C',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1131004',
+    storeName: 'Maxi ICA Stormarknad Arninge',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004250',
+    storeName: 'ICA Kvantum Täby C',
     regionId: DEFAULT_ICA_REGION_ID
   }
 ];

@@ -42,6 +42,22 @@ export type HemkopWeeklyDiscount = {
   retrievedAt: string;
 };
 
+export type HemkopStore = {
+  storeId: string;
+  name: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  countryCode: string;
+  latitude: number | null;
+  longitude: number | null;
+  onlineStore: boolean;
+  clickAndCollect: boolean;
+  flyerUrl: string;
+  sourceUrl: string;
+  retrievedAt: string;
+};
+
 type HemkopSearchProduct = {
   code?: unknown;
   name?: unknown;
@@ -107,10 +123,44 @@ type AxfoodCampaignResponse = {
   };
 };
 
+type HemkopStoreAddress = {
+  line1?: unknown;
+  town?: unknown;
+  postalCode?: unknown;
+  country?: { isocode?: unknown };
+  formattedAddress?: unknown;
+  latitude?: unknown;
+  longitude?: unknown;
+};
+
+type HemkopStoreApiRow = {
+  storeId?: unknown;
+  name?: unknown;
+  address?: HemkopStoreAddress;
+  geoPoint?: { latitude?: unknown; longitude?: unknown };
+  onlineStore?: unknown;
+  clickAndCollect?: unknown;
+  flyerURL?: unknown;
+};
+
 export const HEMKOP_SEARCH_BASE_URL = 'https://www.hemkop.se/search';
 export const HEMKOP_WEEKLY_DISCOUNTS_BASE_URL = 'https://www.hemkop.se/search/campaigns/offline';
+export const HEMKOP_STORE_API_URL = 'https://www.hemkop.se/axfood/rest/store';
 export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_ID = '4003';
-export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS = ['4003', '4127', '4190', '4798', '4660', '4775'] as const;
+export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS = [
+  '4003',
+  '4127',
+  '4190',
+  '4798',
+  '4660',
+  '4775',
+  '4196',
+  '4111',
+  '4162',
+  '4273',
+  '4349',
+  '4359'
+] as const;
 
 export const DEFAULT_HEMKOP_SEARCH_QUERIES = [
   'makaroner',
@@ -147,6 +197,19 @@ export type FetchHemkopWeeklyDiscountsOptions = {
   retrievedAt?: string;
 };
 
+export type FetchHemkopAllStoreWeeklyDiscountsOptions = Omit<FetchHemkopWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & {
+  storeApiUrl?: string;
+  maxStores?: number;
+};
+
+export type FetchHemkopStoresOptions = {
+  fetchImpl?: typeof fetch;
+  online?: boolean;
+  maxRows?: number;
+  retrievedAt?: string;
+  storeApiUrl?: string;
+};
+
 export function buildHemkopSearchUrl(query: string, size?: number, page = 0): string {
   const url = new URL(HEMKOP_SEARCH_BASE_URL);
   url.searchParams.set('q', query);
@@ -168,6 +231,40 @@ export function buildHemkopWeeklyDiscountsUrl(
   url.searchParams.set('page', String(page));
   url.searchParams.set('size', String(size));
   return url.toString();
+}
+
+export function buildHemkopStoresUrl(
+  options: { online?: boolean; storeApiUrl?: string } = {}
+): string {
+  const url = new URL(options.storeApiUrl ?? HEMKOP_STORE_API_URL);
+  if (options.online !== undefined) url.searchParams.set('online', String(options.online));
+  return url.toString();
+}
+
+export async function fetchHemkopStores(options: FetchHemkopStoresOptions = {}): Promise<HemkopStore[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const sourceUrl = buildHemkopStoresUrl({ online: options.online, storeApiUrl: options.storeApiUrl });
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const response = await fetchImpl(sourceUrl, {
+    headers: {
+      accept: 'application/json',
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+  if (!response.ok) throw new Error(`Hemkop store catalog request failed: ${response.status}`);
+  const payload = await response.json() as HemkopStoreApiRow[];
+  if (!Array.isArray(payload)) throw new Error('Hemkop store catalog response must be an array.');
+  const rows: HemkopStore[] = [];
+  const seenStoreIds = new Set<string>();
+  for (const store of payload) {
+    const row = normalizeHemkopStore(store, sourceUrl, retrievedAt);
+    if (!row || seenStoreIds.has(row.storeId)) continue;
+    seenStoreIds.add(row.storeId);
+    rows.push(row);
+    if (options.maxRows && rows.length >= options.maxRows) break;
+  }
+  if (rows.length === 0) throw new Error('Hemkop store catalog had no usable stores.');
+  return rows;
 }
 
 export async function fetchHemkopProducts(options: FetchHemkopProductsOptions = {}): Promise<HemkopProduct[]> {
@@ -283,6 +380,53 @@ export async function fetchHemkopWeeklyDiscounts(
   }
 
   return rows;
+}
+
+export async function fetchHemkopWeeklyDiscountsForAllStores(
+  options: FetchHemkopAllStoreWeeklyDiscountsOptions = {}
+): Promise<HemkopWeeklyDiscount[]> {
+  const stores = await fetchHemkopStores({
+    fetchImpl: options.fetchImpl,
+    online: true,
+    maxRows: options.maxStores,
+    retrievedAt: options.retrievedAt,
+    storeApiUrl: options.storeApiUrl
+  });
+  return await fetchHemkopWeeklyDiscounts({
+    fetchImpl: options.fetchImpl,
+    storeIds: stores.map((store) => store.storeId),
+    maxRows: options.maxRows ?? stores.length * 300,
+    pageSize: options.pageSize,
+    retrievedAt: options.retrievedAt
+  });
+}
+
+export function normalizeHemkopStore(
+  store: HemkopStoreApiRow,
+  sourceUrl: string,
+  retrievedAt: string
+): HemkopStore | null {
+  const storeId = text(store.storeId);
+  const name = text(store.name);
+  const address = text(store.address?.line1) || text(store.address?.formattedAddress);
+  const city = text(store.address?.town);
+  if (!storeId || !name || !address || !city) return null;
+
+  return {
+    storeId,
+    name,
+    address,
+    city,
+    postalCode: text(store.address?.postalCode),
+    countryCode: text(store.address?.country?.isocode) || 'SE',
+    latitude: numberOrNull(store.geoPoint?.latitude) ?? numberOrNull(store.address?.latitude),
+    longitude: numberOrNull(store.geoPoint?.longitude) ?? numberOrNull(store.address?.longitude),
+    onlineStore: store.onlineStore === true,
+    clickAndCollect: store.clickAndCollect === true,
+    flyerUrl: text(store.flyerURL),
+    sourceUrl,
+    retrievedAt
+  };
 }
 
 export function normalizeHemkopProduct(

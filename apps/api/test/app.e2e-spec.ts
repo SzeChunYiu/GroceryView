@@ -327,6 +327,16 @@ class RecordingPriceHistoryExecutor {
   }
 }
 
+class UnconfiguredPostgresExecutor {
+  isConfigured(): boolean {
+    return false;
+  }
+
+  async query<T>(): Promise<T[]> {
+    throw new Error('Unexpected PostgreSQL query without DATABASE_URL.');
+  }
+}
+
 describe('GroceryView API app', () => {
   let app: INestApplication;
   let priceHistoryExecutor: RecordingPriceHistoryExecutor;
@@ -410,6 +420,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/basket/trip-cost']);
     assert.ok(docs.body.paths['/users/demo/basket/fulfillment-slots/{retailerId}/{storeId}']);
     assert.ok(docs.body.paths['/users/demo/basket/handoff/{retailerId}']);
+    assert.ok(docs.body.paths['/users/demo/basket/transfer/{retailerId}']);
     assert.ok(docs.body.paths['/users/demo/basket/import-export']);
     assert.ok(docs.body.paths['/users/demo/basket/import-review']);
     assert.ok(docs.body.paths['/users/demo/basket/import-review/{reviewItemId}/decisions']);
@@ -1003,6 +1014,15 @@ describe('GroceryView API app', () => {
     assert.equal(handoff.body.primaryAction.actionType, 'copy_list');
     assert.match(handoff.body.unsupportedReasons[1], /cannot claim purchase completion/i);
 
+    const transfer = await request(app.getHttpServer())
+      .get('/users/demo/basket/transfer/willys')
+      .expect(200);
+    assert.equal(transfer.body.userId, 'demo');
+    assert.equal(transfer.body.demo, true);
+    assert.equal(transfer.body.status, 'blocked');
+    assert.equal(transfer.body.canAttemptTransfer, false);
+    assert.match(transfer.body.blockedReasons[0], /not verified as supported/);
+
     const slots = await request(app.getHttpServer())
       .get('/users/demo/basket/fulfillment-slots/willys/willys-odenplan')
       .expect(200);
@@ -1216,5 +1236,36 @@ describe('GroceryView API app', () => {
 
   it('returns 404 for missing category market reports', async () => {
     await request(app.getHttpServer()).get('/categories/missing-category/market').expect(404);
+  });
+});
+
+describe('GroceryView API real-only deal and alert endpoints', () => {
+  let app: INestApplication;
+
+  beforeEach(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule]
+    })
+      .overrideProvider(PostgresQueryExecutorService)
+      .useValue(new UnconfiguredPostgresExecutor())
+      .compile();
+
+    app = moduleFixture.createNestApplication();
+    configureApp(app);
+    await app.init();
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  it('fails closed instead of serving demo flyer offers or price alerts without PostgreSQL', async () => {
+    await request(app.getHttpServer()).get('/deals/flyer-offers').expect(503);
+    await request(app.getHttpServer()).get('/stores/willys-odenplan/flyer-offers').expect(503);
+    await request(app.getHttpServer()).get('/users/demo/watchlist/price-alerts').expect(503);
+    await request(app.getHttpServer())
+      .post('/users/demo/watchlist/price-alerts')
+      .send({ productId: 'coffee', targetPrice: 50 })
+      .expect(503);
   });
 });

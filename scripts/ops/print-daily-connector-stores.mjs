@@ -1,0 +1,91 @@
+#!/usr/bin/env node
+import process from 'node:process';
+
+function toDailyStoreConfig(store) {
+  return {
+    storeId: store.storeId,
+    name: store.name,
+    address: store.address || store.name,
+    city: store.city,
+    countryCode: store.countryCode ?? 'SE',
+    ...(store.latitude === null || store.latitude === undefined ? {} : { latitude: store.latitude }),
+    ...(store.longitude === null || store.longitude === undefined ? {} : { longitude: store.longitude }),
+    ...(store.conceptName ? { storeType: store.conceptName } : {})
+  };
+}
+
+async function loadStoreFetchers() {
+  try {
+    return await import('../../packages/ingestion/dist/index.js');
+  } catch (error) {
+    throw new Error(`Build @groceryview/ingestion before exporting live connector stores: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+export async function printDailyConnectorStores({ fetchers, selfTest = false } = {}) {
+  const source = fetchers ?? (selfTest ? {
+    fetchWillysStores: async () => [{
+      storeId: '2149',
+      name: 'Willys Alingsås Hagaplan',
+      address: 'Hagaplan',
+      city: 'Alingsås',
+      countryCode: 'SE',
+      latitude: 57.9374,
+      longitude: 12.5333
+    }],
+    fetchHemkopStores: async () => [{
+      storeId: '4798',
+      name: 'Hemköp Bollnäs',
+      address: 'Långgatan 10',
+      city: 'Bollnäs',
+      countryCode: 'SE',
+      latitude: 61.3461,
+      longitude: 16.0543
+    }],
+    fetchCoopStores: async () => [{
+      storeId: '196183',
+      name: 'Coop Krylbo',
+      conceptName: 'Coop',
+      address: 'Järnvägsgatan 16',
+      city: 'Krylbo',
+      latitude: 60.1307271,
+      longitude: 16.213442
+    }],
+    fetchCityGrossStores: async () => [{
+      storeId: '21',
+      name: 'City Gross Borås',
+      address: '',
+      city: 'Borås',
+      latitude: 57.7141742,
+      longitude: 12.8669819
+    }]
+  } : await loadStoreFetchers());
+
+  const [willysStores, hemkopStores, coopStores, cityGrossStores] = await Promise.all([
+    source.fetchWillysStores({ online: true }),
+    source.fetchHemkopStores({ online: true }),
+    source.fetchCoopStores(),
+    source.fetchCityGrossStores()
+  ]);
+
+  return {
+    generatedAt: new Date().toISOString(),
+    supportedChains: ['willys', 'hemkop', 'coop', 'city_gross'],
+    storesByChain: {
+      willys: willysStores.map(toDailyStoreConfig),
+      hemkop: hemkopStores.map(toDailyStoreConfig),
+      coop: coopStores.map(toDailyStoreConfig),
+      city_gross: cityGrossStores.map(toDailyStoreConfig)
+    }
+  };
+}
+
+if (import.meta.url === new URL(process.argv[1], 'file:').href) {
+  try {
+    const result = await printDailyConnectorStores({ selfTest: process.argv.includes('--self-test') });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+  } catch (error) {
+    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+    process.exitCode = 1;
+  }
+}

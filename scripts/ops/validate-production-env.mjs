@@ -34,17 +34,34 @@ function requireRequiredChains(label, chainIds) {
   if (missing.length > 0) throw new Error(`${label} missing required chains: ${missing.join(', ')}`);
 }
 
+function validateConnectorStores(connector, index) {
+  if (connector.requireStoreScopedPrices === false) return [];
+  if (!Array.isArray(connector.stores) || connector.stores.length === 0) {
+    throw new Error(`GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}].stores must list every branch that can emit prices.`);
+  }
+  return connector.stores.map((store, storeIndex) => {
+    const path = `GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}].stores[${storeIndex}]`;
+    if (store === null || typeof store !== 'object' || Array.isArray(store)) throw new Error(`${path} must be an object.`);
+    for (const field of ['storeId', 'name', 'address', 'city']) {
+      if (typeof store[field] !== 'string' || !store[field].trim()) throw new Error(`${path}.${field} is required.`);
+    }
+    return store.storeId.trim();
+  });
+}
+
 function validateDailyConnectors(env) {
   const connectors = parseJsonEnv(env, 'GROCERYVIEW_DAILY_CONNECTORS_JSON');
   if (!Array.isArray(connectors) || connectors.length === 0) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON must be a non-empty array.');
+  const connectorStoreIds = [];
   for (const [index, connector] of connectors.entries()) {
     if (connector === null || typeof connector !== 'object' || Array.isArray(connector)) throw new Error(`GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}] must be an object.`);
     for (const field of ['connectorId', 'chainId', 'sourceType', 'endpointUrl', 'parserVersion', 'robotsTxtStatus', 'legalReviewStatus', 'hasDataAgreement']) {
       if (connector[field] === undefined || connector[field] === null || connector[field] === '') throw new Error(`GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}].${field} is required.`);
     }
+    connectorStoreIds.push(...validateConnectorStores(connector, index));
   }
   requireRequiredChains('GROCERYVIEW_DAILY_CONNECTORS_JSON.chainId', connectors.map((connector) => String(connector.chainId)));
-  return connectors.length;
+  return { connectorCount: connectors.length, connectorStoreCount: connectorStoreIds.length, connectorStoreIds };
 }
 
 function validateCatalogTargets(env) {
@@ -56,7 +73,16 @@ function validateCatalogTargets(env) {
   const targetStores = requireNonEmptyStringArray(targets.targetStores, 'CATALOG_COVERAGE_TARGETS_JSON.targetStores');
   requireRequiredChains('CATALOG_COVERAGE_TARGETS_JSON.targetChains', targetChains);
   if (targets.requireEveryProductInEveryStore !== true) throw new Error('CATALOG_COVERAGE_TARGETS_JSON.requireEveryProductInEveryStore must be true.');
-  return { productCount: targetProducts.length, storeCount: targetStores.length };
+  return { productCount: targetProducts.length, storeCount: targetStores.length, targetStores };
+}
+
+function validateConnectorStoreCoverage(connectorStoreIds, targetStores) {
+  const connectorStores = new Set(connectorStoreIds);
+  const missingStores = targetStores.filter((storeId) => !connectorStores.has(storeId));
+  if (missingStores.length > 0) {
+    throw new Error(`CATALOG_COVERAGE_TARGETS_JSON.targetStores missing from connector stores: ${missingStores.join(', ')}`);
+  }
+  return targetStores.length;
 }
 
 export function validateProductionEnv(env) {
@@ -64,11 +90,14 @@ export function validateProductionEnv(env) {
   if (missingEnv.length > 0) throw new Error(`Missing required env: ${missingEnv.join(', ')}`);
   new URL(env.PUBLIC_WEB_URL);
   new URL(env.GROCERYVIEW_SERVER_URL);
-  const connectorCount = validateDailyConnectors(env);
+  const connectors = validateDailyConnectors(env);
   const coverage = validateCatalogTargets(env);
+  const connectorStoreCoverageCount = validateConnectorStoreCoverage(connectors.connectorStoreIds, coverage.targetStores);
   return {
     status: 'ready',
-    connectorCount,
+    connectorCount: connectors.connectorCount,
+    connectorStoreCount: connectors.connectorStoreCount,
+    connectorStoreCoverageCount,
     coverageProductCount: coverage.productCount,
     coverageStoreCount: coverage.storeCount
   };
@@ -92,13 +121,14 @@ function selfTestEnv() {
       parserVersion: 'normalized-json-v1',
       robotsTxtStatus: 'not_applicable',
       legalReviewStatus: 'approved',
-      hasDataAgreement: true
+      hasDataAgreement: true,
+      stores: [{ storeId: `${chainId}-odenplan`, name: `${chainId} Odenplan`, address: 'Odenplan', city: 'Stockholm' }]
     }))),
     CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
       targetProducts: ['coffee', 'milk'],
       targetCategories: ['coffee', 'dairy'],
       targetChains: chains,
-      targetStores: ['willys-odenplan', 'coop-odenplan'],
+      targetStores: chains.map((chainId) => `${chainId}-odenplan`),
       requireEveryProductInEveryStore: true
     })
   };

@@ -151,6 +151,19 @@ export class BasketsController {
     }
   }
 
+  @Get('transfer/:retailerId')
+  @ApiOkResponse({ description: 'Secure retailer basket transfer preflight' })
+  transfer(@Param('retailerId') retailerId: string) {
+    try {
+      return { ...groceryApi.getRetailerBasketTransferSession('demo', retailerId), demo: true };
+    } catch (error) {
+      if (error instanceof Error && /Unsupported retailerId/.test(error.message)) {
+        throw new NotFoundException('Retailer transfer not supported');
+      }
+      throw error;
+    }
+  }
+
   @Get('fulfillment-slots/:retailerId/:storeId')
   @ApiOkResponse({ description: 'Fulfillment slot evidence without reservation claims' })
   fulfillmentSlots(@Param('retailerId') retailerId: string, @Param('storeId') storeId: string) {

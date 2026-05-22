@@ -128,6 +128,9 @@ export class RealCatalogService {
       maxPrice: numberQuery(query.maxPrice, 'maxPrice'),
       limit: limitQuery(query.limit)
     };
+    if (filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.minPrice > filters.maxPrice) {
+      throw new BadRequestException('minPrice must be less than or equal to maxPrice.');
+    }
     const categories = filters.categories ?? [];
     const brands = filters.brands ?? [];
     const chains = filters.chains ?? [];
@@ -175,11 +178,17 @@ export class RealCatalogService {
 
   async compareSavedBasket(userId: string, storeSlugs?: string[]) {
     const basketRows = await this.database.query<BasketItemSqlRow>(
-      `select bi.product_id, bi.quantity
-       from weekly_baskets wb
-       join basket_items bi on bi.basket_id = wb.id
-       where wb.user_id = $1
-       order by wb.week_start desc, bi.id`,
+      `with latest_basket as (
+         select id
+         from weekly_baskets
+         where user_id = $1
+         order by week_start desc, id desc
+         limit 1
+       )
+       select bi.product_id, bi.quantity
+       from latest_basket lb
+       join basket_items bi on bi.basket_id = lb.id
+       order by bi.id`,
       [userId]
     );
     if (basketRows.length === 0) throw new NotFoundException('Saved basket not found.');
@@ -209,6 +218,21 @@ export class RealCatalogService {
           )
           and ($2::text[] is null or exists (select 1 from unnest(products.category_path) category where lower(category) = any($2::text[])))
           and ($3::text[] is null or lower(coalesce(products.brand, '')) = any($3::text[]))
+          and (
+            ($4::text[] is null and $5::text[] is null and $6::text[] is null and $7::numeric is null and $8::numeric is null)
+            or exists (
+              select 1
+              from latest_prices filter_prices
+              left join chains filter_chains on filter_chains.id = filter_prices.chain_id
+              left join stores filter_stores on filter_stores.id = filter_prices.store_id
+              where filter_prices.product_id = products.id
+                and ($4::text[] is null or filter_chains.slug = any($4::text[]))
+                and ($5::text[] is null or filter_stores.slug = any($5::text[]))
+                and ($6::text[] is null or filter_prices.price_type = any($6::text[]))
+                and ($7::numeric is null or filter_prices.price >= $7::numeric)
+                and ($8::numeric is null or filter_prices.price <= $8::numeric)
+            )
+          )
         order by products.canonical_name, products.slug
         limit $9
       )

@@ -10,6 +10,7 @@ import {
   planBasketFulfillmentSlots,
   planBasketImportExport,
   planBasketTripCost,
+  planRetailerBasketTransferSession,
   planRetailerHandoff,
   createHouseholdState,
   rankNutritionPerKrona,
@@ -33,6 +34,7 @@ import {
   type BasketFulfillmentSlotInput,
   type BasketTripCostPlan,
   type BasketTripCostTravelMode,
+  type RetailerBasketTransferSession,
   type RetailerHandoffPlan,
   type RetailerHandoffSupport,
   type BrandTierIndexSummary,
@@ -480,6 +482,11 @@ export type RetailerHandoffReport = RetailerHandoffPlan & {
   itemCount: number;
 };
 
+export type RetailerBasketTransferSessionReport = RetailerBasketTransferSession & {
+  userId: string;
+  itemCount: number;
+};
+
 export type StoreBasketQuoteLine = {
   productId: string;
   productName: string;
@@ -678,7 +685,11 @@ export type ProductPriceHistoryObservationInput = {
   productSlug: string;
   productName: string;
   chainId: string;
+  chainSlug?: string;
+  chainName?: string;
   storeId?: string;
+  storeSlug?: string;
+  storeName?: string;
   sourceRunId?: string;
   rawRecordId?: string;
   retailerProductRef?: string;
@@ -2981,6 +2992,32 @@ function buildRetailerHandoffReport(userId: string, retailerId: string, userItem
   return { ...plan, userId, itemCount: userItems.length };
 }
 
+function buildRetailerBasketTransferSession(userId: string, retailerId: string, userItems: BasketItemRequest[]): RetailerBasketTransferSessionReport {
+  requireNonEmptyId(userId, 'userId');
+  const support = retailerHandoffSupport[retailerId];
+  if (!support) throw new Error(`Unsupported retailerId: ${retailerId}`);
+  const plan = planRetailerBasketTransferSession({
+    retailerId,
+    retailerName: support.retailerName,
+    basketId: `${userId}:current-basket`,
+    support: support.support,
+    shopperSessionPresent: true,
+    transferEndpoint: undefined,
+    signedPayload: undefined,
+    lines: userItems.map((item) => {
+      const product = products.find((candidate) => candidate.id === item.productId);
+      return {
+        productId: item.productId,
+        productName: product?.name ?? item.productId,
+        quantity: item.quantity,
+        matched: Boolean(product?.availableChains.includes(retailerId)),
+        ...(product ? { productUrl: productUrlForRetailer(product, retailerId) } : {})
+      };
+    })
+  });
+  return { ...plan, userId, itemCount: userItems.length };
+}
+
 function buildBasketTripCostReport(userId: string, favoriteStoreIds: string[], userItems: BasketItemRequest[], request: BasketTripCostRequest): BasketTripCostReport {
   requireNonEmptyId(userId, 'userId');
   const comparisonStoreIds = favoriteStoreIds.length > 0 ? favoriteStoreIds : stores.map((store) => store.id);
@@ -3472,7 +3509,7 @@ function basketImportKnownProducts() {
   }));
 }
 
-const basketImportReviewGuardrails = [
+export const basketImportReviewGuardrails = [
   'Retailer basket review rows are account-bound and never visible across signed-in users.',
   'Unmatched retailer rows stay out of the basket until a signed-in shopper accepts a verified GroceryView product match.',
   'Dismissed retailer rows remain auditable and are not silently converted into products.'
@@ -3485,6 +3522,23 @@ function basketImportReviewId(userId: string, source: BasketImportExportSource, 
     .replace(/^-+|-+$/g, '')
     .slice(0, 48) || 'retailer-row';
   return `basket-import-review-${userId}-${source.retailerId}-${Date.parse(source.capturedAt)}-${index}-${slug}`;
+}
+
+export function createBasketImportReviewItems(
+  userId: string,
+  source: BasketImportExportSource,
+  reviewItems: BasketImportExportReviewItem[],
+  existingCount = 0
+): BasketImportReviewItem[] {
+  return reviewItems.map((item, index): BasketImportReviewItem => ({
+    ...item,
+    reviewItemId: basketImportReviewId(userId, source, item.rawName, existingCount + index),
+    retailerId: source.retailerId,
+    sourceKind: source.sourceKind,
+    capturedAt: source.capturedAt,
+    status: 'open',
+    createdAt: source.capturedAt
+  }));
 }
 
 function storeFlyerOfferReport(storeId: string, asOf?: string): StoreFlyerOfferReport {
@@ -4179,6 +4233,10 @@ export function createGroceryViewApi() {
       return buildRetailerHandoffReport(userId, retailerId, baskets.get(userId) ?? []);
     },
 
+    getRetailerBasketTransferSession(userId: string, retailerId: string): RetailerBasketTransferSessionReport {
+      return buildRetailerBasketTransferSession(userId, retailerId, baskets.get(userId) ?? []);
+    },
+
     importBasketFromRetailerPage(userId: string, request: BasketImportExportRequest): BasketImportExportReport {
       requireNonEmptyId(userId, 'userId');
       const plan = planBasketImportExport({
@@ -4189,15 +4247,7 @@ export function createGroceryViewApi() {
       for (const item of plan.acceptedItems) this.addBasketItem(userId, { productId: item.productId, quantity: item.quantity });
       if (plan.reviewItems.length > 0) {
         const existing = basketImportReviews.get(userId) ?? [];
-        const created = plan.reviewItems.map((item, index): BasketImportReviewItem => ({
-          ...item,
-          reviewItemId: basketImportReviewId(userId, plan.source, item.rawName, existing.length + index),
-          retailerId: plan.source.retailerId,
-          sourceKind: plan.source.sourceKind,
-          capturedAt: plan.source.capturedAt,
-          status: 'open',
-          createdAt: plan.source.capturedAt
-        }));
+        const created = createBasketImportReviewItems(userId, plan.source, plan.reviewItems, existing.length);
         basketImportReviews.set(userId, [...existing, ...created]);
       }
       return {

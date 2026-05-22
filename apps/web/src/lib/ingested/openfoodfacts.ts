@@ -1,9 +1,9 @@
 // AUTO-GENERATED from the official OpenFoodFacts world data export.
 // Source URL: https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
-// Retrieved: 2026-05-22T11:18:28.578Z
-// Row count: 1587 real barcode+nutrition enrichment rows matched to existing ingested retailer products.
-// Candidate barcode count checked from current Willys/Hemkop/Coop/ICA reklamblad ingested rows: 2968. ICA reklamblad candidate barcodes: 362.
-// Export rows scanned: 4528597; candidate barcodes present in export: 1897; matched rows without usable nutrition/name: 310.
+// Retrieved: 2026-05-22T10:51:26.620Z
+// Row count: 1581 real barcode+nutrition enrichment rows matched to existing ingested retailer products.
+// Candidate barcode count checked from current Willys/Hemkop/Coop/ICA reklamblad ingested rows: 2953. ICA reklamblad candidate barcodes: 346.
+// Export rows scanned: 4526744; candidate barcodes present in export: 1890; matched rows without usable nutrition/name: 309.
 // No-match or nutrition-empty products were skipped.
 
 export type OpenFoodFactsNutritionPer100g = {
@@ -47,13 +47,13 @@ export type OpenFoodFactsIngestedProduct = {
 
 export const openFoodFactsSource = {
   "source": "openfoodfacts.org world data export barcode nutrition enrichment",
-  "retrievedAt": "2026-05-22T11:18:28.578Z",
-  "rowCount": 1587,
-  "candidateBarcodeCount": 2968,
-  "icaReklambladCandidateBarcodeCount": 362,
-  "matchedExportBarcodeCount": 1897,
-  "matchedWithoutNutritionCount": 310,
-  "scannedExportRowCount": 4528597,
+  "retrievedAt": "2026-05-22T10:51:26.620Z",
+  "rowCount": 1581,
+  "candidateBarcodeCount": 2953,
+  "icaReklambladCandidateBarcodeCount": 346,
+  "matchedExportBarcodeCount": 1890,
+  "matchedWithoutNutritionCount": 309,
+  "scannedExportRowCount": 4526744,
   "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz"
 } as const;
 
@@ -81,7 +81,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/0690225301329/sella-basmati-rice-india-gate",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=0690225301329",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -117,7 +117,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/234/039/800/0007/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/2340398000007/ost-graddis-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=2340398000007",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -159,7 +159,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/303/681/010/0576/front_en.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3036810100576/moutarde-de-dijon-grey-poupon",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3036810100576",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -203,7 +203,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/303/681/020/1280/front_en.229.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3036810201280/dijon-originale-senf-maille",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3036810201280",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -245,7 +245,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/317/658/207/8038/front_pt.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3176582078038/le-rustique-raclette",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3176582078038",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -292,7 +292,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/322/802/421/0138/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3228024210138/burger-cheese-with-cheddar-president",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3228024210138",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -348,7 +348,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/325/447/401/9274/front_en.51.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3254474019274/maiskorn-i-saltlake-green-giant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3254474019274",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -357,16 +357,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Gröna jätten",
         "packageText": "480 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957952",
-        "name": "Majs",
-        "brand": "Gröna jätten",
-        "packageText": "480 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -402,7 +393,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/341/558/152/0927/front_en.34.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3415581520927/fruit-collection-haagen-dazs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3415581520927",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -498,7 +489,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/352/323/006/1001/front_fi.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3523230061001/mozzarella-eurial",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3523230061001",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -534,7 +525,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/3523230062633/chevre-soignon",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3523230062633",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -615,7 +606,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/352/323/006/4903/front_it.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3523230064903/mozzarella-maestrella",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3523230064903",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -673,7 +664,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/380/002/049/1423/front_en.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3800020491423/tablette-caramel-sale-knoppers",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3800020491423",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -754,7 +745,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/3830042432272/chicken-salami-classic-pepi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3830042432272",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -803,7 +794,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/383/897/556/6675/front_nb.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3838975566675/halal-kylling-argeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3838975566675",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -846,7 +837,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/385/010/400/3189/front_en.42.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3850104003189/podravka-chicken-noodle-soup",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3850104003189",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -882,7 +873,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/387/011/400/0961/front_de.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/3870114000961/lovacka-pileca-pasteta-ovako",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3870114000961",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -926,7 +917,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/017/702/6700/front_fr.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4000177026700/caprisun-jungle-drink-capri-sun",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4000177026700",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -935,16 +926,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Capri-Sun",
         "packageText": "10 x 20 cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958005",
-        "name": "Fruktdryck",
-        "brand": "Capri-Sun",
-        "packageText": "10 x 20 cl",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -983,7 +965,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/017/715/8227/front_fr.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4000177158227/capri-sun-orange",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4000177158227",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -992,16 +974,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Capri-Sun",
         "packageText": "10 x 20 cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958005",
-        "name": "Fruktdryck",
-        "brand": "Capri-Sun",
-        "packageText": "10 x 20 cl",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -1028,7 +1001,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/4000358084215/pumper-nickelpema",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4000358084215",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1074,7 +1047,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/151/800/4692/front_en.29.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4001518004692/twist-n-snack-cheese-griesson",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4001518004692",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1126,7 +1099,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/172/402/2398/front_de.62.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4001724022398/ristorante-pizza-mozzarella-glutenfrei-dr-oetker",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4001724022398",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1177,7 +1150,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/172/403/8900/front_en.38.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4001724038900/pizza-salame-ristorante",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4001724038900",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1222,7 +1195,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/172/403/8962/front_en.49.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4001724038962/ristorante-pizza-prosciutto-dr-oetker-ristorante",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4001724038962",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1275,7 +1248,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/172/403/9082/front_en.42.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4001724039082/ristorante-pizza-hawaii-dr-oetker",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4001724039082",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1328,7 +1301,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/172/403/9112/front_de.84.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4001724039112/pizza-dr-oetker-ristorante",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4001724039112",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1385,7 +1358,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/172/403/9143/front_de.83.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4001724039143/ristorante-pizza-vegetale-dr-oetker-ristorante",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4001724039143",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1435,7 +1408,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/172/403/9174/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4001724039174/pizza-pollo-dr-oetker",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4001724039174",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1475,7 +1448,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/235/902/1022/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4002359021022/sas-till-bolognese-original-dolmio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4002359021022",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -1617,7 +1590,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/246/821/2434/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4002468212434/cheddar-slice-country-cow",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4002468212434",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1662,7 +1635,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/272/000/8102/front_fr.50.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4002720008102/bellacrema-la-crema-melitta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4002720008102",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1715,7 +1688,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/272/000/8300/front_de.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4002720008300/bella-crema-espresso-kaffee-melitta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4002720008300",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1760,7 +1733,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/297/118/6208/front_es.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4002971186208/montar-backe-ehrmann",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4002971186208",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1811,7 +1784,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/860/100/1002/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4008601001002/sun-rice-rubezahl-schokoladen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4008601001002",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1853,7 +1826,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/400/990/039/0309/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4009900390309/extra-professional-strong-mint",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4009900390309",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1939,7 +1912,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/180/000/2077/front_da.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4011800002077/havre-banan-corny",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4011800002077",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -1983,7 +1956,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/180/056/3516/front_en.31.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4011800563516/corny-big",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4011800563516",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2076,7 +2049,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/440/090/1191/front_en.320.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4014400901191/merci-storck",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4014400901191",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -2159,7 +2132,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/624/103/1211/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4016241031211/doftljus-yoghurt-naturell-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4016241031211",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2204,7 +2177,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/624/105/0304/front_en.49.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4016241050304/superkramig-grekisk-yoghurt-naturell-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4016241050304",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2249,7 +2222,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/624/105/0311/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4016241050311/grekisk-yoghurt-low-fat-jordgubb-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4016241050311",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2294,7 +2267,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/624/105/0328/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4016241050328/grekisk-yoghurt-citron-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4016241050328",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2340,7 +2313,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/624/105/0588/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4016241050588/grekisk-yoghurt-citron-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4016241050588",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2378,7 +2351,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/624/105/1035/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4016241051035/mild-kvarg-vanilj-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4016241051035",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2459,7 +2432,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/834/215/5773/front_fr.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4018342155773/aladin-sosis-350-gr",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4018342155773",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2503,7 +2476,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/834/219/5267/front_fr.19.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4018342195267/aladimlis-simple-aladin",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4018342195267",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2539,7 +2512,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/401/834/219/5274/front_fr.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4018342195274/biberbi-dilim-aladin",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4018342195274",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2575,7 +2548,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/4027400149807/ketchup-hela",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4027400149807",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2611,7 +2584,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/4027400149869/original-spice-ketchup-hela",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4027400149869",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2647,7 +2620,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/406/230/004/7457/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4062300047457/hipp-pasta-bolognese",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4062300047457",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2689,7 +2662,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/410/029/002/4758/front_en.29.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4100290024758/caramel-macchiato-starbucks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4100290024758",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -2725,7 +2698,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/410/029/002/5083/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4100290025083/iskaffe-latte-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4100290025083",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -2761,7 +2734,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/410/029/005/6308/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4100290056308/caffe-latte-starbucks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4100290056308",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -2851,7 +2824,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/4100290056421/starbucks-caramel-macchiato-bottle-250ml",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4100290056421",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -2887,7 +2860,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/410/029/005/6438/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4100290056438/cappuccino-chilled-coffee-starbucks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4100290056438",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -2930,7 +2903,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/410/218/005/6962/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4102180056962/proteintoast-nordic-wellness",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4102180056962",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -2966,7 +2939,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/4740173001775/vannamei-rakor-marwi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4740173001775",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -3056,7 +3029,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/477/019/016/1046/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/4770190161046/surimi-vivi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4770190161046",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -3137,7 +3110,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/4770513127216/kycklingbrost-file-top-choice-poultry",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4770513127216",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -3231,7 +3204,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/500/011/263/7939/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5000112637939/coca-cola-zero-sugar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5000112637939",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -3300,7 +3273,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/500/015/952/8481/front_nb.72.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5000159528481/dark-chocolate-nuts-sea-salt-be-kind",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5000159528481",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -3389,7 +3362,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/500/018/432/1064/front_en.60.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5000184321064/majoneesi-hellmann-s",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5000184321064",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -3398,16 +3371,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Hellman's",
         "packageText": "400 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957974",
-        "name": "Majonnäs",
-        "brand": "Hellman's",
-        "packageText": "400 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -3447,7 +3411,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/500/018/936/3069/front_en.119.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5000189363069/after-eight-nestle",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5000189363069",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -3542,7 +3506,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/500/029/514/6099/front_en.40.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5000295146099/sliced-mature-cheddar-cathedral-city",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5000295146099",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -3582,7 +3546,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/500/039/605/5979/front_de.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5000396055979/tartlets-choco-mcvities",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5000396055979",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -3663,7 +3627,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5010478247819/banana-skids-swizzels",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5010478247819",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -3715,7 +3679,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/501/115/763/0274/front_fr.46.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5011157630274/riz-basmati-tilda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5011157630274",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -3765,7 +3729,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/501/115/773/0271/front_fr.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5011157730271/riz-thai-jasmine-rice-1-kg-tilda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5011157730271",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -3819,7 +3783,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/501/115/788/8101/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5011157888101/pure-basmati-rice-tilda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5011157888101",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -3869,7 +3833,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/501/115/788/8163/front_en.42.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5011157888163/lime-coriander-basmati-rice-tilda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5011157888163",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -3915,7 +3879,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/501/115/788/8224/front_en.45.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5011157888224/coconut-chilli-lemongrass-tilda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5011157888224",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -3967,7 +3931,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/501/115/799/5403/front_en.34.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5011157995403/fragrant-jasmine-rice-tilda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5011157995403",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -4013,7 +3977,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/501/147/610/3053/front_en.57.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5011476103053/nesquik-frokostblanding-375g-nestle-nestle-norge",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5011476103053",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -4099,7 +4063,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/503/886/213/0400/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5038862130400/innocent-orange-juice",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5038862130400",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -4108,7 +4072,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Innocent",
         "packageText": "1.5 L",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -4146,7 +4110,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/505/678/490/7474/front_sv.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5056784907474/monster-energy-lando-norris-zero-sugar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5056784907474",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -4194,7 +4158,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/505/931/902/3229/front_en.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5059319023229/frosties-kellogg-s",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5059319023229",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -4280,7 +4244,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/506/010/733/0382/front_nl.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5060107330382/peaches-bananas-ella-s-kitchen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5060107330382",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -4328,7 +4292,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/506/016/669/4777/front_sv.34.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5060166694777/monster-energy",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5060166694777",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -4420,7 +4384,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/506/050/350/0686/front_nl.46.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5060503500686/organic-blueberries-apples-bananas-with-vanilla-ella-s-kitchen-organic",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5060503500686",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -4460,7 +4424,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/506/050/350/2307/front_nl.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5060503502307/ella-s-kitchen-7-m-peach-banana-maize-sticks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5060503502307",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -4500,7 +4464,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/520/217/808/3570/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5202178083570/goat-milk-olympus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5202178083570",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -4536,7 +4500,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5202277806131/feta-kassos",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5202277806131",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -4572,7 +4536,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/528/100/355/1019/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5281003551019/tahini-pate-de-sesame-100-al-rabih-produit-par-sonaco-s-a-r-l-liban",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5281003551019",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -4616,7 +4580,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/539/151/514/0448/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5391515140448/strawberry-yogurt",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5391515140448",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -4661,7 +4625,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/012/600/6353/front_en.112.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5410126006353/lotus-biscoff-speculoos-fourre-creme-saveur-chocolat-150g",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410126006353",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -4715,7 +4679,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/012/600/6360/front_en.211.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5410126006360/lotus-biscoff-speculoos-fourre-creme-speculoos-150g",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410126006360",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -4767,7 +4731,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/012/600/6377/front_en.95.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5410126006377/lotus-biscoff-speculoos-fourre-creme-saveur-vanille-150g",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410126006377",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -4821,7 +4785,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/012/680/6090/front_en.71.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5410126806090/the-original-speculoos-biscoff",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410126806090",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -4857,7 +4821,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/014/641/3643/front_en.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5410146413643/danonino",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410146413643",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -4893,7 +4857,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/067/300/5847/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5410673005847/ben-s-original-langkornigt",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410673005847",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -4942,7 +4906,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/067/300/5861/front_fi.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5410673005861/pitkajyvainen-riisi-keitetty-mars-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410673005861",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -4989,7 +4953,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/067/300/6004/front_en.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5410673006004/uncle-ben-s-fullkornsris-boil-in-bag-500g-mars-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410673006004",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5039,7 +5003,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/067/300/6325/front_sv.25.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5410673006325/basmatiris-boil-in-bag-ben-s-original",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410673006325",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5087,7 +5051,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/067/300/6349/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5410673006349/basmatiriisi-ben-s-original",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410673006349",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5123,7 +5087,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/067/300/6363/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5410673006363/jasmiiniriisi-ben-s-originals",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410673006363",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5182,7 +5146,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/118/811/0675/front_en.55.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5411188110675/mild-creamy-nature-alpro",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5411188110675",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5240,7 +5204,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/118/811/0743/front_sv.49.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5411188110743/plantgurt-blueberry-soya-alpro",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5411188110743",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5305,7 +5269,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/118/811/0835/front_en.669.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5411188110835/alpro-mandeldrink-original-1l",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5411188110835",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5408,7 +5372,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/541/118/812/1237/front_en.67.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5411188121237/passionfruit-protein-alpro",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5411188121237",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5454,7 +5418,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/542/002/410/2019/front_sv.54.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5420024102019/mozzarella-tine-sa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5420024102019",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5490,7 +5454,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5420024199095/mozzarella-michelangelo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5420024199095",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5539,7 +5503,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/542/002/463/0031/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5420024630031/michelangelo-mozzarella-bio-ecu",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5420024630031",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5580,7 +5544,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/570/109/006/8493/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5701090068493/stjarn-mix-favorit-haribo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5701090068493",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -5668,7 +5632,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/570/163/814/5129/front_tr.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5701638145129/piknik-ciftlik-peyniri-sutdiyari",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5701638145129",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5712,7 +5676,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/570/402/503/6789/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5704025036789/gouda-emborg",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5704025036789",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5748,7 +5712,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5704025036796/edam-emborg",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5704025036796",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5784,7 +5748,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5705250256317/kyckling-minikorv-robert",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5705250256317",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -5829,7 +5793,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/570/719/603/1836/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5707196031836/original-bacon-skivor-tulip",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5707196031836",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -5838,16 +5802,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Tulip",
         "packageText": "100-125 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957944",
-        "name": "Bacon",
-        "brand": "Tulip",
-        "packageText": "100-125 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -5879,7 +5834,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/570/719/617/1938/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5707196171938/kalkon-bacon-tulip",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5707196171938",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -5888,16 +5843,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Tulip",
         "packageText": "100-125 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957944",
-        "name": "Bacon",
-        "brand": "Tulip",
-        "packageText": "100-125 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -5936,7 +5882,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/570/719/625/1012/front_de.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5707196251012/chicken-bacon-tulip",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5707196251012",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -5945,16 +5891,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Tulip",
         "packageText": "100-125 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957944",
-        "name": "Bacon",
-        "brand": "Tulip",
-        "packageText": "100-125 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -5981,7 +5918,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/570/835/601/0265/front_en.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5708356010265/gaudina-ready-chef",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5708356010265",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6017,7 +5954,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5710326016641/iskaffe-monday-wiener",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5710326016641",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6053,7 +5990,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/032/601/7792/front_it.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5710326017792/wiener-iskaffe-laktosfri-monday",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5710326017792",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -6089,7 +6026,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/032/602/2819/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5710326022819/iskaffe-salted-caramel-coop",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5710326022819",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -6135,7 +6072,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/302/3620/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953023620/pucko-chokladmjolk",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953023620",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6179,7 +6116,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/303/0895/front_en.26.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953030895/apetina-herbs-spices-arla-foods-amba",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953030895",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6225,7 +6162,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/304/1914/front_sv.25.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953041914/yalla-original-drickyoghurt-mango-banan-apelsin-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953041914",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6261,7 +6198,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/304/2003/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953042003/yalla-drickyoghurt-jordgubb-laktosfri-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953042003",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6316,7 +6253,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/304/2034/front_fi.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953042034/jogurttismoothie-vadelma-yalla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953042034",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6357,7 +6294,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/305/6710/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953056710/original-white-cheese-apetina",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953056710",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6398,7 +6335,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/305/6741/front_en.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953056741/original-white-cheese-arla-apetina",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953056741",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6444,7 +6381,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/307/3397/front_en.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953073397/potatis-purjolokssoppa-kelda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953073397",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6486,7 +6423,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/308/1699/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953081699/paneer-cheese-original-arla-foods",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953081699",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6522,7 +6459,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/312/4860/front_de.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953124860/starbuck-tripleshot-espresso-starbucks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953124860",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -6558,7 +6495,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953156304/graddis-mild-och-kramig-graddost-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953156304",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6594,7 +6531,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953156311/gouda-mild-och-len-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953156311",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6635,7 +6572,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/315/6328/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953156328/port-salut-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953156328",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6671,7 +6608,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/316/9854/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953169854/choklad-mjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953169854",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6719,7 +6656,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/318/0613/front_en.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953180613/grekisk-matyoghurt-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953180613",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6755,7 +6692,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/318/6110/front_da.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953186110/pastasas-mild-ost-kelda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953186110",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6791,7 +6728,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953191923/texmex-riven-ost-jalapeno-chili-arla-koket",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953191923",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6838,7 +6775,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/319/4054/front_en.28.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953194054/protein-drink-with-coffee-starbucks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953194054",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -6874,7 +6811,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953194771/fyra-ostar-kelda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953194771",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6910,7 +6847,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953194801/pastasas-tomat-creme-fraiche-kelda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953194801",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6946,7 +6883,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/319/5907/front_tr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953195907/arla-cultura-profibi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953195907",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -6982,7 +6919,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953195914/profibi-jordgubb-fil-med-fibrer-laktosfri-arla-cultura",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953195914",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7018,7 +6955,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953196409/pasta-sauce-mushroom-and-cheese-kelda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953196409",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7056,7 +6993,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/571/195/320/4234/front_en.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953204234/protein-chocolate-flavoured-shake-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953204234",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7092,7 +7029,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5711953207914/havarti-ost-26-fett-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5711953207914",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7110,7 +7047,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Castello",
         "packageText": "450-500 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -7141,7 +7078,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/574/030/120/3124/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5740301203124/torskrygg-royal-greenland",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5740301203124",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -7308,7 +7245,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/000/005/754/0597/front_da.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/57540597/anthon-berg-marzipan-bar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=57540597",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -7317,16 +7254,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Anthon Berg",
         "packageText": "33-40 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957968",
-        "name": "Marsipanbröd",
-        "brand": "Anthon Berg",
-        "packageText": "33-40 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -7361,7 +7289,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/576/046/664/2019/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5760466642019/original-white-cheese-arla-apetina",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5760466642019",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7397,7 +7325,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5760466805162/mellanmjolk-lang-hallbarhet-laktosfri-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5760466805162",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7440,7 +7368,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/576/046/687/8210/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5760466878210/gron-sparrissoppa-kelda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5760466878210",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7478,7 +7406,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/576/046/698/3570/front_en.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5760466983570/port-salut-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5760466983570",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7524,7 +7452,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/577/454/013/7506/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5774540137506/dark-70-anthon-berg",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5774540137506",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -7619,7 +7547,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/590/012/007/0059/front_en.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900120070059/twarog-t%C5%82usty",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900120070059",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7668,7 +7596,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/590/064/303/4965/front_en.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900643034965/activia-yoghurt-jordbaer-4x125g-danone",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900643034965",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7715,7 +7643,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/590/064/303/5023/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900643035023/activia-yoghurt-blabaer-4x125g-danone",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900643035023",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7751,7 +7679,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/590/064/905/8354/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900649058354/cappuccino-gold-classic-mokate",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900649058354",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7787,7 +7715,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/590/064/905/8361/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900649058361/cappucino-gold-chocolate-mokate",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900649058361",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7827,7 +7755,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/590/064/908/3097/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900649083097/matcha-latte-mokate",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900649083097",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -7863,7 +7791,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900783010904/chili-sauce-heinz",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900783010904",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7899,7 +7827,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900783010928/chili-sauce-hot-heinz",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900783010928",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7940,7 +7868,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/590/082/000/5733/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900820005733/twarog-po%C5%82tusty-mlekpol-mazurski-smak",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900820005733",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -7981,7 +7909,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/590/082/000/5764/front_en.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900820005764/full-fat-curd-cheese-mlekpol",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900820005764",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8017,7 +7945,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/590/082/001/6401/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900820016401/steamed-smoked-cheese-mlekpol",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900820016401",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8065,7 +7993,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/590/095/131/1505/front_en.198.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5900951311505/snickers",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900951311505",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8153,7 +8081,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/590/248/713/2869/front_en.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/5902487132869/southern-fried-chicken-fillets-kitchen-joy",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5902487132869",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8194,7 +8122,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/600/650/700/8840/front_en.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6006507008840/korean-style-bbq-rub-cape-herb-spice",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6006507008840",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -8288,7 +8216,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/002/4841/front_fi.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408430024841/kreikkalainen-jogurtti-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408430024841",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8332,7 +8260,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/002/5237/front_fi.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408430025237/kreikkalainen-jogurtti-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408430025237",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8389,7 +8317,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/010/2068/front_fi.64.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408430102068/oddlygood-barista-kaurajuoma-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408430102068",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -8398,7 +8326,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Oddlygood",
         "packageText": "1000 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -8441,7 +8369,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/010/2358/front_en.31.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408430102358/oddlygood-barista-vanilla-oddly-good",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408430102358",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -8492,7 +8420,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/010/2365/front_fi.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408430102365/oddlygood-barista-salted-caramel-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408430102365",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -8532,7 +8460,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/040/7675/front_en.25.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408430407675/profeel-proteiinivanukas-proteinpudding-suklaa-choklad-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408430407675",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8627,7 +8555,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/040/8221/front_fi.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408430408221/kreikkalainen-jogurtti-mango-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408430408221",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8663,7 +8591,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/200/0706/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432000706/yoghurt-passionsfrukt-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432000706",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8699,7 +8627,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432000928/banan-yoghurt-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432000928",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8745,7 +8673,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/200/1680/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432001680/smor-och-raps-gardsgoda-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432001680",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8790,7 +8718,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/200/1697/front_sv.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432001697/gardsgoda-smor-raps-mellan-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432001697",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8826,7 +8754,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432001703/gardsgods-smor-raps-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432001703",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8874,7 +8802,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/200/1710/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432001710/gardsgoda-laktosfri-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432001710",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8910,7 +8838,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432002649/pasta-sas-smakrik-ost-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432002649",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8946,7 +8874,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/200/2922/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432002922/grekisk-yogurt-6-valii",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432002922",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -8982,7 +8910,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432002960/lime-cheesecake-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432002960",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9028,7 +8956,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/206/1233/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432061233/smor-normalsaltat-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432061233",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -9082,7 +9010,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/206/1240/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432061240/smor-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432061240",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -9127,7 +9055,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/206/1295/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432061295/laktosfri-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432061295",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9170,7 +9098,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/208/6212/front_sv.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432086212/laktosfri-mellanmjolk-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432086212",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9215,7 +9143,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/208/6564/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432086564/mjolk-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432086564",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9270,7 +9198,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/208/6816/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432086816/yoghurt-jordgubb-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432086816",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9314,7 +9242,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/208/6878/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432086878/yogurt-skogsbar-0-1-fett-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432086878",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9363,7 +9291,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/208/7851/front_sv.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432087851/valio-eila-laktosfri-mellanmjolkdryck",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432087851",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9416,7 +9344,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/208/7868/front_sv.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432087868/standardmjolk-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432087868",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9478,7 +9406,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/208/8933/front_sv.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432088933/valio-vanilj-original-slat",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432088933",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9571,7 +9499,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/208/8971/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432088971/valio-vanilj-sommarbar-med-fruktbitar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432088971",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9616,7 +9544,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432096006/kefir-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432096006",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9652,7 +9580,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432096013/kefir-hallon-laktosfri-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432096013",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9703,7 +9631,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/210/2462/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432102462/latt-naturell-yoghurt-0-4-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432102462",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9739,7 +9667,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/210/2486/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432102486/yoghurt-mango-vanilj-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432102486",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9785,7 +9713,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/210/2516/front_en.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432102516/yoghurt-naturell-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432102516",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9831,7 +9759,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/210/2523/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432102523/vanilj-yoghurt-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432102523",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9867,7 +9795,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/210/2585/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432102585/yoghurt-naturell-4-fett-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432102585",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9903,7 +9831,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/210/6194/front_en.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432106194/yogurth-banan-vanilj-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432106194",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -9960,7 +9888,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/210/6569/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432106569/vanilj-hallon-slat-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432106569",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10011,7 +9939,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/220/0946/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432200946/valio-eila-slat-yoghurt-paron-vanilj",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432200946",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10047,7 +9975,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432202544/lattmjolk-laktosfri-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432202544",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -10083,7 +10011,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432202605/vanilj-melon-slat-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432202605",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10119,7 +10047,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/640/843/220/3428/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6408432203428/gardsgoda-normalsaltat-valio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432203428",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10155,7 +10083,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/6411200005063/white-chocolate-strawberry-elovena",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6411200005063",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10201,7 +10129,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/641/645/303/8288/front_en.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6416453038288/tutti-frutti-original-fazen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6416453038288",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10281,7 +10209,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/641/645/305/7104/front_fi.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6416453057104/dumle-summer-mix-fazer",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6416453057104",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10317,7 +10245,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/6430081490584/oat-drink-barista-oddly-good",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6430081490584",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -10370,7 +10298,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/643/008/149/1291/front_fi.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6430081491291/nutty-vanilla-barista-oat-drink-oddly-good",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6430081491291",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -10423,7 +10351,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/643/820/701/1811/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/6438207011811/smorgas-vaxtbaserat-carlshamn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6438207011811",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10471,7 +10399,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/703/771/002/0069/front_en.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7037710020069/smash-salt-karamell-orkla-confectionery-snacks-norge",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7037710020069",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -10552,7 +10480,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7038010022449/original-cheese-norvegia",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7038010022449",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10644,7 +10572,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/703/801/002/2630/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7038010022630/graddost-tine",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7038010022630",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10684,7 +10612,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7038010070839/rislunsj-jordebaer-tine",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7038010070839",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -10778,7 +10706,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/703/801/007/0846/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7038010070846/rislunsj-tine",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7038010070846",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10814,7 +10742,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7038010071997/yoghurt-chocklad-med-chokladcrips-tine",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7038010071997",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10850,7 +10778,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300200054005/kotlett-scan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300200054005",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -10886,7 +10814,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/020/063/0001/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300200630001/notspett-svartpeppar-scan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300200630001",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -10967,7 +10895,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300200730008/grillspett-mild-chili-scan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300200730008",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -11055,7 +10983,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/020/671/8000/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300206718000/bacon-hkscan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300206718000",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -11214,7 +11142,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/020/678/7006/front_sv.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300206787006/svensk-falukorv-scan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300206787006",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -11223,16 +11151,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Scan",
         "packageText": "800 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957913",
-        "name": "Falukorv",
-        "brand": "Scan",
-        "packageText": "800 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -11264,7 +11183,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/020/707/1005/front_en.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300207071005/klassisk-grillkorv-scan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300207071005",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11462,16 +11381,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Scan",
         "packageText": "270-640 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958009",
-        "name": "Grillkorv",
-        "brand": "Scan",
-        "packageText": "270-640 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -11498,7 +11408,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/029/873/5008/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300298735008/ostschnitzlar-scan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300298735008",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11548,7 +11458,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/029/891/9002/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300298919002/scan-hamburgare-original",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300298919002",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11584,7 +11494,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/032/127/5006/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300321275006/kycklingkebab-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300321275006",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11620,7 +11530,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300321279004/kycklingpinnar-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300321279004",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11656,7 +11566,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300321281007/crispy-chicken-burgers-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300321281007",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11707,7 +11617,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/032/137/2002/front_sv.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300321372002/max-kycklingnuggets",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300321372002",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11743,7 +11653,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300321373009/crispy-kycklingburgare-max",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300321373009",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11779,7 +11689,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300321375003/hot-wings-chicken-max",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300321375003",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11815,7 +11725,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300322511004/innerfile-kyckling-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300322511004",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11851,7 +11761,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/032/254/4002/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300322544002/frozen-chicken-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300322544002",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -11902,7 +11812,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/032/254/7003/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300322547003/larfile-kyckling-morad-djupfryst-kronfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300322547003",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11947,7 +11857,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/032/318/5006/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300323185006/kycklingnuggets-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300323185006",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -11983,7 +11893,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300324013001/atklar-kyckling-caesar-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300324013001",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12019,7 +11929,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/032/401/4008/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300324014008/atklar-kyckling-soltorkade-tomater-kronfagel-ab",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300324014008",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12055,7 +11965,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300324023000/atklar-kyckling-caesar-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300324023000",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12091,7 +12001,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300324024007/atklar-kyckling-bbq-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300324024007",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12127,7 +12037,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300324025004/atklar-kyckling-classic-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300324025004",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12163,7 +12073,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/032/755/2002/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300327552002/kyckling-kottbullar-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300327552002",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12208,7 +12118,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/032/760/2004/front_en.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300327602004/kyckling-burgare-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300327602004",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12244,7 +12154,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300327668000/kycklingfars-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300327668000",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12280,7 +12190,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300327772004/kycklingmage-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300327772004",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12316,7 +12226,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300327773001/chicken-hearts-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300327773001",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12352,7 +12262,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300328521007/minutstrimlor-kronfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300328521007",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12370,16 +12280,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Kronfågel. Ursprung Sverige",
         "packageText": "550-600 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958006",
-        "name": "Färsk Minutfilé",
-        "brand": "Kronfågel. Ursprung Sverige",
-        "packageText": "550-600 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -12406,7 +12307,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300328527009/kycklingminutfile-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300328527009",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12424,16 +12325,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Kronfågel. Ursprung Sverige",
         "packageText": "550-600 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958006",
-        "name": "Färsk Minutfilé",
-        "brand": "Kronfågel. Ursprung Sverige",
-        "packageText": "550-600 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -12460,7 +12352,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300328530009/minut-filer-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300328530009",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -12532,16 +12424,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Kronfågel. Ursprung Sverige",
         "packageText": "550-600 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958006",
-        "name": "Färsk Minutfilé",
-        "brand": "Kronfågel. Ursprung Sverige",
-        "packageText": "550-600 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -12568,7 +12451,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300328531006/minutstrimlor-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300328531006",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12586,16 +12469,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Kronfågel. Ursprung Sverige",
         "packageText": "550-600 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958006",
-        "name": "Färsk Minutfilé",
-        "brand": "Kronfågel. Ursprung Sverige",
-        "packageText": "550-600 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -12622,7 +12496,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300328590003/sma-fina-innerfileer-finputsad-kycklinginnerfile-kronfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300328590003",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12665,7 +12539,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/040/012/2689/front_nb.70.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300400122689/sandwich-cheese-chives-wasa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300400122689",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12755,7 +12629,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/040/024/5005/front_sv.38.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300400245005/frukost-wasa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300400245005",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12799,7 +12673,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/730/040/024/8204/front_nb.26.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7300400248204/frukost-knacke-barilla-norge",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300400248204",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12841,7 +12715,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/005/000/1975/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310050001975/lofbergs-jubileum-latt-morkrost",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310050001975",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -12868,16 +12742,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Löfbergs",
         "packageText": "450 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957987",
-        "name": "Kaffe",
-        "brand": "Löfbergs",
-        "packageText": "450 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -12904,7 +12769,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310050005072/creamy-cookie-espresso-lofbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310050005072",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -12940,7 +12805,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/005/000/5096/front_da.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310050005096/ice-cappuccino-vanilla-lofbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310050005096",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -12981,7 +12846,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/005/000/5171/front_fr.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310050005171/ice-latte-macchiato-lofbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310050005171",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13083,7 +12948,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/005/000/5188/front_en.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310050005188/ice-espresso-milk-lofbergs-lila-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310050005188",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -13129,7 +12994,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/007/000/1849/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310070001849/wasser-ramlosa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310070001849",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -13138,16 +13003,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Ramlösa",
         "packageText": "150 cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958012",
-        "name": "Kolsyrat vatten",
-        "brand": "Ramlösa",
-        "packageText": "150 cl",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -13186,7 +13042,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/007/012/4906/front_sv.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310070124906/pepsi-max-carlsberg",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310070124906",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -13274,7 +13130,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/015/5539/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090155539/lattdryck-bjornbar-och-hallon-bob",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090155539",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13337,7 +13193,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "BOB",
         "packageText": "20cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -13373,7 +13229,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/016/5538/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090165538/citron-och-lime-lattdryck-bob",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090165538",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -13382,7 +13238,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "BOB",
         "packageText": "20cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -13417,7 +13273,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/020/6538/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090206538/vattenmelon-och-hallon-lattdryck-bob",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090206538",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -13426,7 +13282,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "BOB",
         "packageText": "20cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -13460,7 +13316,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/038/9163/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090389163/fun-light-mandarin-madness",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090389163",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13554,7 +13410,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/075/0697/front_en.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090750697/bruna-bonor-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090750697",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13649,7 +13505,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/075/5692/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090755692/risgrot-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090755692",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13689,7 +13545,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/076/1525/front_fi.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090761525/risifrutti-laktosfri",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090761525",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13729,7 +13585,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/077/1623/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090771623/risi-frutti-jordbaer",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090771623",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13771,7 +13627,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/077/2620/front_sv.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090772620/risifrutti-hallon-risi-fruitti",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090772620",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13812,7 +13668,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/077/2927/front_fi.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090772927/risi-frutti-xl-vadelma-orkla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090772927",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13853,7 +13709,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/077/6628/front_sv.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090776628/risifrutti-blabar-orkla-foods",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090776628",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13897,7 +13753,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/077/8714/front_sv.19.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090778714/risifrutti-jordgubb-utan-tillsatt-socker-risi-frutti",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090778714",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13938,7 +13794,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/009/079/2628/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310090792628/risifrutti-skogsbar-orkla-foods",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310090792628",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -13976,7 +13832,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/010/069/0395/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310100690395/gr%C3%B8t-frukt-6mnd-120g-semper",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310100690395",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14012,7 +13868,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310100697813/grot-puuro-apple-banana-cinnamon-semper",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310100697813",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14048,7 +13904,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310100721082/little-kids-grot-apple-banana-raspberry-semper",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310100721082",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14084,7 +13940,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310100970633/apple-banana-and-berry-semper",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310100970633",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14122,7 +13978,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/0225/front_sv.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130000225/fullkorns-pasta-spaghetti-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130000225",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14160,7 +14016,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/2885/front_sv.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130002885/korngryn-go-green",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130002885",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14205,7 +14061,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3530/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130003530/snabb-makaroner-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003530",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -14254,7 +14110,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3547/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130003547/ideal-makaroner-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003547",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -14309,7 +14165,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3554/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130003554/snabbmakaroner-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003554",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14351,7 +14207,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3561/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130003561/gammaldags-ideal-makaroner-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003561",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -14396,7 +14252,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3882/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130003882/fullkornspasta-penne-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003882",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14444,7 +14300,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3899/front_is.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130003899/fullkornspasta-fusilli-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003899",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14484,7 +14340,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3981/front_en.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130003981/makaroner-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003981",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -14527,7 +14383,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/6128/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130006128/fiberhavregryn-axa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130006128",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -14572,7 +14428,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130006234/bonpasta-fusilli-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130006234",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14621,7 +14477,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/6258/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130006258/fiberhavregryn-axa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130006258",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14657,7 +14513,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130007576/svensk-fusili-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130007576",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14693,7 +14549,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130007583/svensk-penne-lantmannen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130007583",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14733,7 +14589,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/9051/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130009051/linspasta-fusilli-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130009051",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14769,7 +14625,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130009532/fiberpasta-fusilli-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130009532",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14805,7 +14661,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/001/1344/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130011344/linspasta-penne-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130011344",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14841,7 +14697,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130012358/svensk-conchiglie-kungsorn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130012358",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14882,7 +14738,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/001/2402/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130012402/svensk-gemelli-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130012402",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14926,7 +14782,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/001/3409/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130013409/start-choc-go-bananas-lantmannen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130013409",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14962,7 +14818,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130013591/klippt-spaghetti-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130013591",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -14998,7 +14854,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130013669/extra-fylliga-havre-gryn-axa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130013669",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -15056,7 +14912,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/032/1085/front_sv.19.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130321085/havregryn-axa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130321085",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -15117,7 +14973,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/032/1122/front_sv.44.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130321122/havregryn-axa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130321122",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -15230,7 +15086,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/032/1184/front_sv.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130321184/axa-fiber-havregryn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130321184",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -15279,7 +15135,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/032/1238/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130321238/fiber-havregryn-gyllenhammar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130321238",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -15340,7 +15196,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/032/1283/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130321283/gyllenhamars-havregryn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130321283",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -15385,7 +15241,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130341021/puffat-ris-vargarda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130341021",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -15433,7 +15289,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/041/6170/front_en.26.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130416170/ideal-makaroner-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130416170",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -15474,7 +15330,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/041/7405/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130417405/spaghetti-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130417405",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -15574,7 +15430,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130418105/makaroner-fullkornspasta-kungsornen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130418105",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -15624,7 +15480,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/080/1709/front_fi.71.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310130801709/start-naturell-granola-lantmannen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130801709",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -15705,7 +15561,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310155600523/senap-grovstark-johnny-s",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310155600523",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -15741,7 +15597,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310155600554/stark-senap-vastervik",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310155600554",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -15781,7 +15637,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/015/560/0769/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310155600769/senap-grovstark-johnny-s",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310155600769",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -15821,7 +15677,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/015/560/1018/front_sv.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310155601018/vasterviks-senap-grov-kavli",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310155601018",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -15857,7 +15713,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310155803771/bbq-sauce-original-johnny-s",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310155803771",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -15946,7 +15802,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/015/600/0490/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310156000490/hultbergs-milda-senap",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310156000490",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -15990,7 +15846,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/000/1785/front_sv.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240001785/granola-kakao-och-hallon-pauluns",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240001785",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -16071,7 +15927,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240025231/chilisas-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240025231",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -16116,7 +15972,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240025279/felix-chilisas-osotad",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240025279",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -16152,7 +16008,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/003/8002/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240038002/tomatpure-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240038002",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -16194,7 +16050,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/006/0010/front_sv.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240060010/tomatketchup-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240060010",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -16249,7 +16105,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/006/0058/front_sv.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240060058/tomatketchup-osotad-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240060058",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -16302,7 +16158,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/006/0072/front_sv.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240060072/felix-tomatketchup-original",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240060072",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -16407,7 +16263,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/006/0157/front_en.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240060157/tomatoketchup-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240060157",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -16452,7 +16308,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/006/0478/front_sv.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240060478/tomatketchup-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240060478",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -16503,7 +16359,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/006/0638/front_sv.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240060638/tomatketchup-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240060638",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -16548,7 +16404,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/006/6098/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240066098/rotmos-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240066098",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -16595,7 +16451,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/006/6128/front_sv.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240066128/felix-klassiskt-potatismos",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240066128",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -16642,7 +16498,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/006/6166/front_sv.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240066166/klassiskt-potatismus-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240066166",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -16688,7 +16544,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/006/6333/front_nb.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240066333/felix-klassisk-potetmos",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240066333",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -16742,7 +16598,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/007/2341/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240072341/anamma-stenugnsbakad-panpizza-vegovesuvio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240072341",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -16778,7 +16634,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/007/3836/front_en.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240073836/potatis-kroketter-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240073836",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -16814,7 +16670,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240075151/ost-broccolisoppa-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240075151",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -16853,7 +16709,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/007/6806/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240076806/penne-con-mozzarella-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240076806",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -16944,7 +16800,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/007/8862/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240078862/ost-skinkpaj-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240078862",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -16998,7 +16854,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/007/9555/front_sv.43.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240079555/felix-originalet-ost-skinkpaj",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240079555",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -17034,7 +16890,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240079593/kyckling-och-broccolipaj-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240079593",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -17070,7 +16926,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/012/0189/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310240120189/vegoschnitzel-anamma",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240120189",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -17151,7 +17007,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/035/010/6837/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350106837/licorice-salt-5g-gott-blandat",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350106837",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -17160,16 +17016,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Malaco, Ahlgrens",
         "packageText": "130-210 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957914",
-        "name": "Gott & Blandat, Ahlgrens bilar",
-        "brand": "Malaco, Ahlgrens",
-        "packageText": "130-210 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -17207,7 +17054,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/035/010/6844/front_sv.40.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350106844/gott-blandat-original-malaco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350106844",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -17270,16 +17117,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Malaco, Ahlgrens",
         "packageText": "130-210 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957914",
-        "name": "Gott & Blandat, Ahlgrens bilar",
-        "brand": "Malaco, Ahlgrens",
-        "packageText": "130-210 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -17314,7 +17152,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/035/010/9906/front_en.55.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350109906/ahlgrens-biler-original-160g-cloetta-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350109906",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -17323,16 +17161,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Malaco, Ahlgrens",
         "packageText": "130-210 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957914",
-        "name": "Gott & Blandat, Ahlgrens bilar",
-        "brand": "Malaco, Ahlgrens",
-        "packageText": "130-210 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -17365,7 +17194,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/035/011/2050/front_sv.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350112050/ahlgrens-bilar-sursockrade",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350112050",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -17374,16 +17203,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Malaco, Ahlgrens",
         "packageText": "130-210 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957914",
-        "name": "Gott & Blandat, Ahlgrens bilar",
-        "brand": "Malaco, Ahlgrens",
-        "packageText": "130-210 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -17410,7 +17230,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/035/011/4153/front_de.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350114153/bilar-sveriges-mest-kopta-bil-cloetta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350114153",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -17419,16 +17239,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Malaco, Ahlgrens",
         "packageText": "130-210 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957914",
-        "name": "Gott & Blandat, Ahlgrens bilar",
-        "brand": "Malaco, Ahlgrens",
-        "packageText": "130-210 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -17460,7 +17271,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/035/011/6249/front_en.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350116249/gott-blandat-supersur-cloetta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350116249",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -17469,16 +17280,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Malaco, Ahlgrens",
         "packageText": "130-210 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957914",
-        "name": "Gott & Blandat, Ahlgrens bilar",
-        "brand": "Malaco, Ahlgrens",
-        "packageText": "130-210 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -17511,7 +17313,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/035/011/6447/front_sv.26.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350116447/ahlgrens-bilar-fruktkombi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350116447",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -17520,16 +17322,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Malaco, Ahlgrens",
         "packageText": "130-210 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957914",
-        "name": "Gott & Blandat, Ahlgrens bilar",
-        "brand": "Malaco, Ahlgrens",
-        "packageText": "130-210 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -17579,7 +17372,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/035/011/8342/front_en.47.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350118342/kexchoklad-cloetta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350118342",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -17660,7 +17453,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350136254/lakritsdack-ahlgrens-bilar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350136254",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -17669,16 +17462,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Malaco, Ahlgrens",
         "packageText": "130-210 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957914",
-        "name": "Gott & Blandat, Ahlgrens bilar",
-        "brand": "Malaco, Ahlgrens",
-        "packageText": "130-210 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -17714,7 +17498,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/035/013/6353/front_nb.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350136353/ahlgrens-bilar-syrlig-frukt-cloetta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350136353",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -17723,16 +17507,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Malaco, Ahlgrens",
         "packageText": "130-210 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957914",
-        "name": "Gott & Blandat, Ahlgrens bilar",
-        "brand": "Malaco, Ahlgrens",
-        "packageText": "130-210 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -17759,7 +17534,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350136698/gott-och-blandat-juicy-giants-gott-blandat",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350136698",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -17768,16 +17543,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Malaco, Ahlgrens",
         "packageText": "130-210 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957914",
-        "name": "Gott & Blandat, Ahlgrens bilar",
-        "brand": "Malaco, Ahlgrens",
-        "packageText": "130-210 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -17810,7 +17576,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350136902/djungelvral-original-malaco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350136902",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -17891,7 +17657,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350504657/polly-banana-split-cloetta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350504657",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -17927,7 +17693,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310350504947/ahlgrens-bilar-x-trocadero-cloetta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310350504947",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -17936,16 +17702,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Malaco, Ahlgrens",
         "packageText": "130-210 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957914",
-        "name": "Gott & Blandat, Ahlgrens bilar",
-        "brand": "Malaco, Ahlgrens",
-        "packageText": "130-210 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -17980,7 +17737,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/040/100/0060/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310401000060/loka-naturell",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310401000060",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -18070,7 +17827,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/040/100/0374/front_de.29.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310401000374/trocadero-spendrups",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310401000374",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -18079,16 +17836,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Trocadero, Loka crush, Champis",
         "packageText": "140-150 cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918750",
-        "name": "Läsk",
-        "brand": "Trocadero, Loka crush, Champis",
-        "packageText": "140-150 cl",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -18120,7 +17868,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/040/100/9551/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310401009551/mariestads",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310401009551",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -18211,7 +17959,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/040/101/4319/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310401014319/loka-crush-med-smak-av-paron",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310401014319",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -18220,16 +17968,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Trocadero, Loka crush, Champis",
         "packageText": "140-150 cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918750",
-        "name": "Läsk",
-        "brand": "Trocadero, Loka crush, Champis",
-        "packageText": "140-150 cl",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -18261,7 +18000,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310401014326/crush-hallon-loka",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310401014326",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -18270,16 +18009,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Trocadero, Loka crush, Champis",
         "packageText": "140-150 cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918750",
-        "name": "Läsk",
-        "brand": "Trocadero, Loka crush, Champis",
-        "packageText": "140-150 cl",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -18317,7 +18047,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/040/103/4584/front_en.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310401034584/trocadero-zero-sugar-spendrups",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310401034584",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -18326,16 +18056,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Trocadero, Loka crush, Champis",
         "packageText": "140-150 cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918750",
-        "name": "Läsk",
-        "brand": "Trocadero, Loka crush, Champis",
-        "packageText": "140-150 cl",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -18371,7 +18092,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/040/104/7447/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310401047447/champis-zero-spendrups",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310401047447",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -18380,16 +18101,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Trocadero, Loka crush, Champis",
         "packageText": "140-150 cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918750",
-        "name": "Läsk",
-        "brand": "Trocadero, Loka crush, Champis",
-        "packageText": "140-150 cl",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -18416,7 +18128,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/040/105/0324/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310401050324/loka-crush-smultron",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310401050324",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -18425,16 +18137,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Trocadero, Loka crush, Champis",
         "packageText": "140-150 cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918750",
-        "name": "Läsk",
-        "brand": "Trocadero, Loka crush, Champis",
-        "packageText": "140-150 cl",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -18461,7 +18164,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/040/105/6166/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310401056166/crush-skogsbar-loka",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310401056166",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -18470,16 +18173,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Trocadero, Loka crush, Champis",
         "packageText": "140-150 cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918750",
-        "name": "Läsk",
-        "brand": "Trocadero, Loka crush, Champis",
-        "packageText": "140-150 cl",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -18506,7 +18200,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310470661803/chocolate-flavor-original-pudding-cup-jello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310470661803",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -18596,7 +18290,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/050/000/0404/front_sv.56.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500000404/findus-dagens-pasta-alfredo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500000404",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -18639,7 +18333,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/050/004/0127/front_sv.19.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500040127/findus-dagens-oxjarpar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500040127",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -18727,7 +18421,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/050/008/8853/front_sv.25.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500088853/findus-dagens-pasta-fyra-ostar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500088853",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -18780,7 +18474,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/050/018/3572/front_sv.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500183572/linguine-bolognese-findus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500183572",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -18826,7 +18520,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/050/018/6702/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500186702/ostschnitzel-findus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500186702",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -18862,7 +18556,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/050/018/6764/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500186764/rostad-kyckling-findus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500186764",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -18898,7 +18592,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/050/018/6917/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500186917/dagens-kyckling-curry-findus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500186917",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -18934,7 +18628,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/050/018/7686/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500187686/pasta-carbonara-findus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500187686",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -18970,7 +18664,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500188362/teriyaki-chicken-noodles-veggies-findus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500188362",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19013,7 +18707,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/050/018/8454/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500188454/tasty-bites-findus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500188454",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -19103,7 +18797,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500189550/pasta-bacon-parmesansas-findus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500189550",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19139,7 +18833,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/050/019/0112/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500190112/tacofarssas-med-ris-findus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500190112",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19183,7 +18877,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/050/019/1621/front_en.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500191621/chicken-shop-southern-fried-chicken-findus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500191621",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19219,7 +18913,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500191652/2-crispy-chicken-santa-maria-chicken-shop",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500191652",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19255,7 +18949,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310500191683/2-chicken-burgers-findus-chicken-shop",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310500191683",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19301,7 +18995,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/052/000/7506/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310520007506/crackers-sproda-frukostkex-goteborgs-kex",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310520007506",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19343,7 +19037,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/052/001/1770/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310520011770/coco-crunches-olw",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310520011770",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -19352,7 +19046,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Olw",
         "packageText": "90g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -19379,7 +19073,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/052/002/2097/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310520022097/kex-sourcream-onion-goteborgs-kex",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310520022097",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19470,7 +19164,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310532106532/saltade-potatischips-estrella",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310532106532",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19506,7 +19200,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/053/211/5329/front_sv.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310532115329/ostbagar-estrella",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310532115329",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19542,7 +19236,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310532115442/ost-ringar-chili-cheese-estrella",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310532115442",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19594,7 +19288,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/053/215/0764/front_sv.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310532150764/salta-jordnotter-estrella",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310532150764",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -19675,7 +19369,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310532151211/notmix-klassisk-estrella",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310532151211",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19756,7 +19450,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310532304136/potatischips-lagrad-ost-havssalt-estrella",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310532304136",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19792,7 +19486,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310628005572/cheezy-chorre-sibylla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310628005572",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -19873,7 +19567,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310628008894/varmkorv-lithells",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310628008894",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -19968,7 +19662,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/000/5941/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310860005941/latt-lagom-original-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310860005941",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20014,7 +19708,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/000/7259/front_en.31.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310860007259/orange-red-grapefruit-god-morgon",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310860007259",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -20023,16 +19717,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "God Morgon",
         "packageText": "1 liter",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918754",
-        "name": "Juice",
-        "brand": "God Morgon",
-        "packageText": "1 liter",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -20075,7 +19760,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/000/7372/front_en.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310860007372/orange-godmorgon",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310860007372",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -20084,16 +19769,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "God Morgon",
         "packageText": "1 liter",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918754",
-        "name": "Juice",
-        "brand": "God Morgon",
-        "packageText": "1 liter",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -20120,7 +19796,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310860007396/red-grapefruit-godmorgon",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310860007396",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -20129,16 +19805,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "God Morgon",
         "packageText": "1 liter",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918754",
-        "name": "Juice",
-        "brand": "God Morgon",
-        "packageText": "1 liter",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -20174,7 +19841,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/056/1102/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310860561102/smor-laktosfti-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310860561102",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20219,7 +19886,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/056/1249/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310860561249/arla-kockserien-smorstav",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310860561249",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -20274,7 +19941,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/101/1514/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861011514/fjallfil-naturell",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861011514",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20316,7 +19983,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/101/1538/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861011538/fjallfil-blabar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861011538",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20352,7 +20019,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861011590/fjallfil-hallon-roda-vinbar-norrmejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861011590",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20388,7 +20055,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861011958/filmjolk-blabar-verum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861011958",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20426,7 +20093,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/101/2429/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861012429/lattfil-drottningbar-verum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861012429",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20464,7 +20131,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/101/2504/front_en.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861012504/fil-blabar-verum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861012504",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20500,7 +20167,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/101/3006/front_es.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861013006/verum-filmjolk-persika-papaya",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861013006",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20536,7 +20203,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861013129/filmjolk-jordgubb-kiwi-verum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861013129",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20572,7 +20239,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/101/4102/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861014102/kramig-yoghurt-kvarg-naturell-verum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861014102",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20608,7 +20275,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/101/4119/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861014119/vanilj-yoghurt-kvarg-verum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861014119",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20644,7 +20311,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861081005/vasterbottensost-33",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861081005",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20680,7 +20347,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/108/1487/front_es.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861081487/vasterbottensost-norrmejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861081487",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20728,7 +20395,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/168/0604/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310861680604/norrloumi-norrmejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310861680604",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20768,7 +20435,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/0194/front_en.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865000194/mjolk-3-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865000194",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20812,7 +20479,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/0361/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865000361/arla-mjolk",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865000361",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20854,7 +20521,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/1191/front_sv.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865001191/lattmjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865001191",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20896,7 +20563,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/1818/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865001818/mellanmjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865001818",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20942,7 +20609,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/1825/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865001825/arla-ko-mellanmjolk",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865001825",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -20978,7 +20645,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865005151/svenskt-smor-82-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865005151",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -21024,7 +20691,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/5168/front_sv.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865005168/svenskt-smor-normalsaltat-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865005168",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -21322,7 +20989,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/5250/front_sv.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865005250/smor-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865005250",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -21376,7 +21043,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/5267/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865005267/smor-ekologiskt-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865005267",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -21412,7 +21079,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865005304/smor-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865005304",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -21467,7 +21134,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/5496/front_sv.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865005496/svenskt-smor-osaltat-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865005496",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -21528,7 +21195,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/501/8465/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865018465/yoggi-original-2-jordgubb-smultron-yoggi-original-2-strawberries-wild-strawberries-european-strawberries-arla-yoggi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865018465",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -21588,7 +21255,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/501/8472/front_sv.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865018472/yoggi-original-skogsbar-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865018472",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -21648,7 +21315,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/501/8496/front_sv.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865018496/yoggi-original-2-samoa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865018496",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -21701,7 +21368,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/505/2681/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865052681/yoggi-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865052681",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -21737,7 +21404,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865058058/mellanmjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865058058",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -21784,7 +21451,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/506/2024/front_en.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865062024/mjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865062024",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -21839,7 +21506,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/506/6206/front_sv.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865066206/mild-yoghurt-naturel-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865066206",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -21898,7 +21565,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/507/0456/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865070456/yoggi-original-vanilj-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865070456",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -21945,7 +21612,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/507/1705/front_en.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865071705/ekologisk-mjolk-3-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865071705",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22000,7 +21667,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/507/1804/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865071804/ekologisk-mellanmjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865071804",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22044,7 +21711,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/507/4225/front_fr.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865074225/apple-god-morgon",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865074225",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -22053,16 +21720,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "God Morgon",
         "packageText": "1 liter",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918754",
-        "name": "Juice",
-        "brand": "God Morgon",
-        "packageText": "1 liter",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -22096,7 +21754,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/507/4522/front_en.34.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865074522/farsk-svensk-lantmjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865074522",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -22145,7 +21803,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/507/5192/front_fr.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865075192/laktosfri-eko-mellanmjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865075192",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22190,7 +21848,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/507/8353/front_en.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865078353/turkisk-yoghurt-arla-koket",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865078353",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22240,7 +21898,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/507/9978/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865079978/yoggi-laktosfri-samoa-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865079978",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22283,7 +21941,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/5733/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865085733/laktosfri-mellanmjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865085733",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22319,7 +21977,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865086259/ljus-chokladmjolk-pucko",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865086259",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22371,7 +22029,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/7713/front_sv.25.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865087713/arla-ko-ekologisk-minimjolk",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865087713",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22421,7 +22079,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/7935/front_es.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865087935/arla-filmjolk",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865087935",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22457,7 +22115,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/7980/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865087980/lait-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865087980",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22493,7 +22151,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/8024/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865088024/lattfill-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865088024",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22533,7 +22191,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/8215/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865088215/filmjolk-hallon-blabar-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865088215",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22579,7 +22237,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/8222/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865088222/filmjolk-jordgubb-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865088222",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22631,7 +22289,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/8482/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865088482/yoggi-original-vanilj-jordgubb-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865088482",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -22676,7 +22334,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865088499/yoggi-skogsbar-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865088499",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -22731,7 +22389,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/8505/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865088505/mild-yoghurt-naturell-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865088505",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22778,7 +22436,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/8512/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865088512/mild-yogurt-vanilj-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865088512",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -22840,7 +22498,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/3363/front_sv.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865093363/yoggi-mini-blabar-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865093363",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -22885,7 +22543,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/3370/front_sv.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865093370/yoggi-mini-0-1-fett-samoa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865093370",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22921,7 +22579,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865093417/hallon-1-fett",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865093417",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22957,7 +22615,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/3523/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865093523/lattmjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865093523",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -22999,7 +22657,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/3530/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865093530/arla-3-mjolk",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865093530",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23048,7 +22706,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/4117/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865094117/filmjolk-laktosfri-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865094117",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23100,7 +22758,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/4155/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865094155/laktosfri-naturell-mild-yoghurt-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865094155",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23136,7 +22794,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/4490/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865094490/grekisk-yoghurt-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865094490",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23185,7 +22843,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/4629/front_en.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865094629/arla-latte-art-eko",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865094629",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23239,7 +22897,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/5466/front_en.43.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865095466/arla-koket-grekisk-yoghurt-10",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865095466",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23464,7 +23122,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865095732/laktosfri-lattmjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865095732",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23500,7 +23158,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865096166/yoggi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865096166",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23543,7 +23201,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/7248/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865097248/filmjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865097248",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23587,7 +23245,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/7996/front_en.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865097996/naturell-grekisk-mild-yoghurt-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865097996",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23623,7 +23281,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/9839/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865099839/fruktyoghurt-yoggi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865099839",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23672,7 +23330,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/556/0759/front_sv.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865560759/svenskt-smor-ekologist-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865560759",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23708,7 +23366,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/556/1121/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865561121/smor-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865561121",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -23765,7 +23423,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/569/1750/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865691750/onaka-filmjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865691750",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23801,7 +23459,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865691774/a-fill-naturell-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865691774",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23844,7 +23502,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/569/1835/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865691835/latt-a-fil-naturell-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865691835",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23880,7 +23538,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/569/2917/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865692917/afil-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865692917",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23924,7 +23582,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/569/8391/front_sv.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865698391/yoggi-original-blabar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865698391",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23973,7 +23631,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/586/6356/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865866356/yoghurt-naturell-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866356",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -23991,16 +23649,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Arla",
         "packageText": "1 kg",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957910",
-        "name": "Mild yoghurt",
-        "brand": "Arla",
-        "packageText": "1 kg",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -24040,7 +23689,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/586/6394/front_sv.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865866394/latt-mild-yoghurt-naturell-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866394",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24058,16 +23707,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Arla",
         "packageText": "1 kg",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957910",
-        "name": "Mild yoghurt",
-        "brand": "Arla",
-        "packageText": "1 kg",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -24104,7 +23744,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/586/6424/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865866424/mild-yoghurt-naturell-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866424",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24122,16 +23762,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Arla",
         "packageText": "1 kg",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957910",
-        "name": "Mild yoghurt",
-        "brand": "Arla",
-        "packageText": "1 kg",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -24170,7 +23801,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/586/6448/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865866448/latt-mild-vaniljyoghurt-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866448",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24188,16 +23819,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Arla",
         "packageText": "1 kg",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957910",
-        "name": "Mild yoghurt",
-        "brand": "Arla",
-        "packageText": "1 kg",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -24232,7 +23854,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865866486/mild-yogurt-vanilj-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866486",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24250,16 +23872,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Arla",
         "packageText": "1 kg",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957910",
-        "name": "Mild yoghurt",
-        "brand": "Arla",
-        "packageText": "1 kg",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -24295,7 +23908,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/586/6554/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865866554/grekisk-mild-yoghurt-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866554",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24331,7 +23944,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/586/6561/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865866561/grekisk-yoghurt-vanilj-arlanda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866561",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24380,7 +23993,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/586/6585/front_sv.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865866585/mindre-socker-mild-yoghurt-vanilj-1-5-fett-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866585",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24398,16 +24011,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Arla",
         "packageText": "1 kg",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957910",
-        "name": "Mild yoghurt",
-        "brand": "Arla",
-        "packageText": "1 kg",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -24445,7 +24049,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/586/6592/front_sv.25.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865866592/eko-latt-mild-yoghurt-naturell-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866592",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24494,7 +24098,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/586/6608/front_da.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865866608/arla-mild-yoghurt-naturlig-fetthalt",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866608",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24530,7 +24134,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/587/7475/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865877475/mini-jordgubb-yoggi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865877475",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -24575,7 +24179,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865879592/mild-yoghurt-slat-hallon-arla-mild-yoghurt",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865879592",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24611,7 +24215,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/588/8617/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865888617/frukt-yoghurt-jordgubb-yoggi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865888617",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24657,7 +24261,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/588/8846/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865888846/latt-mild-yoghurt-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865888846",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24693,7 +24297,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865889096/filmjolk-jordgubb-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865889096",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24729,7 +24333,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/588/9430/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865889430/laktosfri-mjolk-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865889430",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24765,7 +24369,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/588/9867/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865889867/fruktyoghurt-yoggi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865889867",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24810,7 +24414,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/589/0078/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865890078/kefir-naturell-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865890078",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24855,7 +24459,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/589/0757/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865890757/laktosfri-turkisk-yoghurt-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865890757",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24891,7 +24495,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310865891280/turkisk-yoghurt-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865891280",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24927,7 +24531,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310867004862/peach-lindahls",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310867004862",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24963,7 +24567,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/700/4916/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310867004916/pear-and-vanilla-glassig-sommarfil-skanemejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310867004916",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -24999,7 +24603,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/700/4947/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310867004947/protein-lindahls",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310867004947",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25035,7 +24639,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310867004954/turkish-yogurt-salakis",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310867004954",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25053,16 +24657,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Salakis",
         "packageText": "1 kg",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957696",
-        "name": "Turkisk, Grekisk Yoghurt",
-        "brand": "Salakis",
-        "packageText": "1 kg",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -25098,7 +24693,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310867104494/gresk-naturell-yoghurt-salakis",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310867104494",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -25107,16 +24702,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Salakis",
         "packageText": "1 kg",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957696",
-        "name": "Turkisk, Grekisk Yoghurt",
-        "brand": "Salakis",
-        "packageText": "1 kg",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -25152,7 +24738,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/720/4118/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310867204118/laktosfri-turkisk-yoghurt-salakis",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310867204118",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25188,7 +24774,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310867501286/asens-lantmjolk-gammaldags-skanemejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310867501286",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25224,7 +24810,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310867535700/vanilj-yoghurt-lindahls",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310867535700",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25267,7 +24853,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/754/8540/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310867548540/yoghurt-kvarg-vaniljsmak-laktosfri-lindahls",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310867548540",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25310,7 +24896,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/756/1020/front_en.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310867561020/tropisk-juice-bravo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310867561020",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -25478,7 +25064,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/089/010/0333/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310890100333/grodinge-ostkaka-frodinge",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310890100333",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25521,7 +25107,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/089/010/0685/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310890100685/frodinge-ostkaka",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310890100685",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25571,7 +25157,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/089/020/3652/front_en.28.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310890203652/kladdkaka-frodinge",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310890203652",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25607,7 +25193,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310941801608/bredbar-kycklingpastej-lonneberga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310941801608",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25652,7 +25238,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/096/002/7270/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310960027270/ost-skinkpaj-dafgards",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310960027270",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25699,7 +25285,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/096/002/7300/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310960027300/kycklingpaj-dafgards",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310960027300",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25741,7 +25327,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/096/004/4178/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310960044178/ugnsrostad-kyckling-dafgards",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310960044178",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25784,7 +25370,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/096/004/4185/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310960044185/kyckling-jacob-dafgards",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310960044185",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25820,7 +25406,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/096/004/9258/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7310960049258/caesarpaj-dafgards",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310960049258",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25856,7 +25442,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041004722/frost-flakes-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041004722",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25892,7 +25478,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041012376/vit-sparris-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041012376",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -25930,7 +25516,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/101/8453/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041018453/farskost-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041018453",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26024,7 +25610,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/104/8719/front_sv.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041048719/ekologiskt-fullkornsbrod-med-linfron-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041048719",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26060,7 +25646,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/105/6318/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041056318/falukorv-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041056318",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -26141,7 +25727,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041060322/jordgubbar-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041060322",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26222,7 +25808,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/106/2654/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041062654/pesto-alla-genovese-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041062654",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26308,7 +25894,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/106/2692/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041062692/grovt-brod-lingon-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041062692",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26349,7 +25935,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/106/2708/front_sv.19.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041062708/grovt-brod-vital-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041062708",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26395,7 +25981,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/106/2722/front_sv.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041062722/vallmorost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041062722",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26439,7 +26025,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/106/2746/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041062746/fullkornsgott-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041062746",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26480,7 +26066,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/106/4337/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041064337/agg-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041064337",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -26525,7 +26111,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041064498/sparris-djupfryst-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041064498",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26569,7 +26155,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/106/5044/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041065044/turkisk-yoghurt-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041065044",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -26659,7 +26245,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041065075/grona-sohabonor-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041065075",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26744,7 +26330,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041070383/lattmjolk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041070383",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26789,7 +26375,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/107/0390/front_sv.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041070390/mellan-mjolk-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041070390",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26835,7 +26421,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/107/0406/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041070406/ekologiskt-mjolk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041070406",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26873,7 +26459,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/107/1724/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041071724/filmjolk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041071724",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -26909,7 +26495,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041071748/basturokt-skinka-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041071748",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -27098,7 +26684,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041071946/fil-3-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041071946",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27134,7 +26720,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/107/1953/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041071953/ekologisk-a-fil-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041071953",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27178,7 +26764,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/107/2226/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041072226/svenska-agg-fran-frigaende-hons-inomhus-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041072226",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -27214,7 +26800,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/107/2905/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041072905/vitlokssalami-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041072905",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27297,7 +26883,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/108/1198/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041081198/fruity-ice-cream-banana-split-dazzley",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041081198",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -27407,7 +26993,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/108/6391/front_en.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041086391/rainbow-chip-cookies-dazzley",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041086391",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27488,7 +27074,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043000487/rokt-kyckling-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043000487",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27539,7 +27125,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/0517/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043000517/shot-ingefara-gurkmeja-apelsin-apple-citron-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043000517",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -27620,7 +27206,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043000647/kycklingpytt-prime-patrol",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043000647",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27677,7 +27263,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/0685/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043000685/ekologiska-havregryn-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043000685",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -27728,7 +27314,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/0869/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043000869/ekologisk-vit-quinoa-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043000869",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27770,7 +27356,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/0876/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043000876/ekologisk-rod-quinoa-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043000876",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27806,7 +27392,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043001606/linguine-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043001606",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27842,7 +27428,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043001637/ekologisk-tagliatelle-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043001637",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27878,7 +27464,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002023/la-chitarra-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002023",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27918,7 +27504,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2030/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002030/risoni-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002030",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27954,7 +27540,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002139/ekologisk-spaghetti-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002139",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -27990,7 +27576,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2184/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002184/lattmjokdryck-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002184",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28035,7 +27621,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2191/front_sv.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002191/mellanmjolk-med-langre-hallbarhet-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002191",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -28084,7 +27670,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2252/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002252/laktosfri-ekologisk-mjolk-dryck-3-0-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002252",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28133,7 +27719,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2269/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002269/mellan-fil-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002269",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28169,7 +27755,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2276/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002276/fil-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002276",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28205,7 +27791,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2290/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002290/a-fil-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002290",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28241,7 +27827,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2429/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002429/frigaende-inomhus-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002429",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28282,7 +27868,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2436/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002436/agg-15p-frigaende-inomhus-medium-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002436",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -28318,7 +27904,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2498/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002498/jasminris-langkornigt-aromatiskt-okokt-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002498",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28354,7 +27940,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2504/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002504/jasminris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002504",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28390,7 +27976,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002511/jasmin-ris-boil-in-bag-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002511",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28438,7 +28024,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2528/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002528/basmatiris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002528",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -28495,7 +28081,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2535/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002535/basmatiris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002535",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28531,7 +28117,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2542/front_sv.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043002542/basmatiris-boil-in-bag-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002542",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28567,7 +28153,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/3624/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043003624/torkad-banan-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043003624",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28603,7 +28189,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/3631/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043003631/chilisas-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043003631",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28639,7 +28225,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043004416/penne-rosso-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043004416",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28729,7 +28315,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/4423/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043004423/fusilli-verde-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043004423",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28765,7 +28351,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043004430/tortellini-funghi-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043004430",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28801,7 +28387,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043004447/kondisrulle-banana-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043004447",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28837,7 +28423,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/4980/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043004980/langkornigt-ris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043004980",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28873,7 +28459,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/5161/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005161/casarecce-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005161",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28909,7 +28495,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/5185/front_it.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005185/meze-maniche-rigate-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005185",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28945,7 +28531,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/5246/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005246/langkornigt-ris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005246",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -28987,7 +28573,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005437/vallmopave-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005437",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29029,7 +28615,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005444/fropave-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005444",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29072,7 +28658,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005727/feta-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005727",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29162,7 +28748,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005734/ekologisk-fetaost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005734",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29198,7 +28784,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005789/riven-gratangost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005789",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29288,7 +28874,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005796/riven-pizzaost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005796",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29331,7 +28917,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/5802/front_en.31.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005802/riven-texmexost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005802",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29427,7 +29013,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005819/riven-mozzarella-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005819",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29469,7 +29055,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/5826/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043005826/riven-mozzarellaost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005826",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29517,7 +29103,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/6656/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043006656/tomatpure-dubbelt-koncentrerad-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043006656",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29565,7 +29151,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/6823/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043006823/ekologiska-fiberhavregryn-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043006823",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29601,7 +29187,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043007806/fetaost-laktosfri-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043007806",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29637,7 +29223,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/7851/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043007851/couscous-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043007851",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29673,7 +29259,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/7868/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043007868/couscous-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043007868",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29709,7 +29295,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008001/halloumi-burgare-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008001",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29745,7 +29331,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/8308/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008308/capellini-no-001-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008308",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29753,42 +29339,6 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "name": "Capellini",
         "brand": "Garant",
         "packageText": "GARANT, 1kg",
-        "sourceUrl": "https://www.hemkop.se/search?q=pasta&page=1&size=100",
-        "retrievedAt": "2026-05-22T10:31:52.581Z"
-      }
-    ]
-  },
-  {
-    "barcode": "7311043008315",
-    "name": "Spaghetti",
-    "brands": "Garant",
-    "quantity": "",
-    "categories": [],
-    "labels": [],
-    "nutriscoreGrade": "unknown",
-    "nutritionPer100g": {
-      "energyKj": 1487.6,
-      "energyKcal": 351,
-      "fat": 1.4,
-      "saturatedFat": 0.3,
-      "carbohydrates": 71,
-      "sugars": 2.9,
-      "fiber": 3.1,
-      "proteins": 12,
-      "salt": 0.01,
-      "sodium": 0.004
-    },
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043008315/spaghetti-garant",
-    "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008315",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
-    "retailerMatches": [
-      {
-        "chain": "hemkop",
-        "productCode": "101548683_ST",
-        "name": "Spaghetti",
-        "brand": "Garant",
-        "packageText": "GARANT, 2kg",
         "sourceUrl": "https://www.hemkop.se/search?q=pasta&page=1&size=100",
         "retrievedAt": "2026-05-22T10:31:52.581Z"
       }
@@ -29817,7 +29367,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/8322/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008322/spagetti-no-03-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008322",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29858,7 +29408,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/8346/front_sv.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008346/fusilli-no-57-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008346",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -29903,7 +29453,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008353/gnocchi-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008353",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -29948,7 +29498,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008360/penne-rigate-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008360",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -29984,7 +29534,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008377/farfalle-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008377",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -30037,7 +29587,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008391/ekologisk-kokosmjolk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008391",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30118,7 +29668,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008414/lasagneplattor-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008414",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30154,7 +29704,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008438/lasagneplattor-fullkorn-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008438",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30190,7 +29740,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008520/grillost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008520",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30226,7 +29776,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/8537/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008537/grillost-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008537",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30262,7 +29812,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008544/grillost-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008544",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30298,7 +29848,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008551/grillostburgare-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008551",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30388,7 +29938,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008568/grillostburgare-chili-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008568",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30424,7 +29974,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008575/grillost-brugare",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008575",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30460,7 +30010,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/8667/front_da.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008667/emmentaler-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008667",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30496,7 +30046,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008681/basmatiris-lang-finkornig-grant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008681",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30532,7 +30082,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008735/parlcouscous-couscous-av-vete-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008735",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30568,7 +30118,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008742/arborioris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008742",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30611,7 +30161,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043008933/potatiskroketter-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008933",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30657,7 +30207,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043009091/crunchy-fries-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043009091",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -30738,7 +30288,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043009268/jasminris-staple-food",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043009268",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30774,7 +30324,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043009275/jasminris-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043009275",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30810,7 +30360,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043009411/bredbart-lattmargarin-dairy-food",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043009411",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30846,7 +30396,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/9596/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043009596/hushallsost-skivad-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043009596",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30882,7 +30432,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043011117/klassisk-tomatketchup-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043011117",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30918,7 +30468,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/1148/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043011148/puffat-ris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043011148",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30954,7 +30504,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043011636/drickyoghurt-mango-persika-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043011636",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -30994,7 +30544,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/1674/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043011674/tante-legrumes-poulet-et-citron-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043011674",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -31037,7 +30587,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/1742/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043011742/agg-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043011742",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -31082,7 +30632,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/1957/front_fr.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043011957/ekologisk-blandfars-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043011957",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -31163,7 +30713,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043012527/salladskykling-eldrado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043012527",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -31253,7 +30803,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/2541/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043012541/fardiggrillad-kycklingbrostfile-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043012541",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -31289,7 +30839,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043013883/margarin-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043013883",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -31325,7 +30875,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043013890/margarin-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043013890",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -31370,7 +30920,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043013906/smor-och-raps-extrasaltat-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043013906",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -31416,7 +30966,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/3944/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043013944/kefir-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043013944",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -31460,7 +31010,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/4101/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043014101/bulgur-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043014101",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -31496,7 +31046,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043014736/grov-bulgur-av-durumvete-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043014736",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -31532,7 +31082,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043014798/smokey-ribs-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043014798",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -31613,7 +31163,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043014842/rostad-lok-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043014842",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -31694,7 +31244,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043015306/finkornig-rom-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043015306",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -31775,7 +31325,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043015504/potatissallad-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043015504",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -31811,7 +31361,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/5535/front_sv.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043015535/skagenrora-redo-att-ata",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043015535",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -31892,7 +31442,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/5559/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043015559/kycklingwok-med-nudlar-redo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043015559",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -31928,7 +31478,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/5580/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043015580/limpa-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043015580",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -31973,7 +31523,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/5597/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043015597/ekologiska-havregryn-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043015597",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -32018,7 +31568,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043016228/jordgubbs-yoghurt-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043016228",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32054,7 +31604,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043016433/fusilli-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043016433",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32090,7 +31640,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043016440/penne-pasta-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043016440",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32126,7 +31676,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043016648/girandole-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043016648",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32162,7 +31712,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/7607/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043017607/yogurt-fetarora-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043017607",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32198,7 +31748,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043017645/pastasas-classico-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043017645",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32234,7 +31784,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043017652/pastasas-basilico-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043017652",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32278,7 +31828,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/8000/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043018000/crunchy-yoghurt-jordgubb-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043018000",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32326,7 +31876,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/8116/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043018116/skyr-mango-passion-eko",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043018116",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32407,7 +31957,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043018352/basmatiris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043018352",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32443,7 +31993,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043018369/extra-langa-fina-korn-basmatiris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043018369",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32484,7 +32034,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/8772/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043018772/agg-fran-utehons-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043018772",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -32538,7 +32088,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/8789/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043018789/ekologiska-agg-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043018789",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32578,7 +32128,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/8796/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043018796/svenska-agg-fran-utehons-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043018796",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -32623,7 +32173,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043019076/agg-s-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043019076",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32659,7 +32209,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043019113/agg-l-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043019113",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32695,7 +32245,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/9120/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043019120/frigaende-hons-inomhus-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043019120",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -32731,7 +32281,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043019175/svenska-agg-fran-hons-frigaende-inomhus-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043019175",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32767,7 +32317,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/9533/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043019533/sprodbakad-firre-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043019533",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -32848,7 +32398,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043019557/kalvfond-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043019557",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -32929,7 +32479,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043019571/kycklingfond-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043019571",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -32965,7 +32515,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043020003/mild-naturell-yoghurt-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043020003",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33011,7 +32561,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/302/0201/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043020201/stora-limpan-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043020201",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -33101,7 +32651,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/302/0232/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043020232/jordartskocka-potatis-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043020232",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33145,7 +32695,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/302/0409/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043020409/burrata-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043020409",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33181,7 +32731,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043020591/riven-gouda-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043020591",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33217,7 +32767,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043020621/laktosfri-yoghurt-persika-mango-ananas-och-passionsfrukt-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043020621",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33259,7 +32809,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043020683/napoletano-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043020683",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -33340,7 +32890,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043020829/salladsost-21-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043020829",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -33430,7 +32980,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043020843/laktosfri-salladsost-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043020843",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33466,7 +33016,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043021109/grotris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043021109",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33502,7 +33052,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043021673/kycklingkottbullar-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043021673",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33538,7 +33088,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043021680/kyckling-burgare-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043021680",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33574,7 +33124,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043024339/cheddar-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043024339",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33618,7 +33168,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/302/4940/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043024940/ciabatta-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043024940",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33662,7 +33212,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/302/4957/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043024957/ciabatta-oliv-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043024957",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33703,7 +33253,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043024988/potatisgratang-redo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043024988",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33712,42 +33262,6 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Redo",
         "packageText": "REDO, 800g",
         "sourceUrl": "https://www.hemkop.se/search?q=potatis&page=0&size=100",
-        "retrievedAt": "2026-05-22T10:31:52.581Z"
-      }
-    ]
-  },
-  {
-    "barcode": "7311043025909",
-    "name": "Rostad Lök",
-    "brands": "Eldorado",
-    "quantity": "",
-    "categories": [],
-    "labels": [],
-    "nutriscoreGrade": "unknown",
-    "nutritionPer100g": {
-      "energyKj": 2410,
-      "energyKcal": 590,
-      "fat": 44,
-      "saturatedFat": 21,
-      "carbohydrates": 40,
-      "sugars": 9,
-      "fiber": null,
-      "proteins": 6,
-      "salt": 1.18,
-      "sodium": 0.472
-    },
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/302/5909/front_sv.3.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043025909/rostad-lok-eldorado",
-    "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043025909",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
-    "retailerMatches": [
-      {
-        "chain": "hemkop",
-        "productCode": "101823616_ST",
-        "name": "Rostad Lök",
-        "brand": "Eldorado",
-        "packageText": "ELDORADO, 150g",
-        "sourceUrl": "https://www.hemkop.se/search?q=ketchup&page=0&size=100",
         "retrievedAt": "2026-05-22T10:31:52.581Z"
       }
     ]
@@ -33775,7 +33289,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043026708/burger-slices-med-cheddar-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043026708",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33811,7 +33325,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043026715/burger-slice-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043026715",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33847,7 +33361,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043027521/bulgur-av-durumvete-fin-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043027521",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33883,7 +33397,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311043027781/agg-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043027781",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -33941,7 +33455,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/1952/front_sv.34.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070001952/rasker-fullkorn-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070001952",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -33977,7 +33491,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/3543/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070003543/honokaka-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070003543",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -34028,7 +33542,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/3567/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070003567/hono-farsk-jollekaka-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070003567",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -34069,7 +33583,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/3932/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070003932/himla-go-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070003932",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -34105,7 +33619,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/4007/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070004007/skanor-grova-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070004007",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -34147,7 +33661,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070004106/grekiskt-lantbrod-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070004106",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -34157,49 +33671,6 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "packageText": "PÅGEN, 560g",
         "sourceUrl": "https://www.hemkop.se/search?q=brod&page=0&size=100",
         "retrievedAt": "2026-05-22T10:31:52.581Z"
-      }
-    ]
-  },
-  {
-    "barcode": "7311070004144",
-    "name": "Muslibröd",
-    "brands": "Pågen",
-    "quantity": "650 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:cereals-and-their-products",
-      "en:breads",
-      "en:packaged-breads"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "c",
-    "nutritionPer100g": {
-      "energyKj": 1175.9,
-      "energyKcal": 279,
-      "fat": 5.1,
-      "saturatedFat": 0.7,
-      "carbohydrates": 45,
-      "sugars": 6.3,
-      "fiber": 4.4,
-      "proteins": 11,
-      "salt": 1.0825,
-      "sodium": 0.433
-    },
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311070004144/muslibrod-pagen",
-    "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070004144",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
-    "retailerMatches": [
-      {
-        "chain": "ica",
-        "productCode": "5003957970",
-        "name": "Grötbröd, Müslibröd",
-        "brand": "Pågen",
-        "packageText": "650-780 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
       }
     ]
   },
@@ -34235,7 +33706,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/8159/front_sv.40.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070008159/levain-rustikt-surdegsbrod-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070008159",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -34292,7 +33763,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/8432/front_sv.31.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070008432/raglevain-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070008432",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -34346,7 +33817,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/8463/front_sv.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070008463/jattefranska-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070008463",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -34405,7 +33876,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/8494/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070008494/lantgoda-surdegsbrod-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070008494",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -34453,7 +33924,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/8708/front_sv.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070008708/grotbrod-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070008708",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -34471,16 +33942,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pågen",
         "packageText": "650-780 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957970",
-        "name": "Grötbröd, Müslibröd",
-        "brand": "Pågen",
-        "packageText": "650-780 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -34513,7 +33975,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/033/0090/front_sv.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070330090/energi-proteinbrod-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070330090",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -34559,7 +34021,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/033/0243/front_en.38.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070330243/lingon-grova-special-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070330243",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -34728,7 +34190,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/033/0328/front_sv.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070330328/guldkorn-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070330328",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -34780,7 +34242,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/033/6160/front_en.29.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070336160/roast-n-toast-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070336160",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -34825,7 +34287,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/033/7297/front_en.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070337297/hono-farsk-skargardskaka-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070337297",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -34881,7 +34343,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/033/8188/front_en.82.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311070338188/pagen-limpan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070338188",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -34934,7 +34396,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/133/6244/front_en.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311071336244/rostad-pagen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311071336244",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -34974,7 +34436,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/002/9500/front_da.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311310029500/marinade-allround-santa-maria",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311310029500",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -35057,7 +34519,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/003/4474/front_en.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311310034474/tom-kha-soup-santa-maria",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311310034474",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35144,7 +34606,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/101/4017/front_sv.30.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311311014017/grillkrydda-santa-maria",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311014017",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -35231,7 +34693,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/101/5205/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311311015205/kardemumma-malen-santa-maria",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311015205",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -35267,7 +34729,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311311024641/hela-linfron-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311024641",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35315,7 +34777,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/102/4672/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311311024672/pumpakarnor-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311024672",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35363,7 +34825,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/102/4689/front_sv.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311311024689/solroskarnor-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311024689",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35399,7 +34861,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311311024696/majsmjol-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311024696",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35444,7 +34906,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/102/4702/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311311024702/chia-fron-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311024702",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35480,7 +34942,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/102/4719/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311311024719/sesamfron-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311024719",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35527,7 +34989,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/102/5136/front_de.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311311025136/krispig-mandel-hasselnot-musli-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311025136",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35563,7 +35025,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/102/5150/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311311025150/krispig-musli-kokos-hasselnot-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311025150",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35601,7 +35063,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/102/5167/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311311025167/krispig-musli-tranbar-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311025167",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35646,7 +35108,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/200/0545/front_en.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311312000545/rice-noodles-santa-maria",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311312000545",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -35741,7 +35203,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/200/5458/front_nb.59.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311312005458/coconut-milk-original-250ml-st-maria-santa-maria",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311312005458",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -35831,7 +35293,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/200/7421/front_sv.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311312007421/sesamkakor-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311312007421",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35867,7 +35329,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311441165610/burger-cheese-kavli",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311441165610",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -35948,7 +35410,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311441440069/lyckans-ost-bacon-kavli",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311441440069",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -35984,7 +35446,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/144/321/0202/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311443210202/barry-jordgubb-smultron-kavli",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311443210202",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36074,7 +35536,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311443210400/blabar-yoghurt-barry",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311443210400",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36110,7 +35572,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311443210509/korsbar-barry",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311443210509",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -36200,7 +35662,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311443210851/barry-persika",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311443210851",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36244,7 +35706,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/144/328/0052/front_sv.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311443280052/bollnasfil",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311443280052",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36291,7 +35753,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/0871/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870010871/smor-bregott",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870010871",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36336,7 +35798,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/0888/front_en.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870010888/bregott-normalsaltat-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870010888",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36372,7 +35834,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870010901/bregott-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870010901",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36423,7 +35885,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/0918/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870010918/bregott-ecologisk-normalsaltat-smor-och-rapsolja-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870010918",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36459,7 +35921,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870010925/smor-mindre-bregott",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870010925",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36514,7 +35976,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/0932/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870010932/bregott-mellan-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870010932",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36553,7 +36015,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/0956/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870010956/bregott-laktosfri-bregott-laktosfritt",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870010956",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36601,7 +36063,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870010963/bregott-ekologiskt-normalsaltat-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870010963",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36655,7 +36117,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/0970/front_sv.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870010970/bregott-normalsaltat",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870010970",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36706,7 +36168,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/0987/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870010987/bregott-extrasaltat",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870010987",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36758,7 +36220,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/1076/front_sv.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870011076/bregott-normalsaltat-storpack-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870011076",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36811,7 +36273,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/1083/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870011083/bregott-smor-mellan-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870011083",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36847,7 +36309,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/1151/front_no.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870011151/bregott-havssalt-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870011151",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36883,7 +36345,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870011199/hushallsost-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870011199",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36919,7 +36381,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870011205/hushallsost-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870011205",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -36963,7 +36425,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/2202/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870012202/cherrylicious-yoggi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870012202",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -37008,7 +36470,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/2257/front_en.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870012257/arla-yougurt",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870012257",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37044,7 +36506,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870012516/yoghurt-banan-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870012516",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37080,7 +36542,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870012523/hairy-berry-yogurt-yoggi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870012523",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37116,7 +36578,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/2530/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870012530/cherry-licious-yoggi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870012530",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37152,7 +36614,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/2677/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870012677/holy-lemony-mini-yoggi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870012677",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37188,7 +36650,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/001/3278/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870013278/graddost-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870013278",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37230,7 +36692,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/065/2187/front_sv.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870652187/smor-rapsolja-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870652187",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37275,7 +36737,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/065/2194/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311870652194/smor-och-rapsolja-arla-koket",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311870652194",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37316,7 +36778,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/102/3009/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311871023009/munkens-svarta-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311871023009",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37357,7 +36819,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/102/3054/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311871023054/prast-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311871023054",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37399,7 +36861,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/102/3061/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311871023061/herrgard-mild-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311871023061",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37443,7 +36905,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/590/4342/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311875904342/riven-mozzarella-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311875904342",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37479,7 +36941,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311875914938/billinge-ost-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311875914938",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37515,7 +36977,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311877014216/herrgardsost-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311877014216",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37556,7 +37018,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/701/5091/front_sv.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311877015091/pizzaost-riven-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311877015091",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37598,7 +37060,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/701/5107/front_en.34.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311877015107/riven-svensk-ost-mager-arla-koket",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311877015107",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37640,7 +37102,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/701/5121/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311877015121/riven-svensk-ost-texmex-arla-koket",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311877015121",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37676,7 +37138,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311877016685/riven-ost-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311877016685",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37714,7 +37176,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/187/702/0729/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311877020729/protein-ost-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311877020729",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37755,7 +37217,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311877020736/mild-fyllig-ost-17-fett-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311877020736",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37791,7 +37253,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312060200492/kalas-cola-och-hallon-triumf-glass",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312060200492",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -37872,7 +37334,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/217/009/5100/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312170095100/mangosose-semper",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312170095100",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -37918,7 +37380,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/220/004/0797/front_sv.52.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312200040797/fiberrost-skogaholm-bageri",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312200040797",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -37967,7 +37429,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/222/009/6019/front_en.31.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312220096019/biscoff-lotus",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312220096019",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -38003,7 +37465,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312338005132/kycklingmedwurst-lonneberga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312338005132",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38045,7 +37507,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/233/800/6627/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312338006627/extrarok-kyckling-lonneberga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312338006627",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38081,7 +37543,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312338006634/kyckling-grillad-lonneberga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312338006634",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38128,7 +37590,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/256/003/0018/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312560030018/raris-frebaco-kvarn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312560030018",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38177,7 +37639,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/256/003/4214/front_en.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312560034214/mathavre-frebaco-kvarn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312560034214",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38213,7 +37675,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/256/003/4313/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312560034313/svenska-kvarngryn-frebaco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312560034313",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38256,7 +37718,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/256/003/6027/front_en.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312560036027/havreris-frebaco-kvarn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312560036027",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38301,7 +37763,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/256/003/6232/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312560036232/svenskt-kornris-frebaco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312560036232",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38352,7 +37814,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/256/005/7404/front_sv.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312560057404/svenska-havreringbar-fazer-kvarn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312560057404",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38445,7 +37907,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/263/102/3635/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312631023635/ris-mjol-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312631023635",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38487,7 +37949,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/263/121/1308/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312631211308/rostade-solroskarnor-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312631211308",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38537,7 +37999,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/263/121/1322/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312631211322/rostade-saltade-solroskarnor-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312631211322",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38573,7 +38035,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312631211407/pumpakarnor-risenta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312631211407",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -38609,7 +38071,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312690800024/kolastrut-sia",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312690800024",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -38618,16 +38080,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "SIA Glass",
         "packageText": "4-6 pack",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918753",
-        "name": "Glass flerpack",
-        "brand": "SIA Glass",
-        "packageText": "4-6 pack",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -38666,7 +38119,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312690800048/juni-sia-glass",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312690800048",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -38675,52 +38128,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "SIA Glass",
         "packageText": "4-6 pack",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918753",
-        "name": "Glass flerpack",
-        "brand": "SIA Glass",
-        "packageText": "4-6 pack",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      }
-    ]
-  },
-  {
-    "barcode": "7312690800079",
-    "name": "Salt Lakrits",
-    "brands": "Sia",
-    "quantity": "",
-    "categories": [],
-    "labels": [],
-    "nutriscoreGrade": "unknown",
-    "nutritionPer100g": {
-      "energyKj": 1123.7,
-      "energyKcal": 270,
-      "fat": 17,
-      "saturatedFat": 12,
-      "carbohydrates": 26,
-      "sugars": 24,
-      "fiber": null,
-      "proteins": 3.1,
-      "salt": 0.0975,
-      "sodium": 0.039
-    },
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7312690800079/salt-lakrits-sia",
-    "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312690800079",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
-    "retailerMatches": [
-      {
-        "chain": "ica",
-        "productCode": "5003918753",
-        "name": "Glass flerpack",
-        "brand": "SIA Glass",
-        "packageText": "4-6 pack",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -38747,7 +38155,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/269/080/0086/front_no.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312690800086/glassbat",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312690800086",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -38756,88 +38164,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "SIA Glass",
         "packageText": "4-6 pack",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918753",
-        "name": "Glass flerpack",
-        "brand": "SIA Glass",
-        "packageText": "4-6 pack",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      }
-    ]
-  },
-  {
-    "barcode": "7312690800246",
-    "name": "Salt Karamell",
-    "brands": "Sia",
-    "quantity": "",
-    "categories": [],
-    "labels": [],
-    "nutriscoreGrade": "unknown",
-    "nutritionPer100g": {
-      "energyKj": 1395.44117647059,
-      "energyKcal": 338.235294117647,
-      "fat": 17.6470588235294,
-      "saturatedFat": 13.2352941176471,
-      "carbohydrates": 39.7058823529412,
-      "sugars": 27.9411764705882,
-      "fiber": null,
-      "proteins": 3.97058823529412,
-      "salt": 0.433823529411765,
-      "sodium": 0.173529411764706
-    },
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7312690800246/salt-karamell-sia",
-    "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312690800246",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
-    "retailerMatches": [
-      {
-        "chain": "ica",
-        "productCode": "5003918753",
-        "name": "Glass flerpack",
-        "brand": "SIA Glass",
-        "packageText": "4-6 pack",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      }
-    ]
-  },
-  {
-    "barcode": "7312690800284",
-    "name": "Emil I Löneberga",
-    "brands": "Sia Glass",
-    "quantity": "",
-    "categories": [],
-    "labels": [],
-    "nutriscoreGrade": "unknown",
-    "nutritionPer100g": {
-      "energyKj": 1073.4,
-      "energyKcal": 260,
-      "fat": 11,
-      "saturatedFat": 8,
-      "carbohydrates": 34,
-      "sugars": 23,
-      "fiber": null,
-      "proteins": 5.2,
-      "salt": 0.1975,
-      "sodium": 0.079
-    },
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7312690800284/emil-i-loneberga-sia-glass",
-    "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312690800284",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
-    "retailerMatches": [
-      {
-        "chain": "ica",
-        "productCode": "5003918753",
-        "name": "Glass flerpack",
-        "brand": "SIA Glass",
-        "packageText": "4-6 pack",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -38873,7 +38200,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312690800345/sandwich-sia",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312690800345",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -38882,16 +38209,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "SIA Glass",
         "packageText": "4-6 pack",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918753",
-        "name": "Glass flerpack",
-        "brand": "SIA Glass",
-        "packageText": "4-6 pack",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -38929,7 +38247,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/272/002/1238/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312720021238/cider-original-herrljunga-cider-ab",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312720021238",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -39010,7 +38328,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/272/008/0303/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312720080303/ingefara-apple-citron-shot-herrljunga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312720080303",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -39019,7 +38337,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Herrljunga",
         "packageText": "50cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -39054,7 +38372,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/292/009/4957/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312920094957/risgrynsgrot-laktosfri-lecora",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312920094957",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39090,7 +38408,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7312920094988/risgrynsgrot-utan-tillsatt-socker-lecora",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7312920094988",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39126,7 +38444,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/316/000/1309/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313160001309/baguettesallad-kyckling-curry-rydbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313160001309",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39169,7 +38487,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/316/000/4638/front_sv.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313160004638/mangoraja-rydbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313160004638",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -39257,7 +38575,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/316/000/5390/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313160005390/delikatess-potatissalad-creme-fraiche-rydbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313160005390",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39298,7 +38616,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/316/000/5543/front_sv.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313160005543/vegansk-potatissalad-rydbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313160005543",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39334,7 +38652,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313160020430/potatissalad-rydbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313160020430",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39370,7 +38688,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313160020447/delikatess-potatissallad-klassik-rydbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313160020447",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39456,7 +38774,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313160020478/delikatess-potatissalad-creme-fraiche-rydbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313160020478",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39497,7 +38815,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313160020522/potatissallad-tomat-basilika-rydbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313160020522",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39539,7 +38857,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/316/131/0561/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313161310561/potatissallad-original-rydbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313161310561",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39580,7 +38898,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/316/131/1377/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313161311377/potatissallad-orginal-rydbergs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313161311377",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39625,7 +38943,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/331/001/2100/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313310012100/potatissallad-orneborgs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313310012100",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39661,7 +38979,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313619001638/god-morgon-tropical-arla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313619001638",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -39670,16 +38988,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "God Morgon",
         "packageText": "1 liter",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918754",
-        "name": "Juice",
-        "brand": "God Morgon",
-        "packageText": "1 liter",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -39711,7 +39020,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/361/900/2147/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313619002147/fruit-crush-juice-apple-orange-mango-god-morgon",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313619002147",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -39720,16 +39029,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "God Morgon",
         "packageText": "1 liter",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918754",
-        "name": "Juice",
-        "brand": "God Morgon",
-        "packageText": "1 liter",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -39756,7 +39056,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313619002246/orange-nectar-godmorgon",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313619002246",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -39765,16 +39065,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "God Morgon",
         "packageText": "1 liter",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918754",
-        "name": "Juice",
-        "brand": "God Morgon",
-        "packageText": "1 liter",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -39801,7 +39092,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940011856/majskyckling-innerfile-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940011856",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39837,7 +39128,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/394/001/2600/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940012600/farsk-strimlad-kycklinglarfile-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940012600",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39873,7 +39164,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940012648/kycklingbrostfile-paneng-red-curry-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940012648",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39909,7 +39200,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940012921/kycklingbrostfile-strimlad-och-marinerad-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940012921",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39945,7 +39236,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/394/001/2952/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940012952/kyckling-brost-file-korean-style-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940012952",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -39990,7 +39281,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/394/002/7000/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940027000/grillad-kycklingbrostfile-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940027000",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40026,7 +39317,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/394/002/7048/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940027048/poulet-braise-lagat-klart-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940027048",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40068,7 +39359,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/394/002/7062/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940027062/grillad-skivad-kycklingbrostfile-citron-vitlok-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940027062",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40104,7 +39395,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940183478/kycklingspett-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940183478",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40140,7 +39431,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/394/026/7505/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940267505/salladskyckling-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940267505",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40176,7 +39467,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940267512/thaikryddad-kyckling-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940267512",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40214,7 +39505,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/394/052/2901/front_nb.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940522901/majskyckling-brost-fileer-guldfagel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940522901",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40261,7 +39552,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/394/057/4504/front_sv.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940574504/fardiggrillade-buffalo-wings-av-svensk-kyckling-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940574504",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40297,7 +39588,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940574900/chicken-drumsticks-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940574900",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40333,7 +39624,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940580055/chicken-nuggets-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940580055",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40376,7 +39667,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/394/058/0062/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940580062/chicken-sticks-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940580062",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40412,7 +39703,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7313940580154/chicken-nuggets-guldfageln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7313940580154",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40458,7 +39749,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/432/004/1012/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314320041012/hembakat-ostras",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314320041012",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40504,7 +39795,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/432/004/1029/front_sv.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314320041029/halsa-ostras",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314320041029",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40607,7 +39898,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/432/004/1036/front_sv.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314320041036/sportbrod-ostras",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314320041036",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40651,7 +39942,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/432/004/1067/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314320041067/bondbrod-ostras",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314320041067",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40694,7 +39985,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/432/004/1074/front_sv.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314320041074/stenugnsbakat-jubileumsbrod-ostras",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314320041074",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40740,7 +40031,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/432/004/1081/front_sv.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314320041081/rund-sund-ostras",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314320041081",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40776,7 +40067,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314320041364/lantbrod-med-morot-majs-ostras",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314320041364",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -40812,7 +40103,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314720719702/juice-apple-och-apelsin-juice-med-fruktkott-kiviks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314720719702",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -40821,7 +40112,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Kiviks Musteri",
         "packageText": "1l",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -40848,7 +40139,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/472/072/0111/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314720720111/tropisk-multivitamin-blanddryck-kiviks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314720720111",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -40857,7 +40148,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Kiviks Musteri",
         "packageText": "20cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -40896,7 +40187,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/472/072/0418/front_sv.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314720720418/citron-lime-fruktdryck-kiviks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314720720418",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -40905,7 +40196,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Kiviks Musteri",
         "packageText": "20cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -40942,7 +40233,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/472/072/3310/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314720723310/kiviks-fladerblom-fruktdryck",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314720723310",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -40951,7 +40242,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Kiviks Musteri",
         "packageText": "20cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -40986,7 +40277,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/472/072/4317/front_sv.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314720724317/frukt-bardryck-hallon-persika-kiviks-musteri",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314720724317",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -40995,7 +40286,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Kiviks Musteri",
         "packageText": "20cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -41032,7 +40323,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/472/072/8315/front_sv.26.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314720728315/paron-fruktdryck-kiviks-musteri",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314720728315",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -41041,7 +40332,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Kiviks Musteri",
         "packageText": "20cl",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -41073,7 +40364,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7314873525014/havssalt-lantbrod-fazer",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7314873525014",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -41237,7 +40528,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/520/059/3966/front_en.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7315200593966/caj-p-kyllingmarinade-65ml-haugen-gruppen-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7315200593966",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41273,7 +40564,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/536/111/1849/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7315361111849/lattebit-delicato",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7315361111849",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -41309,7 +40600,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/611/000/1534/front_it.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7316110001534/pasta-alla-bolognese-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7316110001534",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41345,7 +40636,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7316110001886/boston-gurka-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7316110001886",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -41426,7 +40717,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7316110002302/sesam-dressing-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7316110002302",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41462,7 +40753,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7316110002371/tomatketchup-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7316110002371",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -41510,7 +40801,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7316150979596/halloumi-fontana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7316150979596",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41546,7 +40837,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7316840008087/agg-fran-utehons-dava",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7316840008087",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41582,7 +40873,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/684/001/0813/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7316840010813/aggvitor-dava",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7316840010813",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41618,7 +40909,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7316840806072/ekologiska-agg-krav",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7316840806072",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41661,7 +40952,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7316843015075/agg-lantagg",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7316843015075",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41697,7 +40988,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7317370106588/vannameirakor-leroy",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7317370106588",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41783,7 +41074,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/766/358/0521/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7317663580521/ekologisk-skansk-senap-bj%C5%8Drnekulla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7317663580521",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41819,7 +41110,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7317663580538/sotstark-senap-bjornekulla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7317663580538",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41860,7 +41151,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/773/111/5389/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7317731115389/salta-kvarn-ekologiska-havregryn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7317731115389",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41896,7 +41187,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/773/152/4204/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7317731524204/ekologisk-quinoa-salta-kvarn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7317731524204",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41932,7 +41223,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/773/152/4303/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7317731524303/rod-quinoa-salta-kvarn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7317731524303",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -41970,7 +41261,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/773/153/5101/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7317731535101/rott-ris-salta-kvarn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7317731535101",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -42011,7 +41302,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/773/153/5200/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7317731535200/ekologist-svart-ris-salta-kvarn",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7317731535200",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -42021,50 +41312,6 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "packageText": "SALTÅ KVARN, 500g",
         "sourceUrl": "https://www.hemkop.se/search?q=ris&page=0&size=100",
         "retrievedAt": "2026-05-22T10:31:52.581Z"
-      }
-    ]
-  },
-  {
-    "barcode": "7318690062844",
-    "name": "Mango",
-    "brands": "ICA",
-    "quantity": "250 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:fruits-and-vegetables-based-foods",
-      "en:fruits-based-foods",
-      "en:fruits",
-      "en:tropical-fruits",
-      "en:mangoes"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "a",
-    "nutritionPer100g": {
-      "energyKj": 248.6,
-      "energyKcal": 56,
-      "fat": 0.6,
-      "saturatedFat": 0,
-      "carbohydrates": 12.1,
-      "sugars": 10,
-      "fiber": 1.1,
-      "proteins": 0.7,
-      "salt": 0,
-      "sodium": 0
-    },
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/869/006/2844/front_en.20.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7318690062844/mango-ica",
-    "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690062844",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
-    "retailerMatches": [
-      {
-        "chain": "ica",
-        "productCode": "5003957905",
-        "name": "Fryst mango",
-        "brand": "ICA",
-        "packageText": "250 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
       }
     ]
   },
@@ -42091,7 +41338,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690065692/caramel-sauce-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690065692",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42100,16 +41347,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957983",
-        "name": "Glassås",
-        "brand": "ICA",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42136,7 +41374,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/869/007/7312/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690077312/glassas-saltlakrits-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690077312",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42145,16 +41383,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957983",
-        "name": "Glassås",
-        "brand": "ICA",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42181,7 +41410,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690080176/mini-marshmallows-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690080176",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42190,16 +41419,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "150 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957982",
-        "name": "Minimarshmallows",
-        "brand": "ICA",
-        "packageText": "150 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42226,7 +41446,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690091028/grillad-paprika-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690091028",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42235,16 +41455,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "530 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958011",
-        "name": "Grillad paprika",
-        "brand": "ICA",
-        "packageText": "530 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42271,7 +41482,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690108863/korvbrod-surdeg-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690108863",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42280,16 +41491,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "8-pack",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957971",
-        "name": "Korvbröd surdeg",
-        "brand": "ICA",
-        "packageText": "8-pack",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42316,7 +41518,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/869/011/0002/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690110002/strimlad-skinka-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690110002",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42325,16 +41527,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "180 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957950",
-        "name": "Rökt skinka strimlad",
-        "brand": "ICA",
-        "packageText": "180 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42369,7 +41562,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/869/012/7086/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690127086/ica-mozzarella-caseificio-villa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690127086",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42378,16 +41571,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "125 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958004",
-        "name": "Mozzarella",
-        "brand": "ICA",
-        "packageText": "125 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42419,7 +41603,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/869/016/3480/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690163480/salty-caramelsas-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690163480",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42428,16 +41612,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957983",
-        "name": "Glassås",
-        "brand": "ICA",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42464,7 +41639,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690164012/syltkakor-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690164012",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42473,16 +41648,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957975",
-        "name": "Småkakor",
-        "brand": "ICA",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42515,7 +41681,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/869/016/4029/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690164029/finska-pinnar-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690164029",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42524,16 +41690,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957975",
-        "name": "Småkakor",
-        "brand": "ICA",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42560,7 +41717,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690164036/chokladsnittar-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690164036",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42569,16 +41726,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957975",
-        "name": "Småkakor",
-        "brand": "ICA",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42605,7 +41753,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690164043/havreflarn-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690164043",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42614,16 +41762,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957975",
-        "name": "Småkakor",
-        "brand": "ICA",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42650,7 +41789,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690164067/drommar-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690164067",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42659,16 +41798,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957975",
-        "name": "Småkakor",
-        "brand": "ICA",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42704,7 +41834,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/869/016/6726/front_en.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690166726/pizzakit-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690166726",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42713,16 +41843,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "600 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957949",
-        "name": "Pizzakit",
-        "brand": "ICA",
-        "packageText": "600 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42749,7 +41870,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/869/017/7203/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690177203/kolasnittar-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690177203",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42758,16 +41879,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957975",
-        "name": "Småkakor",
-        "brand": "ICA",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42794,7 +41906,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690487890/kanelkakor-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690487890",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42803,16 +41915,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957975",
-        "name": "Småkakor",
-        "brand": "ICA",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42841,7 +41944,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/869/049/1453/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690491453/chokladflarn-icas",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690491453",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42850,16 +41953,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957975",
-        "name": "Småkakor",
-        "brand": "ICA",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42886,7 +41980,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690492313/kastanje-champinjoner-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690492313",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42895,16 +41989,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA. Polen/Litauen",
         "packageText": "250 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957934",
-        "name": "Kastanjechampinjoner i ask",
-        "brand": "ICA. Polen/Litauen",
-        "packageText": "250 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42931,7 +42016,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/869/049/3808/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690493808/rismal-jordgubb-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690493808",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42940,16 +42025,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "175 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957973",
-        "name": "Rismål",
-        "brand": "ICA",
-        "packageText": "175 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -42976,7 +42052,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690493815/rismal-hallon-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690493815",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -42985,16 +42061,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "175 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957973",
-        "name": "Rismål",
-        "brand": "ICA",
-        "packageText": "175 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -43021,7 +42088,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690493839/rismal-korsbar-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690493839",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -43030,16 +42097,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "175 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957973",
-        "name": "Rismål",
-        "brand": "ICA",
-        "packageText": "175 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -43066,7 +42124,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690506775/rismal-blabar-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690506775",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -43075,16 +42133,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "175 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957973",
-        "name": "Rismål",
-        "brand": "ICA",
-        "packageText": "175 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -43111,7 +42160,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690513452/skink-schnitzel-300g-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690513452",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -43120,16 +42169,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Ursprung Sverige",
         "packageText": "300 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957967",
-        "name": "Skinkschnitzel",
-        "brand": "Ursprung Sverige",
-        "packageText": "300 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -43156,7 +42196,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690514725/krabbsticks-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690514725",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -43165,16 +42205,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "200",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957948",
-        "name": "Surimisticks",
-        "brand": "ICA",
-        "packageText": "200",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -43201,7 +42232,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7318690656753/hamburgare-kott-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7318690656753",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -43210,16 +42241,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA",
         "packageText": "720 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003918751",
-        "name": "Fryst hamburgare",
-        "brand": "ICA",
-        "packageText": "720 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -43261,7 +42283,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/732/255/003/6012/front_de.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7322550036012/varma-koppen-ost-broccoli-mangd-fardig-soppa-3-bla-band",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7322550036012",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -43305,7 +42327,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/732/255/003/6036/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7322550036036/varma-koppen-sparris-bla-band",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7322550036036",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -43354,7 +42376,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/732/255/003/6067/front_sv.26.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7322550036067/potatis-purjolok-varma-koppen",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7322550036067",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -43393,7 +42415,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/732/255/003/6081/front_sv.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7322550036081/varma-koppen-redd-kyckling-bla-band",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7322550036081",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -43429,7 +42451,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7322550049623/kycklingbuljong-bong",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7322550049623",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -43465,7 +42487,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/732/255/005/2678/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7322550052678/touch-of-taste-kycklingfond-bong",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7322550052678",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -43506,7 +42528,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/732/255/005/2722/front_en.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7322550052722/kyllingfond-180ml-touch-of-taste-haugen-gruppen-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7322550052722",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -43542,7 +42564,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/732/255/009/2070/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7322550092070/cafe-de-paris-bla-band",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7322550092070",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -43578,7 +42600,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330416751092/hummersoppa-hanssons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330416751092",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -43659,7 +42681,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330563001606/ost-bacon-sorunda-korvfabrik",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330563001606",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -43695,7 +42717,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330563002696/ostkorv-sorunda-korvfabrik",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330563002696",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -43731,7 +42753,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330671127243/spetspaprika-rod-ica",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330671127243",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -43740,16 +42762,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "ICA. Nederländerna",
         "packageText": "200 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957931",
-        "name": "Röd spetspaprika i påse",
-        "brand": "ICA. Nederländerna",
-        "packageText": "200 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -43776,7 +42789,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330792006311/bokbedsrokt-skinka-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330792006311",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -43785,16 +42798,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -43821,7 +42825,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/079/201/0325/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330792010325/cognacs-medwurst-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330792010325",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -43830,16 +42834,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -43866,7 +42861,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330792059317/kokt-saltrulle-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330792059317",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -43875,16 +42870,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -43911,7 +42897,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330792077762/parsons-vegoskivor",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330792077762",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -43920,16 +42906,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -43956,7 +42933,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077095/grillar-kyckling-parssons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077095",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -43965,16 +42942,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44001,7 +42969,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/079/707/7118/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077118/rokt-skinka-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077118",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -44010,16 +42978,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44046,7 +43005,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077132/rokt-emilsskinka-parssons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077132",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -44055,16 +43014,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44091,7 +43041,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077149/rokt-emilskinka-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077149",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -44100,16 +43050,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44136,7 +43077,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077163/halmstad-salami-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077163",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -44145,16 +43086,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44181,7 +43113,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077194/pepper-salami-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077194",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -44190,16 +43122,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44226,7 +43149,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077200/basturokt-emilskinka-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077200",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -44235,16 +43158,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44271,7 +43185,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077484/kalkonsalami",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077484",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -44280,16 +43194,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44316,7 +43221,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/079/707/7606/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077606/vegan-ham-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077606",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -44379,16 +43284,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44415,7 +43311,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077613/vegoskivor-paprika-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077613",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -44424,16 +43320,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44460,7 +43347,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/079/707/7620/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077620/vegoskivor-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077620",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -44469,16 +43356,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44508,7 +43386,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/079/707/7866/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797077866/vegoskivor-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797077866",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -44517,16 +43395,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Pärsons",
         "packageText": "90-160 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957946",
-        "name": "Smörgåsmat",
-        "brand": "Pärsons",
-        "packageText": "90-160 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -44555,7 +43424,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/079/777/0927/front_ar.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330797770927/grillad-kyckling-parsons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330797770927",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -44604,7 +43473,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/098/900/3505/front_en.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330989003505/chicken-schnitzel-qibbla-halal-kott-ab",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330989003505",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -44640,7 +43509,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330989005080/chicken-meatballs-qibbla-halal-kott-ab",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330989005080",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -44676,7 +43545,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7330989005226/shawarma-kyckling-kebab-halal",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7330989005226",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -44712,7 +43581,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331044060501/chicken-kottbullar-ingelsta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331044060501",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -44748,7 +43617,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/104/407/2573/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331044072573/kalkon-brostfile-ingelsta-kalkon",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331044072573",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -44888,6 +43757,42 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     ]
   },
   {
+    "barcode": "7331044072627",
+    "name": "Tunnskivad Kalkonbröstfilé",
+    "brands": "Ingelsta",
+    "quantity": "",
+    "categories": [],
+    "labels": [],
+    "nutriscoreGrade": "unknown",
+    "nutritionPer100g": {
+      "energyKj": 493.1,
+      "energyKcal": 120,
+      "fat": 2.3,
+      "saturatedFat": 0.7,
+      "carbohydrates": 1.3,
+      "sugars": null,
+      "fiber": null,
+      "proteins": 22.7,
+      "salt": null,
+      "sodium": null
+    },
+    "imageUrl": "",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7331044072627/tunnskivad-kalkonbrostfile-ingelsta",
+    "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331044072627",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
+    "retailerMatches": [
+      {
+        "chain": "coop",
+        "productCode": "7331044072627",
+        "name": "Kalkonbröstfilé Tunnskivad",
+        "brand": "Ingelsta Kalkon",
+        "packageText": "400g",
+        "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+        "retrievedAt": "2026-05-22T10:38:22.011Z"
+      }
+    ]
+  },
+  {
     "barcode": "7331061000856",
     "name": "Arrabbiata Pastasås",
     "brands": "",
@@ -44916,7 +43821,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/106/100/0856/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331061000856/arrabbiata-pastasas",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331061000856",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -44960,7 +43865,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/121/701/0050/front_en.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331217010050/bulgur-sevan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331217010050",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45004,7 +43909,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/121/701/0067/front_nb.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331217010067/mellangrov-bulgur-sevan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331217010067",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45040,7 +43945,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/121/701/0340/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331217010340/bulgur-nudlar-sevan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331217010340",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45076,7 +43981,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331217011200/parl-couscous-sevan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331217011200",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45127,7 +44032,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/121/701/2993/front_sv.64.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331217012993/hummus-original-sevan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331217012993",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -45208,7 +44113,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/121/701/5734/front_id.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331217015734/basmatiris-2kg-sevan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331217015734",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45251,7 +44156,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/149/412/4617/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331494124617/jarlsberg-tine",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331494124617",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45287,7 +44192,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331494126710/brie-wernerssons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331494126710",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45328,7 +44233,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/149/412/8967/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331494128967/norvegia-tine",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331494128967",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45364,7 +44269,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331494129094/maasdamer-wemersson-ost-ab",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331494129094",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45400,7 +44305,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331494129971/graddost-wernerssons",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331494129971",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -45445,7 +44350,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/150/000/7118/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7331500007118/paj-med-vasterbottenost-carolines-kok",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331500007118",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45493,7 +44398,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/204/017/0546/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7332040170546/tofu-naturell-ekologisk-yi-pin",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7332040170546",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45540,7 +44445,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/204/030/0219/front_sv.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7332040300219/tofu-silkesmjuk-yipin",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7332040300219",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45589,7 +44494,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/733/204/030/2114/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7332040302114/ekologisk-tofu-alspansrokt-yipin",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7332040302114",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45634,7 +44539,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/000/540/0331/front_fr.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340005400331/cheez-ballz-olw",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340005400331",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45695,7 +44600,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/000/540/3226/front_en.53.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340005403226/cheez-cruncherz-flaming-hot-olw",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340005403226",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45746,7 +44651,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/000/540/3349/front_sv.32.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340005403349/cheez-footballz-on-my-way",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340005403349",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45785,7 +44690,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/001/251/5004/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340012515004/superbrod-tranbar-da-carla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340012515004",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45821,7 +44726,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340023810204/lattrokt-kyckling-svea",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340023810204",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45862,7 +44767,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/004/608/0738/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340046080738/chili-bearnaise-johan-jureskog",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340046080738",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -45955,7 +44860,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/340/1794/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083401794/garant-majskorvar-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083401794",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -46045,7 +44950,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083402241/halloumi-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083402241",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -46147,7 +45052,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/340/2258/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083402258/boil-in-bag-jasminris-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083402258",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -46192,7 +45097,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/340/5679/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083405679/tarte-aux-fromages-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083405679",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -46289,7 +45194,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/340/6133/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083406133/grana-padano-12-manader-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083406133",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -46325,7 +45230,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083410956/kyckling-brostfile-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083410956",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -46370,7 +45275,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083426513/riven-grana-padano-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083426513",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -46406,7 +45311,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083426629/emmentaler-freshgold",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083426629",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -46450,7 +45355,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/342/6636/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083426636/gouda-fetthalt-30",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083426636",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -46540,7 +45445,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083426643/massdamet-fetthalt-frishgold",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083426643",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -46576,7 +45481,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083426667/graddost-frischgold",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083426667",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -46615,7 +45520,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/342/7299/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083427299/mellanmjolk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083427299",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -46660,7 +45565,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/342/7312/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083427312/mjolk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083427312",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -46709,7 +45614,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083427923/prosciutto-grudo-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083427923",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -46844,7 +45749,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/0626/front_uk.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083430626/fettuccine-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083430626",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -46880,7 +45785,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083430640/farsk-pasta-tagliolini-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083430640",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -46970,7 +45875,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083430657/pasta-fresca-pappardelle-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083430657",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47006,7 +45911,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/0671/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083430671/pasta-fresca-lasagne-plattor-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083430671",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47042,7 +45947,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/0688/front_it.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083430688/ricotta-spinaci-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083430688",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47140,7 +46045,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/0701/front_en.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083430701/farsk-tortelloni-al-formaggi-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083430701",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47180,7 +46085,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/2057/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083432057/finmalen-senap-original-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083432057",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47220,7 +46125,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/2064/front_sv.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083432064/garant-finmald-senap-stark-och-sot-axfood-sverige",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083432064",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47261,7 +46166,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/4624/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083434624/frigaende-utomhus-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083434624",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -47314,7 +46219,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/4716/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083434716/kycklingbrostfile-fryst-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083434716",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -47359,7 +46264,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083434723/kycklinginnerfile-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083434723",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -47458,7 +46363,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/4976/front_en.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083434976/meatloaf-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083434976",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -47509,7 +46414,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/4983/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083434983/kyckling-klubbor-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083434983",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47557,7 +46462,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/5232/front_sv.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435232/jasminris-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435232",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -47602,7 +46507,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435270/kyckling-brostfile-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435270",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47638,7 +46543,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435461/cheddar-frischgold",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435461",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47688,7 +46593,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/5539/front_en.30.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435539/naturell-kvarg-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435539",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -47823,7 +46728,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435607/skivad-edamer-ost",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435607",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47859,7 +46764,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435614/skivad-edamer-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435614",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47895,7 +46800,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435621/skivad-edamer-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435621",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47931,7 +46836,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435638/skivad-gouda-28-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435638",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -47967,7 +46872,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435645/gouda-skivad-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435645",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -48057,7 +46962,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435652/skivad-gouda-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435652",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48101,7 +47006,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/5683/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435683/gouda-cheese-el-dorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435683",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48142,7 +47047,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/5690/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435690/riven-ost-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435690",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48190,7 +47095,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/5942/front_sv.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435942/naturell-yoghurt-laktosefri-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435942",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48226,7 +47131,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435959/filmmjolk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435959",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48262,7 +47167,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/5966/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435966/mjolk-laktosfri-3-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435966",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48298,7 +47203,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/5973/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435973/laktosfri-mellanmjolk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435973",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48334,7 +47239,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083435980/laktosfri-lattmjolkdryck-fetthalt-0-5-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083435980",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48370,7 +47275,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083436222/hovmastarsas-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083436222",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48451,7 +47356,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083436765/pizzamix-28-frischgold",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083436765",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48487,7 +47392,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083436772/pizzamix-frischgold",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083436772",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48537,7 +47442,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/343/9094/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083439094/garant-ekologisk-skivad-gouda-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083439094",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48573,7 +47478,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083439513/ekologisk-majs-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083439513",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48654,7 +47559,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083440335/skivad-cheddar-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083440335",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48693,7 +47598,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/0489/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083440489/mellan-mjolk-dryck-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083440489",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48729,7 +47634,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/0526/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083440526/herrgard-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083440526",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48765,7 +47670,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/0533/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083440533/prast-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083440533",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48808,7 +47713,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/3015/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083443015/matpaj-med-getost-och-spenat-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083443015",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48844,7 +47749,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083443251/kycklingbuljong-ekologisk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083443251",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48939,7 +47844,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/3282/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083443282/ekologisk-pastasas-classico-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083443282",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -48975,7 +47880,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/3305/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083443305/arrabbiata-pastasas-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083443305",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49065,7 +47970,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083443428/lins-pasta-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083443428",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49106,7 +48011,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/3442/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083443442/ekologisk-bon-pasta-fettuccine-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083443442",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49148,7 +48053,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/3473/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083443473/kokosgradde-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083443473",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49246,7 +48151,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/3886/front_sv.40.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083443886/mjolk-med-lite-langre-hallbarhet-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083443886",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -49305,7 +48210,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/3893/front_sv.39.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083443893/mellanmjolk-med-langre-hallbarhet-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083443893",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -49358,7 +48263,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/4098/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083444098/langkornigt-ris-parboiled-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083444098",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -49403,7 +48308,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083444104/langkornigt-ris-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083444104",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -49462,7 +48367,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/4388/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083444388/brioche-hamburgerbrod-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083444388",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49552,7 +48457,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/4616/front_en.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083444616/citron-pressad-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083444616",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49643,7 +48548,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/5088/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083445088/15-ekologiska-agg-fran-frigaende-hons-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083445088",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49687,7 +48592,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/5187/front_sv.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083445187/gnocchi-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083445187",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49723,7 +48628,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/6733/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083446733/duokaka-hallon-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083446733",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49810,7 +48715,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/6863/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083446863/mini-baguette-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083446863",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49853,7 +48758,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083446870/baguette-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083446870",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49891,7 +48796,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/6962/front_sv.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083446962/svarta-bonor-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083446962",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -49978,7 +48883,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/7235/front_en.19.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083447235/protein-brod-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083447235",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50014,7 +48919,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083447259/riskakor-ostsmak-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083447259",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50067,7 +48972,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/7365/front_sv.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083447365/ekologiska-svarta-bonor-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083447365",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50160,7 +49065,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/7402/front_en.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083447402/carnaroli-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083447402",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50205,7 +49110,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/7532/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083447532/burger-slices-med-cheddar-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083447532",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50292,7 +49197,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/7549/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083447549/farskost-naturell-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083447549",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -50386,7 +49291,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/7853/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083447853/ekologiskt-smor-svenskt-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083447853",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50432,7 +49337,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/7860/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083447860/svenskt-smor-fran-dalarna-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083447860",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50473,7 +49378,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/7891/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083447891/laktosfri-mjolk-3-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083447891",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50522,7 +49427,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/7983/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083447983/bredbart-normalsaltat-smor-raps-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083447983",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50564,7 +49469,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/8416/front_sv.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083448416/delikatess-potatis-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083448416",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50608,7 +49513,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/8638/front_sv.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083448638/creme-fraiche-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083448638",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50695,7 +49600,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/344/9499/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083449499/muslibar-choklad-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083449499",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50789,7 +49694,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/0488/front_sv.32.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083450488/eldorado-snabbnudlar-med-smak-av-svamp-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083450488",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50883,7 +49788,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/0525/front_sv.33.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083450525/snabbnudlar-med-smak-av-kyckling-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083450525",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -50919,7 +49824,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/0549/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083450549/mungbonor-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083450549",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51004,7 +49909,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/0723/front_de.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083450723/senap-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083450723",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51040,7 +49945,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083451447/langkornigt-ris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083451447",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51078,7 +49983,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/1454/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083451454/fullkornsris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083451454",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51114,7 +50019,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083452093/strimlad-kyckling-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083452093",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51158,7 +50063,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/2901/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083452901/grotris-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083452901",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51194,7 +50099,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083453441/tortelloni-arrabiata",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083453441",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51230,7 +50135,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/3892/front_en.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083453892/chorizo-chicken-sausages-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083453892",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -51320,7 +50225,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/4332/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083454332/majspasta-glutenfri-spaghetti-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083454332",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51416,7 +50321,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/4349/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083454349/rigatoni-majspasta-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083454349",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51452,7 +50357,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083454356/glutenfri-fusilli-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083454356",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51495,7 +50400,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/5155/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083455155/prosciutto-cotto-funghi-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083455155",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51578,7 +50483,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/5858/front_en.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083455858/kycklingfars-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083455858",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51614,7 +50519,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/6701/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083456701/appel-juice-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083456701",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -51704,7 +50609,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/6732/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083456732/kycklinggrillkorv-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083456732",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51748,7 +50653,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/6749/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083456749/tjock-kyckling-grillkorv-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083456749",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51784,7 +50689,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083456756/kyckling-stekkorv-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083456756",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51820,7 +50725,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/6763/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083456763/kycklingchorizo-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083456763",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51856,7 +50761,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083457036/frusen-mango-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083457036",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -51941,7 +50846,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/7197/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083457197/olkorv-vitlok-prime-patrol",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083457197",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52033,7 +50938,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/7593/front_sv.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083457593/ekologisk-mellan-mjolk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083457593",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52079,7 +50984,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/7609/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083457609/ekologisk-mjolk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083457609",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52118,7 +51023,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/8057/front_nb.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083458057/flytande-margarin-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083458057",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52165,7 +51070,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/8491/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083458491/eldorado-pulver-potatismos-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083458491",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52205,7 +51110,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/345/8507/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083458507/curry-mangosas-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083458507",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52286,7 +51191,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083459252/fyllda-grona-oliver-vitlok-grant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083459252",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52367,7 +51272,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083459979/farsk-kycklingbrostfile-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083459979",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52403,7 +51308,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083459986/kyckling-innerfile-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083459986",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52439,7 +51344,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083459993/willys-kyckling-larfile-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083459993",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52475,7 +51380,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083462207/svenska-fagel-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083462207",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -52520,7 +51425,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083462214/kycklingklubba-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083462214",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -52574,7 +51479,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/2221/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083462221/kyclling-vingar-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083462221",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -52619,7 +51524,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083462238/kycklinglar-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083462238",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -52672,7 +51577,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/3471/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083463471/pesto-con-tofu-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083463471",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52713,7 +51618,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/3518/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083463518/ekologisk-chilisas-original-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083463518",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52749,7 +51654,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083463587/ekologisk-bonpasta-lasagne-plattor-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083463587",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52785,7 +51690,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/3747/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083463747/kapris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083463747",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52827,7 +51732,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/4171/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083464171/smoothie-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083464171",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52863,7 +51768,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083464898/soppa-tomat-zucchini-paprika-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083464898",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -52944,7 +51849,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083465017/grillkorv-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083465017",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -53037,7 +51942,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/5260/front_sv.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083465260/basmatiris-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083465260",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -53094,7 +51999,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/5277/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083465277/boil-in-bag-basmatiris-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083465277",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53130,7 +52035,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083465284/basmatiris-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083465284",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53178,7 +52083,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083465321/organic-jasmine-rice-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083465321",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53214,7 +52119,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083465338/ekologisk-langkornigt-ris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083465338",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53250,7 +52155,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/5413/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083465413/stora-odlade-blabar-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083465413",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53331,7 +52236,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083467516/tortillachips-ost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083467516",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53371,7 +52276,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/7547/front_da.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083467547/ekologisk-glutenfri-lasagne-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083467547",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53414,7 +52319,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/7875/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083467875/mjolk-3-0-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083467875",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -53459,7 +52364,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083468070/tortilla-chips-havssalt-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083468070",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53540,7 +52445,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/8391/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083468391/vegobacon-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083468391",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -53696,7 +52601,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/8469/front_sv.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083468469/kyckling-wienerkorv-rokt-med-alspan-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083468469",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53732,7 +52637,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/8476/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083468476/kycking-bacon-rokt-med-alspan-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083468476",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53768,7 +52673,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/8933/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083468933/blomkalsris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083468933",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53804,7 +52709,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083469206/eko-kappris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083469206",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53842,7 +52747,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/9503/front_sv.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083469503/tomatpure-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083469503",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -53888,7 +52793,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/9602/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083469602/krossade-tomater-i-tomatjuice-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083469602",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -54036,7 +52941,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/346/9619/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083469619/ekologiska-passerade-tomater-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083469619",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -54117,7 +53022,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083471193/popcorn-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083471193",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -54198,7 +53103,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/1230/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083471230/kycklinglarfile-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083471230",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -54234,7 +53139,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083471650/capricciosa-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083471650",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -54315,7 +53220,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083472275/la-mafalda-pasta-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083472275",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -54405,7 +53310,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/4323/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083474323/klassisk-bratwurst-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083474323",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -54492,7 +53397,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/5962/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083475962/kyckling-innerfile-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083475962",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -54537,7 +53442,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083476808/parmigiano-reggiano-ekologisk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083476808",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -54582,7 +53487,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/6815/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083476815/riven-parmigiano-reggiano-sub-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083476815",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -54618,7 +53523,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083476822/ekologisk-parmesan-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083476822",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -54662,7 +53567,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/7089/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083477089/rapsolja-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083477089",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -54747,7 +53652,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/8024/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478024/fusilli-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478024",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -54847,7 +53752,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/8048/front_sv.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478048/ekologisk-gnocchi-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478048",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -54896,7 +53801,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/8062/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478062/ekolgisk-penne-rigate-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478062",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -54932,7 +53837,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478086/snabbmakaroner-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478086",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -54985,7 +53890,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/8178/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478178/yoghurt-mild-vanilj-fetthalt-2-0-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478178",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55023,7 +53928,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/8185/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478185/bonpasta-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478185",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55073,7 +53978,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/8215/front_sv.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478215/tonfisk-i-solrosolja-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478215",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55168,7 +54073,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/8253/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478253/eldorado-kycklingkebab",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478253",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55212,7 +54117,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/347/8284/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478284/yoghurt-mild-naturell-fetthalt-3-0-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478284",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55248,7 +54153,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478321/hallon-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478321",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55329,7 +54234,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478581/ekologiska-makaroner-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478581",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -55379,7 +54284,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083478932/rostbrod-brioche",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083478932",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55415,7 +54320,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083479151/jasminris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083479151",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55456,7 +54361,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/0034/front_sv.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083480034/tomatketchup-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083480034",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55505,7 +54410,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/0126/front_sv.26.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083480126/havredryck-barista-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083480126",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55598,7 +54503,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/0140/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083480140/ekologisk-yoghurt-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083480140",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55634,7 +54539,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083480263/appel-och-flader-juice-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083480263",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55715,7 +54620,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/0287/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083480287/pizzamix-frischgold",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083480287",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55766,7 +54671,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/0638/front_sv.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083480638/fiberhavregryn-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083480638",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -55820,7 +54725,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/0829/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083480829/surdegsbaguette-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083480829",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55864,7 +54769,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/1000/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083481000/original-fil-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083481000",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55914,7 +54819,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/1390/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083481390/ekologiska-glutenfria-havregryn-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083481390",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55958,7 +54863,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/1871/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083481871/snabbnudlar-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083481871",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -55994,7 +54899,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/2106/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083482106/langkornigt-ris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083482106",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56043,7 +54948,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/3981/front_sv.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083483981/havredryck-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083483981",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56140,7 +55045,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/4919/front_sv.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083484919/quiche-lorraine-matpaj-med-ost-och-bacon-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083484919",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56176,7 +55081,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083485107/bucatini-no7-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083485107",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56222,7 +55127,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/5657/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083485657/vegansk-tortelloni-pomodoro-basilico-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083485657",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56258,7 +55163,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083486272/kallrokt-lax-falkenberg",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083486272",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -56339,7 +55244,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083486449/laktosfri-drick-yoghurt-skogsbar-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083486449",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56375,7 +55280,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/6456/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083486456/drickyoghurt-med-smak-av-jordgubb-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083486456",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56411,7 +55316,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/6722/front_sv.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083486722/kycklingbrostfile-grillkryddad-eldorado",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083486722",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56453,7 +55358,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/6746/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083486746/grillad-kyckling-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083486746",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56489,7 +55394,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/6814/front_sv.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083486814/dijon-senap-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083486814",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56525,7 +55430,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/6920/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083486920/pasta-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083486920",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -56678,7 +55583,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083487484/korv-stroganoff-redo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083487484",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56772,7 +55677,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/7491/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083487491/redo-panerad-fisk-med-potatismos-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083487491",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56808,7 +55713,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083487514/carbonara-redo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083487514",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56855,7 +55760,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/7798/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083487798/10-ekologiska-agg-fran-frigaende-hons-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083487798",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56891,7 +55796,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/7965/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083487965/taco-kryddmix-original-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083487965",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -56972,7 +55877,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083488351/grot-med-bar-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083488351",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -57053,7 +55958,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083488481/riven-italiensk-hardost-fresca-d-oro",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083488481",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -57091,7 +55996,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/348/8511/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083488511/parmesanost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083488511",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -57181,7 +56086,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083489761/parmigiano-reggiano-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083489761",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -57217,7 +56122,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083489907/smoothie-banan-mango-passionsfrukt-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083489907",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -57298,7 +56203,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083490446/matgradde-dairy-food",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083490446",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -57379,7 +56284,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083490552/majskakor-friggs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083490552",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -57514,7 +56419,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/0590/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083490590/tang-caviar-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083490590",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -57597,7 +56502,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/0705/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083490705/vego-kebab-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083490705",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -57684,7 +56589,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/1160/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083491160/rokt-kyckling-svensk-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083491160",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -57730,7 +56635,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/1863/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083491863/brie-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083491863",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -57811,7 +56716,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/2662/front_hr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083492662/mini-majskakor-ost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083492662",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -57861,7 +56766,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/3324/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083493324/kyckling-chorizo-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083493324",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -57897,7 +56802,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/3478/front_no.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083493478/vegansk-skagen-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083493478",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -57933,7 +56838,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083494987/gemelli-pasta-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083494987",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -57988,7 +56893,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/5007/front_en.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083495007/fusilli-100-fullkorn-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083495007",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58024,7 +56929,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/5014/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083495014/penne-rigate-100-fullkorn-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083495014",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58060,7 +56965,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/5038/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083495038/tagliatelle-fullkorn-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083495038",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58096,7 +57001,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083495649/grillost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083495649",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58136,7 +57041,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083495670/latt-mjolk-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083495670",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58182,7 +57087,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/6011/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083496011/langkornigt-ris",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083496011",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58218,7 +57123,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/6219/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083496219/a-fil-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083496219",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58254,7 +57159,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083496332/ekologiskt-basmatiris-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083496332",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58290,7 +57195,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083496677/majskakor-ost-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083496677",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58334,7 +57239,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/6905/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083496905/naturell-tofu-axfood",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083496905",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58424,7 +57329,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/7346/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083497346/bacon-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083497346",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58517,7 +57422,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/008/349/9913/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340083499913/wokmix-garant",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340083499913",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58609,7 +57514,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/013/160/1008/front_sv.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340131601008/nocco-bcaa-paron",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340131601008",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58690,7 +57595,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/013/160/6232/front_en.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340131606232/focus-passionite-nocco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340131606232",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -58780,7 +57685,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/734/015/481/3648/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340154813648/mac-heaven-mac-cheese-cheddar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340154813648",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -58861,7 +57766,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7340154815260/mexican-hot-sauce-valentina-salsa-picante",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7340154815260",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -58944,7 +57849,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/055/0214/front_da.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350000550214/danonino-pouch-fraise-70g-danone",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350000550214",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -58997,7 +57902,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/055/2874/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350000552874/yo-pro-blueberry-danone-yopro",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350000552874",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59033,7 +57938,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350000553536/yopro-banana-flavour-yogurt-drink",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350000553536",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59069,7 +57974,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350000553628/activia-persika",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350000553628",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59114,7 +58019,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/240/0333/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002400333/olivolja-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002400333",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59207,7 +58112,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/240/2658/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002402658/feta-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002402658",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59257,7 +58162,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/240/2955/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002402955/ekologiska-kikartor-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002402955",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -59338,7 +58243,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/240/3846/front_es.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002403846/halloumi-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002403846",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59383,7 +58288,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/240/4317/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002404317/parmigiano-reggiano-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002404317",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59419,7 +58324,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/240/4522/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002404522/spaghetti-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002404522",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59464,7 +58369,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/240/4546/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002404546/mezze-maniche-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002404546",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59504,7 +58409,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002404560/radiatori-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002404560",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59540,7 +58445,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/240/4577/front_se.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002404577/tortiglioni-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002404577",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59581,7 +58486,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002404584/zeta-strozzapreti-zeta-casa-di-luca",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002404584",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59629,7 +58534,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/240/4980/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002404980/arborio-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002404980",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59665,7 +58570,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002406199/pastasas-basillika-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002406199",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59701,7 +58606,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350002407059/linguine-zeta-casa-do-luca",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350002407059",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59737,7 +58642,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350005152017/ostkaka-osterians",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350005152017",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59777,7 +58682,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/000/671/0704/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350006710704/swe-bar-chocolate-danalads",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350006710704",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59874,7 +58779,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/072/9539/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350020729539/aito-barista-havredryck-fazer",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350020729539",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -59923,7 +58828,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/779/3731/front_sv.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027793731/mozzarela-di-bufala-campana-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027793731",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -59968,7 +58873,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/779/3984/front_en.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027793984/burrata-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027793984",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60004,7 +58909,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/779/5322/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027795322/fusilli-zeta-casa-di-luca",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027795322",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60048,7 +58953,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/779/5520/front_it.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027795520/zeta-italiensk-mozzarella",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027795520",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60084,7 +58989,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/779/5940/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027795940/parmigiano-reggiano-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027795940",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60120,7 +59025,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/779/6077/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027796077/macaronetti-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027796077",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -60170,7 +59075,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/779/6091/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027796091/kramig-pesto-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027796091",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -60251,7 +59156,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027796121/carnaroliris-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027796121",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60287,7 +59192,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/779/6794/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027796794/vongoloni-zeta-vongoloni",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027796794",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60323,7 +59228,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027797272/pappardelle-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027797272",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60359,7 +59264,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027797975/tagliatelle-zeta-casa-di-luca",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027797975",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60401,7 +59306,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027798002/grillost-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027798002",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60437,7 +59342,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027798378/pastamore-casa-di-luca",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027798378",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60473,7 +59378,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/779/9146/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027799146/lasagne-plattor-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027799146",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60509,7 +59414,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027799191/grana-padano-12-man-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027799191",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60545,7 +59450,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027799627/strosa-preti-glutenfri-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027799627",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60592,7 +59497,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/779/9818/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027799818/no-1-capellini-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027799818",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60628,7 +59533,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350027799931/gran-amore-zeta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350027799931",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60664,7 +59569,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350028543571/flavored-coffee-shake-naturdiet",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350028543571",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -60709,7 +59614,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/854/5094/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350028545094/friggs-majskakor-ost",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350028545094",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60745,7 +59650,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350028546459/naturdiet",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350028546459",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -60783,7 +59688,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/002/854/6992/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350028546992/kladdkaka-swebar",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350028546992",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -60864,7 +59769,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350028549061/protein-kakor-ost-friggs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350028549061",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60900,7 +59805,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350031135473/batard-champagne-limpa-la-lorraine",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350031135473",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -60984,7 +59889,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/003/521/0107/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350035210107/samyang-ramen-bergqvist",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350035210107",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -61032,7 +59937,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/003/521/0114/front_en.41.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350035210114/samyang-ramen-beef-flavor",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350035210114",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -61118,7 +60023,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/003/927/8264/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350039278264/vitost-plivit",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350039278264",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -61160,7 +60065,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/003/927/9186/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350039279186/burek-spenat-ost",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350039279186",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -61201,7 +60106,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/004/272/0026/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350042720026/remoulade-eriks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350042720026",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -61210,16 +60115,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Eriks såser",
         "packageText": "170-230 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957941",
-        "name": "Såser",
-        "brand": "Eriks såser",
-        "packageText": "170-230 ml",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -61253,7 +60149,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/004/272/0040/front_sv.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350042720040/eriks-pepparsas-oluf-lorentzen-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350042720040",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -61262,16 +60158,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Eriks såser",
         "packageText": "170-230 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957941",
-        "name": "Såser",
-        "brand": "Eriks såser",
-        "packageText": "170-230 ml",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -61300,7 +60187,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/004/272/0132/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350042720132/chili-bearnaise-eriks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350042720132",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -61309,16 +60196,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Eriks såser",
         "packageText": "170-230 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957941",
-        "name": "Såser",
-        "brand": "Eriks såser",
-        "packageText": "170-230 ml",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -61350,7 +60228,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/004/272/0293/front_sv.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350042720293/eriks-bearnaise-provencale",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350042720293",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -61359,16 +60237,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Eriks såser",
         "packageText": "170-230 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957941",
-        "name": "Såser",
-        "brand": "Eriks såser",
-        "packageText": "170-230 ml",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -61399,7 +60268,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/004/272/1924/front_sv.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350042721924/eriks-parmesansas",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350042721924",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -61408,16 +60277,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Eriks såser",
         "packageText": "170-230 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957941",
-        "name": "Såser",
-        "brand": "Eriks såser",
-        "packageText": "170-230 ml",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -61444,7 +60304,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350042722174/bearnaise-tryffel-eriks-saser",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350042722174",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -61453,16 +60313,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Eriks såser",
         "packageText": "170-230 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957941",
-        "name": "Såser",
-        "brand": "Eriks såser",
-        "packageText": "170-230 ml",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -61489,7 +60340,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350042722181/gronpepparsas-eriks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350042722181",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -61498,16 +60349,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Eriks såser",
         "packageText": "170-230 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957941",
-        "name": "Såser",
-        "brand": "Eriks såser",
-        "packageText": "170-230 ml",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -61539,7 +60381,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/004/272/2228/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350042722228/aioli-eriks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350042722228",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -61548,16 +60390,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Eriks såser",
         "packageText": "170-230 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957941",
-        "name": "Såser",
-        "brand": "Eriks såser",
-        "packageText": "170-230 ml",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -61584,7 +60417,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/004/272/2372/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350042722372/romsas-eriks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350042722372",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -61593,16 +60426,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Eriks såser",
         "packageText": "170-230 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957941",
-        "name": "Såser",
-        "brand": "Eriks såser",
-        "packageText": "170-230 ml",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -61646,7 +60470,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/004/559/1050/front_sv.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350045591050/tryffel-gardschips",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350045591050",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -61727,7 +60551,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/004/559/6499/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350045596499/sour-cream-and-triple-onion-gardschips",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350045596499",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -61818,7 +60642,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/004/646/5633/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350046465633/potatismjol-kockens",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350046465633",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -61859,7 +60683,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/005/121/1164/front_es.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350051211164/salami-milano-no6-engelmans",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350051211164",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -61994,7 +60818,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/005/121/4561/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350051214561/fikon-marmelad-%C4%93ngelmanns",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350051214561",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -62075,7 +60899,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/005/420/1209/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350054201209/burgarcheddar-vaddo-gardsmejeri",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350054201209",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62111,7 +60935,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350054201216/hamburger-ost-tryffel-vaddo-gardsmejeri",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350054201216",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62147,7 +60971,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/005/420/1223/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350054201223/burgarcheddar-chili-jalapeno-vaddo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350054201223",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62183,7 +61007,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350054201230/burgarcheddar-lagrad-18-manader-vaddo-gardsmejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350054201230",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62226,7 +61050,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/005/479/5807/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350054795807/nutbar-dave-jon-s",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350054795807",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -62281,7 +61105,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/005/679/1500/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350056791500/ayran-larsa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350056791500",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62317,7 +61141,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350056792101/vitost-oriental-creamy",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350056792101",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62362,7 +61186,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/005/679/3016/front_en.37.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350056793016/grekisk-yoghurt-larsa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350056793016",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62407,7 +61231,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/005/679/3023/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350056793023/grekisk-yoghurt-naturell-larsa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350056793023",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62443,7 +61267,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/005/679/3030/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350056793030/turkisk-yoghurt-naturell-larsa",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350056793030",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62488,7 +61312,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/005/679/6000/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350056796000/turkisk-yoghurt-dryck-aryan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350056796000",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62524,7 +61348,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350059440085/mild-garlic-chicken-dumplings-beijing8",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350059440085",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62567,7 +61391,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/006/008/5947/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350060085947/dadelpasta-al-emir",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350060085947",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62603,7 +61427,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350060086548/vitost-white-combi-golden-cow",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350060086548",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62639,7 +61463,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/006/070/4657/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350060704657/pastasas-vodka-fiorelli",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350060704657",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62675,7 +61499,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350068290107/strawberry-n-cream-milkshake-propud",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350068290107",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62724,7 +61548,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/006/829/0145/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350068290145/propud-milkshake-chocolate-no-added-sugar-njie",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350068290145",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62766,7 +61590,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/006/829/0152/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350068290152/vanilla-ice-cream-propud",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350068290152",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -62820,7 +61644,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/006/829/1210/front_sv.70.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350068291210/milkshake-chocolate-propud",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350068291210",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -62957,7 +61781,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/006/829/5867/front_en.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350068295867/lowcaly-mango-njie",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350068295867",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -63040,7 +61864,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/008/616/0659/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350086160659/ice-coffee-salted-caramel-hell",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350086160659",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -63049,7 +61873,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Hell",
         "packageText": "250 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -63076,7 +61900,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350086160666/slim-vanilla-ice-coffe",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350086160666",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -63085,7 +61909,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Hell",
         "packageText": "250 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -63114,7 +61938,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/009/045/1057/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350090451057/klassisk-kebab-schysst-kak",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350090451057",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -63199,7 +62023,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/009/045/1422/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350090451422/mild-kebabsas-schysst-kak",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350090451422",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -63284,7 +62108,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/009/045/1439/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350090451439/vitlok-kebabsas-schysst-kak",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350090451439",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -63365,7 +62189,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/009/045/1880/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350090451880/kebab-rullebrod-schysstkak",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350090451880",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -63446,7 +62270,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/009/045/1996/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350090451996/kebab-schysst-kak",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350090451996",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -63527,7 +62351,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350090452504/kycklingkebab-schysst-kak",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350090452504",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -63569,7 +62393,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/009/218/0085/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350092180085/mango-passion-kombucha-humm",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350092180085",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -63578,7 +62402,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Humm",
         "packageText": "414ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -63609,7 +62433,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/009/218/0122/front_pl.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350092180122/humm-kombucha",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350092180122",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -63618,7 +62442,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Humm",
         "packageText": "414ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -63654,7 +62478,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/009/218/0207/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350092180207/kombucha-grapefruit-humm",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350092180207",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -63663,7 +62487,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Humm",
         "packageText": "414ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -63690,7 +62514,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350092180245/kombucha-strawberry-humm",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350092180245",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -63699,7 +62523,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Humm",
         "packageText": "330 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -63726,7 +62550,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350092180283/kombucha-pear-humm",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350092180283",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -63735,7 +62559,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Humm",
         "packageText": "330 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -63764,7 +62588,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/009/911/1129/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350099111129/granola-blabar-jordgubb-farsking",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350099111129",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -63845,7 +62669,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350102500124/cold-brew-concentrate-mode",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350102500124",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -63881,7 +62705,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350107990821/cappuccino-ice-coffee",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350107990821",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -63890,7 +62714,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Hell",
         "packageText": "250 ml",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -63927,7 +62751,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/011/394/0087/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350113940087/tahina-zeina-s",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350113940087",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -63975,7 +62799,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/011/394/0285/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350113940285/basmati-zeina-s",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350113940285",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -64056,7 +62880,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350113940599/basmati-boil-in-bag-zeinas",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350113940599",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64092,7 +62916,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350113940605/boil-in-bag-jasmine-rice-zeina",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350113940605",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64128,7 +62952,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350113940612/boil-in-bag-langkornigt-zeina-s",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350113940612",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64169,7 +62993,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/011/594/0061/front_es.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350115940061/habanero-salsa-el-taco-truck",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350115940061",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64264,7 +63088,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/011/692/1151/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350116921151/shiro-miso-soybean-paste-white-twin-dragon",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350116921151",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64300,7 +63124,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/011/692/3742/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350116923742/pate-de-sesame-blanc",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350116923742",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64336,7 +63160,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350116923957/japanese-soy-sauce-twin-dragon",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350116923957",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -64417,7 +63241,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350122560627/karleksmums-kladdkaka-frodinge",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350122560627",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -64453,7 +63277,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350126080824/vegopirog-anamma",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350126080824",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64489,7 +63313,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350126082835/matjessill-abba",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350126082835",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64570,7 +63394,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/012/608/8134/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350126088134/rigatoni-kyckling-pesto-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350126088134",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64610,7 +63434,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/012/608/8523/front_en.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350126088523/mustig-soppa-kyckling-morot-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350126088523",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64646,7 +63470,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350126088646/svamp-risotto-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350126088646",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64686,7 +63510,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/012/608/8790/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350126088790/ostpaj-med-vasterbottenost-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350126088790",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64722,7 +63546,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350126089490/frukost-marmelad-bob",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350126089490",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64758,7 +63582,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350126089728/senap-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350126089728",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64798,7 +63622,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/012/608/9759/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350126089759/sotstark-senap-felix",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350126089759",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64834,7 +63658,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350135373016/rostad-lok",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350135373016",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64870,7 +63694,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350166370060/pasta-linguine-mino",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350166370060",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64906,7 +63730,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350166370084/pasta-rigatoni-mino",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350166370084",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64942,7 +63766,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350166370091/orecchiette-mino",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350166370091",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -64978,7 +63802,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350166370107/capunti-mino",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350166370107",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65017,7 +63841,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/735/016/751/6535/front_nl.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7350167516535/bacon-chips-redhead",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7350167516535",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65053,7 +63877,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391049000803/kyxkling-steak-bbq-orginal-lonneberga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391049000803",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65089,7 +63913,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391049001749/kycklingspett-lonneberga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391049001749",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65132,7 +63956,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/104/900/2821/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391049002821/chicken-breast-lonneberga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391049002821",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65168,7 +63992,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/104/900/2845/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391049002845/kycklinglarfile-lonneberga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391049002845",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65204,7 +64028,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391049003477/tunna-fileer-lonneberga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391049003477",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65240,7 +64064,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391049003651/kycklingspett-lonneberga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391049003651",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65276,7 +64100,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391049003880/kycklingspett-bbq-chipotle-lonneberga",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391049003880",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65317,7 +64141,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/173/700/7602/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391737007602/osotat-medelhavs-levain-sodervidinge",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391737007602",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -65353,7 +64177,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391814006122/frystorkad-jordgubb-vit-choklad-exotic-snacks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391814006122",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65395,7 +64219,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/181/400/9109/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391814009109/valnotter-naturella-exotic-snacks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391814009109",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65476,7 +64300,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391835916349/kycklingbuljong-kung-markata",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391835916349",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65512,7 +64336,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391835917827/grotris-kung-markatta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391835917827",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65548,7 +64372,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391835920285/tomatpure-kung-markatta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391835920285",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65603,7 +64427,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/183/592/0322/front_sv.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391835920322/tahini-med-salt-kung-markatta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391835920322",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65639,7 +64463,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7391881837049/kaffe-bona-alvesta-glass",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7391881837049",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65681,7 +64505,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/203/100/0016/front_sv.26.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392031000016/johnny-s-senap-sot-stark",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392031000016",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65721,7 +64545,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/203/100/0122/front_de.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392031000122/senap-original-johnny-s",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392031000122",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65761,7 +64585,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/203/100/1013/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392031001013/senap-original-johnnys",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392031001013",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65797,7 +64621,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392031001068/american-yellow-mustard-osotad-johnny-s",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392031001068",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65852,7 +64676,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/205/012/3420/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392050123420/sproda-risbrod-olda",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392050123420",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65888,7 +64712,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392659002492/chips-lagrad-ost-lantchips",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392659002492",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65924,7 +64748,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/266/310/0603/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392663100603/gyoza-med-kycklingfyllning-och-dipsas-men-men",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392663100603",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -65968,7 +64792,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/267/200/0697/front_fr.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392672000697/turkish-yoghourt-naturell-laktosfri-salakis",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392672000697",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66018,7 +64842,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/267/200/1410/front_sv.52.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392672001410/grekisk-ekologisk-yoghurt-lindahls",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392672001410",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66064,7 +64888,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/267/200/1472/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392672001472/kvarg-yogurt-vanilj-lindahls",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392672001472",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66108,7 +64932,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/267/200/1540/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392672001540/laktosfri-grekisk-yoghurt-salakis",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392672001540",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66152,7 +64976,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/267/200/1724/front_fr.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392672001724/lindahls-peche-passion-nestle",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392672001724",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66242,7 +65066,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/267/200/4466/front_sv.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392672004466/turkisk-yoghurt-salakis",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392672004466",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66290,7 +65114,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/267/210/4050/front_sv.46.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392672104050/turkkilainen-maustamaton-jogurtti-10-lactalis-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392672104050",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66339,7 +65163,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/267/210/4104/front_nb.31.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7392672104104/turkisk-naturell-yoghurt-salakis",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7392672104104",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66357,16 +65181,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Salakis",
         "packageText": "1 kg",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957696",
-        "name": "Turkisk, Grekisk Yoghurt",
-        "brand": "Salakis",
-        "packageText": "1 kg",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -66397,7 +65212,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/306/100/1547/front_en.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393061001547/mjolk-falkopings-mejeri",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393061001547",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -66433,7 +65248,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/307/718/1509/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393077181509/goody-sweet-ovals-bubs",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393077181509",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -66478,7 +65293,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/372/000/1178/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720001178/allerum-prast-riven-skanemejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720001178",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66519,7 +65334,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/372/009/0202/front_en.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720090202/allrum-greve-allerum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720090202",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66560,7 +65375,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/372/009/0226/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720090226/prastost-allerum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720090226",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66596,7 +65411,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720090875/tre-lagrade-ostar-riven-allerum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720090875",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66632,7 +65447,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720091315/herrgard-ost-allerum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720091315",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66668,7 +65483,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720091322/allerum-prast-hardost",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720091322",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66704,7 +65519,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720091452/greve-12-manader-allerum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720091452",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66740,7 +65555,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720091506/prast-allerum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720091506",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66776,7 +65591,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/372/009/1513/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720091513/cheese-allerum-herrgard",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720091513",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66812,7 +65627,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/372/009/1520/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720091520/greve-allerum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720091520",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66850,7 +65665,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/372/009/1865/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720091865/lagrad-ost-svecia-28-allerum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720091865",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66886,7 +65701,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720091940/cheddar-allerum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720091940",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66922,7 +65737,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/372/009/2404/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720092404/herrgard-allerum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720092404",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66958,7 +65773,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720092442/allrum-greve-skanemejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720092442",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -66994,7 +65809,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720092480/prastost-lagrad-12-manader-allerum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720092480",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67030,7 +65845,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/372/009/2510/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720092510/prast-hardost-allrum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720092510",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67071,7 +65886,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/372/009/2749/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720092749/greve-ost-skanemejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720092749",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -67122,7 +65937,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720092770/herrgard-mild-skanemejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720092770",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -67167,7 +65982,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720092794/prastost-skanemejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720092794",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -67212,7 +66027,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720092800/prast-hardost-skanemejerier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720092800",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -67257,7 +66072,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720092817/rike-skanemejeriet",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720092817",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67293,7 +66108,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393720092862/ekologiskt-hardost-prast",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393720092862",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67329,7 +66144,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393914000123/kycklingbrost-i-basilikasas-gooh",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393914000123",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67365,7 +66180,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/391/400/0130/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393914000130/korv-stroganoff-gooh",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393914000130",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67401,7 +66216,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393914000147/kottbullar-med-potatismos-och-graddsas-gooh",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393914000147",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67437,7 +66252,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/391/400/0185/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393914000185/grillost-stroganoff-gooh",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393914000185",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67473,7 +66288,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7393914000208/kyckling-curry-gooh",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7393914000208",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67517,7 +66332,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/437/661/5740/front_no.28.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7394376615740/havregurt-naturell-oatly-norway-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7394376615740",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67574,7 +66389,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/437/661/6037/front_fi.118.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7394376616037/ikaffe-oatly",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7394376616037",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -67696,7 +66511,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/437/661/8048/front_sv.35.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7394376618048/ikaffe-barista-edition-oatly",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7394376618048",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67756,7 +66571,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/437/662/0171/front_de.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7394376620171/oatly-ikaffe-barista-edition",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7394376620171",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67822,7 +66637,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/437/662/1666/front_fi.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7394376621666/ikaffe-ekologisk-luomu-oatly",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7394376621666",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67875,7 +66690,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/437/662/1994/front_fi.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7394376621994/ikaffe-light-oatly",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7394376621994",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67917,7 +66732,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/437/662/3912/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7394376623912/ikaffe-churros-oatly",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7394376623912",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67953,7 +66768,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7394376624025/ikaffe-coconut-flavor-oatly",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7394376624025",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -67998,7 +66813,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/739/881/838/9985/front_en.25.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7398818389985/cookie-dough-high-protein-lohilo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7398818389985",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68082,7 +66897,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/212/0814/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612120814/chicken-dumplings-spicefield",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612120814",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68118,7 +66933,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/212/1224/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612121224/egg-noodles-spicefield",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612121224",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68199,7 +67014,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612121552/teriyaki-kycklingspett-spicefield",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612121552",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68241,7 +67056,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/214/2182/front_sv.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612142182/pastasas-vitlok-monte-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612142182",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68284,7 +67099,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/214/2199/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612142199/monte-castello-pastasas-arrabiata-emd",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612142199",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68327,7 +67142,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/214/2205/front_sv.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612142205/pastasas-basilika-monte-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612142205",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68375,7 +67190,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/215/0729/front_en.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612150729/fusilli-emd",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612150729",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -68420,7 +67235,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/215/0736/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612150736/penne-rigate-monte-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612150736",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -68475,7 +67290,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/215/0743/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612150743/spaghetti-monte-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612150743",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68511,7 +67326,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/215/0750/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612150750/snabbmakaroner-monte-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612150750",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -68556,7 +67371,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612150774/spaghetti-monte-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612150774",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68592,7 +67407,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612150798/fusilli-monte-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612150798",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68628,7 +67443,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612150941/tagliatelle-monte-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612150941",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68664,7 +67479,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612150958/fidelini-monte-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612150958",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68700,7 +67515,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/215/0965/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612150965/lasagneplattor-monte-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612150965",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68741,7 +67556,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/215/0972/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612150972/conchiglie-monte-castello",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612150972",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -68794,7 +67609,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612160841/mozzarella-fresca-d-oro",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612160841",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68894,7 +67709,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/216/0865/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612160865/mozarella-laktosfri-fresca-d-oro",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612160865",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68930,7 +67745,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612160889/lagrad-hardost-fresca-d-oro",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612160889",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -68966,7 +67781,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612160896/lagrad-hardost-fresca-d-oro",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612160896",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -69002,7 +67817,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612212113/powerking",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612212113",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -69083,7 +67898,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612212199/chocobannan-soft-protein-bar-powerking",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612212199",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -69129,7 +67944,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/222/1351/front_sv.28.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612221351/powerking-powerkingemd",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612221351",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -69210,7 +68025,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/222/2389/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612222389/the-energizer-powerking",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612222389",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -69291,7 +68106,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612404501/ice-tea-peach-premier",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612404501",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -69383,7 +68198,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/161/270/0092/front_fr.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7611612700092/8-tortillas-banderos",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7611612700092",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -69522,7 +68337,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/303/123/9436/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613031239436/nescafe-morkrost",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613031239436",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -69558,7 +68373,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/303/287/3691/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613032873691/nescafe-original",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613032873691",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -69625,7 +68440,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/303/317/4667/front_fr.383.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613033174667/cafe-au-lait-nescafe-dolce-gusto",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613033174667",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -69691,7 +68506,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/303/436/5774/front_en.124.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613034365774/cafe-con-leche-nescafe-dolce-gusto",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613034365774",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -69727,7 +68542,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/303/453/2657/front_es.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613034532657/capuccino-nescafe-gold",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613034532657",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -69776,7 +68591,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/303/549/7641/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613035497641/fruktstang-havre-blabar-svarte-vinbar-nestle-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613035497641",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -69866,7 +68681,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/303/583/0318/front_sv.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613035830318/lyx-mellanrost-nescafe",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613035830318",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -69908,7 +68723,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/303/686/7443/front_bg.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613036867443/kapseln-espresso-dolce-gusto",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613036867443",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -69956,7 +68771,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/303/696/1721/front_fr.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613036961721/nespresso-colombia-starbucks",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613036961721",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -69983,16 +68798,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Zoegas, Starbucks",
         "packageText": "10-pack",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957986",
-        "name": "Kaffekapslar",
-        "brand": "Zoegas, Starbucks",
-        "packageText": "10-pack",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -70021,7 +68827,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/303/756/4426/front_en.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613037564426/starbucks-caramel-macchiato-12-stk-as-nestle-norge",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613037564426",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70059,7 +68865,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/303/984/0047/front_fr.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613039840047/caffe-latte-nestle-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613039840047",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70105,7 +68911,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/761/328/755/4376/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7613287554376/chow-mein-flavour-instant-noodles-maggi",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7613287554376",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -70195,7 +69001,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/220/104/7764/front_sv.39.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622201047764/fransk-nougat-marabou",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622201047764",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -70276,7 +69082,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/220/112/5660/front_fr.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622201125660/oreo-crunchies-dipped",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622201125660",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70319,7 +69125,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/220/150/1143/front_en.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622201501143/oreo-remix-fresa-nata",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622201501143",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70360,7 +69166,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/220/163/6807/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622201636807/home-style-cookie-marabou",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622201636807",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70403,7 +69209,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/220/163/6951/front_en.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622201636951/suklaataytekeksi-marabou",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622201636951",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70441,7 +69247,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/220/163/7699/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622201637699/home-style-oreo-creme-marabou",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622201637699",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70482,7 +69288,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/220/202/9738/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622202029738/choco-brookie-marabou",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622202029738",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70520,7 +69326,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/220/202/9998/front_da.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622202029998/marabou-choco-brownie",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622202029998",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70555,7 +69361,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "nutriscoreGrade": "e",
     "nutritionPer100g": {
       "energyKj": 2044.5,
-      "energyKcal": 492,
+      "energyKcal": 518.840579710145,
       "fat": 22,
       "saturatedFat": 7.4,
       "carbohydrates": 67,
@@ -70568,7 +69374,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/221/013/7258/front_en.180.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622210137258/oreo-double-creme",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622210137258",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70613,7 +69419,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/221/047/7439/front_en.141.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622210477439/oreo-golden-mondelez-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622210477439",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70649,7 +69455,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/221/069/7134/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622210697134/hamburgeost-sottilette",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622210697134",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -70749,7 +69555,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/221/085/0652/front_sv.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622210850652/soft-chocowhoopies-marabou",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622210850652",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70796,7 +69602,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/230/033/6738/front_en.407.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622300336738/oreo-original",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622300336738",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -70898,7 +69704,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/230/058/9882/front_sv.39.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622300589882/mjolk-choklad-xl-cookies-marabou",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622300589882",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70941,7 +69747,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/230/072/1459/front_sv.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622300721459/daim-xl-cookies-marabou",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622300721459",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -70977,7 +69783,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/762/230/075/0053/front_fr.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7622300750053/choco-moment-marabou",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7622300750053",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -71029,7 +69835,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/000/9745/front_fr.48.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070009745/cafe-bio-organic-lavazza",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070009745",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71083,7 +69889,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/001/2875/front_fr.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070012875/caffe-lavazza-espresso-oluf-lorentzen-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070012875",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71128,7 +69934,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/001/9362/front_fr.23.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070019362/qualita-oro-lavazza",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070019362",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71168,7 +69974,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/002/0559/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070020559/kaffee-cafe-en-grains-100-arabica-lavazza",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070020559",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -71219,7 +70025,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/002/1631/front_fr.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070021631/itierra-lavazza",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070021631",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -71264,7 +70070,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/002/5066/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070025066/cafe-grain-grand-crema-espresso-lavazza",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070025066",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71324,7 +70130,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/002/5400/front_de.93.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070025400/crema-e-aroma-oluf-lorentzen-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070025400",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71382,7 +70188,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/003/6321/front_en.35.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070036321/qualita-rossa-lavazza",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070036321",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -71426,7 +70232,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/003/8370/front_de.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070038370/espresso-lavazza",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070038370",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71474,7 +70280,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/005/3465/front_de.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070053465/qualita-oro-kapseln-lavazza-luigi-lavazza-s-p-a",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070053465",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71577,7 +70383,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/005/3472/front_it.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070053472/crema-e-gusto-lavazza-luigi-lavazza-s-p-a",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070053472",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71629,7 +70435,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/005/3526/front_it.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070053526/lavazza-qualita-rossa-lavazza-luigi-lavazza-s-p-a",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070053526",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71684,7 +70490,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/005/3540/front_it.19.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070053540/itierra-bio-organic-lavazza",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070053540",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71732,7 +70538,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/005/3564/front_fr.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070053564/cafe-en-capsule-alu-lavazza",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070053564",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71778,7 +70584,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/005/3625/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070053625/cafe-espresso-maestro-lavazza",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070053625",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71814,7 +70620,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/007/008/3837/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000070083837/tales-of-roma",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000070083837",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71861,7 +70667,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/013/900/7095/front_it.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139007095/mezze-maniche-rigate-garofalo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139007095",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -71926,7 +70732,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/013/991/0142/front_en.53.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139910142/pates-spaghetti-n-9-garofalo-500gv2",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139910142",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -71976,7 +70782,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/013/991/0159/front_fr.48.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139910159/garofalo-linguine-igp-500g",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139910159",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72027,7 +70833,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/013/991/0227/front_fr.32.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139910227/fusilli-igp-500g-garofalo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139910227",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72076,7 +70882,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/013/991/0241/front_fr.36.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139910241/farfalle-garofalo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139910241",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72123,7 +70929,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/013/991/0258/front_es.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139910258/mafalda-corta-garofalo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139910258",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -72183,7 +70989,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/013/991/0265/front_en.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139910265/radiatori-garofalo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139910265",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72229,7 +71035,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/013/991/0272/front_it.28.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139910272/pappardelle-garofalo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139910272",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72273,7 +71079,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/013/991/0289/front_fr.55.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139910289/tagliatelle-nido-garofalo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139910289",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72322,7 +71128,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/013/992/9809/front_it.16.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139929809/mafalda-corta-garofalo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139929809",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72358,7 +71164,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139933189/pasta-ziti-corti",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139933189",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72394,7 +71200,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000139937941/garofalo-pasta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000139937941",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72442,7 +71248,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/043/013/2045/front_en.49.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000430132045/mozzarella-galbani",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000430132045",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72491,7 +71297,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/043/013/3035/front_en.235.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8000430133035/mozzarella-galbani",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8000430133035",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -72594,7 +71400,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/125/000/1757/front_it.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001250001757/lasagna-n-502-de-cecco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001250001757",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72643,7 +71449,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/125/000/9999/front_en.109.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001250009999/gnocchi-di-patate-de-cecco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001250009999",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72694,7 +71500,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/125/012/0076/front_it.172.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001250120076/linguine-n-7-de-cecco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001250120076",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72746,7 +71552,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/125/012/0120/front_it.266.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001250120120/spaghetti-n-12-de-cecco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001250120120",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72796,7 +71602,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/125/012/0236/front_de.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001250120236/tortiglioni-de-cecco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001250120236",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72844,7 +71650,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/125/012/0878/front_fr.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001250120878/cavatappi-de-cecco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001250120878",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72891,7 +71697,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/125/012/0939/front_it.61.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001250120939/farfalle-de-cecco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001250120939",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72939,7 +71745,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/125/015/2039/front_it.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001250152039/tagliatelle-dececco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001250152039",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -72980,7 +71786,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001250253019/pappardelle-301-pates-haute-qualite-sachet-de-500g-de-cecco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001250253019",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73020,7 +71826,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001420011883/risotto-gallo-pronto-riso-dal-1856-2-min-min-min-o",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001420011883",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73059,7 +71865,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/142/001/1890/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001420011890/risotto-alla-milanese-gallo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001420011890",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73095,7 +71901,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001440136924/polpa-finissima-cirio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001440136924",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -73104,16 +71910,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Cirio",
         "packageText": "390 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957947",
-        "name": "Krossade tomater",
-        "brand": "Cirio",
-        "packageText": "390 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -73149,7 +71946,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/166/512/8674/front_en.39.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001665128674/ravioli-ricotta-e-spinaci-rana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001665128674",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73167,16 +71964,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Rana",
         "packageText": "250 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958010",
-        "name": "Färsk fylld pasta",
-        "brand": "Rana",
-        "packageText": "250 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -73211,7 +71999,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/166/512/8681/front_fr.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001665128681/prosciutto-crudo-e-formaggio-giovanni-rana-tradizionali",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001665128681",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73229,16 +72017,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Rana",
         "packageText": "250 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958010",
-        "name": "Färsk fylld pasta",
-        "brand": "Rana",
-        "packageText": "250 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -73271,7 +72050,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/166/512/8698/front_en.34.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001665128698/tortellini-med-sopp-rana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001665128698",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -73280,16 +72059,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Rana",
         "packageText": "250 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958010",
-        "name": "Färsk fylld pasta",
-        "brand": "Rana",
-        "packageText": "250 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -73328,7 +72098,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/166/512/8704/front_nb.30.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001665128704/rana-fersk-ravioli-med-4-oster-oluf-lorentzen-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001665128704",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -73337,16 +72107,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Rana",
         "packageText": "250 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958010",
-        "name": "Färsk fylld pasta",
-        "brand": "Rana",
-        "packageText": "250 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -73385,7 +72146,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/166/512/8728/front_fr.36.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001665128728/ravioli-basilico-e-pinoli-rana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001665128728",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -73394,16 +72155,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Rana",
         "packageText": "250 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958010",
-        "name": "Färsk fylld pasta",
-        "brand": "Rana",
-        "packageText": "250 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -73446,7 +72198,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/166/570/0016/front_en.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001665700016/tortellini-with-ham-and-mozzarella-rana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001665700016",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -73455,16 +72207,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Rana",
         "packageText": "250 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003958010",
-        "name": "Färsk fylld pasta",
-        "brand": "Rana",
-        "packageText": "250 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -73499,7 +72242,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/166/572/2131/front_fi.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8001665722131/gnocchi-giovanni-rana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8001665722131",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -73600,7 +72343,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/200/443/7259/front_it.37.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8002004437259/biraghini-snack",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8002004437259",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73652,7 +72395,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/267/000/4205/front_en.109.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8002670004205/mozzarella-granarolo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8002670004205",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73699,7 +72442,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/267/000/4342/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8002670004342/gocce-di-mozzarella-granarolo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8002670004342",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73743,7 +72486,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/267/000/6612/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8002670006612/mozzarella-maxi-250g-granarolo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8002670006612",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73788,7 +72531,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/267/000/8739/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8002670008739/burratine-granarolo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8002670008739",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73824,7 +72567,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/267/001/1289/front_co.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8002670011289/straciatella-granarolo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8002670011289",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73867,7 +72610,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/356/600/0578/front_it.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8003566000578/parmigiano-reggiano",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8003566000578",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73923,7 +72666,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/469/005/2044/front_it.78.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8004690052044/penne-rigate-n-20-la-molisana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8004690052044",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -73967,7 +72710,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/469/005/2600/front_fr.25.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8004690052600/la-molisana-gnocchi-26",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8004690052600",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74014,7 +72757,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/469/005/2815/front_fr.38.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8004690052815/pasta-casareccia-la-molisana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8004690052815",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74064,7 +72807,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/469/005/3225/front_it.49.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8004690053225/pasta-mezzi-rigatoni-molisana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8004690053225",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74112,7 +72855,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/469/005/7308/front_en.42.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8004690057308/radiatori-la-molisana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8004690057308",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74163,7 +72906,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/469/010/1513/front_it.62.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8004690101513/spaghetto-quadrato-n-1-la-molisana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8004690101513",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74210,7 +72953,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/469/017/2803/front_it.60.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8004690172803/fusilli-corti-bucati-la-molisana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8004690172803",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74265,7 +73008,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/469/061/1500/front_it.90.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8004690611500/spaghetti-n-15-le-integrali-la-molisana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8004690611500",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74325,7 +73068,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/469/061/2804/front_en.208.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8004690612804/fusilli-no-28-le-integrali-la-molisana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8004690612804",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74375,7 +73118,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/469/061/3191/front_it.61.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8004690613191/mezzi-rigatoni-32-integrali-la-molisana",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8004690613191",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74418,7 +73161,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/511/000/0775/front_en.134.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8005110000775/sauce-tomate-parmigiano-reggiano-mutti",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8005110000775",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74465,7 +73208,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/511/000/5695/front_en.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8005110005695/sugo-speciale-with-voghiera-garlic-mutti",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8005110005695",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74508,7 +73251,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/511/012/0015/front_fr.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8005110120015/doppio-concentrato-di-pomodoro-mutti",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8005110120015",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74562,7 +73305,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/511/051/7006/front_en.143.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8005110517006/pasta-sauce-mutti",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8005110517006",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74608,7 +73351,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/511/051/8003/front_en.140.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8005110518003/sugo-con-peperoncino-mutti",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8005110518003",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74650,7 +73393,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/811/004/0642/front_it.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8008110040642/wudy-classico-aia",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8008110040642",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74692,7 +73435,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/834/320/0134/front_it.101.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8008343200134/rummo-linguine-n-13",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8008343200134",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74744,7 +73487,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/834/320/0486/front_en.106.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8008343200486/fussili-rummo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8008343200486",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74795,7 +73538,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/834/320/0509/front_fr.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8008343200509/rigatoni-n-50-rummo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8008343200509",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74842,7 +73585,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/834/320/0516/front_en.31.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8008343200516/rummo-mezzi-rigatoni-no-51",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8008343200516",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74882,7 +73625,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/834/320/0547/front_fr.12.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8008343200547/riccioli-nr-54-geia-food-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8008343200547",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74936,7 +73679,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/834/320/0660/front_en.76.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8008343200660/penne-rigate-n-66-rummo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8008343200660",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -74982,7 +73725,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/800/834/320/0882/front_fr.46.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8008343200882/pates-de-ble-casarecce-n-88-pasta-corta-rummo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8008343200882",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75026,7 +73769,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/801/178/000/9703/front_it.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8011780009703/riscossa-vermicelli-tagliati-70-pastificio",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8011780009703",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75062,7 +73805,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8030467000192/sushi-reis-1kg-oishii-yamato",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8030467000192",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75110,7 +73853,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/000/008/050/8816/front_en.62.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/80508816/classic-extra-virgin-oil-lesieur",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=80508816",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -75278,7 +74021,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/010/5735/front_en.156.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076800105735/penne-rigate-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076800105735",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75327,7 +74070,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/010/5988/front_en.94.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076800105988/fusilli-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076800105988",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75381,7 +74124,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/019/5019/front_en.2385.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076800195019/capellini-nr-1-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076800195019",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75396,8 +74139,8 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
   },
   {
     "barcode": "8076800195057",
-    "name": "Spaghetti N°5",
-    "brands": "Barilla",
+    "name": "Spaghetti N° 5",
+    "brands": "Barilla, BARILLA NORGE ASbarilla",
     "quantity": "500 g",
     "categories": [
       "en:plant-based-foods-and-beverages",
@@ -75434,7 +74177,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/019/5057/front_en.3809.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076800195057/spaghetti-n-5-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076800195057",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75482,7 +74225,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/019/5132/front_de.177.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076800195132/bavette-n-13-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076800195132",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75535,7 +74278,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/208/5738/front_en.3506.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076802085738/penne-rigate-no-73-durum-wheat-semolina-pasta-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076802085738",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75578,7 +74321,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/208/5851/front_en.54.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076802085851/gnocchi-n-85-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076802085851",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75626,7 +74369,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/208/5899/front_en.110.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076802085899/rigatoni-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076802085899",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75675,7 +74418,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/208/5912/front_en.104.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076802085912/pipe-rigate-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076802085912",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75722,7 +74465,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/208/5981/front_en.44.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076802085981/barilla-fusilli-n-98",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076802085981",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75771,7 +74514,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/421/5058/front_en.26.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076804215058/spaghetti-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076804215058",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75825,7 +74568,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/807/0882/front_de.122.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076808070882/cannelloni-nr-88-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076808070882",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75876,7 +74619,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/815/0072/front_fr.357.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076808150072/pates-spaghettoni-n-7-500g-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076808150072",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75926,7 +74669,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/889/0015/front_fr.148.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076808890015/pates-tortellini-jambon-fromage-collezione-250g-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076808890015",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -75973,7 +74716,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/950/0289/front_fr.96.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809500289/tortellini-fromage-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809500289",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76021,7 +74764,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/950/1415/front_en.39.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809501415/mezze-penne-tricolore-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809501415",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76071,7 +74814,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/951/2268/front_de.268.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809512268/pasta-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809512268",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76122,7 +74865,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/951/3388/front_en.191.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809513388/arrabbiata-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809513388",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76169,7 +74912,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/951/3715/front_fr.65.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809513715/sauce-tomate-aux-olives-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809513715",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76215,7 +74958,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/951/3739/front_en.88.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809513739/tomate-y-badilico-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809513739",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -76316,7 +75059,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/952/3561/front_en.119.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809523561/toscana-krauter-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809523561",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76364,7 +75107,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/952/3707/front_fr.69.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809523707/pates-castellane-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809523707",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76411,7 +75154,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/952/3738/front_en.361.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809523738/lasagne-platten-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809523738",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76454,7 +75197,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/952/3776/front_de.115.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809523776/fettucine-n-166-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809523776",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76492,7 +75235,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/953/1382/front_fr.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809531382/barilla-1kg-spaghetti-taysjyva-barilla-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809531382",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76539,7 +75282,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/956/9811/front_de.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809569811/spaghetti-barilla-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809569811",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76583,7 +75326,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/957/2996/front_cs.39.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809572996/aglio-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809572996",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76633,7 +75376,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/957/6352/front_fr.64.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809576352/lasagne-sans-gluten-250g-eu-barilla-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809576352",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76681,7 +75424,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/957/9100/front_fr.130.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809579100/pates-risoni-500g-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809579100",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76728,7 +75471,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/958/0144/front_en.21.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809580144/farfalle-n-65-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809580144",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76773,7 +75516,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/958/0731/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809580731/tagliatelle-500g-barilla-barilla-norge",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809580731",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76815,7 +75558,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/958/5194/front_fr.25.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809585194/spaghetti-500g-albronzo-rev-eu-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809585194",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76857,7 +75600,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/958/5217/front_fr.53.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809585217/pates-premium-fusilloni-al-bronzo-500g-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809585217",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76900,7 +75643,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/958/5224/front_fr.55.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809585224/pates-premium-mezzi-rigatoni-al-bronzo-500g-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809585224",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76948,7 +75691,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/958/5231/front_fr.50.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809585231/pates-premium-linguine-al-bronzo-500g-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809585231",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -76995,7 +75738,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/807/680/958/5415/front_fr.39.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8076809585415/pates-premium-tortiglioni-al-bronzo-500g-barilla",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8076809585415",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -77038,7 +75781,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/841/007/641/0115/front_nb.26.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8410076410115/taco-sauce-medium-old-el-paso",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8410076410115",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -77047,16 +75790,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Old el Paso",
         "packageText": "226-230g, 326g, 25 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957951",
-        "name": "Tacosås, Tortillabröd, Tacokrydda",
-        "brand": "Old el Paso",
-        "packageText": "226-230g, 326g, 25 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -77089,7 +75823,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/841/007/641/0122/front_nb.28.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8410076410122/taco-sauce-old-el-paso",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8410076410122",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -77098,16 +75832,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Old el Paso",
         "packageText": "226-230g, 326g, 25 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957951",
-        "name": "Tacosås, Tortillabröd, Tacokrydda",
-        "brand": "Old el Paso",
-        "packageText": "226-230g, 326g, 25 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -77143,7 +75868,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/841/007/649/1916/front_en.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8410076491916/taco-original-spice-mix-old-el-paso",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8410076491916",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -77152,16 +75877,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Old el Paso",
         "packageText": "226-230g, 326g, 25 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957951",
-        "name": "Tacosås, Tortillabröd, Tacokrydda",
-        "brand": "Old el Paso",
-        "packageText": "226-230g, 326g, 25 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -77188,7 +75904,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8445290805041/fullkorns-grot-nestle",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8445290805041",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -77231,7 +75947,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/844/529/091/4200/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8445290914200/nescafe-3-in-1-creamy-latte",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8445290914200",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -77289,7 +76005,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/844/529/148/4634/front_en.15.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8445291484634/mocha-nescafe",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8445291484634",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -77332,7 +76048,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/844/529/150/9863/front_fr.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8445291509863/nescafe-3en1-cafe-soluble-au-lait-sucre-boite-de-10-sticks-de-15-5g",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8445291509863",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -77371,7 +76087,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/844/529/162/8151/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8445291628151/vegoburgare-halsans-kok",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8445291628151",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -77380,16 +76096,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Hälsans Kök",
         "packageText": "440-450 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957945",
-        "name": "Vegetariska produkter",
-        "brand": "Hälsans Kök",
-        "packageText": "440-450 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -77416,7 +76123,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8445291678842/vegoschnitzel-halsans-kok",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8445291678842",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -77425,16 +76132,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Hälsans Kök",
         "packageText": "440-450 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957945",
-        "name": "Vegetariska produkter",
-        "brand": "Hälsans Kök",
-        "packageText": "440-450 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -77464,7 +76162,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/844/529/167/9139/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8445291679139/vegonuggets-halsans-kok",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8445291679139",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -77473,16 +76171,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Hälsans Kök",
         "packageText": "440-450 g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
-      },
-      {
-        "chain": "ica",
-        "productCode": "5003957945",
-        "name": "Vegetariska produkter",
-        "brand": "Hälsans Kök",
-        "packageText": "440-450 g",
-        "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -77536,7 +76225,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/869/063/503/0873/front_en.26.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8690635030873/tomatpure-tat",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8690635030873",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -77585,7 +76274,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/039/852/2733/front_en.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8710398522733/chipito-cheese-flavor-cheetos",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8710398522733",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -77630,7 +76319,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8710449956319/pom-duchesse-aviko",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8710449956319",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "ica",
@@ -77639,7 +76328,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "brand": "Aviko",
         "packageText": "600g",
         "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-        "retrievedAt": "2026-05-22T11:10:32.630Z"
+        "retrievedAt": "2026-05-22T09:30:22.424Z"
       }
     ]
   },
@@ -77668,7 +76357,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/036/0040/front_fr.13.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000360040/lungo-estremo-intensity-10-jacobs-douwe-egberts-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000360040",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -77727,7 +76416,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/036/0316/front_en.33.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000360316/cafe-l-or-lungo-profondo-8-jacobs-douwe-egberts-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000360316",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -77779,7 +76468,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/036/0521/front_en.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000360521/capsule-l-or-espresso-supremo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000360521",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -77891,7 +76580,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/036/0545/front_fr.18.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000360545/l-or-espresso-lungo-mattinata",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000360545",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -77949,7 +76638,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/036/0569/front_fr.30.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000360569/capsule-espresso-lungo-profondo-intensite-8-l-or",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000360569",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78003,7 +76692,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/036/0583/front_fr.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000360583/espresso-onyx-l-or-12",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000360583",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78062,7 +76751,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/036/0613/front_fr.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000360613/l-or-espresso-kenya-10-capsules-maison-du-cafe-or-expresso",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000360613",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78109,7 +76798,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/036/0835/front_fr.40.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000360835/cafe-l-or-ristretto-intensity-11-jacobs-douwe-egberts-norge-as-retail",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000360835",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -78163,7 +76852,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/036/3706/front_fr.20.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000363706/cafe-l-or-espresso-cappuccino-tassimo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000363706",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78213,7 +76902,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/039/0757/front_de.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000390757/tassimo-morning-cafe-strong-xl",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000390757",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78262,7 +76951,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/048/8225/front_en.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000488225/espresso-caramel-l-or",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000488225",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78307,7 +76996,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000494585/kaffe-gevalia-latte-caramel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000494585",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78355,7 +77044,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/058/1049/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000581049/coconut-iced-espresso-capsules-l-or-expresso",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000581049",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -78391,7 +77080,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/070/3397/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000703397/tassimo-lor-latte",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000703397",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -78442,7 +77131,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/100/071/2559/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711000712559/espresso-noisette-hazelnut-l-or",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711000712559",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78496,7 +77185,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/111/801/3593/front_sv.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711118013593/potatisgratang-peka",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711118013593",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78538,7 +77227,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/111/801/6020/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711118016020/potatisgratang-peka",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711118016020",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78577,7 +77266,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711118031306/kryddig-kulpotatis-peka",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711118031306",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78623,7 +77312,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/120/034/4734/front_sv.61.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711200344734/knorr-pasta-snack-pot-unilever-norge",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711200344734",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78659,7 +77348,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/120/035/9721/front_en.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711200359721/carbonara-knorr",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711200359721",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78699,7 +77388,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/120/040/2625/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711200402625/sotstark-senap-utan-socker-slotts",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711200402625",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -78741,7 +77430,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/741/6239/front_sv.33.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327416239/pasta-snack-pot-bolognese-unilever-norge-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327416239",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -78831,7 +77520,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/748/0537/front_en.62.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327480537/magnum-batonnet-gold-caramel-billion-85ml",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327480537",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -78867,7 +77556,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327549265/piggelin-gb-glace",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327549265",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -78908,7 +77597,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/754/9364/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327549364/paron-splitt-unilever",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327549364",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -78951,7 +77640,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/758/5782/front_fr.45.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327585782/magnum-glace-batonnet-mini-caramel-amande-gold-caramel-billionaire-6x55ml",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327585782",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -78999,7 +77688,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/760/9082/front_en.77.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327609082/mini-classic-almond-white-chocolate-magnum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327609082",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -79048,7 +77737,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/761/1924/front_de.40.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327611924/magnum-mini-almond",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327611924",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -79096,7 +77785,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/761/2372/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327612372/magnum-ice-cream-lolly-110-ml",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327612372",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -79141,7 +77830,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/762/2289/front_en.56.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327622289/pink-lemonade-magnum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327622289",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -79186,7 +77875,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/763/9942/front_en.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327639942/bonbon-gold-caramel-billionaire-magnum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327639942",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -79231,7 +77920,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/764/0450/front_en.56.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327640450/bon-bon-white-chocolate-cookies-magnum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327640450",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -79283,7 +77972,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/766/3640/front_de.24.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327663640/blueberry-cookie-magnum",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327663640",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -79326,7 +78015,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/132/766/7525/front_es.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8711327667525/haribo-push-up-eis-einzeln",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8711327667525",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -79367,7 +78056,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/210/044/6306/front_sv.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8712100446306/88-gb-glace",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8712100446306",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -79408,7 +78097,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/210/063/9739/front_sv.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8712100639739/nogger-classic-gb-glass",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8712100639739",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -79455,7 +78144,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/242/935/0100/front_en.110.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8712429350100/demae-ramen-chicken-nissin",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8712429350100",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -79495,7 +78184,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/410/075/1374/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8714100751374/finmalen-stark-senap-slotts",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8714100751374",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -79535,7 +78224,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/410/075/1527/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8714100751527/senap-original-slotts",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8714100751527",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -79576,7 +78265,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/410/075/1664/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8714100751664/grovkornig-skansk-senap-slotts",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8714100751664",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -79614,7 +78303,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/455/500/0188/front_en.22.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8714555000188/zwan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8714555000188",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -79652,7 +78341,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/455/500/0478/front_de.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8714555000478/zwan",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8714555000478",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -79698,7 +78387,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/570/001/6504/front_en.139.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8715700016504/ketchup-heinz",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8715700016504",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -79757,7 +78446,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/570/011/8109/front_en.27.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8715700118109/tomato-ketchup-zero-sugar-heinz",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8715700118109",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -79800,7 +78489,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/570/042/2046/front_en.10.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8715700422046/seriously-good-heinz",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8715700422046",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -79889,7 +78578,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/570/042/3944/front_fr.44.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8715700423944/ketchup-50-sucres-sel-en-haugen-gruppen-as",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8715700423944",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -79939,7 +78628,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/000/6355/front_sv.11.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200006355/milda-culinesse-flytande",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200006355",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -79987,7 +78676,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/000/7772/front_sv.14.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200007772/milda-culinesse-flytande",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200007772",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80039,7 +78728,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/005/2529/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200052529/butter-becel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200052529",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80097,7 +78786,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/005/2543/front_sv.50.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200052543/latt-omega-3-becel",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200052543",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80133,7 +78822,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200066748/creme-bonjour-kantarell-flora",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200066748",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80223,7 +78912,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/025/7344/front_en.5.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200257344/latta-original",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200257344",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80288,7 +78977,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/025/7375/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200257375/latta-smor-original",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200257375",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80334,7 +79023,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/025/7900/front_sv.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200257900/extrasaltat-latta",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200257900",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80379,7 +79068,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/025/8303/front_sv.39.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200258303/latta-mini",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200258303",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80433,7 +79122,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/025/9508/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200259508/plant-b-tter-flora",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200259508",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80478,7 +79167,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/027/9292/front_sv.17.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200279292/latta-original-upfield",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200279292",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80530,7 +79219,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/028/4173/front_sv.9.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200284173/plant-cre-m-15-flora",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200284173",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80611,7 +79300,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200295537/flora",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200295537",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80647,7 +79336,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/871/920/031/1886/front_sv.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200311886/flora",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200311886",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80683,7 +79372,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8719200312319/extra-saltat-flora",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8719200312319",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80719,7 +79408,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/8720608006656/peach-flavoured-ice-tea-lipton",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8720608006656",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "willys",
@@ -80863,7 +79552,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/872/270/013/2523/front_de.8.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8722700132523/sandwich-original-langnese",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8722700132523",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "coop",
@@ -80910,7 +79599,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/885/052/111/1127/front_fr.6.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8850521111127/vermicelle-riz-400g-1-mm-oriental-oriental-food",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8850521111127",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -80954,7 +79643,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/893/600/782/0360/front_en.7.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8936007820360/vermicelle-de-riz-frais-bambou-thuan-phong-400g-vietnam-tufoco",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8936007820360",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -81002,7 +79691,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/893/850/703/9266/front_fr.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/8938507039266/jasmine-rice-riz-parfume-jasmin-lotus-rice",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=8938507039266",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -81049,7 +79738,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "https://images.openfoodfacts.org/images/products/931/014/000/1074/front_en.3.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/9310140001074/australian-medium-grain-calrose-rice-sunrice",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=9310140001074",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",
@@ -81085,7 +79774,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "imageUrl": "",
     "productUrl": "http://world-en.openfoodfacts.org/product/9556041602761/chilisas-stark-ayamo",
     "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=9556041602761",
-    "retrievedAt": "2026-05-22T11:18:28.578Z",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
     "retailerMatches": [
       {
         "chain": "hemkop",

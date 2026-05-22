@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { babyDiaperPriceTracker, watchlistAlertBoard, watchlistAlertInputs } from '@/lib/demo-data';
+import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, watchlistAlertBoard, watchlistAlertInputs } from '@/lib/demo-data';
 
 function priceSource(productId: string) {
   return watchlistAlertInputs.products.find((product) => product.productId === productId)?.source ?? 'visible price row';
@@ -71,6 +71,34 @@ export default function WatchlistPage() {
             </div>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">{budgetEssentialsPriceDropAlerts.persona}</p>
+        <h2 className="mt-2 text-2xl font-black">Essentials price-drop alerts</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          This low-income tracker calls buildWatchlistAlerts for weekly essentials and keeps essentialCategory plus weeklyNeed visible so shoppers can prioritize staples before treats.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {budgetEssentialsPriceDropAlerts.rows.map((row) => (
+            <Link className="rounded-2xl border border-emerald-200 bg-white p-4 hover:border-emerald-700" href={`/products/${row.productId}`} key={row.productId}>
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-lg font-black text-slate-950">{row.productName}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">essentialCategory: {row.essentialCategory}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">weeklyNeed: {row.weeklyNeed}</p>
+                </div>
+                <p className="text-2xl font-black text-emerald-800">{row.alertCount} alerts</p>
+              </div>
+              <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                <p className="rounded-2xl bg-emerald-100 p-3 font-semibold">Best {row.bestPrice} SEK</p>
+                <p className="rounded-2xl bg-emerald-100 p-3 font-black text-emerald-900">Deal Score {row.dealScore}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">{row.source}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-4 text-sm font-semibold text-slate-700">{budgetEssentialsPriceDropAlerts.coverage.caveat}</p>
       </Card>
 
       <Card className="mt-6 border-blue-200 bg-blue-50">

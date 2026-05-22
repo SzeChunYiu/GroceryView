@@ -96,7 +96,11 @@ describe('createGroceryViewApi', () => {
         productSlug: 'bryggkaffe-450g',
         productName: 'Bryggkaffe mellanrost 450 g',
         chainId: 'chain-willys',
+        chainSlug: 'willys',
+        chainName: 'Willys',
         storeId: 'store-willys',
+        storeSlug: 'willys-odenplan',
+        storeName: 'Willys Odenplan',
         priceType: 'promotion',
         price: 49.9,
         regularPrice: 59.9,
@@ -127,6 +131,27 @@ describe('createGroceryViewApi', () => {
 
     assert.equal(report?.productSlug, 'bryggkaffe-450g');
     assert.deepEqual(report?.points.map((point) => point.observationId), ['obs-coffee-old', 'obs-coffee-new']);
+    assert.deepEqual(report?.points.at(-1), {
+      observationId: 'obs-coffee-new',
+      productId: 'product-coffee',
+      productSlug: 'bryggkaffe-450g',
+      productName: 'Bryggkaffe mellanrost 450 g',
+      chainId: 'chain-willys',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      storeId: 'store-willys',
+      storeSlug: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      priceType: 'promotion',
+      price: 49.9,
+      regularPrice: 59.9,
+      unitPrice: 110.89,
+      currency: 'SEK',
+      memberRequired: false,
+      observedAt: '2026-05-19T09:00:00.000Z',
+      confidence: 0.94,
+      provenance: { source: 'open_prices', rawSnapshotRef: 's3://raw/coffee-new.html' }
+    });
     assert.deepEqual(report?.priceTypes, ['promotion', 'shelf']);
     assert.equal(report?.summary?.latestPrice, 49.9);
     assert.equal(report?.summary?.changeFromPrevious, -10);
@@ -147,6 +172,30 @@ describe('createGroceryViewApi', () => {
     assert.deepEqual(result.facets.chains.find((facet) => facet.value === 'willys'), { value: 'willys', label: 'Willys', count: 2 });
     assert.deepEqual(result.facets.priceRange, { min: 14.9, max: 54.9 });
     assert.deepEqual(result.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores']);
+  });
+
+  it('keeps unpriced catalog rows unpriced in faceted search responses', () => {
+    const result = buildFacetedProductSearch({
+      rows: [
+        ...realRows,
+        {
+          productId: 'product-oats',
+          slug: 'havregryn-1kg',
+          canonicalName: 'Havregryn 1 kg',
+          brand: 'Axa',
+          categoryPath: ['Pantry', 'Breakfast'],
+          packageSize: 1,
+          packageUnit: 'kg',
+          comparableUnit: 'kg'
+        }
+      ],
+      filters: { query: 'havre', limit: 10 }
+    });
+
+    const oats = result.products.find((product) => product.productId === 'product-oats');
+    assert.equal(oats?.cheapestPrice, null);
+    assert.deepEqual(oats?.currentPrices, []);
+    assert.equal(result.evidence.latestPriceCount, realRows.length);
   });
 
   it('builds basket comparisons from latest price rows without estimated fallback prices', () => {
@@ -1189,6 +1238,20 @@ describe('createGroceryViewApi', () => {
       () => api.resolveBasketImportReviewItem('user-2', reviewItemId, { decision: 'dismiss' }),
       /Basket import review item not found/
     );
+  });
+
+  it('blocks retailer basket transfer sessions unless support is verified', () => {
+    const api = createGroceryViewApi();
+
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    const report = api.getRetailerBasketTransferSession('user-1', 'willys');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.retailerId, 'willys');
+    assert.equal(report.status, 'blocked');
+    assert.equal(report.canAttemptTransfer, false);
+    assert.match(report.blockedReasons[0] ?? '', /not verified as supported/);
+    assert.match(report.guardrails[0], /verified retailer capability/);
   });
 
   it('returns retailer handoff plans with support matrix fallbacks and checkout guardrails', () => {

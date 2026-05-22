@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
-import { createGroceryViewApi } from '@groceryview/api';
+import { createGroceryViewApi, type BasketImportReviewItem } from '@groceryview/api';
 import { createHttpHandler } from '../index.js';
 
 async function json(response: Response) {
@@ -295,36 +295,12 @@ describe('createHttpHandler', () => {
     ]);
 
     const flyerOffers = await handle(new Request('http://localhost/api/deals/flyer-offers?chain=willys&asOf=2026-05-20T12:00:00.000Z'));
-    assert.equal(flyerOffers.status, 200);
-    const flyerOffersBody = await json(flyerOffers) as {
-      offerCount: number;
-      stores: Array<{ storeId: string; offerCount: number; totalOneEachSavings: number }>;
-      offers: Array<{ offerId: string; productId: string; savings: number; sourceType: string; sourceRunId: string }>;
-      guardrails: string[];
-    };
-    assert.equal(flyerOffersBody.offerCount, 2);
-    assert.deepEqual(flyerOffersBody.stores.map((store) => [store.storeId, store.offerCount, store.totalOneEachSavings]), [
-      ['willys-odenplan', 2, 22]
-    ]);
-    assert.deepEqual(flyerOffersBody.offers.map((offer) => [offer.offerId, offer.productId, offer.savings, offer.sourceType]), [
-      ['flyer-willys-odenplan-coffee-2026w21', 'coffee', 15, 'weekly_flyer'],
-      ['flyer-willys-odenplan-private-label-milk-2026w21', 'private-label-milk', 7, 'weekly_flyer']
-    ]);
-    assert.match(flyerOffersBody.guardrails[0] ?? '', /validity window/i);
+    assert.equal(flyerOffers.status, 503);
+    assert.deepEqual(await json(flyerOffers), { error: 'Flyer offers provider is not configured.' });
 
     const storeFlyerOffers = await handle(new Request('http://localhost/api/stores/lidl-sveavagen/flyer-offers?asOf=2026-05-20T12:00:00.000Z'));
-    assert.equal(storeFlyerOffers.status, 200);
-    const storeFlyerOffersBody = await json(storeFlyerOffers) as {
-      storeId: string;
-      offerCount: number;
-      totalOneEachSavings: number;
-      bestOffer: { productId: string; sourceRunId: string };
-    };
-    assert.equal(storeFlyerOffersBody.storeId, 'lidl-sveavagen');
-    assert.equal(storeFlyerOffersBody.offerCount, 1);
-    assert.equal(storeFlyerOffersBody.totalOneEachSavings, 3);
-    assert.equal(storeFlyerOffersBody.bestOffer.productId, 'milk');
-    assert.equal(storeFlyerOffersBody.bestOffer.sourceRunId, 'source-run-lidl-flyer-2026-05-19');
+    assert.equal(storeFlyerOffers.status, 503);
+    assert.deepEqual(await json(storeFlyerOffers), { error: 'Store flyer offers provider is not configured.' });
 
     const storeDealSummary = await handle(new Request('http://localhost/api/stores/willys-odenplan/deal-summary'));
     assert.equal(storeDealSummary.status, 200);
@@ -699,8 +675,8 @@ describe('createHttpHandler', () => {
     assert.deepEqual(await json(dealSummary), { error: 'Store not found.' });
 
     const flyerOffers = await handle(new Request('http://localhost/api/stores/missing-store/flyer-offers'));
-    assert.equal(flyerOffers.status, 404);
-    assert.deepEqual(await json(flyerOffers), { error: 'Store not found.' });
+    assert.equal(flyerOffers.status, 503);
+    assert.deepEqual(await json(flyerOffers), { error: 'Store flyer offers provider is not configured.' });
 
     const categoryCoverage = await handle(new Request('http://localhost/api/stores/missing-store/category-coverage'));
     assert.equal(categoryCoverage.status, 404);
@@ -766,25 +742,16 @@ describe('createHttpHandler', () => {
     assert.deepEqual(watchlist.items[0]?.allowedPriceTypes, ['shelf']);
     assert.equal(watchlist.alerts.length, 2);
 
-    const priceAlerts = await json(await handle(new Request('http://localhost/api/watchlist/price-alerts?userId=user-1'))) as {
-      trackedItemCount: number;
-      alertCount: number;
-      alerts: Array<{ type: string; productId: string }>;
-      guardrails: string[];
-    };
-    assert.equal(priceAlerts.trackedItemCount, 1);
-    assert.equal(priceAlerts.alertCount, 0);
-    assert.deepEqual(priceAlerts.alerts, []);
-    assert.match(priceAlerts.guardrails[0] ?? '', /target price/i);
+    const priceAlerts = await handle(new Request('http://localhost/api/watchlist/price-alerts?userId=user-1'));
+    assert.equal(priceAlerts.status, 503);
+    assert.deepEqual(await json(priceAlerts), { error: 'Watchlist price-alert provider is not configured.' });
 
     const updatedPriceAlerts = await handle(new Request('http://localhost/api/watchlist/price-alerts?userId=user-1', {
       method: 'POST',
       body: JSON.stringify({ productId: 'coffee', targetPrice: 50, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] })
     }));
-    assert.equal(updatedPriceAlerts.status, 201);
-    const updatedPriceAlertsBody = await json(updatedPriceAlerts) as { trackedItemCount: number; alertCount: number };
-    assert.equal(updatedPriceAlertsBody.trackedItemCount, 1);
-    assert.equal(updatedPriceAlertsBody.alertCount, 1);
+    assert.equal(updatedPriceAlerts.status, 503);
+    assert.deepEqual(await json(updatedPriceAlerts), { error: 'Watchlist price-alert writer is not configured.' });
 
     const comparison = await json(await handle(new Request('http://localhost/api/basket/compare?userId=user-1', { method: 'POST' }))) as { cheapestByProduct: { total: number } };
     assert.equal(comparison.cheapestByProduct.total, 99.8);
@@ -838,6 +805,21 @@ describe('createHttpHandler', () => {
     ]);
     assert.match(handoff.unsupportedReasons[1] ?? '', /cannot claim purchase completion/i);
     assert.match(handoff.guardrails[0], /not checkout confirmation/i);
+
+    const transfer = await json(await handle(new Request('http://localhost/api/basket/transfer/willys?userId=user-1'))) as {
+      userId: string;
+      retailerId: string;
+      status: string;
+      canAttemptTransfer: boolean;
+      blockedReasons: string[];
+      guardrails: string[];
+    };
+    assert.equal(transfer.userId, 'user-1');
+    assert.equal(transfer.retailerId, 'willys');
+    assert.equal(transfer.status, 'blocked');
+    assert.equal(transfer.canAttemptTransfer, false);
+    assert.match(transfer.blockedReasons[0] ?? '', /not verified as supported/);
+    assert.match(transfer.guardrails[0] ?? '', /verified retailer capability/);
 
 
     const importExport = await handle(new Request('http://localhost/api/basket/import-export?userId=user-import', {
@@ -1371,6 +1353,64 @@ describe('createHttpHandler', () => {
       enforcementReasons: string[];
     };
     assert.deepEqual(missing.enforcementReasons, ['missing_subscription_entitlement']);
+  });
+
+  it('uses the runtime repository for account-bound basket import review persistence when configured', async () => {
+    const api = createGroceryViewApi();
+    const savedRows: Array<{ userId: string; items: Array<{ reviewItemId: string; rawName: string; status: string }> }> = [];
+    const openRows = new Map<string, BasketImportReviewItem[]>();
+    const handle = createHttpHandler(api, {
+      basketImportReviewRepository: {
+        async saveBasketImportReviewItems(userId, items) {
+          savedRows.push({ userId, items: items.map((item) => ({ reviewItemId: item.reviewItemId, rawName: item.rawName, status: item.status })) });
+          openRows.set(userId, items.map((item) => ({ ...item })));
+        },
+        async listOpenBasketImportReviewItems(userId) {
+          return openRows.get(userId)?.filter((item) => item.status === 'open') ?? [];
+        },
+        async resolveBasketImportReviewItem(userId, reviewItemId, resolution) {
+          const items = openRows.get(userId) ?? [];
+          const index = items.findIndex((item) => item.reviewItemId === reviewItemId && item.status === 'open');
+          if (index === -1) throw new Error(`Basket import review item not found: ${reviewItemId}`);
+          const resolved = {
+            ...items[index]!,
+            status: resolution.status,
+            resolvedAt: resolution.resolvedAt,
+            ...(resolution.resolvedProductId ? { resolvedProductId: resolution.resolvedProductId } : {}),
+            ...(resolution.quantity === undefined ? {} : { quantity: resolution.quantity })
+          };
+          openRows.set(userId, items.map((item, itemIndex) => itemIndex === index ? resolved : item));
+          return resolved;
+        }
+      }
+    });
+
+    await handle(new Request('http://localhost/api/basket/import-export?userId=user-db-import', {
+      method: 'POST',
+      body: JSON.stringify({
+        source: { sourceKind: 'bookmarklet', retailerId: 'willys', origin: 'https://www.willys.se', capturedAt: '2026-05-22T09:35:00.000Z', consentGranted: true },
+        capturedLines: [
+          { rawName: 'Retailer-only bakery bun', quantity: 3 }
+        ]
+      })
+    }));
+
+    assert.equal(savedRows[0]?.userId, 'user-db-import');
+    assert.equal(savedRows[0]?.items[0]?.rawName, 'Retailer-only bakery bun');
+    const queue = await json(await handle(new Request('http://localhost/api/basket/import-review?userId=user-db-import'))) as {
+      openItemCount: number;
+      items: Array<{ reviewItemId: string; rawName: string }>;
+    };
+    assert.equal(queue.openItemCount, 1);
+    assert.equal(queue.items[0]?.rawName, 'Retailer-only bakery bun');
+
+    const decision = await handle(new Request(`http://localhost/api/basket/import-review/${encodeURIComponent(queue.items[0]!.reviewItemId)}/decisions?userId=user-db-import`, {
+      method: 'POST',
+      body: JSON.stringify({ decision: 'dismiss' })
+    }));
+    assert.equal(decision.status, 200);
+    assert.equal((await json(decision) as { status: string }).status, 'dismissed');
+    assert.equal((await json(await handle(new Request('http://localhost/api/basket/import-review?userId=user-db-import'))) as { openItemCount: number }).openItemCount, 0);
   });
 
   it('accepts signed billing subscription events and persists entitlement mutations', async () => {

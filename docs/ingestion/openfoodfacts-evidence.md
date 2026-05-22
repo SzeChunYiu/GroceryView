@@ -2,13 +2,13 @@
 
 - Source: official OpenFoodFacts world data export
 - Source URL: https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
-- Retrieved: 2026-05-22T11:18:28.578Z
-- Candidate barcode count checked from current Willys/Hemkop/Coop/ICA reklamblad ingested rows: 2968
-- ICA reklamblad candidate barcode count checked: 362 unique barcodes
-- Export rows scanned: 4528597
-- Candidate barcodes present in export: 1897
-- Matched rows without usable nutrition/name skipped: 310
-- Real rows fetched: 1587 barcode+nutrition rows matched to existing ingested retailer products
+- Retrieved: 2026-05-22T10:51:26.620Z
+- Candidate barcode count checked from current Willys/Hemkop/Coop/ICA reklamblad ingested rows: 2953
+- ICA reklamblad candidate barcode count checked: 346 unique barcodes
+- Export rows scanned: 4526744
+- Candidate barcodes present in export: 1890
+- Matched rows without usable nutrition/name skipped: 309
+- Real rows fetched: 1581 barcode+nutrition rows matched to existing ingested retailer products
 - Connector: packages/ingestion/src/connectors/openfoodfacts.ts
 - Web wire: apps/web/src/lib/ingested/openfoodfacts.ts
 
@@ -16,10 +16,10 @@ The direct product API returned HTTP 429 during the 2026-05-22 probe. The offici
 
 ## Verification
 
-- Verified: 2026-05-22T11:21:04Z
+- Verified: 2026-05-22T11:08:46Z
 - Export join path: `fetchOpenFoodFactsExportRetailerEnrichments`
 - Unit coverage: `fetchOpenFoodFactsExportRetailerEnrichments` joins only retailer candidate barcodes from the export and skips nutrition-empty rows.
-- Artifact audit: `rowCount` 1587 equals 1587 emitted barcode rows; all 1587 barcodes are unique; `candidateBarcodeCount` 2968 equals the 2968 unique usable current Willys/Hemkop/Coop/ICA reklamblad candidate barcodes; every emitted barcode appears in those current candidates; zero emitted rows have empty nutrition; zero emitted rows use a source outside `https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=...`.
+- Artifact audit: `rowCount` 1581 equals 1581 emitted barcode rows; all 1581 barcodes are unique; `candidateBarcodeCount` 2953 equals the 2953 unique usable current Willys/Hemkop/Coop/ICA reklamblad candidate barcodes; every emitted barcode appears in those current candidates; zero emitted rows have empty nutrition; zero emitted rows use a source outside `https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=...`.
 
 ## Sample Retrieved Rows
 

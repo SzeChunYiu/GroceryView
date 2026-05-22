@@ -105,6 +105,7 @@ describe('verified-data UI', () => {
     assert.match(route, /Account-bound import review/);
     assert.match(route, /unmatched retailer rows stay out of the basket/i);
     assert.match(route, /signed-in shopper accepts/i);
+    assert.match(route, /PostgreSQL-backed runtime repository/i);
     assert.doesNotMatch(route, /NoVerifiedData/);
     assert.match(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
@@ -125,6 +126,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces the secure retailer basket transfer preflight contract on the basket ideas route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/basket-ideas/page.tsx');
+
+    assert.match(verified, /export const retailerBasketTransferContract = /);
+    assert.match(verified, /\/api\/basket\/transfer/);
+    assert.match(route, /retailerBasketTransferContract/);
+    assert.match(route, /Secure basket transfer preflight/);
+    assert.match(route, /block unless capability is verified/i);
+    assert.match(route, /not checkout confirmation/i);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+    assert.match(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
 
   it('surfaces the basket trip-cost optimizer contract on the shopping trips route', async () => {
     const verified = await read('src/lib/verified-data.ts');
@@ -137,6 +153,32 @@ describe('verified-data UI', () => {
     assert.match(route, /travel-cost optimizer/);
     assert.match(route, /NoVerifiedData/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+  it('surfaces elderly nearest-store and delivery options without private location data', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/shopping-trips/page.tsx');
+
+    assert.match(verified, /export const elderlyNearestDeliveryPlanner = /);
+    assert.match(route, /elderlyNearestDeliveryPlanner/);
+    assert.match(route, /Nearest-store \+ delivery options/);
+    assert.match(route, /mobilitySupport/);
+    assert.match(route, /no private home location/);
+    assert.match(route, /NoVerifiedData/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+  });
+
+  it('surfaces budget cheapest-store-for-my-list routing without private location data', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/shopping-trips/page.tsx');
+
+    assert.match(verified, /export const budgetCheapestStoreRoutingPlanner = /);
+    assert.match(route, /budgetCheapestStoreRoutingPlanner/);
+    assert.match(route, /Cheapest-store-for-my-list routing/);
+    assert.match(route, /routeRankInputs/);
+    assert.match(route, /storeListGuardrails/);
+    assert.match(route, /NoVerifiedData/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
@@ -179,6 +221,18 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a budget stretch-krona basket optimizer using real basket strategy output', async () => {
+    const source = await read('src/app/weekly-basket/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+    assert.match(demo, /budgetStretchKronaOptimizer/);
+    assert.match(demo, /compareBasketStrategies/);
+    assert.match(source, /budgetStretchKronaOptimizer/);
+    assert.match(source, /Stretch your krona optimizer/);
+    assert.match(source, /kronaSavedPerExtraStore/);
+    assert.match(source, /missingPriceBlockers/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
 
 
 
@@ -199,6 +253,18 @@ describe('verified-data UI', () => {
     assert.match(source, /buildWatchlistAlerts/);
     assert.match(source, /Baby & diaper price tracking/);
     assert.match(source, /diaperUnitPrice/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('surfaces budget essentials price-drop alerts using the real watchlist engine', async () => {
+    const source = await read('src/app/watchlist/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+    assert.match(demo, /budgetEssentialsPriceDropAlerts/);
+    assert.match(demo, /buildWatchlistAlerts/);
+    assert.match(source, /budgetEssentialsPriceDropAlerts/);
+    assert.match(source, /Essentials price-drop alerts/);
+    assert.match(source, /essentialCategory/);
+    assert.match(source, /weeklyNeed/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
@@ -279,6 +345,52 @@ describe('verified-data UI', () => {
     assert.match(source, /nutritionPerKrona/);
     assert.match(source, /rankNutritionPerKrona/);
     assert.match(source, /valuePer10Sek/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('surfaces a halal kosher and ethnic aisle finder from verified category rows', async () => {
+    const source = await read('src/app/categories/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+    assert.match(verified, /export const immigrantAisleFinder/);
+    assert.match(source, /immigrantAisleFinder/);
+    assert.match(source, /Halal, kosher & ethnic aisle finder/);
+    assert.match(source, /dietaryTags/);
+    assert.match(source, /verifiedCategorySlug/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('surfaces immigrant familiar-brand search from verified product rows', async () => {
+    const source = await read('src/app/products/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+    assert.match(verified, /export const immigrantFamiliarBrandSearch/);
+    assert.match(source, /immigrantFamiliarBrandSearch/);
+    assert.match(source, /Familiar-brand search/);
+    assert.match(source, /reportedBrand/);
+    assert.match(source, /verifiedProductSlug/);
+    assert.match(source, /searchTokens/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('surfaces immigrant image-first browsing from verified product images', async () => {
+    const source = await read('src/app/products/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+    assert.match(verified, /export const immigrantImageFirstBrowsing/);
+    assert.match(source, /immigrantImageFirstBrowsing/);
+    assert.match(source, /Image-first browsing/);
+    assert.match(source, /imageUrl/);
+    assert.match(source, /visualAlt/);
+    assert.match(source, /verifiedProductSlug/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('surfaces immigrant multilingual UI access in the public shell', async () => {
+    const source = await read('src/components/market-shell.tsx');
+    assert.match(source, /immigrantMultilingualUi/);
+    assert.match(source, /Multilingual UI starter/);
+    assert.match(source, /languageOptions/);
+    assert.match(source, /Arabic/);
+    assert.match(source, /Somali/);
+    assert.match(source, /No machine-translated prices/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
@@ -475,6 +587,19 @@ describe('verified-data UI', () => {
     assert.match(route, /chain\.topProductSlug/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+  it('surfaces a budget lowest price anywhere radar from matched chain prices', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/compare/page.tsx');
+
+    assert.match(verified, /export const budgetLowestPriceRadar/);
+    assert.match(route, /budgetLowestPriceRadar/);
+    assert.match(route, /Lowest price anywhere radar/);
+    assert.match(route, /cheapestChain/);
+    assert.match(route, /verifiedProductSlug/);
+    assert.match(route, /priceGap/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
   it('surfaces verified OpenPrices observation depth on the homepage', async () => {

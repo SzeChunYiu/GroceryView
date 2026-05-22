@@ -2,7 +2,7 @@
 // Stores source URL: https://matpriskollen.se/api/v1/stores?lat=56.93287&lon=12.54594&limit=40
 // Offer source URL pattern: https://matpriskollen.se/api/v1/stores/{storeKey}/offers?lat=56.93287&lon=12.54594&limit=200
 // Offer source URLs: https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/e3a2e2b0-b292-49cb-b2c1-2aa751165fe2/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/b6ae1eb7-36ef-4dac-9532-ec89cdf44422/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/eca042e8-89ce-46ad-af67-ff9a9d366d16/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/222f11dc-994a-44c1-b4ac-e65712754506/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/5f8c8d81-d30c-405a-9a20-5bda49363935/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200; https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200
-// Retrieved: 2026-05-22T11:24:52.830Z
+// Retrieved: 2026-05-22T11:29:14.829Z
 // Row count: 575 real grocery offer rows fetched from matpriskollen.se.
 
 export type MatpriskollenIngestedOffer = {
@@ -31,7 +31,7 @@ export type MatpriskollenIngestedOffer = {
 
 export const matpriskollenSource = {
   "source": "matpriskollen.se public store/offers JSON API",
-  "retrievedAt": "2026-05-22T11:24:52.830Z",
+  "retrievedAt": "2026-05-22T11:29:14.829Z",
   "rowCount": 575,
   "storesSourceUrl": "https://matpriskollen.se/api/v1/stores?lat=56.93287&lon=12.54594&limit=40",
   "sourceUrlPattern": "https://matpriskollen.se/api/v1/stores/{storeKey}/offers?lat=56.93287&lon=12.54594&limit=200",
@@ -76,7 +76,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0156ff11-3c20-43cf-a217-5a95ccb68b16",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "036e04e6-99fa-4621-8321-dea0b65279f1",
@@ -99,7 +99,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/036e04e6-99fa-4621-8321-dea0b65279f1",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "074bffa7-ba96-4ab3-94f2-7463bbd351d6",
@@ -122,7 +122,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/074bffa7-ba96-4ab3-94f2-7463bbd351d6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/4ce86595-c52d-4c29-c367-08d5baccc90b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0d838e11-e6b6-47c6-9ef3-1813ba4567b4",
@@ -145,7 +145,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0d838e11-e6b6-47c6-9ef3-1813ba4567b4",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/b6cd7af7-6c90-4fa8-99e8-f4deea4ec648/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2066b948-9766-4abf-8a2f-1ad8eada5deb",
@@ -168,7 +168,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2066b948-9766-4abf-8a2f-1ad8eada5deb",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2220ed66-6ccf-42ab-974f-631b71f3d63e",
@@ -191,7 +191,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2220ed66-6ccf-42ab-974f-631b71f3d63e",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2b88d019-11c4-4371-8469-ef0d30db5e75",
@@ -214,7 +214,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2b88d019-11c4-4371-8469-ef0d30db5e75",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/2346ddbd-ad0a-41a1-63a1-08d6a8255641/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2f69d8b7-1c64-48bd-9fd4-3aaefa2a7c6b",
@@ -237,7 +237,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2f69d8b7-1c64-48bd-9fd4-3aaefa2a7c6b",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/674a2344-d936-4074-e973-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "318b3f13-c637-4577-8743-ef7e9b9156ab",
@@ -260,7 +260,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/318b3f13-c637-4577-8743-ef7e9b9156ab",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/2a4f81d7-4905-46ce-990b-8e3ae6513a14/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3228c4a4-12e0-40c5-9b97-895249fe16c8",
@@ -283,7 +283,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3228c4a4-12e0-40c5-9b97-895249fe16c8",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/64ed17d6-9afe-47aa-a73c-85120ab751ba/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "347a367e-fafc-4884-ab7c-8088b6869c92",
@@ -306,7 +306,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/347a367e-fafc-4884-ab7c-8088b6869c92",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c6cff01d-66ea-4dcd-ef1b-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "34d24f21-2874-4d71-9e19-56d2003d355c",
@@ -329,7 +329,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/34d24f21-2874-4d71-9e19-56d2003d355c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/15acdd32-0f7b-4f3b-b83b-ebd6b4501276/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3651cf7a-c9f6-43d3-a8f7-b196694cced5",
@@ -352,7 +352,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3651cf7a-c9f6-43d3-a8f7-b196694cced5",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "394e9d7a-35f2-4a39-928f-87adfb552faf",
@@ -375,7 +375,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/394e9d7a-35f2-4a39-928f-87adfb552faf",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3b64bb04-2017-4885-b3ee-360d535d239d",
@@ -398,7 +398,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3b64bb04-2017-4885-b3ee-360d535d239d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5ee1f5ee-4c1b-44be-a6d6-4ffadb48ac4b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3e1280d0-e321-431a-9623-b92ec7c5951b",
@@ -421,7 +421,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3e1280d0-e321-431a-9623-b92ec7c5951b",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f551a1d6-79a1-41e4-bde4-2f9a3265a29b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3f0a5944-923b-485b-a72f-fd678cbdf0c7",
@@ -444,7 +444,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3f0a5944-923b-485b-a72f-fd678cbdf0c7",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "435f54e1-d81e-4ec7-aa92-1b3efa84e3a6",
@@ -467,7 +467,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/435f54e1-d81e-4ec7-aa92-1b3efa84e3a6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/edc9f4c2-6139-422a-49c7-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "472c945d-a2de-41cd-b46e-962b68f5ff89",
@@ -490,7 +490,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/472c945d-a2de-41cd-b46e-962b68f5ff89",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3ab620fc-66f0-4456-7025-08d4ac1a34ec/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4aaaf464-da9a-42e4-97bb-ce9b0399490d",
@@ -513,7 +513,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4aaaf464-da9a-42e4-97bb-ce9b0399490d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/48f26494-bb6f-495a-8ca8-12b64c27f845/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4d6c2d51-2019-4db3-9246-aa2718a9ed6f",
@@ -536,7 +536,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4d6c2d51-2019-4db3-9246-aa2718a9ed6f",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/e74ae2dd-437b-45a1-332b-08d495917ded/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "50c56874-1ccd-4899-9d89-dfc9d86501bc",
@@ -559,7 +559,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/50c56874-1ccd-4899-9d89-dfc9d86501bc",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/fc0681ab-ae2f-4b81-c427-08d4c3af03c6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5125eeae-e619-425c-af04-4ab72c5e3d09",
@@ -582,7 +582,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5125eeae-e619-425c-af04-4ab72c5e3d09",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/d59b6267-5d19-48d6-5d29-08d59e7a8d25/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "51a0c725-8d5f-4e92-9b04-c395d755be5b",
@@ -605,7 +605,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/51a0c725-8d5f-4e92-9b04-c395d755be5b",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "535d6292-a42f-4f10-a071-5db84fc962b7",
@@ -628,7 +628,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/535d6292-a42f-4f10-a071-5db84fc962b7",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ef3da428-0d32-4aa1-ae4d-24e853020fe9/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "546730cf-90b7-444c-ae20-f53b28acb28a",
@@ -651,7 +651,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/546730cf-90b7-444c-ae20-f53b28acb28a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/b93064a4-0a7a-462c-029e-08d692e9ad3c/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "591b4cf2-bd32-47a8-aed1-28dad779128b",
@@ -674,7 +674,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/591b4cf2-bd32-47a8-aed1-28dad779128b",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5d42806f-dd56-4e95-7806-08d6b281ec0c/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5b242ab3-131b-475d-a237-83cce5e50f70",
@@ -697,7 +697,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5b242ab3-131b-475d-a237-83cce5e50f70",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5ccd40dd-11fb-4bb6-a358-e5b34c1a59af",
@@ -720,7 +720,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5ccd40dd-11fb-4bb6-a358-e5b34c1a59af",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6b18b506-60b1-4574-e4bb-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5d6a6852-b740-495e-ae0e-5c83471ede32",
@@ -743,7 +743,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5d6a6852-b740-495e-ae0e-5c83471ede32",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "62c387e6-95f0-4c36-90cf-e071252a0eb9",
@@ -766,7 +766,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/62c387e6-95f0-4c36-90cf-e071252a0eb9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/e813f876-72eb-4b4a-7006-08d4ac1a34ec/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "62de5f22-f0e1-472e-9bc1-ba9ce270db90",
@@ -789,7 +789,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/62de5f22-f0e1-472e-9bc1-ba9ce270db90",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "65752b22-943a-4b3e-8340-01b778097413",
@@ -812,7 +812,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/65752b22-943a-4b3e-8340-01b778097413",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/54cdda25-b46f-4c20-4805-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "66b71a03-b579-4d64-a29e-f4afe21b9bc8",
@@ -835,7 +835,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/66b71a03-b579-4d64-a29e-f4afe21b9bc8",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c89f1d50-0163-4ec2-9766-5f113c9b734a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6705f955-04a0-43a3-b95e-2caa2b3f05db",
@@ -858,7 +858,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6705f955-04a0-43a3-b95e-2caa2b3f05db",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a7531c66-9765-4782-932a-2ece4db631d4/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "670f4695-c7f7-4e0d-a3e2-3b1edacc9800",
@@ -881,7 +881,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/670f4695-c7f7-4e0d-a3e2-3b1edacc9800",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/73373a0e-4752-4c55-9c8c-fa1c0a3bbab6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "68cddbb9-53ef-4218-9f2d-70cf0ad87485",
@@ -904,7 +904,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/68cddbb9-53ef-4218-9f2d-70cf0ad87485",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/97fed9fd-0058-4501-48c2-08d8487d8491/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6c361dc3-68f0-42e0-ae7d-6c4914a3c9f4",
@@ -927,7 +927,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6c361dc3-68f0-42e0-ae7d-6c4914a3c9f4",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6dc0f189-e74f-40cc-bfdf-a8a41d5b72e5",
@@ -950,7 +950,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6dc0f189-e74f-40cc-bfdf-a8a41d5b72e5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ba8caeac-c978-4c39-dae7-08d4a1776a57/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "70d135ac-3e29-457c-ae4c-e6ae6c6c9abf",
@@ -973,7 +973,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/70d135ac-3e29-457c-ae4c-e6ae6c6c9abf",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/4d35c5a3-3b2d-43e6-faf3-08d6191b1ea2/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "713992f6-f980-40ce-8b3f-3e1db429528e",
@@ -996,7 +996,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/713992f6-f980-40ce-8b3f-3e1db429528e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f71b5289-cf1f-448a-9562-c1def6160c3c/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7870132b-1119-4bec-8e58-3c1be43c2939",
@@ -1019,7 +1019,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7870132b-1119-4bec-8e58-3c1be43c2939",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "79e875e9-b7c8-45ca-80df-2b61d7b4aae4",
@@ -1042,7 +1042,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/79e875e9-b7c8-45ca-80df-2b61d7b4aae4",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7e1ec76d-26c2-4995-ac19-1c5987a88d19",
@@ -1065,7 +1065,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7e1ec76d-26c2-4995-ac19-1c5987a88d19",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6dec6217-dcac-4f92-97d6-d8342e964792/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8593625d-44c0-4317-ab10-d196151ae1cf",
@@ -1088,7 +1088,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8593625d-44c0-4317-ab10-d196151ae1cf",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8641296d-de9f-46ff-9d25-82ff9ca337b6",
@@ -1111,7 +1111,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8641296d-de9f-46ff-9d25-82ff9ca337b6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/901cea98-dc33-4902-a5b3-f01bf0ed838b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "93e9f707-2478-4794-8f75-f41237e26716",
@@ -1134,7 +1134,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/93e9f707-2478-4794-8f75-f41237e26716",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9846be2f-0910-4a8b-9f7a-dcd83a8acef9",
@@ -1157,7 +1157,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9846be2f-0910-4a8b-9f7a-dcd83a8acef9",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9ff99bd2-0aca-476d-868d-04dc5d56c119",
@@ -1180,7 +1180,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9ff99bd2-0aca-476d-868d-04dc5d56c119",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/eea033d8-cbeb-47ea-88aa-c0b58bd89ea2/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a25d83c7-e23d-46dc-b8f4-58010ac77291",
@@ -1203,7 +1203,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a25d83c7-e23d-46dc-b8f4-58010ac77291",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/1fa1aa0e-2400-43cb-bacc-0e6fad8c9867/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a474af2b-3b22-42d8-86a4-a1e80701eec7",
@@ -1226,7 +1226,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a474af2b-3b22-42d8-86a4-a1e80701eec7",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/65cac984-8e27-42eb-fa08-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a677a0ac-0b83-4019-9ca5-5ef83d9127e1",
@@ -1249,7 +1249,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a677a0ac-0b83-4019-9ca5-5ef83d9127e1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3dc511fd-d85f-4815-89f5-359f6f6b4aaa/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a77e1efa-237f-419b-acff-c6496375d62f",
@@ -1272,7 +1272,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a77e1efa-237f-419b-acff-c6496375d62f",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c5946edb-8b31-4f35-73ff-08d535f00adf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "aab8113d-c3b1-4e74-836c-b91da6553ec4",
@@ -1295,7 +1295,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/aab8113d-c3b1-4e74-836c-b91da6553ec4",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/753cd086-de1b-47df-76bd-08d535f00adf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "aeef6ecc-a588-4a86-8151-92093ac5f303",
@@ -1318,7 +1318,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/aeef6ecc-a588-4a86-8151-92093ac5f303",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/21bcbda7-8938-4ef6-ad25-7e3b2553f3b9/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b0537fe4-7cf7-4610-8671-efcb07574f0e",
@@ -1341,7 +1341,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b0537fe4-7cf7-4610-8671-efcb07574f0e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/4aa71097-ebf3-485d-a90d-35ab64e25968/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b6f7d2af-c3f8-412a-a22e-8cf9ea58f85e",
@@ -1364,7 +1364,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b6f7d2af-c3f8-412a-a22e-8cf9ea58f85e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/73e14e12-e474-48fe-8abc-307169612e1e/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "bc2443a8-a00b-4c0d-8983-49057632d39c",
@@ -1387,7 +1387,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/bc2443a8-a00b-4c0d-8983-49057632d39c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/31befa68-e96b-4f6a-48a7-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "bd0a1e02-78b8-4f73-954d-c295f8e63180",
@@ -1410,7 +1410,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/bd0a1e02-78b8-4f73-954d-c295f8e63180",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c046070f-ed90-4581-9737-ff777a8baa40",
@@ -1433,7 +1433,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c046070f-ed90-4581-9737-ff777a8baa40",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/78bc60ff-03e3-4f9b-b8e0-c0003f6af5f3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c14c53d3-7999-4e6e-bc50-ed84a6c44ef0",
@@ -1456,7 +1456,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c14c53d3-7999-4e6e-bc50-ed84a6c44ef0",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c14f0dff-dad6-4d28-bdf2-92ab4ce2c38b",
@@ -1479,7 +1479,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c14f0dff-dad6-4d28-bdf2-92ab4ce2c38b",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c2689a9c-8014-4220-8ada-e6e94768f3fe",
@@ -1502,7 +1502,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c2689a9c-8014-4220-8ada-e6e94768f3fe",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/091b80ae-d6f5-4ee7-6d55-08d535f00adf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c3968366-2031-4ad8-b8c6-a0292ebc62b9",
@@ -1525,7 +1525,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c3968366-2031-4ad8-b8c6-a0292ebc62b9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/32e99e9b-5525-4df9-d0c0-08d6594e26c0/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c5e8275c-d677-4f38-87e2-397a393129e6",
@@ -1548,7 +1548,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c5e8275c-d677-4f38-87e2-397a393129e6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/010bfbc9-9950-4f04-aa1e-f1ff8d3c080d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c6b8525e-5577-4680-ba84-4ec89f96ec69",
@@ -1571,7 +1571,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c6b8525e-5577-4680-ba84-4ec89f96ec69",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/362900b8-258d-4d39-bf3e-bbfe128c1770/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c7540a41-e9e4-4666-a355-eb75fd090ec0",
@@ -1594,7 +1594,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c7540a41-e9e4-4666-a355-eb75fd090ec0",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/373de6a9-d5ea-450a-872d-407e43ea9403/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "cce270b7-5025-4708-b387-5392941f7123",
@@ -1617,7 +1617,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/cce270b7-5025-4708-b387-5392941f7123",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8e712df1-6439-40f8-b3b6-a77d9fad7878/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d02ec5b1-b837-4949-97fb-0f44058fe130",
@@ -1640,7 +1640,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d02ec5b1-b837-4949-97fb-0f44058fe130",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d08893d0-d101-4aba-820e-5a3389f95a0a",
@@ -1663,7 +1663,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d08893d0-d101-4aba-820e-5a3389f95a0a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ddd8bfed-0833-4b67-89f5-6d2100df42c9",
@@ -1686,7 +1686,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ddd8bfed-0833-4b67-89f5-6d2100df42c9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/50a9b4ef-ea7a-4917-789b-08d6b281ec0c/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ddf626ff-ccfc-4ba2-9b4f-01a3dd26338d",
@@ -1709,7 +1709,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ddf626ff-ccfc-4ba2-9b4f-01a3dd26338d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/710fe6e1-be18-4774-66ec-08d5048c20b5/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e2cb18de-8391-46c1-888f-0a464ce69643",
@@ -1732,7 +1732,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e2cb18de-8391-46c1-888f-0a464ce69643",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/65bef4ca-2ee4-4f01-525c-08d569d56bbf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e798830d-5f4d-42de-904c-240c43c1abca",
@@ -1755,7 +1755,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e798830d-5f4d-42de-904c-240c43c1abca",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3d91f3a3-659d-4bf5-f168-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e82f9e1f-cd82-47c1-9cc2-c7f1f1df4643",
@@ -1778,7 +1778,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e82f9e1f-cd82-47c1-9cc2-c7f1f1df4643",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/18925428-15b1-4a3a-bc53-c611541c41ae/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "eb119d8c-dc71-4529-ad72-f3ffa582bbd7",
@@ -1801,7 +1801,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/eb119d8c-dc71-4529-ad72-f3ffa582bbd7",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "eb2a1014-396f-4eb7-86d1-7d00b17ae8b0",
@@ -1824,7 +1824,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/eb2a1014-396f-4eb7-86d1-7d00b17ae8b0",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f0cf8f56-dbf6-4b46-73b8-08d4ac1a34ec/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f1acd96c-23db-4781-b09b-f6c24252d8e6",
@@ -1847,7 +1847,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f1acd96c-23db-4781-b09b-f6c24252d8e6",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f7d6e1e9-c9c8-4600-be54-cc46c5305079",
@@ -1870,7 +1870,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f7d6e1e9-c9c8-4600-be54-cc46c5305079",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5151a90f-e4c3-4589-a628-6d4e15629a5d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "fa1e05a8-bc5f-4f74-b35a-b800c2c902ee",
@@ -1893,7 +1893,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/fa1e05a8-bc5f-4f74-b35a-b800c2c902ee",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/d389f390-2180-45f9-4835-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "fcfcc78e-d825-4816-b141-668af7c61dff",
@@ -1916,7 +1916,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/fcfcc78e-d825-4816-b141-668af7c61dff",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c0cc31d1-719a-4509-89fa-31ca46219ea9/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "feaa17d1-e64d-4eed-ad71-c711f9d0dbc5",
@@ -1939,7 +1939,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/d20e31b2-2c0e-4e87-8f8e-280d41b1bb16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/feaa17d1-e64d-4eed-ad71-c711f9d0dbc5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c20f4eaa-4bb9-4ec1-bf1e-c21a7ed77d18/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "037e9555-b8a0-44f4-8950-224ae1bd15d7",
@@ -1962,7 +1962,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/037e9555-b8a0-44f4-8950-224ae1bd15d7",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "04892ef4-3e90-420a-91a9-da647549ffcc",
@@ -1985,7 +1985,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/04892ef4-3e90-420a-91a9-da647549ffcc",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0531e41d-f7eb-4be5-a3b8-229fe108cfa2",
@@ -2008,7 +2008,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0531e41d-f7eb-4be5-a3b8-229fe108cfa2",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0c390bca-095e-4c38-bb90-5e96002e22dd",
@@ -2031,7 +2031,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0c390bca-095e-4c38-bb90-5e96002e22dd",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0cc97c2d-ef5e-472b-bdb0-158f4949b627",
@@ -2054,7 +2054,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0cc97c2d-ef5e-472b-bdb0-158f4949b627",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a4bd547e-f3a3-439d-b960-7ad114b96a33/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0f9f39eb-6f3a-4aca-bc11-d550a74903e5",
@@ -2077,7 +2077,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0f9f39eb-6f3a-4aca-bc11-d550a74903e5",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "10345928-2d2a-4176-af32-1ad1295de951",
@@ -2100,7 +2100,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/10345928-2d2a-4176-af32-1ad1295de951",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "10a9e68d-e064-48fd-9214-e0318764d349",
@@ -2123,7 +2123,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/10a9e68d-e064-48fd-9214-e0318764d349",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "10b1d1c8-3f16-40f1-a470-1d0ddac0f946",
@@ -2146,7 +2146,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/10b1d1c8-3f16-40f1-a470-1d0ddac0f946",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "13557964-02d9-4817-b9dd-921ee31b2840",
@@ -2169,7 +2169,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/13557964-02d9-4817-b9dd-921ee31b2840",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "13844a10-3e5f-4d90-8f05-940b7d2f3ab9",
@@ -2192,7 +2192,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/13844a10-3e5f-4d90-8f05-940b7d2f3ab9",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "15c42ec1-c0c8-435f-8a3c-b0917dc494dc",
@@ -2215,7 +2215,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/15c42ec1-c0c8-435f-8a3c-b0917dc494dc",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "16d20c16-2a73-4f55-8e4c-011f3e156758",
@@ -2238,7 +2238,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/16d20c16-2a73-4f55-8e4c-011f3e156758",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1b9ba3e6-b31b-4949-a397-ec0f54cb76b9",
@@ -2261,7 +2261,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1b9ba3e6-b31b-4949-a397-ec0f54cb76b9",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1e422c83-ad1c-4884-8b13-dab276baf896",
@@ -2284,7 +2284,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1e422c83-ad1c-4884-8b13-dab276baf896",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "21c83616-d3fd-47a7-b07c-7c36c44c974a",
@@ -2307,7 +2307,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/21c83616-d3fd-47a7-b07c-7c36c44c974a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "21fddaed-7425-4efe-a97a-2975c87b32a5",
@@ -2330,7 +2330,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/21fddaed-7425-4efe-a97a-2975c87b32a5",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2393cc72-415e-4a17-855f-c6eca0f4e438",
@@ -2353,7 +2353,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2393cc72-415e-4a17-855f-c6eca0f4e438",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "266b194f-5a81-43cd-8864-629eb3e16406",
@@ -2376,7 +2376,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/266b194f-5a81-43cd-8864-629eb3e16406",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2704b8eb-51b3-4128-9e48-d29540c9927f",
@@ -2399,7 +2399,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2704b8eb-51b3-4128-9e48-d29540c9927f",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "270f9033-1f4b-4db9-b312-d8611422dc5c",
@@ -2422,7 +2422,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/270f9033-1f4b-4db9-b312-d8611422dc5c",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2ab5a5b8-35f3-413b-9543-d02d48566637",
@@ -2445,7 +2445,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2ab5a5b8-35f3-413b-9543-d02d48566637",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2baa7d02-08fe-45f6-827e-3977529ee34a",
@@ -2468,7 +2468,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2baa7d02-08fe-45f6-827e-3977529ee34a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2c4e1f56-ad9b-4fe2-9bf3-215532b180ad",
@@ -2491,7 +2491,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2c4e1f56-ad9b-4fe2-9bf3-215532b180ad",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2e45e8e1-7a6b-46f4-a1b7-0025aaabcff5",
@@ -2514,7 +2514,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2e45e8e1-7a6b-46f4-a1b7-0025aaabcff5",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2f8d8b07-1180-49cf-a83e-c592853c2522",
@@ -2537,7 +2537,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2f8d8b07-1180-49cf-a83e-c592853c2522",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3129d5e4-f362-4b8b-8032-f880f4fc3fdf",
@@ -2560,7 +2560,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3129d5e4-f362-4b8b-8032-f880f4fc3fdf",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3380c57e-f6ee-4e7e-823f-7f368eb0c484",
@@ -2583,7 +2583,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3380c57e-f6ee-4e7e-823f-7f368eb0c484",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "33df5403-e5b1-4406-8f4c-cf9a13e6e448",
@@ -2606,7 +2606,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/33df5403-e5b1-4406-8f4c-cf9a13e6e448",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "34079f30-cb50-4ab2-84df-68274443a5ff",
@@ -2629,7 +2629,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/34079f30-cb50-4ab2-84df-68274443a5ff",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3411ca7a-7752-4e64-b5af-507eb7b6b806",
@@ -2652,7 +2652,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3411ca7a-7752-4e64-b5af-507eb7b6b806",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "377e0066-25f1-4dae-94fb-7ee8cff429be",
@@ -2675,7 +2675,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/377e0066-25f1-4dae-94fb-7ee8cff429be",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "37a9fa7a-2360-4910-b918-ef4b694403d4",
@@ -2698,7 +2698,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/37a9fa7a-2360-4910-b918-ef4b694403d4",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3d3e4e86-410b-4024-b316-3eac4ca56c3f",
@@ -2721,7 +2721,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3d3e4e86-410b-4024-b316-3eac4ca56c3f",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3d4b8a06-93ee-48ac-bdb8-a3b6960e9b84",
@@ -2744,7 +2744,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3d4b8a06-93ee-48ac-bdb8-a3b6960e9b84",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3ec4118f-2f8c-4df8-a415-3eee30a1b3d0",
@@ -2767,7 +2767,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3ec4118f-2f8c-4df8-a415-3eee30a1b3d0",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "42f26cd7-a0fc-44d5-83cf-d895f0233d17",
@@ -2790,7 +2790,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/42f26cd7-a0fc-44d5-83cf-d895f0233d17",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/fbd78027-270e-46e1-bbef-278110e38de1/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "43774280-1954-4748-9c94-62ee15ccd84c",
@@ -2813,7 +2813,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/43774280-1954-4748-9c94-62ee15ccd84c",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "446020fd-9b9c-4a38-804c-1817f9a36fa9",
@@ -2836,7 +2836,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/446020fd-9b9c-4a38-804c-1817f9a36fa9",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "46d5391c-f913-4343-af1e-6a9765098530",
@@ -2859,7 +2859,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/46d5391c-f913-4343-af1e-6a9765098530",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "46f7c3c2-ae39-4c49-9b36-bf81afb5533d",
@@ -2882,7 +2882,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/46f7c3c2-ae39-4c49-9b36-bf81afb5533d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4c273695-3432-44f2-99c6-1d39dba4f8e5",
@@ -2905,7 +2905,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4c273695-3432-44f2-99c6-1d39dba4f8e5",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4f699c27-ade8-4487-bff4-9f4d84545985",
@@ -2928,7 +2928,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4f699c27-ade8-4487-bff4-9f4d84545985",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "54173884-d81e-4674-a1ab-4e7ba1e60e59",
@@ -2951,7 +2951,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/54173884-d81e-4674-a1ab-4e7ba1e60e59",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "565eefa4-864e-4a5e-ba45-35bfb01fa285",
@@ -2974,7 +2974,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/565eefa4-864e-4a5e-ba45-35bfb01fa285",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5a0df0ba-ee47-43f6-a620-b7514ef204f3",
@@ -2997,7 +2997,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5a0df0ba-ee47-43f6-a620-b7514ef204f3",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5a323f38-4b32-4007-9360-48dbdcd1adf1",
@@ -3020,7 +3020,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5a323f38-4b32-4007-9360-48dbdcd1adf1",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5bbd777a-a8cd-4bd2-b33f-c4692840d3c0",
@@ -3043,7 +3043,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5bbd777a-a8cd-4bd2-b33f-c4692840d3c0",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5c2c0a9f-01c4-4895-b87d-0f649e98757f",
@@ -3066,7 +3066,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5c2c0a9f-01c4-4895-b87d-0f649e98757f",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5c6fbfa1-f2c9-43de-890b-139c56b95cf3",
@@ -3089,7 +3089,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5c6fbfa1-f2c9-43de-890b-139c56b95cf3",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "624b90a8-477d-4020-ad23-287b0b2ee413",
@@ -3112,7 +3112,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/624b90a8-477d-4020-ad23-287b0b2ee413",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "661f522d-6c56-4824-9af5-47a3be38343b",
@@ -3135,7 +3135,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/661f522d-6c56-4824-9af5-47a3be38343b",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "67742610-f668-4535-adc6-6805821ed940",
@@ -3158,7 +3158,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/67742610-f668-4535-adc6-6805821ed940",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f0cf8f56-dbf6-4b46-73b8-08d4ac1a34ec/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "68b12087-b1b5-4791-93ce-e2d7de6c12bc",
@@ -3181,7 +3181,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/68b12087-b1b5-4791-93ce-e2d7de6c12bc",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6cd4e20c-42ce-4a1b-a944-a1910ea1f868",
@@ -3204,7 +3204,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6cd4e20c-42ce-4a1b-a944-a1910ea1f868",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/168570d8-0eed-4715-d8f9-08d4a1776a57/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "74f83a31-0a38-4f19-8e0d-d77b64d2c733",
@@ -3227,7 +3227,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/74f83a31-0a38-4f19-8e0d-d77b64d2c733",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7924304f-080a-4dc6-ae8b-2a697b2ffe6a",
@@ -3250,7 +3250,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7924304f-080a-4dc6-ae8b-2a697b2ffe6a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7b784bb3-2c52-487b-baf8-491a7387397f",
@@ -3273,7 +3273,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7b784bb3-2c52-487b-baf8-491a7387397f",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/1c5c97cc-3cf4-4512-1c6f-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7c0e3d8e-0d28-4ca4-95ef-7ec5b57f35d8",
@@ -3296,7 +3296,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7c0e3d8e-0d28-4ca4-95ef-7ec5b57f35d8",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7ff483c2-274e-4bbb-b177-e49d2c73f6ee",
@@ -3319,7 +3319,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7ff483c2-274e-4bbb-b177-e49d2c73f6ee",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/380d1e51-db6c-4469-84e1-86aff8699a74/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8000d3f9-fbe2-4a2e-bbfd-413d8dcefb5e",
@@ -3342,7 +3342,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8000d3f9-fbe2-4a2e-bbfd-413d8dcefb5e",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "842f5acc-4f65-4ede-9843-56854032a113",
@@ -3365,7 +3365,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/842f5acc-4f65-4ede-9843-56854032a113",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/227cfd81-062b-4931-9724-68db82c453c7/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8980051c-2ba9-4a49-8274-a10fae8a639b",
@@ -3388,7 +3388,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8980051c-2ba9-4a49-8274-a10fae8a639b",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8ae70cb2-b21d-485e-9eb1-075debfb2bce",
@@ -3411,7 +3411,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8ae70cb2-b21d-485e-9eb1-075debfb2bce",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8fd65df1-f92e-4749-9fb7-2afe3c17b20e",
@@ -3434,7 +3434,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8fd65df1-f92e-4749-9fb7-2afe3c17b20e",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8fdd7ee5-dff6-4b7e-9814-578a3381e9a3",
@@ -3457,7 +3457,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8fdd7ee5-dff6-4b7e-9814-578a3381e9a3",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "92c2b841-c136-4035-bfa8-4b7203968dc8",
@@ -3480,7 +3480,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/92c2b841-c136-4035-bfa8-4b7203968dc8",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/450ca074-5d7b-4197-da19-08d4a1776a57/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "94c1bb31-c6c3-44e3-90cd-d0d10e9dd46d",
@@ -3503,7 +3503,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/94c1bb31-c6c3-44e3-90cd-d0d10e9dd46d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "968d4cd2-4edc-4a72-a0fb-0a7ea3cdee0a",
@@ -3526,7 +3526,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/968d4cd2-4edc-4a72-a0fb-0a7ea3cdee0a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "96fbab54-1dfe-46fd-ae4f-be94fcaa6c51",
@@ -3549,7 +3549,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/96fbab54-1dfe-46fd-ae4f-be94fcaa6c51",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "982311b8-3d75-4a80-ae47-8aa2e71fedc8",
@@ -3572,7 +3572,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/982311b8-3d75-4a80-ae47-8aa2e71fedc8",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "98f8e5c1-917f-401c-948e-c3500d3c95d0",
@@ -3595,7 +3595,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/98f8e5c1-917f-401c-948e-c3500d3c95d0",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9935f774-9b33-4a73-80fe-37256aa5a507",
@@ -3618,7 +3618,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9935f774-9b33-4a73-80fe-37256aa5a507",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9e9d0cfc-cc51-4d67-98e2-453b0ac4c355",
@@ -3641,7 +3641,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9e9d0cfc-cc51-4d67-98e2-453b0ac4c355",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9f218624-12dd-4a27-85b4-23c91caac1ad",
@@ -3664,7 +3664,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9f218624-12dd-4a27-85b4-23c91caac1ad",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9f2bdb1b-4ea5-46c9-88bc-8cd57e5c6a70",
@@ -3687,7 +3687,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9f2bdb1b-4ea5-46c9-88bc-8cd57e5c6a70",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a17c699e-12c5-45f2-83b9-6df4c268f8c8",
@@ -3710,7 +3710,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a17c699e-12c5-45f2-83b9-6df4c268f8c8",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a7ff5829-441e-41d0-85af-bac3db0cdaea",
@@ -3733,7 +3733,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a7ff5829-441e-41d0-85af-bac3db0cdaea",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c08a0e75-890c-4291-73b9-08d4ac1a34ec/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a8cb4bcc-ebfa-4ac9-9314-18f17edc97e9",
@@ -3756,7 +3756,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a8cb4bcc-ebfa-4ac9-9314-18f17edc97e9",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a9139030-abb0-43a4-bf4b-7a85d934b14b",
@@ -3779,7 +3779,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a9139030-abb0-43a4-bf4b-7a85d934b14b",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ac2b2f6f-b6a7-43e3-ad13-a3f20c2cc453",
@@ -3802,7 +3802,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ac2b2f6f-b6a7-43e3-ad13-a3f20c2cc453",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/cf6a3ab8-29e2-48c4-1d7c-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ad42f694-0498-4fc5-84e9-d7be1010818a",
@@ -3825,7 +3825,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ad42f694-0498-4fc5-84e9-d7be1010818a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ad8840b7-8a54-4326-9b60-fe0174a1b416",
@@ -3848,7 +3848,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ad8840b7-8a54-4326-9b60-fe0174a1b416",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "adc1ebe1-5cc2-4dbc-b9ff-b3217076e8c3",
@@ -3871,7 +3871,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/adc1ebe1-5cc2-4dbc-b9ff-b3217076e8c3",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ae49e827-4e77-48ff-9d02-79e6f006b1a4",
@@ -3894,7 +3894,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ae49e827-4e77-48ff-9d02-79e6f006b1a4",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b1595d12-4c0e-446f-aae1-02d8dd8c0b7d",
@@ -3917,7 +3917,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b1595d12-4c0e-446f-aae1-02d8dd8c0b7d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/57ab2ca3-4be1-4b29-b1c4-e29e6744623a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b2d0c072-8cfb-40ad-af6f-9cbe8ef03c30",
@@ -3940,7 +3940,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b2d0c072-8cfb-40ad-af6f-9cbe8ef03c30",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b530e670-aec3-4fc1-8d58-47ade5c0ed59",
@@ -3963,7 +3963,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b530e670-aec3-4fc1-8d58-47ade5c0ed59",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b54e9b80-b24e-4188-9807-8d53b246c1f7",
@@ -3986,7 +3986,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b54e9b80-b24e-4188-9807-8d53b246c1f7",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b7d54bd4-48c6-4580-903a-3ca5957c2a9c",
@@ -4009,7 +4009,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b7d54bd4-48c6-4580-903a-3ca5957c2a9c",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b9d963c2-a9b0-411a-9335-ffcf27ad88f7",
@@ -4032,7 +4032,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b9d963c2-a9b0-411a-9335-ffcf27ad88f7",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "becf7e9a-96dc-4cfd-af31-22dbc6bba588",
@@ -4055,7 +4055,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/becf7e9a-96dc-4cfd-af31-22dbc6bba588",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c04c5506-9603-427b-a059-4545f515152c",
@@ -4078,7 +4078,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c04c5506-9603-427b-a059-4545f515152c",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c0f3166f-b560-4801-acce-a47e1d44573e",
@@ -4101,7 +4101,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c0f3166f-b560-4801-acce-a47e1d44573e",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c1c4cc59-bc2e-444f-9366-d55beba5d6f9",
@@ -4124,7 +4124,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c1c4cc59-bc2e-444f-9366-d55beba5d6f9",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c42bcdfb-8d45-47e5-a731-7ba51440a104",
@@ -4147,7 +4147,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c42bcdfb-8d45-47e5-a731-7ba51440a104",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c498f3cd-ff1d-4c7e-a83e-2ff73323adb2",
@@ -4170,7 +4170,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c498f3cd-ff1d-4c7e-a83e-2ff73323adb2",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bf3b8496-c539-4d66-acc2-6ab738c9259f/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c92455bb-5ca2-43b4-b5a4-b123c792aa4b",
@@ -4193,7 +4193,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c92455bb-5ca2-43b4-b5a4-b123c792aa4b",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "cdedef68-d1aa-4b06-90f2-977bc4eb370a",
@@ -4216,7 +4216,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/cdedef68-d1aa-4b06-90f2-977bc4eb370a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/64319751-4e7e-4eb2-f59b-08d752490d14/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d0215e86-45ec-4f44-be91-ee618477d01d",
@@ -4239,7 +4239,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d0215e86-45ec-4f44-be91-ee618477d01d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d42a7c81-23a1-41dd-9c94-feed58551e05",
@@ -4262,7 +4262,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d42a7c81-23a1-41dd-9c94-feed58551e05",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d4867d53-6c38-407e-bfc9-7f38bfe717b8",
@@ -4285,7 +4285,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d4867d53-6c38-407e-bfc9-7f38bfe717b8",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ff6ad90e-cce4-47f7-8c41-08d47f4192ef/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d63b449c-39a3-4ba6-ad15-713ac16feb8f",
@@ -4308,7 +4308,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d63b449c-39a3-4ba6-ad15-713ac16feb8f",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d6bd38e5-adcc-4f86-b81e-c0adfac0d182",
@@ -4331,7 +4331,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d6bd38e5-adcc-4f86-b81e-c0adfac0d182",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d6c4e818-5504-496d-a2d6-8a8d0010a93a",
@@ -4354,7 +4354,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d6c4e818-5504-496d-a2d6-8a8d0010a93a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d89451c0-b535-441c-8a95-1dab08996720",
@@ -4377,7 +4377,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d89451c0-b535-441c-8a95-1dab08996720",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d924e547-7fc5-45fa-939f-40125f93e0f9",
@@ -4400,7 +4400,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d924e547-7fc5-45fa-939f-40125f93e0f9",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d9a97614-6eec-4476-b308-bba217aea091",
@@ -4423,7 +4423,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d9a97614-6eec-4476-b308-bba217aea091",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/2a54af03-f494-4c73-9a2d-a9d42ec876d0/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "da2cb8b1-5cd5-49ca-878e-0821d3198694",
@@ -4446,7 +4446,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/da2cb8b1-5cd5-49ca-878e-0821d3198694",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "dea527f4-2419-40e0-9afc-d1543abde719",
@@ -4469,7 +4469,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/dea527f4-2419-40e0-9afc-d1543abde719",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e35d3b68-ab72-4b6e-9949-c59ac726277d",
@@ -4492,7 +4492,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e35d3b68-ab72-4b6e-9949-c59ac726277d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e5114e01-7be2-44ad-84b1-d13e4a921aa6",
@@ -4515,7 +4515,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e5114e01-7be2-44ad-84b1-d13e4a921aa6",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e71b7add-01b8-4cbb-81a3-f1868bd60dc6",
@@ -4538,7 +4538,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e71b7add-01b8-4cbb-81a3-f1868bd60dc6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/1ea03287-0747-4fe9-393b-08d7b66fa5bb/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e76d4cce-aaca-4005-8d9c-dee5415ff435",
@@ -4561,7 +4561,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e76d4cce-aaca-4005-8d9c-dee5415ff435",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/349e92ed-1287-4e9d-c422-08d4c3af03c6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ea750d95-3488-4016-8587-35d90e441282",
@@ -4584,7 +4584,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ea750d95-3488-4016-8587-35d90e441282",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ec5af556-6e81-49e6-bf83-a363534ce3fc",
@@ -4607,7 +4607,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ec5af556-6e81-49e6-bf83-a363534ce3fc",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "edcf547f-5034-415b-9e38-3132d9adafbe",
@@ -4630,7 +4630,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/edcf547f-5034-415b-9e38-3132d9adafbe",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "edda82f7-910d-4e2d-be0a-12bba77b4c5a",
@@ -4653,7 +4653,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/edda82f7-910d-4e2d-be0a-12bba77b4c5a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f1557a04-0ead-4be9-83fb-6b734123edba",
@@ -4676,7 +4676,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f1557a04-0ead-4be9-83fb-6b734123edba",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f2d05219-7901-418a-8aa1-feed5d2af85c",
@@ -4699,7 +4699,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f2d05219-7901-418a-8aa1-feed5d2af85c",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f4e0bca3-74e1-4965-8c93-3c60a8c032c6",
@@ -4722,7 +4722,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f4e0bca3-74e1-4965-8c93-3c60a8c032c6",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f8a38ffd-867a-4b1d-adb7-e06b1ca11501",
@@ -4745,7 +4745,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f8a38ffd-867a-4b1d-adb7-e06b1ca11501",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "fb44a91c-4a34-4076-b8bc-115eb3f3757c",
@@ -4768,7 +4768,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/fb44a91c-4a34-4076-b8bc-115eb3f3757c",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ff4ff3ea-adff-4e56-8b7d-9395b0b4c726",
@@ -4791,7 +4791,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/bf1e6140-ac51-471c-8d46-b69a4be2d6ca/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ff4ff3ea-adff-4e56-8b7d-9395b0b4c726",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "02cab556-e199-4f8f-bf7d-43a1443f1635",
@@ -4814,7 +4814,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/02cab556-e199-4f8f-bf7d-43a1443f1635",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/059ca763-896d-4f54-fc8c-08d562fe98c3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0315e2c2-66c4-4058-ae3e-54f800400153",
@@ -4837,7 +4837,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0315e2c2-66c4-4058-ae3e-54f800400153",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a542a7af-6fd9-49d8-d823-08d887606415/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0c4dd934-f6dc-4340-82dc-c31a0c04e35d",
@@ -4860,7 +4860,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0c4dd934-f6dc-4340-82dc-c31a0c04e35d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "19492741-e998-4e83-9899-a5deaa9cfa95",
@@ -4883,7 +4883,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/19492741-e998-4e83-9899-a5deaa9cfa95",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/dc08394c-b6b7-4aee-7c25-08d6b281ec0c/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1d060a96-c069-4a28-bab0-0e8f56005f81",
@@ -4906,7 +4906,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1d060a96-c069-4a28-bab0-0e8f56005f81",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8ca72de7-22fc-4c15-a0c2-9d1e99ebb744/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1dd5409a-7c38-4140-bf68-9c8533775b73",
@@ -4929,7 +4929,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1dd5409a-7c38-4140-bf68-9c8533775b73",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/2150fe34-1935-4ed4-8769-f52bed8f13d0/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "22393ef2-8d89-41ff-aa72-7ed7c10e3fac",
@@ -4952,7 +4952,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/22393ef2-8d89-41ff-aa72-7ed7c10e3fac",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/adbc4bb2-3c35-4858-afef-7f555108368b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "27be27ea-8eb9-47f6-af71-0fb5d732d2e1",
@@ -4975,7 +4975,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/27be27ea-8eb9-47f6-af71-0fb5d732d2e1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/4a3beaed-10fc-4320-0ea5-08d8e8d1304c/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "38879e0d-f681-4a4e-9e51-2a7e383fffe8",
@@ -4998,7 +4998,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/38879e0d-f681-4a4e-9e51-2a7e383fffe8",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/286884cb-b22a-4ce2-a24e-e14f727c4bc7/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "38abdf09-94e5-46bd-a2ca-ff9404247557",
@@ -5021,7 +5021,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/38abdf09-94e5-46bd-a2ca-ff9404247557",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/7e9df48f-24da-45d2-b8c9-5e0c7f2b53f1/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "41b42d18-dd0e-44f2-a750-f475f090eadb",
@@ -5044,7 +5044,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/41b42d18-dd0e-44f2-a750-f475f090eadb",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5c9196d0-5046-4f46-47bf-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4270757b-46a7-4536-9c84-43aec286f5ac",
@@ -5067,7 +5067,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4270757b-46a7-4536-9c84-43aec286f5ac",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/632996ab-004b-41fd-53ce-08d569d56bbf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4b17118d-21df-419e-a6de-dff6f0f2d3dd",
@@ -5090,7 +5090,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4b17118d-21df-419e-a6de-dff6f0f2d3dd",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/cce14a42-5e93-4909-bf6d-e1c005347f96/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "53fd6ffb-ffa8-49dd-9109-b1459e4943a8",
@@ -5113,7 +5113,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/53fd6ffb-ffa8-49dd-9109-b1459e4943a8",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ebfbfe25-78e8-42d2-1251-08d55a87c1e8/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "54de76d9-d32d-473b-9a72-7a5c3962757e",
@@ -5136,7 +5136,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/54de76d9-d32d-473b-9a72-7a5c3962757e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/510403ec-6792-46df-f8ac-08d562fe98c3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "556d6db8-1c73-465e-891d-514ec19078ec",
@@ -5159,7 +5159,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/556d6db8-1c73-465e-891d-514ec19078ec",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bd647e45-4f85-4f5b-f823-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "597d2ae7-e68e-44a6-a1ba-c1d3bc1e93a0",
@@ -5182,7 +5182,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/597d2ae7-e68e-44a6-a1ba-c1d3bc1e93a0",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/47bd3adb-147c-4405-49f7-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5c1fea46-c5df-453c-8061-642b6f7072a5",
@@ -5205,7 +5205,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5c1fea46-c5df-453c-8061-642b6f7072a5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/59460d0a-1d05-419d-9eaf-994b0dd42fe5/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "67d1dfd3-a042-4fa0-90fc-eb4cdeaee866",
@@ -5228,7 +5228,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/67d1dfd3-a042-4fa0-90fc-eb4cdeaee866",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/582768c9-d9bd-4117-99b3-8780b5bb8856/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6a42954e-f335-4698-a50e-3a5394f9b7ba",
@@ -5251,7 +5251,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6a42954e-f335-4698-a50e-3a5394f9b7ba",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/16174b58-85d2-47a6-5d1e-08d771a2d39f/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6bdfee7f-224f-41bc-8fdc-e38a9d2dffa6",
@@ -5274,7 +5274,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6bdfee7f-224f-41bc-8fdc-e38a9d2dffa6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bbcccbe8-b499-4a69-52a6-08d569d56bbf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6e55bdb4-8181-43ff-a01a-9ce856559e29",
@@ -5297,7 +5297,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6e55bdb4-8181-43ff-a01a-9ce856559e29",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/4216afb9-02b1-443c-8662-1934122cabc9/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6f30c0cd-fd02-4881-99eb-5c0225913b7f",
@@ -5320,7 +5320,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6f30c0cd-fd02-4881-99eb-5c0225913b7f",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c50927eb-fb23-4d8b-c6d3-08d4c3af03c6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "707fa749-188b-4a99-a2f7-c6a8b73480a9",
@@ -5343,7 +5343,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/707fa749-188b-4a99-a2f7-c6a8b73480a9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/2134f175-aae8-4fd9-a3a4-d63cbee6127b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7788bb71-92db-46fd-8d0f-aeead20f1097",
@@ -5366,7 +5366,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7788bb71-92db-46fd-8d0f-aeead20f1097",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/0709578b-f8b3-4bbf-12ba-08d55a87c1e8/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "79bdf2b3-60e8-44bc-8e2a-277565f335e6",
@@ -5389,7 +5389,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/79bdf2b3-60e8-44bc-8e2a-277565f335e6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f3929929-d4be-475a-7d7a-08d49846e02b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7ae07478-1f55-46b2-abcc-e012147e54c6",
@@ -5412,7 +5412,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7ae07478-1f55-46b2-abcc-e012147e54c6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/2a1d38e8-8a32-4488-94fd-f8c61b1ae85b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "822b10d8-e732-47a9-b796-1e6a7f48621d",
@@ -5435,7 +5435,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/822b10d8-e732-47a9-b796-1e6a7f48621d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ec2fa1e4-2bca-470b-bb59-1b0fbcec9596/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "945dfa03-00ce-4ccc-a03e-afc4a367a52b",
@@ -5458,7 +5458,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/945dfa03-00ce-4ccc-a03e-afc4a367a52b",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/52c76a7a-794e-499d-bfcd-0e7bd95fb1dd/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "97e37b30-4f2a-4aa6-8d16-471573013f03",
@@ -5481,7 +5481,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/97e37b30-4f2a-4aa6-8d16-471573013f03",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a3089329-6fd6-41cc-8535-3c9355f180ee/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9ca473d1-0986-4601-b0cf-94b8c6c9c7d2",
@@ -5504,7 +5504,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9ca473d1-0986-4601-b0cf-94b8c6c9c7d2",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bab3304e-7079-4321-876b-3a98981552c8/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a4e1e83f-dff3-40ac-b197-0f712e6d0c91",
@@ -5527,7 +5527,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a4e1e83f-dff3-40ac-b197-0f712e6d0c91",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/d2d67945-78b8-4c4c-0dfb-08d8c7d00274/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a60cd8c5-e90f-441b-80b1-ba8760fbb7e8",
@@ -5550,7 +5550,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a60cd8c5-e90f-441b-80b1-ba8760fbb7e8",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a4bd547e-f3a3-439d-b960-7ad114b96a33/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "acc860a2-26c0-4358-8562-ece673a66221",
@@ -5573,7 +5573,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/acc860a2-26c0-4358-8562-ece673a66221",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ae50d4a0-667d-48e4-b214-bf4217922921/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b191f222-cfb5-4cbc-93b2-0fb2b92ef2b7",
@@ -5596,7 +5596,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b191f222-cfb5-4cbc-93b2-0fb2b92ef2b7",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/87713bc4-6659-41e9-907c-3afd6f525ce6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b8553e07-7a93-4a7c-beaa-183e146b294a",
@@ -5619,7 +5619,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b8553e07-7a93-4a7c-beaa-183e146b294a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/91d096ef-6d11-4f8a-8cc0-fab443ff3087/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "bd3e8167-5276-4709-8607-b5f9cb3210e0",
@@ -5642,7 +5642,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/bd3e8167-5276-4709-8607-b5f9cb3210e0",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/b581a979-84a2-4885-b026-781b855c4c0c/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "bd4f97d6-5a4b-4fb6-afd3-c41cdf8f7eed",
@@ -5665,7 +5665,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/bd4f97d6-5a4b-4fb6-afd3-c41cdf8f7eed",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/45846e49-359f-4bcd-8c25-08d47f4192ef/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "bfe16007-05f6-4138-a17f-c3a8cc003fb1",
@@ -5688,7 +5688,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/bfe16007-05f6-4138-a17f-c3a8cc003fb1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/d5db9485-d5c7-445f-b839-e96cd3597df6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c25d5b90-9c62-4bb0-b9bd-d6a166e793ba",
@@ -5711,7 +5711,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c25d5b90-9c62-4bb0-b9bd-d6a166e793ba",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/30f7c0b2-13ca-44de-8779-e8b70722890a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c6d1163d-839e-4582-8b4a-535e0ca50ac9",
@@ -5734,7 +5734,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c6d1163d-839e-4582-8b4a-535e0ca50ac9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/196eb7c3-d2ec-43fc-abe7-024aea01af42/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c73af9c5-eab3-4e6e-aa07-8916f0ff362a",
@@ -5757,7 +5757,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c73af9c5-eab3-4e6e-aa07-8916f0ff362a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/17978b73-5248-4bf1-651e-08d47f480a49/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d334c1d9-9184-452c-8cdd-52f6473a4eff",
@@ -5780,7 +5780,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d334c1d9-9184-452c-8cdd-52f6473a4eff",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/672862f8-3417-465e-a370-1d6df9bab7be/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d3437c13-b12d-4c48-9873-de17b368b4d8",
@@ -5803,7 +5803,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d3437c13-b12d-4c48-9873-de17b368b4d8",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/845050da-f8c8-4df2-e8da-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d9f4cc28-201f-446d-9d5a-9601201f15e6",
@@ -5826,7 +5826,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d9f4cc28-201f-446d-9d5a-9601201f15e6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8b23dd70-dabe-4ca4-8843-8601a52b6bbb/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e1754ddf-49c7-45bf-9df9-8b68c8a63631",
@@ -5849,7 +5849,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e1754ddf-49c7-45bf-9df9-8b68c8a63631",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e43feaba-c8df-49e8-8e1a-256ddd860c92",
@@ -5872,7 +5872,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e43feaba-c8df-49e8-8e1a-256ddd860c92",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/e6dd5d7f-7c94-4dd5-f899-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f9e2e06e-d2af-4593-843f-4be51dcdf9b0",
@@ -5895,7 +5895,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/436c409f-2658-4067-88ad-45397627b7c8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f9e2e06e-d2af-4593-843f-4be51dcdf9b0",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/40eab764-eba3-4fdd-f3a7-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "49a8b634-274f-4f4e-9d90-7c26efda6327",
@@ -5918,7 +5918,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/e3a2e2b0-b292-49cb-b2c1-2aa751165fe2/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/49a8b634-274f-4f4e-9d90-7c26efda6327",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/aa2a5916-5a6c-4e7a-813c-08d49846e02b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4c1d3bf6-8db0-4294-9469-45b6adfaf8ea",
@@ -5941,7 +5941,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/e3a2e2b0-b292-49cb-b2c1-2aa751165fe2/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4c1d3bf6-8db0-4294-9469-45b6adfaf8ea",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bb56ae0c-0a80-4b7f-5dcf-08d771a2d39f/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "908ec37e-fef9-4b69-b479-f014b229d606",
@@ -5964,7 +5964,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/e3a2e2b0-b292-49cb-b2c1-2aa751165fe2/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/908ec37e-fef9-4b69-b479-f014b229d606",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8452df13-2f2e-463a-7df9-08d49846e02b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a3daede5-e864-48fb-a9cc-736f4c11faca",
@@ -5987,7 +5987,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/e3a2e2b0-b292-49cb-b2c1-2aa751165fe2/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a3daede5-e864-48fb-a9cc-736f4c11faca",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c668f414-168c-4843-3e20-08d525be06e9/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c569291e-f2de-41b7-b883-9897dc106439",
@@ -6010,7 +6010,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/e3a2e2b0-b292-49cb-b2c1-2aa751165fe2/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c569291e-f2de-41b7-b883-9897dc106439",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/05a28763-d1aa-40be-9b56-8424dc7176f3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "12092764-98fc-454a-b2e6-a72d2c348f3c",
@@ -6033,7 +6033,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/12092764-98fc-454a-b2e6-a72d2c348f3c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/eea033d8-cbeb-47ea-88aa-c0b58bd89ea2/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "140e883b-f937-4c61-8a9f-5bb48c84ad2c",
@@ -6056,7 +6056,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/140e883b-f937-4c61-8a9f-5bb48c84ad2c",
     "imageUrl": "https://d3hlz95t29ptj0.cloudfront.net/95db4fe7-b6f8-46d0-95cd-c7487c2ad9d2/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "16bcaee8-815f-45b8-9669-c8c0f7115f38",
@@ -6079,7 +6079,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/16bcaee8-815f-45b8-9669-c8c0f7115f38",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/023a8401-7194-4505-48eb-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1a0e606b-c9ab-4e34-b176-566fc9abef2c",
@@ -6102,7 +6102,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1a0e606b-c9ab-4e34-b176-566fc9abef2c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f1baaa44-57f7-4377-64b2-08d6a8255641/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1bcb68cc-a291-42c5-8f43-28ce2055b655",
@@ -6125,7 +6125,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1bcb68cc-a291-42c5-8f43-28ce2055b655",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/aa717825-19ce-46f4-eea1-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1e763f3a-9a66-4126-8b64-83d031929095",
@@ -6148,7 +6148,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1e763f3a-9a66-4126-8b64-83d031929095",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/df6bdf68-6fba-4a94-a579-3cac05a5fcfd/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "30a23f1f-25d7-48d8-b924-87546a6e696f",
@@ -6171,7 +6171,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/30a23f1f-25d7-48d8-b924-87546a6e696f",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/47536862-7b2e-4f4a-9da9-d2c6cd1d6b67/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3405edde-a886-457c-a056-df750ad653ff",
@@ -6194,7 +6194,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3405edde-a886-457c-a056-df750ad653ff",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/16e2bc55-1778-4670-c48e-08d4c3af03c6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "35b8da27-c4d5-4d65-99a3-91b9b4db5d20",
@@ -6217,7 +6217,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/35b8da27-c4d5-4d65-99a3-91b9b4db5d20",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/0709578b-f8b3-4bbf-12ba-08d55a87c1e8/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "41fb37a8-b2c8-43cc-ae68-26d3e74239a7",
@@ -6240,7 +6240,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/41fb37a8-b2c8-43cc-ae68-26d3e74239a7",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4e90523c-663f-4260-84ad-6d7f6afc1f86",
@@ -6263,7 +6263,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4e90523c-663f-4260-84ad-6d7f6afc1f86",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5cbba92a-d999-4ff0-a0ce-239eaf67a0e6",
@@ -6286,7 +6286,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5cbba92a-d999-4ff0-a0ce-239eaf67a0e6",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5e15939c-e9eb-49b6-827b-4f10cdfec17c",
@@ -6309,7 +6309,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5e15939c-e9eb-49b6-827b-4f10cdfec17c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3ad7ada8-8580-4cdb-bcb9-ae32cb7bfd70/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "61883d52-6621-41c0-a08e-3216a4467530",
@@ -6332,7 +6332,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/61883d52-6621-41c0-a08e-3216a4467530",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/dbcb3f30-b69b-4f63-8f3c-cc07c86d1756/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6c911a1f-3ce4-4165-b703-fc5e137705fb",
@@ -6355,7 +6355,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6c911a1f-3ce4-4165-b703-fc5e137705fb",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "716ee4f3-706b-4a1a-b5c4-8db749e9c4a9",
@@ -6378,7 +6378,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/716ee4f3-706b-4a1a-b5c4-8db749e9c4a9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/4d7192c6-d5cc-44a7-ec56-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7bebe313-9710-426a-9b3e-ae26bfc82676",
@@ -6401,7 +6401,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7bebe313-9710-426a-9b3e-ae26bfc82676",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/010b5d8d-c7ec-40fb-84b5-d9d3b0734c25/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8f3dfe8f-9140-4a6a-a80f-d42d6280ea2b",
@@ -6424,7 +6424,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8f3dfe8f-9140-4a6a-a80f-d42d6280ea2b",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/4b4f601b-7e7f-455b-688c-08d47f480a49/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "96c0e5a5-a41d-4dcc-b60d-769452643a0b",
@@ -6447,7 +6447,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/96c0e5a5-a41d-4dcc-b60d-769452643a0b",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/e42628c4-35a0-4061-9347-2e5c8ea1bc36/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "98c9dfec-396e-47aa-9699-5b9a78214e23",
@@ -6470,7 +6470,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/98c9dfec-396e-47aa-9699-5b9a78214e23",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9d337607-24c2-4606-ae34-4ee6158e8bd9",
@@ -6493,7 +6493,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9d337607-24c2-4606-ae34-4ee6158e8bd9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/1165afc9-402b-46d4-f6ae-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9d66c615-7256-45b3-a6d6-3cfd0a03ef96",
@@ -6516,7 +6516,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9d66c615-7256-45b3-a6d6-3cfd0a03ef96",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bccb1b34-bcc7-4427-9a76-b21edeb39567/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a9902606-b1b7-4caa-8cd5-797b7dcb38ba",
@@ -6539,7 +6539,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a9902606-b1b7-4caa-8cd5-797b7dcb38ba",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/574f25bc-4cb7-4a3a-ba3a-6a4c22a290a3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b12f21ec-e78d-4aee-a36c-853d435237d4",
@@ -6562,7 +6562,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b12f21ec-e78d-4aee-a36c-853d435237d4",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/597cce5c-538e-4fb5-ad72-a224b3a56640/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b3222316-9a5c-4385-bceb-dadefad6c3ac",
@@ -6585,7 +6585,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b3222316-9a5c-4385-bceb-dadefad6c3ac",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5a10b397-65e7-477b-5de1-08d59e7a8d25/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "bb759c5f-8927-430e-8261-e2cadf4e08bc",
@@ -6608,7 +6608,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/bb759c5f-8927-430e-8261-e2cadf4e08bc",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6d5315d1-b2d1-4612-8744-df5b089ba5f0/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "be768633-734c-45db-b197-e5cd15296157",
@@ -6631,7 +6631,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/be768633-734c-45db-b197-e5cd15296157",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/2c7480a2-86cd-491f-be39-0174e9ca9225/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c3a1b61d-5d04-45db-a08c-3f8ae08f1206",
@@ -6654,7 +6654,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c3a1b61d-5d04-45db-a08c-3f8ae08f1206",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c41c2509-1400-441f-aade-2ffe91a41bc1",
@@ -6677,7 +6677,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c41c2509-1400-441f-aade-2ffe91a41bc1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c643067e-45a9-4359-26a6-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c84db4d9-57b2-4f4d-a0fc-80fe0a918ff3",
@@ -6700,7 +6700,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c84db4d9-57b2-4f4d-a0fc-80fe0a918ff3",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d52fc882-18da-4e30-9fdc-292650cd3b55",
@@ -6723,7 +6723,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d52fc882-18da-4e30-9fdc-292650cd3b55",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/64319751-4e7e-4eb2-f59b-08d752490d14/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "dbb748c9-da09-4c4d-ba0b-9f7c8cbcb5fe",
@@ -6746,7 +6746,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/dbb748c9-da09-4c4d-ba0b-9f7c8cbcb5fe",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/b7317563-a7c6-404f-bacf-5dae687b710b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e20e598e-d759-4b7b-a22d-df51c5add40e",
@@ -6769,7 +6769,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e20e598e-d759-4b7b-a22d-df51c5add40e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/77514946-ed9c-4e8d-c52b-08d4c3af03c6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e2af1a64-3b3b-47f0-8d2b-58b68363f7c1",
@@ -6792,7 +6792,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e2af1a64-3b3b-47f0-8d2b-58b68363f7c1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/24c3f9b4-999c-43a5-ab29-655d005ef6d0/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e33edd49-da9e-4ee1-beaa-45a235b96f11",
@@ -6815,7 +6815,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e33edd49-da9e-4ee1-beaa-45a235b96f11",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/300771a9-3ea1-4b75-aeb5-a1a6a964f461/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e3bb8def-4092-4fc7-97bc-92e14540679d",
@@ -6838,7 +6838,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e3bb8def-4092-4fc7-97bc-92e14540679d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e6264332-9ec0-4e66-b156-221515cc1435",
@@ -6861,7 +6861,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e6264332-9ec0-4e66-b156-221515cc1435",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f0a28233-2f7d-439f-b9e3-212b0702b7e6",
@@ -6884,7 +6884,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f0a28233-2f7d-439f-b9e3-212b0702b7e6",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "fa5a7da1-f4a9-4129-bdd7-e16b4ee7946a",
@@ -6907,7 +6907,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/fa5a7da1-f4a9-4129-bdd7-e16b4ee7946a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/91d096ef-6d11-4f8a-8cc0-fab443ff3087/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "fbda23b2-395c-487a-8893-3c4c995542ac",
@@ -6930,7 +6930,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/fbda23b2-395c-487a-8893-3c4c995542ac",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5ed424c7-fdf3-4e19-9a03-a023fc0237c6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "fc2c92fa-5738-41a8-98f7-3e4854aec78a",
@@ -6953,7 +6953,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/4d438b68-ddfb-4bab-9037-e91fdb293479/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/fc2c92fa-5738-41a8-98f7-3e4854aec78a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0091dbee-6d26-468a-a2fb-7f2b9c3a2db9",
@@ -6976,7 +6976,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0091dbee-6d26-468a-a2fb-7f2b9c3a2db9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/b8a339d3-4f85-47a9-ba63-cc6726da5fd1/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0b0ec4d1-fa79-4c33-a65f-363700669964",
@@ -6999,7 +6999,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0b0ec4d1-fa79-4c33-a65f-363700669964",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bf3d47b6-9522-4b97-50b4-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0b45a62d-a148-4850-90c6-9e710d5c8b8a",
@@ -7022,7 +7022,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0b45a62d-a148-4850-90c6-9e710d5c8b8a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bcd104ce-33a4-4e10-b58d-ff51410e07c3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0b977591-26a3-4962-9d04-00a85585a531",
@@ -7045,7 +7045,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0b977591-26a3-4962-9d04-00a85585a531",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "259b2616-bd4e-4dbc-bd9a-67442427e1b5",
@@ -7068,7 +7068,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/259b2616-bd4e-4dbc-bd9a-67442427e1b5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/e67853a0-03c7-4a92-a535-d99997cfad14/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "265268f7-f592-4051-9552-c19a78046016",
@@ -7091,7 +7091,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/265268f7-f592-4051-9552-c19a78046016",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bb737ba9-ff44-4f9a-8936-b74f0c998b28/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "28c6a3af-39de-4689-8d05-a7ec1b560532",
@@ -7114,7 +7114,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/28c6a3af-39de-4689-8d05-a7ec1b560532",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/31befa68-e96b-4f6a-48a7-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "334e66f1-d7c8-4954-9ed7-c6ba63460a0c",
@@ -7137,7 +7137,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/334e66f1-d7c8-4954-9ed7-c6ba63460a0c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/9988391f-efaf-4205-76b7-08d5e2d04776/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3cf94524-75db-4151-ad84-ce8132045ff2",
@@ -7160,7 +7160,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3cf94524-75db-4151-ad84-ce8132045ff2",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3ad7ada8-8580-4cdb-bcb9-ae32cb7bfd70/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "44082592-a693-497e-8805-34f037107253",
@@ -7183,7 +7183,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/44082592-a693-497e-8805-34f037107253",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a3c84868-e42a-4c77-8ba9-2f3367fae38b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4f5ff173-d4e3-45ed-99dc-e5a9e2b4ec64",
@@ -7206,7 +7206,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4f5ff173-d4e3-45ed-99dc-e5a9e2b4ec64",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/2ae47ad0-6eb2-4055-cdbe-08d4f98bb95d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "52ded729-08ef-4057-a974-ef93c7f67ae1",
@@ -7229,7 +7229,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/52ded729-08ef-4057-a974-ef93c7f67ae1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/7e9df48f-24da-45d2-b8c9-5e0c7f2b53f1/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "540c8cff-5d00-4dd6-8cfb-8feb2b577f23",
@@ -7252,7 +7252,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/540c8cff-5d00-4dd6-8cfb-8feb2b577f23",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/831f908c-e146-40ab-e96a-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "54cc3c01-2e16-446f-8018-58d1b5a2ef97",
@@ -7275,7 +7275,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/54cc3c01-2e16-446f-8018-58d1b5a2ef97",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/dc08394c-b6b7-4aee-7c25-08d6b281ec0c/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5686dfc1-d054-46c6-a5da-deb2d2d2cde7",
@@ -7298,7 +7298,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5686dfc1-d054-46c6-a5da-deb2d2d2cde7",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5d4cc037-7ff7-4918-b95e-dab05f764190",
@@ -7321,7 +7321,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5d4cc037-7ff7-4918-b95e-dab05f764190",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/39cd8340-9a9e-4e83-7284-08d7daec7cf6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "633ff4a5-afba-4a1d-9130-fac6d2c39654",
@@ -7344,7 +7344,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/633ff4a5-afba-4a1d-9130-fac6d2c39654",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5e2f18ef-9693-4ed8-ff8c-08d6915616f1/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "639cf07c-a197-4657-a9fe-e88db7506edf",
@@ -7367,7 +7367,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/639cf07c-a197-4657-a9fe-e88db7506edf",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "645bc382-54ae-4560-87b6-97620f982312",
@@ -7390,7 +7390,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/645bc382-54ae-4560-87b6-97620f982312",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/95023424-aef2-4f72-8944-6e2d6f7bea4f/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "668f716d-c4b7-45af-8414-942c74665505",
@@ -7413,7 +7413,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/668f716d-c4b7-45af-8414-942c74665505",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6f33dfb5-98a8-4930-a65d-207082ebecd5",
@@ -7436,7 +7436,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6f33dfb5-98a8-4930-a65d-207082ebecd5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/23208cba-435d-4ecf-c639-08d4c3af03c6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7f84cea2-37c2-4117-bc4b-e9a2847639a4",
@@ -7459,7 +7459,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7f84cea2-37c2-4117-bc4b-e9a2847639a4",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8ecca298-54c4-4da6-6fea-08d535f00adf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7faced2d-393b-439e-a324-f12d545b37b9",
@@ -7482,7 +7482,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7faced2d-393b-439e-a324-f12d545b37b9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/7210a045-fb42-4d00-a331-864df6d14851/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7fb5d619-604c-40a0-a830-17045f11b16a",
@@ -7505,7 +7505,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7fb5d619-604c-40a0-a830-17045f11b16a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/17331ab5-db7d-4144-8ba4-82edb24be038/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7fe0bcb1-e562-4388-8a2b-f34fba51cb9a",
@@ -7528,7 +7528,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7fe0bcb1-e562-4388-8a2b-f34fba51cb9a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/91163894-1b42-465f-7e85-08d49846e02b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8727ce84-c25d-4be7-8361-0cddf87be347",
@@ -7551,7 +7551,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8727ce84-c25d-4be7-8361-0cddf87be347",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/d24fec98-9e0a-409f-a3ba-555108d305c4/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "880f8b02-92c4-486c-b6cd-c0f96a651e57",
@@ -7574,7 +7574,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/880f8b02-92c4-486c-b6cd-c0f96a651e57",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/20fa2b99-ccf0-4a73-8f71-08d55e413998/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8e5991fa-06e0-4c54-8b7a-d416e48704eb",
@@ -7597,7 +7597,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8e5991fa-06e0-4c54-8b7a-d416e48704eb",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/7805f62f-7218-4ea0-155d-08d71b9dc131/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9c443c0a-c5a4-4bd1-82d0-bdc464ec3329",
@@ -7620,7 +7620,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9c443c0a-c5a4-4bd1-82d0-bdc464ec3329",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/612507f0-1065-4be3-1d25-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9f843270-e281-4532-a59d-9c39af66fd07",
@@ -7643,7 +7643,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9f843270-e281-4532-a59d-9c39af66fd07",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/574f25bc-4cb7-4a3a-ba3a-6a4c22a290a3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a07459ed-b328-4643-b6fa-010c894eb35b",
@@ -7666,7 +7666,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a07459ed-b328-4643-b6fa-010c894eb35b",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/da237ee5-f87b-40ea-a3cf-869e811c50ce/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a22ff323-9e3b-4a65-990c-f2618fcd47da",
@@ -7689,7 +7689,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a22ff323-9e3b-4a65-990c-f2618fcd47da",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/b8d09ad2-c820-41bc-fc45-08d562fe98c3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a36e4566-3cb4-4083-8a57-869619a62887",
@@ -7712,7 +7712,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a36e4566-3cb4-4083-8a57-869619a62887",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ff73d61d-9bd7-4bde-0d1c-08d8c7d00274/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b6b6e9a1-b65a-4e89-bfe8-096422c03330",
@@ -7735,7 +7735,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b6b6e9a1-b65a-4e89-bfe8-096422c03330",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/7559162b-dec2-4678-a2f9-8e8952d3c005/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c2b69caf-c2e0-4476-a469-f4ad15772715",
@@ -7758,7 +7758,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c2b69caf-c2e0-4476-a469-f4ad15772715",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f3a1c88f-1c3a-4e67-fc51-08d7999a4fa8/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c3cb93a3-3870-436e-a23c-d3f279f95b1c",
@@ -7781,7 +7781,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c3cb93a3-3870-436e-a23c-d3f279f95b1c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/08985972-7504-4875-aa1e-5180081359bd/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c441d377-35ab-4970-b4bd-0842a9da4ccb",
@@ -7804,7 +7804,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c441d377-35ab-4970-b4bd-0842a9da4ccb",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/b365c5cb-32e8-4660-98ff-b71150c2ab6f/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d055ddec-e061-4441-a2c7-83848c96ace4",
@@ -7827,7 +7827,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d055ddec-e061-4441-a2c7-83848c96ace4",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/1525224c-cdad-421e-1258-08d5b4d004f3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d434a4cb-7d51-43df-8c9a-7df6cfa04ac1",
@@ -7850,7 +7850,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d434a4cb-7d51-43df-8c9a-7df6cfa04ac1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/eea033d8-cbeb-47ea-88aa-c0b58bd89ea2/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d96c5978-04fc-4add-9d48-aebf01b5eab9",
@@ -7873,7 +7873,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d96c5978-04fc-4add-9d48-aebf01b5eab9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f276cd85-6f9b-46c2-83f3-cc6a19914597/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "dc20c23a-d4bf-4d6f-8de7-3e6bc125b3bf",
@@ -7896,7 +7896,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/dc20c23a-d4bf-4d6f-8de7-3e6bc125b3bf",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/632996ab-004b-41fd-53ce-08d569d56bbf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e029964a-47c3-4013-9c4b-4631d585484d",
@@ -7919,7 +7919,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e029964a-47c3-4013-9c4b-4631d585484d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ca424b14-a849-4b1e-f0c8-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e3f517ff-5472-4ead-9681-878f43bae884",
@@ -7942,7 +7942,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e3f517ff-5472-4ead-9681-878f43bae884",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bb08c942-c2ad-4bac-c693-08d4c3af03c6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e4c09054-36f8-4900-9807-38f575f872ed",
@@ -7965,7 +7965,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e4c09054-36f8-4900-9807-38f575f872ed",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/24b4765a-5c72-461d-6562-08d7ed547bf3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e7825a03-8088-474d-9600-ba45dd7fb9ae",
@@ -7988,7 +7988,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e7825a03-8088-474d-9600-ba45dd7fb9ae",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/2acd1239-6dc0-4472-e93a-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ef10f881-9540-4af0-800d-37e3e147e0df",
@@ -8011,7 +8011,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ef10f881-9540-4af0-800d-37e3e147e0df",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/38dbab0e-72af-4a24-98b5-f28ae6b87b4a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f144e395-128d-4614-9248-dbd11b95db19",
@@ -8034,7 +8034,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/28466e7c-7f44-48fc-bf74-b4e6f0e088f8/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f144e395-128d-4614-9248-dbd11b95db19",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/db45aa4c-1b44-4226-bde9-fb17d3914765/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "039d3e58-d516-4262-b20d-d8e53db92617",
@@ -8057,7 +8057,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/039d3e58-d516-4262-b20d-d8e53db92617",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ed974c04-321c-4943-0e88-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0b0b79cb-99fb-4ec9-9b27-897c09f6947a",
@@ -8080,7 +8080,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0b0b79cb-99fb-4ec9-9b27-897c09f6947a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/02d26a3d-32a7-40ee-70c4-08d4ac1a34ec/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0e5c5d07-d7f6-482a-b608-a07b0f79a492",
@@ -8103,7 +8103,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0e5c5d07-d7f6-482a-b608-a07b0f79a492",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f3929929-d4be-475a-7d7a-08d49846e02b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "148bb88a-4f06-4b26-a21e-8ee5e30fde85",
@@ -8126,7 +8126,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/148bb88a-4f06-4b26-a21e-8ee5e30fde85",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/1b88db6a-c721-4ba7-a663-410c37f5458f/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1dffc4de-3e1a-4f60-adf1-0bedb34467cb",
@@ -8149,7 +8149,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1dffc4de-3e1a-4f60-adf1-0bedb34467cb",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/d3230b70-3e9a-446c-b172-298fa6b50432/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1e10e1e1-4a97-42c7-bc56-0bb191f685fe",
@@ -8172,7 +8172,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1e10e1e1-4a97-42c7-bc56-0bb191f685fe",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/20e349ca-aae5-4caa-a89f-2de61786152d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1e435e2f-97fa-46dd-8e23-7d9a6a53dada",
@@ -8195,7 +8195,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1e435e2f-97fa-46dd-8e23-7d9a6a53dada",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "25642211-eb47-48ef-96ac-bb3cbeed47cd",
@@ -8218,7 +8218,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/25642211-eb47-48ef-96ac-bb3cbeed47cd",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bd22e6af-c87b-4372-0c26-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "29fdf1a5-f891-427b-ad0c-699334ee461f",
@@ -8241,7 +8241,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/29fdf1a5-f891-427b-ad0c-699334ee461f",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2cfb8ed9-7643-45a6-963a-c4df583851c8",
@@ -8264,7 +8264,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2cfb8ed9-7643-45a6-963a-c4df583851c8",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2e9e465c-8a06-4524-963a-9a360eebe61a",
@@ -8287,7 +8287,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2e9e465c-8a06-4524-963a-9a360eebe61a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5c468ffc-0c85-4151-bd69-f0d723e4615b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "34ce6a78-426f-411a-9f6e-b62dfa9deca3",
@@ -8310,7 +8310,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/34ce6a78-426f-411a-9f6e-b62dfa9deca3",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/45a4bc79-eeab-4c6a-eee8-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3a4b4653-610a-40a3-825a-7bbd12430b73",
@@ -8333,7 +8333,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3a4b4653-610a-40a3-825a-7bbd12430b73",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6adc4d8a-d6f4-4f0e-47f1-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3be57a5c-76cb-401d-a0e6-46f2b9aaeed1",
@@ -8356,7 +8356,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3be57a5c-76cb-401d-a0e6-46f2b9aaeed1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ced897b9-57fc-4f22-296f-08d627f59e83/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "40365d7a-3bb1-4eac-9bb2-48548ea5c84f",
@@ -8379,7 +8379,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/40365d7a-3bb1-4eac-9bb2-48548ea5c84f",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "437152f8-20a7-492c-a41b-f92179b369e5",
@@ -8402,7 +8402,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/437152f8-20a7-492c-a41b-f92179b369e5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/47bd3adb-147c-4405-49f7-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "44654716-1b6e-45f9-8bb3-b33e8f09347f",
@@ -8425,7 +8425,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/44654716-1b6e-45f9-8bb3-b33e8f09347f",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6f340055-15d3-44b8-0d3d-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5384479c-32f3-49d2-afc9-dcb4b147a943",
@@ -8448,7 +8448,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5384479c-32f3-49d2-afc9-dcb4b147a943",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/dd90aa49-49bd-435b-a800-73d444434a0b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "597562aa-7793-4240-b786-a6cf2f7add55",
@@ -8471,7 +8471,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/597562aa-7793-4240-b786-a6cf2f7add55",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "67896fe6-63ec-40b1-a4d0-53b9ddaeea47",
@@ -8494,7 +8494,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/67896fe6-63ec-40b1-a4d0-53b9ddaeea47",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ff5af042-c71d-49bf-ac73-30be6d4f91bd/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "681ee562-c117-4099-b8d7-68fbdaa60066",
@@ -8517,7 +8517,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/681ee562-c117-4099-b8d7-68fbdaa60066",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/632f2329-d12b-4ac9-f978-08d562fe98c3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "68faa67a-eec5-40a4-9cce-feb36fa677e1",
@@ -8540,7 +8540,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/68faa67a-eec5-40a4-9cce-feb36fa677e1",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6a6b51d6-342c-41e0-a8c0-1397499ae8e6",
@@ -8563,7 +8563,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6a6b51d6-342c-41e0-a8c0-1397499ae8e6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/b981a066-4a0d-479e-f57b-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6d824887-1b88-4565-9b66-5985bea06fa0",
@@ -8586,7 +8586,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6d824887-1b88-4565-9b66-5985bea06fa0",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/486da1c6-55e6-4260-f520-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6dab5f98-9462-4fa0-8330-91dc5459dc9a",
@@ -8609,7 +8609,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6dab5f98-9462-4fa0-8330-91dc5459dc9a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6f1017ee-a0c1-4b55-a9ef-ec1c2cdeb489",
@@ -8632,7 +8632,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6f1017ee-a0c1-4b55-a9ef-ec1c2cdeb489",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ee2ca1aa-377b-4331-a507-e67a335859a1/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6fe39f4b-dd1b-429f-9f6b-30f53578ec00",
@@ -8655,7 +8655,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6fe39f4b-dd1b-429f-9f6b-30f53578ec00",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "71e3dfef-443a-427d-b3e2-df7057dd8b11",
@@ -8678,7 +8678,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/71e3dfef-443a-427d-b3e2-df7057dd8b11",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5d1b9a2d-9863-4f98-38c9-08d9116b5717/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7b40c499-59a2-49b6-b852-d360084b1558",
@@ -8701,7 +8701,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7b40c499-59a2-49b6-b852-d360084b1558",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7d8d0d7c-38f2-4bc4-9829-073ca99e93ae",
@@ -8724,7 +8724,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7d8d0d7c-38f2-4bc4-9829-073ca99e93ae",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/e42c4252-c1ad-4d9d-0c6a-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "85a7468f-a916-4a41-a82f-10a7734b9885",
@@ -8747,7 +8747,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/85a7468f-a916-4a41-a82f-10a7734b9885",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/84ca5d8f-7477-4b19-8c67-08d47f4192ef/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "87cefead-e285-4fc1-a4f3-f2e42022b591",
@@ -8770,7 +8770,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/87cefead-e285-4fc1-a4f3-f2e42022b591",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/86604cde-60dd-44e6-64d9-08d68c0a56fe/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8b125f2c-6f61-45be-a600-2b8cb0d0ec30",
@@ -8793,7 +8793,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8b125f2c-6f61-45be-a600-2b8cb0d0ec30",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/7343e2b3-1bb2-4bda-9d3f-aec065ed4bd0/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8f8fd849-1a0c-4f5b-9486-8e4a86ee61dc",
@@ -8816,7 +8816,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8f8fd849-1a0c-4f5b-9486-8e4a86ee61dc",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/7fcfa114-d639-4780-9343-a92adf9dd7fd/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9022f47c-b331-4f43-8e2e-c06937779387",
@@ -8839,7 +8839,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9022f47c-b331-4f43-8e2e-c06937779387",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a0c58461-b8b9-4f17-9e4c-f6687ab9c93b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "92b30bf7-8654-411c-b13e-89200919a95d",
@@ -8862,7 +8862,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/92b30bf7-8654-411c-b13e-89200919a95d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9bd53d76-ec59-4c94-9b79-689c1cfc6b57",
@@ -8885,7 +8885,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9bd53d76-ec59-4c94-9b79-689c1cfc6b57",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a4fbfa84-15e9-4aa0-bdd3-1641a91f69ac",
@@ -8908,7 +8908,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a4fbfa84-15e9-4aa0-bdd3-1641a91f69ac",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/20bf52a6-a2d0-4930-9d66-9c5fb51ac901/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a6ff3e23-18f9-4cb6-a399-c64f14fcf813",
@@ -8931,7 +8931,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a6ff3e23-18f9-4cb6-a399-c64f14fcf813",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a7f3a638-1334-459d-9003-e73690a422c5",
@@ -8954,7 +8954,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a7f3a638-1334-459d-9003-e73690a422c5",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a9434819-6453-4191-9442-2e2d011fe752",
@@ -8977,7 +8977,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a9434819-6453-4191-9442-2e2d011fe752",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/b021036f-49fb-446e-fbcd-08d619e10ca3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b301e725-2381-43e9-baeb-41b10191db8e",
@@ -9000,7 +9000,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b301e725-2381-43e9-baeb-41b10191db8e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/87713bc4-6659-41e9-907c-3afd6f525ce6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b8169566-1b49-43c1-a423-af18aad824ab",
@@ -9023,7 +9023,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b8169566-1b49-43c1-a423-af18aad824ab",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "bd1dff4c-5b25-47eb-a04c-d47edf3618e0",
@@ -9046,7 +9046,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/bd1dff4c-5b25-47eb-a04c-d47edf3618e0",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/84a93ef5-8a8d-4be7-df69-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "be0b7f80-72cd-4edd-a6a2-8771a7976e69",
@@ -9069,7 +9069,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/be0b7f80-72cd-4edd-a6a2-8771a7976e69",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3b45a107-fb34-452b-9358-356940b95e2f/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c4fc5cf0-1742-404d-aad9-e10e86b1006b",
@@ -9092,7 +9092,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c4fc5cf0-1742-404d-aad9-e10e86b1006b",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/67704558-5928-4317-b077-4188d4862037/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "cadc2b27-c80d-4160-a459-848760f34dec",
@@ -9115,7 +9115,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/cadc2b27-c80d-4160-a459-848760f34dec",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c03fcae0-ab6f-4286-b9fe-da9c1a96a2cd/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "cb7920fd-8631-4bef-9176-072ab3d93e22",
@@ -9138,7 +9138,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/cb7920fd-8631-4bef-9176-072ab3d93e22",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "cddf4c53-7908-4a61-9634-9f14a8aaa08d",
@@ -9161,7 +9161,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/cddf4c53-7908-4a61-9634-9f14a8aaa08d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/56840adc-ecd8-48e8-f70c-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "cebf6fb8-ec2b-4def-b231-0e6921876b6b",
@@ -9184,7 +9184,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/cebf6fb8-ec2b-4def-b231-0e6921876b6b",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/64fd1f07-f5a2-4776-801f-3ae128423fa1/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "cf178101-8dba-4ea4-9877-1fe8f1ed0f96",
@@ -9207,7 +9207,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/cf178101-8dba-4ea4-9877-1fe8f1ed0f96",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/907a0dff-569d-4792-f3ad-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d07c647e-5a35-4972-b9e1-b4cc3df535b7",
@@ -9230,7 +9230,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d07c647e-5a35-4972-b9e1-b4cc3df535b7",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/b4e25ee3-5808-4838-ba0a-7f18628a59c1/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d566d1c1-3c34-44c9-b71c-7edabd9a40f7",
@@ -9253,7 +9253,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d566d1c1-3c34-44c9-b71c-7edabd9a40f7",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/746c913b-d755-4d66-9309-212a39c46455/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d7a8b25a-702c-4e84-b99f-50de20a8c18e",
@@ -9276,7 +9276,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d7a8b25a-702c-4e84-b99f-50de20a8c18e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/94e5bcbc-05b6-4eba-feef-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d8d9cef2-e187-4b6d-93b7-85058231ed98",
@@ -9299,7 +9299,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d8d9cef2-e187-4b6d-93b7-85058231ed98",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "df4b980a-5799-4ed2-a392-86e87369d92a",
@@ -9322,7 +9322,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/df4b980a-5799-4ed2-a392-86e87369d92a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/37ef0089-df37-4044-00bc-08d79dd5d8c1/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "df6c069e-7833-40b3-a829-396ae75f97d6",
@@ -9345,7 +9345,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/df6c069e-7833-40b3-a829-396ae75f97d6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8f68bfda-f417-44d4-a123-fc40d29411da/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "df9a1210-81cd-4056-b448-8ca36e6be871",
@@ -9368,7 +9368,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/df9a1210-81cd-4056-b448-8ca36e6be871",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "dfeac3ab-5e61-42ad-9290-df7d8997144f",
@@ -9391,7 +9391,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/dfeac3ab-5e61-42ad-9290-df7d8997144f",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/831574b0-1109-4051-f379-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e0b086f3-8a75-449c-bbda-62b628f63610",
@@ -9414,7 +9414,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e0b086f3-8a75-449c-bbda-62b628f63610",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/58f09dc6-57cc-4ce7-0e89-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e84b09be-536f-4ebb-a5b0-5aae4c308ec2",
@@ -9437,7 +9437,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e84b09be-536f-4ebb-a5b0-5aae4c308ec2",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/59636d66-3088-4739-f367-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "eef83f0a-2718-4d24-bf1b-f19440b663da",
@@ -9460,7 +9460,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/eef83f0a-2718-4d24-bf1b-f19440b663da",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5fa0fb88-1160-48b9-7943-08d91156c34e/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f51604ce-c37a-4ef6-a413-8d01e7e11a2f",
@@ -9483,7 +9483,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f51604ce-c37a-4ef6-a413-8d01e7e11a2f",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/16ff3759-5e76-4331-8f0c-08d55e413998/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f6c9bfe8-1ae6-48f4-b273-3285e3d20db9",
@@ -9506,7 +9506,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f6c9bfe8-1ae6-48f4-b273-3285e3d20db9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/001a0204-b575-48c6-b379-097759e0635e/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "fb800700-999b-45c2-a0be-4847ee66b591",
@@ -9529,7 +9529,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/f8bb29a3-1da7-4e2e-91a4-128467aab66a/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/fb800700-999b-45c2-a0be-4847ee66b591",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/65cac984-8e27-42eb-fa08-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "111e3696-8365-4323-b1e4-b105c5abc7f1",
@@ -9552,7 +9552,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/111e3696-8365-4323-b1e4-b105c5abc7f1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/4037724e-88b9-43cb-9d31-7e0d1f15f46f/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1225e532-e1ab-4324-9179-79a0632c638c",
@@ -9575,7 +9575,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1225e532-e1ab-4324-9179-79a0632c638c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/4513f649-2b8a-46c0-8573-492331926f92/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1a5f8be6-6326-4ef3-8796-24953d556ee6",
@@ -9598,7 +9598,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1a5f8be6-6326-4ef3-8796-24953d556ee6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/7559162b-dec2-4678-a2f9-8e8952d3c005/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "282b1ca9-606d-49b8-8551-b2766af7c528",
@@ -9621,7 +9621,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/282b1ca9-606d-49b8-8551-b2766af7c528",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/caa4637a-4d4b-4035-ad15-d859245fd315/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2e1ee678-9d15-4cca-ac76-9d32dd2fc5ff",
@@ -9644,7 +9644,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2e1ee678-9d15-4cca-ac76-9d32dd2fc5ff",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c3b44670-b358-4b5c-0fe8-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3247586b-f2f8-4e65-9aea-e5f4c8d90ab2",
@@ -9667,7 +9667,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3247586b-f2f8-4e65-9aea-e5f4c8d90ab2",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/632996ab-004b-41fd-53ce-08d569d56bbf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3ad3c453-c83c-4a72-b158-e640a3687d2a",
@@ -9690,7 +9690,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3ad3c453-c83c-4a72-b158-e640a3687d2a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "44c736d9-6c06-4316-a8fd-d484e098a3a5",
@@ -9713,7 +9713,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/44c736d9-6c06-4316-a8fd-d484e098a3a5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6f64cae8-72b4-41c4-925c-a631a395c940/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4682ed90-2016-470a-93f1-2b3e412211ac",
@@ -9736,7 +9736,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4682ed90-2016-470a-93f1-2b3e412211ac",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3ad7ada8-8580-4cdb-bcb9-ae32cb7bfd70/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "50685d5b-0ff1-4be2-a886-39709875a5f8",
@@ -9759,7 +9759,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/50685d5b-0ff1-4be2-a886-39709875a5f8",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/280fc5f2-6dc1-4635-f74b-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5282d5fe-1acc-45a1-b738-4bcc21bdc32e",
@@ -9782,7 +9782,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5282d5fe-1acc-45a1-b738-4bcc21bdc32e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/faa19631-bb2b-4d30-4b81-08d8eee4b72e/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "52ed750f-84cd-44f2-9a77-a3dcd1c8294e",
@@ -9805,7 +9805,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/52ed750f-84cd-44f2-9a77-a3dcd1c8294e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/286884cb-b22a-4ce2-a24e-e14f727c4bc7/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "58d71c29-2999-4169-8b2d-77694dd9f2b2",
@@ -9828,7 +9828,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/58d71c29-2999-4169-8b2d-77694dd9f2b2",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/16ff3759-5e76-4331-8f0c-08d55e413998/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "593847df-749b-4248-86f0-bffc6cbfbd6c",
@@ -9851,7 +9851,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/593847df-749b-4248-86f0-bffc6cbfbd6c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/4f966d47-af50-4f04-aad1-1295f0d01eba/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5cd876ad-fcf5-407b-84b4-7cf261ce91cb",
@@ -9874,7 +9874,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5cd876ad-fcf5-407b-84b4-7cf261ce91cb",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5e4aeef0-cc6a-482a-9278-8a001410ef86",
@@ -9897,7 +9897,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5e4aeef0-cc6a-482a-9278-8a001410ef86",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "616e1bb8-3060-4353-952c-607491ffdbf4",
@@ -9920,7 +9920,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/616e1bb8-3060-4353-952c-607491ffdbf4",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ca5ef8cc-e028-4f97-d681-08d70664f172/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6de6bf48-e360-418c-b2cb-37a4c71270ae",
@@ -9943,7 +9943,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6de6bf48-e360-418c-b2cb-37a4c71270ae",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5bd07877-e575-46fc-f440-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "77dea29d-4280-462f-b085-f38f82be67e1",
@@ -9966,7 +9966,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/77dea29d-4280-462f-b085-f38f82be67e1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/9c829af9-e9ed-4276-9575-14c044bc233e/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "79ac254a-fdc3-4c09-860d-9156753abe4c",
@@ -9989,7 +9989,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/79ac254a-fdc3-4c09-860d-9156753abe4c",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "83867f43-b05d-47bd-96af-71b1ce15d0ac",
@@ -10012,7 +10012,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/83867f43-b05d-47bd-96af-71b1ce15d0ac",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/20bf52a6-a2d0-4930-9d66-9c5fb51ac901/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "90c2e112-4a3e-46b8-84af-6f5ab3a8fb57",
@@ -10035,7 +10035,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/90c2e112-4a3e-46b8-84af-6f5ab3a8fb57",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8f68bfda-f417-44d4-a123-fc40d29411da/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "97eb0756-17bd-4738-b5be-53b8e8976f3d",
@@ -10058,7 +10058,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/97eb0756-17bd-4738-b5be-53b8e8976f3d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/77153c4a-dfb0-47c4-129b-08d5b4d004f3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9b028e02-a682-45b4-82bf-64f8e70ed246",
@@ -10081,7 +10081,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9b028e02-a682-45b4-82bf-64f8e70ed246",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/02d26a3d-32a7-40ee-70c4-08d4ac1a34ec/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a5a264f8-9073-4d25-b4ff-1355f05a4a50",
@@ -10104,7 +10104,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a5a264f8-9073-4d25-b4ff-1355f05a4a50",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/fc73baa7-a294-4de3-9be8-2510005877ec/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a5e67969-cff8-4d8a-a1b3-dd1762b8c65f",
@@ -10127,7 +10127,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a5e67969-cff8-4d8a-a1b3-dd1762b8c65f",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a7292988-e2c6-4dbb-b1b5-5b1de76158cf",
@@ -10150,7 +10150,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a7292988-e2c6-4dbb-b1b5-5b1de76158cf",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/555cafce-6696-472f-b86c-2ae766f35a6d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ad1b581f-3a53-4c93-b89a-3a811e0d09d0",
@@ -10173,7 +10173,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ad1b581f-3a53-4c93-b89a-3a811e0d09d0",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6ba96d46-94d8-417c-ec41-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "adcef422-650e-41e4-bf7e-c55603882c1f",
@@ -10196,7 +10196,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/adcef422-650e-41e4-bf7e-c55603882c1f",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/496b73f9-b289-4cd1-91d6-8399fdce95fe/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "af78797e-1ef8-4ecc-a9d5-c2e31801d30e",
@@ -10219,7 +10219,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/af78797e-1ef8-4ecc-a9d5-c2e31801d30e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6adc4d8a-d6f4-4f0e-47f1-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b3255e1c-f284-424a-8248-65dddd31624c",
@@ -10242,7 +10242,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b3255e1c-f284-424a-8248-65dddd31624c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/faa19631-bb2b-4d30-4b81-08d8eee4b72e/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b528ed0e-2771-40eb-8fc4-d814841a475d",
@@ -10265,7 +10265,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b528ed0e-2771-40eb-8fc4-d814841a475d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/831574b0-1109-4051-f379-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "bd3b4578-9ecb-471b-a102-1776df491b16",
@@ -10288,7 +10288,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/bd3b4578-9ecb-471b-a102-1776df491b16",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3b45a107-fb34-452b-9358-356940b95e2f/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c5046a4b-71b7-47a0-85c5-2651eed05a17",
@@ -10311,7 +10311,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c5046a4b-71b7-47a0-85c5-2651eed05a17",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8443eb92-3295-4fa8-f245-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c9ac9659-2489-427e-96f7-db066673cbda",
@@ -10334,7 +10334,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c9ac9659-2489-427e-96f7-db066673cbda",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/9497530e-8393-41dd-9bf4-f9015b127aca/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d13c0539-e38c-4b6d-b97e-cd7144cfa484",
@@ -10357,7 +10357,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d13c0539-e38c-4b6d-b97e-cd7144cfa484",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/fde611ef-01cf-4f8d-9f64-93fd677eb7eb/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d154e72e-9eee-4c6c-af1f-127d7d299c3e",
@@ -10380,7 +10380,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d154e72e-9eee-4c6c-af1f-127d7d299c3e",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d3a67dfe-3801-450d-9a48-8ea5cb4464fc",
@@ -10403,7 +10403,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d3a67dfe-3801-450d-9a48-8ea5cb4464fc",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/632996ab-004b-41fd-53ce-08d569d56bbf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d464ffac-32da-4b8a-bfdf-ac6f080e5c7d",
@@ -10426,7 +10426,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d464ffac-32da-4b8a-bfdf-ac6f080e5c7d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d7b553ef-9cea-416e-bed7-04919c4eab4c",
@@ -10449,7 +10449,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d7b553ef-9cea-416e-bed7-04919c4eab4c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ac50e5a9-36d4-44da-f9f9-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d894148f-4fb3-4709-b8d9-63262e8d981e",
@@ -10472,7 +10472,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d894148f-4fb3-4709-b8d9-63262e8d981e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/9263f11b-40f0-4c34-af19-c310beff88c1/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "da4cfba1-e192-45de-a52b-6d4642c67cfd",
@@ -10495,7 +10495,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/da4cfba1-e192-45de-a52b-6d4642c67cfd",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/61c2f0f3-c2a2-48d2-fda9-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ddb10781-9cce-4139-bc75-99dc55ac6aa5",
@@ -10518,7 +10518,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ddb10781-9cce-4139-bc75-99dc55ac6aa5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/fde611ef-01cf-4f8d-9f64-93fd677eb7eb/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e483d921-25fd-441a-bd5b-5d7c642a747d",
@@ -10541,7 +10541,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e483d921-25fd-441a-bd5b-5d7c642a747d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/7e977d16-7215-4e33-9841-c09139801b6d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e633befd-ae06-47bb-82db-6935c28ef8b9",
@@ -10564,7 +10564,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e633befd-ae06-47bb-82db-6935c28ef8b9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/0cee6535-ee13-446a-f032-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ea654fc1-23ac-45fd-a089-de567983a9d4",
@@ -10587,7 +10587,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ea654fc1-23ac-45fd-a089-de567983a9d4",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/54f71986-b2d2-4882-6488-08d6a8255641/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ebf3b8f1-c343-4676-9adf-4c2ff4c5b549",
@@ -10610,7 +10610,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ebf3b8f1-c343-4676-9adf-4c2ff4c5b549",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5b59247c-84b7-466c-4a32-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f1c7d20e-7439-4207-b290-1b7c0d035c09",
@@ -10633,7 +10633,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f1c7d20e-7439-4207-b290-1b7c0d035c09",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/273ad2a6-6af2-4e25-f18e-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "fd8d61fd-8d19-47d9-8ad6-856a24940d9a",
@@ -10656,7 +10656,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/074551b4-2514-42ef-92a1-e9b381ec8016/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/fd8d61fd-8d19-47d9-8ad6-856a24940d9a",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "05b2350f-fe4e-4ccf-a3b4-327766db188c",
@@ -10679,7 +10679,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/05b2350f-fe4e-4ccf-a3b4-327766db188c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c874dfdc-d1ee-44a5-1970-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "163bdade-7812-4b2e-8ddd-bdfaea7ad413",
@@ -10702,7 +10702,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/163bdade-7812-4b2e-8ddd-bdfaea7ad413",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/eec26f11-3397-488b-f380-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2c3aea1e-d06c-4a63-8953-6d487e6c7df5",
@@ -10725,7 +10725,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2c3aea1e-d06c-4a63-8953-6d487e6c7df5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/633a9c89-2807-4cc0-8551-63082161b0c2/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "334540e1-6544-4f7d-8a48-20df0f5da09f",
@@ -10748,7 +10748,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/334540e1-6544-4f7d-8a48-20df0f5da09f",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/40f94776-3aa4-426a-8cc9-08d47f4192ef/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "339b486c-7677-4674-ba81-a5972ab6bbd9",
@@ -10771,7 +10771,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/339b486c-7677-4674-ba81-a5972ab6bbd9",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3f6eee33-d8cc-49d6-8f5b-da71661eb15c",
@@ -10794,7 +10794,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3f6eee33-d8cc-49d6-8f5b-da71661eb15c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6adc4d8a-d6f4-4f0e-47f1-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "474c444a-2f6e-42fb-a228-6bc56f7d7d67",
@@ -10817,7 +10817,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/474c444a-2f6e-42fb-a228-6bc56f7d7d67",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8e2c7640-5bf2-45c1-1d6e-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "54d8f334-5d74-45dc-81ec-4bfcdfcfdb95",
@@ -10840,7 +10840,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/54d8f334-5d74-45dc-81ec-4bfcdfcfdb95",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/20bf52a6-a2d0-4930-9d66-9c5fb51ac901/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "561f7ce8-b0d8-470f-9606-63c76fca0792",
@@ -10863,7 +10863,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/561f7ce8-b0d8-470f-9606-63c76fca0792",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "623eaab2-8e12-42cd-82ca-013f5bb219b3",
@@ -10886,7 +10886,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/623eaab2-8e12-42cd-82ca-013f5bb219b3",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bd992243-5c8f-41c5-fd90-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6e19ef8b-ed7b-4eb0-83b4-fcbea33b4975",
@@ -10909,7 +10909,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6e19ef8b-ed7b-4eb0-83b4-fcbea33b4975",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/632996ab-004b-41fd-53ce-08d569d56bbf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6e2265e0-44be-40f6-8a1a-8e195d85c0e3",
@@ -10932,7 +10932,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6e2265e0-44be-40f6-8a1a-8e195d85c0e3",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/20bd33cd-56aa-45b5-e223-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "74c5a54b-6e56-4a70-9f25-be4500f1523d",
@@ -10955,7 +10955,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/74c5a54b-6e56-4a70-9f25-be4500f1523d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5c7ad157-81ae-4930-90a0-9943b902fcd0/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "75dc3f7a-3886-4f92-a8cc-173d694d3034",
@@ -10978,7 +10978,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/75dc3f7a-3886-4f92-a8cc-173d694d3034",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7ea411e6-3da1-4062-8d5c-000aef789dc5",
@@ -11001,7 +11001,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7ea411e6-3da1-4062-8d5c-000aef789dc5",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8936a263-3e8b-46b1-8765-d08fbd6f1bc3",
@@ -11024,7 +11024,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8936a263-3e8b-46b1-8765-d08fbd6f1bc3",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8ba321c8-a949-4792-80cc-81d5d6277ace",
@@ -11047,7 +11047,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8ba321c8-a949-4792-80cc-81d5d6277ace",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c5c76acf-08f7-4841-3f32-08d680d0f18d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "902f8de7-e3ef-4358-8b6b-d03e5d61bee8",
@@ -11070,7 +11070,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/902f8de7-e3ef-4358-8b6b-d03e5d61bee8",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5a155a2f-65bb-4c2d-c644-08d4c3af03c6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "9381a8a2-75f1-4fac-94b0-b4d7c6ac59f6",
@@ -11093,7 +11093,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/9381a8a2-75f1-4fac-94b0-b4d7c6ac59f6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5d914454-6d5a-44c5-a4c8-532f05f90bbf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "93b410f5-335c-4fbd-9550-62564d7584e0",
@@ -11116,7 +11116,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/93b410f5-335c-4fbd-9550-62564d7584e0",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/b602dde3-6064-4bf8-a89e-d847c27ae6bf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "980fe19b-c1bd-48cd-b5a4-2c991e87bf97",
@@ -11139,7 +11139,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/980fe19b-c1bd-48cd-b5a4-2c991e87bf97",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f3624be9-6a5a-4f35-f237-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a51dc5a5-494c-40a8-a50c-6eb67061aa14",
@@ -11162,7 +11162,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a51dc5a5-494c-40a8-a50c-6eb67061aa14",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8055b774-1ddd-47f7-b738-a8eb383328a8/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a7936d7d-18c9-46fd-99a2-95e949036c83",
@@ -11185,7 +11185,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a7936d7d-18c9-46fd-99a2-95e949036c83",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/632f2329-d12b-4ac9-f978-08d562fe98c3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ad8efd8b-c1b6-4b04-95f8-8d850a45df6a",
@@ -11208,7 +11208,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ad8efd8b-c1b6-4b04-95f8-8d850a45df6a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/28b22f24-8804-4b95-a857-08d7358bd1b3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b094f8d8-f332-4a29-aa8e-c607c13b7308",
@@ -11231,7 +11231,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b094f8d8-f332-4a29-aa8e-c607c13b7308",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/16ff3759-5e76-4331-8f0c-08d55e413998/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c0613d5e-f360-4669-8b39-2e5b2cceb4f6",
@@ -11254,7 +11254,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c0613d5e-f360-4669-8b39-2e5b2cceb4f6",
     "imageUrl": "https://d3hlz95t29ptj0.cloudfront.net/f4656133-f523-47e0-bb70-f15b3a20e8eb/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c7dde94d-daf4-4c28-970d-25a0508ea143",
@@ -11277,7 +11277,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c7dde94d-daf4-4c28-970d-25a0508ea143",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e629b1d0-74c0-4cf8-bdf2-0aed1cb9f257",
@@ -11300,7 +11300,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e629b1d0-74c0-4cf8-bdf2-0aed1cb9f257",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/d81a2cc8-0380-4737-babe-f999f70468d2/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e6414912-68b5-4dd8-8208-f395f1eb482e",
@@ -11323,7 +11323,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e6414912-68b5-4dd8-8208-f395f1eb482e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a7adb0b0-5113-4100-6566-08d7ed547bf3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e718d784-0e78-4241-8a6a-c0b1044f4072",
@@ -11346,7 +11346,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e718d784-0e78-4241-8a6a-c0b1044f4072",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a680d679-4358-47d4-8737-a93f4527b54c/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "edba3641-6a74-49f3-9c3d-6fdefc9a62d1",
@@ -11369,7 +11369,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/edba3641-6a74-49f3-9c3d-6fdefc9a62d1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/03812d6e-364e-4a64-8b8b-085d14b5e3d8/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ef800802-94e9-4297-8b67-cd42c704b155",
@@ -11392,7 +11392,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ef800802-94e9-4297-8b67-cd42c704b155",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/cf528c5c-2f16-47a6-b005-d1ccf0f30639/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f0bd71bf-145b-4cb9-beb6-ad5cf3aa987f",
@@ -11415,7 +11415,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f0bd71bf-145b-4cb9-beb6-ad5cf3aa987f",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/2aff28a2-27dc-470e-ebfb-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f4527e46-16ab-4fc3-9466-9438d1575f19",
@@ -11438,7 +11438,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/42813e13-2e26-424d-bd48-e5cd096ad6f4/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f4527e46-16ab-4fc3-9466-9438d1575f19",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/13925a30-38a7-45fc-bf72-ef0b378c392d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "25e2e063-e8d3-4daa-b931-500a60586697",
@@ -11461,7 +11461,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/b6ae1eb7-36ef-4dac-9532-ec89cdf44422/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/25e2e063-e8d3-4daa-b931-500a60586697",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7ca57cbd-5dfd-40ef-b4be-635a3722d7ca",
@@ -11484,7 +11484,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/b6ae1eb7-36ef-4dac-9532-ec89cdf44422/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7ca57cbd-5dfd-40ef-b4be-635a3722d7ca",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6de0a891-12f3-45dc-1971-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "aa7cda80-d192-436e-97e7-f48201335871",
@@ -11507,7 +11507,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/b6ae1eb7-36ef-4dac-9532-ec89cdf44422/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/aa7cda80-d192-436e-97e7-f48201335871",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5fa0fb88-1160-48b9-7943-08d91156c34e/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "5171e391-b416-4728-aff1-8a60374e533a",
@@ -11530,7 +11530,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/eca042e8-89ce-46ad-af67-ff9a9d366d16/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/5171e391-b416-4728-aff1-8a60374e533a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/59460d0a-1d05-419d-9eaf-994b0dd42fe5/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "152632d3-d09b-4320-84d5-e90c11f97fe3",
@@ -11553,7 +11553,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/222f11dc-994a-44c1-b4ac-e65712754506/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/152632d3-d09b-4320-84d5-e90c11f97fe3",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/abae29ba-7066-44b6-2ddc-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4edc13fe-a9fa-483f-9453-ff1717632d7d",
@@ -11576,7 +11576,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/222f11dc-994a-44c1-b4ac-e65712754506/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4edc13fe-a9fa-483f-9453-ff1717632d7d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "944264ec-8553-40dd-b449-84d228783369",
@@ -11599,7 +11599,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/5f8c8d81-d30c-405a-9a20-5bda49363935/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/944264ec-8553-40dd-b449-84d228783369",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "14cca7ee-91f5-49af-8e88-581858a099e9",
@@ -11622,7 +11622,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/14cca7ee-91f5-49af-8e88-581858a099e9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/47bd3adb-147c-4405-49f7-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "156933bc-5f45-4b31-907d-7a4343ee73f7",
@@ -11645,7 +11645,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/156933bc-5f45-4b31-907d-7a4343ee73f7",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1ac9a578-b10d-4acf-be5d-4567408fabfe",
@@ -11668,7 +11668,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1ac9a578-b10d-4acf-be5d-4567408fabfe",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/39cd8340-9a9e-4e83-7284-08d7daec7cf6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "1dc9b125-ccd6-4abc-a30f-d0aab3e80fa5",
@@ -11691,7 +11691,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/1dc9b125-ccd6-4abc-a30f-d0aab3e80fa5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a9e72235-c5a7-444c-a5fd-10ecfaf7b583/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "24c921b0-fcc8-4291-bbf8-caec3e6f79ee",
@@ -11714,7 +11714,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/24c921b0-fcc8-4291-bbf8-caec3e6f79ee",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3ad7ada8-8580-4cdb-bcb9-ae32cb7bfd70/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "312f6b1e-8645-4254-95fb-f4b7582b8776",
@@ -11737,7 +11737,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/312f6b1e-8645-4254-95fb-f4b7582b8776",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8ecca298-54c4-4da6-6fea-08d535f00adf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "353e90d6-251d-409c-9ec8-77c51d431f4d",
@@ -11760,7 +11760,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/353e90d6-251d-409c-9ec8-77c51d431f4d",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/9988391f-efaf-4205-76b7-08d5e2d04776/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "35a0ca0b-1ea7-4244-aecc-a3a25df8b504",
@@ -11783,7 +11783,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/35a0ca0b-1ea7-4244-aecc-a3a25df8b504",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/31befa68-e96b-4f6a-48a7-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "55f3d76f-da48-47c9-9e04-6f0908aff763",
@@ -11806,7 +11806,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/55f3d76f-da48-47c9-9e04-6f0908aff763",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6380a829-2e9c-4582-a24d-50d1c73b8865",
@@ -11829,7 +11829,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6380a829-2e9c-4582-a24d-50d1c73b8865",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/16174b58-85d2-47a6-5d1e-08d771a2d39f/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6a846ec0-368a-47a8-8c20-e15503ceda04",
@@ -11852,7 +11852,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6a846ec0-368a-47a8-8c20-e15503ceda04",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/7559162b-dec2-4678-a2f9-8e8952d3c005/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "80f5d1e1-52d2-40e1-891d-cd509f476dd0",
@@ -11875,7 +11875,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/80f5d1e1-52d2-40e1-891d-cd509f476dd0",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "81db94bd-ad5f-42a5-9679-315bdb0fdce4",
@@ -11898,7 +11898,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/81db94bd-ad5f-42a5-9679-315bdb0fdce4",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/91163894-1b42-465f-7e85-08d49846e02b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "87d73de2-6f2b-4bdb-b1a2-c7cce0b4f0f8",
@@ -11921,7 +11921,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/87d73de2-6f2b-4bdb-b1a2-c7cce0b4f0f8",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/57ac3ebb-7b2f-408b-8dcf-8b53b4477092/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "91dd1549-8dbc-4708-9fe2-b2b1b33b5d82",
@@ -11944,7 +11944,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/91dd1549-8dbc-4708-9fe2-b2b1b33b5d82",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/7805f62f-7218-4ea0-155d-08d71b9dc131/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a0339683-186a-449a-9277-4f9f5c59e317",
@@ -11967,7 +11967,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a0339683-186a-449a-9277-4f9f5c59e317",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a30ebd7a-b7b8-4cfc-88b3-a80679cf57f9",
@@ -11990,7 +11990,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a30ebd7a-b7b8-4cfc-88b3-a80679cf57f9",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/20fa2b99-ccf0-4a73-8f71-08d55e413998/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "aad77118-c840-4054-90ea-273649f9642c",
@@ -12013,7 +12013,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/aad77118-c840-4054-90ea-273649f9642c",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a4bd547e-f3a3-439d-b960-7ad114b96a33/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c0a2a698-3c26-4efe-b0a2-565c7d98f9bd",
@@ -12036,7 +12036,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c0a2a698-3c26-4efe-b0a2-565c7d98f9bd",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d4079caa-e52c-420c-b1b9-466785215506",
@@ -12059,7 +12059,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d4079caa-e52c-420c-b1b9-466785215506",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/2a1d38e8-8a32-4488-94fd-f8c61b1ae85b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d6c75222-07fb-4de1-9da5-873d9e9bc947",
@@ -12082,7 +12082,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d6c75222-07fb-4de1-9da5-873d9e9bc947",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/dc08394c-b6b7-4aee-7c25-08d6b281ec0c/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "dc43c9fc-7fb4-4af7-b020-db94454bf194",
@@ -12105,7 +12105,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/dc43c9fc-7fb4-4af7-b020-db94454bf194",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/632996ab-004b-41fd-53ce-08d569d56bbf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "e6678bb0-5b5e-40e0-b6b2-c8dd01afddd5",
@@ -12128,7 +12128,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/e6678bb0-5b5e-40e0-b6b2-c8dd01afddd5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bd647e45-4f85-4f5b-f823-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "eac6cb9a-dad4-403d-9a01-e487e00bf604",
@@ -12151,7 +12151,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/eac6cb9a-dad4-403d-9a01-e487e00bf604",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/0709578b-f8b3-4bbf-12ba-08d55a87c1e8/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f05cfdf3-13fe-43bc-b13a-9a135d5a3fb3",
@@ -12174,7 +12174,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f05cfdf3-13fe-43bc-b13a-9a135d5a3fb3",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/bb08c942-c2ad-4bac-c693-08d4c3af03c6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f4e510dc-b84b-4e67-a9f4-53f3de8367fb",
@@ -12197,7 +12197,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f4e510dc-b84b-4e67-a9f4-53f3de8367fb",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/1525224c-cdad-421e-1258-08d5b4d004f3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f71114ce-f2cc-4431-9802-6cca5e62decd",
@@ -12220,7 +12220,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f71114ce-f2cc-4431-9802-6cca5e62decd",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/845050da-f8c8-4df2-e8da-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "fef6f8a1-db35-4709-a147-a7efb6df729e",
@@ -12243,7 +12243,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9c8391fe-fe1a-403c-8fcd-797bc9e3e6b3/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/fef6f8a1-db35-4709-a147-a7efb6df729e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/582768c9-d9bd-4117-99b3-8780b5bb8856/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "047ac4a7-d690-47ad-a04e-8c94fc0e9020",
@@ -12266,7 +12266,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/047ac4a7-d690-47ad-a04e-8c94fc0e9020",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/5205d16b-5af1-4ef2-9619-1f4b2a1a4c3e/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "04acea86-0aa7-4f76-8ab9-6f43e58d03dc",
@@ -12289,7 +12289,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/04acea86-0aa7-4f76-8ab9-6f43e58d03dc",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/e26eb678-0d98-4a14-bc46-51bb4a6b9ef4/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "07d54e0e-a2b1-4564-a5ec-4216b68c807e",
@@ -12312,7 +12312,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/07d54e0e-a2b1-4564-a5ec-4216b68c807e",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/0d9e0020-bb35-4d8b-e99b-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0ace2277-72b6-4015-a8a5-2d30f1cf2281",
@@ -12335,7 +12335,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0ace2277-72b6-4015-a8a5-2d30f1cf2281",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/122fda6a-8ba3-44ea-932f-6354d4bc3230/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "0d7d59d9-c6fc-4f8d-95f7-aa4a843351a6",
@@ -12358,7 +12358,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/0d7d59d9-c6fc-4f8d-95f7-aa4a843351a6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/608bc525-bdcf-4a37-fbfd-08d4985afd7a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "116523ba-bfd9-4dcc-a1ac-3fb7f727c9b3",
@@ -12381,7 +12381,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/116523ba-bfd9-4dcc-a1ac-3fb7f727c9b3",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/60c518ae-3279-47c0-ffa9-08d79dd5d8c0/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "13c8032d-dd0f-4117-afcd-93fa4254c420",
@@ -12404,7 +12404,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/13c8032d-dd0f-4117-afcd-93fa4254c420",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/680f347f-bb2d-4502-472e-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "15313ad3-49a7-4d0a-bafe-59e8b0761459",
@@ -12427,7 +12427,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/15313ad3-49a7-4d0a-bafe-59e8b0761459",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/0cff16b3-1823-46b9-f5bb-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "17adf825-5b6c-498a-90a3-0dc128d1e1f8",
@@ -12450,7 +12450,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/17adf825-5b6c-498a-90a3-0dc128d1e1f8",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "214e26c5-88e8-4456-ab95-4314b045306b",
@@ -12473,7 +12473,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/214e26c5-88e8-4456-ab95-4314b045306b",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/8ecca298-54c4-4da6-6fea-08d535f00adf/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "2b623ad5-0c0b-41c7-970e-08b2323955bf",
@@ -12496,7 +12496,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/2b623ad5-0c0b-41c7-970e-08b2323955bf",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3e327539-4077-4bdd-ae0f-7b4c841565d6/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3423cf64-3922-458e-b7df-7866b5207ad6",
@@ -12519,7 +12519,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3423cf64-3922-458e-b7df-7866b5207ad6",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3cfeb76a-b347-49ff-919f-00bfd4d40a7b",
@@ -12542,7 +12542,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3cfeb76a-b347-49ff-919f-00bfd4d40a7b",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6f3df733-a7ea-44a9-9201-655e04e738d0/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "3e5ff8b1-69b7-46f8-bb00-1a88dbc19580",
@@ -12565,7 +12565,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/3e5ff8b1-69b7-46f8-bb00-1a88dbc19580",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "4da4ed5e-3d91-4e16-861b-3b5851a456ef",
@@ -12588,7 +12588,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/4da4ed5e-3d91-4e16-861b-3b5851a456ef",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/d948aebd-d0d7-48b1-a9d9-406f65b6e733/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "619c1f6f-bfc2-4a18-81d9-e06ca5b4c053",
@@ -12611,7 +12611,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/619c1f6f-bfc2-4a18-81d9-e06ca5b4c053",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "62148f11-efd1-4bb2-badc-b8350ff9313d",
@@ -12634,7 +12634,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/62148f11-efd1-4bb2-badc-b8350ff9313d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "63d411a0-f0dd-4655-9933-3ac675ab8c58",
@@ -12657,7 +12657,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/63d411a0-f0dd-4655-9933-3ac675ab8c58",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/803aa3d2-f33d-4000-4ba2-08d5c5e4cb83/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6574b23b-dedd-40ce-b327-721b18b6caa3",
@@ -12680,7 +12680,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6574b23b-dedd-40ce-b327-721b18b6caa3",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/612507f0-1065-4be3-1d25-08d4985afd7b/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "6c570bce-14aa-4896-a880-e9355bae21c1",
@@ -12703,7 +12703,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/6c570bce-14aa-4896-a880-e9355bae21c1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/c572b236-c3f4-4c45-8df1-08d47f4192ef/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "7c9e953c-01b8-46a5-a3ab-dea8cb5e9d16",
@@ -12726,7 +12726,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/7c9e953c-01b8-46a5-a3ab-dea8cb5e9d16",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/63e84410-bb32-438d-f9b3-08d562fe98c3/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "8378f74a-9c86-45a2-be7d-2d945f900563",
@@ -12749,7 +12749,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/8378f74a-9c86-45a2-be7d-2d945f900563",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f7afa02c-21c4-4c37-eea9-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "86f51b0d-d4e0-4de5-9191-83ce9798689a",
@@ -12772,7 +12772,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/86f51b0d-d4e0-4de5-9191-83ce9798689a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6ac86d9c-ed0d-4629-94ee-7e45e4c72b51/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "888207eb-7385-4bac-9e91-9dcac30fbbf7",
@@ -12795,7 +12795,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/888207eb-7385-4bac-9e91-9dcac30fbbf7",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "88c5aa30-382b-4137-8c2b-571f4ae027b2",
@@ -12818,7 +12818,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/88c5aa30-382b-4137-8c2b-571f4ae027b2",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/f5cb2270-0751-44af-87be-402387dd0b0e/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "94431c84-8b87-4daf-a860-932b9c4145e3",
@@ -12841,7 +12841,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/94431c84-8b87-4daf-a860-932b9c4145e3",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "95bb2056-9c33-4790-8dd6-a670ee1de738",
@@ -12864,7 +12864,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/95bb2056-9c33-4790-8dd6-a670ee1de738",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/d93aa7e1-2dec-482d-90c8-08d47f4192ef/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "a695646f-259b-49cd-82b2-7b9158a2f8c5",
@@ -12887,7 +12887,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/a695646f-259b-49cd-82b2-7b9158a2f8c5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/173f5977-81c2-4f85-2076-08d4c51c93ea/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "aa5b3ac9-5aaf-4431-86af-894d12aaa985",
@@ -12910,7 +12910,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/aa5b3ac9-5aaf-4431-86af-894d12aaa985",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/cf750a52-f0cb-44b2-9c40-70849d6e00b5/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "aae8a693-3bb9-4cbd-a19c-c31f0519732d",
@@ -12933,7 +12933,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/aae8a693-3bb9-4cbd-a19c-c31f0519732d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ad6ea97d-c16d-4d98-963b-cce921c7f83c",
@@ -12956,7 +12956,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ad6ea97d-c16d-4d98-963b-cce921c7f83c",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b07e5c6e-ce16-4db7-90eb-00f9ee1ac972",
@@ -12979,7 +12979,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b07e5c6e-ce16-4db7-90eb-00f9ee1ac972",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/6b753aff-87d2-4ad1-627c-08d921d4a04a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "b0d20dee-a0a7-4396-9546-76a0fb66ad93",
@@ -13002,7 +13002,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/b0d20dee-a0a7-4396-9546-76a0fb66ad93",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/31befa68-e96b-4f6a-48a7-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "be38b6ed-9183-4eaf-8a2f-11c85bc8be46",
@@ -13025,7 +13025,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/be38b6ed-9183-4eaf-8a2f-11c85bc8be46",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/15acdd32-0f7b-4f3b-b83b-ebd6b4501276/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "bf8d8243-4d5e-4093-8639-5e0a581d1bb1",
@@ -13048,7 +13048,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/bf8d8243-4d5e-4093-8639-5e0a581d1bb1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/a58686ac-2a4d-4ab5-4865-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c1de7ab8-0bdf-420e-8abe-f57356824c6d",
@@ -13071,7 +13071,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c1de7ab8-0bdf-420e-8abe-f57356824c6d",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c335b29a-3855-4e9f-aa89-2a944732ea1a",
@@ -13094,7 +13094,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c335b29a-3855-4e9f-aa89-2a944732ea1a",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/0ffd7b81-a063-42a8-b745-e1e37507414a/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c6dd6984-5ada-45d6-9621-1a02aacfe7d5",
@@ -13117,7 +13117,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c6dd6984-5ada-45d6-9621-1a02aacfe7d5",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/47bd3adb-147c-4405-49f7-08d47f3b722d/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "c81d9c4a-42ba-42a9-84d9-462814ed2419",
@@ -13140,7 +13140,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/c81d9c4a-42ba-42a9-84d9-462814ed2419",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/dcde123a-db76-4458-73e5-08d4ac1a34ec/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "cda908f9-ef08-4deb-a13c-32388c05b9ad",
@@ -13163,7 +13163,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/cda908f9-ef08-4deb-a13c-32388c05b9ad",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3511dca3-e112-4dc5-ae93-3afcca0815e1/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "ce5eaf58-a4f4-4331-9452-c6eef2946110",
@@ -13186,7 +13186,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/ce5eaf58-a4f4-4331-9452-c6eef2946110",
     "imageUrl": "",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "cfc3924a-c9a9-4aaa-bb2a-8dc66ee1d4f0",
@@ -13209,7 +13209,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/cfc3924a-c9a9-4aaa-bb2a-8dc66ee1d4f0",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/3de66706-3ba0-4a6d-acae-2321f25b6f60/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "d59f781d-d63b-47e4-ab9c-67b3c2bb89f1",
@@ -13232,7 +13232,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/d59f781d-d63b-47e4-ab9c-67b3c2bb89f1",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/ca424b14-a849-4b1e-f0c8-08d47f3c1412/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "f2cac7ca-523b-4fe8-be8f-8c0c8592f661",
@@ -13255,7 +13255,7 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/f2cac7ca-523b-4fe8-be8f-8c0c8592f661",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/20610e87-4f04-44e7-aa38-ab60bbf8dccb/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   },
   {
     "code": "fc36be0b-4682-44c1-9dee-68b84d2214f6",
@@ -13278,6 +13278,6 @@ export const matpriskollenOffers: MatpriskollenIngestedOffer[] = [
     "sourceUrl": "https://matpriskollen.se/api/v1/stores/9d11818d-536f-415e-9e64-6c7a327c5d4c/offers?lat=56.93287&lon=12.54594&limit=200",
     "productUrl": "https://matpriskollen.se/deal/fc36be0b-4682-44c1-9dee-68b84d2214f6",
     "imageUrl": "https://mpk-product-images.s3.eu-north-1.amazonaws.com/912b6164-2390-4b20-7747-08d6b281ec0c/full.jpeg",
-    "retrievedAt": "2026-05-22T11:24:52.830Z"
+    "retrievedAt": "2026-05-22T11:29:14.829Z"
   }
 ];

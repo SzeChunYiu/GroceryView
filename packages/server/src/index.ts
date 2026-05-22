@@ -5,9 +5,12 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
   buildFlyerOfferReport,
+  basketImportReviewGuardrails,
+  createBasketImportReviewItems,
   createGroceryViewApi,
   type BasketImportExportRequest,
   type BasketImportReviewDecisionRequest,
+  type BasketImportReviewItem,
   type CategoryBudgetPatch,
   type FlyerOfferObservationInput,
   type FlyerOfferReport,
@@ -104,6 +107,16 @@ export type AuthOptions = {
     listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
     saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
   };
+  basketImportReviewRepository?: {
+    saveBasketImportReviewItems(userId: string, items: BasketImportReviewItem[]): Promise<void>;
+    listOpenBasketImportReviewItems(userId: string): Promise<BasketImportReviewItem[]>;
+    resolveBasketImportReviewItem(userId: string, reviewItemId: string, resolution: {
+      status: 'accepted' | 'dismissed';
+      resolvedAt: string;
+      resolvedProductId?: string;
+      quantity?: number;
+    }): Promise<BasketImportReviewItem>;
+  };
   notificationWebhookSecret?: string;
   notificationSuppressionSink?: {
     upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
@@ -159,6 +172,14 @@ export type RuntimePersistenceRepository = {
   getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
+  saveBasketImportReviewItems?(userId: string, items: BasketImportReviewItem[]): Promise<void>;
+  listOpenBasketImportReviewItems?(userId: string): Promise<BasketImportReviewItem[]>;
+  resolveBasketImportReviewItem?(userId: string, reviewItemId: string, resolution: {
+    status: 'accepted' | 'dismissed';
+    resolvedAt: string;
+    resolvedProductId?: string;
+    quantity?: number;
+  }): Promise<BasketImportReviewItem>;
   upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
 };
 
@@ -1280,7 +1301,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           category: url.searchParams.get('category') ?? undefined,
           productId: url.searchParams.get('productId') ?? undefined
         };
-        return jsonResponse(authOptions.flyerOffersProvider ? await authOptions.flyerOffersProvider(query) : api.getFlyerOffers(query));
+        if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Flyer offers provider is not configured.');
+        return jsonResponse(await authOptions.flyerOffersProvider(query));
       }
 
       if (method === 'GET' && path === '/api/account/subscription-access') {
@@ -1530,13 +1552,10 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       const storeFlyerOffersMatch = path.match(/^\/api\/stores\/([^/]+)\/flyer-offers$/);
       if (method === 'GET' && storeFlyerOffersMatch) {
         const storeId = decodeURIComponent(storeFlyerOffersMatch[1]);
-        if (authOptions.storeFlyerOffersProvider) {
-          const report = await authOptions.storeFlyerOffersProvider(storeId, { asOf: url.searchParams.get('asOf') ?? undefined });
-          if (!report) return errorResponse(404, 'Store not found.');
-          return jsonResponse(report);
-        }
-        if (!api.getStore(storeId)) return errorResponse(404, 'Store not found.');
-        return jsonResponse(api.getStoreFlyerOffers(storeId, { asOf: url.searchParams.get('asOf') ?? undefined }));
+        if (!authOptions.storeFlyerOffersProvider) return errorResponse(503, 'Store flyer offers provider is not configured.');
+        const report = await authOptions.storeFlyerOffersProvider(storeId, { asOf: url.searchParams.get('asOf') ?? undefined });
+        if (!report) return errorResponse(404, 'Store not found.');
+        return jsonResponse(report);
       }
 
       const storePriceCoverageMatch = path.match(/^\/api\/stores\/([^/]+)\/price-coverage$/);
@@ -1673,7 +1692,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
         if (method === 'GET') {
-          return jsonResponse(authOptions.watchlistPriceAlertsProvider ? await authOptions.watchlistPriceAlertsProvider(user) : api.getWatchlistPriceAlerts(user));
+          if (!authOptions.watchlistPriceAlertsProvider) return errorResponse(503, 'Watchlist price-alert provider is not configured.');
+          return jsonResponse(await authOptions.watchlistPriceAlertsProvider(user));
         }
         if (method === 'POST') {
           const body = await readJson(request);
@@ -1683,10 +1703,9 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             favoriteStoresOnly: typeof body.favoriteStoresOnly === 'boolean' ? body.favoriteStoresOnly : undefined,
             allowedPriceTypes: optionalWatchlistPriceTypes(body.allowedPriceTypes)
           };
+          if (!authOptions.watchlistPriceAlertWriter) return errorResponse(503, 'Watchlist price-alert writer is not configured.');
           return jsonResponse(
-            authOptions.watchlistPriceAlertWriter
-              ? await authOptions.watchlistPriceAlertWriter(user, alert)
-              : api.addWatchlistPriceAlert(user, alert),
+            await authOptions.watchlistPriceAlertWriter(user, alert),
             { status: 201 }
           );
         }
@@ -1787,7 +1806,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (authError) return authError;
         if (method === 'POST') {
           const body = await readJson(request);
-          return jsonResponse(api.importBasketFromRetailerPage(user, basketImportExportRequestFromBody(body)), { status: 201 });
+          const report = api.importBasketFromRetailerPage(user, basketImportExportRequestFromBody(body));
+          if (authOptions.basketImportReviewRepository && report.reviewItems.length > 0) {
+            const existingOpen = await authOptions.basketImportReviewRepository.listOpenBasketImportReviewItems(user);
+            await authOptions.basketImportReviewRepository.saveBasketImportReviewItems(
+              user,
+              createBasketImportReviewItems(user, report.source, report.reviewItems, existingOpen.length)
+            );
+          }
+          return jsonResponse(report, { status: 201 });
         }
       }
 
@@ -1796,7 +1823,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
-        if (method === 'GET') return jsonResponse(api.getBasketImportReviewQueue(user));
+        if (method === 'GET') {
+          if (authOptions.basketImportReviewRepository) {
+            const items = await authOptions.basketImportReviewRepository.listOpenBasketImportReviewItems(user);
+            return jsonResponse({ userId: user, openItemCount: items.length, items, guardrails: basketImportReviewGuardrails });
+          }
+          return jsonResponse(api.getBasketImportReviewQueue(user));
+        }
       }
 
       const importReviewDecisionMatch = path.match(/^\/api\/basket\/import-review\/([^/]+)\/decisions$/);
@@ -1807,7 +1840,31 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (authError) return authError;
         if (method === 'POST') {
           const body = await readJson(request);
-          return jsonResponse(api.resolveBasketImportReviewItem(user, decodeURIComponent(importReviewDecisionMatch[1]!), basketImportReviewDecisionFromBody(body)));
+          const requestBody = basketImportReviewDecisionFromBody(body);
+          const reviewItemId = decodeURIComponent(importReviewDecisionMatch[1]!);
+          if (authOptions.basketImportReviewRepository) {
+            const openItems = await authOptions.basketImportReviewRepository.listOpenBasketImportReviewItems(user);
+            const reviewItem = openItems.find((item) => item.reviewItemId === reviewItemId);
+            if (!reviewItem) return errorResponse(404, `Basket import review item not found: ${reviewItemId}`);
+            if (requestBody.decision === 'accept_as_product') {
+              if (!requestBody.productId) return errorResponse(400, 'productId is required when accepting an import review item.');
+              if (!api.getProduct(requestBody.productId)) return errorResponse(400, `Unknown product: ${requestBody.productId}`);
+              if (requestBody.quantity !== undefined) requiredNumber(requestBody.quantity, 'quantity');
+              const quantity = requestBody.quantity ?? reviewItem.quantity;
+              api.addBasketItem(user, { productId: requestBody.productId, quantity });
+              return jsonResponse(await authOptions.basketImportReviewRepository.resolveBasketImportReviewItem(user, reviewItemId, {
+                status: 'accepted',
+                resolvedAt: (authOptions.now ?? new Date()).toISOString(),
+                resolvedProductId: requestBody.productId,
+                quantity
+              }));
+            }
+            return jsonResponse(await authOptions.basketImportReviewRepository.resolveBasketImportReviewItem(user, reviewItemId, {
+              status: 'dismissed',
+              resolvedAt: (authOptions.now ?? new Date()).toISOString()
+            }));
+          }
+          return jsonResponse(api.resolveBasketImportReviewItem(user, reviewItemId, requestBody));
         }
       }
 
@@ -1827,6 +1884,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
         if (method === 'GET') return jsonResponse(api.getRetailerHandoffPlan(user, decodeURIComponent(handoffMatch[1])));
+      }
+
+      const transferMatch = path.match(/^\/api\/basket\/transfer\/([^/]+)$/);
+      if (transferMatch) {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getRetailerBasketTransferSession(user, decodeURIComponent(transferMatch[1]!)));
       }
 
       if (path === '/api/basket/trip-cost') {
@@ -2181,6 +2247,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/import-review': { get: protectedOperation('Get account-bound retailer basket import review rows.') },
       '/api/basket/import-review/{reviewItemId}/decisions': { post: protectedOperation('Resolve an account-bound retailer basket import review row.') },
       '/api/basket/trip-cost': { get: protectedOperation('Get basket totals ranked by shelf price plus explicit travel, time, delivery, and split-shop costs.') },
+      '/api/basket/transfer/{retailerId}': { get: protectedOperation('Preflight secure retailer basket transfer and block unless capability is verified.') },
       '/api/basket/recurring-digest': { get: protectedOperation('Get recurring basket changes, missing-price blockers, and suggested review actions.') },
       '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },
@@ -2335,6 +2402,15 @@ export function buildRepositoryBackedAuthOptions(
       listOpenHumanReviewAssignments: () => repository.listOpenHumanReviewAssignments(),
       saveHumanReviewAssignment: (assignment) => repository.saveHumanReviewAssignment(assignment)
     },
+    ...(repository.saveBasketImportReviewItems && repository.listOpenBasketImportReviewItems && repository.resolveBasketImportReviewItem
+      ? {
+          basketImportReviewRepository: {
+            saveBasketImportReviewItems: (userId, items) => repository.saveBasketImportReviewItems!(userId, items),
+            listOpenBasketImportReviewItems: (userId) => repository.listOpenBasketImportReviewItems!(userId),
+            resolveBasketImportReviewItem: (userId, reviewItemId, resolution) => repository.resolveBasketImportReviewItem!(userId, reviewItemId, resolution)
+          }
+        }
+      : {}),
     notificationSuppressionSink: {
       upsertNotificationSuppression: (suppression) => repository.upsertNotificationSuppression(suppression)
     },

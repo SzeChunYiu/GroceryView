@@ -28,6 +28,48 @@ export const matchedChainProducts = axfoodProducts.filter((product) => product.i
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
+export const immigrantFamiliarBrandSearch = productUniverse
+  .map((product) => {
+    const isChainProduct = 'lowestPrice' in product;
+    const reportedBrand = isChainProduct ? product.brand : product.brands || 'Brand not reported';
+    const verifiedPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
+    const evidenceLabel = isChainProduct
+      ? `${product.inChains.length} Axfood chains`
+      : `${product.observationCount} OpenPrices observations`;
+
+    return {
+      reportedBrand,
+      productName: product.name,
+      verifiedProductSlug: product.slug,
+      categoryLabel: labelFromSlug(product.category),
+      searchTokens: [reportedBrand, product.name, labelFromSlug(product.category)]
+        .filter(Boolean)
+        .join(' · '),
+      evidenceLabel,
+      verifiedPrice
+    };
+  })
+  .filter((row) => row.reportedBrand !== 'Brand not reported')
+  .sort((a, b) => a.reportedBrand.localeCompare(b.reportedBrand, 'sv') || a.productName.localeCompare(b.productName, 'sv'))
+  .slice(0, 8);
+export const immigrantImageFirstBrowsing = productUniverse
+  .filter((product) => Boolean(product.image))
+  .map((product) => {
+    const isChainProduct = 'lowestPrice' in product;
+    const reportedBrand = isChainProduct ? product.brand : product.brands || 'Brand not reported';
+    const verifiedPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
+    return {
+      imageUrl: product.image,
+      visualAlt: `${product.name} package image`,
+      productName: product.name,
+      reportedBrand,
+      verifiedProductSlug: product.slug,
+      categoryLabel: labelFromSlug(product.category),
+      evidenceLabel: isChainProduct ? `${product.inChains.length} chain prices` : `${product.observationCount} observations`,
+      verifiedPrice
+    };
+  })
+  .slice(0, 10);
 
 export const storeUniverse = osmStores;
 export const featuredStores = [...osmStores]
@@ -136,6 +178,27 @@ export const categorySummaries = Object.entries(categoryLabels)
   })
   .filter((category) => category.openPriceRows > 0 || category.chainRows > 0)
   .sort((a, b) => (b.openPriceRows + b.chainRows) - (a.openPriceRows + a.chainRows));
+
+export const immigrantAisleFinder = [
+  {
+    label: 'Halal-friendly protein aisle',
+    verifiedCategorySlug: 'meat-seafood',
+    dietaryTags: ['halal candidate', 'ask-store-confirmation'],
+    caveat: 'Uses verified meat and seafood category rows only; halal certification is not inferred from product name.'
+  },
+  {
+    label: 'Kosher pantry staples',
+    verifiedCategorySlug: 'pantry',
+    dietaryTags: ['kosher candidate', 'pack-label-check'],
+    caveat: 'Uses pantry category coverage and keeps kosher certification as a package-label check.'
+  },
+  {
+    label: 'Ethnic aisle basics',
+    verifiedCategorySlug: 'international',
+    dietaryTags: ['rice', 'spices', 'world foods'],
+    caveat: 'Shows verified category entry points without inventing store aisle numbers.'
+  }
+];
 
 export const categoryQualityMatrix = categorySummaries
   .map((category) => {
@@ -389,6 +452,31 @@ export const chainSavingsLedger = Object.values(
   }))
   .sort((a, b) => b.totalSavings - a.totalSavings || a.chain.localeCompare(b.chain, 'sv'));
 
+export const budgetLowestPriceRadar = matchedChainProducts
+  .map((product) => {
+    const pricedRows = chainPriceRows(product).sort((a, b) => (a.price ?? Number.POSITIVE_INFINITY) - (b.price ?? Number.POSITIVE_INFINITY));
+    const cheapest = pricedRows[0];
+    const priciest = pricedRows[pricedRows.length - 1];
+    const cheapestPrice = cheapest?.price ?? product.lowestPrice;
+    const expensivePrice = priciest?.price ?? product.highestPrice;
+
+    return {
+      productName: product.name,
+      reportedBrand: product.brand,
+      verifiedProductSlug: product.slug,
+      cheapestChain: cheapest?.chain ?? product.lowestChain,
+      cheapestPrice,
+      expensiveChain: priciest?.chain ?? '',
+      expensivePrice,
+      priceGap: expensivePrice - cheapestPrice,
+      spreadPct: product.spreadPct,
+      evidenceLabel: `${pricedRows.length} matched chain prices`
+    };
+  })
+  .filter((row) => row.priceGap > 0)
+  .sort((a, b) => b.priceGap - a.priceGap || b.spreadPct - a.spreadPct)
+  .slice(0, 8);
+
 export const keyMetrics = [
   { label: 'Verified price rows', value: (axfoodProducts.length + pricedProducts.length).toLocaleString('sv-SE'), detail: 'Axfood products plus OpenPrices observations rendered from generated modules.' },
   { label: 'Matched Willys/Hemköp products', value: matchedChainProducts.length.toLocaleString('sv-SE'), detail: 'Only products present in both chain catalogues are compared.' },
@@ -449,6 +537,7 @@ export const basketImportReviewContract = {
   ],
   shippedBehaviors: [
     'Lists only the signed-in shopper’s open retailer import review rows.',
+    'Persists open and resolved review rows through the PostgreSQL-backed runtime repository when DATABASE_URL is configured.',
     'Keeps unmatched retailer rows stay out of the basket until a signed-in shopper accepts a verified GroceryView product match.',
     'Allows dismissing retailer-only rows without converting them into verified products.',
     'Marks accepted and dismissed rows resolved so they leave the open review queue.'
@@ -488,6 +577,29 @@ export const retailerHandoffContract = {
   ]
 };
 
+export const retailerBasketTransferContract = {
+  endpoint: '/api/basket/transfer/{retailerId}',
+  title: 'Secure basket transfer preflight',
+  status: 'implemented_account_api',
+  requiredInputs: [
+    'signed-in userId',
+    'target retailerId from the verified support matrix',
+    'current basket product ids, quantities, verified retailer product matches, and product URLs',
+    'verified retailer basket-transfer capability, endpoint, signed payload, and active shopper retailer session'
+  ],
+  shippedBehaviors: [
+    'Preflights basket transfer and blocks unless capability is verified as supported.',
+    'Requires every basket line to have a verified retailer product match and product URL.',
+    'Returns copy-list and product-link fallback paths through the handoff surface when transfer is blocked.',
+    'Keeps transfer attempts separate from checkout confirmation, payment, delivery booking, and inventory reservation.'
+  ],
+  blockedInStaticSnapshot: [
+    'No retailer currently has verified automatic basket transfer enabled in the public static snapshot.',
+    'No unsupported retailer transfer endpoint is called from GroceryView.',
+    'No basket transfer is described as checkout completion or purchase confirmation.'
+  ]
+};
+
 export const basketTripCostContract = {
   endpoint: '/api/basket/trip-cost',
   title: 'Basket + trip cost optimizer',
@@ -509,6 +621,41 @@ export const basketTripCostContract = {
     'No retailer delivery or checkout confirmation is claimed from optimizer output.',
     'No precise user location is rendered without explicit signed-in consent.'
   ]
+};
+
+export const elderlyNearestDeliveryPlanner = {
+  persona: 'Elderly / seniors',
+  title: 'Nearest-store + delivery options',
+  status: 'static_public_planner',
+  mobilitySupport: [
+    { label: 'Nearest verified store', evidence: 'uses OSM store records and public district labels before any private home location is requested' },
+    { label: 'Delivery fallback', evidence: 'routes shoppers to fulfillment slot evidence when walking or transit effort is too high' },
+    { label: 'Pickup fallback', evidence: 'keeps pickup separate from delivery and requires retailer checkout confirmation' }
+  ],
+  guardrails: [
+    'no private home location is bundled with the static snapshot',
+    'store distance is not personalized until a signed-in shopper consents',
+    'delivery and pickup options are evidence only, not retailer reservations'
+  ]
+};
+
+export const budgetCheapestStoreRoutingPlanner = {
+  persona: 'Budget-conscious / low-income',
+  title: 'Cheapest-store-for-my-list routing',
+  status: 'account_api_guardrail_surface',
+  routeRankInputs: [
+    'signed-in shopping list with verified product ids and quantities',
+    'favorite or reachable store ids selected from verified GroceryView stores',
+    'complete basket totals from the trip-cost optimizer for every ranked option',
+    'explicit travel mode and shopper-approved location or district context'
+  ],
+  storeListGuardrails: [
+    'No private home location is read or rendered in the public static snapshot.',
+    'Stores with missing basket prices remain blockers instead of being ranked as cheapest.',
+    'Routing ranks basket plus trip cost; it does not claim checkout, stock, or delivery reservation.',
+    'Cheapest-store copy must link back to verified shelf-total and travel-cost evidence.'
+  ],
+  nextStep: 'Use the account-only basket trip-cost endpoint once a shopper signs in, consents to location context, and has a current list.'
 };
 
 export const fulfillmentSlotsContract = {

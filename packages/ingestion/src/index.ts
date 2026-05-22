@@ -9,9 +9,26 @@ import {
   type QueryExecutor,
   type SourceRunRecord
 } from '@groceryview/db';
+import {
+  fetchCityGrossProductsForAllStores,
+  type CityGrossProduct
+} from './connectors/citygross.js';
+import {
+  fetchCoopWeeklyDiscountsForAllStores,
+  type CoopWeeklyDiscount
+} from './connectors/coop.js';
+import {
+  fetchHemkopWeeklyDiscountsForAllStores,
+  type HemkopWeeklyDiscount
+} from './connectors/hemkop.js';
+import {
+  fetchWillysWeeklyDiscountsForAllStores,
+  type WillysWeeklyDiscount
+} from './connectors/willys.js';
 
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/overpass.js';
+export * from './connectors/citygross.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
@@ -1534,6 +1551,209 @@ export async function fetchRetailerConnectorSnapshot(
   };
 }
 
+type ParsedPackageQuantity = {
+  packageSize: number;
+  packageUnit: string;
+};
+
+function parseNativePackageText(value: string): ParsedPackageQuantity {
+  const match = value.match(/(\d+(?:[,.]\d+)?)\s*(kg|g|gram|l|liter|ml|st|styck|pcs|piece|pack)\b/i);
+  if (!match) return { packageSize: 1, packageUnit: 'piece' };
+  const unit = match[2].toLowerCase();
+  const packageUnit = unit === 'st' || unit === 'styck' || unit === 'pack' ? 'piece' : unit === 'liter' ? 'l' : unit === 'gram' ? 'g' : unit;
+  return { packageSize: Number(match[1].replace(',', '.')), packageUnit };
+}
+
+function nativePriceFromText(value: string): number | undefined {
+  const match = value.match(/(\d+(?:[,.]\d+)?)/);
+  if (!match) return undefined;
+  const parsed = Number(match[1].replace(',', '.'));
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function dailyNativeNumberParam(url: URL, name: string): number | undefined {
+  const value = url.searchParams.get(name);
+  if (value === null || value.trim() === '') return undefined;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1) throw new Error(`${name} must be a positive integer.`);
+  return parsed;
+}
+
+function dailyNativeStringListParam(url: URL, name: string): string[] | undefined {
+  const value = url.searchParams.get(name);
+  if (value === null || value.trim() === '') return undefined;
+  return value.split(',').map((part) => part.trim()).filter(Boolean);
+}
+
+function willysWeeklyDiscountToDailyItem(row: WillysWeeklyDiscount): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const regularPrice = nativePriceFromText(row.regularPriceText);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `willys-${stableKeyPart(row.productCode || row.code)}`,
+    categoryId: stableKeyPart(row.category || 'weekly-offers'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: regularPrice !== undefined && regularPrice > row.price ? regularPrice : undefined,
+    promoText: row.conditionText || row.priceText || undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const regularPrice = nativePriceFromText(row.regularPriceText);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `hemkop-${stableKeyPart(row.productCode || row.code)}`,
+    categoryId: stableKeyPart(row.category || 'weekly-offers'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: regularPrice !== undefined && regularPrice > row.price ? regularPrice : undefined,
+    promoText: row.conditionText || row.priceText || undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `coop-${stableKeyPart(row.ean || row.code)}`,
+    categoryId: 'weekly-offers',
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.offerPrice,
+    regularPrice: row.ordinaryPrice > row.offerPrice ? row.ordinaryPrice : undefined,
+    promoText: row.offerMechanicText || row.offerPriceText || undefined,
+    memberOnly: row.medMeraRequired,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `citygross-${stableKeyPart(row.gtin || row.code)}`,
+    categoryId: stableKeyPart(row.category || 'city-gross-products'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: row.regularPrice !== null && row.regularPrice > row.price ? row.regularPrice : undefined,
+    promoText: row.regularPrice !== null && row.regularPrice > row.price ? 'City Gross discounted public price' : undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function dailyNativeSnapshotResult(input: {
+  plan: RetailerConnectorRunPlan;
+  retrievedAt: string;
+  items: RetailerConnectorParsedProduct[];
+}): RetailerConnectorFetchResult {
+  const body = JSON.stringify({ items: input.items });
+  const contentHash = contentHashFor(body);
+  const refHash = contentHash.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
+  return {
+    statusCode: 200,
+    body,
+    contentType: 'application/json',
+    retrievedAt: input.retrievedAt,
+    sourceUrl: input.plan.provenance.sourceUrl,
+    rawSnapshotRef: `raw://daily-native/${stableKeyPart(input.plan.sourceRunId)}/${refHash}`,
+    contentHash
+  };
+}
+
+export async function fetchDailyConnectorSnapshot(
+  plan: RetailerConnectorRunPlan,
+  options: FetchRetailerConnectorSnapshotOptions = {}
+): Promise<RetailerConnectorFetchResult> {
+  const sourceUrl = plan.provenance.sourceUrl;
+  if (sourceUrl === GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchWillysWeeklyDiscountsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchHemkopWeeklyDiscountsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(hemkopWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCoopWeeklyDiscountsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      productQueries: dailyNativeStringListParam(url, 'productQueries'),
+      includeStoreDetails: url.searchParams.get('includeStoreDetails') === 'true',
+      subscriptionKey: url.searchParams.get('subscriptionKey') ?? undefined,
+      storeApiSubscriptionKey: url.searchParams.get('storeApiSubscriptionKey') ?? undefined,
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(coopWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCityGrossProductsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(cityGrossProductToDailyItem) });
+  }
+
+  return await fetchRetailerConnectorSnapshot(plan, options);
+}
+
 export async function runRetailerConnector(input: RetailerConnectorRunInput): Promise<RetailerConnectorRunResult> {
   const plan = planRetailerConnectorRun(input);
   const baseResult = {
@@ -2036,8 +2256,22 @@ export function planIngestionBatch(inputs: RetailerProductInput[]): IngestionBat
   return { accepted, rejected };
 }
 
+export type DailyIngestionStoreConfig = {
+  storeId: string;
+  name: string;
+  address: string;
+  city: string;
+  countryCode?: string;
+  district?: string;
+  latitude?: number;
+  longitude?: number;
+  storeType?: string;
+};
+
 export type DailyIngestionConnectorConfig = Omit<RetailerConnectorPlanInput, 'requestedAt'> & {
   requestedAt?: string;
+  stores?: DailyIngestionStoreConfig[];
+  requireStoreScopedPrices?: boolean;
 };
 
 export type DailyIngestionEnv = Partial<Record<'DATABASE_URL' | 'GROCERYVIEW_DAILY_CONNECTORS_JSON', string>>;
@@ -2087,7 +2321,49 @@ export const requiredDailyIngestionChainIds = [
   'city_gross'
 ] as const;
 
+export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/willys/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
+
 const requireForDailyIngestion = createRequire(import.meta.url);
+
+function parseDailyStoreConfigs(value: unknown, path: string): DailyIngestionStoreConfig[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) throw new Error(`${path} must be an array when provided.`);
+  return value.map((entry, index) => {
+    const storePath = `${path}[${index}]`;
+    if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) throw new Error(`${storePath} must be an object.`);
+    const record = entry as Record<string, unknown>;
+    for (const field of ['storeId', 'name', 'address', 'city']) {
+      if (typeof record[field] !== 'string' || !record[field].trim()) throw new Error(`${storePath}.${field} is required.`);
+    }
+    const optionalString = (field: string): string | undefined => {
+      const candidate = record[field];
+      if (candidate === undefined || candidate === null || candidate === '') return undefined;
+      if (typeof candidate !== 'string') throw new Error(`${storePath}.${field} must be a string.`);
+      return candidate.trim();
+    };
+    const optionalNumber = (field: string): number | undefined => {
+      const candidate = record[field];
+      if (candidate === undefined || candidate === null || candidate === '') return undefined;
+      const parsed = typeof candidate === 'number' ? candidate : Number(candidate);
+      if (!Number.isFinite(parsed)) throw new Error(`${storePath}.${field} must be a finite number.`);
+      return parsed;
+    };
+    return {
+      storeId: String(record.storeId).trim(),
+      name: String(record.name).trim(),
+      address: String(record.address).trim(),
+      city: String(record.city).trim(),
+      countryCode: optionalString('countryCode'),
+      district: optionalString('district'),
+      latitude: optionalNumber('latitude'),
+      longitude: optionalNumber('longitude'),
+      storeType: optionalString('storeType')
+    };
+  });
+}
 
 function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[] {
   const parsed = JSON.parse(value) as unknown;
@@ -2111,7 +2387,9 @@ function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[
       legalReviewStatus: record.legalReviewStatus as LegalReviewStatus,
       hasDataAgreement: Boolean(record.hasDataAgreement),
       endpointUrl: String(record.endpointUrl),
-      parserVersion: String(record.parserVersion)
+      parserVersion: String(record.parserVersion),
+      stores: parseDailyStoreConfigs(record.stores, `GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}].stores`),
+      requireStoreScopedPrices: record.requireStoreScopedPrices === undefined ? true : Boolean(record.requireStoreScopedPrices)
     };
   });
   const configuredChains = new Set(connectors.map((connector) => normalizeDailySlug(connector.chainId)));
@@ -2170,6 +2448,63 @@ async function upsertDailyChain(executor: QueryExecutor, chainId: string): Promi
   return id;
 }
 
+async function upsertDailyStore(executor: QueryExecutor, chainId: string, store: DailyIngestionStoreConfig): Promise<string> {
+  const slug = normalizeDailySlug(store.storeId);
+  const rows = await executor.query<IdRow>(
+    `insert into stores(slug, chain_id, external_ref, name, address_line1, city, region, country_code, position, store_type)
+     values (
+       $1, $2, $3, $4, $5, $6, $7, $8,
+       case
+         when $9::numeric is null or $10::numeric is null then null
+         else ST_SetSRID(ST_MakePoint($10::numeric, $9::numeric), 4326)::geography
+       end,
+       coalesce($11, 'supermarket')
+     )
+     on conflict (slug) do update set
+       chain_id = excluded.chain_id, external_ref = excluded.external_ref, name = excluded.name,
+       address_line1 = excluded.address_line1, city = excluded.city, region = excluded.region,
+       country_code = excluded.country_code, position = excluded.position,
+       store_type = excluded.store_type, updated_at = now()
+     returning id`,
+    [
+      slug,
+      chainId,
+      store.storeId,
+      store.name,
+      store.address,
+      store.city,
+      store.district ?? null,
+      store.countryCode ?? 'SE',
+      store.latitude ?? null,
+      store.longitude ?? null,
+      store.storeType ?? null
+    ]
+  );
+  const id = rows[0]?.id;
+  if (!id) throw new Error(`Daily ingestion store upsert did not return an id: ${store.storeId}`);
+  return id;
+}
+
+function validateStoreScopedConnectorOutput(config: DailyIngestionConnectorConfig, result: RetailerConnectorRunResult): string[] {
+  if (config.requireStoreScopedPrices === false) return [];
+  const configuredStores = new Set((config.stores ?? []).map((store) => normalizeDailySlug(store.storeId)));
+  const missingStoreProducts: string[] = [];
+  const unknownStores = new Set<string>();
+  for (const accepted of result.ingestion.accepted) {
+    const storeId = accepted.priceObservation.storeId;
+    if (!storeId?.trim()) {
+      missingStoreProducts.push(accepted.priceObservation.retailerProductId ?? accepted.product.id);
+      continue;
+    }
+    const normalizedStoreId = normalizeDailySlug(storeId);
+    if (!configuredStores.has(normalizedStoreId)) unknownStores.add(normalizedStoreId);
+  }
+  const blockers: string[] = [];
+  if (missingStoreProducts.length > 0) blockers.push(`${config.chainId}:missing_store_scoped_prices:${missingStoreProducts.slice(0, 10).join(',')}`);
+  if (unknownStores.size > 0) blockers.push(`${config.chainId}:unknown_store_ids:${[...unknownStores].sort().slice(0, 10).join(',')}`);
+  return blockers;
+}
+
 async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProduct): Promise<string> {
   const rows = await executor.query<IdRow>(
     `insert into products(
@@ -2214,6 +2549,7 @@ async function persistDailyConnectorOutput(input: {
   const sourceWriter = createPostgresSourceRecordWriter(executor);
   const aliasRepository = createPostgresProductAliasRepository(executor);
   const priceWriter = createPostgresPriceObservationWriter(executor);
+  const storesBySlug = new Map((config.stores ?? []).map((store) => [normalizeDailySlug(store.storeId), store]));
   const sourceRun = await sourceWriter.createSourceRun({
     sourceType: dbSourceTypeForConnector(config.sourceType),
     sourceName: config.connectorId,
@@ -2237,6 +2573,8 @@ async function persistDailyConnectorOutput(input: {
 
   for (const accepted of result.ingestion.accepted) {
     const chainId = await upsertDailyChain(executor, accepted.priceObservation.chainId);
+    const storeConfig = accepted.priceObservation.storeId ? storesBySlug.get(normalizeDailySlug(accepted.priceObservation.storeId)) : undefined;
+    const storeId = storeConfig ? await upsertDailyStore(executor, chainId, storeConfig) : undefined;
     const productId = await upsertDailyProduct(executor, accepted.product);
     await aliasRepository.upsertProductAlias({
       productId,
@@ -2279,6 +2617,7 @@ async function persistDailyConnectorOutput(input: {
     const observation = await priceWriter.recordPriceObservation({
       productId,
       chainId,
+      storeId,
       sourceRunId: sourceRun.sourceRunId,
       rawRecordId: rawRecord.rawRecordId,
       retailerProductRef: accepted.priceObservation.retailerProductId,
@@ -2332,7 +2671,7 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
     const runConfig = { ...config, requestedAt: input.requestedAt };
     const result = await runRetailerConnector({
       ...runConfig,
-      fetcher: (plan) => fetchRetailerConnectorSnapshot(plan, {
+      fetcher: (plan) => fetchDailyConnectorSnapshot(plan, {
         retrievedAt: input.requestedAt,
         rawSnapshotRefPrefix: 'raw://daily-ingestion',
         fetchImpl: input.fetchImpl,
@@ -2354,14 +2693,24 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
       continue;
     }
 
-    const persisted = await persistDailyConnectorOutput({ executor: input.executor, config: runConfig, result });
-    persistedRuns += 1;
-    acceptedCount += persisted.acceptedCount;
-    rejectedCount += persisted.rejectedCount;
-    sourceRunIds.push(...persisted.sourceRunIds);
-    rawRecordIds.push(...persisted.rawRecordIds);
-    observationIds.push(...persisted.observationIds);
-    if (persisted.rejectedCount > 0) blockers.push(`${config.chainId}:rejected_products:${persisted.rejectedCount}`);
+    const storeScopeBlockers = validateStoreScopedConnectorOutput(runConfig, result);
+    if (storeScopeBlockers.length > 0) {
+      blockers.push(...storeScopeBlockers);
+      continue;
+    }
+
+    try {
+      const persisted = await persistDailyConnectorOutput({ executor: input.executor, config: runConfig, result });
+      persistedRuns += 1;
+      acceptedCount += persisted.acceptedCount;
+      rejectedCount += persisted.rejectedCount;
+      sourceRunIds.push(...persisted.sourceRunIds);
+      rawRecordIds.push(...persisted.rawRecordIds);
+      observationIds.push(...persisted.observationIds);
+      if (persisted.rejectedCount > 0) blockers.push(`${config.chainId}:rejected_products:${persisted.rejectedCount}`);
+    } catch (error) {
+      blockers.push(`${config.chainId}:persistence_failed:${error instanceof Error ? error.message : 'unknown_error'}`);
+    }
   }
 
   return {

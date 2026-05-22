@@ -67,3 +67,17 @@ Sample rows:
 8. 2500298073 | Smör | 39,90/st | 18/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
 9. 2500298184 | Klassikerlåda 18-pack | 79,90/st | 18/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
 10. 2500297334 | Kaptenens favoriter | 49,90/st | 18/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+
+## Willys weekly discounts expansion 2026-05-22
+
+- Source: willys.se public Axfood campaign JSON
+- Source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-22T10:55:55.346Z
+- Store IDs: 2110, 2187, 2102, 2149, 2355, 2268, 2121, 2212, 2193, 2207, 2219, 2260
+- Real weekly discount rows fetched and wired: 2428
+- Web wire: apps/web/src/lib/ingested/willys.ts
+
+Sample rows:
+1. 2500306014 | 2110 | Grön sparris 250g | 29,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500306996 | 2110 | Lyxrosor 12-pack | 99,00/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500303258 | 2110 | Mozzarella | 2 för 20,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
