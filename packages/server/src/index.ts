@@ -1305,6 +1305,18 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(await authOptions.flyerOffersProvider(query));
       }
 
+      if (method === 'GET' && path === '/api/deals/discounts') {
+        const query = {
+          asOf: url.searchParams.get('asOf') ?? undefined,
+          storeId: url.searchParams.get('storeId') ?? undefined,
+          chain: url.searchParams.get('chain') ?? undefined,
+          category: url.searchParams.get('category') ?? undefined,
+          productId: url.searchParams.get('productId') ?? undefined
+        };
+        if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Discounts provider is not configured.');
+        return jsonResponse(await authOptions.flyerOffersProvider(query));
+      }
+
       if (method === 'GET' && path === '/api/account/subscription-access') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1553,6 +1565,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       if (method === 'GET' && storeFlyerOffersMatch) {
         const storeId = decodeURIComponent(storeFlyerOffersMatch[1]);
         if (!authOptions.storeFlyerOffersProvider) return errorResponse(503, 'Store flyer offers provider is not configured.');
+        const report = await authOptions.storeFlyerOffersProvider(storeId, { asOf: url.searchParams.get('asOf') ?? undefined });
+        if (!report) return errorResponse(404, 'Store not found.');
+        return jsonResponse(report);
+      }
+
+      const storeDiscountsMatch = path.match(/^\/api\/stores\/([^/]+)\/discounts$/);
+      if (method === 'GET' && storeDiscountsMatch) {
+        const storeId = decodeURIComponent(storeDiscountsMatch[1]);
+        if (!authOptions.storeFlyerOffersProvider) return errorResponse(503, 'Store discounts provider is not configured.');
         const report = await authOptions.storeFlyerOffersProvider(storeId, { asOf: url.searchParams.get('asOf') ?? undefined });
         if (!report) return errorResponse(404, 'Store not found.');
         return jsonResponse(report);
@@ -2191,6 +2212,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/notifications/inbox': { get: protectedOperation('Get notification inbox delivery status, holds, suppressions, and alert guardrails.') },
       '/api/receipts/review': { get: protectedOperation('Get receipt review budget impact, match confidence, and writeback guardrails.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
+      '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
@@ -2199,6 +2221,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/stores/{id}/category-coverage': { get: publicOperation('Get store price coverage grouped by product category.') },
       '/api/stores/{id}/deal-summary': { get: publicOperation('Get store deal summary with category leaders and score guardrails.') },
       '/api/stores/{id}/deals': { get: publicOperation('Get ranked in-store deals for one store.') },
+      '/api/stores/{id}/discounts': { get: publicOperation('Get active weekly discounts captured for one branch.') },
       '/api/stores/{id}/flyer-offers': { get: publicOperation('Get active weekly flyer offers captured for one branch.') },
       '/api/stores/{id}/price-coverage': { get: publicOperation('Get store catalog price coverage with missing product guardrails.') },
       '/api/products/search': { get: publicOperation('Search products.') },

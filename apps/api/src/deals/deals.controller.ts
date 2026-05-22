@@ -18,4 +18,16 @@ export class DealsController {
   ) {
     return this.deals.flyerOffers({ asOf, storeId, chain, category, productId });
   }
+
+  @Get('discounts')
+  @ApiOkResponse({ description: 'Active per-branch weekly discounts with source evidence' })
+  discounts(
+    @Query('asOf') asOf?: string,
+    @Query('storeId') storeId?: string,
+    @Query('chain') chain?: string,
+    @Query('category') category?: string,
+    @Query('productId') productId?: string
+  ) {
+    return this.deals.flyerOffers({ asOf, storeId, chain, category, productId });
+  }
 }

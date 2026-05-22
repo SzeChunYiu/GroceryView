@@ -593,9 +593,19 @@ describe('runtime config', () => {
         ['obs-runtime-flyer-coffee', 'run-runtime-flyer', 'https://example.test/runtime-flyer', 15]
       ]);
 
+      const discounts = await service.handler(new Request('http://localhost/api/deals/discounts?chain=willys&asOf=2026-05-20T12:00:00.000Z'));
+      assert.equal(discounts.status, 200);
+      assert.deepEqual((await discounts.json() as { offers: Array<{ offerId: string; sourceType: string }> }).offers.map((offer) => [offer.offerId, offer.sourceType]), [
+        ['obs-runtime-flyer-coffee', 'weekly_flyer']
+      ]);
+
       const storeFlyerOffers = await service.handler(new Request('http://localhost/api/stores/willys-odenplan/flyer-offers?asOf=2026-05-20T12:00:00.000Z'));
       assert.equal(storeFlyerOffers.status, 200);
       assert.equal((await storeFlyerOffers.json() as { storeId: string; bestOffer: { offerId: string } }).bestOffer.offerId, 'obs-runtime-flyer-coffee');
+
+      const storeDiscounts = await service.handler(new Request('http://localhost/api/stores/willys-odenplan/discounts?asOf=2026-05-20T12:00:00.000Z'));
+      assert.equal(storeDiscounts.status, 200);
+      assert.equal((await storeDiscounts.json() as { storeId: string; bestOffer: { offerId: string } }).bestOffer.offerId, 'obs-runtime-flyer-coffee');
 
       const alerts = await service.handler(new Request('http://localhost/api/watchlist/price-alerts?userId=user-1', {
         headers: { authorization: `Bearer ${token}` }
