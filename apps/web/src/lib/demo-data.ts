@@ -1817,6 +1817,25 @@ export const weeklyBasketOptimizer = {
   }
 };
 
+const budgetStretchKronaComparison = compareBasketStrategies(weeklyBasketOptimizerInput);
+const budgetStretchKronaExtraStores = Math.max(0, budgetStretchKronaComparison.splitStoreCount - 1);
+
+export const budgetStretchKronaOptimizer = {
+  persona: 'Budget-conscious / low-income',
+  title: 'Stretch your krona optimizer',
+  comparison: budgetStretchKronaComparison,
+  kronaSavedPerExtraStore: budgetStretchKronaExtraStores > 0
+    ? budgetStretchKronaComparison.savingsVsBestSingleStore / budgetStretchKronaExtraStores
+    : 0,
+  missingPriceBlockers: weeklyBasketOptimizerInput.items
+    .filter((item) => item.prices.length < weeklyBasketOptimizerInput.favoriteStoreIds.length)
+    .map((item) => ({
+      productId: item.productId,
+      missingStoreCount: weeklyBasketOptimizerInput.favoriteStoreIds.length - item.prices.length
+    })),
+  guardrail: 'Splitting stores is recommended only when the real compareBasketStrategies savings beats the extra-store burden; missing prices remain blockers instead of estimates.'
+};
+
 export const familyBulkUnitPriceComparison = {
   persona: 'Families with kids',
   title: 'Family-pack unit prices',

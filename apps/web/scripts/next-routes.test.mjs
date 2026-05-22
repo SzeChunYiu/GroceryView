@@ -208,6 +208,18 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a budget stretch-krona basket optimizer using real basket strategy output', async () => {
+    const source = await read('src/app/weekly-basket/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+    assert.match(demo, /budgetStretchKronaOptimizer/);
+    assert.match(demo, /compareBasketStrategies/);
+    assert.match(source, /budgetStretchKronaOptimizer/);
+    assert.match(source, /Stretch your krona optimizer/);
+    assert.match(source, /kronaSavedPerExtraStore/);
+    assert.match(source, /missingPriceBlockers/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
 
 
 
