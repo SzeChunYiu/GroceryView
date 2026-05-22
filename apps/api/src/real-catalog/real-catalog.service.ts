@@ -165,9 +165,10 @@ export class RealCatalogService {
     this.requireDatabase();
 
     const productRefs = [...new Set(input.items.map((item) => item.productId))];
+    const storeSlugs = [...new Set((input.storeSlugs ?? []).map((storeSlug) => storeSlug.trim()).filter(Boolean))];
     const rows = await this.database.query<CatalogPriceSqlRow>(this.basketPriceSql(), [
       productRefs,
-      input.storeSlugs && input.storeSlugs.length > 0 ? input.storeSlugs : null
+      storeSlugs.length > 0 ? storeSlugs : null
     ]);
     const mappedRows = rows.map(mapCatalogRow);
     const canonicalProductIds = new Map<string, string>();
@@ -178,7 +179,7 @@ export class RealCatalogService {
     return buildRealBasketComparison({
       userId: input.userId,
       items: input.items.map((item) => ({ ...item, productId: canonicalProductIds.get(item.productId) ?? item.productId })),
-      selectedStoreSlugs: input.storeSlugs,
+      selectedStoreSlugs: storeSlugs,
       latestPrices: mappedRows,
       basketSource: input.basketSource
     });
