@@ -11,7 +11,7 @@ import {
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
-import { chainPriceRows, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
+import { chainPriceRows, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 
 const REQUIRED_CHAIN_COVERAGE = 6;
 const smartSwapPrivateLabelPreference = {
@@ -228,6 +228,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const dealVerdict = dealScoreVerdictFor(product);
   const smartSwaps = smartSwapRecommendationsFor(product);
   const priceHistoryBadge = priceHistoryBadgeFor(product);
+  const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   return (
     <PageShell>
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
@@ -259,6 +260,23 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           </dl>
         </Card>
       </div>
+      <Card className="mt-6 border-slate-200 bg-slate-50">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-500">Data freshness badge</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">{freshnessBadge.sourceName}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">{freshnessBadge.caveat}</p>
+          </div>
+          <Link className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={freshnessBadge.evidenceRoute}>
+            Check source route
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">Freshness: {freshnessBadge.freshnessLabel}</p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">Coverage: {freshnessBadge.coverageLabel}</p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">Confidence: {freshnessBadge.confidenceBadge}</p>
+        </div>
+      </Card>
       <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>

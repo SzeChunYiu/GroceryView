@@ -705,6 +705,28 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(shell, /@\/components\/sample-data/);
   });
 
+  it('surfaces reusable data-freshness confidence badges across public routes', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const product = await read('src/app/products/[slug]/page.tsx');
+    const category = await read('src/app/categories/[slug]/page.tsx');
+
+    assert.match(verified, /export const dataFreshnessBadges = /);
+    assert.match(verified, /sourceKind/);
+    assert.match(verified, /freshnessLabel/);
+    assert.match(verified, /confidenceBadge/);
+    assert.match(shell, /dataFreshnessBadges\.map/);
+    assert.match(shell, /Data freshness badges/);
+    assert.match(product, /dataFreshnessBadges/);
+    assert.match(product, /Data freshness badge/);
+    assert.match(product, /freshnessBadge\.freshnessLabel/);
+    assert.match(product, /freshnessBadge\.confidenceBadge/);
+    assert.match(category, /dataFreshnessBadges\.filter/);
+    assert.match(category, /Category data-freshness badges/);
+    assert.doesNotMatch(product, /@\/lib\/demo-data/);
+    assert.doesNotMatch(category, /@\/components\/sample-data/);
+  });
+
   it('surfaces household planning with verified market context only', async () => {
     const householdPage = await read('src/app/household/page.tsx');
 

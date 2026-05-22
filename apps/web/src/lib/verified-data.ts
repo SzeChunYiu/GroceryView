@@ -413,6 +413,37 @@ export const sourceCoverage = [
   }
 ];
 
+function sourceKindFor(name: string) {
+  if (name === 'Axfood chain price snapshot') return 'axfood';
+  if (name === 'OpenPrices SEK observations') return 'openprices';
+  if (name === 'OpenFoodFacts metadata catalog') return 'openfoodfacts';
+  return 'osm';
+}
+
+function sourceRouteFor(name: string) {
+  if (name === 'Sweden store directory') return '/stores';
+  if (name === 'OpenPrices SEK observations' || name === 'OpenFoodFacts metadata catalog') return '/products';
+  return '/compare';
+}
+
+function confidenceBadgeFor(name: string) {
+  if (name === 'Axfood chain price snapshot') return 'chain-wide catalogue confidence';
+  if (name === 'OpenPrices SEK observations') return 'community-observed confidence';
+  if (name === 'OpenFoodFacts metadata catalog') return 'metadata-only confidence';
+  return 'location-directory confidence';
+}
+
+export const dataFreshnessBadges = sourceCoverage.map((source) => ({
+  sourceKind: sourceKindFor(source.name),
+  sourceName: source.name,
+  source: source.source,
+  freshnessLabel: source.freshness,
+  coverageLabel: source.coverage,
+  confidenceBadge: confidenceBadgeFor(source.name),
+  evidenceRoute: sourceRouteFor(source.name),
+  caveat: source.caveat
+}));
+
 const sourceRowsTotal = sourceCoverage.reduce((total, source) => total + source.rows, 0);
 
 export const sourceReadinessMatrix = sourceCoverage.map((source) => {
