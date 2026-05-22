@@ -214,6 +214,81 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003654',
     storeName: 'ICA Supermarket Alunda',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004219',
+    storeName: 'Maxi ICA Stormarknad Göteborg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004589',
+    storeName: 'ICA Kvantum Mölndal',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003954',
+    storeName: 'Maxi ICA Stormarknad Högsbo, Göteborg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003825',
+    storeName: 'Maxi ICA Stormarknad Torslanda',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003932',
+    storeName: 'ICA Kvantum Hovås',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004392',
+    storeName: 'Maxi ICA Stormarknad Kungälv',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004185',
+    storeName: 'Maxi ICA Stormarknad Kungsbacka',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003398',
+    storeName: 'ICA Kvantum Stenungsund',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003778',
+    storeName: 'ICA Kvantum Frölunda',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004365',
+    storeName: 'Maxi ICA Stormarknad Partille',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003383',
+    storeName: 'ICA Kvantum Lerum',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003849',
+    storeName: 'ICA Supermarket Hönö',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003917',
+    storeName: 'ICA Kvantum Kungsbacka',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004291',
+    storeName: 'ICA Supermarket Nordeviks',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004520',
+    storeName: 'ICA Supermarket Noltorp',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 

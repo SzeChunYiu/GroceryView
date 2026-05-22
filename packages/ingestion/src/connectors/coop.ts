@@ -237,6 +237,11 @@ export type FetchCoopWeeklyDiscountsOptions = {
   retrievedAt?: string;
 };
 
+export type FetchCoopAllStoreWeeklyDiscountsOptions = Omit<FetchCoopWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & {
+  maxStores?: number;
+  includeStoreDetails?: boolean;
+};
+
 export type FetchCoopStoresOptions = {
   fetchImpl?: typeof fetch;
   maxRows?: number;
@@ -573,6 +578,34 @@ export async function fetchCoopWeeklyDiscounts(
   }
 
   return rows;
+}
+
+export async function fetchCoopWeeklyDiscountsForAllStores(
+  options: FetchCoopAllStoreWeeklyDiscountsOptions = {}
+): Promise<CoopWeeklyDiscount[]> {
+  const stores = await fetchCoopStores({
+    fetchImpl: options.fetchImpl,
+    maxRows: options.maxStores,
+    storeApiVersion: options.storeApiVersion,
+    storeApiUrl: options.storeApiUrl,
+    storeApiSubscriptionKey: options.storeApiSubscriptionKey,
+    includeDetails: options.includeStoreDetails,
+    retrievedAt: options.retrievedAt
+  });
+  return await fetchCoopWeeklyDiscounts({
+    fetchImpl: options.fetchImpl,
+    storeIds: stores.map((store) => store.storeId),
+    storeApiVersion: options.storeApiVersion,
+    storeApiUrl: options.storeApiUrl,
+    storeApiSubscriptionKey: options.storeApiSubscriptionKey,
+    productQueries: options.productQueries,
+    maxRows: options.maxRows ?? stores.length * (options.productQueries?.length ?? DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES.length),
+    device: options.device,
+    apiVersion: options.apiVersion,
+    subscriptionKey: options.subscriptionKey,
+    personalizationApiUrl: options.personalizationApiUrl,
+    retrievedAt: options.retrievedAt
+  });
 }
 
 export function normalizeCoopProduct(
