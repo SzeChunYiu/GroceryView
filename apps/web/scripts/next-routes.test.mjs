@@ -284,6 +284,15 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces an elderly large-text high-contrast mode in the public shell', async () => {
+    const source = await read('src/components/market-shell.tsx');
+    assert.match(source, /elderlyAccessibilityMode/);
+    assert.match(source, /Large-text high-contrast mode/);
+    assert.match(source, /contrast-safe/);
+    assert.match(source, /text-2xl/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('uses a readable global shell and provenance surfaces across the app', async () => {
     const globals = await read('src/app/globals.css');
     const nav = await read('src/components/app-nav.tsx');
