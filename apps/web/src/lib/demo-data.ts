@@ -2369,6 +2369,49 @@ export const familyMealPlannerFromDeals = {
   }
 };
 
+const freezerBatchCookSteps: Record<string, string[]> = {
+  'Deal bowl': [
+    'Cook the full pantry deal as a base, then cool half before adding fresh toppings.',
+    'Portion the protein and vegetable deal into dinner servings first.',
+    'Freeze labelled leftovers only after the visible deal price clears the batch budget.'
+  ],
+  'Budget pasta': [
+    'Cook the pantry row once, split sauce into fresh dinner and freezer trays.',
+    'Use the highest deal-score protein row across both trays.',
+    'Keep one portion chilled and freeze the rest within two hours.'
+  ],
+  'Protein lunchbox': [
+    'Batch the protein and pantry deal together for lunchbox bases.',
+    'Hold watery vegetables out of freezer portions when texture would suffer.',
+    'Mark freezer portions with product ids and deal source labels.'
+  ]
+};
+
+export const freezerBatchCookPlanner = {
+  persona: 'Meal-preppers / large households',
+  title: 'Freezer batch-cook planner',
+  servings: 8,
+  maxBatchCost: 240,
+  meals: suggestDealBasedMeals({
+    deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
+    maxMealCost: 240,
+    servings: 8
+  }).map((suggestion) => ({
+    ...suggestion,
+    freezerPortions: Math.max(0, 8 - 4),
+    batchCookSteps: freezerBatchCookSteps[suggestion.title] ?? [
+      'Cook the selected deal ingredients once.',
+      'Serve four portions fresh and chill the rest quickly.',
+      'Freeze labelled portions with the visible deal source.'
+    ],
+    ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean)
+  })),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Batch-cook planning reuses suggestDealBasedMeals with visible deal prices only; freezer capacity, allergens, and household preferences need account data before auto-planning.'
+  }
+};
+
 export const expiryDealRadarReports = [
   {
     id: 'expiry-laxfile-liljeholmen',
