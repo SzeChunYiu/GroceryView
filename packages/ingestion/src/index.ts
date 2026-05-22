@@ -3156,7 +3156,23 @@ async function persistDailyConnectorOutput(input: {
            observed_at,
            confidence,
            provenance
-         from inserted
+         from (
+           select distinct on (product_id, chain_id, store_id, price_type)
+             product_id,
+             chain_id,
+             store_id,
+             price_type,
+             id,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             observed_at,
+             confidence,
+             provenance
+           from inserted
+           order by product_id, chain_id, store_id, price_type, observed_at desc, id desc
+         ) latest_input
          on conflict (product_id, chain_id, store_id, price_type) do update set
            observation_id = excluded.observation_id,
            price = excluded.price,
