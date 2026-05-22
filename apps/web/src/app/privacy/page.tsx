@@ -1,4 +1,5 @@
 import { NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { PrivacyRequestActions } from '@/components/privacy-request-actions';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -28,6 +29,7 @@ export default function FeaturePage() {
   return (
     <PageShell>
       <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
+      <PrivacyRequestActions />
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <TopSpreads limit={5} />
         <SourceCoverage />
