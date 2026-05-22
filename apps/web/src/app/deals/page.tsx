@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { expiryDealRadar, expiryDealRadarReports } from '@/lib/demo-data';
+import { expiryDealRadar, expiryDealRadarReports, singlePortionDealFinder } from '@/lib/demo-data';
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
@@ -62,6 +62,34 @@ export default function DealsPage() {
             </Link>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Students / young singles</p>
+        <h2 className="mt-2 text-2xl font-black">Single-portion deals</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          This student view calls rankDealOpportunities, then keeps only visible small-pack deals that make sense for one-person baskets instead of family-size bulk buys.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          {singlePortionDealFinder.rankedDeals.map((deal) => (
+            <Link className="block rounded-2xl border border-emerald-200 bg-white p-4 hover:border-emerald-700" href={`/products/${deal.productId}`} key={`${deal.storeId}-${deal.productId}`}>
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-lg font-black text-slate-950">{deal.productName}</p>
+                  <p className="mt-1 text-sm text-slate-600">{deal.storeName} · {deal.portionLabel}</p>
+                </div>
+                <p className="text-2xl font-black text-emerald-800">{formatSek(deal.currentPrice)}</p>
+              </div>
+              <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-3">
+                <p className="rounded-2xl bg-emerald-100 p-3 font-semibold">{deal.discountPercent}% below regular</p>
+                <p className="rounded-2xl bg-emerald-100 p-3 font-semibold">{deal.band.label}</p>
+                <p className="rounded-2xl bg-emerald-100 p-3 font-semibold">Deal Score {deal.dealScore}</p>
+              </div>
+              <p className="mt-3 text-xs font-semibold text-slate-600">{deal.source}</p>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-4 text-sm font-semibold text-slate-700">{singlePortionDealFinder.coverage.caveat}</p>
       </Card>
 
       <Card className="mt-6">

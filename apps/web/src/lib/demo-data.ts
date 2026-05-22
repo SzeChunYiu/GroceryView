@@ -2096,6 +2096,78 @@ export const expiryDealRadar = {
   }
 };
 
+export const singlePortionDealInputs = [
+  {
+    productId: 'lindahls-kvarg-500g',
+    productName: 'Lindahls Kvarg Naturell 500g',
+    storeId: 'willys-fridhemsplan',
+    storeName: 'Willys Fridhemsplan',
+    currentPrice: 19.9,
+    regularPrice: 26.9,
+    dealScore: 82,
+    sourceConfidence: 0.74,
+    portionLabel: '1 protein breakfast / snack',
+    source: 'visible member-promo product row sized for one-person use'
+  },
+  {
+    productId: 'garant-korsbarstomater-250g',
+    productName: 'Garant Körsbärstomater 250g',
+    storeId: 'coop-daglivs-fridhemsplan',
+    storeName: 'Coop Daglivs Fridhemsplan',
+    currentPrice: 19.9,
+    regularPrice: 29.9,
+    dealScore: 79,
+    sourceConfidence: 0.72,
+    portionLabel: '2 pasta or salad portions',
+    source: 'visible shelf product row with small-pack markdown evidence'
+  },
+  {
+    productId: 'garant-ekologisk-tofu-270g',
+    productName: 'Garant Ekologisk Tofu 270g',
+    storeId: 'coop-medborgarplatsen',
+    storeName: 'Coop Medborgarplatsen',
+    currentPrice: 21.9,
+    regularPrice: 28.9,
+    dealScore: 76,
+    sourceConfidence: 0.68,
+    portionLabel: '2 dinner portions',
+    source: 'visible shelf product row sized below family-pack quantity'
+  },
+  {
+    productId: 'bravo-apelsinjuice-1l',
+    productName: 'Bravo Apelsinjuice 1L',
+    storeId: 'hemkop-hornstull',
+    storeName: 'Hemköp Hornstull',
+    currentPrice: 22.9,
+    regularPrice: 27.9,
+    dealScore: 64,
+    sourceConfidence: 0.59,
+    portionLabel: '4 breakfast servings',
+    source: 'visible shelf product row retained as a lower-confidence comparison deal'
+  }
+];
+
+export const singlePortionDealFinder = {
+  persona: 'Students / young singles',
+  title: 'Single-portion deals',
+  rankedDeals: rankDealOpportunities({
+    deals: singlePortionDealInputs.map(({ portionLabel: _portionLabel, source: _source, ...deal }) => deal),
+    minimumDealScore: 60,
+    minimumSourceConfidence: 0.55
+  }).map((deal) => {
+    const sourceRow = singlePortionDealInputs.find((input) => input.productId === deal.productId && input.storeId === deal.storeId);
+    return {
+      ...deal,
+      portionLabel: sourceRow?.portionLabel ?? 'single-person portion',
+      source: sourceRow?.source ?? 'visible deal row'
+    };
+  }),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Filters visible small-pack deals through rankDealOpportunities; family-size bulk offers and sponsored placements are excluded from this student view.'
+  }
+};
+
 export const nutritionPerKronaInputs = [
   {
     productId: 'kronfagel-kycklingfile-1kg',
