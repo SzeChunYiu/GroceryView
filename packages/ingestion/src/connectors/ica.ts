@@ -1694,12 +1694,17 @@ export async function fetchIcaDefaultStoreProducts(
   options: FetchIcaDefaultStoreProductsOptions = {}
 ): Promise<IcaProduct[]> {
   const stores = options.stores ?? DEFAULT_ICA_STORE_CONFIGS;
-  const batches = await Promise.allSettled(stores.map((store) => fetchIcaProducts({
-    ...options,
-    storeAccountId: store.storeAccountId,
-    storeName: store.storeName,
-    regionId: store.regionId
-  })));
+  const concurrency = 8;
+  const batches: PromiseSettledResult<IcaProduct[]>[] = [];
+  for (let index = 0; index < stores.length; index += concurrency) {
+    const batch = stores.slice(index, index + concurrency);
+    batches.push(...await Promise.allSettled(batch.map((store) => fetchIcaProducts({
+      ...options,
+      storeAccountId: store.storeAccountId,
+      storeName: store.storeName,
+      regionId: store.regionId
+    }))));
+  }
   const rows = batches.flatMap((batch) => batch.status === 'fulfilled' ? batch.value : []);
   if (rows.length === 0) {
     const firstFailure = batches.find((batch) => batch.status === 'rejected');

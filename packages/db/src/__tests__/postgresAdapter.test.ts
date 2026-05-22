@@ -1231,8 +1231,9 @@ describe('createPostgresCatalogReader', () => {
       }
     ]);
     assert.match(executor.calls[0]!.sql, /left join latest_prices on latest_prices\.product_id = products\.id/);
+    assert.match(executor.calls[0]!.sql, /left join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
-    assert.match(executor.calls[0]!.sql, /array_agg\(distinct latest_prices\.chain_id\)/);
+    assert.match(executor.calls[0]!.sql, /array_agg\(distinct replace\(chains\.slug, '-', '_'\)\)/);
     assert.match(executor.calls[0]!.sql, /stores\.external_ref/);
     assert.deepEqual(executor.calls[0]!.params, [25]);
   });
