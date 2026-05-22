@@ -75,6 +75,31 @@ describe('verified-data UI', () => {
   });
 
 
+  it('ships signed-in privacy request controls without destructive anonymous actions', async () => {
+    const privacy = await read('src/app/privacy/page.tsx');
+    const actions = await read('src/components/privacy-request-actions.tsx');
+    const server = await read('../../packages/server/src/index.ts');
+
+    assert.match(privacy, /PrivacyRequestActions/);
+    assert.match(actions, /'use client'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(actions, /Authorization: `Bearer \$\{accessToken\}`/);
+    assert.match(actions, /\/api\/privacy\/export\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /\/api\/privacy\/deletion-plan\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /\/api\/privacy\/request-fulfillment\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /data_export/);
+    assert.match(actions, /account_deletion/);
+    assert.match(actions, /ad_data_opt_out/);
+    assert.match(actions, /destructiveAction: false/);
+    assert.match(actions, /Sign in first/);
+    assert.match(actions, /No anonymous privacy requests/);
+    assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
+    assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
+    assert.match(server, /requiresReauthentication: true/);
+  });
+
+
 
   it('surfaces the bookmarklet import/export contract and static asset on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
