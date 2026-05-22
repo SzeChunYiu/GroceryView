@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post } 
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { groceryApi } from '../demo-data.js';
+import { WatchlistsService } from './watchlists.service.js';
 
 const allowedWatchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const;
 
@@ -78,30 +79,50 @@ function asProductNotFound(error: unknown) {
 @ApiTags('watchlists')
 @Controller('users/demo/watchlist')
 export class WatchlistsController {
+  constructor(private readonly watchlists: WatchlistsService) {}
+
   @Get()
   @ApiOkResponse({ description: 'Demo user watchlist' })
-  list() {
+  async list() {
+    if (this.watchlists.isConfigured()) return this.watchlists.list('demo');
     return groceryApi.getWatchlist('demo');
   }
 
   @Post()
   @ApiCreatedResponse({ description: 'Watchlist item created' })
-  create(@Body() body: WatchlistItemDto) {
+  async create(@Body() body: WatchlistItemDto) {
     const item = { ...body, favoriteStoresOnly: body.favoriteStoresOnly ?? false };
+    if (this.watchlists.isConfigured()) {
+      try {
+        return await this.watchlists.create('demo', item);
+      } catch (error) {
+        asProductNotFound(error);
+      }
+    }
     groceryApi.addWatchlistItem('demo', item);
     return item;
   }
 
   @Get('price-alerts')
   @ApiOkResponse({ description: 'Demo user active watchlist target-price alerts' })
-  priceAlerts() {
+  async priceAlerts() {
+    if (this.watchlists.isConfigured()) return this.watchlists.priceAlerts('demo');
     return { ...groceryApi.getWatchlistPriceAlerts('demo'), demo: true };
   }
 
   @Post('price-alerts')
   @ApiCreatedResponse({ description: 'Watchlist target-price alert created' })
-  createPriceAlert(@Body() body: WatchlistPriceAlertDto) {
+  async createPriceAlert(@Body() body: WatchlistPriceAlertDto) {
     try {
+      if (this.watchlists.isConfigured()) {
+        const report = await this.watchlists.createPriceAlert('demo', {
+          productId: body.productId,
+          targetPrice: body.targetPrice,
+          favoriteStoresOnly: body.favoriteStoresOnly,
+          allowedPriceTypes: body.allowedPriceTypes
+        });
+        return report;
+      }
       return {
         ...groceryApi.addWatchlistPriceAlert('demo', {
           productId: body.productId,
@@ -118,8 +139,12 @@ export class WatchlistsController {
 
   @Patch(':productId')
   @ApiOkResponse({ description: 'Watchlist item updated' })
-  update(@Param('productId') productId: string, @Body() body: WatchlistPatchDto) {
+  async update(@Param('productId') productId: string, @Body() body: WatchlistPatchDto) {
     try {
+      if (this.watchlists.isConfigured()) {
+        const watchlist = await this.watchlists.update('demo', productId, body);
+        return { productId, item: watchlist.items.find((item) => item.productId === productId), watchlist };
+      }
       groceryApi.updateWatchlistItem('demo', productId, body);
       const watchlist = groceryApi.getWatchlist('demo');
       return { productId, item: watchlist.items.find((item) => item.productId === productId), watchlist, demo: true };
@@ -130,8 +155,12 @@ export class WatchlistsController {
 
   @Delete(':productId')
   @ApiOkResponse({ description: 'Watchlist item removed' })
-  remove(@Param('productId') productId: string) {
+  async remove(@Param('productId') productId: string) {
     try {
+      if (this.watchlists.isConfigured()) {
+        const result = await this.watchlists.remove('demo', productId);
+        return { productId, ...result };
+      }
       const result = groceryApi.removeWatchlistItem('demo', productId);
       return { productId, ...result, watchlist: groceryApi.getWatchlist('demo'), demo: true };
     } catch (error) {

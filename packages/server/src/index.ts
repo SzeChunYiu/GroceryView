@@ -3,7 +3,18 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createGroceryViewApi, type CategoryBudgetPatch, type HouseholdPlanRequest } from '@groceryview/api';
+import {
+  buildFlyerOfferReport,
+  createGroceryViewApi,
+  type CategoryBudgetPatch,
+  type FlyerOfferObservationInput,
+  type FlyerOfferReport,
+  type FlyerOfferStoreSummary,
+  type HouseholdPlanRequest,
+  type StoreFlyerOfferReport,
+  type WatchlistPriceAlertReport,
+  type WatchlistPriceAlertRequest
+} from '@groceryview/api';
 import { createSessionToken, parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
 import { buildCatalogCoverageReport, type CatalogCoverageInput, type CatalogCoverageReport } from '@groceryview/catalog';
 import {
@@ -38,6 +49,7 @@ import {
   planPantryReplenishment,
   planPrivacyRequestFulfillment,
   summarizeHumanReviewSla,
+  buildWatchlistAlerts,
   type HumanReviewAssignment,
   type HumanReviewDecision,
   type HumanReviewOperator,
@@ -47,6 +59,8 @@ import {
   type PrivacyRequestType,
   type BasketTripCostTravelMode,
   type RecurringBasketCadence,
+  type WatchlistItem,
+  type WatchlistProductSnapshot,
   type WatchlistPriceType
 } from '@groceryview/core';
 import {
@@ -103,6 +117,10 @@ export type AuthOptions = {
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
+  flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
+  storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
+  watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
+  watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
   scanProviders?: ScanProviders;
   scanUploadStorage?: ScanUploadStorage;
 };
@@ -142,6 +160,12 @@ export type RuntimePersistenceRepository = {
   upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
 };
 
+type RuntimeWatchlistRepository = {
+  getFavoriteStoreIds(userId: string): Promise<string[]>;
+  addWatchlistItem(userId: string, item: WatchlistItem): Promise<void>;
+  getWatchlist(userId: string): Promise<WatchlistItem[]>;
+};
+
 export type RuntimePgPool = PgLikeClient & {
   end(): Promise<void> | void;
 };
@@ -156,7 +180,23 @@ export type RuntimeHandlerOptions = {
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
+  flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
+  storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
+  watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
+  watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
   pgPoolFactory?: RuntimePgPoolFactory;
+};
+
+export type FlyerOffersProviderQuery = {
+  asOf?: string;
+  storeId?: string;
+  chain?: string;
+  category?: string;
+  productId?: string;
+};
+
+export type StoreFlyerOffersProviderQuery = {
+  asOf?: string;
 };
 
 type JsonRecord = Record<string, unknown>;
@@ -370,6 +410,320 @@ function optionalWatchlistPriceTypes(value: unknown): WatchlistPriceType[] | und
     }
   }
   return values as WatchlistPriceType[];
+}
+
+type FlyerOfferSqlRow = {
+  observation_id: string;
+  source_run_id: string | null;
+  raw_record_id: string | null;
+  price_type: 'promotion' | 'member';
+  price: string | number;
+  regular_price: string | number;
+  currency: 'SEK';
+  promotion_text: string | null;
+  promotion_starts_on: string | Date | null;
+  promotion_ends_on: string | Date | null;
+  member_required: boolean;
+  observed_at: string | Date;
+  valid_from: string | Date | null;
+  valid_until: string | Date | null;
+  confidence: string | number;
+  provenance: Record<string, unknown> | string | null;
+  product_id: string;
+  product_slug: string;
+  product_name: string;
+  category_path: string[];
+  chain_id: string;
+  chain_slug: string;
+  chain_name: string;
+  store_id: string;
+  store_slug: string;
+  store_name: string;
+  store_city: string | null;
+};
+
+type StoreFlyerSqlRow = {
+  store_slug: string;
+  store_name: string;
+  chain_slug: string;
+};
+
+type WatchlistLatestPriceRow = {
+  product_id: string;
+  product_slug: string;
+  product_name: string;
+  store_slug: string;
+  store_name: string;
+  price: string | number;
+  price_type: WatchlistPriceType;
+  confidence: string | number;
+  observed_at: string | Date;
+};
+
+function iso(value: string | Date): string {
+  return value instanceof Date ? value.toISOString() : value;
+}
+
+function optionalIso(value: string | Date | null): string | undefined {
+  return value === null ? undefined : iso(value);
+}
+
+function provenanceRecord(value: Record<string, unknown> | string | null): Record<string, unknown> {
+  if (!value) return {};
+  return typeof value === 'string' ? JSON.parse(value) as Record<string, unknown> : value;
+}
+
+function flyerObservationFromSql(row: FlyerOfferSqlRow): FlyerOfferObservationInput {
+  const promotionStartsOn = optionalIso(row.promotion_starts_on);
+  const promotionEndsOn = optionalIso(row.promotion_ends_on);
+  const validFrom = optionalIso(row.valid_from);
+  const validUntil = optionalIso(row.valid_until);
+  return {
+    observationId: row.observation_id,
+    ...(row.source_run_id ? { sourceRunId: row.source_run_id } : {}),
+    ...(row.raw_record_id ? { rawRecordId: row.raw_record_id } : {}),
+    priceType: row.price_type,
+    price: Number(row.price),
+    regularPrice: Number(row.regular_price),
+    currency: row.currency,
+    ...(row.promotion_text ? { promotionText: row.promotion_text } : {}),
+    ...(promotionStartsOn ? { promotionStartsOn } : {}),
+    ...(promotionEndsOn ? { promotionEndsOn } : {}),
+    memberRequired: row.member_required,
+    observedAt: iso(row.observed_at),
+    ...(validFrom ? { validFrom } : {}),
+    ...(validUntil ? { validUntil } : {}),
+    confidence: Number(row.confidence),
+    provenance: provenanceRecord(row.provenance),
+    productId: row.product_id,
+    productSlug: row.product_slug,
+    productName: row.product_name,
+    categoryPath: row.category_path ?? [],
+    chainId: row.chain_id,
+    chainSlug: row.chain_slug,
+    chainName: row.chain_name,
+    storeId: row.store_id,
+    storeSlug: row.store_slug,
+    storeName: row.store_name,
+    ...(row.store_city ? { storeCity: row.store_city } : {})
+  };
+}
+
+async function queryFlyerOffersFromPostgres(executor: QueryExecutor, query: FlyerOffersProviderQuery): Promise<FlyerOfferReport> {
+  const asOf = query.asOf ?? new Date().toISOString();
+  const rows = await executor.query<FlyerOfferSqlRow>(
+    `select observations.id::text as observation_id,
+            observations.source_run_id::text,
+            observations.raw_record_id::text,
+            observations.price_type,
+            observations.price,
+            observations.regular_price,
+            observations.currency,
+            observations.promotion_text,
+            observations.promotion_starts_on,
+            observations.promotion_ends_on,
+            observations.member_required,
+            observations.observed_at,
+            observations.valid_from,
+            observations.valid_until,
+            observations.confidence,
+            observations.provenance,
+            products.id::text as product_id,
+            products.slug as product_slug,
+            products.canonical_name as product_name,
+            products.category_path,
+            chains.id::text as chain_id,
+            chains.slug as chain_slug,
+            chains.name as chain_name,
+            stores.id::text as store_id,
+            stores.slug as store_slug,
+            stores.name as store_name,
+            stores.city as store_city
+     from observations
+     join products on products.id = observations.product_id
+     join chains on chains.id = observations.chain_id
+     join stores on stores.id = observations.store_id
+     where observations.price_type in ('promotion', 'member')
+       and observations.regular_price is not null
+       and observations.price < observations.regular_price
+       and ($1::timestamptz >= coalesce(observations.valid_from, observations.promotion_starts_on::timestamptz, observations.observed_at))
+       and ($1::timestamptz <= coalesce(observations.valid_until, (observations.promotion_ends_on::timestamptz + interval '1 day' - interval '1 millisecond'), observations.observed_at))
+       and ($2::text is null or stores.slug = $2)
+       and ($3::text is null or chains.slug = $3)
+       and ($4::text is null or exists (select 1 from unnest(products.category_path) category where lower(category) = lower($4::text)))
+       and ($5::text is null or products.slug = $5 or products.id::text = $5)
+     order by observations.observed_at desc, stores.name, products.canonical_name`,
+    [
+      asOf,
+      query.storeId ?? null,
+      query.chain ?? null,
+      query.category ?? null,
+      query.productId ?? null
+    ]
+  );
+  return buildFlyerOfferReport({
+    asOf,
+    filters: {
+      ...(query.storeId ? { storeId: query.storeId } : {}),
+      ...(query.chain ? { chain: query.chain } : {}),
+      ...(query.category ? { category: query.category } : {}),
+      ...(query.productId ? { productId: query.productId } : {})
+    },
+    observations: rows.map(flyerObservationFromSql)
+  });
+}
+
+async function queryStoreFlyerOffersFromPostgres(
+  executor: QueryExecutor,
+  storeId: string,
+  query: StoreFlyerOffersProviderQuery
+): Promise<StoreFlyerOfferReport | null> {
+  const stores = await executor.query<StoreFlyerSqlRow>(
+    `select stores.slug as store_slug,
+            stores.name as store_name,
+            chains.slug as chain_slug
+     from stores
+     join chains on chains.id = stores.chain_id
+     where stores.slug = $1`,
+    [storeId]
+  );
+  const store = stores[0];
+  if (!store) return null;
+  const report = await queryFlyerOffersFromPostgres(executor, { asOf: query.asOf, storeId });
+  return {
+    storeId: store.store_slug,
+    storeName: store.store_name,
+    chain: store.chain_slug,
+    asOf: report.asOf,
+    offerCount: report.offerCount,
+    categoryCount: new Set(report.offers.map((offer) => offer.category)).size,
+    totalOneEachSavings: report.offers.reduce((sum, offer) => Math.round((sum + offer.savings + Number.EPSILON) * 100) / 100, 0),
+    bestOffer: report.offers[0] ?? null,
+    offers: report.offers,
+    guardrails: report.guardrails
+  };
+}
+
+async function watchlistProductsFromPostgres(executor: QueryExecutor, watchlist: readonly WatchlistItem[]): Promise<WatchlistProductSnapshot[]> {
+  const productIds = [...new Set(watchlist.map((item) => item.productId))];
+  if (productIds.length === 0) return [];
+  const rows = await executor.query<WatchlistLatestPriceRow>(
+    `select products.id::text as product_id,
+            products.slug as product_slug,
+            products.canonical_name as product_name,
+            stores.slug as store_slug,
+            stores.name as store_name,
+            latest_prices.price,
+            latest_prices.price_type,
+            latest_prices.confidence,
+            latest_prices.observed_at
+     from latest_prices
+     join products on products.id = latest_prices.product_id
+     left join stores on stores.id = latest_prices.store_id
+     where products.id::text = any($1::text[])
+        or products.slug = any($1::text[])
+     order by products.id::text, latest_prices.price asc, stores.name nulls last, latest_prices.observed_at desc`,
+    [productIds]
+  );
+
+  const rowsByProduct = new Map<string, WatchlistLatestPriceRow[]>();
+  for (const row of rows) {
+    const keys = new Set([row.product_id, row.product_slug]);
+    for (const key of keys) rowsByProduct.set(key, [...(rowsByProduct.get(key) ?? []), row]);
+  }
+
+  return productIds.flatMap((productId) => {
+    const productRows = rowsByProduct.get(productId) ?? [];
+    const best = productRows[0];
+    if (!best) return [];
+    return [{
+      productId,
+      productName: best.product_name,
+      bestPrice: Number(best.price),
+      bestStoreId: best.store_slug,
+      bestPriceType: best.price_type,
+      prices: productRows.map((row) => ({
+        storeId: row.store_slug,
+        storeName: row.store_name,
+        price: Number(row.price),
+        priceType: row.price_type
+      })),
+      dealScore: Math.round(Math.max(0, Math.min(1, Number(best.confidence))) * 100),
+      isNew52WeekLow: false
+    }];
+  });
+}
+
+async function queryWatchlistPriceAlertsFromPostgres(
+  executor: QueryExecutor,
+  repository: RuntimeWatchlistRepository,
+  userId: string
+): Promise<WatchlistPriceAlertReport> {
+  const [watchlist, favoriteStoreIds] = await Promise.all([
+    repository.getWatchlist(userId),
+    repository.getFavoriteStoreIds(userId)
+  ]);
+  const favoriteStoreRows = favoriteStoreIds.length === 0
+    ? []
+    : await executor.query<{ store_slug: string }>(
+      'select slug as store_slug from stores where id::text = any($1::text[]) or slug = any($1::text[])',
+      [favoriteStoreIds]
+    );
+  const favoriteStoreSlugs = favoriteStoreRows.length === 0 ? favoriteStoreIds : favoriteStoreRows.map((row) => row.store_slug);
+  const products = await watchlistProductsFromPostgres(executor, watchlist);
+  const alerts = buildWatchlistAlerts({ watchlist, products, favoriteStoreIds: favoriteStoreSlugs });
+  return {
+    userId,
+    trackedItemCount: watchlist.length,
+    alertCount: alerts.filter((alert) => alert.type === 'target_price').length,
+    alerts: alerts.filter((alert) => alert.type === 'target_price'),
+    guardrails: [
+      'Watchlist target-price alerts are calculated from persisted latest_prices rows for saved watchlist items.',
+      'Favorite-store alerts only fire when the current best eligible row belongs to a saved favorite store.',
+      'Allowed price types filter eligible shelf, member, promotion, and estimated rows before threshold evaluation.'
+    ]
+  };
+}
+
+async function upsertWatchlistPriceAlertInPostgres(
+  executor: QueryExecutor,
+  repository: RuntimeWatchlistRepository,
+  userId: string,
+  request: WatchlistPriceAlertRequest
+): Promise<WatchlistPriceAlertReport> {
+  const existingRows = await executor.query<{ id: string }>(
+    'select id::text from watchlist_items where user_id = $1 and (product_id::text = $2 or product_id::text in (select id::text from products where slug = $2)) order by id limit 1',
+    [userId, request.productId]
+  );
+  if (existingRows[0]) {
+    await executor.query(
+      `update watchlist_items
+       set target_price = $2,
+           favorite_stores_only = $3,
+           allowed_price_types = $4
+       where id::text = $1`,
+      [
+        existingRows[0].id,
+        request.targetPrice,
+        request.favoriteStoresOnly ?? true,
+        request.allowedPriceTypes ?? ['shelf']
+      ]
+    );
+  } else {
+    const productRows = await executor.query<{ product_id: string }>(
+      'select id::text as product_id from products where id::text = $1 or slug = $1 limit 1',
+      [request.productId]
+    );
+    const productId = productRows[0]?.product_id;
+    if (!productId) throw new Error(`Unknown productId: ${request.productId}`);
+    await repository.addWatchlistItem(userId, {
+      productId,
+      targetPrice: request.targetPrice,
+      favoriteStoresOnly: request.favoriteStoresOnly ?? true,
+      allowedPriceTypes: request.allowedPriceTypes ?? ['shelf']
+    });
+  }
+  return queryWatchlistPriceAlertsFromPostgres(executor, repository, userId);
 }
 
 function householdPlanRequestFromBody(body: JsonRecord): HouseholdPlanRequest {
@@ -880,13 +1234,14 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
 
       if (method === 'GET' && path === '/api/deals/flyer-offers') {
-        return jsonResponse(api.getFlyerOffers({
+        const query = {
           asOf: url.searchParams.get('asOf') ?? undefined,
           storeId: url.searchParams.get('storeId') ?? undefined,
           chain: url.searchParams.get('chain') ?? undefined,
           category: url.searchParams.get('category') ?? undefined,
           productId: url.searchParams.get('productId') ?? undefined
-        }));
+        };
+        return jsonResponse(authOptions.flyerOffersProvider ? await authOptions.flyerOffersProvider(query) : api.getFlyerOffers(query));
       }
 
       if (method === 'GET' && path === '/api/account/subscription-access') {
@@ -1136,6 +1491,11 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       const storeFlyerOffersMatch = path.match(/^\/api\/stores\/([^/]+)\/flyer-offers$/);
       if (method === 'GET' && storeFlyerOffersMatch) {
         const storeId = decodeURIComponent(storeFlyerOffersMatch[1]);
+        if (authOptions.storeFlyerOffersProvider) {
+          const report = await authOptions.storeFlyerOffersProvider(storeId, { asOf: url.searchParams.get('asOf') ?? undefined });
+          if (!report) return errorResponse(404, 'Store not found.');
+          return jsonResponse(report);
+        }
         if (!api.getStore(storeId)) return errorResponse(404, 'Store not found.');
         return jsonResponse(api.getStoreFlyerOffers(storeId, { asOf: url.searchParams.get('asOf') ?? undefined }));
       }
@@ -1273,15 +1633,23 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
-        if (method === 'GET') return jsonResponse(api.getWatchlistPriceAlerts(user));
+        if (method === 'GET') {
+          return jsonResponse(authOptions.watchlistPriceAlertsProvider ? await authOptions.watchlistPriceAlertsProvider(user) : api.getWatchlistPriceAlerts(user));
+        }
         if (method === 'POST') {
           const body = await readJson(request);
-          return jsonResponse(api.addWatchlistPriceAlert(user, {
+          const alert = {
             productId: requiredString(body.productId, 'productId'),
             targetPrice: requiredNumber(body.targetPrice, 'targetPrice'),
             favoriteStoresOnly: typeof body.favoriteStoresOnly === 'boolean' ? body.favoriteStoresOnly : undefined,
             allowedPriceTypes: optionalWatchlistPriceTypes(body.allowedPriceTypes)
-          }), { status: 201 });
+          };
+          return jsonResponse(
+            authOptions.watchlistPriceAlertWriter
+              ? await authOptions.watchlistPriceAlertWriter(user, alert)
+              : api.addWatchlistPriceAlert(user, alert),
+            { status: 201 }
+          );
         }
       }
 
@@ -1837,7 +2205,11 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     notificationWorkerRunner: options.notificationWorkerRunner,
     postgresReadinessProvider: options.postgresReadinessProvider,
     sourceRunHealthProvider: options.sourceRunHealthProvider,
-    catalogCoverageProvider: options.catalogCoverageProvider
+    catalogCoverageProvider: options.catalogCoverageProvider,
+    flyerOffersProvider: options.flyerOffersProvider,
+    storeFlyerOffersProvider: options.storeFlyerOffersProvider,
+    watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider,
+    watchlistPriceAlertWriter: options.watchlistPriceAlertWriter
   };
 }
 
@@ -1888,6 +2260,10 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
+  flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
+  storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
+  watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
+  watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
   close(): Promise<void>;
 } {
   if (options.repository || !config.databaseUrl) return { close: noopClose };
@@ -1896,8 +2272,9 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
   const executor: QueryExecutor = createPgQueryExecutor(pool);
   const sourceRecordReader = createPostgresSourceRecordReader(executor);
   const catalogReader = createPostgresCatalogReader(executor);
+  const repository = createPostgresRepository(executor);
   return {
-    repository: createPostgresRepository(executor),
+    repository,
     postgresReadinessProvider: () => checkPostgresIntegrationReadiness({ executor, repositoryProbes: [] }),
     sourceRunHealthProvider: () =>
       checkSourceRunHealth({
@@ -1918,6 +2295,10 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
             })
         }
       : {}),
+    flyerOffersProvider: (query) => queryFlyerOffersFromPostgres(executor, query),
+    storeFlyerOffersProvider: (storeId, query) => queryStoreFlyerOffersFromPostgres(executor, storeId, query),
+    watchlistPriceAlertsProvider: (userId) => queryWatchlistPriceAlertsFromPostgres(executor, repository, userId),
+    watchlistPriceAlertWriter: (userId, request) => upsertWatchlistPriceAlertInPostgres(executor, repository, userId, request),
     async close() {
       await pool.end();
     }
@@ -1931,7 +2312,11 @@ function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: Runt
     ...(resource.repository ? { repository: resource.repository } : {}),
     postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider,
     sourceRunHealthProvider: options.sourceRunHealthProvider ?? resource.sourceRunHealthProvider,
-    catalogCoverageProvider: options.catalogCoverageProvider ?? resource.catalogCoverageProvider
+    catalogCoverageProvider: options.catalogCoverageProvider ?? resource.catalogCoverageProvider,
+    flyerOffersProvider: options.flyerOffersProvider ?? resource.flyerOffersProvider,
+    storeFlyerOffersProvider: options.storeFlyerOffersProvider ?? resource.storeFlyerOffersProvider,
+    watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider ?? resource.watchlistPriceAlertsProvider,
+    watchlistPriceAlertWriter: options.watchlistPriceAlertWriter ?? resource.watchlistPriceAlertWriter
   };
   const authOptions = buildRuntimeRequestAuthOptions(config, runtimeOptions);
   return {
