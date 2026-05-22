@@ -15,6 +15,7 @@ import {
   formatSek,
   freshestOpenPrices,
   homepageAdaptiveProductCards,
+  memberOfferAggregationBoard,
   openPriceObservationDepth,
   priceDropMoversBoard,
   privateLabelDupeFinder,
@@ -121,6 +122,31 @@ export function MarketShell() {
           ))}
         </div>
         <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-emerald-900">{pwaFirstInstall.evidence}</p>
+      </Card>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>Member offers</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">{memberOfferAggregationBoard.title}</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              The homepage now previews member-only evidence from public Lidl and Matpriskollen rows while keeping points account-bound. Rows map to {memberOfferAggregationBoard.sourcePredicate}; {memberOfferAggregationBoard.pointsStatus}
+            </p>
+          </div>
+          <Link className="rounded-full bg-amber-700 px-5 py-3 text-sm font-black text-white" href="/coupon-stacks">
+            Open member offers
+          </Link>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {memberOfferAggregationBoard.rows.slice(0, 3).map((row) => (
+            <Link className="rounded-2xl border border-amber-200 bg-white p-4 shadow-sm hover:border-amber-700" href="/coupon-stacks" key={row.id}>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">{row.chain} · {row.priceType}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{row.memberPriceLabel} member · {row.totalMemberSavingsLabel}</p>
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">pointsEarned: {row.pointsEarned ?? 'blocked'}</p>
+            </Link>
+          ))}
+        </div>
       </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">

@@ -310,6 +310,28 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces member-offer aggregation and loyalty points without anonymous point balances', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/coupon-stacks/page.tsx');
+
+    assert.match(verified, /memberOfferAggregationBoard/);
+    assert.match(verified, /lidlStoreOffers/);
+    assert.match(verified, /matpriskollenOffers/);
+    assert.match(verified, /priceType: 'member'/);
+    assert.match(verified, /requiresMembershipCard|memberOnly/);
+    assert.match(verified, /totalMemberSavings/);
+    assert.match(verified, /pointsEarned/);
+    assert.match(verified, /pointsStatus/);
+    assert.match(verified, /No retailer credentials/);
+    assert.match(verified, /not estimate loyalty points|not infer loyalty points/);
+    assert.match(route, /memberOfferAggregationBoard/);
+    assert.match(route, /Member-offer aggregation/);
+    assert.match(route, /price_type='member'/);
+    assert.match(route, /pointsEarned/);
+    assert.match(route, /No anonymous point balances/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
   it('ships signed-in price-report human review controls without anonymous moderation', async () => {
     const priceReports = await read('src/app/price-reports/page.tsx');
     const actions = await read('src/components/price-report-review-actions.tsx');
