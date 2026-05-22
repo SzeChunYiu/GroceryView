@@ -180,6 +180,26 @@ indicator, never fabricated.
 - **Honesty in UI:** every figure traces to real data; show coverage/confidence; missing inputs are derived from real cross-chain spread/unit prices and labelled, never invented. Brand/source colors are tokens, not ad-hoc.
 - **Time-series features require the daily price DB** (see ingestion plan): charts may render from fixtures now but must swap to live DB observations — that price tape is what makes the index/terminal real.
 
+## Consumer personas — who uses GroceryView and what they get
+
+Build features through the eyes of real people in society. Each persona maps to
+concrete, shippable features on top of the price-index engine. One persona-
+feature = one PR; real data + confidence only. Workers: after the P1–P3
+analytics items, pick the next unbuilt persona feature; tag PRs `feat(persona):`.
+
+1. **Students / young singles** (tight budget, small portions): "cheapest basics" staples board across chains; single-portion deal finder; weekly budget tracker; recipes built from this week's deals.
+2. **Families with kids** (value + planning): family-pack / bulk unit-price comparison; weekly family meal planner from deals; kids' snack & lunchbox deal feed; baby/diaper price tracking + alerts.
+3. **Elderly / pensioners** (fixed income, simplicity, accessibility): large-text/high-contrast mode; staples price-stability view; fixed-income monthly budget; nearest-store + delivery options.
+4. **Immigrants / non-native speakers** (language + familiar products): multilingual UI (top immigrant languages); halal/kosher/ethnic-aisle product finder; familiar-brand search; image-first browsing.
+5. **Budget-conscious / low-income** (every krona counts): "lowest price anywhere" + cross-branch discount radar; "stretch your krona" basket optimizer; price-drop alerts on essentials; cheapest-store-for-my-list routing.
+6. **Health & fitness** (nutrition value): nutrition-per-krona ranking; protein/calorie/macro optimizer; organic/Keyhole/vegan filters; high-protein deal finder.
+7. **Busy professionals** (speed + convenience): one-tap basket optimization; saved baskets + auto-reorder; delivery-vs-store convenience comparison.
+8. **Eco-conscious** (sustainability + waste): expiry/clearance deal radar (cut waste); local & seasonal picks; sustainable-brand filter; "cheaper + greener" suggestions.
+9. **Meal-preppers / large households** (bulk + planning): bulk-buy unit-price optimizer; freezer/batch-cook planner from deals; multi-week list with price forecast.
+10. **Deal-hunters / foodies** (discovery): new-product & price-drop alerts; specialty/premium tier tracking; "today's best deals" movers; watchlist with target prices.
+
+Cross-cutting (every persona benefits, already engine-backed): cross-chain/branch price comparison, price-movement charts (the stock index), Buy/Wait deal signals, personal grocery inflation, watchlist alerts, store map. Each persona is a different *lens* on the same engine — surface the right view for the right person.
+
 ## Updated by operator only
 
 The CEO MUST NOT edit this file. Only the operator (user or main Claude Code
