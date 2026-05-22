@@ -253,6 +253,177 @@ export function planScanReviewWorkItems(scans: ScanReviewWorkItemInput[]): ScanR
   return items.sort((left, right) => scanReviewPriorityRank[left.priority] - scanReviewPriorityRank[right.priority] || left.id.localeCompare(right.id));
 }
 
+
+export type ReceiptAliasGrowthRow = ReceiptOcrRow & {
+  quantityText?: string;
+};
+
+export type ReceiptAliasGrowthReceipt = {
+  scanId: string;
+  chainLabel: string;
+  observedAt: string;
+  rows: ReceiptAliasGrowthRow[];
+};
+
+export type ReceiptAliasGrowthRejectedRow = {
+  scanId: string;
+  rawName: string;
+  reason:
+    | 'chain_label_required'
+    | 'observed_at_required'
+    | 'receipt_row_confidence_below_threshold'
+    | 'item_total_required'
+    | 'quantity_or_weight_required'
+    | 'alias_required';
+};
+
+export type ReceiptAliasGrowthCandidate = {
+  id: string;
+  scanId: string;
+  chainLabel: string;
+  rawName: string;
+  normalizedAlias: string;
+  itemTotal: number;
+  quantity: number;
+  comparableUnit: 'kg' | 'l' | 'st';
+  unitPrice: number;
+  confidence: number;
+  priority: ScanReviewPriority;
+  observedAt: string;
+  reviewAction: 'create_commodity_alias_candidate';
+  evidence: string[];
+};
+
+export type ReceiptAliasGrowthPlan = {
+  status: 'review_required' | 'blocked';
+  candidates: ReceiptAliasGrowthCandidate[];
+  rejectedRows: ReceiptAliasGrowthRejectedRow[];
+  guardrails: string[];
+  summary: string;
+};
+
+const receiptQuantityPattern = /(\d+(?:[,.]\d+)?)\s*(kg|g|l|ml|st)\b/i;
+
+function roundScanMoney(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function parseReceiptQuantity(rawName: string, quantityText?: string): { quantity: number; comparableUnit: 'kg' | 'l' | 'st'; evidenceValue: string } | null {
+  const source = [quantityText, rawName].filter(Boolean).join(' ');
+  const match = source.match(receiptQuantityPattern);
+  if (!match) return null;
+  const parsedValue = Number(match[1].replace(',', '.'));
+  if (!Number.isFinite(parsedValue) || parsedValue <= 0) return null;
+  const unit = match[2].toLowerCase();
+  if (unit === 'kg') return { quantity: parsedValue, comparableUnit: 'kg', evidenceValue: `${parsedValue} kg` };
+  if (unit === 'g') return { quantity: roundScanMoney(parsedValue / 1000), comparableUnit: 'kg', evidenceValue: `${roundScanMoney(parsedValue / 1000)} kg` };
+  if (unit === 'l') return { quantity: parsedValue, comparableUnit: 'l', evidenceValue: `${parsedValue} l` };
+  if (unit === 'ml') return { quantity: roundScanMoney(parsedValue / 1000), comparableUnit: 'l', evidenceValue: `${roundScanMoney(parsedValue / 1000)} l` };
+  return { quantity: parsedValue, comparableUnit: 'st', evidenceValue: `${parsedValue} st` };
+}
+
+function normalizeReceiptAlias(rawName: string): string {
+  return rawName
+    .normalize('NFKD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(receiptQuantityPattern, ' ')
+    .replace(/\b(sek|kr|pris|jmf|jämförpris)\b/gi, ' ')
+    .replace(/[^\p{Letter}\p{Number}]+/gu, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function aliasCandidateId(scanId: string, normalizedAlias: string): string {
+  const slug = normalizedAlias.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'unknown';
+  return `alias-${scanId}-${slug}`;
+}
+
+function rejectReceiptAliasRow(rejectedRows: ReceiptAliasGrowthRejectedRow[], scanId: string, rawName: string, reason: ReceiptAliasGrowthRejectedRow['reason']): void {
+  rejectedRows.push({ scanId, rawName, reason });
+}
+
+export function planReceiptAliasGrowth(input: { receipts: ReceiptAliasGrowthReceipt[]; minimumConfidence?: number }): ReceiptAliasGrowthPlan {
+  const minimumConfidence = input.minimumConfidence ?? 0.55;
+  const candidates: ReceiptAliasGrowthCandidate[] = [];
+  const rejectedRows: ReceiptAliasGrowthRejectedRow[] = [];
+
+  for (const receipt of input.receipts) {
+    if (!receipt.scanId.trim()) throw new Error('scanId is required.');
+    const chainLabel = receipt.chainLabel.trim();
+    const observedAtIsValid = !Number.isNaN(Date.parse(receipt.observedAt));
+
+    for (const row of receipt.rows) {
+      const rawName = row.rawName.trim();
+      if (!chainLabel) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'chain_label_required');
+        continue;
+      }
+      if (!observedAtIsValid) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'observed_at_required');
+        continue;
+      }
+      validateScanConfidence(row.confidence, 'receipt row confidence');
+      if (row.confidence < minimumConfidence) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'receipt_row_confidence_below_threshold');
+        continue;
+      }
+      if (!Number.isFinite(row.itemTotal) || row.itemTotal <= 0) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'item_total_required');
+        continue;
+      }
+      const quantity = parseReceiptQuantity(rawName, row.quantityText);
+      if (!quantity) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'quantity_or_weight_required');
+        continue;
+      }
+      const normalizedAlias = normalizeReceiptAlias(rawName);
+      if (!normalizedAlias) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'alias_required');
+        continue;
+      }
+
+      candidates.push({
+        id: aliasCandidateId(receipt.scanId, normalizedAlias),
+        scanId: receipt.scanId,
+        chainLabel,
+        rawName,
+        normalizedAlias,
+        itemTotal: roundScanMoney(row.itemTotal),
+        quantity: quantity.quantity,
+        comparableUnit: quantity.comparableUnit,
+        unitPrice: roundScanMoney(row.itemTotal / quantity.quantity),
+        confidence: row.confidence,
+        priority: row.confidence < 0.8 ? 'high' : 'medium',
+        observedAt: receipt.observedAt,
+        reviewAction: 'create_commodity_alias_candidate',
+        evidence: [
+          `chain_label:${chainLabel}`,
+          `item_total_sek:${roundScanMoney(row.itemTotal)}`,
+          `quantity:${quantity.evidenceValue}`,
+          `source:receipt_ocr`
+        ]
+      });
+    }
+  }
+
+  candidates.sort((left, right) =>
+    left.normalizedAlias.localeCompare(right.normalizedAlias) ||
+    left.id.localeCompare(right.id)
+  );
+
+  return {
+    status: candidates.length > 0 ? 'review_required' : 'blocked',
+    candidates,
+    rejectedRows,
+    guardrails: [
+      'Receipt-fed aliases are review candidates only; they do not update product_aliases or commodity mappings automatically.',
+      'Every candidate requires chain label + kr + weight evidence before human review.',
+      'Private receipt images stay out of this plan; only normalized OCR metadata is used.'
+    ],
+    summary: `${candidates.length} alias candidates require human review; ${rejectedRows.length} receipt rows were rejected.`
+  };
+}
+
 export async function processScanUpload(input: { upload: ScanUpload; providers: ScanProviders }): Promise<ScanPipelineResult> {
   if (Number.isNaN(Date.parse(input.upload.uploadedAt))) throw new Error('uploadedAt must be an ISO date.');
   if (!input.upload.payload.trim()) throw new Error('payload is required.');
