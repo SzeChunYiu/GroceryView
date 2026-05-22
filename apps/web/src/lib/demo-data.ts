@@ -2631,6 +2631,84 @@ export const nutritionPerKrona = {
   }
 };
 
+const highProteinDealInputs = [
+  {
+    productId: 'kronfagel-kycklingfile-1kg',
+    productName: 'Kronfågel Kycklingfilé 1kg',
+    storeId: 'hemkop-skanstull',
+    storeName: 'Hemköp Skanstull',
+    currentPrice: 109,
+    regularPrice: 139,
+    dealScore: 78,
+    sourceConfidence: 0.72,
+    trainingUse: 'lean dinner prep',
+    source: 'visible Hemköp weekly-deal row + package nutrition label fixture'
+  },
+  {
+    productId: 'lindahls-kvarg-500g',
+    productName: 'Lindahls Kvarg Naturell 500g',
+    storeId: 'willys-fridhemsplan',
+    storeName: 'Willys Fridhemsplan',
+    currentPrice: 19.9,
+    regularPrice: 24.9,
+    dealScore: 84,
+    sourceConfidence: 0.82,
+    trainingUse: 'post-workout snack',
+    source: 'visible member-promo dairy row + package nutrition label fixture'
+  },
+  {
+    productId: 'garant-ekologisk-tofu-270g',
+    productName: 'Garant Ekologisk Tofu 270g',
+    storeId: 'willys-odenplan',
+    storeName: 'Willys Odenplan',
+    currentPrice: 21.9,
+    regularPrice: 26.9,
+    dealScore: 82,
+    sourceConfidence: 0.78,
+    trainingUse: 'plant protein meal prep',
+    source: 'visible Willys shelf row + package nutrition label fixture'
+  },
+  {
+    productId: 'icas-egg-15p',
+    productName: 'ICA Ägg 15-pack',
+    storeId: 'ica-nara-sergels-torg',
+    storeName: 'ICA Nära Sergels Torg',
+    currentPrice: 39.95,
+    regularPrice: 44.95,
+    dealScore: 73,
+    sourceConfidence: 0.76,
+    trainingUse: 'breakfast protein',
+    source: 'visible ICA shelf row + package nutrition label fixture'
+  }
+];
+
+const highProteinRanksByProduct = new Map(rankNutritionPerKrona(nutritionPerKronaInputs, 'protein').map((row) => [row.productId, row]));
+
+export const highProteinDealFinder = {
+  persona: 'Health & fitness',
+  title: 'High-protein deal finder',
+  minProteinPer10Sek: 12,
+  rows: rankDealOpportunities({
+    deals: highProteinDealInputs.map(({ trainingUse: _trainingUse, source: _source, ...deal }) => deal),
+    minimumDealScore: 70,
+    minimumSourceConfidence: 0.7
+  }).map((deal) => {
+    const nutrition = highProteinRanksByProduct.get(deal.productId);
+    const sourceRow = highProteinDealInputs.find((input) => input.productId === deal.productId && input.storeId === deal.storeId);
+    return {
+      ...deal,
+      proteinPer10Sek: nutrition?.valuePer10Sek ?? 0,
+      saltWarning: nutrition?.saltWarning ?? false,
+      trainingUse: sourceRow?.trainingUse ?? 'protein deal',
+      source: sourceRow?.source ?? 'visible deal row + package nutrition label fixture'
+    };
+  }).filter((row) => row.proteinPer10Sek >= 12),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'High-protein deal finder intersects visible deal rows and package nutrition labels; products without both price and nutrition evidence are excluded instead of estimated.'
+  }
+};
+
 const macroProteinRanks = rankNutritionPerKrona(nutritionPerKronaInputs, 'protein');
 const macroCalorieRanks = rankNutritionPerKrona(nutritionPerKronaInputs, 'calories');
 const macroFiberRanks = rankNutritionPerKrona(nutritionPerKronaInputs, 'fiber');
