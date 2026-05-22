@@ -7,6 +7,7 @@ import {
   chainCategoryCoverage,
   categoryQualityMatrix,
   categorySummaries,
+  dataFreshnessBadges,
   featuredStores,
   formatPct,
   formatSek,
@@ -31,6 +32,7 @@ const homepageChainSavings = chainSavingsLedger.slice(0, 2);
 const homepageRouteMap = sourceRouteMap.slice(0, 3);
 const homepageFreshOpenPrices = freshestOpenPrices.slice(3, 9);
 const homepageMapChainIndex = mapChainIndexScores.slice(0, 3);
+const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
 const elderlyAccessibilityMode = {
   persona: 'Elderly / seniors',
   title: 'Large-text high-contrast mode',
@@ -300,19 +302,20 @@ export function MarketShell() {
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <Eyebrow>Freshness board</Eyebrow>
-            <h2 className="mt-2 text-2xl font-black tracking-tight">Snapshot ages that gate every homepage claim</h2>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Data freshness badges that gate every homepage claim</h2>
           </div>
           <Link className="text-sm font-bold text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/data-sources">
-            Review source notes
+            Review {homepageSourceCoverageNames.length} source notes
           </Link>
         </div>
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
-          {sourceCoverage.map((source) => (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={source.name}>
-              <p className="text-sm font-black text-slate-950">{source.name}</p>
-              <p className="mt-2 text-2xl font-black text-emerald-800">{source.freshness}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-700">{source.coverage}</p>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{source.caveat}</p>
+        <div className="mt-5 grid gap-3 lg:grid-cols-4">
+          {dataFreshnessBadges.map((badge) => (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={badge.sourceKind}>
+              <p className="text-sm font-black text-slate-950">{badge.sourceName}</p>
+              <p className="mt-2 text-2xl font-black text-emerald-800">{badge.freshnessLabel}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{badge.coverageLabel}</p>
+              <p className="mt-3 rounded-xl bg-white p-3 text-sm font-black text-slate-700">{badge.confidenceBadge}</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{badge.caveat}</p>
             </div>
           ))}
         </div>
