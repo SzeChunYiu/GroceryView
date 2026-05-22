@@ -1,8 +1,8 @@
 // AUTO-GENERATED from public ICA store-scoped promotions JSON.
 // Source URLs:
-// - https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200 (store 1004599 ICA Kvantum Kungsholmen, retrieved 2026-05-22T08:37:35.000Z, rows 200)
-// - https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200 (store 1004247 ICA Focus, retrieved 2026-05-22T08:49:49.000Z, rows 200)
-// Row count: 400 real store promotion product rows fetched from handlaprivatkund.ica.se.
+// - https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300 (store 1004599 ICA Kvantum Kungsholmen, retrieved 2026-05-22T09:01:33.681Z, rows 300)
+// - https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300 (store 1004247 ICA Focus, retrieved 2026-05-22T09:01:34.220Z, rows 300)
+// Row count: 600 real store promotion product rows fetched from handlaprivatkund.ica.se.
 
 export type IcaIngestedProduct = {
   code: string;
@@ -36,33 +36,33 @@ export type IcaIngestedProduct = {
 export const icaSources = [
   {
     "source": "handlaprivatkund.ica.se public store-scoped promotions JSON",
-    "retrievedAt": "2026-05-22T08:37:35.000Z",
-    "rowCount": 200,
+    "retrievedAt": "2026-05-22T09:01:33.681Z",
+    "rowCount": 300,
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300"
   },
   {
     "source": "handlaprivatkund.ica.se public store-scoped promotions JSON",
-    "retrievedAt": "2026-05-22T08:49:49.000Z",
-    "rowCount": 200,
+    "retrievedAt": "2026-05-22T09:01:34.220Z",
+    "rowCount": 300,
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300"
   }
 ] as const;
 
 export const icaSource = {
   source: 'handlaprivatkund.ica.se public store-scoped promotions JSON',
-  retrievedAt: "2026-05-22T08:49:49.000Z",
-  rowCount: 400,
+  retrievedAt: "2026-05-22T09:01:34.220Z",
+  rowCount: 600,
   storeAccountIds: ["1004599","1004247"],
   storeNames: ["ICA Kvantum Kungsholmen","ICA Focus"],
   regionId: "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-  sourceUrl: "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-  sourceUrls: ["https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200","https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200"]
+  sourceUrl: "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+  sourceUrls: ["https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300","https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300"]
 } as const;
 
 export const icaProducts: IcaIngestedProduct[] = [
@@ -93,8 +93,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2142371",
@@ -123,8 +123,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1024181",
@@ -153,8 +153,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1319139",
@@ -183,8 +183,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1131301",
@@ -213,8 +213,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2014681",
@@ -243,8 +243,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1201853",
@@ -273,8 +273,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2092056",
@@ -303,8 +303,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2161610",
@@ -333,8 +333,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2014811",
@@ -363,8 +363,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2016864",
@@ -393,8 +393,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1477716",
@@ -423,8 +423,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2044679",
@@ -453,8 +453,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1395834",
@@ -483,8 +483,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2032471",
@@ -513,8 +513,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1128801",
@@ -543,8 +543,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2128931",
@@ -573,8 +573,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1345170",
@@ -603,8 +603,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1308752",
@@ -633,8 +633,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2141611",
@@ -663,8 +663,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1354055",
@@ -693,8 +693,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1467613",
@@ -723,8 +723,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1506729",
@@ -753,8 +753,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1467615",
@@ -783,8 +783,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1023696",
@@ -813,8 +813,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2032486",
@@ -843,8 +843,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2032478",
@@ -873,8 +873,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1406677",
@@ -903,8 +903,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2023311",
@@ -933,8 +933,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2141610",
@@ -963,8 +963,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2002122",
@@ -993,8 +993,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2156054",
@@ -1023,8 +1023,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1297807",
@@ -1053,8 +1053,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1509552",
@@ -1083,8 +1083,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1314166",
@@ -1113,8 +1113,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2290439",
@@ -1143,8 +1143,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2016065",
@@ -1173,8 +1173,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1447258",
@@ -1203,8 +1203,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1275805",
@@ -1233,8 +1233,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2154296",
@@ -1263,8 +1263,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1511489",
@@ -1293,8 +1293,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1369540",
@@ -1323,8 +1323,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2079083",
@@ -1353,8 +1353,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1511553",
@@ -1383,8 +1383,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1509554",
@@ -1413,8 +1413,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1348425",
@@ -1443,8 +1443,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2075527",
@@ -1473,8 +1473,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1476574",
@@ -1503,8 +1503,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2129997",
@@ -1533,8 +1533,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1519939",
@@ -1563,8 +1563,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2348531",
@@ -1593,8 +1593,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1484633",
@@ -1623,8 +1623,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2109094",
@@ -1653,8 +1653,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1437693",
@@ -1683,8 +1683,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1529238",
@@ -1713,8 +1713,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2032477",
@@ -1743,8 +1743,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1454469",
@@ -1773,8 +1773,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2154590",
@@ -1803,8 +1803,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2523292",
@@ -1833,8 +1833,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2079084",
@@ -1863,8 +1863,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2012278",
@@ -1893,8 +1893,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1354064",
@@ -1923,8 +1923,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1201739",
@@ -1953,8 +1953,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2119179",
@@ -1983,8 +1983,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1431986",
@@ -2013,8 +2013,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1330374",
@@ -2043,8 +2043,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2128503",
@@ -2073,8 +2073,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1530286",
@@ -2103,8 +2103,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1383915",
@@ -2133,8 +2133,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1201756",
@@ -2163,8 +2163,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2319126",
@@ -2193,8 +2193,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2125444",
@@ -2223,8 +2223,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1454470",
@@ -2253,8 +2253,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2118838",
@@ -2283,8 +2283,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "4000322",
@@ -2313,8 +2313,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1476526",
@@ -2343,8 +2343,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1447256",
@@ -2373,8 +2373,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2510997",
@@ -2403,8 +2403,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2024323",
@@ -2433,8 +2433,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2610131",
@@ -2463,8 +2463,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2032482",
@@ -2493,8 +2493,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1454475",
@@ -2523,8 +2523,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2128879",
@@ -2553,8 +2553,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2154434",
@@ -2583,8 +2583,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2094215",
@@ -2613,8 +2613,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2609916",
@@ -2643,8 +2643,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2032491",
@@ -2673,8 +2673,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1507233",
@@ -2703,8 +2703,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1529239",
@@ -2733,8 +2733,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2510858",
@@ -2763,8 +2763,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1281491",
@@ -2793,8 +2793,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2131847",
@@ -2823,8 +2823,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1454473",
@@ -2853,8 +2853,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2081935",
@@ -2883,8 +2883,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "4000222",
@@ -2913,8 +2913,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1477140",
@@ -2943,8 +2943,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1475661",
@@ -2973,8 +2973,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2348829",
@@ -3003,8 +3003,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2079086",
@@ -3033,8 +3033,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2295693",
@@ -3063,8 +3063,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2563534",
@@ -3093,8 +3093,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2141612",
@@ -3123,8 +3123,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1275638",
@@ -3153,8 +3153,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2155248",
@@ -3183,8 +3183,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1511989",
@@ -3213,8 +3213,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1454477",
@@ -3243,8 +3243,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2100292",
@@ -3273,8 +3273,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2131510",
@@ -3303,8 +3303,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2149187",
@@ -3333,8 +3333,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1297885",
@@ -3363,8 +3363,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2089734",
@@ -3393,8 +3393,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1471494",
@@ -3423,8 +3423,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1454471",
@@ -3453,8 +3453,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1464052",
@@ -3483,8 +3483,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2123109",
@@ -3513,8 +3513,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1278642",
@@ -3543,8 +3543,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1426444",
@@ -3573,8 +3573,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2117082",
@@ -3603,8 +3603,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1454472",
@@ -3633,8 +3633,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "4000221",
@@ -3663,8 +3663,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2073780",
@@ -3693,8 +3693,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1214564",
@@ -3723,8 +3723,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2044005",
@@ -3753,8 +3753,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1354057",
@@ -3783,8 +3783,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1278644",
@@ -3813,8 +3813,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1507124",
@@ -3843,8 +3843,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2151620",
@@ -3873,8 +3873,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2022175",
@@ -3903,8 +3903,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1475752",
@@ -3933,8 +3933,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2166483",
@@ -3963,8 +3963,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2510999",
@@ -3993,8 +3993,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1442888",
@@ -4023,8 +4023,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2382806",
@@ -4053,8 +4053,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2056014",
@@ -4083,8 +4083,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2141752",
@@ -4113,8 +4113,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2141613",
@@ -4143,8 +4143,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1354056",
@@ -4173,8 +4173,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2112347",
@@ -4203,8 +4203,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1395870",
@@ -4233,8 +4233,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2022180",
@@ -4263,8 +4263,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2107443",
@@ -4293,8 +4293,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2153000",
@@ -4323,8 +4323,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1507881",
@@ -4353,8 +4353,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1343597",
@@ -4383,8 +4383,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1276500",
@@ -4413,8 +4413,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2610125",
@@ -4443,8 +4443,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1002307",
@@ -4473,8 +4473,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2032524",
@@ -4503,8 +4503,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2166491",
@@ -4533,8 +4533,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2319147",
@@ -4563,8 +4563,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2294724",
@@ -4593,8 +4593,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2030937",
@@ -4623,8 +4623,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2003011",
@@ -4653,8 +4653,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2358316",
@@ -4683,8 +4683,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2117296",
@@ -4713,8 +4713,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1443477",
@@ -4743,8 +4743,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2153961",
@@ -4773,8 +4773,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1278766",
@@ -4803,8 +4803,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2150783",
@@ -4833,8 +4833,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1354065",
@@ -4863,8 +4863,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1531729",
@@ -4893,8 +4893,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2609917",
@@ -4923,8 +4923,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2022176",
@@ -4953,8 +4953,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2119169",
@@ -4983,8 +4983,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2107584",
@@ -5013,8 +5013,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1002505",
@@ -5043,8 +5043,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2032518",
@@ -5073,8 +5073,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "4000495",
@@ -5103,8 +5103,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2382807",
@@ -5133,8 +5133,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2005122",
@@ -5163,8 +5163,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1002504",
@@ -5193,8 +5193,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2107585",
@@ -5223,8 +5223,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2022177",
@@ -5253,8 +5253,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2075014",
@@ -5283,8 +5283,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1202264",
@@ -5313,8 +5313,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2032506",
@@ -5343,8 +5343,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2035862",
@@ -5373,8 +5373,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2155245",
@@ -5403,8 +5403,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2118437",
@@ -5433,8 +5433,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2168325",
@@ -5463,8 +5463,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2117253",
@@ -5493,8 +5493,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2522025",
@@ -5523,8 +5523,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1414382",
@@ -5553,8 +5553,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1448318",
@@ -5583,8 +5583,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2168326",
@@ -5613,8 +5613,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2141507",
@@ -5643,8 +5643,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2348387",
@@ -5673,8 +5673,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2022181",
@@ -5703,8 +5703,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2128955",
@@ -5733,8 +5733,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2140306",
@@ -5763,8 +5763,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2151304",
@@ -5793,8 +5793,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2140492",
@@ -5823,8 +5823,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2107471",
@@ -5853,8 +5853,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2065267",
@@ -5883,8 +5883,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1208425",
@@ -5913,8 +5913,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2319205",
@@ -5943,8 +5943,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1294167",
@@ -5973,8 +5973,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2382283",
@@ -6003,8 +6003,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2107438",
@@ -6033,8 +6033,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "1520672",
@@ -6063,8 +6063,3008 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004599",
     "storeName": "ICA Kvantum Kungsholmen",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:37:35.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1475751",
+    "productId": "3549f25c-f381-4600-9f23-615de023d358",
+    "retailerProductId": "1475751",
+    "name": "Tacosalsa Medium 226g Old el Paso",
+    "brand": "Old el Paso",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3ba51982-7e55-4a4f-941e-777a36b85f25/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1475751/details",
+    "packageSize": "0.226kg",
+    "countryOfOrigin": "",
+    "price": 21.7,
+    "priceCurrency": "SEK",
+    "unitPrice": 96.02,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "5 för 45 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2155240",
+    "productId": "3a8647aa-34a3-4ddd-b949-f501ecfa2095",
+    "retailerProductId": "2155240",
+    "name": "Byxblöjor Baby Dry Pants Strl 6 13-19kg VP 32p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/b86dcf89-1b20-41df-a9c6-8a0637e8377a/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2155240/details",
+    "packageSize": "32 per frp",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 3.66,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2155246",
+    "productId": "39d52799-9eab-42e9-b153-a83127a83793",
+    "retailerProductId": "2155246",
+    "name": "Byxblöjor Baby Dry Pants Strl 7 15+kg 29p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e9cc93f1-1113-4ef7-a9bd-4875ed050def/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2155246/details",
+    "packageSize": "29 per frp",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 4.03,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1448317",
+    "productId": "a1084252-ec00-4171-8305-68f75e30145a",
+    "retailerProductId": "1448317",
+    "name": "Individual reach Medium Tandborste Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/70ef927a-b378-4e38-a98c-d24a85e28598/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1448317/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2128959",
+    "productId": "543a3742-1c4a-488a-a9da-287fc6acad8b",
+    "retailerProductId": "2128959",
+    "name": "Kaffekapslar Italian Style Roast 10-p Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/d782c429-5546-4329-b09e-935b344a5156/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2128959/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1416698",
+    "productId": "07c6abf3-fadc-42f8-ab9f-6d8d3736f43f",
+    "retailerProductId": "1416698",
+    "name": "Vitlöksdressing 370ml ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/c291388f-3c43-4d74-839e-8b372ccffcb6/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1416698/details",
+    "packageSize": "0.37L",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 76.49,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr -- Stammispris",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1457382",
+    "productId": "7ab2b14a-b8ae-4758-a73a-8916aa601f50",
+    "retailerProductId": "1457382",
+    "name": "Coppa 70g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/83be37d9-9221-40de-81c3-f0f8a054601f/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1457382/details",
+    "packageSize": "0.07kg",
+    "countryOfOrigin": "",
+    "price": 35,
+    "priceCurrency": "SEK",
+    "unitPrice": 500,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr -- Stammispris",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2130264",
+    "productId": "7523dec8-9f34-4961-9f94-a758c25006b4",
+    "retailerProductId": "2130264",
+    "name": "Skinka Bokvedsrökt 110g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/a278b956-a217-49af-81d3-02bfbc7556a9/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2130264/details",
+    "packageSize": "0.11kg",
+    "countryOfOrigin": "",
+    "price": 31.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 283.64,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2154255",
+    "productId": "199cd65d-cc4d-4f51-a825-7bf15f55db24",
+    "retailerProductId": "2154255",
+    "name": "Vegoburgare 450g Hälsans Kök",
+    "brand": "Hälsans Kök",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/7d881e17-02b0-4e2b-ba9c-b15a90ae7869/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2154255/details",
+    "packageSize": "0.45kg",
+    "countryOfOrigin": "",
+    "price": 59.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 132.44,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 75 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2154257",
+    "productId": "31fa3fe3-d476-4eb8-85c6-498cf9f48865",
+    "retailerProductId": "2154257",
+    "name": "Vegoschnitzel 450g Hälsans Kök",
+    "brand": "Hälsans Kök",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/031e12fa-13b4-48f8-a560-bab5e5103d41/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2154257/details",
+    "packageSize": "0.45kg",
+    "countryOfOrigin": "",
+    "price": 59.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 132.44,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 75 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2054518",
+    "productId": "36233df7-fda5-4ad6-8b37-9832049c1055",
+    "retailerProductId": "2054518",
+    "name": "Tampong Procomfort Super 32-p o.b.",
+    "brand": "o.b.",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/2cdad5cd-b5d3-4c31-bec4-06cdef568ec7/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2054518/details",
+    "packageSize": "32 per frp",
+    "countryOfOrigin": "",
+    "price": 56,
+    "priceCurrency": "SEK",
+    "unitPrice": 1.75,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 80 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2128953",
+    "productId": "b04c4f66-6ec4-4bd9-a1af-8849ab68a1d7",
+    "retailerProductId": "2128953",
+    "name": "Kaffekapslar Originale 10-p Zoegas",
+    "brand": "Zoegas",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/7df16f4d-0d2a-4f3f-8176-fd94d2f4a532/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2128953/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 41.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 4.16,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2065049",
+    "productId": "d496eb1f-6baf-4249-8c58-d57a68c5c6bc",
+    "retailerProductId": "2065049",
+    "name": "Kanelbullesnittar 300g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/5e4d15f9-da70-49f7-91a3-ff9f0e7ddf3e/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2065049/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 23.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 78.67,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 30 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1416699",
+    "productId": "3fcc63a5-306b-4f46-b55f-50d92b13b229",
+    "retailerProductId": "1416699",
+    "name": "Thousand island Dressing 370ml ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/222253ec-bec2-4d19-8b1f-1e977c96cc85/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1416699/details",
+    "packageSize": "0.37L",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 76.49,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr -- Stammispris",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2322331",
+    "productId": "26964d81-331c-4648-9d68-19c718440747",
+    "retailerProductId": "2322331",
+    "name": "Aioli Chipotle 230ml Eriks såser",
+    "brand": "Eriks såser",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/bc733a35-89d6-44be-a393-41f1f40f87b3/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2322331/details",
+    "packageSize": "0.23L",
+    "countryOfOrigin": "",
+    "price": 26.97,
+    "priceCurrency": "SEK",
+    "unitPrice": 117.26,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1408781",
+    "productId": "a3fad404-375b-4fb5-930d-c3502300f48b",
+    "retailerProductId": "1408781",
+    "name": "Barntandborste Step by step 3-5 år 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/10452bf1-ebbe-46a2-b377-caf76c76a851/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1408781/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 26,
+    "priceCurrency": "SEK",
+    "unitPrice": 26,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2022178",
+    "productId": "750f1c28-c461-4319-a050-98d7a94f2960",
+    "retailerProductId": "2022178",
+    "name": "Kaka Havreflarn 300g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/06ed1448-9b41-4ea3-9f87-9e2b01b34234/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2022178/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 23.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 78.67,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 30 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2107439",
+    "productId": "b8e13b6f-5179-403d-9832-27a3832ecbfc",
+    "retailerProductId": "2107439",
+    "name": "Paj Ost och Skinka 300g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/176c2a5c-8e1b-4590-89e3-e82a7512955d/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2107439/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 51.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 170.33,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 70 kr -- Stammispris",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2151361",
+    "productId": "31e814c0-5268-40d8-b013-df87ae839a29",
+    "retailerProductId": "2151361",
+    "name": "Salami Spinata alla Calabrese 70g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/41dc263b-9906-4e3c-b073-e01e8235eba2/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2151361/details",
+    "packageSize": "0.07kg",
+    "countryOfOrigin": "",
+    "price": 30.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 431.43,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr -- Stammispris",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2155244",
+    "productId": "73250e4a-cfa0-4de6-abce-590db0f88271",
+    "retailerProductId": "2155244",
+    "name": "Byxblöjor Baby Dry Pants Strl 4 9-15kg VP 42p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/24d649c7-23ea-47ff-8438-9ab9bc382df5/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2155244/details",
+    "packageSize": "42 per frp",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 2.79,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2067023",
+    "productId": "dcb83fa4-8f2f-49c4-ad1a-1b38b4eccf08",
+    "retailerProductId": "2067023",
+    "name": "Kalkonsalami 100g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6283fb89-5f45-4629-890e-9a562d3448a9/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2067023/details",
+    "packageSize": "0.1kg",
+    "countryOfOrigin": "",
+    "price": 31.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 312,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1408782",
+    "productId": "73185199-3cb6-4a7b-9848-dc1d4f66b9c9",
+    "retailerProductId": "1408782",
+    "name": "Barntandborste Step by step 6-9 år 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/f755ae9f-26c6-44c5-93da-354f745359eb/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1408782/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 26,
+    "priceCurrency": "SEK",
+    "unitPrice": 26,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2154256",
+    "productId": "87cf9b14-5e5c-4830-8b3f-84b1639e951c",
+    "retailerProductId": "2154256",
+    "name": "Vegonuggets 440g Hälsans Kök",
+    "brand": "Hälsans Kök",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/f53e1fbb-e381-46c9-bf63-4742a308587a/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2154256/details",
+    "packageSize": "0.44kg",
+    "countryOfOrigin": "",
+    "price": 59.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 135.45,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 75 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2054525",
+    "productId": "f4854f45-9b5b-491d-8261-e6b599b629b8",
+    "retailerProductId": "2054525",
+    "name": "Tampong ProComfort Normal 32-p o.b.",
+    "brand": "o.b.",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/0fb00197-369e-4194-87f6-bb740628efda/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2054525/details",
+    "packageSize": "32 per frp",
+    "countryOfOrigin": "",
+    "price": 56,
+    "priceCurrency": "SEK",
+    "unitPrice": 1.75,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 80 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2153001",
+    "productId": "ec415713-0930-4b73-ae36-a4ae73e6e4f8",
+    "retailerProductId": "2153001",
+    "name": "Grönpepparsås 170ml Eriks såser",
+    "brand": "Eriks såser",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/43913b43-a0ba-491f-ac55-108d425ccb60/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2153001/details",
+    "packageSize": "0.17L",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 166.47,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2150682",
+    "productId": "23b92265-0d8e-4957-9d7b-407e6883708e",
+    "retailerProductId": "2150682",
+    "name": "Spareribs Färsk Smokey BBQ ca 1,35g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/995eeb99-6859-4489-ba7d-211147fe9129/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2150682/details",
+    "packageSize": "1112g - 1000000g",
+    "countryOfOrigin": "",
+    "price": 93.15,
+    "priceCurrency": "SEK",
+    "unitPrice": 69,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 74.25,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 55,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "55 kr/kg",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1520668",
+    "productId": "054aa93b-31a2-41c6-b9db-b829759c1301",
+    "retailerProductId": "1520668",
+    "name": "Vegoskivor Tomat & Basilika 100g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3dc11cde-6dcf-4cd5-929d-dd66a30906b1/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1520668/details",
+    "packageSize": "0.1kg",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 283,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1407014",
+    "productId": "aad748c2-5e25-45fa-82b4-50b745e13fd0",
+    "retailerProductId": "1407014",
+    "name": "Nougatsås 300g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3609b04d-86a1-4c0d-bf2c-07d321239005/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1407014/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 38.9,
+    "priceCurrency": "SEK",
+    "unitPrice": 129.67,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2086476",
+    "productId": "391f1b9f-4bda-48ff-9cf7-64320d45e026",
+    "retailerProductId": "2086476",
+    "name": "Kylväska gul/vit rand 4l ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/4db44b87-2109-447a-b1ed-5dc71421e43f/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2086476/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 83.9,
+    "priceCurrency": "SEK",
+    "unitPrice": 83.9,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": 59.9,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 59.9,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.each",
+    "promotionDescription": "59,90 kr/st",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1494706",
+    "productId": "78519df5-d6d8-46ab-a63a-876c443d6371",
+    "retailerProductId": "1494706",
+    "name": "Fläskytterfilé Frystinad ca 650g KRAV ICA I love eco",
+    "brand": "ICA I love eco",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6de89f47-7ae2-44aa-b95a-3bf021bc1ea5/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1494706/details",
+    "packageSize": "528g - 1000000g",
+    "countryOfOrigin": "Sverige",
+    "price": 112.13,
+    "priceCurrency": "SEK",
+    "unitPrice": 172.5,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 83.85,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 129,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "129 kr/kg",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1448314",
+    "productId": "55a11859-2f32-448a-b9b7-11c9056f95af",
+    "retailerProductId": "1448314",
+    "name": "Tandborste Individual Clean Medium 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3240ae29-c964-49aa-9b2e-85ddd067c4ce/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1448314/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2155242",
+    "productId": "5d8eadc9-d96c-4c8a-9b7c-fd0d9e9fd0d6",
+    "retailerProductId": "2155242",
+    "name": "Byxblöjor Premium Protection Pants Strl 5 11-17kg 29p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/757abcc7-d1a4-463d-986c-b3d21e0d2f50/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2155242/details",
+    "packageSize": "29 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 4.21,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2522074",
+    "productId": "b58081aa-3758-4233-bd35-7c3ae2ed3ea4",
+    "retailerProductId": "2522074",
+    "name": "Kaffekapslar House Blend 10st Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/dcfeccc0-f26f-4020-9a15-76cfa15bac42/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2522074/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1520670",
+    "productId": "39b15e41-9477-4e13-93ea-e53348431af2",
+    "retailerProductId": "1520670",
+    "name": "Vegoskivor Paprika 100g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/db723897-68ef-4891-ba1e-4734916308b2/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1520670/details",
+    "packageSize": "0.1kg",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 283,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2168423",
+    "productId": "38c7cb3d-2d40-4d5f-824d-63a5553c1714",
+    "retailerProductId": "2168423",
+    "name": "Funktionell Dryck Peachango BCAA+ 33cl Nocco",
+    "brand": "Nocco",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/353aebb2-925f-45b9-b845-fa50dcbf1a22/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2168423/details",
+    "packageSize": "0.33L",
+    "countryOfOrigin": "",
+    "price": 20.8,
+    "priceCurrency": "SEK",
+    "unitPrice": 63.03,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 35 kr +pant",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2128950",
+    "productId": "e147555a-17fb-41d3-a6c3-d9c89d2067cf",
+    "retailerProductId": "2128950",
+    "name": "Kaffekapslar Colombia 10-p Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6104b8f8-795b-475a-961c-96818ef9f594/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2128950/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2128949",
+    "productId": "0307c9e6-677a-4cef-9382-a5923fb385d9",
+    "retailerProductId": "2128949",
+    "name": "Kaffekapslar Pike Place 10-p Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/82825d88-cd14-4643-9203-f7d8a5836900/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2128949/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2117920",
+    "productId": "a577842c-be44-43d6-b826-f25c5ff1d26b",
+    "retailerProductId": "2117920",
+    "name": "Bacon Kyckling Skivad 100g Tulip",
+    "brand": "Tulip",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/adc57672-7886-43d4-b707-1f7e39063c9a/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2117920/details",
+    "packageSize": "0.1kg",
+    "countryOfOrigin": "",
+    "price": 18.8,
+    "priceCurrency": "SEK",
+    "unitPrice": 188,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 26 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1407015",
+    "productId": "d6fbfb07-2518-411f-9d91-f09b8de97f5a",
+    "retailerProductId": "1407015",
+    "name": "Saltlakritssås 300g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/32d18256-1347-474f-8c85-2e6d05b88e72/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1407015/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 32.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 107,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1510352",
+    "productId": "0b268f1d-c7db-4520-a495-2ab68ef21db5",
+    "retailerProductId": "1510352",
+    "name": "Funktionsdryck BCAA Äpple Koffeinfri Sockerfri 33cl Nocco",
+    "brand": "Nocco",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/c73b9c4e-d4ac-4b2f-a33a-c49e7f6727b5/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1510352/details",
+    "packageSize": "0.33L",
+    "countryOfOrigin": "",
+    "price": 22.7,
+    "priceCurrency": "SEK",
+    "unitPrice": 68.79,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 35 kr +pant",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2128957",
+    "productId": "10e084c8-459e-4ecb-94cd-a1f753d469fc",
+    "retailerProductId": "2128957",
+    "name": "Kaffekapslar Blonde Espresso Roast 10-p Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/bbed8592-319c-448d-8420-25dace914d82/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2128957/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2051270",
+    "productId": "09442e45-60ae-4eab-b552-8727f78cf6c8",
+    "retailerProductId": "2051270",
+    "name": "Vegoskivor Salami 100g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/9590f41a-a741-4872-bb6e-4ab20e60b83c/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2051270/details",
+    "packageSize": "0.1kg",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 283,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2093529",
+    "productId": "de08bc1e-9805-40e6-9f79-19404cb070bd",
+    "retailerProductId": "2093529",
+    "name": "Grillkorv Cheddar Jalapeno 77% Kötthalt 270g Scan",
+    "brand": "Scan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/646761fb-cb45-4d2f-9684-42c748100612/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2093529/details",
+    "packageSize": "0.27kg",
+    "countryOfOrigin": "Sverige",
+    "price": 46.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 171.48,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 33,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 122.22,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "33 kr/st -- Max 2 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2294744",
+    "productId": "3c85fa7c-4a3d-43f6-96e9-e43abbbfbb27",
+    "retailerProductId": "2294744",
+    "name": "Läsk Påskmust 12-p 33cl Apotekarnes",
+    "brand": "Apotekarnes",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/de795c89-dd91-4727-81f7-42d144147dee/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2294744/details",
+    "packageSize": "3.96L",
+    "countryOfOrigin": "",
+    "price": 67.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 16.94,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promoPrice": 40.26,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 10.17,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promotionDescription": "40 % rabatt",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074352",
+    "productId": "0fa9951b-ab9b-48ea-b38c-7ba2ee93bb10",
+    "retailerProductId": "2074352",
+    "name": "Hårfärg Natural & Easy Sammet Mörkbrun 580 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/11cf7a37-0fa7-420f-a30f-de63739e36f9/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074352/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2522075",
+    "productId": "397c4c79-e009-4731-b1f9-82b528276067",
+    "retailerProductId": "2522075",
+    "name": "Kaffekapslar Espresso Roast 10st Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/ff5146e3-506a-4530-a298-e2285235fed0/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2522075/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2067020",
+    "productId": "06c9dc75-dd75-4609-8c58-4fcfd65d8b5b",
+    "retailerProductId": "2067020",
+    "name": "Pepparsalami 120g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/14c109e8-87ce-48aa-8698-92c0f81a57d0/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2067020/details",
+    "packageSize": "0.12kg",
+    "countryOfOrigin": "",
+    "price": 31.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 260,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2149819",
+    "productId": "a607f4aa-157a-4798-8274-5c4b33c76282",
+    "retailerProductId": "2149819",
+    "name": "Tandborste Ultralite Sensitive UltraSoft 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/fadde2b0-2b2a-416e-95f6-95502bc91912/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2149819/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2155243",
+    "productId": "7322f0fd-8de4-4953-9408-ee2ecb777e30",
+    "retailerProductId": "2155243",
+    "name": "Byxblöjor Premium Protection Pants Strl 6 13-19kg 27p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/26e42a67-a590-416a-beef-199b16d6fffe/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2155243/details",
+    "packageSize": "27 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 4.52,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2099474",
+    "productId": "bb38389a-6c7f-4572-9521-ac4964885bdf",
+    "retailerProductId": "2099474",
+    "name": "Tandborste Ultralite Medium 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6c0bf4e7-fe2e-4107-a79b-abbb3171aedb/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2099474/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2107472",
+    "productId": "1f949103-5e5c-4178-9d10-7753bf97f17c",
+    "retailerProductId": "2107472",
+    "name": "Mild & Krämig  ca 500g Arla",
+    "brand": "Arla",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/362e8ab6-cce4-4189-8da1-0f54a8aa7e48/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2107472/details",
+    "packageSize": "405.6g - 1000000g",
+    "countryOfOrigin": "Sverige",
+    "price": 67.15,
+    "priceCurrency": "SEK",
+    "unitPrice": 134.3,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 49.51,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 99.01,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "99 kr/kg",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2093145",
+    "productId": "1bb92463-a21f-4b8b-a9c8-f3ea36887422",
+    "retailerProductId": "2093145",
+    "name": "Halmstadssalami 120g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6074026d-1f18-488e-bdb9-c63c5c2759eb/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2093145/details",
+    "packageSize": "0.12kg",
+    "countryOfOrigin": "",
+    "price": 31.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 260,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2090432",
+    "productId": "204e7e24-673b-4b31-bd4c-51e9dd5381b9",
+    "retailerProductId": "2090432",
+    "name": "Påskmust Sockerfri 3000ml Zeunerts",
+    "brand": "Zeunerts",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/279312a2-ac0d-46e6-a080-df3451fafe9a/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2090432/details",
+    "packageSize": "3L",
+    "countryOfOrigin": "",
+    "price": 68.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 22.7,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 40.86,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 13.62,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "40 % rabatt",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1435686",
+    "productId": "e3a945b2-8e9a-4e5b-b328-b45f8279c828",
+    "retailerProductId": "1435686",
+    "name": "Ansiktskräm Natt Revitalift antirynk 50ml L'Oreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/9f41fe0e-dd21-4c2a-ae77-3729463c05af/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1435686/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 2340,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1780,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2155241",
+    "productId": "79213d3e-f64d-4358-9693-156eb642e7a9",
+    "retailerProductId": "2155241",
+    "name": "Byxblöjor Premium Protection Pants Strl 4 9-15kg 31p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/f2338e7f-3af9-4144-9d48-7817b64e30cd/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2155241/details",
+    "packageSize": "31 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 3.94,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2030938",
+    "productId": "e4577ff6-aa46-4f0d-a4f2-51855d0fa03d",
+    "retailerProductId": "2030938",
+    "name": "Honeymustard 370ml ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/c3c1cad7-8bb3-42ae-bc98-d47e075e1d76/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2030938/details",
+    "packageSize": "0.37L",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 76.49,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr -- Stammispris",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1448315",
+    "productId": "edc4397d-ce9a-4bef-bd00-edb40118e9dd",
+    "retailerProductId": "1448315",
+    "name": "Individual clean Mjuk Tandborste Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/8e9f9529-4ac0-4bbd-a474-08f47925bbb6/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1448315/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2155196",
+    "productId": "b878fe64-7804-4ca1-b3b9-8856061994f6",
+    "retailerProductId": "2155196",
+    "name": "Blöjor Premium Protection Strl 3 6-10kg VP 48p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/504b45ce-9e4e-4d9f-9aa6-25ea32cba7e3/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2155196/details",
+    "packageSize": "48 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 2.54,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1129496",
+    "productId": "9f05e520-f056-49f2-907c-9a989b99ddde",
+    "retailerProductId": "1129496",
+    "name": "Surströmming 300g Röda Ulven",
+    "brand": "Röda Ulven",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3c59336c-dc74-49d1-8135-816d7fc7aeb8/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1129496/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 73.8,
+    "priceCurrency": "SEK",
+    "unitPrice": 246,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg.without.liquid",
+    "promoPrice": 44.28,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 147.6,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg.without.liquid",
+    "promotionDescription": "40 % rabatt",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1435689",
+    "productId": "86a76ad8-3392-4075-8b76-1dcf76750db8",
+    "retailerProductId": "1435689",
+    "name": "Ansiktskräm Dag Revitalift Anti-wrinkle 50ml L'Oreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/8d25ceb7-9c9f-4b66-b148-6209b8ecf158/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1435689/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 2340,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1780,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1514312",
+    "productId": "2fa51a6b-303f-44e8-b008-5f66f2c40341",
+    "retailerProductId": "1514312",
+    "name": "Ansiktskräm Dag Revitalift Anti-Wrinkle SPF 30 50ml Loreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/01e6e740-7c04-433e-b0d5-9223fa3e40c5/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1514312/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 2340,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1780,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2173132",
+    "productId": "404b831a-24a2-48b3-96d6-b789d766fa51",
+    "retailerProductId": "2173132",
+    "name": "Mugg melamin Ambrosia 30cl ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/867b4a1b-87da-4e85-958a-ab3b89e39ab9/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2173132/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 37.5,
+    "priceCurrency": "SEK",
+    "unitPrice": 37.5,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 50 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2522079",
+    "productId": "c9f55a7d-c986-4774-aaa3-303c72e66843",
+    "retailerProductId": "2522079",
+    "name": "Kaffekapslar Decaf Espresso 10st Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/807d34de-46c2-4ca4-b718-4f12ed912d35/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2522079/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2128954",
+    "productId": "04cf190e-1909-4ba7-b146-aff18032514c",
+    "retailerProductId": "2128954",
+    "name": "Kaffekapslar Caffé Verona 10-p Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6e4f495e-33f4-4cf7-adfd-3d28234134f5/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2128954/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2155199",
+    "productId": "aa93ecae-cd30-4f61-930f-c4b9b7994f39",
+    "retailerProductId": "2155199",
+    "name": "Blöjor Premium Protection Strl 6 13-18kg VP 30p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/64f4c34a-d3de-48cc-8e96-bef24eb13344/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2155199/details",
+    "packageSize": "30 per frp",
+    "countryOfOrigin": "",
+    "price": 125,
+    "priceCurrency": "SEK",
+    "unitPrice": 4.17,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074355",
+    "productId": "682243a3-e338-459c-b743-966d278c6b79",
+    "retailerProductId": "2074355",
+    "name": "Hårfärg Natural & Easy Kashmir Ljusbrun 560 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/c718236f-48fe-45d2-ab4c-03496e8b7ea8/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074355/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2155197",
+    "productId": "629127fe-2323-4dd0-b778-4bbe6c3b40be",
+    "retailerProductId": "2155197",
+    "name": "Blöjor Premium Protection Strl 4 9-14kg VP 39p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e6f3bbf0-e50f-4bcf-9fcc-7bed09e0c1a9/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2155197/details",
+    "packageSize": "39 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 3.13,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074343",
+    "productId": "37749699-c143-43d5-a25d-f74cce783d9c",
+    "retailerProductId": "2074343",
+    "name": "Hårfärg Blonde L1++ Extra 1-p Schwarzkopf",
+    "brand": "Blonde Schwarzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/95a2b6c9-ccf1-42ad-a394-5fefdbaedb97/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074343/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 98,
+    "priceCurrency": "SEK",
+    "unitPrice": 98,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2155198",
+    "productId": "b327b57c-98a1-4b31-aa74-7e4e40fd7a08",
+    "retailerProductId": "2155198",
+    "name": "Blöjor Premium Protection Strl 5 11-16kg VP 34p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/224b0a71-3e16-42b0-b3f3-488691e9be98/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2155198/details",
+    "packageSize": "34 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 3.59,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074367",
+    "productId": "fc03dabc-62a3-40da-b42f-fd9590e83165",
+    "retailerProductId": "2074367",
+    "name": "Hårfärg Natural & Easy Ebenholts Svart  590 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/374ed26f-5ae1-4cb7-833b-c12abd2e0d23/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074367/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2173131",
+    "productId": "ba3674fe-b220-45f8-8e8f-cbc75e317b84",
+    "retailerProductId": "2173131",
+    "name": "Skål melamin Ambrosia 16cm ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e64f054f-b656-49be-8bbc-ca22224da275/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2173131/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 35.5,
+    "priceCurrency": "SEK",
+    "unitPrice": 35.5,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 60 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2099475",
+    "productId": "34d22228-8abe-4cf8-9d97-6b55cc09c941",
+    "retailerProductId": "2099475",
+    "name": "Tandborste Ultralite Soft 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/50565ffb-83e4-42da-b654-c95103d73e27/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2099475/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074361",
+    "productId": "69c4aa35-080c-487e-b0c0-4a4ed54cb22f",
+    "retailerProductId": "2074361",
+    "name": "Hårfärg Natural & Easy Frostig Mörkbrun 583 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3d7887bd-02c3-419d-b0f7-782dc16cb8ff/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074361/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074359",
+    "productId": "b0561793-9b41-4cca-9344-2b42a4cdc80e",
+    "retailerProductId": "2074359",
+    "name": "Hårfärg Natural & Easy Mocka Chokladbrun 584 1-p  Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6a5fe269-efd3-4ccf-8687-bc4e0659bd7c/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074359/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2026659",
+    "productId": "53a0cf57-83eb-4c4c-b641-f0f1a7e697d9",
+    "retailerProductId": "2026659",
+    "name": "Tandborste Green Clean 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6f6abec1-0ea2-4806-8f09-65011d5520e4/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2026659/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 28,
+    "priceCurrency": "SEK",
+    "unitPrice": 28,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1435690",
+    "productId": "b41c5eb4-d42b-4d06-9b6e-f74e8ad9bde9",
+    "retailerProductId": "1435690",
+    "name": "Ansiktskräm Dag Age Perfect Moisturising 50ml L'Oreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/94a26660-60f9-4568-bdaf-35318279c21e/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1435690/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 136,
+    "priceCurrency": "SEK",
+    "unitPrice": 2720,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1780,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2107587",
+    "productId": "91221566-af4e-49fb-a930-908be0ee01d8",
+    "retailerProductId": "2107587",
+    "name": "Delikata ost ca 500g Arla",
+    "brand": "Arla",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/b93fec67-673f-452b-83d6-70a42c4f4aa6/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2107587/details",
+    "packageSize": "405.6g - 1000000g",
+    "countryOfOrigin": "Sverige",
+    "price": 69.55,
+    "priceCurrency": "SEK",
+    "unitPrice": 139.1,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 49.5,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 99,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "99 kr/kg",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074351",
+    "productId": "b8af517a-56b7-47cb-b330-2b0faaac744c",
+    "retailerProductId": "2074351",
+    "name": "Hårfärg Natural & Easy Äkta Kastanj Mellanbrun 570 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/308099e3-4baa-4d70-9cf5-c710d961e98e/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074351/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1435494",
+    "productId": "8934f7ff-316d-4870-9756-1aa1f7d0ff2e",
+    "retailerProductId": "1435494",
+    "name": "Revitalift Eye Contour Rynkkräm 15ml L'Oreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/1b7acca1-c35d-4509-982e-06d72350c604/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1435494/details",
+    "packageSize": "0.015L",
+    "countryOfOrigin": "",
+    "price": 130,
+    "priceCurrency": "SEK",
+    "unitPrice": 8666.67,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 5933.33,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074366",
+    "productId": "b0b6fded-8c3d-4abd-a474-2b15ee330a50",
+    "retailerProductId": "2074366",
+    "name": "Hårfärg Natural & Easy Champagne Ljusblond 530 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/d1e7418d-0522-4708-8a3a-df4a8aa6c3a4/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074366/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2294739",
+    "productId": "51e1192f-58ae-4fa8-aa9b-57a2b419a317",
+    "retailerProductId": "2294739",
+    "name": "Läsk Påskmust  50cl Apotekarnes",
+    "brand": "Apotekarnes",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/ecb2d031-08d5-4566-82fb-17efd0e2d581/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2294739/details",
+    "packageSize": "0.5L",
+    "countryOfOrigin": "",
+    "price": 13.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 26.4,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promoPrice": 7.92,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 15.84,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promotionDescription": "40 % rabatt",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074344",
+    "productId": "17dea98a-fc37-4abe-a19b-73cc7939c631",
+    "retailerProductId": "2074344",
+    "name": "Hårfärg Blonde L101 Silver Blonde 1-p Schwarzkopf",
+    "brand": "Blonde Schwarzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/5adb608c-88db-48fc-8b8e-78e12675188b/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074344/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 98,
+    "priceCurrency": "SEK",
+    "unitPrice": 98,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2223421",
+    "productId": "b608ce5b-541a-45c8-b1eb-f0114bffd2e8",
+    "retailerProductId": "2223421",
+    "name": "Hårfärg 890 Black 1-p Brillance Schwartzkopf",
+    "brand": "Brillance Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/5ce6d501-3977-4770-b900-3ab822d91b87/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2223421/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 86,
+    "priceCurrency": "SEK",
+    "unitPrice": 86,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "1480915",
+    "productId": "c49e61d4-c7fa-41bc-bc3f-0a39b4800130",
+    "retailerProductId": "1480915",
+    "name": "Nattkräm Age Perfect Moisturising 50ml L'Oreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/d3e881de-1fe6-4eb1-9e77-4d0f597ed491/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/1480915/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 136,
+    "priceCurrency": "SEK",
+    "unitPrice": 2720,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1780,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2609918",
+    "productId": "a67fc16e-f998-41a3-b521-2d84711f15bf",
+    "retailerProductId": "2609918",
+    "name": "Energidryck Summer Edition 2 33cl Nocco",
+    "brand": "Nocco",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/4d04da07-a5fc-4b30-8a2d-89cb66278253/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2609918/details",
+    "packageSize": "0.33L",
+    "countryOfOrigin": "",
+    "price": 20.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 61.52,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 35 kr +pant",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074342",
+    "productId": "569177d7-2199-431f-a527-2f7edd8af8ca",
+    "retailerProductId": "2074342",
+    "name": "Hårfärg Blonde M1 Super Slingor 1-p Schwarzkopf",
+    "brand": "Blonde Schwarzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/dd6c618d-0ea8-4972-9322-7b04ec797d31/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074342/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 98,
+    "priceCurrency": "SEK",
+    "unitPrice": 98,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2090733",
+    "productId": "7c3f71c1-977d-425a-8ede-647483d8f722",
+    "retailerProductId": "2090733",
+    "name": "Tandborste Barn 5-10år Extra Mjuk 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/ca65e625-6f21-4b93-a9bf-aa375a357e30/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2090733/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 27,
+    "priceCurrency": "SEK",
+    "unitPrice": 27,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074362",
+    "productId": "4b4bd62f-25d6-46c9-b5fd-f2a05fed16ec",
+    "retailerProductId": "2074362",
+    "name": "Hårfärg Natural & Easy Sval Ljusbrun 563 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/9b090949-d15b-4537-96e0-68e29b77b426/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074362/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074360",
+    "productId": "eff0170a-7231-42ae-8b3e-6de543e417e3",
+    "retailerProductId": "2074360",
+    "name": "Hårfärg Natural & Easy Nordisk Askblond 533 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e92a920d-b15e-424b-aa50-024e8ae8b71c/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074360/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2173745",
+    "productId": "9359f02b-0fcc-4b30-92d7-71fa8f99bd9c",
+    "retailerProductId": "2173745",
+    "name": "Fleecefilt Hjärtan",
+    "brand": "Noble House",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/452f1d86-8a96-4f5a-a18c-09660cc1be3b/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2173745/details",
+    "packageSize": "",
+    "countryOfOrigin": "Kina",
+    "price": 120,
+    "priceCurrency": "SEK",
+    "unitPrice": 120,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": 60,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 60,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.each",
+    "promotionDescription": "50 % rabatt",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2223420",
+    "productId": "91cb1b31-2bba-4239-898b-ac634e13796e",
+    "retailerProductId": "2223420",
+    "name": "Hårfärg 880 Dark Brown 1-p Brillance Schwartzkopf",
+    "brand": "Brillance Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/ee85b0c6-343e-4e70-ab43-bf9ec172e747/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2223420/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 86,
+    "priceCurrency": "SEK",
+    "unitPrice": 86,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2151302",
+    "productId": "462e8684-f126-44ba-8d0c-3b8219c6fc23",
+    "retailerProductId": "2151302",
+    "name": "Kaffekapslar NESP Ristretto 57g Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/f2de3111-b0e8-488e-b90f-1582a403d142/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2151302/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2382657",
+    "productId": "9edad934-711a-466c-b604-e3b69fd16878",
+    "retailerProductId": "2382657",
+    "name": "Solskydd Kids Sensitive Advanced Colored Roll-on SPF50+ 50ml Ambre Solaire",
+    "brand": "Ambre Solaire",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e87b0d0e-b6aa-46bc-ba84-93e56ee11e33/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2382657/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 96.9,
+    "priceCurrency": "SEK",
+    "unitPrice": 1938,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 72.67,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1453.4,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "25 % rabatt",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074365",
+    "productId": "d7db5347-59c6-4628-a1c8-9d15d2f22670",
+    "retailerProductId": "2074365",
+    "name": "Hårfärg Natural & Easy Satin Mörkblond 550 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/c4a8a387-f65b-4299-8650-33605ff2c0de/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074365/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2174183",
+    "productId": "779f5c4c-5a53-488b-b0aa-ef0e37bc8981",
+    "retailerProductId": "2174183",
+    "name": "Funny Sheep Caramel Milk Chocolate Popcorn 90g Smart Snack",
+    "brand": "Smart Snack",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3e546e72-1e0b-497c-b8b0-53cad844318e/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2174183/details",
+    "packageSize": "0.09kg",
+    "countryOfOrigin": "",
+    "price": 21.67,
+    "priceCurrency": "SEK",
+    "unitPrice": 240.78,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 13,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 144.44,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "40 % rabatt",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2153743",
+    "productId": "174bed3b-e4aa-46d8-a11f-6466a2261c9e",
+    "retailerProductId": "2153743",
+    "name": "Solskyddskräm Hydra 24H Protect SPF30 175ml Ambre Solaire",
+    "brand": "Ambre Solaire",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/a18627c7-e637-4f30-b061-c2d5bf9afefb/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2153743/details",
+    "packageSize": "0.175L",
+    "countryOfOrigin": "",
+    "price": 124,
+    "priceCurrency": "SEK",
+    "unitPrice": 708.57,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 93,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 531.43,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "25 % rabatt",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2223418",
+    "productId": "e81ea5b8-fe2e-4e61-90c9-e8190e1a1da1",
+    "retailerProductId": "2223418",
+    "name": "Hårfärg 862 Natural Brown 1-p Brillance Schwartzkopf",
+    "brand": "Brillance Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/afa100d1-23c2-42f0-917e-a72f229c646b/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2223418/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 86,
+    "priceCurrency": "SEK",
+    "unitPrice": 86,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2090883",
+    "productId": "1c3771b4-3aac-4781-99bc-20be19bb38ef",
+    "retailerProductId": "2090883",
+    "name": "Hårfärg 566 Matt Askbrun Natural & Easy 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/96cd1fbb-3bcb-4598-9005-e7bfc743b892/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2090883/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2074354",
+    "productId": "fd6f5578-fb92-42d6-b822-66af2d941cf9",
+    "retailerProductId": "2074354",
+    "name": "Hårfärg Natural & Easy Kastanj 576 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/79d23a8e-76f8-443b-b904-ff901e84da96/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2074354/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
+  },
+  {
+    "code": "2105326",
+    "productId": "412b983a-3751-4412-8152-f29f578ee1e5",
+    "retailerProductId": "2105326",
+    "name": "Hårfärg 555 Mörk Honungsblond 1-p Natural & Easy Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e19c36e0-88a8-4e99-a77b-b79a0a06bc1d/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004599/products/2105326/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004599",
+    "storeName": "ICA Kvantum Kungsholmen",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:33.681Z"
   },
   {
     "code": "2077461",
@@ -6093,8 +9093,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2142371",
@@ -6123,8 +9123,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1024181",
@@ -6153,8 +9153,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1319139",
@@ -6183,8 +9183,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1131301",
@@ -6213,8 +9213,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2014681",
@@ -6243,8 +9243,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1201853",
@@ -6273,8 +9273,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2092056",
@@ -6303,8 +9303,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2161610",
@@ -6333,8 +9333,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2014811",
@@ -6363,8 +9363,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2016864",
@@ -6393,8 +9393,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1477716",
@@ -6423,8 +9423,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2044679",
@@ -6453,8 +9453,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1395834",
@@ -6483,8 +9483,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2032471",
@@ -6513,8 +9513,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1128801",
@@ -6543,8 +9543,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2128931",
@@ -6573,8 +9573,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1345170",
@@ -6603,8 +9603,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1308752",
@@ -6633,8 +9633,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2141611",
@@ -6663,8 +9663,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1354055",
@@ -6693,8 +9693,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1467613",
@@ -6723,8 +9723,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1506729",
@@ -6753,8 +9753,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1467615",
@@ -6783,8 +9783,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1023696",
@@ -6813,8 +9813,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2032486",
@@ -6843,8 +9843,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2032478",
@@ -6873,8 +9873,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1406677",
@@ -6903,8 +9903,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2023311",
@@ -6933,8 +9933,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2141610",
@@ -6963,8 +9963,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2002122",
@@ -6993,8 +9993,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2156054",
@@ -7023,8 +10023,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1297807",
@@ -7053,8 +10053,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1509552",
@@ -7083,8 +10083,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1314166",
@@ -7113,8 +10113,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2290439",
@@ -7143,8 +10143,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2016065",
@@ -7173,8 +10173,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1447258",
@@ -7203,8 +10203,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1275805",
@@ -7233,8 +10233,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2154296",
@@ -7263,8 +10263,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1511489",
@@ -7293,8 +10293,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1369540",
@@ -7323,8 +10323,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2079083",
@@ -7353,8 +10353,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1511553",
@@ -7383,8 +10383,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1509554",
@@ -7413,8 +10413,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1348425",
@@ -7443,8 +10443,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2075527",
@@ -7473,8 +10473,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1476574",
@@ -7503,8 +10503,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2129997",
@@ -7533,8 +10533,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1519939",
@@ -7563,8 +10563,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2348531",
@@ -7593,8 +10593,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1484633",
@@ -7623,8 +10623,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2109094",
@@ -7653,8 +10653,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1437693",
@@ -7683,8 +10683,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1529238",
@@ -7713,8 +10713,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2032477",
@@ -7743,8 +10743,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1454469",
@@ -7773,8 +10773,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2154590",
@@ -7803,8 +10803,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2523292",
@@ -7833,8 +10833,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2079084",
@@ -7863,8 +10863,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2012278",
@@ -7893,8 +10893,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1354064",
@@ -7923,8 +10923,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1201739",
@@ -7953,8 +10953,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2119179",
@@ -7983,8 +10983,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1431986",
@@ -8013,8 +11013,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1330374",
@@ -8043,8 +11043,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2128503",
@@ -8073,8 +11073,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1530286",
@@ -8103,8 +11103,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1383915",
@@ -8133,8 +11133,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1201756",
@@ -8163,8 +11163,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2319126",
@@ -8193,8 +11193,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2125444",
@@ -8223,8 +11223,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1454470",
@@ -8253,8 +11253,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2118838",
@@ -8283,8 +11283,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "4000322",
@@ -8313,8 +11313,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1476526",
@@ -8343,8 +11343,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1447256",
@@ -8373,8 +11373,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2510997",
@@ -8403,8 +11403,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2024323",
@@ -8433,8 +11433,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2610131",
@@ -8463,8 +11463,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2032482",
@@ -8493,8 +11493,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1454475",
@@ -8523,8 +11523,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2128879",
@@ -8553,8 +11553,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2154434",
@@ -8583,8 +11583,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2094215",
@@ -8613,8 +11613,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2609916",
@@ -8643,8 +11643,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2032491",
@@ -8673,8 +11673,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1507233",
@@ -8703,8 +11703,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1529239",
@@ -8733,8 +11733,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2510858",
@@ -8763,8 +11763,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1281491",
@@ -8793,8 +11793,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2131847",
@@ -8823,8 +11823,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1454473",
@@ -8853,8 +11853,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2081935",
@@ -8883,8 +11883,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "4000222",
@@ -8913,8 +11913,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1477140",
@@ -8943,8 +11943,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1475661",
@@ -8973,8 +11973,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2348829",
@@ -9003,8 +12003,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2079086",
@@ -9033,8 +12033,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2295693",
@@ -9063,8 +12063,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2563534",
@@ -9093,8 +12093,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2141612",
@@ -9123,8 +12123,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1275638",
@@ -9153,8 +12153,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2155248",
@@ -9183,8 +12183,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1511989",
@@ -9213,8 +12213,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1454477",
@@ -9243,8 +12243,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2100292",
@@ -9273,8 +12273,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2131510",
@@ -9303,8 +12303,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2149187",
@@ -9333,8 +12333,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1297885",
@@ -9363,8 +12363,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2089734",
@@ -9393,8 +12393,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1471494",
@@ -9423,8 +12423,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1454471",
@@ -9453,8 +12453,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1464052",
@@ -9483,8 +12483,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2123109",
@@ -9513,8 +12513,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1278642",
@@ -9543,8 +12543,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1426444",
@@ -9573,8 +12573,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2117082",
@@ -9603,8 +12603,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1454472",
@@ -9633,8 +12633,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "4000221",
@@ -9663,8 +12663,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2073780",
@@ -9693,8 +12693,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1214564",
@@ -9723,8 +12723,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2044005",
@@ -9753,8 +12753,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1354057",
@@ -9783,8 +12783,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1278644",
@@ -9813,8 +12813,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1507124",
@@ -9843,8 +12843,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2151620",
@@ -9873,8 +12873,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2022175",
@@ -9903,8 +12903,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1475752",
@@ -9933,8 +12933,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2166483",
@@ -9963,8 +12963,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2510999",
@@ -9993,8 +12993,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1442888",
@@ -10023,8 +13023,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2382806",
@@ -10053,8 +13053,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2056014",
@@ -10083,8 +13083,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2141752",
@@ -10113,8 +13113,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2141613",
@@ -10143,8 +13143,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1354056",
@@ -10173,8 +13173,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2112347",
@@ -10203,8 +13203,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1395870",
@@ -10233,8 +13233,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2022180",
@@ -10263,8 +13263,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2107443",
@@ -10293,8 +13293,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2153000",
@@ -10323,8 +13323,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1507881",
@@ -10353,8 +13353,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1343597",
@@ -10383,8 +13383,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1276500",
@@ -10413,8 +13413,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2610125",
@@ -10443,8 +13443,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1002307",
@@ -10473,8 +13473,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2032524",
@@ -10503,8 +13503,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2166491",
@@ -10533,8 +13533,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2319147",
@@ -10563,8 +13563,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2294724",
@@ -10593,8 +13593,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2030937",
@@ -10623,8 +13623,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2003011",
@@ -10653,8 +13653,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2358316",
@@ -10683,8 +13683,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2117296",
@@ -10713,8 +13713,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1443477",
@@ -10743,8 +13743,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2153961",
@@ -10773,8 +13773,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1278766",
@@ -10803,8 +13803,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2150783",
@@ -10833,8 +13833,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1354065",
@@ -10863,8 +13863,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1531729",
@@ -10893,8 +13893,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2609917",
@@ -10923,8 +13923,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2022176",
@@ -10953,8 +13953,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2119169",
@@ -10983,8 +13983,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2107584",
@@ -11013,8 +14013,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1002505",
@@ -11043,8 +14043,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2032518",
@@ -11073,8 +14073,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "4000495",
@@ -11103,8 +14103,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2382807",
@@ -11133,8 +14133,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2005122",
@@ -11163,8 +14163,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1002504",
@@ -11193,8 +14193,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2107585",
@@ -11223,8 +14223,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2022177",
@@ -11253,8 +14253,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2075014",
@@ -11283,8 +14283,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1202264",
@@ -11313,8 +14313,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2032506",
@@ -11343,8 +14343,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2035862",
@@ -11373,8 +14373,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2155245",
@@ -11403,8 +14403,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2118437",
@@ -11433,8 +14433,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2168325",
@@ -11463,8 +14463,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2117253",
@@ -11493,8 +14493,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2522025",
@@ -11523,8 +14523,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1414382",
@@ -11553,8 +14553,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1448318",
@@ -11583,8 +14583,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2168326",
@@ -11613,8 +14613,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2141507",
@@ -11643,8 +14643,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2348387",
@@ -11673,8 +14673,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2022181",
@@ -11703,8 +14703,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2128955",
@@ -11733,8 +14733,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2140306",
@@ -11763,8 +14763,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2151304",
@@ -11793,8 +14793,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2140492",
@@ -11823,8 +14823,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2107471",
@@ -11853,8 +14853,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2065267",
@@ -11883,8 +14883,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1208425",
@@ -11913,8 +14913,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2319205",
@@ -11943,8 +14943,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1294167",
@@ -11973,8 +14973,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2382283",
@@ -12003,8 +15003,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "2107438",
@@ -12033,8 +15033,8 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   },
   {
     "code": "1520672",
@@ -12063,7 +15063,3007 @@ export const icaProducts: IcaIngestedProduct[] = [
     "storeAccountId": "1004247",
     "storeName": "ICA Focus",
     "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
-    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=200&maxPageSize=200",
-    "retrievedAt": "2026-05-22T08:49:49.000Z"
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1475751",
+    "productId": "3549f25c-f381-4600-9f23-615de023d358",
+    "retailerProductId": "1475751",
+    "name": "Tacosalsa Medium 226g Old el Paso",
+    "brand": "Old el Paso",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3ba51982-7e55-4a4f-941e-777a36b85f25/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1475751/details",
+    "packageSize": "0.226kg",
+    "countryOfOrigin": "",
+    "price": 21.7,
+    "priceCurrency": "SEK",
+    "unitPrice": 96.02,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "5 för 45 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2155240",
+    "productId": "3a8647aa-34a3-4ddd-b949-f501ecfa2095",
+    "retailerProductId": "2155240",
+    "name": "Byxblöjor Baby Dry Pants Strl 6 13-19kg VP 32p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/b86dcf89-1b20-41df-a9c6-8a0637e8377a/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2155240/details",
+    "packageSize": "32 per frp",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 3.66,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2155246",
+    "productId": "39d52799-9eab-42e9-b153-a83127a83793",
+    "retailerProductId": "2155246",
+    "name": "Byxblöjor Baby Dry Pants Strl 7 15+kg 29p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e9cc93f1-1113-4ef7-a9bd-4875ed050def/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2155246/details",
+    "packageSize": "29 per frp",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 4.03,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1448317",
+    "productId": "a1084252-ec00-4171-8305-68f75e30145a",
+    "retailerProductId": "1448317",
+    "name": "Individual reach Medium Tandborste Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/70ef927a-b378-4e38-a98c-d24a85e28598/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1448317/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2128959",
+    "productId": "543a3742-1c4a-488a-a9da-287fc6acad8b",
+    "retailerProductId": "2128959",
+    "name": "Kaffekapslar Italian Style Roast 10-p Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/d782c429-5546-4329-b09e-935b344a5156/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2128959/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1416698",
+    "productId": "07c6abf3-fadc-42f8-ab9f-6d8d3736f43f",
+    "retailerProductId": "1416698",
+    "name": "Vitlöksdressing 370ml ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/c291388f-3c43-4d74-839e-8b372ccffcb6/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1416698/details",
+    "packageSize": "0.37L",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 76.49,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr -- Stammispris",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1457382",
+    "productId": "7ab2b14a-b8ae-4758-a73a-8916aa601f50",
+    "retailerProductId": "1457382",
+    "name": "Coppa 70g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/83be37d9-9221-40de-81c3-f0f8a054601f/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1457382/details",
+    "packageSize": "0.07kg",
+    "countryOfOrigin": "",
+    "price": 35,
+    "priceCurrency": "SEK",
+    "unitPrice": 500,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr -- Stammispris",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2130264",
+    "productId": "7523dec8-9f34-4961-9f94-a758c25006b4",
+    "retailerProductId": "2130264",
+    "name": "Skinka Bokvedsrökt 110g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/a278b956-a217-49af-81d3-02bfbc7556a9/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2130264/details",
+    "packageSize": "0.11kg",
+    "countryOfOrigin": "",
+    "price": 31.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 283.64,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2154255",
+    "productId": "199cd65d-cc4d-4f51-a825-7bf15f55db24",
+    "retailerProductId": "2154255",
+    "name": "Vegoburgare 450g Hälsans Kök",
+    "brand": "Hälsans Kök",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/7d881e17-02b0-4e2b-ba9c-b15a90ae7869/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2154255/details",
+    "packageSize": "0.45kg",
+    "countryOfOrigin": "",
+    "price": 59.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 132.44,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 75 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2154257",
+    "productId": "31fa3fe3-d476-4eb8-85c6-498cf9f48865",
+    "retailerProductId": "2154257",
+    "name": "Vegoschnitzel 450g Hälsans Kök",
+    "brand": "Hälsans Kök",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/031e12fa-13b4-48f8-a560-bab5e5103d41/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2154257/details",
+    "packageSize": "0.45kg",
+    "countryOfOrigin": "",
+    "price": 59.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 132.44,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 75 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2054518",
+    "productId": "36233df7-fda5-4ad6-8b37-9832049c1055",
+    "retailerProductId": "2054518",
+    "name": "Tampong Procomfort Super 32-p o.b.",
+    "brand": "o.b.",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/2cdad5cd-b5d3-4c31-bec4-06cdef568ec7/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2054518/details",
+    "packageSize": "32 per frp",
+    "countryOfOrigin": "",
+    "price": 56,
+    "priceCurrency": "SEK",
+    "unitPrice": 1.75,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 80 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2128953",
+    "productId": "b04c4f66-6ec4-4bd9-a1af-8849ab68a1d7",
+    "retailerProductId": "2128953",
+    "name": "Kaffekapslar Originale 10-p Zoegas",
+    "brand": "Zoegas",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/7df16f4d-0d2a-4f3f-8176-fd94d2f4a532/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2128953/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 41.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 4.16,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2065049",
+    "productId": "d496eb1f-6baf-4249-8c58-d57a68c5c6bc",
+    "retailerProductId": "2065049",
+    "name": "Kanelbullesnittar 300g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/5e4d15f9-da70-49f7-91a3-ff9f0e7ddf3e/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2065049/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 23.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 78.67,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 30 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1416699",
+    "productId": "3fcc63a5-306b-4f46-b55f-50d92b13b229",
+    "retailerProductId": "1416699",
+    "name": "Thousand island Dressing 370ml ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/222253ec-bec2-4d19-8b1f-1e977c96cc85/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1416699/details",
+    "packageSize": "0.37L",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 76.49,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr -- Stammispris",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2322331",
+    "productId": "26964d81-331c-4648-9d68-19c718440747",
+    "retailerProductId": "2322331",
+    "name": "Aioli Chipotle 230ml Eriks såser",
+    "brand": "Eriks såser",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/bc733a35-89d6-44be-a393-41f1f40f87b3/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2322331/details",
+    "packageSize": "0.23L",
+    "countryOfOrigin": "",
+    "price": 26.97,
+    "priceCurrency": "SEK",
+    "unitPrice": 117.26,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1408781",
+    "productId": "a3fad404-375b-4fb5-930d-c3502300f48b",
+    "retailerProductId": "1408781",
+    "name": "Barntandborste Step by step 3-5 år 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/10452bf1-ebbe-46a2-b377-caf76c76a851/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1408781/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 26,
+    "priceCurrency": "SEK",
+    "unitPrice": 26,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2022178",
+    "productId": "750f1c28-c461-4319-a050-98d7a94f2960",
+    "retailerProductId": "2022178",
+    "name": "Kaka Havreflarn 300g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/06ed1448-9b41-4ea3-9f87-9e2b01b34234/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2022178/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 23.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 78.67,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 30 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2107439",
+    "productId": "b8e13b6f-5179-403d-9832-27a3832ecbfc",
+    "retailerProductId": "2107439",
+    "name": "Paj Ost och Skinka 300g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/176c2a5c-8e1b-4590-89e3-e82a7512955d/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2107439/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 51.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 170.33,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 70 kr -- Stammispris",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2151361",
+    "productId": "31e814c0-5268-40d8-b013-df87ae839a29",
+    "retailerProductId": "2151361",
+    "name": "Salami Spinata alla Calabrese 70g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/41dc263b-9906-4e3c-b073-e01e8235eba2/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2151361/details",
+    "packageSize": "0.07kg",
+    "countryOfOrigin": "",
+    "price": 30.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 431.43,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr -- Stammispris",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2155244",
+    "productId": "73250e4a-cfa0-4de6-abce-590db0f88271",
+    "retailerProductId": "2155244",
+    "name": "Byxblöjor Baby Dry Pants Strl 4 9-15kg VP 42p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/24d649c7-23ea-47ff-8438-9ab9bc382df5/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2155244/details",
+    "packageSize": "42 per frp",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 2.79,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2067023",
+    "productId": "dcb83fa4-8f2f-49c4-ad1a-1b38b4eccf08",
+    "retailerProductId": "2067023",
+    "name": "Kalkonsalami 100g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6283fb89-5f45-4629-890e-9a562d3448a9/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2067023/details",
+    "packageSize": "0.1kg",
+    "countryOfOrigin": "",
+    "price": 31.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 312,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1408782",
+    "productId": "73185199-3cb6-4a7b-9848-dc1d4f66b9c9",
+    "retailerProductId": "1408782",
+    "name": "Barntandborste Step by step 6-9 år 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/f755ae9f-26c6-44c5-93da-354f745359eb/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1408782/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 26,
+    "priceCurrency": "SEK",
+    "unitPrice": 26,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2154256",
+    "productId": "87cf9b14-5e5c-4830-8b3f-84b1639e951c",
+    "retailerProductId": "2154256",
+    "name": "Vegonuggets 440g Hälsans Kök",
+    "brand": "Hälsans Kök",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/f53e1fbb-e381-46c9-bf63-4742a308587a/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2154256/details",
+    "packageSize": "0.44kg",
+    "countryOfOrigin": "",
+    "price": 59.6,
+    "priceCurrency": "SEK",
+    "unitPrice": 135.45,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 75 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2054525",
+    "productId": "f4854f45-9b5b-491d-8261-e6b599b629b8",
+    "retailerProductId": "2054525",
+    "name": "Tampong ProComfort Normal 32-p o.b.",
+    "brand": "o.b.",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/0fb00197-369e-4194-87f6-bb740628efda/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2054525/details",
+    "packageSize": "32 per frp",
+    "countryOfOrigin": "",
+    "price": 56,
+    "priceCurrency": "SEK",
+    "unitPrice": 1.75,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 80 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2153001",
+    "productId": "ec415713-0930-4b73-ae36-a4ae73e6e4f8",
+    "retailerProductId": "2153001",
+    "name": "Grönpepparsås 170ml Eriks såser",
+    "brand": "Eriks såser",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/43913b43-a0ba-491f-ac55-108d425ccb60/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2153001/details",
+    "packageSize": "0.17L",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 166.47,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2150682",
+    "productId": "23b92265-0d8e-4957-9d7b-407e6883708e",
+    "retailerProductId": "2150682",
+    "name": "Spareribs Färsk Smokey BBQ ca 1,35g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/995eeb99-6859-4489-ba7d-211147fe9129/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2150682/details",
+    "packageSize": "1112g - 1000000g",
+    "countryOfOrigin": "",
+    "price": 93.15,
+    "priceCurrency": "SEK",
+    "unitPrice": 69,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 74.25,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 55,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "55 kr/kg",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1520668",
+    "productId": "054aa93b-31a2-41c6-b9db-b829759c1301",
+    "retailerProductId": "1520668",
+    "name": "Vegoskivor Tomat & Basilika 100g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3dc11cde-6dcf-4cd5-929d-dd66a30906b1/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1520668/details",
+    "packageSize": "0.1kg",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 283,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1407014",
+    "productId": "aad748c2-5e25-45fa-82b4-50b745e13fd0",
+    "retailerProductId": "1407014",
+    "name": "Nougatsås 300g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3609b04d-86a1-4c0d-bf2c-07d321239005/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1407014/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 38.9,
+    "priceCurrency": "SEK",
+    "unitPrice": 129.67,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2086476",
+    "productId": "391f1b9f-4bda-48ff-9cf7-64320d45e026",
+    "retailerProductId": "2086476",
+    "name": "Kylväska gul/vit rand 4l ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/4db44b87-2109-447a-b1ed-5dc71421e43f/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2086476/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 83.9,
+    "priceCurrency": "SEK",
+    "unitPrice": 83.9,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": 59.9,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 59.9,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.each",
+    "promotionDescription": "59,90 kr/st",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1494706",
+    "productId": "78519df5-d6d8-46ab-a63a-876c443d6371",
+    "retailerProductId": "1494706",
+    "name": "Fläskytterfilé Frystinad ca 650g KRAV ICA I love eco",
+    "brand": "ICA I love eco",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6de89f47-7ae2-44aa-b95a-3bf021bc1ea5/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1494706/details",
+    "packageSize": "528g - 1000000g",
+    "countryOfOrigin": "Sverige",
+    "price": 112.13,
+    "priceCurrency": "SEK",
+    "unitPrice": 172.5,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 83.85,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 129,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "129 kr/kg",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1448314",
+    "productId": "55a11859-2f32-448a-b9b7-11c9056f95af",
+    "retailerProductId": "1448314",
+    "name": "Tandborste Individual Clean Medium 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3240ae29-c964-49aa-9b2e-85ddd067c4ce/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1448314/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2155242",
+    "productId": "5d8eadc9-d96c-4c8a-9b7c-fd0d9e9fd0d6",
+    "retailerProductId": "2155242",
+    "name": "Byxblöjor Premium Protection Pants Strl 5 11-17kg 29p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/757abcc7-d1a4-463d-986c-b3d21e0d2f50/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2155242/details",
+    "packageSize": "29 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 4.21,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2522074",
+    "productId": "b58081aa-3758-4233-bd35-7c3ae2ed3ea4",
+    "retailerProductId": "2522074",
+    "name": "Kaffekapslar House Blend 10st Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/dcfeccc0-f26f-4020-9a15-76cfa15bac42/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2522074/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1520670",
+    "productId": "39b15e41-9477-4e13-93ea-e53348431af2",
+    "retailerProductId": "1520670",
+    "name": "Vegoskivor Paprika 100g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/db723897-68ef-4891-ba1e-4734916308b2/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1520670/details",
+    "packageSize": "0.1kg",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 283,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2168423",
+    "productId": "38c7cb3d-2d40-4d5f-824d-63a5553c1714",
+    "retailerProductId": "2168423",
+    "name": "Funktionell Dryck Peachango BCAA+ 33cl Nocco",
+    "brand": "Nocco",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/353aebb2-925f-45b9-b845-fa50dcbf1a22/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2168423/details",
+    "packageSize": "0.33L",
+    "countryOfOrigin": "",
+    "price": 20.8,
+    "priceCurrency": "SEK",
+    "unitPrice": 63.03,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 35 kr +pant",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2128950",
+    "productId": "e147555a-17fb-41d3-a6c3-d9c89d2067cf",
+    "retailerProductId": "2128950",
+    "name": "Kaffekapslar Colombia 10-p Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6104b8f8-795b-475a-961c-96818ef9f594/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2128950/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2128949",
+    "productId": "0307c9e6-677a-4cef-9382-a5923fb385d9",
+    "retailerProductId": "2128949",
+    "name": "Kaffekapslar Pike Place 10-p Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/82825d88-cd14-4643-9203-f7d8a5836900/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2128949/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2117920",
+    "productId": "a577842c-be44-43d6-b826-f25c5ff1d26b",
+    "retailerProductId": "2117920",
+    "name": "Bacon Kyckling Skivad 100g Tulip",
+    "brand": "Tulip",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/adc57672-7886-43d4-b707-1f7e39063c9a/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2117920/details",
+    "packageSize": "0.1kg",
+    "countryOfOrigin": "",
+    "price": 18.8,
+    "priceCurrency": "SEK",
+    "unitPrice": 188,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 26 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1407015",
+    "productId": "d6fbfb07-2518-411f-9d91-f09b8de97f5a",
+    "retailerProductId": "1407015",
+    "name": "Saltlakritssås 300g ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/32d18256-1347-474f-8c85-2e6d05b88e72/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1407015/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 32.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 107,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1510352",
+    "productId": "0b268f1d-c7db-4520-a495-2ab68ef21db5",
+    "retailerProductId": "1510352",
+    "name": "Funktionsdryck BCAA Äpple Koffeinfri Sockerfri 33cl Nocco",
+    "brand": "Nocco",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/c73b9c4e-d4ac-4b2f-a33a-c49e7f6727b5/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1510352/details",
+    "packageSize": "0.33L",
+    "countryOfOrigin": "",
+    "price": 22.7,
+    "priceCurrency": "SEK",
+    "unitPrice": 68.79,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 35 kr +pant",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2128957",
+    "productId": "10e084c8-459e-4ecb-94cd-a1f753d469fc",
+    "retailerProductId": "2128957",
+    "name": "Kaffekapslar Blonde Espresso Roast 10-p Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/bbed8592-319c-448d-8420-25dace914d82/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2128957/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2051270",
+    "productId": "09442e45-60ae-4eab-b552-8727f78cf6c8",
+    "retailerProductId": "2051270",
+    "name": "Vegoskivor Salami 100g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/9590f41a-a741-4872-bb6e-4ab20e60b83c/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2051270/details",
+    "packageSize": "0.1kg",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 283,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2093529",
+    "productId": "de08bc1e-9805-40e6-9f79-19404cb070bd",
+    "retailerProductId": "2093529",
+    "name": "Grillkorv Cheddar Jalapeno 77% Kötthalt 270g Scan",
+    "brand": "Scan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/646761fb-cb45-4d2f-9684-42c748100612/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2093529/details",
+    "packageSize": "0.27kg",
+    "countryOfOrigin": "Sverige",
+    "price": 46.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 171.48,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 33,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 122.22,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "33 kr/st -- Max 2 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2294744",
+    "productId": "3c85fa7c-4a3d-43f6-96e9-e43abbbfbb27",
+    "retailerProductId": "2294744",
+    "name": "Läsk Påskmust 12-p 33cl Apotekarnes",
+    "brand": "Apotekarnes",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/de795c89-dd91-4727-81f7-42d144147dee/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2294744/details",
+    "packageSize": "3.96L",
+    "countryOfOrigin": "",
+    "price": 67.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 16.94,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promoPrice": 40.26,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 10.17,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promotionDescription": "40 % rabatt",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074352",
+    "productId": "0fa9951b-ab9b-48ea-b38c-7ba2ee93bb10",
+    "retailerProductId": "2074352",
+    "name": "Hårfärg Natural & Easy Sammet Mörkbrun 580 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/11cf7a37-0fa7-420f-a30f-de63739e36f9/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074352/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2522075",
+    "productId": "397c4c79-e009-4731-b1f9-82b528276067",
+    "retailerProductId": "2522075",
+    "name": "Kaffekapslar Espresso Roast 10st Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/ff5146e3-506a-4530-a298-e2285235fed0/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2522075/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2067020",
+    "productId": "06c9dc75-dd75-4609-8c58-4fcfd65d8b5b",
+    "retailerProductId": "2067020",
+    "name": "Pepparsalami 120g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/14c109e8-87ce-48aa-8698-92c0f81a57d0/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2067020/details",
+    "packageSize": "0.12kg",
+    "countryOfOrigin": "",
+    "price": 31.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 260,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2149819",
+    "productId": "a607f4aa-157a-4798-8274-5c4b33c76282",
+    "retailerProductId": "2149819",
+    "name": "Tandborste Ultralite Sensitive UltraSoft 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/fadde2b0-2b2a-416e-95f6-95502bc91912/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2149819/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2155243",
+    "productId": "7322f0fd-8de4-4953-9408-ee2ecb777e30",
+    "retailerProductId": "2155243",
+    "name": "Byxblöjor Premium Protection Pants Strl 6 13-19kg 27p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/26e42a67-a590-416a-beef-199b16d6fffe/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2155243/details",
+    "packageSize": "27 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 4.52,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2099474",
+    "productId": "bb38389a-6c7f-4572-9521-ac4964885bdf",
+    "retailerProductId": "2099474",
+    "name": "Tandborste Ultralite Medium 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6c0bf4e7-fe2e-4107-a79b-abbb3171aedb/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2099474/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2107472",
+    "productId": "1f949103-5e5c-4178-9d10-7753bf97f17c",
+    "retailerProductId": "2107472",
+    "name": "Mild & Krämig  ca 500g Arla",
+    "brand": "Arla",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/362e8ab6-cce4-4189-8da1-0f54a8aa7e48/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2107472/details",
+    "packageSize": "405.6g - 1000000g",
+    "countryOfOrigin": "Sverige",
+    "price": 67.15,
+    "priceCurrency": "SEK",
+    "unitPrice": 134.3,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 49.51,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 99.01,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "99 kr/kg",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2093145",
+    "productId": "1bb92463-a21f-4b8b-a9c8-f3ea36887422",
+    "retailerProductId": "2093145",
+    "name": "Halmstadssalami 120g Pärsons",
+    "brand": "Pärsons",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6074026d-1f18-488e-bdb9-c63c5c2759eb/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2093145/details",
+    "packageSize": "0.12kg",
+    "countryOfOrigin": "",
+    "price": 31.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 260,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 38 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2090432",
+    "productId": "204e7e24-673b-4b31-bd4c-51e9dd5381b9",
+    "retailerProductId": "2090432",
+    "name": "Påskmust Sockerfri 3000ml Zeunerts",
+    "brand": "Zeunerts",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/279312a2-ac0d-46e6-a080-df3451fafe9a/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2090432/details",
+    "packageSize": "3L",
+    "countryOfOrigin": "",
+    "price": 68.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 22.7,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 40.86,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 13.62,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "40 % rabatt",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1435686",
+    "productId": "e3a945b2-8e9a-4e5b-b328-b45f8279c828",
+    "retailerProductId": "1435686",
+    "name": "Ansiktskräm Natt Revitalift antirynk 50ml L'Oreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/9f41fe0e-dd21-4c2a-ae77-3729463c05af/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1435686/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 2340,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1780,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2155241",
+    "productId": "79213d3e-f64d-4358-9693-156eb642e7a9",
+    "retailerProductId": "2155241",
+    "name": "Byxblöjor Premium Protection Pants Strl 4 9-15kg 31p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/f2338e7f-3af9-4144-9d48-7817b64e30cd/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2155241/details",
+    "packageSize": "31 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 3.94,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2030938",
+    "productId": "e4577ff6-aa46-4f0d-a4f2-51855d0fa03d",
+    "retailerProductId": "2030938",
+    "name": "Honeymustard 370ml ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/c3c1cad7-8bb3-42ae-bc98-d47e075e1d76/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2030938/details",
+    "packageSize": "0.37L",
+    "countryOfOrigin": "",
+    "price": 28.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 76.49,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 32 kr -- Stammispris",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1448315",
+    "productId": "edc4397d-ce9a-4bef-bd00-edb40118e9dd",
+    "retailerProductId": "1448315",
+    "name": "Individual clean Mjuk Tandborste Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/8e9f9529-4ac0-4bbd-a474-08f47925bbb6/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1448315/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2155196",
+    "productId": "b878fe64-7804-4ca1-b3b9-8856061994f6",
+    "retailerProductId": "2155196",
+    "name": "Blöjor Premium Protection Strl 3 6-10kg VP 48p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/504b45ce-9e4e-4d9f-9aa6-25ea32cba7e3/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2155196/details",
+    "packageSize": "48 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 2.54,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1129496",
+    "productId": "9f05e520-f056-49f2-907c-9a989b99ddde",
+    "retailerProductId": "1129496",
+    "name": "Surströmming 300g Röda Ulven",
+    "brand": "Röda Ulven",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3c59336c-dc74-49d1-8135-816d7fc7aeb8/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1129496/details",
+    "packageSize": "0.3kg",
+    "countryOfOrigin": "",
+    "price": 73.8,
+    "priceCurrency": "SEK",
+    "unitPrice": 246,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg.without.liquid",
+    "promoPrice": 44.28,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 147.6,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg.without.liquid",
+    "promotionDescription": "40 % rabatt",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1435689",
+    "productId": "86a76ad8-3392-4075-8b76-1dcf76750db8",
+    "retailerProductId": "1435689",
+    "name": "Ansiktskräm Dag Revitalift Anti-wrinkle 50ml L'Oreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/8d25ceb7-9c9f-4b66-b148-6209b8ecf158/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1435689/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 2340,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1780,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1514312",
+    "productId": "2fa51a6b-303f-44e8-b008-5f66f2c40341",
+    "retailerProductId": "1514312",
+    "name": "Ansiktskräm Dag Revitalift Anti-Wrinkle SPF 30 50ml Loreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/01e6e740-7c04-433e-b0d5-9223fa3e40c5/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1514312/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 117,
+    "priceCurrency": "SEK",
+    "unitPrice": 2340,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1780,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2173132",
+    "productId": "404b831a-24a2-48b3-96d6-b789d766fa51",
+    "retailerProductId": "2173132",
+    "name": "Mugg melamin Ambrosia 30cl ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/867b4a1b-87da-4e85-958a-ab3b89e39ab9/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2173132/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 37.5,
+    "priceCurrency": "SEK",
+    "unitPrice": 37.5,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 50 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2522079",
+    "productId": "c9f55a7d-c986-4774-aaa3-303c72e66843",
+    "retailerProductId": "2522079",
+    "name": "Kaffekapslar Decaf Espresso 10st Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/807d34de-46c2-4ca4-b718-4f12ed912d35/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2522079/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2128954",
+    "productId": "04cf190e-1909-4ba7-b146-aff18032514c",
+    "retailerProductId": "2128954",
+    "name": "Kaffekapslar Caffé Verona 10-p Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6e4f495e-33f4-4cf7-adfd-3d28234134f5/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2128954/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2155199",
+    "productId": "aa93ecae-cd30-4f61-930f-c4b9b7994f39",
+    "retailerProductId": "2155199",
+    "name": "Blöjor Premium Protection Strl 6 13-18kg VP 30p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/64f4c34a-d3de-48cc-8e96-bef24eb13344/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2155199/details",
+    "packageSize": "30 per frp",
+    "countryOfOrigin": "",
+    "price": 125,
+    "priceCurrency": "SEK",
+    "unitPrice": 4.17,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074355",
+    "productId": "682243a3-e338-459c-b743-966d278c6b79",
+    "retailerProductId": "2074355",
+    "name": "Hårfärg Natural & Easy Kashmir Ljusbrun 560 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/c718236f-48fe-45d2-ab4c-03496e8b7ea8/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074355/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2155197",
+    "productId": "629127fe-2323-4dd0-b778-4bbe6c3b40be",
+    "retailerProductId": "2155197",
+    "name": "Blöjor Premium Protection Strl 4 9-14kg VP 39p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e6f3bbf0-e50f-4bcf-9fcc-7bed09e0c1a9/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2155197/details",
+    "packageSize": "39 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 3.13,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074343",
+    "productId": "37749699-c143-43d5-a25d-f74cce783d9c",
+    "retailerProductId": "2074343",
+    "name": "Hårfärg Blonde L1++ Extra 1-p Schwarzkopf",
+    "brand": "Blonde Schwarzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/95a2b6c9-ccf1-42ad-a394-5fefdbaedb97/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074343/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 98,
+    "priceCurrency": "SEK",
+    "unitPrice": 98,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2155198",
+    "productId": "b327b57c-98a1-4b31-aa74-7e4e40fd7a08",
+    "retailerProductId": "2155198",
+    "name": "Blöjor Premium Protection Strl 5 11-16kg VP 34p Pampers",
+    "brand": "Pampers",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/224b0a71-3e16-42b0-b3f3-488691e9be98/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2155198/details",
+    "packageSize": "34 per frp",
+    "countryOfOrigin": "",
+    "price": 122,
+    "priceCurrency": "SEK",
+    "unitPrice": 3.59,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 189 kr -- Max 1 erbj/hushåll",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074367",
+    "productId": "fc03dabc-62a3-40da-b42f-fd9590e83165",
+    "retailerProductId": "2074367",
+    "name": "Hårfärg Natural & Easy Ebenholts Svart  590 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/374ed26f-5ae1-4cb7-833b-c12abd2e0d23/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074367/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2173131",
+    "productId": "ba3674fe-b220-45f8-8e8f-cbc75e317b84",
+    "retailerProductId": "2173131",
+    "name": "Skål melamin Ambrosia 16cm ICA",
+    "brand": "ICA",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e64f054f-b656-49be-8bbc-ca22224da275/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2173131/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 35.5,
+    "priceCurrency": "SEK",
+    "unitPrice": 35.5,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 60 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2099475",
+    "productId": "34d22228-8abe-4cf8-9d97-6b55cc09c941",
+    "retailerProductId": "2099475",
+    "name": "Tandborste Ultralite Soft 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/50565ffb-83e4-42da-b654-c95103d73e27/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2099475/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 25,
+    "priceCurrency": "SEK",
+    "unitPrice": 25,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074361",
+    "productId": "69c4aa35-080c-487e-b0c0-4a4ed54cb22f",
+    "retailerProductId": "2074361",
+    "name": "Hårfärg Natural & Easy Frostig Mörkbrun 583 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3d7887bd-02c3-419d-b0f7-782dc16cb8ff/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074361/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074359",
+    "productId": "b0561793-9b41-4cca-9344-2b42a4cdc80e",
+    "retailerProductId": "2074359",
+    "name": "Hårfärg Natural & Easy Mocka Chokladbrun 584 1-p  Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6a5fe269-efd3-4ccf-8687-bc4e0659bd7c/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074359/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2026659",
+    "productId": "53a0cf57-83eb-4c4c-b641-f0f1a7e697d9",
+    "retailerProductId": "2026659",
+    "name": "Tandborste Green Clean 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/6f6abec1-0ea2-4806-8f09-65011d5520e4/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2026659/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 28,
+    "priceCurrency": "SEK",
+    "unitPrice": 28,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1435690",
+    "productId": "b41c5eb4-d42b-4d06-9b6e-f74e8ad9bde9",
+    "retailerProductId": "1435690",
+    "name": "Ansiktskräm Dag Age Perfect Moisturising 50ml L'Oreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/94a26660-60f9-4568-bdaf-35318279c21e/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1435690/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 136,
+    "priceCurrency": "SEK",
+    "unitPrice": 2720,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1780,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2107587",
+    "productId": "91221566-af4e-49fb-a930-908be0ee01d8",
+    "retailerProductId": "2107587",
+    "name": "Delikata ost ca 500g Arla",
+    "brand": "Arla",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/b93fec67-673f-452b-83d6-70a42c4f4aa6/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2107587/details",
+    "packageSize": "405.6g - 1000000g",
+    "countryOfOrigin": "Sverige",
+    "price": 69.55,
+    "priceCurrency": "SEK",
+    "unitPrice": 139.1,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 49.5,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 99,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "99 kr/kg",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074351",
+    "productId": "b8af517a-56b7-47cb-b330-2b0faaac744c",
+    "retailerProductId": "2074351",
+    "name": "Hårfärg Natural & Easy Äkta Kastanj Mellanbrun 570 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/308099e3-4baa-4d70-9cf5-c710d961e98e/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074351/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1435494",
+    "productId": "8934f7ff-316d-4870-9756-1aa1f7d0ff2e",
+    "retailerProductId": "1435494",
+    "name": "Revitalift Eye Contour Rynkkräm 15ml L'Oreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/1b7acca1-c35d-4509-982e-06d72350c604/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1435494/details",
+    "packageSize": "0.015L",
+    "countryOfOrigin": "",
+    "price": 130,
+    "priceCurrency": "SEK",
+    "unitPrice": 8666.67,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 5933.33,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074366",
+    "productId": "b0b6fded-8c3d-4abd-a474-2b15ee330a50",
+    "retailerProductId": "2074366",
+    "name": "Hårfärg Natural & Easy Champagne Ljusblond 530 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/d1e7418d-0522-4708-8a3a-df4a8aa6c3a4/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074366/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2294739",
+    "productId": "51e1192f-58ae-4fa8-aa9b-57a2b419a317",
+    "retailerProductId": "2294739",
+    "name": "Läsk Påskmust  50cl Apotekarnes",
+    "brand": "Apotekarnes",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/ecb2d031-08d5-4566-82fb-17efd0e2d581/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2294739/details",
+    "packageSize": "0.5L",
+    "countryOfOrigin": "",
+    "price": 13.2,
+    "priceCurrency": "SEK",
+    "unitPrice": 26.4,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promoPrice": 7.92,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 15.84,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promotionDescription": "40 % rabatt",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074344",
+    "productId": "17dea98a-fc37-4abe-a19b-73cc7939c631",
+    "retailerProductId": "2074344",
+    "name": "Hårfärg Blonde L101 Silver Blonde 1-p Schwarzkopf",
+    "brand": "Blonde Schwarzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/5adb608c-88db-48fc-8b8e-78e12675188b/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074344/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 98,
+    "priceCurrency": "SEK",
+    "unitPrice": 98,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2223421",
+    "productId": "b608ce5b-541a-45c8-b1eb-f0114bffd2e8",
+    "retailerProductId": "2223421",
+    "name": "Hårfärg 890 Black 1-p Brillance Schwartzkopf",
+    "brand": "Brillance Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/5ce6d501-3977-4770-b900-3ab822d91b87/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2223421/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 86,
+    "priceCurrency": "SEK",
+    "unitPrice": 86,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "1480915",
+    "productId": "c49e61d4-c7fa-41bc-bc3f-0a39b4800130",
+    "retailerProductId": "1480915",
+    "name": "Nattkräm Age Perfect Moisturising 50ml L'Oreal",
+    "brand": "Loreal",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/d3e881de-1fe6-4eb1-9e77-4d0f597ed491/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/1480915/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 136,
+    "priceCurrency": "SEK",
+    "unitPrice": 2720,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 89,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1780,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "89 kr/st",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2609918",
+    "productId": "a67fc16e-f998-41a3-b521-2d84711f15bf",
+    "retailerProductId": "2609918",
+    "name": "Energidryck Summer Edition 2 33cl Nocco",
+    "brand": "Nocco",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/4d04da07-a5fc-4b30-8a2d-89cb66278253/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2609918/details",
+    "packageSize": "0.33L",
+    "countryOfOrigin": "",
+    "price": 20.3,
+    "priceCurrency": "SEK",
+    "unitPrice": 61.52,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre.without.deposit",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 35 kr +pant",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074342",
+    "productId": "569177d7-2199-431f-a527-2f7edd8af8ca",
+    "retailerProductId": "2074342",
+    "name": "Hårfärg Blonde M1 Super Slingor 1-p Schwarzkopf",
+    "brand": "Blonde Schwarzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/dd6c618d-0ea8-4972-9322-7b04ec797d31/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074342/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 98,
+    "priceCurrency": "SEK",
+    "unitPrice": 98,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2090733",
+    "productId": "7c3f71c1-977d-425a-8ede-647483d8f722",
+    "retailerProductId": "2090733",
+    "name": "Tandborste Barn 5-10år Extra Mjuk 1-p Jordan",
+    "brand": "Jordan",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/ca65e625-6f21-4b93-a9bf-aa375a357e30/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2090733/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 27,
+    "priceCurrency": "SEK",
+    "unitPrice": 27,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 40 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074362",
+    "productId": "4b4bd62f-25d6-46c9-b5fd-f2a05fed16ec",
+    "retailerProductId": "2074362",
+    "name": "Hårfärg Natural & Easy Sval Ljusbrun 563 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/9b090949-d15b-4537-96e0-68e29b77b426/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074362/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074360",
+    "productId": "eff0170a-7231-42ae-8b3e-6de543e417e3",
+    "retailerProductId": "2074360",
+    "name": "Hårfärg Natural & Easy Nordisk Askblond 533 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e92a920d-b15e-424b-aa50-024e8ae8b71c/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074360/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2173745",
+    "productId": "9359f02b-0fcc-4b30-92d7-71fa8f99bd9c",
+    "retailerProductId": "2173745",
+    "name": "Fleecefilt Hjärtan",
+    "brand": "Noble House",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/452f1d86-8a96-4f5a-a18c-09660cc1be3b/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2173745/details",
+    "packageSize": "",
+    "countryOfOrigin": "Kina",
+    "price": 120,
+    "priceCurrency": "SEK",
+    "unitPrice": 120,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": 60,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 60,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.each",
+    "promotionDescription": "50 % rabatt",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2223420",
+    "productId": "91cb1b31-2bba-4239-898b-ac634e13796e",
+    "retailerProductId": "2223420",
+    "name": "Hårfärg 880 Dark Brown 1-p Brillance Schwartzkopf",
+    "brand": "Brillance Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/ee85b0c6-343e-4e70-ab43-bf9ec172e747/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2223420/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 86,
+    "priceCurrency": "SEK",
+    "unitPrice": 86,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2151302",
+    "productId": "462e8684-f126-44ba-8d0c-3b8219c6fc23",
+    "retailerProductId": "2151302",
+    "name": "Kaffekapslar NESP Ristretto 57g Starbucks",
+    "brand": "Starbucks",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/f2de3111-b0e8-488e-b90f-1582a403d142/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2151302/details",
+    "packageSize": "10 per frp",
+    "countryOfOrigin": "",
+    "price": 50.1,
+    "priceCurrency": "SEK",
+    "unitPrice": 5.01,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "3 för 95 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2382657",
+    "productId": "9edad934-711a-466c-b604-e3b69fd16878",
+    "retailerProductId": "2382657",
+    "name": "Solskydd Kids Sensitive Advanced Colored Roll-on SPF50+ 50ml Ambre Solaire",
+    "brand": "Ambre Solaire",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e87b0d0e-b6aa-46bc-ba84-93e56ee11e33/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2382657/details",
+    "packageSize": "0.05L",
+    "countryOfOrigin": "",
+    "price": 96.9,
+    "priceCurrency": "SEK",
+    "unitPrice": 1938,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 72.67,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 1453.4,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "25 % rabatt",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074365",
+    "productId": "d7db5347-59c6-4628-a1c8-9d15d2f22670",
+    "retailerProductId": "2074365",
+    "name": "Hårfärg Natural & Easy Satin Mörkblond 550 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/c4a8a387-f65b-4299-8650-33605ff2c0de/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074365/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2174183",
+    "productId": "779f5c4c-5a53-488b-b0aa-ef0e37bc8981",
+    "retailerProductId": "2174183",
+    "name": "Funny Sheep Caramel Milk Chocolate Popcorn 90g Smart Snack",
+    "brand": "Smart Snack",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/3e546e72-1e0b-497c-b8b0-53cad844318e/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2174183/details",
+    "packageSize": "0.09kg",
+    "countryOfOrigin": "",
+    "price": 21.67,
+    "priceCurrency": "SEK",
+    "unitPrice": 240.78,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.kg",
+    "promoPrice": 13,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 144.44,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.kg",
+    "promotionDescription": "40 % rabatt",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2153743",
+    "productId": "174bed3b-e4aa-46d8-a11f-6466a2261c9e",
+    "retailerProductId": "2153743",
+    "name": "Solskyddskräm Hydra 24H Protect SPF30 175ml Ambre Solaire",
+    "brand": "Ambre Solaire",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/a18627c7-e637-4f30-b061-c2d5bf9afefb/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2153743/details",
+    "packageSize": "0.175L",
+    "countryOfOrigin": "",
+    "price": 124,
+    "priceCurrency": "SEK",
+    "unitPrice": 708.57,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.litre",
+    "promoPrice": 93,
+    "promoPriceCurrency": "SEK",
+    "promoUnitPrice": 531.43,
+    "promoUnitPriceCurrency": "SEK",
+    "promoUnitPriceUnit": "fop.price.per.litre",
+    "promotionDescription": "25 % rabatt",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2223418",
+    "productId": "e81ea5b8-fe2e-4e61-90c9-e8190e1a1da1",
+    "retailerProductId": "2223418",
+    "name": "Hårfärg 862 Natural Brown 1-p Brillance Schwartzkopf",
+    "brand": "Brillance Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/afa100d1-23c2-42f0-917e-a72f229c646b/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2223418/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 86,
+    "priceCurrency": "SEK",
+    "unitPrice": 86,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2090883",
+    "productId": "1c3771b4-3aac-4781-99bc-20be19bb38ef",
+    "retailerProductId": "2090883",
+    "name": "Hårfärg 566 Matt Askbrun Natural & Easy 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/96cd1fbb-3bcb-4598-9005-e7bfc743b892/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2090883/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2074354",
+    "productId": "fd6f5578-fb92-42d6-b822-66af2d941cf9",
+    "retailerProductId": "2074354",
+    "name": "Hårfärg Natural & Easy Kastanj 576 1-p Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/79d23a8e-76f8-443b-b904-ff901e84da96/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2074354/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
+  },
+  {
+    "code": "2105326",
+    "productId": "412b983a-3751-4412-8152-f29f578ee1e5",
+    "retailerProductId": "2105326",
+    "name": "Hårfärg 555 Mörk Honungsblond 1-p Natural & Easy Schwartzkopf",
+    "brand": "Natural & Easy Schwartzkopf",
+    "categories": [
+      "ON_OFFER"
+    ],
+    "imageUrl": "https://handlaprivatkund.ica.se/images-v3/bf7a00ca-390e-4769-865f-dc369586872e/e19c36e0-88a8-4e99-a77b-b79a0a06bc1d/300x300.jpg",
+    "productUrl": "https://handlaprivatkund.ica.se/stores/1004247/products/2105326/details",
+    "packageSize": "",
+    "countryOfOrigin": "",
+    "price": 77,
+    "priceCurrency": "SEK",
+    "unitPrice": 77,
+    "unitPriceCurrency": "SEK",
+    "unitPriceUnit": "fop.price.per.each",
+    "promoPrice": null,
+    "promoPriceCurrency": "",
+    "promoUnitPrice": null,
+    "promoUnitPriceCurrency": "",
+    "promoUnitPriceUnit": "",
+    "promotionDescription": "2 för 119 kr",
+    "storeAccountId": "1004247",
+    "storeName": "ICA Focus",
+    "regionId": "6ae1c52a-99a8-4b19-9464-dd01274df39d",
+    "sourceUrl": "https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300",
+    "retrievedAt": "2026-05-22T09:01:34.220Z"
   }
 ];

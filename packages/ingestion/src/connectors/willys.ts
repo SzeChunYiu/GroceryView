@@ -97,6 +97,10 @@ type AxfoodCampaignProduct = {
 
 type AxfoodCampaignResponse = {
   results?: AxfoodCampaignProduct[];
+  pagination?: {
+    numberOfPages?: unknown;
+    currentPage?: unknown;
+  };
 };
 
 export const WILLYS_SEARCH_BASE_URL = 'https://www.willys.se/search';
@@ -132,6 +136,7 @@ export type FetchWillysWeeklyDiscountsOptions = {
   fetchImpl?: typeof fetch;
   storeId?: string;
   maxRows?: number;
+  pageSize?: number;
   retrievedAt?: string;
 };
 
@@ -141,11 +146,15 @@ export function buildWillysSearchUrl(query: string): string {
   return url.toString();
 }
 
-export function buildWillysWeeklyDiscountsUrl(storeId = DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_ID, size = 50): string {
+export function buildWillysWeeklyDiscountsUrl(
+  storeId = DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_ID,
+  size = 100,
+  page = 0
+): string {
   const url = new URL(WILLYS_WEEKLY_DISCOUNTS_BASE_URL);
   url.searchParams.set('q', storeId);
   url.searchParams.set('type', 'PERSONAL_GENERAL');
-  url.searchParams.set('page', '0');
+  url.searchParams.set('page', String(page));
   url.searchParams.set('size', String(size));
   return url.toString();
 }
@@ -193,36 +202,50 @@ export async function fetchWillysWeeklyDiscounts(
 ): Promise<WillysWeeklyDiscount[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const storeId = options.storeId ?? DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_ID;
-  const maxRows = options.maxRows ?? 50;
+  const maxRows = options.maxRows ?? 300;
+  const pageSize = options.pageSize ?? Math.min(maxRows, 100);
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
-  const sourceUrl = buildWillysWeeklyDiscountsUrl(storeId, maxRows);
-  const response = await fetchImpl(sourceUrl, {
-    headers: {
-      accept: 'application/json',
-      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error(`Willys weekly discounts request failed for ${storeId}: ${response.status}`);
-  }
-
-  const payload = await response.json() as AxfoodCampaignResponse;
   const rows: WillysWeeklyDiscount[] = [];
   const seenCodes = new Set<string>();
+  let page = 0;
+  let pageCount: number | null = null;
 
-  for (const product of payload.results ?? []) {
-    for (const promotion of product.potentialPromotions ?? []) {
-      const row = normalizeWillysWeeklyDiscount(product, promotion, sourceUrl, retrievedAt, storeId);
-      if (!row || seenCodes.has(row.code)) {
-        continue;
+  while (rows.length < maxRows && (pageCount === null || page < pageCount)) {
+    const sourceUrl = buildWillysWeeklyDiscountsUrl(storeId, pageSize, page);
+    const response = await fetchImpl(sourceUrl, {
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
       }
-      seenCodes.add(row.code);
-      rows.push(row);
-      if (rows.length >= maxRows) {
-        return rows;
+    });
+
+    if (!response.ok) {
+      throw new Error(`Willys weekly discounts request failed for ${storeId}: ${response.status}`);
+    }
+
+    const payload = await response.json() as AxfoodCampaignResponse;
+    const results = payload.results ?? [];
+    const responsePageCount = numberOrNull(payload.pagination?.numberOfPages);
+    pageCount = responsePageCount && responsePageCount > 0 ? responsePageCount : page + 1;
+
+    for (const product of results) {
+      for (const promotion of product.potentialPromotions ?? []) {
+        const row = normalizeWillysWeeklyDiscount(product, promotion, sourceUrl, retrievedAt, storeId);
+        if (!row || seenCodes.has(row.code)) {
+          continue;
+        }
+        seenCodes.add(row.code);
+        rows.push(row);
+        if (rows.length >= maxRows) {
+          return rows;
+        }
       }
     }
+
+    if (results.length === 0) {
+      break;
+    }
+    page += 1;
   }
 
   return rows;

@@ -21,6 +21,19 @@ class RecordingPgPool {
   calls: Array<{ text: string; values: unknown[] }> = [];
   closed = false;
   private entitlementRow: unknown | null = null;
+  private watchlistRows: Array<{
+    product_id: string;
+    target_price: number;
+    alert_deal_score_at: null;
+    favorite_stores_only: boolean;
+    allowed_price_types: string[];
+  }> = [{
+    product_id: 'product-coffee',
+    target_price: 50,
+    alert_deal_score_at: null,
+    favorite_stores_only: true,
+    allowed_price_types: ['promotion']
+  }];
 
   async query(text: string, values: unknown[] = []) {
     this.calls.push({ text, values });
@@ -90,6 +103,86 @@ class RecordingPgPool {
     if (text.includes('from subscription_entitlements')) {
       const row = this.entitlementRow as { user_id?: string } | null;
       return { rows: row?.user_id === values[0] ? [row] : [] };
+    }
+    if (text.includes("observations.price_type in ('promotion', 'member')")) {
+      return {
+        rows: [{
+          observation_id: 'obs-runtime-flyer-coffee',
+          source_run_id: 'run-runtime-flyer',
+          raw_record_id: 'raw-runtime-flyer',
+          price_type: 'promotion',
+          price: '49.90',
+          regular_price: '64.90',
+          currency: 'SEK',
+          promotion_text: 'Runtime weekly flyer',
+          promotion_starts_on: '2026-05-19',
+          promotion_ends_on: '2026-05-25',
+          member_required: false,
+          observed_at: '2026-05-19T06:30:00.000Z',
+          valid_from: '2026-05-19T00:00:00.000Z',
+          valid_until: '2026-05-25T21:59:59.000Z',
+          confidence: '0.9200',
+          provenance: { sourceUrl: 'https://example.test/runtime-flyer' },
+          product_id: 'product-coffee',
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          category_path: ['coffee'],
+          chain_id: 'chain-willys',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          store_id: 'store-willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          store_city: 'Stockholm'
+        }]
+      };
+    }
+    if (text.includes('from stores') && text.includes('join chains') && text.includes('where stores.slug = $1')) {
+      return {
+        rows: values[0] === 'willys-odenplan'
+          ? [{ store_slug: 'willys-odenplan', store_name: 'Willys Odenplan', chain_slug: 'willys' }]
+          : []
+      };
+    }
+    if (text.includes('select store_id from favorite_stores')) {
+      return { rows: [{ store_id: 'store-willys' }] };
+    }
+    if (text.includes('select slug as store_slug from stores')) {
+      return { rows: [{ store_slug: 'willys-odenplan' }] };
+    }
+    if (text.includes('select product_id, target_price, alert_deal_score_at, favorite_stores_only, allowed_price_types from watchlist_items')) {
+      return { rows: this.watchlistRows };
+    }
+    if (text.includes('select id::text from watchlist_items')) {
+      return { rows: [] };
+    }
+    if (text.includes('select id::text as product_id from products')) {
+      return { rows: [{ product_id: 'product-coffee' }] };
+    }
+    if (text.includes('insert into watchlist_items')) {
+      this.watchlistRows = [{
+        product_id: values[1] as string,
+        target_price: values[2] as number,
+        alert_deal_score_at: null,
+        favorite_stores_only: values[4] as boolean,
+        allowed_price_types: values[5] as string[]
+      }];
+      return { rows: [] };
+    }
+    if (text.includes('from latest_prices')) {
+      return {
+        rows: [{
+          product_id: 'product-coffee',
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          price: '49.90',
+          price_type: 'promotion',
+          confidence: '0.9200',
+          observed_at: '2026-05-19T06:30:00.000Z'
+        }]
+      };
     }
     if (text.includes('left join latest_prices')) {
       return {
@@ -466,6 +559,77 @@ describe('runtime config', () => {
     const writeCall = pool.calls.find((call) => call.text.includes('insert into subscription_entitlements'));
     assert.deepEqual(writeCall?.values.slice(0, 4), ['user-1', 'premium', 'premium_monthly', 'active']);
     assert.equal(writeCall?.text.includes('$1'), true);
+  });
+
+  it('serves runtime flyer offers and watchlist price alerts from persisted PostgreSQL rows', async () => {
+    const pool = new RecordingPgPool();
+    const authSecret = 'auth-secret';
+    const service = createRuntimeHttpService(
+      {
+        NODE_ENV: 'development',
+        PORT: '3000',
+        AUTH_SECRET: authSecret,
+        DATABASE_URL: 'postgres://runtime-db.example/groceryview',
+        PUBLIC_WEB_URL: 'https://groceryview.example',
+        NOTIFICATION_WEBHOOK_SECRET: 'notification-secret',
+        BILLING_WEBHOOK_SECRET: 'billing-secret',
+        METRICS_TOKEN: 'metrics-secret'
+      },
+      { pgPoolFactory: () => pool }
+    );
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, authSecret);
+
+    try {
+      const flyerOffers = await service.handler(new Request('http://localhost/api/deals/flyer-offers?chain=willys&asOf=2026-05-20T12:00:00.000Z'));
+      assert.equal(flyerOffers.status, 200);
+      const flyerBody = await flyerOffers.json() as {
+        offerCount: number;
+        offers: Array<{ offerId: string; sourceRunId: string; sourceUrl: string; savings: number }>;
+      };
+      assert.equal(flyerBody.offerCount, 1);
+      assert.deepEqual(flyerBody.offers.map((offer) => [offer.offerId, offer.sourceRunId, offer.sourceUrl, offer.savings]), [
+        ['obs-runtime-flyer-coffee', 'run-runtime-flyer', 'https://example.test/runtime-flyer', 15]
+      ]);
+
+      const storeFlyerOffers = await service.handler(new Request('http://localhost/api/stores/willys-odenplan/flyer-offers?asOf=2026-05-20T12:00:00.000Z'));
+      assert.equal(storeFlyerOffers.status, 200);
+      assert.equal((await storeFlyerOffers.json() as { storeId: string; bestOffer: { offerId: string } }).bestOffer.offerId, 'obs-runtime-flyer-coffee');
+
+      const alerts = await service.handler(new Request('http://localhost/api/watchlist/price-alerts?userId=user-1', {
+        headers: { authorization: `Bearer ${token}` }
+      }));
+      assert.equal(alerts.status, 200);
+      const alertBody = await alerts.json() as {
+        userId: string;
+        trackedItemCount: number;
+        alertCount: number;
+        alerts: Array<{ type: string; trigger: { storeId: string; value: number } }>;
+      };
+      assert.equal(alertBody.userId, 'user-1');
+      assert.equal(alertBody.trackedItemCount, 1);
+      assert.equal(alertBody.alertCount, 1);
+      assert.deepEqual(alertBody.alerts.map((alert) => [alert.type, alert.trigger.storeId, alert.trigger.value]), [
+        ['target_price', 'willys-odenplan', 49.9]
+      ]);
+
+      const created = await service.handler(new Request('http://localhost/api/watchlist/price-alerts?userId=user-1', {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${token}`,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({ productId: 'coffee', targetPrice: 45, favoriteStoresOnly: true, allowedPriceTypes: ['promotion'] })
+      }));
+      assert.equal(created.status, 201);
+      assert.equal((await created.json() as { alertCount: number }).alertCount, 0);
+    } finally {
+      await service.close();
+    }
+
+    assert.equal(pool.closed, true);
+    assert.equal(pool.calls.some((call) => call.text.includes('from observations')), true);
+    assert.equal(pool.calls.some((call) => call.text.includes('from latest_prices')), true);
+    assert.equal(pool.calls.some((call) => call.text.includes('insert into watchlist_items')), true);
   });
 
   it('exposes PostgreSQL readiness from the runtime DATABASE_URL pool without leaking secrets', async () => {

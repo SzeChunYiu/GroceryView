@@ -556,6 +556,45 @@ describe('fetchHemkopWeeklyDiscounts', () => {
       retrievedAt: '2026-05-22T08:25:03.000Z'
     }]);
   });
+
+  it('paginates Hemkop Axfood weekly discounts until reported pages are exhausted', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = new URL(String(url)).searchParams.get('page');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 2, currentPage: Number(page) },
+        results: [{
+          manufacturer: 'Garant',
+          name: `Hemkop offer ${page}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: `hemkop-${page}`,
+            mainProductCode: `hemkop-product-${page}`,
+            name: `Hemkop offer ${page}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopWeeklyDiscounts({
+      storeId: '4003',
+      maxRows: 10,
+      pageSize: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildHemkopWeeklyDiscountsUrl('4003', 1, 0),
+      buildHemkopWeeklyDiscountsUrl('4003', 1, 1)
+    ]);
+    assert.deepEqual(rows.map((row) => row.code), ['hemkop-0', 'hemkop-1']);
+    assert.equal(rows[1]?.sourceUrl, buildHemkopWeeklyDiscountsUrl('4003', 1, 1));
+  });
 });
 
 describe('fetchIcaProducts', () => {
@@ -1203,6 +1242,45 @@ describe('fetchWillysWeeklyDiscounts', () => {
       sourceUrl: buildWillysWeeklyDiscountsUrl('2110', 1),
       retrievedAt: '2026-05-22T08:25:03.000Z'
     }]);
+  });
+
+  it('paginates Willys Axfood weekly discounts until reported pages are exhausted', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = new URL(String(url)).searchParams.get('page');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 2, currentPage: Number(page) },
+        results: [{
+          manufacturer: 'Garant',
+          name: `Willys offer ${page}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: `willys-${page}`,
+            mainProductCode: `willys-product-${page}`,
+            name: `Willys offer ${page}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysWeeklyDiscounts({
+      storeId: '2110',
+      maxRows: 10,
+      pageSize: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildWillysWeeklyDiscountsUrl('2110', 1, 0),
+      buildWillysWeeklyDiscountsUrl('2110', 1, 1)
+    ]);
+    assert.deepEqual(rows.map((row) => row.code), ['willys-0', 'willys-1']);
+    assert.equal(rows[1]?.sourceUrl, buildWillysWeeklyDiscountsUrl('2110', 1, 1));
   });
 });
 
