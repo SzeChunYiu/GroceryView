@@ -162,7 +162,7 @@ export function buildWillysWeeklyDiscountsUrl(
 export async function fetchWillysProducts(options: FetchWillysProductsOptions = {}): Promise<WillysProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const queries = options.queries ?? DEFAULT_WILLYS_SEARCH_QUERIES;
-  const maxRows = options.maxRows ?? 75;
+  const maxRows = options.maxRows ?? 150;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: WillysProduct[] = [];
   const seenCodes = new Set<string>();
