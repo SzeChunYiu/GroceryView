@@ -663,6 +663,31 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces product multi-timeframe price charts using the real core chart adapter and lightweight-charts', async () => {
+    const product = await read('src/app/products/[slug]/page.tsx');
+    const chart = await read('src/components/price-chart-terminal.tsx');
+
+    assert.match(product, /buildPriceChartSeries/);
+    assert.match(product, /priceChartTerminalFor/);
+    assert.match(product, /timeframeWindows/);
+    assert.match(product, /rangeDays: window\.rangeDays/);
+    assert.match(product, /PriceChartTerminal/);
+    assert.match(chart, /lightweight-charts/);
+    assert.match(chart, /createChart/);
+    assert.match(chart, /LineSeries/);
+    assert.match(chart, /Price chart terminal/);
+    assert.match(chart, /1W/);
+    assert.match(chart, /1M/);
+    assert.match(chart, /3M/);
+    assert.match(chart, /1Y/);
+    assert.match(chart, /ALL/);
+    assert.match(chart, /crosshair value readout/);
+    assert.match(chart, /lineStyle/);
+    assert.match(chart, /markers/);
+    assert.doesNotMatch(product, /@\/lib\/demo-data/);
+    assert.doesNotMatch(chart, /@\/components\/sample-data/);
+  });
+
   it('surfaces verified catalogue savings on the compare route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/compare/page.tsx');
@@ -804,6 +829,29 @@ describe('verified-data UI', () => {
     assert.match(products, /OpenFoodFacts metadata catalog/);
     assert.match(products, /metadata-only/);
     assert.match(products, /No synthetic prices/);
+  });
+
+  it('ships JSON-LD organization, site search, product offer, and breadcrumb metadata', async () => {
+    const layout = await read('src/app/layout.tsx');
+    const productRoute = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(layout, /application\/ld\+json/);
+    assert.match(layout, /'@type': 'Organization'/);
+    assert.match(layout, /'@type': 'WebSite'/);
+    assert.match(layout, /SearchAction/);
+    assert.match(layout, /query-input/);
+    assert.match(layout, /https:\/\/grocery-web-mu\.vercel\.app/);
+
+    assert.match(productRoute, /productJsonLdFor/);
+    assert.match(productRoute, /'@type': 'Product'/);
+    assert.match(productRoute, /'@type': 'AggregateOffer'/);
+    assert.match(productRoute, /lowPrice/);
+    assert.match(productRoute, /highPrice/);
+    assert.match(productRoute, /priceCurrency: 'SEK'/);
+    assert.match(productRoute, /breadcrumbJsonLdFor/);
+    assert.match(productRoute, /'@type': 'BreadcrumbList'/);
+    assert.match(productRoute, /application\/ld\+json/);
+    assert.doesNotMatch(productRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
   it('ships crawlable sitemap and robots metadata from verified route drivers', async () => {

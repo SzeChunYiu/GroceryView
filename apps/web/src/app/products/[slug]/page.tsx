@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
+  buildPriceChartSeries,
   calculateDealScore,
   recommendSmartSwaps,
   scoreBand,
@@ -9,15 +10,24 @@ import {
   type BrandTier
 } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 
 const REQUIRED_CHAIN_COVERAGE = 6;
+const siteUrl = 'https://grocery-web-mu.vercel.app';
 const smartSwapPrivateLabelPreference = {
   acceptedTiers: ['standard_private_label', 'budget_private_label', 'organic_private_label', 'discount_chain_label'] as BrandTier[],
   blockedCategories: ['baby_formula']
 };
+const timeframeWindows = [
+  { label: '1W', rangeDays: 7, rangeLabel: 'last 7 days' },
+  { label: '1M', rangeDays: 30, rangeLabel: 'last 30 days' },
+  { label: '3M', rangeDays: 90, rangeLabel: 'last 90 days' },
+  { label: '1Y', rangeDays: 365, rangeLabel: 'last 365 days' },
+  { label: 'ALL', rangeDays: undefined, rangeLabel: 'all observed points' }
+] as const;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -57,6 +67,58 @@ function productBrand(product: NonNullable<ReturnType<typeof findProduct>>) {
 
 function productUnitPrice(product: NonNullable<ReturnType<typeof findProduct>>) {
   return 'lowestPrice' in product ? product.lowestPrice : product.priceMedian;
+}
+
+function productOfferBounds(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product) {
+    const prices = chainPriceRows(product)
+      .map((row) => row.price)
+      .filter((price): price is number => typeof price === 'number' && Number.isFinite(price));
+    return {
+      lowPrice: prices.length ? Math.min(...prices) : product.lowestPrice,
+      highPrice: prices.length ? Math.max(...prices) : product.highestPrice,
+      offerCount: Math.max(prices.length, product.inChains.length)
+    };
+  }
+
+  return { lowPrice: product.priceMin, highPrice: product.priceMax, offerCount: product.observationCount };
+}
+
+function productJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const bounds = productOfferBounds(product);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: product.image ? [product.image] : undefined,
+    brand: { '@type': 'Brand', name: productBrand(product) },
+    category: labelFromSlug(product.category),
+    offers: {
+      '@type': 'AggregateOffer',
+      priceCurrency: 'SEK',
+      lowPrice: bounds.lowPrice,
+      highPrice: bounds.highPrice,
+      offerCount: bounds.offerCount,
+      availability: 'https://schema.org/InStock',
+      url: `${siteUrl}/products/${product.slug}`
+    }
+  };
+}
+
+function breadcrumbJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Products', item: `${siteUrl}/products` },
+      { '@type': 'ListItem', position: 2, name: labelFromSlug(product.category), item: `${siteUrl}/categories/${product.category}` },
+      { '@type': 'ListItem', position: 3, name: product.name, item: `${siteUrl}/products/${product.slug}` }
+    ]
+  };
+}
+
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
 function brandTierFor(brand: string, labels: string[] = []): BrandTier {
@@ -216,6 +278,80 @@ function priceHistoryBadgeFor(product: NonNullable<ReturnType<typeof findProduct
   };
 }
 
+function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceChartTerminalModel {
+  const emptyWindows: PriceChartTerminalWindow[] = timeframeWindows.map((window) => ({
+    label: window.label,
+    rangeLabel: window.rangeLabel,
+    pointCount: 0,
+    markerCount: 0,
+    latestValueLabel: 'Not reported',
+    lowValueLabel: 'Not reported',
+    highValueLabel: 'Not reported',
+    series: []
+  }));
+
+  if ('lowestPrice' in product || product.observations.length === 0) {
+    return {
+      available: false,
+      title: 'Multi-timeframe chart withheld',
+      sourceLabel: 'No dated OpenPrices tape bundled for this source',
+      confidenceLabel: 'chart confidence unavailable',
+      caveat: 'This product source has no dated observation tape, so GroceryView does not render a synthetic chart.',
+      defaultWindow: 'ALL',
+      windows: emptyWindows
+    };
+  }
+
+  const latestObservedAt = latestObservationFor(product)?.date ?? product.lastObservedAt;
+  const asOf = `${latestObservedAt}T00:00:00.000Z`;
+  const sourceConfidence = clamp(product.observationCount / 30, 0, 1);
+  const observations = product.observations.map((observation) => ({
+    observedAt: `${observation.date}T00:00:00.000Z`,
+    price: observation.price,
+    storeId: 'openprices-community',
+    storeName: 'OpenPrices community',
+    sourceType: 'online' as const,
+    confidence: sourceConfidence,
+    provenanceLabel: `${product.observationCount} OpenPrices observations · ${product.code}`
+  }));
+
+  const windows = timeframeWindows.map((window): PriceChartTerminalWindow => {
+    const result = buildPriceChartSeries({
+      observations,
+      asOf,
+      rangeDays: window.rangeDays,
+      markerLimitPerSeries: 8
+    });
+    const points = result.series.flatMap((series) => series.points);
+    const values = points.map((point) => point.value);
+    const latestPoint = [...points].sort((a, b) => a.time.localeCompare(b.time)).at(-1);
+
+    return {
+      label: window.label,
+      rangeLabel: window.rangeLabel,
+      windowStart: result.windowStart,
+      windowEnd: result.windowEnd,
+      pointCount: points.length,
+      markerCount: result.series.reduce((total, series) => total + series.markers.length, 0),
+      latestValueLabel: latestPoint ? formatSek(latestPoint.value) : 'Not reported',
+      latestObservedAt: latestPoint?.time,
+      lowValueLabel: values.length ? formatSek(Math.min(...values)) : 'Not reported',
+      highValueLabel: values.length ? formatSek(Math.max(...values)) : 'Not reported',
+      series: result.series
+    };
+  });
+
+  return {
+    available: windows.some((window) => window.pointCount > 0),
+    title: 'Multi-timeframe OpenPrices tape',
+    sourceLabel: 'buildPriceChartSeries · OpenPrices community observations',
+    confidenceLabel: `${formatPct(sourceConfidence * 100)} chart confidence`,
+    caveat: 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred.',
+    defaultWindow: windows.find((window) => window.label === '1Y' && window.pointCount > 0)?.label ?? 'ALL',
+    windows
+  };
+}
+
 export function generateStaticParams() {
   return [...axfoodProducts.slice(0, 40), ...pricedProducts.slice(0, 40)].map((product) => ({ slug: product.slug }));
 }
@@ -228,9 +364,14 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const dealVerdict = dealScoreVerdictFor(product);
   const smartSwaps = smartSwapRecommendationsFor(product);
   const priceHistoryBadge = priceHistoryBadgeFor(product);
+  const priceChartTerminal = priceChartTerminalFor(product);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
+  const productJsonLd = productJsonLdFor(product);
+  const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
   return (
     <PageShell>
+      <script dangerouslySetInnerHTML={{ __html: jsonLd(productJsonLd) }} type="application/ld+json" />
+      <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">{product.name}</h1>
       <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
@@ -326,6 +467,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         )}
         <p className="mt-4 text-xs font-semibold text-slate-500">{smartSwaps.caveat}</p>
       </Card>
+      <PriceChartTerminal chart={priceChartTerminal} />
       <Card className="mt-6 border-sky-200 bg-sky-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
