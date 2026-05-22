@@ -5,6 +5,8 @@ export type CatalogProductCoverage = {
   observedStoreIds: string[];
 };
 
+export { COMMODITIES, STAPLE_BASKET, findCommodity, type Commodity, type ComparableUnit } from './commodities.js';
+
 export type CatalogCoverageInput = {
   targetProducts?: string[];
   targetCategories: string[];

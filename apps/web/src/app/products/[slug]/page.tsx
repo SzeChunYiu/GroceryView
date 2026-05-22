@@ -13,7 +13,7 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
-import { chainPriceRows, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
+import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { metadataForProduct } from '@/lib/seo';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
@@ -968,6 +968,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const crossChainHistoryOverlay = crossChainHistoryOverlayFor(product);
   const intraChainBranchSpread = intraChainBranchSpreadFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
+  const commodityComparison = commodityComparisonForProduct(product.slug);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
   const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
@@ -1021,6 +1022,40 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700">Confidence: {freshnessBadge.confidenceBadge}</p>
         </div>
       </Card>
+      {commodityComparison ? (
+        <Card className="mt-6 border-lime-200 bg-lime-50/70">
+          <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-lime-800">Commodity / no-barcode price match</p>
+              <h2 className="mt-2 text-2xl font-black text-slate-950">Cheapest chain for this commodity</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+                Calls compareCommodityUnitPrices for the canonical {commodityComparison.commodityName} commodity and compares only kr/{commodityComparison.comparableUnit} rows that clear sourceConfidence. Alias-matched loose produce and meat are labelled medium-confidence, never barcode-equivalent.
+              </p>
+            </div>
+            <div className="rounded-[2rem] bg-white p-5 text-right shadow-sm">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">{commodityComparison.status}</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">{commodityComparison.cheapestChain?.chainName ?? 'Coverage blocked'}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{commodityComparison.coverage.chainCount} chain(s) · {commodityComparison.coverage.observationCount} evidence rows</p>
+            </div>
+          </div>
+          {commodityComparison.status === 'priced' ? (
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {commodityComparison.rows.map((row) => (
+                <Link className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm transition hover:border-lime-700" href={`/products/${row.productId}`} key={`${row.chainId}-${row.productId}`}>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">#{row.rank} · {row.chainName}</p>
+                  <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
+                  <p className="mt-2 text-2xl font-black text-emerald-800">{formatSek(row.unitPrice)} / {row.comparableUnit}</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-600">sourceConfidence {formatPct(row.sourceConfidence * 100)} · save {formatPct(row.savingsVsNextPercent)} vs next chain</p>
+                  <p className="mt-2 text-xs font-semibold text-slate-500">{row.variant ?? 'Variant not reported'} {row.originCountry ? `· origin ${row.originCountry}` : ''}</p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-950">{commodityComparison.confidenceLabel}</p>
+          )}
+          <p className="mt-4 text-xs font-semibold text-slate-500">{commodityComparison.confidenceLabel}</p>
+        </Card>
+      ) : null}
       <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>

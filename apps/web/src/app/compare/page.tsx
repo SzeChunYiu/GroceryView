@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
+import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -67,6 +67,32 @@ export default function ComparePage() {
                 <p className="rounded-xl bg-rose-50 p-3 font-black text-rose-950">Gap {formatSek(item.priceGap)}</p>
               </div>
               <p className="mt-3 text-xs font-semibold text-slate-500">{item.evidenceLabel} · {formatPct(item.spreadPct)}</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+      <Card className="mt-6 border-lime-200 bg-lime-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-lime-800">feat(commodity)</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Cross-chain commodity comparison</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Calls compareCommodityUnitPrices over canonical commodity/alias match rows, then ranks each chain by comparable kr/{commodityComparisons[0]?.comparableUnit ?? 'kg'} evidence. Pack prices and barcode-only matches do not enter this board.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-lime-900 shadow-sm">{commodityComparisons.length} priced commodities</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {commodityComparisons.slice(0, 6).map((comparison) => (
+            <Link className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-lime-700" href={`/products/${comparison.cheapestChain?.productId}`} key={comparison.commodityId}>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-lime-800">{comparison.commodityName} · kr/{comparison.comparableUnit}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{comparison.cheapestChain?.chainName ?? 'Coverage blocked'}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{comparison.cheapestChain?.productName ?? 'No chain clears coverage'}</p>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                <p className="rounded-xl bg-lime-50 p-3 font-black text-lime-950">Cheapest {formatSek(comparison.cheapestChain?.unitPrice)}</p>
+                <p className="rounded-xl bg-white p-3 font-black text-slate-950">{formatPct(comparison.cheapestChain?.savingsVsNextPercent)} vs next</p>
+              </div>
+              <p className="mt-3 text-xs font-semibold text-slate-500">{comparison.confidenceLabel}</p>
             </Link>
           ))}
         </div>

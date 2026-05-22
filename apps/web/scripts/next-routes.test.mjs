@@ -437,6 +437,24 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces cross-chain commodity comparison by comparable unit on compare and product routes', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const compare = await read('src/app/compare/page.tsx');
+    const product = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(verified, /compareCommodityUnitPrices/);
+    assert.match(verified, /commodityComparisons/);
+    assert.match(verified, /commodityComparisonForProduct/);
+    assert.match(verified, /commodity\/alias match/);
+    assert.match(compare, /commodityComparisons/);
+    assert.match(compare, /Cross-chain commodity comparison/);
+    assert.match(compare, /kr\/\{comparison\.comparableUnit\}/);
+    assert.match(product, /commodityComparisonForProduct/);
+    assert.match(product, /Cheapest chain for this commodity/);
+    assert.match(product, /sourceConfidence/);
+    assert.doesNotMatch(compare, /NoVerifiedData/);
+  });
+
 
 
 
