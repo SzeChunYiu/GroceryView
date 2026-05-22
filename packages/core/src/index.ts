@@ -403,6 +403,95 @@ export type BasketTripCostPlan = {
 
 
 
+
+export type BasketFulfillmentMode = 'pickup' | 'delivery';
+export type BasketFulfillmentAccess = 'official_api' | 'manual_evidence' | 'stub_only' | 'blocked';
+
+export type BasketFulfillmentSlotEvidenceSource = {
+  access: BasketFulfillmentAccess;
+  evidenceUrl?: string;
+  capturedAt: string;
+  shopperConsent: boolean;
+};
+
+export type BasketFulfillmentSlotInput = {
+  slotId: string;
+  mode: BasketFulfillmentMode;
+  startsAt: string;
+  endsAt: string;
+  fee: number;
+  currency: 'SEK';
+  available: boolean;
+};
+
+export type BasketFulfillmentSlotsInput = {
+  retailerId: string;
+  retailerName: string;
+  storeId: string;
+  storeName: string;
+  asOf: string;
+  basketProductIds: string[];
+  source: BasketFulfillmentSlotEvidenceSource;
+  slots: BasketFulfillmentSlotInput[];
+};
+
+export type BasketFulfillmentSlotsPlan = {
+  retailerId: string;
+  retailerName: string;
+  storeId: string;
+  storeName: string;
+  asOf: string;
+  status: 'evidence_available' | 'manual_review' | 'blocked';
+  availableSlotCount: number;
+  availableSlots: BasketFulfillmentSlotInput[];
+  blockedReasons: string[];
+  guardrails: string[];
+};
+
+const fulfillmentSlotGuardrails = [
+  'Fulfillment slots are evidence snapshots, not retailer reservations.',
+  'Delivery or pickup availability must be re-confirmed inside the retailer checkout.',
+  'GroceryView cannot claim checkout completion, delivery booking, or inventory reservation from slot evidence.'
+];
+
+export function planBasketFulfillmentSlots(input: BasketFulfillmentSlotsInput): BasketFulfillmentSlotsPlan {
+  requireNonBlank(input.retailerId, 'retailerId');
+  requireNonBlank(input.retailerName, 'retailerName');
+  requireNonBlank(input.storeId, 'storeId');
+  requireNonBlank(input.storeName, 'storeName');
+  requireNonBlank(input.asOf, 'asOf');
+  requireNonBlank(input.source.capturedAt, 'capturedAt');
+  const blockedReasons: string[] = [];
+  if (!input.source.shopperConsent) blockedReasons.push('Shopper consent is required before using retailer checkout slot evidence.');
+  if (input.source.access === 'blocked' || input.source.access === 'stub_only') blockedReasons.push(`${input.retailerName} fulfillment slot access is ${input.source.access}.`);
+  for (const productId of input.basketProductIds) requireNonBlank(productId, 'basketProductIds.productId');
+
+  const slots = input.slots.map((slot) => {
+    requireNonBlank(slot.slotId, 'slotId');
+    requireNonBlank(slot.startsAt, 'startsAt');
+    requireNonBlank(slot.endsAt, 'endsAt');
+    if (slot.fee < 0) throw new Error('fee must be non-negative.');
+    if (!slot.available) blockedReasons.push(`${slot.slotId} is currently unavailable.`);
+    return slot;
+  });
+  const availableSlots = slots.filter((slot) => slot.available);
+  const status = blockedReasons.some((reason) => /consent|required|blocked|stub_only/.test(reason))
+    ? 'blocked'
+    : availableSlots.length > 0 ? 'evidence_available' : 'manual_review';
+  return {
+    retailerId: input.retailerId,
+    retailerName: input.retailerName,
+    storeId: input.storeId,
+    storeName: input.storeName,
+    asOf: input.asOf,
+    status,
+    availableSlotCount: availableSlots.length,
+    availableSlots,
+    blockedReasons,
+    guardrails: fulfillmentSlotGuardrails
+  };
+}
+
 export type BasketImportExportSourceKind = 'bookmarklet' | 'browser_extension' | 'copy_paste';
 
 export type BasketImportExportSource = {

@@ -487,6 +487,29 @@ export const basketTripCostContract = {
   ]
 };
 
+export const fulfillmentSlotsContract = {
+  endpoint: '/api/basket/fulfillment-slots/{retailerId}/{storeId}',
+  title: 'Delivery and pickup slot evidence',
+  status: 'implemented_account_api',
+  requiredInputs: [
+    'signed-in userId',
+    'retailerId and storeId selected from verified GroceryView store records',
+    'shopper consent for manually captured retailer slot evidence',
+    'capturedAt and asOf timestamps for every delivery or pickup availability snapshot'
+  ],
+  shippedBehaviors: [
+    'Separates pickup and delivery availability evidence from basket pricing and trip-cost ranking.',
+    'Returns only currently available slots in the available slot list while retaining unavailable-slot blockers.',
+    'Labels every slot report as evidence, not retailer reservations or checkout completion.',
+    'Requires shoppers to re-confirm delivery or pickup availability inside the retailer checkout.'
+  ],
+  blockedInStaticSnapshot: [
+    'No authenticated private basket or retailer session is bundled with this static build.',
+    'No delivery or pickup slot is presented as reserved, booked, or guaranteed.',
+    'No retailer checkout is completed or claimed from static evidence snapshots.'
+  ]
+};
+
 export const recurringBasketDigestContract = {
   endpoint: '/api/basket/recurring-digest',
   title: 'Recurring basket digest',

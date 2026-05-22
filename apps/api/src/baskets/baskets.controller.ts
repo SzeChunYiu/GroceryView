@@ -118,6 +118,19 @@ export class BasketsController {
     }
   }
 
+  @Get('fulfillment-slots/:retailerId/:storeId')
+  @ApiOkResponse({ description: 'Fulfillment slot evidence without reservation claims' })
+  fulfillmentSlots(@Param('retailerId') retailerId: string, @Param('storeId') storeId: string) {
+    try {
+      return { ...groceryApi.getBasketFulfillmentSlots('demo', retailerId, storeId), demo: true };
+    } catch (error) {
+      if (error instanceof Error && /Unknown storeId/.test(error.message)) {
+        throw new NotFoundException('Store not found');
+      }
+      throw error;
+    }
+  }
+
   @Get('trip-cost')
   @ApiOkResponse({ description: 'Basket plus travel-cost optimizer' })
   tripCost(

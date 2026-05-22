@@ -125,6 +125,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces fulfillment slot evidence guardrails on the shopping trips route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/shopping-trips/page.tsx');
+
+    assert.match(verified, /export const fulfillmentSlotsContract = /);
+    assert.match(verified, /\/api\/basket\/fulfillment-slots/);
+    assert.match(route, /fulfillmentSlotsContract/);
+    assert.match(route, /Delivery and pickup slot evidence/);
+    assert.match(route, /not retailer reservations/);
+    assert.match(route, /retailer checkout/);
+    assert.match(route, /NoVerifiedData/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces the recurring basket digest product contract on the weekly basket route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/weekly-basket/page.tsx');

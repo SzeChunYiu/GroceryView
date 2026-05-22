@@ -408,6 +408,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
     assert.ok(docs.body.paths['/users/demo/basket/recurring-digest']);
     assert.ok(docs.body.paths['/users/demo/basket/trip-cost']);
+    assert.ok(docs.body.paths['/users/demo/basket/fulfillment-slots/{retailerId}/{storeId}']);
     assert.ok(docs.body.paths['/users/demo/basket/handoff/{retailerId}']);
     assert.ok(docs.body.paths['/users/demo/basket/import-export']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
@@ -995,6 +996,15 @@ describe('GroceryView API app', () => {
     assert.equal(handoff.body.retailerId, 'willys');
     assert.equal(handoff.body.primaryAction.actionType, 'copy_list');
     assert.match(handoff.body.unsupportedReasons[1], /cannot claim purchase completion/i);
+
+    const slots = await request(app.getHttpServer())
+      .get('/users/demo/basket/fulfillment-slots/willys/willys-odenplan')
+      .expect(200);
+    assert.equal(slots.body.userId, 'demo');
+    assert.equal(slots.body.demo, true);
+    assert.equal(slots.body.status, 'evidence_available');
+    assert.equal(slots.body.availableSlotCount, 1);
+    assert.match(slots.body.guardrails[0], /not retailer reservations/i);
 
     const tripCost = await request(app.getHttpServer())
       .get('/users/demo/basket/trip-cost?travelMode=car&valueOfTimePerHour=120&carCostPerKm=3.5&splitTripPenalty=15')
