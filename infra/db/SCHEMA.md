@@ -124,6 +124,22 @@ Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `obse
 
 Primary key: `(product_id, chain_id, store_id, price_type)`.
 
+### `price_daily`
+
+Derived daily rollup over immutable `observations` for product charts, 52-week-low checks, and historic range reads. Raw observations remain authoritative; charts and 52-week-low reads must hit `price_daily` or `price_weekly` instead of scanning raw observations for long ranges.
+
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `currency`, `bucket_day`, `min_price`, `max_price`, `avg_price`, `last_price`, unit-price equivalents, `first_observed_at`, `last_observed_at`, `observation_count`, `source_observation_ids`, `provenance`.
+
+Indexes: `price_daily_product_chain_day_idx`, `price_daily_store_day_idx`, and `price_daily_domain_day_idx`.
+
+### `price_weekly`
+
+Derived weekly rollup over immutable `observations` for long-range market charts and price-history summaries. It uses ISO-style `date_trunc('week', observed_at)::date` buckets and keeps source observation ids so every aggregate remains traceable to raw facts.
+
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `currency`, `week_start`, `min_price`, `max_price`, `avg_price`, `last_price`, unit-price equivalents, `first_observed_at`, `last_observed_at`, `observation_count`, `source_observation_ids`, `provenance`.
+
+Indexes: `price_weekly_product_chain_week_idx`, `price_weekly_store_week_idx`, and `price_weekly_domain_week_idx`.
+
 ### `users`
 
 Application user profile data.

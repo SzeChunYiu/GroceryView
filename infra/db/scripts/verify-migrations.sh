@@ -56,6 +56,8 @@ REQUIRED_TABLES=(
   retailer_source_policies
   observations
   latest_prices
+  price_daily
+  price_weekly
   users
   watchlists
   baskets
