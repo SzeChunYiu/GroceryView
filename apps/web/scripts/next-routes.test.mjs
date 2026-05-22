@@ -944,6 +944,22 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces an honest intra-chain branch spread gate without branch-price claims', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /intraChainBranchSpreadFor/);
+    assert.match(source, /branchSpreadRows/);
+    assert.match(source, /cheapestBranchLabel/);
+    assert.match(source, /dearestBranchLabel/);
+    assert.match(source, /intra-chain branch spread/);
+    assert.match(source, /per-branch shelf observations/);
+    assert.match(source, /No branch spread is calculated from chain-wide catalogue prices/);
+    assert.match(source, /confidence\/coverage/);
+    assert.match(source, /chainPriceRows/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces product multi-timeframe price charts using the real core chart adapter and lightweight-charts', async () => {
     const product = await read('src/app/products/[slug]/page.tsx');
     const chart = await read('src/components/price-chart-terminal.tsx');
