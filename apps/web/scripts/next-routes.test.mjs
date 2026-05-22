@@ -663,6 +663,31 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces product multi-timeframe price charts using the real core chart adapter and lightweight-charts', async () => {
+    const product = await read('src/app/products/[slug]/page.tsx');
+    const chart = await read('src/components/price-chart-terminal.tsx');
+
+    assert.match(product, /buildPriceChartSeries/);
+    assert.match(product, /priceChartTerminalFor/);
+    assert.match(product, /timeframeWindows/);
+    assert.match(product, /rangeDays: window\.rangeDays/);
+    assert.match(product, /PriceChartTerminal/);
+    assert.match(chart, /lightweight-charts/);
+    assert.match(chart, /createChart/);
+    assert.match(chart, /LineSeries/);
+    assert.match(chart, /Price chart terminal/);
+    assert.match(chart, /1W/);
+    assert.match(chart, /1M/);
+    assert.match(chart, /3M/);
+    assert.match(chart, /1Y/);
+    assert.match(chart, /ALL/);
+    assert.match(chart, /crosshair value readout/);
+    assert.match(chart, /lineStyle/);
+    assert.match(chart, /markers/);
+    assert.doesNotMatch(product, /@\/lib\/demo-data/);
+    assert.doesNotMatch(chart, /@\/components\/sample-data/);
+  });
+
   it('surfaces verified catalogue savings on the compare route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/compare/page.tsx');
