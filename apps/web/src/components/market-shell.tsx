@@ -55,6 +55,14 @@ const pwaFirstInstall = {
   manifestPath: '/manifest.webmanifest',
   evidence: 'verified prices load before the app shell asks for anything private'
 };
+const launchFixtureStores = [
+  { slug: 'willys-odenplan', name: 'Willys Odenplan', district: 'Vasastan', fixture: 'Willys Odenplan' },
+  { slug: 'ica-nara-sergels-torg', name: 'ICA Nära Sergels Torg', district: 'Norrmalm', fixture: 'ICA Nara Sergels Torg' },
+  { slug: 'coop-swedenborgsgatan', name: 'Coop Swedenborgsgatan', district: 'Södermalm', fixture: 'Coop Swedenborgsgatan' },
+  { slug: 'lidl-sveavagen', name: 'Lidl Sveavägen', district: 'Vasastan', fixture: 'Lidl Sveavagen' },
+  { slug: 'hemkop-stockholm', name: 'Hemköp Stockholm', district: 'Norrmalm', fixture: 'Hemkop Stockholm locator result' },
+  { slug: 'city-gross-stockholm', name: 'City Gross Stockholm', district: 'Stockholm County', fixture: 'City Gross Stockholm county locator result' }
+];
 
 export function MarketShell() {
   return (
@@ -721,6 +729,23 @@ export function MarketShell() {
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1fr]">
+        <Card>
+          <Eyebrow>Launch fixture stores</Eyebrow>
+          <h2 className="mt-2 text-2xl font-black tracking-tight">Driver-file Stockholm stores</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            These visible links mirror the launch store fixtures in <code>demo-data.ts</code> so the public homepage exposes the acceptance-test store slugs alongside the nationwide OSM directory.
+          </p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {launchFixtureStores.map((store) => (
+              <Link className="block rounded-2xl border border-emerald-200 bg-emerald-50 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}>
+                <p className="font-black text-slate-950">{store.name}</p>
+                <p className="text-sm text-slate-600">{store.district} · fixture {store.fixture}</p>
+                <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{store.slug}</p>
+              </Link>
+            ))}
+          </div>
+        </Card>
+
         <Card>
           <Eyebrow>Store directory</Eyebrow>
           <h2 className="mt-2 text-2xl font-black tracking-tight">Sweden stores from OSM</h2>
