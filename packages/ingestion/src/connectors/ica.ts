@@ -33,6 +33,25 @@ export const DEFAULT_ICA_STORE_NAME = 'ICA Kvantum Kungsholmen';
 export const DEFAULT_ICA_REGION_ID = '6ae1c52a-99a8-4b19-9464-dd01274df39d';
 export const DEFAULT_ICA_MAX_PRODUCTS = 200;
 
+export type IcaStoreConfig = {
+  storeAccountId: string;
+  storeName: string;
+  regionId: string;
+};
+
+export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
+  {
+    storeAccountId: DEFAULT_ICA_STORE_ACCOUNT_ID,
+    storeName: DEFAULT_ICA_STORE_NAME,
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004247',
+    storeName: 'ICA Focus',
+    regionId: DEFAULT_ICA_REGION_ID
+  }
+];
+
 export type FetchIcaProductsOptions = {
   fetchImpl?: typeof fetch;
   storeAccountId?: string;
@@ -92,6 +111,27 @@ export async function fetchIcaProducts(options: FetchIcaProductsOptions = {}): P
     regionId,
     maxRows
   });
+}
+
+export type FetchIcaDefaultStoreProductsOptions = Omit<
+  FetchIcaProductsOptions,
+  'storeAccountId' | 'storeName' | 'regionId'
+> & {
+  stores?: readonly IcaStoreConfig[];
+};
+
+export async function fetchIcaDefaultStoreProducts(
+  options: FetchIcaDefaultStoreProductsOptions = {}
+): Promise<IcaProduct[]> {
+  const stores = options.stores ?? DEFAULT_ICA_STORE_CONFIGS;
+  const batches = await Promise.all(stores.map((store) => fetchIcaProducts({
+    ...options,
+    storeAccountId: store.storeAccountId,
+    storeName: store.storeName,
+    regionId: store.regionId
+  })));
+
+  return batches.flat();
 }
 
 export type ParseIcaStorePromotionsOptions = {
