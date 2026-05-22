@@ -1,5 +1,5 @@
-import { COMMODITIES, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
+import { COMMODITIES, STAPLE_BASKET, type Commodity, type ComparableUnit } from '@groceryview/catalog';
+import { calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
 import { axfoodProducts } from './axfood-products';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
 import { mathemProducts, mathemSource } from './ingested/mathem';
@@ -837,6 +837,46 @@ export const commodityComparisons = commodityComparisonReports
   .slice(0, 12);
 
 export const commodityComparisonCaveat = 'commodity/alias match confidence is medium by design: loose items compare by canonical commodity and unit price, not barcode.';
+
+export const freshFoodStapleBasket = STAPLE_BASKET.map((commodity) => ({
+  slug: commodity.slug,
+  label: commodity.nameSv,
+  comparableUnit: commodity.comparableUnit,
+  categoryPath: commodity.categoryPath.join(' › '),
+  is_staple: commodity.isStaple === true
+}));
+
+const freshFoodStapleIds = new Set(freshFoodStapleBasket.map((commodity) => commodity.slug));
+
+export const freshFoodChainIndexObservations: ChainPriceObservation[] = commodityPriceObservations
+  .filter((observation) => observation.sourceConfidence >= 0.6 && freshFoodStapleIds.has(observation.commodityId))
+  .map((observation) => ({
+    chainId: observation.chainId,
+    category: observation.commodityId,
+    unitPrice: observation.unitPrice
+  }));
+
+const freshFoodCoveredStapleIds = new Set(freshFoodChainIndexObservations.map((observation) => observation.category));
+const freshFoodIndexReport = calculateChainPriceIndex(freshFoodChainIndexObservations);
+
+export const freshFoodChainIndex = {
+  title: 'Fresh-food staple basket index',
+  sourceLabel: 'STAPLE_BASKET commodity taxonomy + Axfood chain unit prices',
+  minimumSourceConfidence: 0.6,
+  stapleBasket: freshFoodStapleBasket,
+  observationCount: freshFoodChainIndexObservations.length,
+  coveredStapleCount: freshFoodCoveredStapleIds.size,
+  totalStapleCount: freshFoodStapleBasket.length,
+  coverageLabel: `${freshFoodCoveredStapleIds.size}/${freshFoodStapleBasket.length} is_staple commodities have confidence-cleared unit-price evidence`,
+  unitLabels: [...new Set(freshFoodStapleBasket.map((commodity) => `kr/${commodity.comparableUnit}`))],
+  report: freshFoodIndexReport,
+  guardrails: [
+    'No forecast: the fresh-food index is a 100-centred snapshot from observed unit prices only.',
+    'Only commodity observations with sourceConfidence >= 0.6 enter the index.',
+    'STAPLE_BASKET rows are representative fresh-food staples, not a personalized basket or stock claim.',
+    'Loose and packaged staple rows compare by kr/kg, kr/l, or kr/st; barcode equivalence is not assumed.'
+  ]
+};
 
 export function commodityComparisonForProduct(slug: string) {
   const product = axfoodProducts.find((candidate) => candidate.slug === slug);

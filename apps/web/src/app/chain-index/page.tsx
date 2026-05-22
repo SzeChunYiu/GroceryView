@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { buildBrandTierPriceObservations, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
-import { categorySummaries, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
+import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata, siteUrl } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -82,6 +82,65 @@ export default function ChainIndexPage() {
               <p className="mt-1 text-sm font-semibold text-blue-900">{chain.confidence} confidence · {chain.categoriesCovered} categories</p>
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <Eyebrow>Fresh food index</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-lime-950">Fresh-food staple basket index</h2>
+            <p className="mt-3 text-sm leading-6 text-lime-950">
+              This panel turns the commodity taxonomy STAPLE_BASKET into a per-chain fresh-food score using calculateChainPriceIndex. Rows are included only when is_staple is true and confidence-cleared unit prices are available as kr/kg, kr/l, or kr/st.
+            </p>
+            <p className="mt-3 rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-lime-950">
+              No forecast: this is a factual snapshot from observed commodity/alias unit prices, not a prediction or branch-stock claim.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-700">Staple coverage</p>
+              <p className="mt-2 text-3xl font-black text-lime-950">{freshFoodChainIndex.coverageLabel}</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-700">Observations</p>
+              <p className="mt-2 text-4xl font-black text-lime-950">{freshFoodChainIndex.observationCount}</p>
+              <p className="mt-2 text-sm font-semibold text-lime-900">Minimum confidence {freshFoodChainIndex.minimumSourceConfidence}</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-700">Units</p>
+              <p className="mt-2 text-2xl font-black text-lime-950">{freshFoodChainIndex.unitLabels.join(' · ')}</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {freshFoodChainIndex.report.chains.slice(0, 6).map((chain) => (
+            <div className="rounded-2xl bg-white/80 p-4" key={chain.chainId}>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-lime-700">{chain.chainId}</p>
+              <p className="mt-2 text-4xl font-black text-lime-950">{chain.overallIndex.toFixed(1)}</p>
+              <p className="mt-1 text-sm font-semibold text-lime-900">{chain.confidence} confidence · {chain.categoriesCovered} staple categories · {chain.observations} rows</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          <div className="rounded-2xl bg-white/80 p-4">
+            <p className="text-sm font-black text-lime-950">Representative is_staple basket</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {freshFoodChainIndex.stapleBasket.slice(0, 18).map((commodity) => (
+                <span className="rounded-full bg-lime-100 px-3 py-1 text-xs font-black text-lime-950" key={commodity.slug}>
+                  {commodity.label} · kr/{commodity.comparableUnit}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl bg-white/80 p-4">
+            <p className="text-sm font-black text-lime-950">Confidence guardrails</p>
+            <ul className="mt-3 space-y-2 text-sm leading-6 text-lime-950">
+              {freshFoodChainIndex.guardrails.map((guardrail) => (
+                <li key={guardrail}>• {guardrail}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       </Card>
 
