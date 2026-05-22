@@ -4,7 +4,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'GroceryView',
-  description: 'Stockholm grocery price intelligence for products, stores, and weekly baskets.'
+  description: 'Sweden grocery price intelligence for products, stores, and weekly baskets.'
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

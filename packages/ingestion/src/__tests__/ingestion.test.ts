@@ -27,6 +27,7 @@ import {
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
   confidenceForSource,
+  buildSwedishCountyGroceryOverpassQuery,
   buildWillysSearchUrl,
   buildWillysStoresUrl,
   buildWillysWeeklyDiscountsUrl,
@@ -89,6 +90,9 @@ import {
   offerVisibilityBoundaryPlans,
   OPENFOODFACTS_EXPORT_URL,
   OVERPASS_INTERPRETER_URL,
+  STOCKHOLM_GROCERY_OVERPASS_QUERY,
+  SWEDEN_GROCERY_OVERPASS_QUERY,
+  SWEDISH_COUNTY_ISO3166_2_CODES,
   parseOverpassGroceryStores,
   retailerRobotsPolicyMatrix,
   runRetailerConnector,
@@ -643,6 +647,17 @@ describe('fetchCoopWeeklyDiscounts', () => {
 });
 
 describe('fetchOverpassGroceryStores', () => {
+  it('ships a Sweden-wide query for the nationwide OSM store refresh', () => {
+    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-1"="SE/);
+    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /admin_level=2/);
+    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /shop"~"\^\(supermarket\|convenience\|grocery\)\$/);
+    assert.doesNotMatch(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
+    assert.match(STOCKHOLM_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
+    assert.equal(SWEDISH_COUNTY_ISO3166_2_CODES.length, 21);
+    assert.match(buildSwedishCountyGroceryOverpassQuery('SE-M'), /ISO3166-2"="SE-M/);
+    assert.match(buildSwedishCountyGroceryOverpassQuery('SE-M'), /admin_level=4/);
+  });
+
   it('posts a public Overpass query and preserves OSM store provenance', async () => {
     const requestedBodies: string[] = [];
     const fetchImpl: typeof fetch = async (url, init) => {

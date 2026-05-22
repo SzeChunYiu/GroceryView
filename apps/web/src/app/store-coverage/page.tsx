@@ -4,7 +4,7 @@ import { formatPct, sourceCoverage, storeBrandLedger, storeFormatCoverage } from
 
 export const dynamic = 'force-static';
 
-const storeSource = sourceCoverage.find((source) => source.name === 'Stockholm store directory');
+const storeSource = sourceCoverage.find((source) => source.name === 'Sweden store directory');
 
 export default function StoreCoveragePage() {
   const brandStores = storeBrandLedger.reduce((sum, brand) => sum + brand.stores, 0);
@@ -16,7 +16,7 @@ export default function StoreCoveragePage() {
       <Eyebrow>Store coverage</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">OSM store coverage without inferred prices</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        Store coverage is rendered from the generated OpenStreetMap Stockholm extract. The page groups verified locations by brand and format so coverage gaps are visible without turning coordinates into branch-level price claims.
+        Store coverage is rendered from the generated Sweden-wide OpenStreetMap extract. The page groups verified locations by brand and format so coverage gaps are visible without turning coordinates into branch-level price claims.
       </p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-4">

@@ -41,6 +41,32 @@ area["ISO3166-2"="SE-AB"][admin_level=4]->.searchArea;
 );
 out center tags 120;`;
 
+export const SWEDEN_GROCERY_OVERPASS_QUERY = `[out:json][timeout:180];
+area["ISO3166-1"="SE"][admin_level=2]->.searchArea;
+(
+  node["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+  way["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+  relation["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+);
+out center tags;`;
+
+
+export const SWEDISH_COUNTY_ISO3166_2_CODES = [
+  'SE-AB', 'SE-AC', 'SE-BD', 'SE-C', 'SE-D', 'SE-E', 'SE-F', 'SE-G', 'SE-H', 'SE-I', 'SE-K', 'SE-M',
+  'SE-N', 'SE-O', 'SE-S', 'SE-T', 'SE-U', 'SE-W', 'SE-X', 'SE-Y', 'SE-Z'
+] as const;
+
+export function buildSwedishCountyGroceryOverpassQuery(iso31662: typeof SWEDISH_COUNTY_ISO3166_2_CODES[number]): string {
+  return `[out:json][timeout:90];
+area["ISO3166-2"="${iso31662}"][admin_level=4]->.searchArea;
+(
+  node["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+  way["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+  relation["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+);
+out center tags;`;
+}
+
 export type FetchOverpassGroceryStoresOptions = {
   fetchImpl?: typeof fetch;
   query?: string;

@@ -543,6 +543,20 @@ describe('verified-data UI', () => {
     assert.match(shell, /\/stores\/\$\{brand\.sampleSlug\}/);
   });
 
+  it('ships an OSM nationwide refresh script and surfaces Sweden-wide copy', async () => {
+    const script = await read('scripts/refresh-osm-stores.mjs');
+    const verified = await read('src/lib/verified-data.ts');
+    const coverage = await read('src/app/store-coverage/page.tsx');
+
+    assert.match(script, /SWEDEN_GROCERY_OVERPASS_QUERY/);
+    assert.match(script, /fetchOverpassGroceryStores/);
+    assert.match(script, /OpenStreetMap Overpass Sweden extract/);
+    assert.match(script, /apps\/web\/src\/lib\/osm-stores\.ts/);
+    assert.match(verified, /OpenStreetMap Overpass Sweden extract/);
+    assert.match(coverage, /Sweden-wide OpenStreetMap extract/);
+    assert.doesNotMatch(coverage, /Stockholm extract/);
+  });
+
   it('surfaces verified OSM store format coverage on the homepage', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
@@ -553,7 +567,7 @@ describe('verified-data UI', () => {
     assert.match(verified, /districts: row\.districts\.size/);
     assert.match(shell, /storeFormatCoverage\.map/);
     assert.match(shell, /OSM format coverage/);
-    assert.match(shell, /Store formats with verified Stockholm coverage/);
+    assert.match(shell, /Store formats with verified Sweden coverage/);
     assert.match(shell, /\/stores\/\$\{format\.sampleSlug\}/);
   });
 

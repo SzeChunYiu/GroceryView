@@ -3,7 +3,7 @@
 - Source: overpass-api.de for OpenStreetMap
 - Source URL: https://overpass-api.de/api/interpreter
 - Retrieved: 2026-05-20T23:42:42.930Z
-- Query: Stockholm county shop=supermarket|convenience|grocery, out center tags 60
+- Query: Sweden-wide shop=supermarket|convenience|grocery, out center tags; county fallback queries are used when the single Sweden area query times out
 - Real rows fetched: 60
 - Connector: packages/ingestion/src/connectors/overpass.ts
 - Web wire: apps/web/src/lib/ingested/overpass.ts

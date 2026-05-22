@@ -6,7 +6,7 @@ export const snapshot = {
   retrievedLabel: '20-21 May 2026',
   axfoodSource: 'Willys and Hemköp public search endpoints',
   openPricesSource: 'OpenPrices / Open Food Facts SEK observations',
-  osmSource: 'OpenStreetMap Overpass Stockholm county extract'
+  osmSource: 'OpenStreetMap Overpass Sweden extract'
 };
 
 const sek = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 });
@@ -330,10 +330,10 @@ export const sourceCoverage = [
     caveat: 'Community observations; every row shows observation count and latest date.'
   },
   {
-    name: 'Stockholm store directory',
+    name: 'Sweden store directory',
     source: snapshot.osmSource,
     rows: osmStores.length,
-    coverage: `${new Set(osmStores.map((store) => store.brand)).size} brands across Stockholm county`,
+    coverage: `${new Set(osmStores.map((store) => store.brand)).size} brands across Sweden`,
     freshness: osmStores[0]?.retrievedDate ?? 'Not reported',
     caveat: 'Location data only; prices are not inferred from store locations.'
   }
@@ -343,7 +343,7 @@ const sourceRowsTotal = sourceCoverage.reduce((total, source) => total + source.
 
 export const sourceReadinessMatrix = sourceCoverage.map((source) => {
   const primaryRoute =
-    source.name === 'Stockholm store directory'
+    source.name === 'Sweden store directory'
       ? '/stores'
       : source.name === 'OpenPrices SEK observations'
         ? '/products'
@@ -362,7 +362,7 @@ export const sourceReadinessMatrix = sourceCoverage.map((source) => {
 
 export const sourceRouteMap = sourceReadinessMatrix.map((source) => {
   const supportingRoutes =
-    source.name === 'Stockholm store directory'
+    source.name === 'Sweden store directory'
       ? ['/stores', '/map', '/data-sources']
       : source.name === 'OpenPrices SEK observations'
         ? ['/products', '/categories', '/data-sources']
@@ -379,19 +379,19 @@ export const sourceRouteMap = sourceReadinessMatrix.map((source) => {
 
 export const sourceClaimLedger = sourceCoverage.map((source) => {
   const route =
-    source.name === 'Stockholm store directory'
+    source.name === 'Sweden store directory'
       ? '/stores'
       : source.name === 'OpenPrices SEK observations'
         ? '/products'
         : '/compare';
   const allowedClaim =
-    source.name === 'Stockholm store directory'
-      ? 'Verified Stockholm store locations, brands, formats, districts, and address coverage.'
+    source.name === 'Sweden store directory'
+      ? 'Verified Sweden store locations, brands, formats, districts, and address coverage.'
       : source.name === 'OpenPrices SEK observations'
         ? 'Observed community price medians, observation counts, product codes, and latest sighting dates.'
         : 'Chain-wide Willys and Hemkop catalogue prices and same-product spread comparisons.';
   const blockedClaim =
-    source.name === 'Stockholm store directory'
+    source.name === 'Sweden store directory'
       ? 'Branch-level prices, inventory, opening hours, or promotion availability.'
       : source.name === 'OpenPrices SEK observations'
         ? 'Guaranteed current shelf price, store-specific availability, or member-only offer state.'
@@ -480,7 +480,7 @@ export const budgetLowestPriceRadar = matchedChainProducts
 export const keyMetrics = [
   { label: 'Verified price rows', value: (axfoodProducts.length + pricedProducts.length).toLocaleString('sv-SE'), detail: 'Axfood products plus OpenPrices observations rendered from generated modules.' },
   { label: 'Matched Willys/Hemköp products', value: matchedChainProducts.length.toLocaleString('sv-SE'), detail: 'Only products present in both chain catalogues are compared.' },
-  { label: 'Stockholm stores', value: osmStores.length.toLocaleString('sv-SE'), detail: 'Physical stores from the OSM Overpass extract.' },
+  { label: 'Sweden stores', value: osmStores.length.toLocaleString('sv-SE'), detail: 'Physical stores from the Sweden-wide OSM Overpass extract.' },
   { label: 'Categories with data', value: categorySummaries.length.toLocaleString('sv-SE'), detail: 'Categories containing at least one verified product row.' }
 ];
 

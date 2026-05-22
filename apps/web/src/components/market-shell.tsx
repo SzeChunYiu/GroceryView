@@ -48,7 +48,7 @@ export function MarketShell() {
     <PageShell>
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
         <div className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-xl md:p-8">
-          <Eyebrow>Stockholm grocery snapshot</Eyebrow>
+          <Eyebrow>Sweden grocery snapshot</Eyebrow>
           <h1 className="mt-4 max-w-4xl text-4xl font-black leading-[0.95] tracking-tight md:text-6xl">
             Readable prices, explicit sources, zero placeholder rows.
           </h1>
@@ -547,7 +547,7 @@ export function MarketShell() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1fr]">
         <Card>
           <Eyebrow>Store directory</Eyebrow>
-          <h2 className="mt-2 text-2xl font-black tracking-tight">Stockholm stores from OSM</h2>
+          <h2 className="mt-2 text-2xl font-black tracking-tight">Sweden stores from OSM</h2>
           <div className="mt-5 space-y-3">
             {featuredStores.slice(0, 7).map((store) => (
               <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}>
@@ -564,7 +564,7 @@ export function MarketShell() {
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <Eyebrow>OSM format coverage</Eyebrow>
-            <h2 className="mt-2 text-2xl font-black tracking-tight">Store formats with verified Stockholm coverage</h2>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Store formats with verified Sweden coverage</h2>
           </div>
           <p className="max-w-xl text-sm leading-6 text-slate-600">
             Format counts, address coverage, brand diversity, and districts are derived directly from the OpenStreetMap store extract.
