@@ -20,7 +20,7 @@ describe('daily ingestion workflow', () => {
       'npm run test -w @groceryview/db',
       'npm run test -w @groceryview/ingestion',
       'npm run --silent ops:daily-connectors',
-      'npm run ops:validate-production-env',
+      'npm run --silent ops:validate-production-env',
       'node packages/ingestion/dist/index.js',
       '/api/readiness/postgres',
       '/api/readiness/source-runs',
