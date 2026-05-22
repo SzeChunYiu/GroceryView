@@ -114,6 +114,66 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003855',
     storeName: 'ICA Supermarket Vanadis',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004315',
+    storeName: 'ICA Nära Kallhäll',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1051011',
+    storeName: 'Maxi ICA Stormarknad Österåker',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003735',
+    storeName: 'Maxi ICA Stormarknad Moraberg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003729',
+    storeName: 'ICA Nära Brottbyhallen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004109',
+    storeName: 'Maxi ICA Stormarknad Vasa Handelsplats',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003510',
+    storeName: 'ICA Nära Enhörna, Södertälje',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003975',
+    storeName: 'ICA Nära Lunda Livs',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003429',
+    storeName: 'Maxi ICA Stormarknad Bålsta',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003421',
+    storeName: 'Maxi ICA Stormarknad Nynäshamn',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003416',
+    storeName: 'ICA Kvantum Knivsta',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003820',
+    storeName: 'ICA Supermarket Torghallen, Mariefred',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003471',
+    storeName: 'ICA Kvantum Rimbo',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
