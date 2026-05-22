@@ -1,5 +1,5 @@
 import { COMMODITIES, STAPLE_BASKET, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
+import { calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
@@ -588,6 +588,75 @@ export const crowdPriceSubmissionContract = {
   ],
   reviewWritebacks: ['accept_community_report', 'dismiss_community_report'],
   nextRuntimeStep: 'Wire the protected runtime endpoint to persist community_report raw_records and enqueue human_review_assignments.'
+};
+
+const tomatoCommodity = COMMODITIES.find((commodity) => commodity.slug === 'tomato') ?? COMMODITIES[0]!;
+const bananaCommodity = COMMODITIES.find((commodity) => commodity.slug === 'banana') ?? COMMODITIES[0]!;
+
+const commodityMappingReviewCandidates = [
+  {
+    id: 'commodity-map-kvisttomat-willys',
+    commodityId: tomatoCommodity.slug,
+    commodityName: tomatoCommodity.nameSv,
+    productId: 'willys-kvisttomat-losvikt',
+    productName: 'Kvisttomat lösvikt',
+    alias: 'Kvisttomat',
+    chainLabel: 'Willys Odenplan',
+    sourceConfidence: 0.52,
+    reporterId: 'reporter-produce-1',
+    createdAt: '2026-05-22T10:00:00.000Z',
+    evidence: ['chain_label:Willys Odenplan', 'unit_price:34.90 kr/kg', 'source:receipt_ocr']
+  },
+  {
+    id: 'commodity-map-banan-reviewed',
+    commodityId: bananaCommodity.slug,
+    commodityName: bananaCommodity.nameSv,
+    productId: 'willys-banan-losvikt',
+    productName: 'Banan lösvikt',
+    alias: 'Banan',
+    chainLabel: 'Willys Odenplan',
+    sourceConfidence: 0.91,
+    createdAt: '2026-05-22T11:00:00.000Z',
+    evidence: ['chain_label:Willys Odenplan', 'unit_price:23.60 kr/kg', 'source:receipt_ocr']
+  }
+];
+
+const commodityMappingQueue = planHumanReviewQueue({
+  productMatches: [],
+  communityReports: [],
+  commodityMappings: commodityMappingReviewCandidates
+});
+
+const commodityMappingAssignmentPlan = planHumanReviewAssignments({
+  assignedAt: '2026-05-22T12:00:00.000Z',
+  queue: commodityMappingQueue,
+  reviewers: [
+    { id: 'curator-produce-1', active: true, openAssignmentCount: 0, maxOpenAssignments: 3, specialties: ['commodity_mapping'] }
+  ]
+});
+
+export const commodityMappingReviewPlan = {
+  title: 'Commodity mapping review',
+  status: commodityMappingQueue.length > 0 ? 'review_required' : 'ready_for_shopper_surface',
+  queueTable: 'human_review_assignments',
+  trustTable: 'community_reporter_trust',
+  candidates: commodityMappingReviewCandidates,
+  queue: commodityMappingQueue,
+  assignments: commodityMappingAssignmentPlan.assignments,
+  unassigned: commodityMappingAssignmentPlan.unassigned,
+  reporterControls: planCommunityReportAbuseControls({
+    reporters: [
+      { reporterId: 'reporter-produce-1', reportsLast24Hours: 2, pendingReports: 1, acceptedReportsLast30Days: 6, rejectedReportsLast30Days: 1 }
+    ]
+  }),
+  reviewWritebacks: ['approve_commodity_mapping', 'reject_commodity_mapping'],
+  guardrails: [
+    'Low-confidence commodity↔item maps are review-only and are not shown to shoppers as verified coverage.',
+    'human_review_assignments receives the commodity_mapping work item before any alias can affect product_aliases or commodity coverage.',
+    'community_reporter_trust throttles risky reporters before their commodity aliases reach a curator.',
+    'Approved mappings still need auditable reviewer identity and source evidence before writeback.'
+  ],
+  nextRuntimeStep: 'Persist commodity_mapping assignments and decisions through the protected human-review endpoint, then write approved aliases into product_aliases.'
 };
 
 

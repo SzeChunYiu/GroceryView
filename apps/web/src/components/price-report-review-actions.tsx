@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
-type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
+type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
 
 function readSession(): BrowserSession {
@@ -67,7 +67,7 @@ export function PriceReportReviewActions() {
       return;
     }
     setStatus('ready');
-    setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. community_report approvals map to accept_community_report and rejections map to dismiss_community_report.`);
+    setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. community_report approvals map to accept_community_report and rejections map to dismiss_community_report; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
   }
 
   return (
@@ -75,7 +75,7 @@ export function PriceReportReviewActions() {
       <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Signed-in reviewer actions</p>
       <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Community price-report review queue</h2>
       <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
-        These controls use the sessionStorage bearer token to load protected human-review assignments and submit moderator decisions. The public page stays fail-closed; only registered reviewers can approve product matches or community reports.
+        These controls use the sessionStorage bearer token to load protected human-review assignments and submit moderator decisions. The public page stays fail-closed; only registered reviewers can approve product matches, community reports, or commodity_mapping tasks.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button className="rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" onClick={loadAssignments} type="button">Load signed-in review queue</button>

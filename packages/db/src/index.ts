@@ -787,7 +787,7 @@ export type AlertRuleRecord = {
 export type HumanReviewAssignmentRecord = {
   id: string;
   reviewId: string;
-  subjectType: 'product_match' | 'community_report';
+  subjectType: 'product_match' | 'community_report' | 'commodity_mapping';
   subjectId: string;
   priority: 'high' | 'medium' | 'low';
   reason: string;

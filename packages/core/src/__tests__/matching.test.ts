@@ -484,6 +484,61 @@ describe('planHumanReviewQueue', () => {
       }
     ]);
   });
+
+  it('routes low-confidence commodity mappings into human_review_assignments while trusted maps stay hidden', () => {
+    const queue = planHumanReviewQueue({
+      productMatches: [],
+      communityReports: [],
+      commodityMappings: [
+        {
+          id: 'commodity-map-kvisttomat-willys',
+          commodityId: 'tomato',
+          commodityName: 'Tomat',
+          productId: 'willys-kvisttomat-losvikt',
+          productName: 'Kvisttomat lösvikt',
+          alias: 'Kvisttomat',
+          chainLabel: 'Willys Odenplan',
+          sourceConfidence: 0.52,
+          reporterId: 'reporter-produce-1',
+          createdAt: '2026-05-22T10:00:00.000Z',
+          evidence: ['chain_label:Willys Odenplan', 'unit_price:34.90 kr/kg', 'source:receipt_ocr']
+        },
+        {
+          id: 'commodity-map-banan-reviewed',
+          commodityId: 'banana',
+          commodityName: 'Banan',
+          productId: 'willys-banan-losvikt',
+          productName: 'Banan lösvikt',
+          alias: 'Banan',
+          chainLabel: 'Willys Odenplan',
+          sourceConfidence: 0.91,
+          createdAt: '2026-05-22T11:00:00.000Z',
+          evidence: ['chain_label:Willys Odenplan', 'unit_price:23.60 kr/kg']
+        }
+      ]
+    });
+
+    assert.deepEqual(queue, [
+      {
+        id: 'review-commodity-map-kvisttomat-willys',
+        subjectType: 'commodity_mapping',
+        subjectId: 'commodity-map-kvisttomat-willys',
+        priority: 'medium',
+        reason: 'Commodity mapping Kvisttomat → Tomat for willys-kvisttomat-losvikt has source confidence 0.52 and must be validated before shopper-facing coverage.'
+      }
+    ]);
+
+    const assignmentPlan = planHumanReviewAssignments({
+      assignedAt: '2026-05-22T12:00:00.000Z',
+      queue,
+      reviewers: [
+        { id: 'curator-produce-1', active: true, openAssignmentCount: 0, maxOpenAssignments: 3, specialties: ['commodity_mapping'] }
+      ]
+    });
+
+    assert.equal(assignmentPlan.assignments[0].subjectType, 'commodity_mapping');
+    assert.equal(assignmentPlan.assignments[0].assigneeId, 'curator-produce-1');
+  });
 });
 
 
@@ -543,6 +598,36 @@ describe('applyHumanReviewDecision', () => {
         notes: 'Ask reporter for shelf photo.'
       }).writeback,
       { action: 'keep_in_review', subjectId: 'report-1', reviewedByHuman: false }
+    );
+  });
+
+  it('approves and rejects commodity mappings with explicit writeback actions', () => {
+    const item = {
+      id: 'review-commodity-map-kvisttomat-willys',
+      subjectType: 'commodity_mapping' as const,
+      subjectId: 'commodity-map-kvisttomat-willys',
+      priority: 'medium' as const,
+      reason: 'Low-confidence commodity alias.'
+    };
+
+    assert.deepEqual(
+      applyHumanReviewDecision({
+        item,
+        decision: 'approve',
+        reviewerId: 'curator-produce-1',
+        decidedAt: '2026-05-22T13:00:00.000Z'
+      }).writeback,
+      { action: 'approve_commodity_mapping', subjectId: 'commodity-map-kvisttomat-willys', reviewedByHuman: true }
+    );
+
+    assert.deepEqual(
+      applyHumanReviewDecision({
+        item,
+        decision: 'reject',
+        reviewerId: 'curator-produce-1',
+        decidedAt: '2026-05-22T13:05:00.000Z'
+      }).writeback,
+      { action: 'reject_commodity_mapping', subjectId: 'commodity-map-kvisttomat-willys', reviewedByHuman: true }
     );
   });
 });
