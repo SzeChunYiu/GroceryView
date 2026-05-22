@@ -15,7 +15,7 @@ User asked: for the grocery project, research similar websites around the world 
 | Learn best features and functionalities | Same document contains feature principles, roadmap, metrics, and action-layer recommendations. | Complete |
 | Document well in the project | Research document is committed under `docs/research/` and this audit under `docs/audits/`. | Complete |
 | Verify doc-only changes | `rtk git diff --cached --check` returned no findings on 2026-05-22. | Complete |
-| PR and merge to main | PR URL and merged state must be recorded after merge. | Pending until PR is merged |
+| PR and merge to main | PR created as https://github.com/SzeChunYiu/GroceryView/pull/719; merged state verified after merge in final completion audit. | In progress |
 
 ## Verification notes
 
