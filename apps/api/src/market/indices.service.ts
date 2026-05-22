@@ -68,19 +68,28 @@ export class IndicesService {
     }
 
     const rows = await this.postgres.query<ChainIndexSqlRow>(
-      `select products.id::text as product_id,
+      `with current_chain_prices as (
+         select distinct on (latest_prices.product_id, latest_prices.chain_id)
+                latest_prices.product_id,
+                latest_prices.chain_id,
+                latest_prices.unit_price,
+                latest_prices.observed_at
+         from latest_prices
+         where latest_prices.price_type in ('shelf', 'online', 'member', 'promotion')
+           and latest_prices.unit_price > 0
+         order by latest_prices.product_id, latest_prices.chain_id, latest_prices.unit_price asc, latest_prices.observed_at desc
+       )
+       select products.id::text as product_id,
               products.slug as product_slug,
               products.canonical_name as product_name,
               products.category_path,
               chains.slug as chain_slug,
-              latest_prices.unit_price as current_unit_price,
-              latest_prices.observed_at as current_observed_at
-       from latest_prices
-       join products on products.id = latest_prices.product_id
-       join chains on chains.id = latest_prices.chain_id
-       where latest_prices.price_type in ('shelf', 'online', 'member', 'promotion')
-         and latest_prices.unit_price > 0
-       order by chains.slug, products.category_path, products.slug, latest_prices.unit_price`
+              current_chain_prices.unit_price as current_unit_price,
+              current_chain_prices.observed_at as current_observed_at
+       from current_chain_prices
+       join products on products.id = current_chain_prices.product_id
+       join chains on chains.id = current_chain_prices.chain_id
+       order by chains.slug, products.category_path, products.slug, current_chain_prices.unit_price`
     );
 
     return buildRealChainPriceIndices(rows.map(mapChainRow));

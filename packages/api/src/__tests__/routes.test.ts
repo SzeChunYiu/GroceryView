@@ -424,6 +424,16 @@ describe('createGroceryViewApi', () => {
         currentObservedAt: '2026-05-21T08:00:00.000Z'
       },
       {
+        productId: 'product-coffee',
+        productSlug: 'bryggkaffe-450g',
+        productName: 'Bryggkaffe mellanrost 450 g',
+        categoryPath: ['coffee'],
+        chainSlug: 'willys',
+        brand: 'Zoegas',
+        currentUnitPrice: 121.5,
+        currentObservedAt: '2026-05-21T07:00:00.000Z'
+      },
+      {
         productId: 'product-milk',
         productSlug: 'standardmjolk-1l',
         productName: 'Standardmjolk 3% 1 l',
@@ -454,7 +464,7 @@ describe('createGroceryViewApi', () => {
     assert.equal(chains.generatedFrom, 4);
     assert.deepEqual(chains.categories, ['coffee', 'dairy']);
     assert.equal(chains.currency, 'SEK');
-    assert.match(chains.guardrails[0], /persisted latest_prices/i);
+    assert.match(chains.guardrails[0], /one cheapest current product price per chain/i);
 
     const categories = buildRealCategoryPriceIndices(rows);
     assert.deepEqual(categories.indices.map((row) => [row.category, row.value, row.productCount]), [
