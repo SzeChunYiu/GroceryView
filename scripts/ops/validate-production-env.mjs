@@ -59,15 +59,17 @@ function validateDailyConnectors(env) {
   const connectors = parseJsonEnv(env, 'GROCERYVIEW_DAILY_CONNECTORS_JSON');
   if (!Array.isArray(connectors) || connectors.length === 0) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON must be a non-empty array.');
   const connectorStoreIds = [];
+  const connectorChainIds = [];
   for (const [index, connector] of connectors.entries()) {
     if (connector === null || typeof connector !== 'object' || Array.isArray(connector)) throw new Error(`GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}] must be an object.`);
     for (const field of ['connectorId', 'chainId', 'sourceType', 'endpointUrl', 'parserVersion', 'robotsTxtStatus', 'legalReviewStatus', 'hasDataAgreement']) {
       if (connector[field] === undefined || connector[field] === null || connector[field] === '') throw new Error(`GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}].${field} is required.`);
     }
+    connectorChainIds.push(String(connector.chainId));
     connectorStoreIds.push(...validateConnectorStores(connector, index));
   }
-  requireRequiredChains('GROCERYVIEW_DAILY_CONNECTORS_JSON.chainId', connectors.map((connector) => String(connector.chainId)));
-  return { connectorCount: connectors.length, connectorStoreCount: connectorStoreIds.length, connectorStoreIds };
+  requireRequiredChains('GROCERYVIEW_DAILY_CONNECTORS_JSON.chainId', connectorChainIds);
+  return { connectorCount: connectors.length, connectorStoreCount: connectorStoreIds.length, connectorStoreIds, connectorChainIds: [...new Set(connectorChainIds)].sort() };
 }
 
 function validateCatalogTargets(env) {
@@ -105,6 +107,7 @@ export function validateProductionEnv(env) {
   return {
     status: 'ready',
     connectorCount: connectors.connectorCount,
+    connectorChainIds: connectors.connectorChainIds,
     connectorStoreCount: connectors.connectorStoreCount,
     connectorStoreCoverageCount,
     coverageProductCount: coverage.productCount,

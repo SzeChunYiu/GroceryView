@@ -71,12 +71,16 @@ jobs:
             >/tmp/production-env-validation.json
           node <<'NODE'
           const body = require('/tmp/production-env-validation.json');
+          const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+          const connectorChainIds = new Set(body.connectorChainIds ?? []);
+          const missingConnectorChains = requiredChains.filter((chainId) => !connectorChainIds.has(chainId));
+          const hasRequiredChains = missingConnectorChains.length === 0;
           if (
             body.status !== 'ready' ||
-            body.connectorCount !== 6 ||
+            !hasRequiredChains ||
             body.connectorStoreCoverageCount !== body.coverageStoreCount
           ) {
-            console.error(JSON.stringify(body));
+            console.error(JSON.stringify({ ...body, missingConnectorChains }));
             process.exit(1);
           }
           NODE
