@@ -15,6 +15,7 @@ describe('buildOpenApiDocument', () => {
       '/api/basket/comparison-report',
       '/api/basket/current',
       '/api/basket/handoff/{retailerId}',
+      '/api/basket/import-export',
       '/api/basket/items',
       '/api/basket/items/{productId}',
       '/api/basket/local-offers',
@@ -90,7 +91,9 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/billing/subscription-events'].post?.security, [{ billingWebhookSignature: [] }]);
     assert.deepEqual(doc.paths['/api/basket/comparison-report'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/handoff/{retailerId}'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/basket/import-export'].post?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/basket/handoff/{retailerId}'].get?.summary ?? '', /handoff/i);
+    assert.match(doc.paths['/api/basket/import-export'].post?.summary ?? '', /bookmarklet|extension/i);
     assert.deepEqual(doc.paths['/api/basket/local-offers'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/recurring-digest'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/trip-cost'].get?.security, [{ bearerAuth: [] }]);

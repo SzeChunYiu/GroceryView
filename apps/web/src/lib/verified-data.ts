@@ -411,6 +411,31 @@ export const unavailablePanels = [
   }
 ];
 
+export const basketImportExportContract = {
+  endpoint: '/api/basket/import-export',
+  title: 'Bookmarklet import/export',
+  status: 'implemented_account_api',
+  sourceKinds: ['bookmarklet', 'browser_extension', 'copy_paste'],
+  staticAsset: '/bookmarklets/groceryview-basket-import.js',
+  requiredInputs: [
+    'signed-in userId',
+    'explicit shopper consent before retailer page content is read',
+    'retailerId, source origin, capturedAt timestamp, and captured retailer basket rows',
+    'raw retailer item names plus quantities and optional GroceryView product ids or product URLs'
+  ],
+  shippedBehaviors: [
+    'Imports only rows matched to verified GroceryView product ids or aliases.',
+    'Leaves unmatched retailer rows in review instead of silently creating verified products.',
+    'Returns copyable export text for matched lines so shoppers can move baskets between contexts.',
+    'Supports bookmarklet and future browser_extension payloads through the same account API contract.'
+  ],
+  blockedInStaticSnapshot: [
+    'No retailer page DOM is read by this static build.',
+    'No private account basket is imported without production authentication.',
+    'No unmatched retailer row is treated as verified catalogue evidence.'
+  ]
+};
+
 export const retailerHandoffContract = {
   endpoint: '/api/basket/handoff/{retailerId}',
   title: 'Retailer handoff support matrix',

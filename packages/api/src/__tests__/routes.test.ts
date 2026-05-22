@@ -1114,6 +1114,39 @@ describe('createGroceryViewApi', () => {
 
 
 
+
+  it('imports consented bookmarklet basket rows and leaves unmatched retailer rows for review', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.importBasketFromRetailerPage('user-1', {
+      source: {
+        sourceKind: 'bookmarklet',
+        retailerId: 'willys',
+        origin: 'https://www.willys.se',
+        capturedAt: '2026-05-22T09:35:00.000Z',
+        consentGranted: true
+      },
+      capturedLines: [
+        { rawName: 'Zoégas Coffee 450g', productId: 'coffee', quantity: 1, productUrl: 'https://www.willys.se/produkt/coffee' },
+        { rawName: 'Arla Milk 1L', quantity: 2 },
+        { rawName: 'Retailer-only bakery bun', quantity: 3 }
+      ]
+    });
+
+    assert.equal(report.status, 'needs_review');
+    assert.deepEqual(report.acceptedItems.map((item) => ({ productId: item.productId, quantity: item.quantity, matchSource: item.matchSource })), [
+      { productId: 'coffee', quantity: 1, matchSource: 'product_id' },
+      { productId: 'milk', quantity: 2, matchSource: 'alias' }
+    ]);
+    assert.equal(report.reviewItems[0]?.rawName, 'Retailer-only bakery bun');
+    assert.deepEqual(api.getBasket('user-1').items, [
+      { productId: 'coffee', quantity: 1 },
+      { productId: 'milk', quantity: 2 }
+    ]);
+    assert.match(report.exportText, /1 × Zoégas Coffee 450g/);
+    assert.match(report.guardrails[0], /explicit shopper consent/);
+  });
+
   it('returns retailer handoff plans with support matrix fallbacks and checkout guardrails', () => {
     const api = createGroceryViewApi();
 

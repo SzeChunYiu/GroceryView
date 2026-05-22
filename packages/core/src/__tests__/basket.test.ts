@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   compareBasketStrategies,
+  planBasketImportExport,
   planBasketTripCost,
   planRetailerHandoff,
   planRecurringBasketDigest,
@@ -203,6 +204,47 @@ describe('validateBasketComparisonLineFixtures', () => {
   });
 });
 
+
+
+
+describe('planBasketImportExport', () => {
+  it('plans consent-gated bookmarklet imports while keeping unmatched retailer rows in review', () => {
+    const plan = planBasketImportExport({
+      source: {
+        sourceKind: 'bookmarklet',
+        retailerId: 'willys',
+        origin: 'https://www.willys.se',
+        capturedAt: '2026-05-22T09:30:00.000Z',
+        consentGranted: true
+      },
+      capturedLines: [
+        { rawName: 'Zoégas Coffee 450g', productId: 'coffee', quantity: 1, productUrl: 'https://www.willys.se/produkt/coffee' },
+        { rawName: 'Standardmjölk 1L', quantity: 2 },
+        { rawName: 'Retailer-only bakery bun', quantity: 3 }
+      ],
+      knownProducts: [
+        { productId: 'coffee', productName: 'Zoégas Coffee 450g', aliases: ['zoegas coffee 450g'] },
+        { productId: 'milk', productName: 'Milk 1L', aliases: ['standardmjölk 1l'] }
+      ]
+    });
+
+    assert.equal(plan.status, 'needs_review');
+    assert.deepEqual(plan.acceptedItems, [
+      { productId: 'coffee', productName: 'Zoégas Coffee 450g', quantity: 1, matchSource: 'product_id', productUrl: 'https://www.willys.se/produkt/coffee' },
+      { productId: 'milk', productName: 'Milk 1L', quantity: 2, matchSource: 'alias' }
+    ]);
+    assert.deepEqual(plan.reviewItems, [
+      { rawName: 'Retailer-only bakery bun', quantity: 3, reason: 'No verified GroceryView product match for retailer row.' }
+    ]);
+    assert.match(plan.exportText, /1 × Zoégas Coffee 450g/);
+    assert.match(plan.exportText, /2 × Milk 1L/);
+    assert.deepEqual(plan.guardrails, [
+      'Bookmarklet and extension imports require explicit shopper consent before reading retailer page content.',
+      'Only matched GroceryView product ids can update the account basket automatically.',
+      'Unmatched retailer rows stay in review and are never silently added as verified products.'
+    ]);
+  });
+});
 
 
 

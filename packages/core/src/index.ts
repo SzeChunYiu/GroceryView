@@ -402,6 +402,116 @@ export type BasketTripCostPlan = {
 };
 
 
+
+export type BasketImportExportSourceKind = 'bookmarklet' | 'browser_extension' | 'copy_paste';
+
+export type BasketImportExportSource = {
+  sourceKind: BasketImportExportSourceKind;
+  retailerId: string;
+  origin: string;
+  capturedAt: string;
+  consentGranted: boolean;
+};
+
+export type BasketImportExportCapturedLine = {
+  rawName: string;
+  quantity: number;
+  productId?: string;
+  productUrl?: string;
+};
+
+export type BasketImportExportKnownProduct = {
+  productId: string;
+  productName: string;
+  aliases?: string[];
+};
+
+export type BasketImportExportInput = {
+  source: BasketImportExportSource;
+  capturedLines: BasketImportExportCapturedLine[];
+  knownProducts: BasketImportExportKnownProduct[];
+};
+
+export type BasketImportExportAcceptedItem = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  matchSource: 'product_id' | 'alias';
+  productUrl?: string;
+};
+
+export type BasketImportExportReviewItem = {
+  rawName: string;
+  quantity: number;
+  reason: string;
+};
+
+export type BasketImportExportPlan = {
+  status: 'ready' | 'needs_review' | 'blocked';
+  source: BasketImportExportSource;
+  acceptedItems: BasketImportExportAcceptedItem[];
+  reviewItems: BasketImportExportReviewItem[];
+  exportText: string;
+  guardrails: string[];
+};
+
+function normalizeImportName(value: string): string {
+  return value.trim().toLocaleLowerCase('sv-SE').replace(/\s+/g, ' ');
+}
+
+export function planBasketImportExport(input: BasketImportExportInput): BasketImportExportPlan {
+  requireNonBlank(input.source.retailerId, 'retailerId');
+  requireNonBlank(input.source.origin, 'origin');
+  requireNonBlank(input.source.capturedAt, 'capturedAt');
+  const guardrails = [
+    'Bookmarklet and extension imports require explicit shopper consent before reading retailer page content.',
+    'Only matched GroceryView product ids can update the account basket automatically.',
+    'Unmatched retailer rows stay in review and are never silently added as verified products.'
+  ];
+  if (!input.source.consentGranted) {
+    return { status: 'blocked', source: input.source, acceptedItems: [], reviewItems: [], exportText: '', guardrails };
+  }
+
+  const byId = new Map(input.knownProducts.map((product) => [product.productId, product]));
+  const byAlias = new Map<string, BasketImportExportKnownProduct>();
+  for (const product of input.knownProducts) {
+    requireNonBlank(product.productId, 'knownProducts.productId');
+    requireNonBlank(product.productName, 'knownProducts.productName');
+    byAlias.set(normalizeImportName(product.productName), product);
+    for (const alias of product.aliases ?? []) byAlias.set(normalizeImportName(alias), product);
+  }
+
+  const acceptedItems: BasketImportExportAcceptedItem[] = [];
+  const reviewItems: BasketImportExportReviewItem[] = [];
+  for (const line of input.capturedLines) {
+    requireNonBlank(line.rawName, 'rawName');
+    if (!Number.isInteger(line.quantity) || line.quantity <= 0 || line.quantity > 99) throw new Error('quantity must be an integer between 1 and 99.');
+    const productById = line.productId ? byId.get(line.productId) : undefined;
+    const productByAlias = byAlias.get(normalizeImportName(line.rawName));
+    const product = productById ?? productByAlias;
+    if (!product) {
+      reviewItems.push({ rawName: line.rawName, quantity: line.quantity, reason: 'No verified GroceryView product match for retailer row.' });
+      continue;
+    }
+    acceptedItems.push({
+      productId: product.productId,
+      productName: product.productName,
+      quantity: line.quantity,
+      matchSource: productById ? 'product_id' : 'alias',
+      ...(line.productUrl ? { productUrl: line.productUrl } : {})
+    });
+  }
+
+  return {
+    status: reviewItems.length > 0 ? 'needs_review' : 'ready',
+    source: input.source,
+    acceptedItems,
+    reviewItems,
+    exportText: acceptedItems.map((item) => `${item.quantity} × ${item.productName}`).join('\n'),
+    guardrails
+  };
+}
+
 export type RetailerHandoffSupportLevel = 'supported' | 'manual' | 'unsupported';
 
 export type RetailerHandoffSupport = {

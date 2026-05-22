@@ -7,6 +7,7 @@ import {
   calculateDealScore,
   calculateFixedBasketIndex,
   compareBasketStrategies,
+  planBasketImportExport,
   planBasketTripCost,
   planRetailerHandoff,
   createHouseholdState,
@@ -23,6 +24,9 @@ import {
   summarizeLocalOfferBasket,
   suggestDealBasedMeals,
   type BasketComparisonResult,
+  type BasketImportExportCapturedLine,
+  type BasketImportExportPlan,
+  type BasketImportExportSource,
   type BasketTripCostPlan,
   type BasketTripCostTravelMode,
   type RetailerHandoffPlan,
@@ -95,6 +99,19 @@ export type ProductDetail = SearchableProduct & {
     discountDepthPercent: number;
     sourceConfidence: number;
   };
+};
+
+
+export type BasketImportExportRequest = {
+  source: BasketImportExportSource;
+  capturedLines: BasketImportExportCapturedLine[];
+};
+
+export type BasketImportExportReport = BasketImportExportPlan & {
+  userId: string;
+  importedItemCount: number;
+  reviewItemCount: number;
+  basketItemCount: number;
 };
 
 export type ProductCheapestNowChainPrice = {
@@ -3383,6 +3400,15 @@ function flyerOfferReport(options: {
   return buildFlyerOfferReportFromOffers(asOf, options, activeFlyerOffers(asOf));
 }
 
+
+function basketImportKnownProducts() {
+  return products.map((product) => ({
+    productId: product.id,
+    productName: product.name,
+    aliases: [product.name, product.ticker]
+  }));
+}
+
 function storeFlyerOfferReport(storeId: string, asOf?: string): StoreFlyerOfferReport {
   requireKnownStore(storeId);
   const store = stores.find((candidate) => candidate.id === storeId)!;
@@ -4068,6 +4094,23 @@ export function createGroceryViewApi() {
 
     getRetailerHandoffPlan(userId: string, retailerId: string): RetailerHandoffReport {
       return buildRetailerHandoffReport(userId, retailerId, baskets.get(userId) ?? []);
+    },
+
+    importBasketFromRetailerPage(userId: string, request: BasketImportExportRequest): BasketImportExportReport {
+      requireNonEmptyId(userId, 'userId');
+      const plan = planBasketImportExport({
+        source: request.source,
+        capturedLines: request.capturedLines,
+        knownProducts: basketImportKnownProducts()
+      });
+      for (const item of plan.acceptedItems) this.addBasketItem(userId, { productId: item.productId, quantity: item.quantity });
+      return {
+        userId,
+        ...plan,
+        importedItemCount: plan.acceptedItems.length,
+        reviewItemCount: plan.reviewItems.length,
+        basketItemCount: (baskets.get(userId) ?? []).length
+      };
     },
 
     getLocalOfferBasketReport(userId: string, asOf = '2026-05-20T12:00:00.000Z'): LocalOfferBasketReport {

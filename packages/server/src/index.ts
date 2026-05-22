@@ -6,6 +6,7 @@ import { pathToFileURL } from 'node:url';
 import {
   buildFlyerOfferReport,
   createGroceryViewApi,
+  type BasketImportExportRequest,
   type CategoryBudgetPatch,
   type FlyerOfferObservationInput,
   type FlyerOfferReport,
@@ -362,6 +363,33 @@ function requiredIsoTimestamp(value: unknown, field: string): string {
 function optionalIsoTimestamp(value: unknown, field: string): string | undefined {
   if (value === undefined) return undefined;
   return requiredIsoTimestamp(value, field);
+}
+
+
+function requiredBasketBridgeSourceKind(value: unknown): BasketImportExportRequest['source']['sourceKind'] {
+  if (value === 'bookmarklet' || value === 'browser_extension' || value === 'copy_paste') return value;
+  throw new Error('sourceKind must be bookmarklet, browser_extension, or copy_paste.');
+}
+
+function basketImportExportRequestFromBody(body: JsonRecord): BasketImportExportRequest {
+  const source = body.source;
+  if (source === null || typeof source !== 'object' || Array.isArray(source)) throw new Error('source must be an object.');
+  const sourceRecord = source as JsonRecord;
+  return {
+    source: {
+      sourceKind: requiredBasketBridgeSourceKind(sourceRecord.sourceKind),
+      retailerId: requiredString(sourceRecord.retailerId, 'source.retailerId'),
+      origin: requiredString(sourceRecord.origin, 'source.origin'),
+      capturedAt: requiredString(sourceRecord.capturedAt, 'source.capturedAt'),
+      consentGranted: sourceRecord.consentGranted === true
+    },
+    capturedLines: requiredRecordArray(body.capturedLines, 'capturedLines').map((line, index) => ({
+      rawName: requiredString(line.rawName, `capturedLines[${index}].rawName`),
+      quantity: requiredNumber(line.quantity, `capturedLines[${index}].quantity`),
+      ...(line.productId === undefined ? {} : { productId: requiredString(line.productId, `capturedLines[${index}].productId`) }),
+      ...(line.productUrl === undefined ? {} : { productUrl: requiredString(line.productUrl, `capturedLines[${index}].productUrl`) })
+    }))
+  };
 }
 
 function authProviderAssertionFromBody(body: JsonRecord): AuthProviderAssertion {
@@ -1741,6 +1769,17 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getLocalOfferBasketReport(user, url.searchParams.get('asOf') ?? undefined));
       }
 
+      if (path === '/api/basket/import-export') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse(api.importBasketFromRetailerPage(user, basketImportExportRequestFromBody(body)), { status: 201 });
+        }
+      }
+
       const handoffMatch = path.match(/^\/api\/basket\/handoff\/([^/]+)$/);
       if (handoffMatch) {
         const user = userIdFrom(url);
@@ -2097,6 +2136,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/comparison-report': { get: protectedOperation('Get basket comparison strategies with assignment and trust labels.') },
       '/api/basket/local-offers': { get: protectedOperation('Get local offer basket coverage, freshness, confidence, and savings by selected stores.') },
       '/api/basket/handoff/{retailerId}': { get: protectedOperation('Get retailer handoff actions, support matrix fallbacks, and checkout-confirmation guardrails.') },
+      '/api/basket/import-export': { post: protectedOperation('Import consented bookmarklet or extension basket rows and return unmatched review items.') },
       '/api/basket/trip-cost': { get: protectedOperation('Get basket totals ranked by shelf price plus explicit travel, time, delivery, and split-shop costs.') },
       '/api/basket/recurring-digest': { get: protectedOperation('Get recurring basket changes, missing-price blockers, and suggested review actions.') },
       '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },

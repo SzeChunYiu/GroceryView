@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { IsArray, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { groceryApi } from '../demo-data.js';
 import { RealCatalogService } from '../real-catalog/real-catalog.service.js';
@@ -18,6 +18,52 @@ class BasketItemQuantityDto {
   @IsNumber()
   @Min(1)
   quantity!: number;
+}
+
+
+class BasketImportSourceDto {
+  @IsString()
+  sourceKind!: 'bookmarklet' | 'browser_extension' | 'copy_paste';
+
+  @IsString()
+  retailerId!: string;
+
+  @IsString()
+  origin!: string;
+
+  @IsString()
+  capturedAt!: string;
+
+  @IsBoolean()
+  consentGranted!: boolean;
+}
+
+class BasketImportLineDto {
+  @IsString()
+  rawName!: string;
+
+  @IsNumber()
+  @Min(1)
+  quantity!: number;
+
+  @IsOptional()
+  @IsString()
+  productId?: string;
+
+  @IsOptional()
+  @IsString()
+  productUrl?: string;
+}
+
+class BasketImportExportDto {
+  @ValidateNested()
+  @Type(() => BasketImportSourceDto)
+  source!: BasketImportSourceDto;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BasketImportLineDto)
+  capturedLines!: BasketImportLineDto[];
 }
 
 class CompareBasketRequestDto {
@@ -51,6 +97,12 @@ export class BasketsController {
   @ApiOkResponse({ description: 'Ranked local offer basket coverage' })
   localOffers(@Query('asOf') asOf?: string) {
     return { ...groceryApi.getLocalOfferBasketReport('demo', asOf), demo: true };
+  }
+
+  @Post('import-export')
+  @ApiCreatedResponse({ description: 'Import consented bookmarklet or extension basket rows for review' })
+  importExport(@Body() body: BasketImportExportDto) {
+    return { ...groceryApi.importBasketFromRetailerPage('demo', body), demo: true };
   }
 
   @Get('handoff/:retailerId')

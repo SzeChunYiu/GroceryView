@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { studentBasicsBoard } from '@/lib/demo-data';
-import { retailerHandoffContract } from '@/lib/verified-data';
+import { basketImportExportContract, retailerHandoffContract } from '@/lib/verified-data';
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
@@ -69,6 +69,34 @@ export default function BasketIdeasPage() {
           </div>
         </Card>
       </div>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Basket bridge</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Bookmarklet import/export: {basketImportExportContract.title}</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          The account API accepts consented bookmarklet or browser extension payloads only after explicit shopper consent at <code className="rounded bg-white/80 px-1 py-0.5 text-emerald-900">{basketImportExportContract.endpoint}</code>, with a static bookmarklet asset at <code className="rounded bg-white/80 px-1 py-0.5 text-emerald-900">{basketImportExportContract.staticAsset}</code>.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div>
+            <p className="font-black text-slate-950">Required inputs</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {basketImportExportContract.requiredInputs.map((input) => <li key={input}>{input}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Shipped behavior</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {basketImportExportContract.shippedBehaviors.map((behavior) => <li key={behavior}>{behavior}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Static snapshot remains closed</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {basketImportExportContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
+            </ul>
+          </div>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Retailer action layer</p>

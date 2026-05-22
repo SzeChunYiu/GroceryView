@@ -75,6 +75,26 @@ describe('verified-data UI', () => {
   });
 
 
+
+  it('surfaces the bookmarklet import/export contract and static asset on the basket ideas route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/basket-ideas/page.tsx');
+    const bookmarklet = await read('public/bookmarklets/groceryview-basket-import.js');
+
+    assert.match(verified, /export const basketImportExportContract = /);
+    assert.match(verified, /\/api\/basket\/import-export/);
+    assert.match(verified, /bookmarklet/);
+    assert.match(verified, /browser_extension/);
+    assert.match(route, /basketImportExportContract/);
+    assert.match(route, /Bookmarklet import\/export/);
+    assert.match(route, /explicit shopper consent/);
+    assert.match(bookmarklet, /GroceryView basket import/);
+    assert.match(bookmarklet, /consentGranted/);
+    assert.match(bookmarklet, /capturedLines/);
+    assert.match(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/basket-ideas/page.tsx');
