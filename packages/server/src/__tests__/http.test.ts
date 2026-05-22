@@ -789,6 +789,33 @@ describe('createHttpHandler', () => {
     });
     assert.match(localOffers.guardrails[0], /favorite stores/);
 
+    const recurringDigest = await json(await handle(new Request('http://localhost/api/basket/recurring-digest?userId=user-1&templateId=weekly-basics&templateName=Weekly%20basics&cadence=weekly&asOf=2026-05-22T08:00:00.000Z'))) as {
+      templateId: string;
+      lineCount: number;
+      comparableDelta: number;
+      lines: Array<{ productId: string; changeType: string; currentStoreName?: string }>;
+      guardrails: string[];
+    };
+    assert.equal(recurringDigest.templateId, 'weekly-basics');
+    assert.equal(recurringDigest.lineCount, 1);
+    assert.equal(recurringDigest.comparableDelta, -20);
+    assert.deepEqual(recurringDigest.lines, [{
+      productId: 'coffee',
+      productName: 'Zoégas Coffee 450g',
+      quantity: 2,
+      currentUnitPrice: 49.9,
+      previousUnitPrice: 59.9,
+      currentLineTotal: 99.8,
+      previousLineTotal: 119.8,
+      lineDelta: -20,
+      lineDeltaPercent: -16.69,
+      currentStoreName: 'Willys Odenplan',
+      confidence: 0.9,
+      changeType: 'price_down',
+      recommendedAction: 'Keep in recurring basket; current verified price is lower than the previous shop.'
+    }]);
+    assert.match(recurringDigest.guardrails[0], /both current and previous verified prices/);
+
     const storeQuote = await json(await handle(new Request('http://localhost/api/basket/stores/willys-odenplan/quote?userId=user-1'))) as {
       storeId: string;
       total: number | null;

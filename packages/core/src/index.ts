@@ -62,6 +62,9 @@ export type HistoricalDealScore = {
 const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
 const roundMoney = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
 const formatSek = (value: number): string => `${value.toFixed(2)} SEK`;
+function requireNonBlank(value: string, fieldName: string): void {
+  if (!value.trim()) throw new Error(`${fieldName} is required.`);
+}
 const storeNameFromId = (storeId: string): string =>
   storeId
     .split('-')
@@ -420,6 +423,82 @@ export type LocalOfferBasketSummary = {
   baselineTotal?: number;
 };
 
+export type RecurringBasketCadence = 'weekly' | 'biweekly' | 'monthly';
+
+export type RecurringBasketLineInput = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  currentUnitPrice?: number | null;
+  previousUnitPrice?: number | null;
+  currentStoreName?: string;
+  previousStoreName?: string;
+  substituteProductName?: string;
+  confidence?: number;
+};
+
+export type RecurringBasketChangeType =
+  | 'price_up'
+  | 'price_down'
+  | 'new_item'
+  | 'missing_current_price'
+  | 'substitute_available'
+  | 'unchanged';
+
+export type RecurringBasketDigestLine = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  currentUnitPrice: number | null;
+  previousUnitPrice: number | null;
+  currentLineTotal: number | null;
+  previousLineTotal: number | null;
+  lineDelta: number | null;
+  lineDeltaPercent: number | null;
+  currentStoreName?: string;
+  previousStoreName?: string;
+  substituteProductName?: string;
+  confidence: number;
+  changeType: RecurringBasketChangeType;
+  recommendedAction: string;
+};
+
+export type RecurringBasketChangeSummary = {
+  priceUp: number;
+  priceDown: number;
+  newItem: number;
+  missingCurrentPrice: number;
+  substituteAvailable: number;
+  unchanged: number;
+};
+
+export type RecurringBasketDigestInput = {
+  templateId: string;
+  templateName: string;
+  cadence: RecurringBasketCadence;
+  asOf: string;
+  lastPurchasedAt?: string;
+  lines: RecurringBasketLineInput[];
+};
+
+export type RecurringBasketDigest = {
+  templateId: string;
+  templateName: string;
+  cadence: RecurringBasketCadence;
+  asOf: string;
+  lastPurchasedAt?: string;
+  lineCount: number;
+  comparableCurrentTotal: number;
+  comparablePreviousTotal: number;
+  comparableDelta: number;
+  comparableDeltaPercent: number;
+  missingCurrentPriceProductIds: string[];
+  changeSummary: RecurringBasketChangeSummary;
+  headline: string;
+  lines: RecurringBasketDigestLine[];
+  guardrails: string[];
+};
+
 export function compareBasketStrategies(input: BasketComparisonInput): BasketComparisonResult {
   const favoriteSet = new Set(input.favoriteStoreIds);
   const missingProductIds: string[] = [];
@@ -692,6 +771,137 @@ export function summarizeLocalOfferBasket(input: LocalOfferBasketInput): LocalOf
     stores,
     bestStore: stores[0],
     baselineTotal
+  };
+}
+
+function recurringBasketLineAction(line: {
+  changeType: RecurringBasketChangeType;
+  substituteProductName?: string;
+}): string {
+  if (line.changeType === 'missing_current_price') return 'Do not auto-buy; current verified price is missing.';
+  if (line.changeType === 'new_item') return 'Review once before adding to the recurring basket baseline.';
+  if (line.changeType === 'substitute_available') return `Review suggested substitute before checkout: ${line.substituteProductName}.`;
+  if (line.changeType === 'price_up') return 'Review price increase and compare against substitutes before checkout.';
+  if (line.changeType === 'price_down') return 'Keep in recurring basket; current verified price is lower than the previous shop.';
+  return 'Keep in recurring basket; price is effectively unchanged.';
+}
+
+export function planRecurringBasketDigest(input: RecurringBasketDigestInput): RecurringBasketDigest {
+  requireNonBlank(input.templateId, 'templateId');
+  requireNonBlank(input.templateName, 'templateName');
+  if (Number.isNaN(Date.parse(input.asOf))) throw new Error('asOf must be an ISO date.');
+  if (input.lastPurchasedAt !== undefined && Number.isNaN(Date.parse(input.lastPurchasedAt))) {
+    throw new Error('lastPurchasedAt must be an ISO date.');
+  }
+
+  const changeSummary: RecurringBasketChangeSummary = {
+    priceUp: 0,
+    priceDown: 0,
+    newItem: 0,
+    missingCurrentPrice: 0,
+    substituteAvailable: 0,
+    unchanged: 0
+  };
+  const missingCurrentPriceProductIds: string[] = [];
+  let comparableCurrentTotal = 0;
+  let comparablePreviousTotal = 0;
+
+  const lines = input.lines.map((line): RecurringBasketDigestLine => {
+    requireNonBlank(line.productId, 'productId');
+    requireNonBlank(line.productName, 'productName');
+    if (!Number.isInteger(line.quantity) || line.quantity <= 0) throw new Error('quantity must be a positive integer.');
+    if (line.currentUnitPrice !== undefined && line.currentUnitPrice !== null && line.currentUnitPrice < 0) {
+      throw new Error('currentUnitPrice must be non-negative.');
+    }
+    if (line.previousUnitPrice !== undefined && line.previousUnitPrice !== null && line.previousUnitPrice < 0) {
+      throw new Error('previousUnitPrice must be non-negative.');
+    }
+
+    const currentUnitPrice = line.currentUnitPrice ?? null;
+    const previousUnitPrice = line.previousUnitPrice ?? null;
+    const currentLineTotal = currentUnitPrice === null ? null : roundMoney(currentUnitPrice * line.quantity);
+    const previousLineTotal = previousUnitPrice === null ? null : roundMoney(previousUnitPrice * line.quantity);
+    const lineDelta = currentLineTotal === null || previousLineTotal === null
+      ? null
+      : roundMoney(currentLineTotal - previousLineTotal);
+    const lineDeltaPercent = lineDelta === null || previousLineTotal === null || previousLineTotal === 0
+      ? null
+      : roundMoney((lineDelta / previousLineTotal) * 100);
+
+    let changeType: RecurringBasketChangeType = 'unchanged';
+    if (currentLineTotal === null) {
+      changeType = 'missing_current_price';
+      missingCurrentPriceProductIds.push(line.productId);
+    } else if (previousLineTotal === null) {
+      changeType = 'new_item';
+    } else if (line.substituteProductName && lineDelta !== null && lineDelta > 0.5) {
+      changeType = 'substitute_available';
+    } else if (lineDelta !== null && lineDelta > 0.5) {
+      changeType = 'price_up';
+    } else if (lineDelta !== null && lineDelta < -0.5) {
+      changeType = 'price_down';
+    }
+
+    if (currentLineTotal !== null && previousLineTotal !== null) {
+      comparableCurrentTotal = roundMoney(comparableCurrentTotal + currentLineTotal);
+      comparablePreviousTotal = roundMoney(comparablePreviousTotal + previousLineTotal);
+    }
+
+    if (lineDelta !== null && lineDelta > 0.5) changeSummary.priceUp += 1;
+    if (changeType === 'price_down') changeSummary.priceDown += 1;
+    if (changeType === 'new_item') changeSummary.newItem += 1;
+    if (changeType === 'missing_current_price') changeSummary.missingCurrentPrice += 1;
+    if (changeType === 'substitute_available') changeSummary.substituteAvailable += 1;
+    if (changeType === 'unchanged') changeSummary.unchanged += 1;
+
+    return {
+      productId: line.productId,
+      productName: line.productName,
+      quantity: line.quantity,
+      currentUnitPrice,
+      previousUnitPrice,
+      currentLineTotal,
+      previousLineTotal,
+      lineDelta,
+      lineDeltaPercent,
+      ...(line.currentStoreName ? { currentStoreName: line.currentStoreName } : {}),
+      ...(line.previousStoreName ? { previousStoreName: line.previousStoreName } : {}),
+      ...(line.substituteProductName ? { substituteProductName: line.substituteProductName } : {}),
+      confidence: clamp(line.confidence ?? 1, 0, 1),
+      changeType,
+      recommendedAction: recurringBasketLineAction({ changeType, substituteProductName: line.substituteProductName })
+    };
+  });
+
+  const comparableDelta = roundMoney(comparableCurrentTotal - comparablePreviousTotal);
+  const comparableDeltaPercent = comparablePreviousTotal === 0
+    ? 0
+    : roundMoney((comparableDelta / comparablePreviousTotal) * 100);
+  const direction = comparableDelta <= 0 ? 'lower' : 'higher';
+  const headline = comparablePreviousTotal === 0
+    ? `${input.templateName} is ready for its first recurring basket baseline.`
+    : `${input.templateName} is ${Math.abs(comparableDeltaPercent).toFixed(2)}% ${direction} than the previous shop on comparable lines.`;
+
+  return {
+    templateId: input.templateId,
+    templateName: input.templateName,
+    cadence: input.cadence,
+    asOf: input.asOf,
+    ...(input.lastPurchasedAt ? { lastPurchasedAt: input.lastPurchasedAt } : {}),
+    lineCount: input.lines.length,
+    comparableCurrentTotal: roundMoney(comparableCurrentTotal),
+    comparablePreviousTotal: roundMoney(comparablePreviousTotal),
+    comparableDelta,
+    comparableDeltaPercent,
+    missingCurrentPriceProductIds,
+    changeSummary,
+    headline,
+    lines,
+    guardrails: [
+      'Only lines with both current and previous verified prices are included in comparable totals.',
+      'Suggested substitutes require user confirmation and never rewrite a saved recurring basket automatically.',
+      'Missing current prices block automatic checkout handoff and remain visible in the digest.'
+    ]
   };
 }
 

@@ -45,6 +45,7 @@ import {
   type PrivacyRequest,
   type PrivacyRequestStatus,
   type PrivacyRequestType,
+  type RecurringBasketCadence,
   type WatchlistPriceType
 } from '@groceryview/core';
 import {
@@ -204,6 +205,11 @@ function requiredScanKind(value: unknown): ScanUpload['kind'] {
 function requiredPantryUnit(value: unknown): PantryInventoryItem['unit'] {
   if (value === 'each' || value === 'kg' || value === 'g' || value === 'l' || value === 'ml' || value === 'pack') return value;
   throw new Error('pantry unit must be each, kg, g, l, ml, or pack.');
+}
+
+function requiredRecurringCadence(value: unknown): RecurringBasketCadence {
+  if (value === 'weekly' || value === 'biweekly' || value === 'monthly') return value;
+  throw new Error('cadence must be weekly, biweekly, or monthly.');
 }
 
 function requiredAuthProvider(value: unknown): AuthProvider {
@@ -1318,6 +1324,24 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getLocalOfferBasketReport(user, url.searchParams.get('asOf') ?? undefined));
       }
 
+      if (path === '/api/basket/recurring-digest') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          return jsonResponse(api.getRecurringBasketDigest(user, {
+            templateId: requiredString(url.searchParams.get('templateId'), 'templateId'),
+            templateName: requiredString(url.searchParams.get('templateName'), 'templateName'),
+            cadence: requiredRecurringCadence(url.searchParams.get('cadence')),
+            asOf: requiredString(url.searchParams.get('asOf'), 'asOf'),
+            ...(url.searchParams.get('lastPurchasedAt')
+              ? { lastPurchasedAt: requiredString(url.searchParams.get('lastPurchasedAt'), 'lastPurchasedAt') }
+              : {})
+          }));
+        }
+      }
+
       const basketStoreQuoteMatch = path.match(/^\/api\/basket\/stores\/([^/]+)\/quote$/);
       if (basketStoreQuoteMatch) {
         const user = userIdFrom(url);
@@ -1624,6 +1648,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/compare': { post: protectedOperation('Compare basket strategies.') },
       '/api/basket/comparison-report': { get: protectedOperation('Get basket comparison strategies with assignment and trust labels.') },
       '/api/basket/local-offers': { get: protectedOperation('Get local offer basket coverage, freshness, confidence, and savings by selected stores.') },
+      '/api/basket/recurring-digest': { get: protectedOperation('Get recurring basket changes, missing-price blockers, and suggested review actions.') },
       '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },
       '/api/budget/categories': {

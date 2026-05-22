@@ -411,6 +411,29 @@ export const unavailablePanels = [
   }
 ];
 
+export const recurringBasketDigestContract = {
+  endpoint: '/api/basket/recurring-digest',
+  title: 'Recurring basket digest',
+  status: 'implemented_account_api',
+  requiredInputs: [
+    'signed-in userId',
+    'saved weekly basket item quantities',
+    'templateId, templateName, cadence, and asOf timestamp',
+    'current and previous verified product prices'
+  ],
+  shippedBehaviors: [
+    'Changed since last shop totals are computed only from comparable verified lines.',
+    'Price-up, price-down, substitute-available, new-item, and missing-current-price states are separated.',
+    'Suggested substitutes require review and never rewrite a recurring basket automatically.',
+    'Missing-price blockers stay visible and block automatic checkout handoff.'
+  ],
+  blockedInStaticSnapshot: [
+    'No authenticated household basket is bundled with this static build.',
+    'No private purchase history is rendered without a production auth session.',
+    'No checkout or retailer handoff is claimed from a digest response.'
+  ]
+};
+
 export type PrivateFeatureRoute =
   | 'weekly-basket'
   | 'watchlist'

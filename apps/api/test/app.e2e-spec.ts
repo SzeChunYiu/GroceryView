@@ -72,6 +72,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/watchlist/{productId}'].patch);
     assert.ok(docs.body.paths['/users/demo/alerts/inbox']);
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
+    assert.ok(docs.body.paths['/users/demo/basket/recurring-digest']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
   });
 
@@ -541,6 +542,15 @@ describe('GroceryView API app', () => {
     assert.equal(localOffers.body.bestStore.storeId, 'willys-odenplan');
     assert.equal(localOffers.body.bestStore.matchedProductIds[0], 'coffee');
     assert.equal(localOffers.body.guardrails.length, 3);
+
+    const recurringDigest = await request(app.getHttpServer())
+      .get('/users/demo/basket/recurring-digest?templateId=weekly-basics&templateName=Weekly%20basics&cadence=weekly&asOf=2026-05-22T08:00:00.000Z')
+      .expect(200);
+    assert.equal(recurringDigest.body.templateId, 'weekly-basics');
+    assert.equal(recurringDigest.body.demo, true);
+    assert.equal(recurringDigest.body.lineCount, 1);
+    assert.equal(recurringDigest.body.lines[0].changeType, 'price_down');
+    assert.match(recurringDigest.body.headline, /Weekly basics is .* lower/);
 
     const storeQuote = await request(app.getHttpServer()).get('/users/demo/basket/stores/willys-odenplan/quote').expect(200);
     assert.equal(storeQuote.body.storeId, 'willys-odenplan');

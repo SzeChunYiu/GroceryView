@@ -8,6 +8,7 @@ import {
   createHouseholdState,
   rankNutritionPerKrona,
   planPantryReplenishment,
+  planRecurringBasketDigest,
   reviewReceiptScan,
   scoreBand,
   searchProducts,
@@ -28,6 +29,8 @@ import {
   type PriceChartObservation,
   type PriceHistoryConfidenceDisclosure,
   type PriceHistorySummary,
+  type RecurringBasketCadence,
+  type RecurringBasketDigest,
   type ReceiptReview,
   type HouseholdBasketItem,
   type HouseholdMember,
@@ -280,6 +283,14 @@ export type LocalOfferBasketReport = LocalOfferBasketSummary & {
   storeIds: string[];
   basketItemCount: number;
   guardrails: string[];
+};
+
+export type RecurringBasketDigestRequest = {
+  templateId: string;
+  templateName: string;
+  cadence: RecurringBasketCadence;
+  asOf: string;
+  lastPurchasedAt?: string;
 };
 
 export type StoreBasketQuoteLine = {
@@ -1589,6 +1600,54 @@ function localOffersForBasket(userItems: BasketItemRequest[], storeIds: string[]
     });
 }
 
+function previousRecurringUnitPrice(product: ProductDetail): number | null {
+  const verifiedHistory = [...product.history]
+    .filter((point) => point.verified)
+    .sort((left, right) => left.date.localeCompare(right.date));
+  return verifiedHistory.at(-2)?.price ?? verifiedHistory.at(-1)?.price ?? null;
+}
+
+function recurringSubstituteName(product: ProductDetail, currentUnitPrice: number | null): string | undefined {
+  if (currentUnitPrice === null) return undefined;
+  const candidate = products
+    .filter((other) =>
+      other.id !== product.id &&
+      other.category === product.category &&
+      other.brandTier.includes('private_label') &&
+      comparableUnit(other) === comparableUnit(product)
+    )
+    .flatMap((other) => other.currentPrices.map((price) => ({ product: other, price })))
+    .filter((candidate) => candidate.price.price < currentUnitPrice)
+    .sort((left, right) => left.price.price - right.price.price || left.product.name.localeCompare(right.product.name))[0];
+  return candidate?.product.name;
+}
+
+function buildRecurringBasketDigest(
+  userId: string,
+  userItems: BasketItemRequest[],
+  request: RecurringBasketDigestRequest
+): RecurringBasketDigest {
+  requireNonEmptyId(userId, 'userId');
+  return planRecurringBasketDigest({
+    ...request,
+    lines: userItems.map((item) => {
+      const product = products.find((candidate) => candidate.id === item.productId);
+      if (!product) throw new Error(`Unknown productId: ${item.productId}`);
+      const currentPrice = bestPriceFor(product);
+      return {
+        productId: product.id,
+        productName: product.name,
+        quantity: item.quantity,
+        currentUnitPrice: currentPrice?.price ?? null,
+        previousUnitPrice: previousRecurringUnitPrice(product),
+        ...(currentPrice?.storeName ? { currentStoreName: currentPrice.storeName } : {}),
+        substituteProductName: recurringSubstituteName(product, currentPrice?.price ?? null),
+        confidence: product.dealSignals.sourceConfidence
+      };
+    })
+  });
+}
+
 function productName(productId: string): string {
   return products.find((product) => product.id === productId)?.name ?? productId;
 }
@@ -2547,6 +2606,10 @@ export function createGroceryViewApi() {
           'Stale or missing offer lines remain visible instead of being treated as available current prices.'
         ]
       };
+    },
+
+    getRecurringBasketDigest(userId: string, request: RecurringBasketDigestRequest): RecurringBasketDigest {
+      return buildRecurringBasketDigest(userId, baskets.get(userId) ?? [], request);
     },
 
     quoteBasketAtStore(userId: string, storeId: string): StoreBasketQuote {
