@@ -58,24 +58,35 @@ export async function printDailyConnectorStores({ fetchers, selfTest = false } =
       city: 'Borås',
       latitude: 57.7141742,
       longitude: 12.8669819
+    }],
+    fetchLidlStores: async () => [{
+      storeId: 'alingsas/vaenersborgsvaegen-21',
+      name: 'Lidl Alingsås Vänersborgsvägen 21',
+      address: 'Vänersborgsvägen 21',
+      city: 'Alingsås',
+      countryCode: 'SE',
+      latitude: 57.93452,
+      longitude: 12.54588
     }]
   } : await loadStoreFetchers());
 
-  const [willysStores, hemkopStores, coopStores, cityGrossStores] = await Promise.all([
+  const [willysStores, hemkopStores, coopStores, cityGrossStores, lidlStores] = await Promise.all([
     source.fetchWillysStores({ online: true }),
     source.fetchHemkopStores({ online: true }),
     source.fetchCoopStores(),
-    source.fetchCityGrossStores()
+    source.fetchCityGrossStores(),
+    source.fetchLidlStores()
   ]);
 
   return {
     generatedAt: new Date().toISOString(),
-    supportedChains: ['willys', 'hemkop', 'coop', 'city_gross'],
+    supportedChains: ['willys', 'hemkop', 'coop', 'city_gross', 'lidl'],
     storesByChain: {
       willys: willysStores.map(toDailyStoreConfig),
       hemkop: hemkopStores.map(toDailyStoreConfig),
       coop: coopStores.map(toDailyStoreConfig),
-      city_gross: cityGrossStores.map(toDailyStoreConfig)
+      city_gross: cityGrossStores.map(toDailyStoreConfig),
+      lidl: lidlStores.map(toDailyStoreConfig)
     }
   };
 }

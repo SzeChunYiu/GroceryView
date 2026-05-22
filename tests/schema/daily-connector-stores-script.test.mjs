@@ -8,11 +8,12 @@ const script = readFileSync(scriptPath, 'utf8');
 const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
 
 describe('daily connector stores export script', () => {
-  it('documents the live City Gross, Coop, Hemkop, and Willys store catalog APIs used for branch metadata', () => {
+  it('documents the live City Gross, Coop, Hemkop, Lidl, and Willys store catalog APIs used for branch metadata', () => {
     assert.match(script, /fetchWillysStores/);
     assert.match(script, /fetchHemkopStores/);
     assert.match(script, /fetchCoopStores/);
     assert.match(script, /fetchCityGrossStores/);
+    assert.match(script, /fetchLidlStores/);
     assert.match(script, /storesByChain/);
     assert.equal(
       pkg.scripts['ops:daily-connector-stores'],
@@ -23,11 +24,12 @@ describe('daily connector stores export script', () => {
   it('self-test emits daily connector store metadata for supported branch-scoped chains', () => {
     const output = execFileSync(process.execPath, [scriptPath.pathname, '--self-test'], { encoding: 'utf8' });
     const body = JSON.parse(output);
-    assert.deepEqual(body.supportedChains, ['willys', 'hemkop', 'coop', 'city_gross']);
+    assert.deepEqual(body.supportedChains, ['willys', 'hemkop', 'coop', 'city_gross', 'lidl']);
     assert.equal(body.storesByChain.willys[0].storeId, '2149');
     assert.equal(body.storesByChain.hemkop[0].storeId, '4798');
     assert.equal(body.storesByChain.coop[0].storeId, '196183');
     assert.equal(body.storesByChain.city_gross[0].storeId, '21');
+    assert.equal(body.storesByChain.lidl[0].storeId, 'alingsas/vaenersborgsvaegen-21');
     for (const chain of body.supportedChains) {
       for (const store of body.storesByChain[chain]) {
         assert.equal(typeof store.storeId, 'string');
