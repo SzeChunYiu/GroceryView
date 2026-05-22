@@ -436,6 +436,28 @@ describe('fetchOpenFoodFactsExportProducts', () => {
     assert.equal(rows[0].nutritionPer100g.sugars, 5.2);
     assert.equal(rows[0].sourceUrl, `${OPENFOODFACTS_EXPORT_URL}#code=7340083494406`);
   });
+
+  it('uses real OpenFoodFacts alternate export names when product_name is empty', async () => {
+    const tsv = [
+      'code\turl\tproduct_name\tabbreviated_product_name\tgeneric_name\tquantity\tbrands\tcategories_tags\tlabels_tags\tnutriscore_grade\tenergy_100g\tenergy-kcal_100g\tfat_100g\tsaturated-fat_100g\tcarbohydrates_100g\tsugars_100g\tfiber_100g\tproteins_100g\tsalt_100g\tsodium_100g\timage_url',
+      '7311071330525\thttps://world.openfoodfacts.org/product/7311071330525\t\t\tMörkt fullkornsbröd med lingon.\t500 g\tPågen\ten:breads\t\tunknown\t1112\t266\t4.1\t0.5\t44\t6.2\t6\t8.8\t0.95\t0.38\thttps://images.openfoodfacts.org/images/products/731/107/133/0525/front_sv.3.400.jpg'
+    ].join('\n');
+    const fetchImpl: typeof fetch = async () => new Response(gzipSync(tsv), {
+      status: 200,
+      headers: { 'content-type': 'application/gzip' }
+    });
+
+    const rows = await fetchOpenFoodFactsExportProducts({
+      codes: ['7311071330525'],
+      fetchImpl,
+      maxRows: 1,
+      retrievedAt: '2026-05-22T22:52:02.759Z'
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].name, 'Mörkt fullkornsbröd med lingon.');
+    assert.equal(rows[0].nutritionPer100g.proteins, 8.8);
+  });
 });
 
 describe('fetchOpenFoodFactsExportRetailerEnrichments', () => {

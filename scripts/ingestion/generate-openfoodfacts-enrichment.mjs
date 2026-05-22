@@ -254,7 +254,7 @@ async function extractArrayFromTypeScriptModule(fileUrl, exportName) {
 
 function normalizeOpenFoodFactsExportRecord(record) {
   const code = asText(record.code);
-  const name = asText(record.product_name);
+  const name = asText(record.product_name) || asText(record.abbreviated_product_name) || asText(record.generic_name);
   if (!code || !name) {
     return null;
   }
