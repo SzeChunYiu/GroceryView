@@ -67,3 +67,17 @@ Sample rows:
 8. 2500298365 | Olivolja Classico | 66 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
 9. 2500298362 | Prosciutto Crudo | 18 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
 10. 2500298307 | Riven ost | 18 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+
+## Hemköp weekly discounts expansion 2026-05-22
+
+- Source: hemkop.se public Axfood campaign JSON
+- Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-22T10:55:44.095Z
+- Store IDs: 4003, 4127, 4190, 4798, 4660, 4775, 4196, 4111, 4162, 4273, 4349, 4359
+- Real weekly discount rows fetched and wired: 2987
+- Web wire: apps/web/src/lib/ingested/hemkop.ts
+
+Sample rows:
+1. 2500309493 | 4003 | Läsk | 6 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500303429 | 4003 | Lingongrova, Guldkorn | 19 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500298172 | 4003 | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100

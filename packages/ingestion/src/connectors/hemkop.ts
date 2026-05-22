@@ -110,7 +110,20 @@ type AxfoodCampaignResponse = {
 export const HEMKOP_SEARCH_BASE_URL = 'https://www.hemkop.se/search';
 export const HEMKOP_WEEKLY_DISCOUNTS_BASE_URL = 'https://www.hemkop.se/search/campaigns/offline';
 export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_ID = '4003';
-export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS = ['4003', '4127', '4190', '4798', '4660', '4775'] as const;
+export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS = [
+  '4003',
+  '4127',
+  '4190',
+  '4798',
+  '4660',
+  '4775',
+  '4196',
+  '4111',
+  '4162',
+  '4273',
+  '4349',
+  '4359'
+] as const;
 
 export const DEFAULT_HEMKOP_SEARCH_QUERIES = [
   'makaroner',
