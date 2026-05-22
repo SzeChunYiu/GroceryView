@@ -2084,6 +2084,27 @@ export const studentDealRecipes = {
   }
 };
 
+export const familyMealPlannerFromDeals = {
+  persona: 'Families with kids',
+  title: 'Family weekly meal planner',
+  servings: 4,
+  maxMealCost: 135,
+  meals: suggestDealBasedMeals({
+    deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
+    maxMealCost: 135,
+    servings: 4
+  }).map((suggestion, index) => ({
+    ...suggestion,
+    weeknightSlot: ['Monday dinner', 'Wednesday dinner', 'Friday freezer night'][index] ?? 'Weekend fallback',
+    lunchboxLeftovers: suggestion.estimatedCostPerServing <= 35,
+    ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean)
+  })),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Family meals use visible deal rows from the same core meal engine; snacks, allergens, and child preferences need account data before launch.'
+  }
+};
+
 export const expiryDealRadarReports = [
   {
     id: 'expiry-laxfile-liljeholmen',

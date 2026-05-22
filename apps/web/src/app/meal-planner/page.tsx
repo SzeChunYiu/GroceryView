@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { dealBasedMeals, studentDealRecipes } from '@/lib/demo-data';
+import { dealBasedMeals, familyMealPlannerFromDeals, studentDealRecipes } from '@/lib/demo-data';
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
@@ -97,6 +97,41 @@ export default function MealPlannerPage() {
           ))}
         </div>
         <p className="mt-4 text-sm font-semibold text-slate-700">{studentDealRecipes.coverage.caveat}</p>
+      </Card>
+
+      <Card className="mt-6 border-blue-200 bg-blue-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-blue-800">{familyMealPlannerFromDeals.persona}</p>
+        <h2 className="mt-2 text-2xl font-black">Family weekly meal planner</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          This family lens calls suggestDealBasedMeals for four-serving dinners and labels which deal-built meals are cheap enough to become lunchboxLeftovers.
+        </p>
+        <div className="mt-4 space-y-4">
+          {familyMealPlannerFromDeals.meals.map((meal) => (
+            <div className="rounded-3xl border border-blue-200 bg-white p-5" key={meal.weeknightSlot}>
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-800">{meal.weeknightSlot}</p>
+                  <p className="mt-1 text-2xl font-black text-slate-950">{meal.title}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{meal.reason}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-3xl font-black text-blue-800">{formatSek(meal.estimatedCost)}</p>
+                  <p className="text-sm font-semibold text-slate-600">{meal.lunchboxLeftovers ? 'lunchboxLeftovers ready' : 'dinner only'}</p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {meal.ingredients.map((ingredient) => ingredient ? (
+                  <Link className="rounded-2xl bg-blue-50 p-4 hover:bg-blue-100" href={`/products/${ingredient.productId}`} key={ingredient.productId}>
+                    <p className="font-black">{ingredient.name}</p>
+                    <p className="mt-1 text-sm text-slate-600">{ingredient.category} · deal score {ingredient.dealScore}</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-700">{formatSek(ingredient.price)} · {ingredient.source}</p>
+                  </Link>
+                ) : null)}
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-sm font-semibold text-slate-700">{familyMealPlannerFromDeals.coverage.caveat}</p>
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
