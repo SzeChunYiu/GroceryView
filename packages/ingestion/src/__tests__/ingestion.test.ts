@@ -11,6 +11,7 @@ import {
   buildCityGrossProductsUrl,
   buildCityGrossStoresUrl,
   buildDailyConnectorConfigsFromEnv,
+  buildDailyIngestionPostgresPoolConfig,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
   buildHemkopSearchUrl,
@@ -3699,6 +3700,16 @@ describe('daily ingestion runner', () => {
 
     assert.equal(configs.connectors.length, 6);
     assert.equal(configs.connectors[5].chainId, 'city_gross');
+  });
+
+  it('forces the production daily ingestion database session into write mode', () => {
+    assert.deepEqual(
+      buildDailyIngestionPostgresPoolConfig('postgres://user:secret@example/groceryview'),
+      {
+        connectionString: 'postgres://user:secret@example/groceryview',
+        options: '-c default_transaction_read_only=off'
+      }
+    );
   });
 
   it('fails closed when daily connector config omits any required chain', () => {
