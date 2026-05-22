@@ -237,6 +237,32 @@ describe('verified-data UI', () => {
   });
 
 
+
+  it('ships signed-in coupon and loyalty offer controls without anonymous savings claims', async () => {
+    const couponStacks = await read('src/app/coupon-stacks/page.tsx');
+    const actions = await read('src/components/coupon-loyalty-actions.tsx');
+    const server = await read('../../packages/server/src/index.ts');
+
+    assert.match(couponStacks, /CouponLoyaltyActions/);
+    assert.match(actions, /'use client'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(actions, /Authorization: `Bearer \$\{accessToken\}`/);
+    assert.match(actions, /\/api\/loyalty\/offers\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /\/api\/account\/subscription-access\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /method: 'GET'/);
+    assert.match(actions, /totalEligibleSavings/);
+    assert.match(actions, /requiresActionCount/);
+    assert.match(actions, /needs_coupon/);
+    assert.match(actions, /needs_membership/);
+    assert.match(actions, /Sign in first/);
+    assert.match(actions, /No anonymous coupon offers/);
+    assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
+    assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
+    assert.match(server, /\/api\/loyalty\/offers/);
+    assert.match(server, /\/api\/account\/subscription-access/);
+  });
+
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/basket-ideas/page.tsx');
