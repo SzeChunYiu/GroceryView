@@ -2576,6 +2576,13 @@ export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): Daily
   };
 }
 
+export function buildDailyIngestionPostgresPoolConfig(databaseUrl: string): { connectionString: string; options: string } {
+  return {
+    connectionString: databaseUrl,
+    options: '-c default_transaction_read_only=off'
+  };
+}
+
 function dbSourceTypeForConnector(sourceType: RetailerConnectorKind): SourceRunRecord['sourceType'] {
   if (sourceType === 'official_api') return 'official_api';
   if (sourceType === 'retailer_online_page') return 'retailer_page';
@@ -3292,9 +3299,9 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
 
 export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.env): Promise<DailyIngestionRunResult> {
   const { databaseUrl, connectors } = buildDailyConnectorConfigsFromEnv(env);
-  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string }) => { query(text: string, values: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void> } };
+  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; options?: string }) => { query(text: string, values: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void> } };
   if (!pg.Pool) throw new Error('pg Pool export is not available.');
-  const pool = new pg.Pool({ connectionString: databaseUrl });
+  const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
   try {
     return await runDailyIngestion({
       executor: createPgQueryExecutor(pool),
