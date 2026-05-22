@@ -21,8 +21,8 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 - Product search URLs: per-branch `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1`, listed in `apps/web/src/lib/ingested/coop.ts`
 - Request body: weekly flyer item queries listed in `DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES`, resultsOptions take 8, empty sort/facets, relatedResultsOptions take 0
 - Required public headers: `storeApiSubscriptionKey` for store metadata and `personalizationApiSubscriptionKey` for product search, both exposed in `window.coopSettings.serviceAccess` on https://www.coop.se/handla/
-- Retrieved: 2026-05-22T13:46:23.654Z
-- Added this iteration: 185510 Stora Coop Stenby Västerås; 232000 Stora Coop Sundsvall; 254900 Stora Coop Enköping; 054000 Stora Coop Finspång
+- Retrieved: 2026-05-22T14:18:16.300Z
+- Added this iteration: 105610 Stora Coop Halmstad; 195020 Stora Coop Norra Backa; 163000 Stora Coop Välsviken; 196000 Stora Coop Ludvika; 026810 Stora Coop Kungsängen; 056010 Stora Coop Garnisonen Linköping; 195030 Stora Coop Falun; 015430 Stora Coop Tumba; 133800 Stora Coop Torp; 201510 Stora Coop Ljusdal; 165270 Stora Coop Kil; 165290 Stora Coop Torsby
 - Stores:
   - 251300, Stora Coop Boländerna, Uppsala, 26 real discount rows
   - 252700, Stora Coop Bromma, Bromma, 24 real discount rows
@@ -82,8 +82,20 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
   - 232000, Stora Coop Sundsvall, Sundsvall, 24 real discount rows
   - 254900, Stora Coop Enköping, Enköping, 20 real discount rows
   - 054000, Stora Coop Finspång, Finspång, 25 real discount rows
+  - 105610, Stora Coop Halmstad, Halmstad, 26 real discount rows
+  - 195020, Stora Coop Norra Backa, Borlänge, 26 real discount rows
+  - 163000, Stora Coop Välsviken, Karlstad, 21 real discount rows
+  - 196000, Stora Coop Ludvika, Ludvika, 21 real discount rows
+  - 026810, Stora Coop Kungsängen, Kungsängen, 26 real discount rows
+  - 056010, Stora Coop Garnisonen Linköping, Linköping, 21 real discount rows
+  - 195030, Stora Coop Falun, Falun, 23 real discount rows
+  - 015430, Stora Coop Tumba, Tumba, 24 real discount rows
+  - 133800, Stora Coop Torp, Uddevalla, 24 real discount rows
+  - 201510, Stora Coop Ljusdal, Ljusdal, 23 real discount rows
+  - 165270, Stora Coop Kil, Kil, 26 real discount rows
+  - 165290, Stora Coop Torsby, Torsby, 20 real discount rows
 - Flyer validity: 2026-05-18T00:00:00 through 2026-05-24T23:59:59
-- Real current flyer discount rows fetched: 1345
+- Real current flyer discount rows fetched: 1626
 
 Every weekly discount row includes Coop product id/EAN, product name, brand, package label, ordinary B2C SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL, and retrieval timestamp.
 
