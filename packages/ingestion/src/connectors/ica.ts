@@ -709,6 +709,106 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004101',
     storeName: 'ICA City Knalleland',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003722',
+    storeName: 'Maxi ICA Stormarknad Borås',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003705',
+    storeName: 'ICA Nära Braås',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004093',
+    storeName: 'ICA Nära Bredaryd',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004577',
+    storeName: 'ICA Supermarket Brommaplan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003838',
+    storeName: 'Maxi ICA Stormarknad Bromölla',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004056',
+    storeName: 'ICA Nära Bräkne-Hoby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004098',
+    storeName: 'ICA City Brämhult',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1037008',
+    storeName: 'ICA Supermarket Charlottenberg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004127',
+    storeName: 'ICA Supermarket Delsbohallen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004290',
+    storeName: 'ICA Supermarket Edsbyn',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003876',
+    storeName: 'ICA Supermarket Tappström',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004151',
+    storeName: 'ICA Supermarket Ekshärad',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004391',
+    storeName: 'ICA Supermarket Eksjö',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004469',
+    storeName: 'ICA Supermarket Emmaboda',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003686',
+    storeName: 'ICA Kvantum BEA Livsmedel',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004152',
+    storeName: 'ICA Kvantum Ekängen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004413',
+    storeName: 'ICA Supermarket Stenby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004513',
+    storeName: 'Maxi ICA Stormarknad Eskilstuna',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004170',
+    storeName: 'ICA Kvantum Falkenberg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003688',
+    storeName: 'ICA Supermarket Skrea Strand',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
