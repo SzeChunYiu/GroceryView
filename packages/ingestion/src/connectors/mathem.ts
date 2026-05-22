@@ -54,6 +54,7 @@ export const DEFAULT_MATHEM_SEARCH_QUERIES = [
   'ketchup',
   'havregryn'
 ] as const;
+export const DEFAULT_MATHEM_MAX_ROWS = 600;
 
 export type FetchMathemProductsOptions = {
   fetchImpl?: typeof fetch;
@@ -71,7 +72,7 @@ export function buildMathemSearchUrl(query: string): string {
 export async function fetchMathemProducts(options: FetchMathemProductsOptions = {}): Promise<MathemProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const queries = options.queries ?? DEFAULT_MATHEM_SEARCH_QUERIES;
-  const maxRows = options.maxRows ?? 150;
+  const maxRows = options.maxRows ?? DEFAULT_MATHEM_MAX_ROWS;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: MathemProduct[] = [];
   const seenCodes = new Set<string>();
