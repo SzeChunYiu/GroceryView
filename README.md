@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 19:17 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 20:18 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **283**
+- **Shipped `feat:`/`wire:` PRs to date:** **286**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,27 +42,25 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1080 feat(commodity): surface mapping review queue
+- #1078 feat(ingest): refresh OpenFoodFacts barcode nutrition
+- #1074 feat(ingest): add ICA Sälen promotions
+- #1076 feat(web): rank matched store price percentiles
+- #1075 feat(ingest): add Coop branch flyer discounts
+- #1073 feat(web): add notification inbox actions
+- #1072 feat(scanner): surface receipt alias growth
+- #1071 feat(web): surface member-offer aggregation
+- #1068 feat(ops): gate deploys on visible production artifact
+- #1066 feat(web): surface fresh food chain index
+- #1062 feat(ingest): add ICA Säffle promotions
+- #1063 feat(web): add scanner camera preview
+- #1064 feat(web): add seasonal produce calendar
 - #1059 feat(ingest): add Coop Karlskoga flyer discounts
 - #1061 feat(api): preserve unpriced basket products
-- #1060 feat(web): surface crowd price submissions
-- #1058 feat(web): surface launch fixture store slugs
-- #1053 feat(ingest): refresh OpenFoodFacts barcode enrichment
-- #1057 feat(web): surface eco basket scorecard
-- #1056 feat(web): add weekly email digest
-- #1055 feat(ingest): add ICA Svenstavik promotions
-- #1052 feat(core): add dietary substitution assistant
-- #1051 feat(web): compare delivery and in-store totals
-- #1050 feat(ingest): add Coop Lund flyer discounts
-- #1049 feat(core): score retailer deep links
-- #1047 feat(ingest): refresh OpenFoodFacts barcode nutrition
-- #1045 feat(web): add Grocery Index ticker widget
-- #1044 feat(ingest): add ICA Sunne promotions
 
 ## 🔄 In progress (open PRs)
 
-- #1064 feat(web): add seasonal produce calendar
-- #1063 feat(web): add scanner camera preview
-- #1062 feat(ingest): add ICA Säffle promotions
+- #1081 feat(account): add signed-in ad disclosure controls
 
 ## 📋 To-do (from GOAL.md backlog)
 
