@@ -2699,6 +2699,45 @@ describe('fetchWillysWeeklyDiscounts', () => {
     assert.deepEqual(rows.map((row) => row.storeId), ['2110', '2187']);
   });
 
+
+
+  it('keeps Willys weekly all-store ingestion moving when one branch campaign request fails', async () => {
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '2110', name: 'Willys Kungsbacka Hede', address: { line1: 'Tölöleden 3', town: 'Kungsbacka' } },
+          { storeId: '2187', name: 'Willys Oskarshamn Snickeriet', address: { line1: 'Snickerivägen 1', town: 'Oskarshamn' } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('q') ?? 'unknown';
+      if (storeId === '2187') throw new Error('simulated Willys weekly timeout');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 1 },
+        results: [{
+          name: `Catalog Willys offer ${storeId}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: `all-store-promo-${storeId}`,
+            mainProductCode: `all-store-product-${storeId}`,
+            name: `Catalog Willys offer ${storeId}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysWeeklyDiscountsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      pageSize: 1,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code]), [['2110', 'all-store-promo-2110']]);
+  });
+
   it('uses the configured Willys weekly store list by default', async () => {
     const requestedUrls: string[] = [];
     const fetchImpl: typeof fetch = async (url) => {
