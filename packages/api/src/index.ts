@@ -722,6 +722,7 @@ export type ProductPriceHistoryAppliedFilters = {
   chain?: string;
   store?: string;
   sourceRun?: string;
+  minConfidence?: number;
   observedFrom?: string;
   observedTo?: string;
   limit?: number;

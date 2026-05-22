@@ -127,7 +127,7 @@ describe('createGroceryViewApi', () => {
         confidence: 0.91,
         provenance: { source: 'open_prices', rawSnapshotRef: 's3://raw/coffee-old.html' }
       }
-    ], { priceType: 'shelf', chain: 'willys', store: 'willys-odenplan', sourceRun: 'run-open-prices-1', limit: 100 });
+    ], { priceType: 'shelf', chain: 'willys', store: 'willys-odenplan', sourceRun: 'run-open-prices-1', minConfidence: 0.9, limit: 100 });
 
     assert.equal(report?.productSlug, 'bryggkaffe-450g');
     assert.deepEqual(report?.points.map((point) => point.observationId), ['obs-coffee-old', 'obs-coffee-new']);
@@ -158,6 +158,7 @@ describe('createGroceryViewApi', () => {
       chain: 'willys',
       store: 'willys-odenplan',
       sourceRun: 'run-open-prices-1',
+      minConfidence: 0.9,
       limit: 100
     });
     assert.equal(report?.summary?.latestPrice, 49.9);
