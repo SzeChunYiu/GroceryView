@@ -178,6 +178,15 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces baby and diaper price tracking alerts using the real watchlist engine', async () => {
+    const source = await read('src/app/watchlist/page.tsx');
+    assert.match(source, /babyDiaperPriceTracker/);
+    assert.match(source, /buildWatchlistAlerts/);
+    assert.match(source, /Baby & diaper price tracking/);
+    assert.match(source, /diaperUnitPrice/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces a student cheapest-basics board using real basket comparison output', async () => {
     const source = await read('src/app/basket-ideas/page.tsx');
     assert.match(source, /studentBasicsBoard/);
