@@ -1594,6 +1594,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003740',
     storeName: 'ICA Kvantum Strömstad',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003751',
+    storeName: 'ICA Supermarket BBB Sunne',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
