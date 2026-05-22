@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 16:13 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 18:15 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **280**
+- **Shipped `feat:`/`wire:` PRs to date:** **275**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,25 +42,27 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
-- #996 feat(web): add product branch spread gate
-- #986 feat(ingest): expand Overpass Sweden grocery stores
-- #992 feat(ingest): expand CityGross product rows
-- #994 feat(ingest): refresh OpenFoodFacts enrichment metadata
-- #993 feat(web): add store price percentile rank gate
-- #990 feat(ingest): expand Mathem public search rows
-- #989 feat(seo): add dynamic product OG price images
-- #985 feat(ingest): expand Coop product rows
-- #983 feat(api): dedupe chain index prices
-- #982 feat(web): add product cross-chain history overlay gate
-- #981 feat(ingest): refresh OpenFoodFacts barcode enrichment
-- #979 feat(ingest): add ICA per-store promotion rows
-- #978 feat(ingest): register Willys weekly connector
-- #977 feat(ingest): expand Coop weekly flyer branches
-- #976 feat(ingest): add ICA per-store promotion rows
+- #1043 feat(web): add private-label dupe finder
+- #1042 feat(core): add stockout substitution planner
+- #1041 feat(web): add price alert thresholds
+- #1040 feat(ingest): refresh OpenFoodFacts barcode nutrition
+- #1038 feat(web): add loyalty price preferences
+- #1037 feat(web): surface digital catalogue offers
+- #1035 feat(web): add changed since last shop digest
+- #1033 feat(ingest): add ICA Strömstad promotions
+- #1032 feat(web): add flyer validity calendar
+- #1030 feat(web): add commodity unit comparison
+- #1028 feat(web): add offer expiry reminders
+- #1027 feat(ingest): add Coop Stadion flyer discounts
+- #1025 feat(web): add dietary scenario filters
+- #1024 feat(ingest): refresh OpenFoodFacts barcode enrichment
+- #1023 feat(ingest): add ICA Storuman promotions
 
 ## 🔄 In progress (open PRs)
 
-- #999 feat(ingest): refresh OpenFoodFacts after worker data
+- #1046 Keep Willys all-store fetch moving past branch failures
+- #1045 feat(web): add Grocery Index ticker widget
+- #1044 feat(ingest): add ICA Sunne promotions
 
 ## 📋 To-do (from GOAL.md backlog)
 
