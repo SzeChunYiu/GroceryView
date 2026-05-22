@@ -1955,6 +1955,23 @@ ${seo}`;
     assert.match(source, /100-centred/);
   });
 
+  it('surfaces the staple-basket fresh-food chain index on chain-index', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const source = await read('src/app/chain-index/page.tsx');
+
+    assert.match(verified, /STAPLE_BASKET/);
+    assert.match(verified, /freshFoodChainIndex/);
+    assert.match(verified, /calculateChainPriceIndex/);
+    assert.match(verified, /sourceConfidence >= 0\.6/);
+    assert.match(source, /freshFoodChainIndex/);
+    assert.match(source, /Fresh-food staple basket index/);
+    assert.match(source, /is_staple/);
+    assert.match(source, /kr\/kg|kr\/l|kr\/st/);
+    assert.match(source, /confidence/i);
+    assert.match(source, /No forecast/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
   it('surfaces an embeddable Grocery Index ticker widget on chain-index', async () => {
     const route = await read('src/app/chain-index/page.tsx');
     const widgetRoute = await read('src/app/widgets/grocery-index-ticker/page.tsx');
