@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import { ProductPriceCards } from './product-price-cards';
+import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedShellCopy } from '@/lib/i18n';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
   chainSavingsLedger,
@@ -44,11 +45,17 @@ const elderlyAccessibilityMode = {
   controls: ['Bigger price cards', 'High-contrast colors', 'Short source labels'],
   evidence: 'contrast-safe shell uses verified route cards only'
 };
+const defaultLocalizedShellCopy = localizedShellCopy.find((copy) => copy.locale === defaultLocale) ?? localizedShellCopy[0];
 const immigrantMultilingualUi = {
   persona: 'Immigrants / new arrivals',
   title: 'Multilingual UI starter',
-  languageOptions: ['Swedish', 'English', 'Arabic', 'Somali'],
-  guardrails: ['Verified prices stay numeric', 'No machine-translated prices', 'Source labels remain visible']
+  languageOptions: localeReadiness,
+  languageOptionLabels: ['Swedish', 'English', 'Arabic', 'Somali'],
+  guardrails: [
+    'No machine-translated prices',
+    defaultLocalizedShellCopy.language.guardrail,
+    ...localeTranslationGuardrails
+  ]
 };
 const pwaFirstInstall = {
   persona: 'Busy mobile shoppers',
@@ -185,14 +192,30 @@ export function MarketShell() {
             <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
               A language access entry point lets new shoppers choose translated navigation help while keeping verified SEK prices, product names, and source evidence unchanged.
             </p>
+            <p className="sr-only">{immigrantMultilingualUi.languageOptionLabels.join(', ')}</p>
           </div>
           <div className="grid gap-2 sm:grid-cols-4">
             {immigrantMultilingualUi.languageOptions.map((language) => (
-              <div className="rounded-2xl bg-white px-4 py-3 text-center font-black text-slate-950" key={language}>
-                {language}
+              <div className="rounded-2xl bg-white px-4 py-3 text-center font-black text-slate-950" key={language.locale}>
+                <span className="block">{language.label}</span>
+                <span className="mt-1 block text-[0.65rem] uppercase tracking-[0.14em] text-slate-500">
+                  {language.status === 'native_reviewed' ? 'reviewed' : 'blocked'}
+                </span>
               </div>
             ))}
           </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {localizedShellCopy.map((copy) => (
+            <div className="rounded-2xl border border-amber-200 bg-white p-4" key={copy.locale}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{copy.locale} next-intl shell copy</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{copy.hero.eyebrow}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{copy.language.persisted}</p>
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+                {copy.nav.overview} · {copy.nav.products} · {copy.nav.compare} · {copy.nav.stores}
+              </p>
+            </div>
+          ))}
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {immigrantMultilingualUi.guardrails.map((guardrail) => (

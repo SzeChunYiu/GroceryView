@@ -1,0 +1,24 @@
+{
+  "nav": {
+    "overview": "Översikt",
+    "products": "Produkter",
+    "compare": "Jämför",
+    "mealCost": "Måltidskostnad",
+    "savings": "Sparläge",
+    "chain": "Kedjor",
+    "stores": "Butiker",
+    "openPrices": "OpenPrices",
+    "map": "Karta",
+    "categories": "Kategorier"
+  },
+  "home": {
+    "eyebrow": "Svensk matpristerminal",
+    "headline": "Verifierade matpriser med tydliga källor.",
+    "body": "GroceryView visar bara prisrader med verifierad källa. Saknas underlag markeras det som en spärr i stället för att fyllas ut."
+  },
+  "language": {
+    "label": "Språk",
+    "persisted": "Språkvalet sparas lokalt och i NEXT_LOCALE-kakan.",
+    "guardrail": "Arabiska och somaliska öppnas först efter granskade översättningar."
+  }
+}

@@ -2239,4 +2239,35 @@ ${seo}`;
     assert.doesNotMatch(fuelRoute, /@\/lib\/demo-data/);
     assert.doesNotMatch(pharmacyRoute, /@\/components\/sample-data/);
   });
+
+  it('ships next-intl language preference switching with persisted locale and Accept-Language detection', async () => {
+    const packageJson = await read('package.json');
+    const i18n = await read('src/lib/i18n.ts');
+    const middleware = await read('src/middleware.ts');
+    const switcher = await read('src/components/language-preference-switcher.tsx');
+    const appNav = await read('src/components/app-nav.tsx');
+    const marketShell = await read('src/components/market-shell.tsx');
+    const svMessages = await read('messages/sv.json');
+    const enMessages = await read('messages/en.json');
+
+    assert.match(packageJson, /"next-intl"/);
+    assert.match(i18n, /createTranslator/);
+    assert.match(i18n, /supportedLocales/);
+    assert.match(i18n, /defaultLocale = 'sv'/);
+    assert.match(i18n, /resolveLocaleFromAcceptLanguage/);
+    assert.match(i18n, /localizedShellCopy/);
+    assert.match(middleware, /accept-language/i);
+    assert.match(middleware, /NEXT_LOCALE/);
+    assert.match(middleware, /x-groceryview-locale/);
+    assert.match(switcher, /localStorage/);
+    assert.match(switcher, /document\.cookie/);
+    assert.match(switcher, /NEXT_LOCALE/);
+    assert.match(switcher, /aria-label="Language preference"/);
+    assert.match(appNav, /LanguagePreferenceSwitcher/);
+    assert.match(marketShell, /localizedShellCopy/);
+    assert.match(svMessages, /"overview": "Översikt"/);
+    assert.match(enMessages, /"overview": "Overview"/);
+    assert.doesNotMatch(svMessages, /machine translated/i);
+    assert.match(i18n, /Arabic and Somali remain blocked until native-quality translations are reviewed/);
+  });
 });
