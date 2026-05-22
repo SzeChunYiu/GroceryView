@@ -1,20 +1,24 @@
 import { BadRequestException, Controller, Get, NotFoundException, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { groceryApi, productPrices } from '../demo-data.js';
+import { CheapestNowService } from './cheapest-now.service.js';
 import { PriceHistoryService, type ProductPriceHistoryFilter } from './price-history.service.js';
 import type { ProductPriceHistoryPriceType } from '@groceryview/api';
 
 @ApiTags('prices')
 @Controller('products/:productId')
 export class PricesController {
-  constructor(private readonly priceHistory: PriceHistoryService) {}
+  constructor(
+    private readonly cheapestNowService: CheapestNowService,
+    private readonly priceHistory: PriceHistoryService
+  ) {}
 
   @Get('cheapest-now')
   @ApiOkResponse({ description: 'Cheapest current observed price per chain for one product' })
-  cheapestNow(@Param('productId') productId: string) {
-    const cheapest = groceryApi.getProductCheapestNow(productId);
+  async cheapestNow(@Param('productId') productId: string) {
+    const cheapest = await this.cheapestNowService.getProductCheapestNow(productId);
     if (!cheapest) throw new NotFoundException('Product not found');
-    return { ...cheapest, demo: true };
+    return cheapest;
   }
 
   @Get('prices')

@@ -16,6 +16,56 @@ class RecordingPriceHistoryExecutor {
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
+    if (sql.includes('latest_prices.price') && sql.includes('products.comparable_unit')) {
+      if (params[0] === 'missing-product') return [] as T[];
+      return [
+        {
+          product_id: 'product-coffee',
+          product_slug: 'bryggkaffe-450g',
+          product_name: 'Bryggkaffe mellanrost 450 g',
+          category_path: ['coffee'],
+          comparable_unit: 'kg',
+          price: '49.90',
+          unit_price: '110.89',
+          currency: 'SEK',
+          observed_at: '2026-05-21T09:00:00.000Z',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan'
+        },
+        {
+          product_id: 'product-coffee',
+          product_slug: 'bryggkaffe-450g',
+          product_name: 'Bryggkaffe mellanrost 450 g',
+          category_path: ['coffee'],
+          comparable_unit: 'kg',
+          price: '59.90',
+          unit_price: '133.11',
+          currency: 'SEK',
+          observed_at: '2026-05-21T08:00:00.000Z',
+          chain_slug: 'lidl',
+          chain_name: 'Lidl',
+          store_slug: 'lidl-sveavagen',
+          store_name: 'Lidl Sveavagen'
+        },
+        {
+          product_id: 'product-coffee',
+          product_slug: 'bryggkaffe-450g',
+          product_name: 'Bryggkaffe mellanrost 450 g',
+          category_path: ['coffee'],
+          comparable_unit: 'kg',
+          price: '64.90',
+          unit_price: '144.22',
+          currency: 'SEK',
+          observed_at: '2026-05-21T07:00:00.000Z',
+          chain_slug: 'coop',
+          chain_name: 'Coop',
+          store_slug: 'coop-odenplan',
+          store_name: 'Coop Odenplan'
+        }
+      ] as T[];
+    }
     if (sql.includes('from products')) {
       if (params[0] === 'missing-product') return [] as T[];
       return [{
@@ -382,7 +432,9 @@ describe('GroceryView API app', () => {
     assert.equal(cheapestNow.body.cheapest.chain, 'willys');
     assert.equal(cheapestNow.body.cheapest.packagePrice, 49.9);
     assert.deepEqual(cheapestNow.body.chainPrices.map((row: { chain: string }) => row.chain), ['willys', 'lidl', 'coop']);
-    assert.equal(cheapestNow.body.demo, true);
+    assert.equal(cheapestNow.body.demo, undefined);
+    assert.equal(cheapestNow.body.observedPriceCount, 3);
+    assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /latest_prices/i);
 
     const terminal = await request(app.getHttpServer()).get('/products/coffee/terminal').expect(200);
     assert.equal(terminal.body.productId, 'coffee');
@@ -878,6 +930,7 @@ describe('GroceryView API app', () => {
     await request(app.getHttpServer()).get('/products/missing-product/deal-score').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/equivalents').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/history').expect(404);
+    await request(app.getHttpServer()).get('/products/missing-product/cheapest-now').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/price-history').expect(404);
     await request(app.getHttpServer()).patch('/users/demo/watchlist/missing-product').send({ targetPrice: 48 }).expect(404);
     await request(app.getHttpServer()).delete('/users/demo/watchlist/missing-product').expect(404);
