@@ -707,6 +707,36 @@ export type FlyerOffer = {
   band: ReturnType<typeof scoreBand>;
 };
 
+export type FlyerOfferObservationInput = {
+  observationId: string;
+  sourceRunId?: string;
+  rawRecordId?: string;
+  priceType: 'promotion' | 'member';
+  price: number;
+  regularPrice: number;
+  currency: 'SEK';
+  promotionText?: string;
+  promotionStartsOn?: string;
+  promotionEndsOn?: string;
+  memberRequired: boolean;
+  observedAt: string;
+  validFrom?: string;
+  validUntil?: string;
+  confidence: number;
+  provenance: Record<string, unknown>;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  categoryPath: string[];
+  chainId: string;
+  chainSlug: string;
+  chainName: string;
+  storeId: string;
+  storeSlug: string;
+  storeName: string;
+  storeCity?: string;
+};
+
 export type FlyerOfferStoreSummary = {
   storeId: string;
   storeName: string;
@@ -2910,6 +2940,44 @@ function flyerOfferFromRow(row: (typeof flyerOfferRows)[number]): FlyerOffer {
   };
 }
 
+function flyerOfferFromObservation(row: FlyerOfferObservationInput): FlyerOffer {
+  const savings = roundPrice(row.regularPrice - row.price);
+  const discountPercent = row.regularPrice > 0 ? roundPercent((savings / row.regularPrice) * 100) : 0;
+  const dealScore = calculateDealScore({
+    currentCityPercentile: Math.max(0, 100 - discountPercent * 3),
+    knownPromoHistoryPercentile: Math.max(0, 100 - discountPercent * 2),
+    equivalentUnitPricePercentile: Math.max(0, 100 - discountPercent * 2.5),
+    discountDepthPercent: discountPercent,
+    sourceConfidence: row.confidence
+  });
+  return {
+    offerId: row.observationId,
+    flyerId: row.sourceRunId ?? row.rawRecordId ?? row.observationId,
+    chain: row.chainSlug,
+    storeId: row.storeSlug,
+    storeName: row.storeName,
+    branchDistrict: row.storeCity ?? row.chainName,
+    productId: row.productSlug,
+    productName: row.productName,
+    category: row.categoryPath[0] ?? 'uncategorized',
+    regularPrice: row.regularPrice,
+    offerPrice: row.price,
+    savings,
+    discountPercent,
+    currency: row.currency,
+    priceType: row.memberRequired || row.priceType === 'member' ? 'member_flyer' : 'flyer',
+    validFrom: row.validFrom ?? row.promotionStartsOn ?? row.observedAt,
+    validThrough: row.validUntil ?? row.promotionEndsOn ?? row.observedAt,
+    observedAt: row.observedAt,
+    sourceType: 'weekly_flyer',
+    sourceUrl: typeof row.provenance.sourceUrl === 'string' ? row.provenance.sourceUrl : '',
+    sourceRunId: row.sourceRunId ?? '',
+    confidence: row.confidence,
+    dealScore,
+    band: scoreBand(dealScore)
+  };
+}
+
 function activeFlyerOffers(asOf: string): FlyerOffer[] {
   const asOfMs = Date.parse(requireIsoTimestamp(asOf, 'asOf'));
   return flyerOfferRows
@@ -2917,19 +2985,15 @@ function activeFlyerOffers(asOf: string): FlyerOffer[] {
     .filter((offer) => Date.parse(offer.validFrom) <= asOfMs && asOfMs <= Date.parse(offer.validThrough));
 }
 
-function flyerOfferReport(options: {
-  asOf?: string;
+function buildFlyerOfferReportFromOffers(asOf: string, options: {
   storeId?: string;
   chain?: string;
   category?: string;
   productId?: string;
-} = {}): FlyerOfferReport {
-  const asOf = options.asOf ?? '2026-05-20T12:00:00.000Z';
-  if (options.storeId) requireKnownStore(options.storeId);
-  if (options.productId) requireKnownProduct(options.productId);
+}, sourceOffers: FlyerOffer[]): FlyerOfferReport {
   const chain = options.chain?.trim().toLowerCase();
   const category = options.category?.trim().toLowerCase();
-  const offers = activeFlyerOffers(asOf)
+  const offers = sourceOffers
     .filter((offer) => !options.storeId || offer.storeId === options.storeId)
     .filter((offer) => !chain || offer.chain === chain)
     .filter((offer) => !category || offer.category.toLowerCase() === category)
@@ -2978,6 +3042,38 @@ function flyerOfferReport(options: {
       'Member flyer prices remain labeled and never overwrite public shelf price history.'
     ]
   };
+}
+
+export function buildFlyerOfferReport(input: {
+  observations: FlyerOfferObservationInput[];
+  asOf: string;
+  filters?: {
+    storeId?: string;
+    chain?: string;
+    category?: string;
+    productId?: string;
+  };
+}): FlyerOfferReport {
+  const asOf = requireIsoTimestamp(input.asOf, 'asOf');
+  const asOfMs = Date.parse(asOf);
+  const offers = input.observations
+    .filter((row) => row.price < row.regularPrice)
+    .map(flyerOfferFromObservation)
+    .filter((offer) => Date.parse(offer.validFrom) <= asOfMs && asOfMs <= Date.parse(offer.validThrough));
+  return buildFlyerOfferReportFromOffers(asOf, input.filters ?? {}, offers);
+}
+
+function flyerOfferReport(options: {
+  asOf?: string;
+  storeId?: string;
+  chain?: string;
+  category?: string;
+  productId?: string;
+} = {}): FlyerOfferReport {
+  const asOf = options.asOf ?? '2026-05-20T12:00:00.000Z';
+  if (options.storeId) requireKnownStore(options.storeId);
+  if (options.productId) requireKnownProduct(options.productId);
+  return buildFlyerOfferReportFromOffers(asOf, options, activeFlyerOffers(asOf));
 }
 
 function storeFlyerOfferReport(storeId: string, asOf?: string): StoreFlyerOfferReport {

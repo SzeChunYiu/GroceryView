@@ -1,10 +1,12 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { groceryApi } from '../demo-data.js';
+import { DealsService } from './deals.service.js';
 
 @ApiTags('deals')
 @Controller('deals')
 export class DealsController {
+  constructor(private readonly deals: DealsService) {}
+
   @Get('flyer-offers')
   @ApiOkResponse({ description: 'Active per-branch weekly flyer offers with source evidence' })
   flyerOffers(
@@ -14,9 +16,6 @@ export class DealsController {
     @Query('category') category?: string,
     @Query('productId') productId?: string
   ) {
-    return {
-      ...groceryApi.getFlyerOffers({ asOf, storeId, chain, category, productId }),
-      demo: true
-    };
+    return this.deals.flyerOffers({ asOf, storeId, chain, category, productId });
   }
 }
