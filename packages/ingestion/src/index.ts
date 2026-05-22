@@ -2521,6 +2521,14 @@ export type DailyIngestionRunInput = {
   requestedAt: string;
   connectors: DailyIngestionConnectorConfig[];
   fetchImpl?: typeof fetch;
+  /** Maximum number of connector fetch/parse/persist jobs to run at once. Defaults to one for conservative production DB sessions. */
+  maxConcurrency?: number;
+  /** Polite delay before a worker starts a connector after the first connector has been scheduled. */
+  connectorStartDelayMs?: number;
+  /** Number of extra attempts for transient connector fetch/parse failures before blocking the run. */
+  connectorRetryAttempts?: number;
+  /** Base delay between retries. Attempt N waits baseDelay * N. */
+  connectorRetryBaseDelayMs?: number;
 };
 
 export type DailyIngestionRunResult = {
@@ -3300,24 +3308,46 @@ async function persistDailyConnectorOutput(input: {
   };
 }
 
-export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<DailyIngestionRunResult> {
-  const blockers: string[] = [];
-  const sourceRunIds: string[] = [];
-  const rawRecordIds: string[] = [];
-  const observationIds: string[] = [];
-  let persistedRuns = 0;
-  let acceptedCount = 0;
-  let rejectedCount = 0;
+type DailyConnectorRunPersistenceResult = Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'> & {
+  blockers: string[];
+  persistedRuns: number;
+};
 
-  for (const config of input.connectors) {
-    const runConfig = { ...config, requestedAt: input.requestedAt };
-    process.stderr.write(`[daily-ingestion] starting ${config.connectorId} (${config.chainId})\n`);
+function normalizeDailyRunnerInteger(value: number | undefined, fallback: number): number {
+  if (value === undefined) return fallback;
+  if (!Number.isFinite(value)) return fallback;
+  return Math.max(0, Math.floor(value));
+}
+
+async function waitForDailyRunnerDelay(delayMs: number): Promise<void> {
+  if (delayMs <= 0) return;
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+}
+
+async function runDailyIngestionConnector(input: {
+  executor: QueryExecutor;
+  requestedAt: string;
+  config: DailyIngestionConnectorConfig;
+  fetchImpl?: typeof fetch;
+  retryAttempts: number;
+  retryBaseDelayMs: number;
+}): Promise<DailyConnectorRunPersistenceResult> {
+  const { executor, config, requestedAt, fetchImpl, retryAttempts, retryBaseDelayMs } = input;
+  const runConfig = { ...config, requestedAt };
+
+  for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
+    if (attempt > 0) {
+      process.stderr.write(`[daily-ingestion] retrying ${config.connectorId} (${config.chainId}) attempt=${attempt + 1}/${retryAttempts + 1}\n`);
+      await waitForDailyRunnerDelay(retryBaseDelayMs * attempt);
+    }
+
+    process.stderr.write(`[daily-ingestion] starting ${config.connectorId} (${config.chainId}) attempt=${attempt + 1}/${retryAttempts + 1}\n`);
     const result = await runRetailerConnector({
       ...runConfig,
       fetcher: (plan) => fetchDailyConnectorSnapshot(plan, {
-        retrievedAt: input.requestedAt,
+        retrievedAt: requestedAt,
         rawSnapshotRefPrefix: 'raw://daily-ingestion',
-        fetchImpl: input.fetchImpl,
+        fetchImpl,
         headers: { accept: 'application/json' }
       }),
       parser: parseRetailerProductJsonSnapshot
@@ -3326,38 +3356,135 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
     process.stderr.write(`[daily-ingestion] fetched ${config.connectorId}: status=${result.status} accepted=${result.acceptedCount} rejected=${result.rejectedCount}\n`);
 
     if (result.status === 'blocked') {
-      blockers.push(...result.requiredActions.map((action) => `${config.chainId}:${action}`));
-      continue;
+      return {
+        blockers: result.requiredActions.map((action) => `${config.chainId}:${action}`),
+        persistedRuns: 0,
+        acceptedCount: 0,
+        rejectedCount: 0,
+        sourceRunIds: [],
+        rawRecordIds: [],
+        observationIds: []
+      };
     }
+
     if (result.status !== 'completed') {
-      blockers.push(`${config.chainId}:connector_${result.status}`);
-      continue;
+      if (attempt < retryAttempts) continue;
+      return {
+        blockers: [`${config.chainId}:connector_${result.status}`],
+        persistedRuns: 0,
+        acceptedCount: 0,
+        rejectedCount: 0,
+        sourceRunIds: [],
+        rawRecordIds: [],
+        observationIds: []
+      };
     }
+
     if (result.acceptedCount === 0) {
-      blockers.push(`${config.chainId}:no_accepted_products`);
-      continue;
+      return {
+        blockers: [`${config.chainId}:no_accepted_products`],
+        persistedRuns: 0,
+        acceptedCount: 0,
+        rejectedCount: 0,
+        sourceRunIds: [],
+        rawRecordIds: [],
+        observationIds: []
+      };
     }
 
     const storeScopeBlockers = validateStoreScopedConnectorOutput(runConfig, result);
     if (storeScopeBlockers.length > 0) {
-      blockers.push(...storeScopeBlockers);
-      continue;
+      return {
+        blockers: storeScopeBlockers,
+        persistedRuns: 0,
+        acceptedCount: 0,
+        rejectedCount: 0,
+        sourceRunIds: [],
+        rawRecordIds: [],
+        observationIds: []
+      };
     }
 
     try {
-      const persisted = await persistDailyConnectorOutput({ executor: input.executor, config: runConfig, result });
-      persistedRuns += 1;
-      acceptedCount += persisted.acceptedCount;
-      rejectedCount += persisted.rejectedCount;
-      sourceRunIds.push(...persisted.sourceRunIds);
-      rawRecordIds.push(...persisted.rawRecordIds);
-      observationIds.push(...persisted.observationIds);
+      const persisted = await persistDailyConnectorOutput({ executor, config: runConfig, result });
+      const blockers = persisted.rejectedCount > 0 ? [`${config.chainId}:rejected_products:${persisted.rejectedCount}`] : [];
       process.stderr.write(`[daily-ingestion] persisted ${config.connectorId}: accepted=${persisted.acceptedCount} rejected=${persisted.rejectedCount} observations=${persisted.observationIds.length}\n`);
-      if (persisted.rejectedCount > 0) blockers.push(`${config.chainId}:rejected_products:${persisted.rejectedCount}`);
+      return {
+        ...persisted,
+        blockers,
+        persistedRuns: 1
+      };
     } catch (error) {
-      process.stderr.write(`[daily-ingestion] persistence failed ${config.connectorId}: ${error instanceof Error ? error.message : 'unknown_error'}\n`);
-      blockers.push(`${config.chainId}:persistence_failed:${error instanceof Error ? error.message : 'unknown_error'}`);
+      const message = error instanceof Error ? error.message : 'unknown_error';
+      process.stderr.write(`[daily-ingestion] persistence failed ${config.connectorId}: ${message}\n`);
+      return {
+        blockers: [`${config.chainId}:persistence_failed:${message}`],
+        persistedRuns: 0,
+        acceptedCount: 0,
+        rejectedCount: 0,
+        sourceRunIds: [],
+        rawRecordIds: [],
+        observationIds: []
+      };
     }
+  }
+
+  return {
+    blockers: [`${config.chainId}:connector_failed`],
+    persistedRuns: 0,
+    acceptedCount: 0,
+    rejectedCount: 0,
+    sourceRunIds: [],
+    rawRecordIds: [],
+    observationIds: []
+  };
+}
+
+export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<DailyIngestionRunResult> {
+  const maxConcurrency = Math.max(1, normalizeDailyRunnerInteger(input.maxConcurrency, 1));
+  const connectorStartDelayMs = normalizeDailyRunnerInteger(input.connectorStartDelayMs, 0);
+  const retryAttempts = normalizeDailyRunnerInteger(input.connectorRetryAttempts, 0);
+  const retryBaseDelayMs = normalizeDailyRunnerInteger(input.connectorRetryBaseDelayMs, 250);
+  const results = new Array<DailyConnectorRunPersistenceResult | undefined>(input.connectors.length);
+  let nextConnectorIndex = 0;
+
+  async function worker(): Promise<void> {
+    while (nextConnectorIndex < input.connectors.length) {
+      const connectorIndex = nextConnectorIndex;
+      nextConnectorIndex += 1;
+      if (connectorIndex > 0) await waitForDailyRunnerDelay(connectorStartDelayMs);
+      const config = input.connectors[connectorIndex];
+      if (!config) continue;
+      results[connectorIndex] = await runDailyIngestionConnector({
+        executor: input.executor,
+        requestedAt: input.requestedAt,
+        config,
+        fetchImpl: input.fetchImpl,
+        retryAttempts,
+        retryBaseDelayMs
+      });
+    }
+  }
+
+  await Promise.all(Array.from({ length: Math.min(maxConcurrency, Math.max(1, input.connectors.length)) }, () => worker()));
+
+  const blockers: string[] = [];
+  const sourceRunIds: string[] = [];
+  const rawRecordIds: string[] = [];
+  const observationIds: string[] = [];
+  let persistedRuns = 0;
+  let acceptedCount = 0;
+  let rejectedCount = 0;
+
+  for (const result of results) {
+    if (!result) continue;
+    blockers.push(...result.blockers);
+    persistedRuns += result.persistedRuns;
+    acceptedCount += result.acceptedCount;
+    rejectedCount += result.rejectedCount;
+    sourceRunIds.push(...result.sourceRunIds);
+    rawRecordIds.push(...result.rawRecordIds);
+    observationIds.push(...result.observationIds);
   }
 
   return {
