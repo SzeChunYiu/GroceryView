@@ -387,6 +387,15 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces brand-tier indices on the chain index route using the real core brand-tier output', async () => {
+    const source = await read('src/app/chain-index/page.tsx');
+    assert.match(source, /calculateBrandTierIndices/);
+    assert.match(source, /buildBrandTierPriceObservations/);
+    assert.match(source, /brandTierSummary/);
+    assert.match(source, /privateLabelSavingsPercent/);
+    assert.match(source, /premiumGapPercent/);
+  });
+
   it('surfaces verified catalogue savings on its own route', async () => {
     const route = await read('src/app/catalogue-savings/page.tsx');
 

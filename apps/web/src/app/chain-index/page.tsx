@@ -1,6 +1,16 @@
 import Link from 'next/link';
+import { calculateBrandTierIndices } from '@groceryview/core';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
+import { buildBrandTierPriceObservations } from '@/lib/chain-index-data';
 import { categorySummaries, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
+
+const brandTierSummary = calculateBrandTierIndices(buildBrandTierPriceObservations());
+
+function tierTone(value: number) {
+  if (value < 95) return 'text-emerald-800 bg-emerald-50';
+  if (value > 105) return 'text-rose-800 bg-rose-50';
+  return 'text-slate-800 bg-slate-50';
+}
 
 export default function ChainIndexPage() {
   const willysWins = matchedChainProducts.filter((product) => product.lowestChain === 'willys').length;
@@ -16,11 +26,59 @@ export default function ChainIndexPage() {
         <Card><p className="text-sm font-black text-slate-600">Average spread</p><p className="mt-2 text-4xl font-black text-emerald-800">{formatPct(averageSpread)}</p></Card>
         <Card><p className="text-sm font-black text-slate-600">Lowest-price wins</p><p className="mt-2 text-xl font-black text-slate-950">Willys {willysWins} · Hemköp {hemkopWins}</p></Card>
       </div>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <Eyebrow>Brand-tier index</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-emerald-950">Budget vs premium basket pressure</h2>
+            <p className="mt-3 text-sm leading-6 text-emerald-950">
+              This section calls calculateBrandTierIndices with buildBrandTierPriceObservations, so private-label, budget, national, and premium tiers are compared through the same fixed-basket index engine instead of hardcoded ranking copy.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-700">Private-label savings</p>
+              <p className="mt-2 text-4xl font-black text-emerald-950">{formatPct(brandTierSummary.privateLabelSavingsPercent)}</p>
+              <p className="mt-2 text-sm font-semibold text-emerald-900">Average savings versus national-brand rows with matching categories.</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-700">Premium gap</p>
+              <p className="mt-2 text-4xl font-black text-emerald-950">{formatPct(brandTierSummary.premiumGapPercent)}</p>
+              <p className="mt-2 text-sm font-semibold text-emerald-900">Premium index gap versus the private-label basket average.</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {brandTierSummary.highestSavingsCategories.map((category) => (
+            <p className="rounded-2xl bg-white/80 p-4 text-sm font-black text-emerald-950" key={category}>{category}</p>
+          ))}
+        </div>
+      </Card>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <Card>
+          <h2 className="text-2xl font-black">Brand-tier fixed basket</h2>
+          <div className="mt-4 space-y-3">
+            {brandTierSummary.indices.map((tier) => (
+              <div className={`rounded-2xl p-4 ${tierTone(tier.value)}`} key={tier.brandTier}>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-lg font-black">{tier.label}</p>
+                    <p className="mt-1 text-sm font-semibold">{tier.categoryCount} categories · movement {formatPct(tier.movementPercent)}</p>
+                  </div>
+                  <p className="text-3xl font-black">{tier.value.toFixed(1)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
         <Card><h2 className="text-2xl font-black">Category spread coverage</h2><div className="mt-4 space-y-3">{categorySummaries.slice(0, 12).map((category) => <Link className="grid grid-cols-[1fr_auto] rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/categories/${category.slug}`} key={category.slug}><span><strong>{category.label}</strong><br /><span className="text-sm text-slate-600">{category.chainRows} Axfood rows</span></span><span className="font-black text-emerald-800">{formatPct(category.strongestSpread)}</span></Link>)}</div></Card>
-        <Card><h2 className="text-2xl font-black">Largest matched spreads</h2><div className="mt-4 space-y-3">{matchedChainProducts.slice(0, 12).map((product) => <Link className="grid grid-cols-[1fr_auto] rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${product.slug}`} key={product.slug}><span><strong>{product.name}</strong><br /><span className="text-sm text-slate-600">Lowest {product.lowestChain}: {formatSek(product.lowestPrice)}</span></span><span className="font-black text-emerald-800">{formatPct(product.spreadPct)}</span></Link>)}</div></Card>
       </div>
-      <div className="mt-6"><SourceCoverage /></div>
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <Card><h2 className="text-2xl font-black">Largest matched spreads</h2><div className="mt-4 space-y-3">{matchedChainProducts.slice(0, 12).map((product) => <Link className="grid grid-cols-[1fr_auto] rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${product.slug}`} key={product.slug}><span><strong>{product.name}</strong><br /><span className="text-sm text-slate-600">Lowest {product.lowestChain}: {formatSek(product.lowestPrice)}</span></span><span className="font-black text-emerald-800">{formatPct(product.spreadPct)}</span></Link>)}</div></Card>
+        <SourceCoverage />
+      </div>
     </PageShell>
   );
 }
