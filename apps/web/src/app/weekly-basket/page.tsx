@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, weeklyBasketOptimizer } from '@/lib/demo-data';
-import { recurringBasketDigestContract } from '@/lib/verified-data';
+import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -118,11 +118,38 @@ export default function WeeklyBasketPage() {
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <Eyebrow>Changed since last shop</Eyebrow>
-        <h2 className="mt-2 text-2xl font-black tracking-tight text-emerald-950">Recurring basket digest: {recurringBasketDigestContract.title}</h2>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-emerald-950">Changed-since-last-shop digest: Recurring basket digest {recurringBasketDigestContract.title}</h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-emerald-950">
-          The account API exposes <code className="rounded bg-white/80 px-1 py-0.5 font-bold">{recurringBasketDigestContract.endpoint}</code> for recurring weekly baskets; it still guards private user-owned rows while this public optimizer uses visible fixture prices.
+          The account API exposes <code className="rounded bg-white/80 px-1 py-0.5 font-bold">{recurringBasketDigestContract.endpoint}</code> for recurring weekly baskets; this public preview calls the same weeklyBasketChangeDigest engine from visible verified rows and keeps private user-owned rows out of the static build.
         </p>
-        <p className="mt-2 text-sm font-semibold text-emerald-900">Shipped behaviours include missing-price blockers, substitutes, and price-up/down classifications.</p>
+        <p className="mt-3 rounded-2xl bg-white p-4 text-lg font-black text-emerald-950">{weeklyBasketChangeDigest.headline}</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <p className="rounded-2xl bg-white p-4 shadow-sm"><span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Current comparable</span><span className="mt-1 block text-2xl font-black text-emerald-900">{formatSek(weeklyBasketChangeDigest.comparableCurrentTotal)}</span></p>
+          <p className="rounded-2xl bg-white p-4 shadow-sm"><span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Previous comparable</span><span className="mt-1 block text-2xl font-black text-slate-950">{formatSek(weeklyBasketChangeDigest.comparablePreviousTotal)}</span></p>
+          <p className="rounded-2xl bg-white p-4 shadow-sm"><span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Delta</span><span className="mt-1 block text-2xl font-black text-emerald-900">{formatSek(weeklyBasketChangeDigest.comparableDelta)}</span></p>
+        </div>
+        <div className="mt-4 grid gap-3 text-sm font-bold text-slate-700 sm:grid-cols-5">
+          <p className="rounded-2xl bg-white p-3">changeSummary price_up: {weeklyBasketChangeDigest.changeSummary.priceUp}</p>
+          <p className="rounded-2xl bg-white p-3">price_down: {weeklyBasketChangeDigest.changeSummary.priceDown}</p>
+          <p className="rounded-2xl bg-white p-3">substitutes: {weeklyBasketChangeDigest.changeSummary.substituteAvailable}</p>
+          <p className="rounded-2xl bg-white p-3">new: {weeklyBasketChangeDigest.changeSummary.newItem}</p>
+          <p className="rounded-2xl bg-white p-3">missing: {weeklyBasketChangeDigest.changeSummary.missingCurrentPrice}</p>
+        </div>
+        <div className="mt-4 space-y-3">
+          {weeklyBasketChangeDigest.lines.map((line) => (
+            <Link className="block rounded-2xl border border-emerald-200 bg-white p-4 hover:border-emerald-700" href={line.productId === 'missing-current-price-example' ? '/weekly-basket' : `/products/${line.productId}`} key={line.productId}>
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-lg font-black text-slate-950">{line.productName}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{line.quantity} × current {line.currentUnitPrice === null ? 'missing' : formatSek(line.currentUnitPrice)} · previous {line.previousUnitPrice === null ? 'new item' : formatSek(line.previousUnitPrice)}</p>
+                </div>
+                <p className="text-right text-sm font-black text-emerald-900">{line.changeType}<br />lineDelta {line.lineDelta === null ? 'n/a' : formatSek(line.lineDelta)}</p>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-slate-700">recommendedAction: {line.recommendedAction}</p>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-4 text-sm font-black text-emerald-950">Missing current prices block automatic checkout handoff; missing-price blockers remain visible in the digest.</p>
       </Card>
 
       <Card className="mt-6 border-blue-200 bg-blue-50">

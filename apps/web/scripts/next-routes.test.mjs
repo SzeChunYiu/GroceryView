@@ -416,6 +416,24 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+
+  it('renders a changed-since-last-shop digest from the real recurring basket engine', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/weekly-basket/page.tsx');
+
+    assert.match(verified, /planRecurringBasketDigest/);
+    assert.match(verified, /weeklyBasketChangeDigest/);
+    assert.match(verified, /currentUnitPrice/);
+    assert.match(verified, /previousUnitPrice/);
+    assert.match(route, /weeklyBasketChangeDigest/);
+    assert.match(route, /Changed-since-last-shop digest/);
+    assert.match(route, /changeSummary/);
+    assert.match(route, /lineDelta/);
+    assert.match(route, /recommendedAction/);
+    assert.match(route, /Missing current prices block automatic checkout handoff/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces a family bulk unit-price comparison from visible package rows', async () => {
     const source = await read('src/app/weekly-basket/page.tsx');
     assert.match(source, /familyBulkUnitPriceComparison/);
