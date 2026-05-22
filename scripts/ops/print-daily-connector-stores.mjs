@@ -33,6 +33,15 @@ export async function printDailyConnectorStores({ fetchers, selfTest = false } =
       latitude: 57.9374,
       longitude: 12.5333
     }],
+    fetchHemkopStores: async () => [{
+      storeId: '4003',
+      name: 'Hemköp Torsplan',
+      address: 'Norra Stationsgatan 80',
+      city: 'Stockholm',
+      countryCode: 'SE',
+      latitude: 59.349016,
+      longitude: 18.035306
+    }],
     fetchCoopStores: async () => [{
       storeId: '196183',
       name: 'Coop Krylbo',
@@ -44,16 +53,18 @@ export async function printDailyConnectorStores({ fetchers, selfTest = false } =
     }]
   } : await loadStoreFetchers());
 
-  const [willysStores, coopStores] = await Promise.all([
+  const [willysStores, hemkopStores, coopStores] = await Promise.all([
     source.fetchWillysStores({ online: true }),
+    source.fetchHemkopStores({ online: true }),
     source.fetchCoopStores()
   ]);
 
   return {
     generatedAt: new Date().toISOString(),
-    supportedChains: ['willys', 'coop'],
+    supportedChains: ['willys', 'hemkop', 'coop'],
     storesByChain: {
       willys: willysStores.map(toDailyStoreConfig),
+      hemkop: hemkopStores.map(toDailyStoreConfig),
       coop: coopStores.map(toDailyStoreConfig)
     }
   };

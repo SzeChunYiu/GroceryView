@@ -9,6 +9,7 @@ import {
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
   buildHemkopSearchUrl,
+  buildHemkopStoresUrl,
   buildHemkopWeeklyDiscountsUrl,
   buildEmaginPdfUrl,
   buildIcaStorePromotionsUrl,
@@ -37,6 +38,7 @@ import {
   fetchCoopWeeklyDiscounts,
   fetchCoopWeeklyDiscountsForAllStores,
   fetchHemkopProducts,
+  fetchHemkopWeeklyDiscountsForAllStores,
   fetchHemkopWeeklyDiscounts,
   fetchIcaDefaultStoreProducts,
   fetchIcaProducts,
@@ -52,6 +54,7 @@ import {
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
+  GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
@@ -937,6 +940,44 @@ describe('fetchHemkopWeeklyDiscounts', () => {
     assert.deepEqual(rows.map((row) => [row.storeId, row.code]), [
       ['4003', 'shared-hemkop-promo'],
       ['4127', 'shared-hemkop-promo']
+    ]);
+  });
+
+  it('can expand Hemkop weekly discounts across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const rows = await fetchHemkopWeeklyDiscountsForAllStores({
+      maxStores: 1,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/axfood/rest/store')) {
+          return new Response(JSON.stringify([
+            { storeId: '4003', name: 'Hemköp Torsplan', address: { line1: 'Norra Stationsgatan 80', town: 'Stockholm' }, onlineStore: true }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({
+          pagination: { numberOfPages: 1 },
+          results: [{
+            name: 'Hemkop all-store offer',
+            priceNoUnit: '29.95',
+            displayVolume: '1kg',
+            potentialPromotions: [{
+              code: 'hemkop-all-store-promo',
+              mainProductCode: 'hemkop-product',
+              name: 'Hemkop all-store offer',
+              price: 22,
+              cartLabel: '22 kr/st'
+            }]
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      },
+      retrievedAt: '2026-05-22T12:10:00.000Z'
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].storeId, '4003');
+    assert.deepEqual(requestedUrls, [
+      buildHemkopStoresUrl({ online: true }),
+      buildHemkopWeeklyDiscountsUrl('4003', 100, 0)
     ]);
   });
 
@@ -2918,6 +2959,64 @@ describe('daily ingestion runner', () => {
     assert.equal(observationInsert?.params[2], 'store-db-2');
     assert.equal(observationInsert?.params[7], 45);
     assert.equal(observationInsert?.params[16], true);
+  });
+
+  it('materializes native Hemkop all-store weekly offers into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T12:10:00.000Z',
+      connectors: [{
+        connectorId: 'hemkop-weekly-all-stores',
+        chainId: 'hemkop',
+        sourceType: 'flyer_campaign',
+        endpointUrl: GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
+        parserVersion: 'hemkop-weekly-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '4003', name: 'Hemköp Torsplan', address: 'Norra Stationsgatan 80', city: 'Stockholm' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/axfood/rest/store')) {
+          return new Response(JSON.stringify([
+            { storeId: '4003', name: 'Hemköp Torsplan', address: { line1: 'Norra Stationsgatan 80', town: 'Stockholm' }, onlineStore: true }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({
+          pagination: { numberOfPages: 1 },
+          results: [{
+            name: 'Yoghurt Naturell',
+            manufacturer: 'Arla',
+            googleAnalyticsCategory: 'Dairy',
+            displayVolume: '1kg',
+            priceNoUnit: '29.95',
+            potentialPromotions: [{
+              code: 'hemkop-promo-4003',
+              mainProductCode: '7310860000010',
+              name: 'Yoghurt Naturell',
+              brands: ['Arla'],
+              price: 22,
+              cartLabel: '22 kr/st',
+              conditionLabel: 'Max 3 köp/hushåll'
+            }]
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildHemkopStoresUrl({ online: true }),
+      buildHemkopWeeklyDiscountsUrl('4003', 100, 0)
+    ]);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.equal(observationInsert?.params[2], 'store-db-2');
+    assert.equal(observationInsert?.params[7], 22);
+    assert.equal(observationInsert?.params[13], 'Max 3 köp/hushåll');
   });
 
   it('fails closed before persistence when store-scoped prices omit configured branch metadata', async () => {

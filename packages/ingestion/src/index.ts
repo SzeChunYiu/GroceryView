@@ -17,6 +17,10 @@ import {
   fetchWillysWeeklyDiscountsForAllStores,
   type WillysWeeklyDiscount
 } from './connectors/willys.js';
+import {
+  fetchHemkopWeeklyDiscountsForAllStores,
+  type HemkopWeeklyDiscount
+} from './connectors/hemkop.js';
 
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/overpass.js';
@@ -1598,6 +1602,28 @@ function willysWeeklyDiscountToDailyItem(row: WillysWeeklyDiscount): RetailerCon
   };
 }
 
+function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const regularPrice = nativePriceFromText(row.regularPriceText);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `hemkop-${stableKeyPart(row.productCode || row.code)}`,
+    categoryId: stableKeyPart(row.category || 'weekly-offers'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: regularPrice !== undefined && regularPrice > row.price ? regularPrice : undefined,
+    promoText: row.conditionText || row.priceText || undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
   return {
@@ -1670,6 +1696,19 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(coopWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchHemkopWeeklyDiscountsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(hemkopWeeklyDiscountToDailyItem) });
   }
 
   return await fetchRetailerConnectorSnapshot(plan, options);
@@ -2244,6 +2283,7 @@ export const requiredDailyIngestionChainIds = [
 
 export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/willys/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
 
 const requireForDailyIngestion = createRequire(import.meta.url);
 
