@@ -2,7 +2,7 @@
 
 - Source: official OpenFoodFacts world data export
 - Source URL: https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
-- Retrieved: 2026-05-22T11:39:52.564Z
+- Retrieved: 2026-05-22T12:10:38.487Z
 - Candidate barcode count checked from current Willys/Hemkop/Coop/ICA reklamblad ingested rows: 3532
 - ICA reklamblad candidate barcode count checked: 990 unique barcodes
 - Export rows scanned: 4528597
@@ -16,7 +16,7 @@ The official OpenFoodFacts export URL under `world.openfoodfacts.org/data` strea
 
 ## Verification
 
-- Verified: 2026-05-22T11:42:36Z
+- Verified: 2026-05-22T12:10:38.487Z
 - Export join path: `fetchOpenFoodFactsExportRetailerEnrichments`
 - Unit coverage: `fetchOpenFoodFactsExportRetailerEnrichments` joins only retailer candidate barcodes from the export and skips nutrition-empty rows.
 - Artifact audit: `rowCount` 1707 equals 1707 emitted barcode rows; all 1707 barcodes are unique; `candidateBarcodeCount` 3532 equals the 3532 unique usable current Willys/Hemkop/Coop/ICA reklamblad candidate barcodes; every emitted barcode appears in those current candidates; zero emitted rows have empty nutrition; zero emitted rows use a source outside `https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=...`.
