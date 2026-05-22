@@ -146,6 +146,174 @@ function roundSek(value: number) {
   return Math.round(value * 100) / 100;
 }
 
+const seasonalCalendarMonthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
+const seasonalProduceNameNeedles = [
+  /äpple|apple/i,
+  /banan|banana/i,
+  /spenat|spinach/i,
+  /potatis|potato|pommes|rösti/i,
+  /tomat|tomato/i,
+  /paprika|pepper/i,
+  /sallad|lettuce/i,
+  /morot|carrot/i,
+  /gurka|cucumber/i,
+  /kål|cabbage/i,
+  /bär|berry|russin|raisin/i
+];
+
+function isSeasonalProduceCandidate(product: (typeof pricedProducts)[number]) {
+  const haystack = `${product.category} ${product.categories.join(' ')} ${product.name}`.toLowerCase();
+  return (
+    product.category === 'produce' ||
+    haystack.includes('fruits-and-vegetables') ||
+    haystack.includes('vegetables') ||
+    haystack.includes('fruits') ||
+    haystack.includes('fresh-foods') ||
+    seasonalProduceNameNeedles.some((needle) => needle.test(product.name))
+  );
+}
+
+function monthlyProduceAverages(product: (typeof pricedProducts)[number]) {
+  const monthBuckets = product.observations.reduce<Map<number, { prices: number[]; years: Set<number> }>>((buckets, observation) => {
+    const observedAt = Date.parse(`${observation.date}T00:00:00.000Z`);
+    if (!Number.isFinite(observedAt) || !Number.isFinite(observation.price) || observation.price <= 0) return buckets;
+    const observedDate = new Date(observedAt);
+    const monthIndex = observedDate.getUTCMonth();
+    const bucket = buckets.get(monthIndex) ?? { prices: [], years: new Set<number>() };
+    bucket.prices.push(observation.price);
+    bucket.years.add(observedDate.getUTCFullYear());
+    buckets.set(monthIndex, bucket);
+    return buckets;
+  }, new Map<number, { prices: number[]; years: Set<number> }>());
+
+  return [...monthBuckets.entries()]
+    .sort(([leftMonth], [rightMonth]) => leftMonth - rightMonth)
+    .map(([monthIndex, bucket]) => {
+      const historicalMonthlyAverage = roundSek(bucket.prices.reduce((sum, price) => sum + price, 0) / bucket.prices.length);
+      return {
+        monthIndex,
+        monthLabel: seasonalCalendarMonthLabels[monthIndex]!,
+        historicalMonthlyAverage,
+        historicalMonthlyAverageLabel: formatSek(historicalMonthlyAverage),
+        observationCount: bucket.prices.length,
+        yearCount: bucket.years.size,
+        lowPriceLabel: formatSek(Math.min(...bucket.prices)),
+        highPriceLabel: formatSek(Math.max(...bucket.prices))
+      };
+    });
+}
+
+export const produceSeasonalityRows = pricedProducts
+  .filter(isSeasonalProduceCandidate)
+  .map((product) => {
+    const monthlyAverages = monthlyProduceAverages(product);
+    const observationCount = monthlyAverages.reduce((sum, row) => sum + row.observationCount, 0);
+    if (monthlyAverages.length < 2 || observationCount < 3) return null;
+    const rankedMonths = [...monthlyAverages].sort((left, right) =>
+      left.historicalMonthlyAverage - right.historicalMonthlyAverage ||
+      right.observationCount - left.observationCount ||
+      left.monthIndex - right.monthIndex
+    );
+    const bestMonth = rankedMonths[0]!;
+    const typicalMonthlyAverage = roundSek(monthlyAverages.reduce((sum, row) => sum + row.historicalMonthlyAverage, 0) / monthlyAverages.length);
+    const savingsVsTypicalPercent = typicalMonthlyAverage > 0
+      ? roundSek(((typicalMonthlyAverage - bestMonth.historicalMonthlyAverage) / typicalMonthlyAverage) * 100)
+      : null;
+
+    return {
+      slug: product.slug,
+      productName: product.name,
+      brand: product.brands || 'Brand not reported',
+      categoryLabel: labelFromSlug(product.category),
+      bestBuyMonth: bestMonth.monthLabel,
+      bestBuyMonthIndex: bestMonth.monthIndex,
+      historicalMonthlyAverage: bestMonth.historicalMonthlyAverage,
+      historicalMonthlyAverageLabel: bestMonth.historicalMonthlyAverageLabel,
+      typicalMonthlyAverage: typicalMonthlyAverage,
+      typicalMonthlyAverageLabel: formatSek(typicalMonthlyAverage),
+      savingsVsTypicalPercent,
+      savingsVsTypicalLabel: savingsVsTypicalPercent !== null ? `${formatPct(savingsVsTypicalPercent)} below observed monthly average` : 'Not reported',
+      observedMonthCount: monthlyAverages.length,
+      observationCount,
+      latestObservedAt: product.lastObservedAt,
+      monthlyAverages,
+      confidenceLabel: monthlyAverages.length >= 6 && observationCount >= 8 ? 'medium seasonal history' : 'limited seasonal history',
+      evidenceLabel: `${observationCount} dated OpenPrices observations across ${monthlyAverages.length} observed months; best time to buy is the lowest historical monthly average, not a forecast.`
+    };
+  })
+  .filter((row): row is NonNullable<typeof row> => row !== null)
+  .sort((left, right) =>
+    right.observedMonthCount - left.observedMonthCount ||
+    right.observationCount - left.observationCount ||
+    left.productName.localeCompare(right.productName, 'sv')
+  )
+  .slice(0, 12);
+
+const seasonalCalendarMonths = seasonalCalendarMonthLabels.map((monthLabel, monthIndex) => {
+  const observedRows = produceSeasonalityRows.filter((row) =>
+    row.monthlyAverages.some((monthlyAverage) => monthlyAverage.monthIndex === monthIndex)
+  );
+  const bestBuyProducts = produceSeasonalityRows
+    .filter((row) => row.bestBuyMonthIndex === monthIndex)
+    .slice(0, 4)
+    .map((row) => ({
+      slug: row.slug,
+      productName: row.productName,
+      bestBuyMonth: row.bestBuyMonth,
+      historicalMonthlyAverage: row.historicalMonthlyAverage,
+      historicalMonthlyAverageLabel: row.historicalMonthlyAverageLabel,
+      savingsVsTypicalLabel: row.savingsVsTypicalLabel,
+      confidenceLabel: row.confidenceLabel
+    }));
+  const monthObservationCount = observedRows.reduce((sum, row) => {
+    const monthlyAverage = row.monthlyAverages.find((average) => average.monthIndex === monthIndex);
+    return sum + (monthlyAverage?.observationCount ?? 0);
+  }, 0);
+  const monthAverages = observedRows
+    .map((row) => row.monthlyAverages.find((average) => average.monthIndex === monthIndex)?.historicalMonthlyAverage)
+    .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
+  const historicalMonthlyAverage = monthAverages.length > 0
+    ? roundSek(monthAverages.reduce((sum, value) => sum + value, 0) / monthAverages.length)
+    : null;
+
+  return {
+    monthLabel,
+    monthIndex,
+    productCount: observedRows.length,
+    bestBuyCount: bestBuyProducts.length,
+    observationCount: monthObservationCount,
+    historicalMonthlyAverage,
+    historicalMonthlyAverageLabel: formatSek(historicalMonthlyAverage),
+    bestBuyProducts,
+    confidenceLabel: bestBuyProducts.length > 0 ? 'observed best-buy month' : 'coverage month only'
+  };
+});
+
+export const seasonalProduceCalendar = {
+  title: 'Seasonal best time to buy produce calendar',
+  status: 'historical_monthly_averages_no_forecast',
+  sourceLabel: snapshot.openPricesSource,
+  productCount: produceSeasonalityRows.length,
+  observationCount: produceSeasonalityRows.reduce((sum, row) => sum + row.observationCount, 0),
+  observedMonthCount: new Set(produceSeasonalityRows.flatMap((row) => row.monthlyAverages.map((average) => average.monthIndex))).size,
+  methodology: 'Best time to buy uses historical monthly averages from dated OpenPrices rows. No forecast or synthetic seasonal prediction is shown.',
+  produceSeasonalityRows,
+  calendarMonths: seasonalCalendarMonths,
+  topBestBuys: [...produceSeasonalityRows]
+    .sort((left, right) => (right.savingsVsTypicalPercent ?? 0) - (left.savingsVsTypicalPercent ?? 0))
+    .slice(0, 6),
+  ecoSeasonalGuidance: [
+    'Eco content is limited to waste-aware planning: buy observed low-price produce when real history says it is usually cheaper.',
+    'No carbon, local-season, or origin claim is inferred from month alone; GroceryView needs explicit label or origin evidence first.',
+    'Fresh-produce coverage is medium/limited when OpenPrices has only a few dated month buckets, so missing months stay labelled instead of filled.'
+  ],
+  guardrails: [
+    'No forecast or synthetic seasonal prediction: every month row is calculated only from historical monthly averages.',
+    'Packaged produce and loose produce can both appear, but they are labelled as OpenPrices observations until commodity unit prices are present.',
+    'Rows with fewer than two observed months or fewer than three dated observations are withheld.'
+  ]
+};
+
 function cheapestMathemProductFor(token: string, aliases: string[] = []) {
   return mathemProducts
     .filter((product) => product.available && Number.isFinite(product.price) && product.price > 0)

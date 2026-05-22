@@ -22,6 +22,7 @@ import {
   snapshot,
   sourceClaimLedger,
   sourceCoverage,
+  seasonalProduceCalendar,
   sourceReadinessMatrix,
   sourceRouteMap,
   storeBrandLedger,
@@ -120,6 +121,34 @@ export function MarketShell() {
           ))}
         </div>
         <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-emerald-900">{pwaFirstInstall.evidence}</p>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>Seasonal best time to buy produce calendar</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Best-buy months from historical price tape</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              {seasonalProduceCalendar.methodology} The homepage shows the first visible calendar picks so unauthenticated shoppers can jump straight from the market terminal into produce seasonality.
+            </p>
+          </div>
+          <Link className="rounded-full bg-emerald-700 px-5 py-3 text-sm font-black text-white" href="/seasonal-calendar">
+            Open calendar
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {seasonalProduceCalendar.topBestBuys.slice(0, 3).map((row) => (
+            <Link className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm hover:border-emerald-700" href={`/products/${row.slug}`} key={row.slug}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Best time to buy · {row.bestBuyMonth}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{row.historicalMonthlyAverageLabel} historicalMonthlyAverage · {row.savingsVsTypicalLabel}</p>
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">{row.confidenceLabel}</p>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-4 rounded-2xl bg-white p-3 text-sm font-bold text-emerald-950">
+          No forecast or synthetic seasonal prediction is shown; missing months remain coverage gaps.
+        </p>
       </Card>
 
       <Card className="mt-6 border-amber-200 bg-amber-50">

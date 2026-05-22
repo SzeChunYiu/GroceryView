@@ -145,6 +145,10 @@ export const routeMetadataCatalog = {
     title: 'Receipt scanner evidence gate | GroceryView',
     description: 'Receipt scanning stays gated until production uploads, extraction records, and account-bound review are verified.'
   },
+  '/seasonal-calendar': {
+    title: 'Seasonal produce price calendar | GroceryView',
+    description: 'Find the best time to buy produce from historical monthly averages, with no forecasted prices and eco planning guardrails.'
+  },
   '/shopping-trips': {
     title: 'Shopping trip and route optimizer | GroceryView',
     description: 'Compare basket trip costs, nearest-store options, delivery evidence, and cheapest-store routing without private location data.'
