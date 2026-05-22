@@ -167,8 +167,8 @@ class RecordingPgPool {
     if (text.includes('select id::text from watchlist_items')) {
       return { rows: [] };
     }
-    if (text.includes('select id::text as product_id from products')) {
-      return { rows: [{ product_id: 'product-coffee' }] };
+    if (text.includes('select id::text as product_id') && text.includes('slug as product_slug')) {
+      return { rows: [{ product_id: 'product-coffee', product_slug: 'coffee' }] };
     }
     if (text.includes('insert into watchlist_items')) {
       this.watchlistRows = [{
@@ -624,13 +624,13 @@ describe('runtime config', () => {
         userId: string;
         trackedItemCount: number;
         alertCount: number;
-        alerts: Array<{ type: string; trigger: { storeId: string; value: number } }>;
+        alerts: Array<{ productId: string; type: string; trigger: { storeId: string; value: number } }>;
       };
       assert.equal(alertBody.userId, 'user-1');
       assert.equal(alertBody.trackedItemCount, 1);
       assert.equal(alertBody.alertCount, 1);
-      assert.deepEqual(alertBody.alerts.map((alert) => [alert.type, alert.trigger.storeId, alert.trigger.value]), [
-        ['target_price', 'willys-odenplan', 49.9]
+      assert.deepEqual(alertBody.alerts.map((alert) => [alert.productId, alert.type, alert.trigger.storeId, alert.trigger.value]), [
+        ['coffee', 'target_price', 'willys-odenplan', 49.9]
       ]);
 
       const created = await service.handler(new Request('http://localhost/api/watchlist/price-alerts?userId=user-1', {
@@ -651,6 +651,7 @@ describe('runtime config', () => {
     assert.equal(pool.calls.some((call) => call.text.includes('from observations')), true);
     assert.equal(pool.calls.some((call) => call.text.includes('from latest_prices')), true);
     assert.equal(pool.calls.some((call) => call.text.includes('insert into watchlist_items')), true);
+    assert.equal(pool.calls.find((call) => call.text.includes('insert into watchlist_items'))?.values[1], 'coffee');
   });
 
   it('exposes PostgreSQL readiness from the runtime DATABASE_URL pool without leaking secrets', async () => {

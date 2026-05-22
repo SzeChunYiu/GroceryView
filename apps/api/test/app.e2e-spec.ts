@@ -914,6 +914,7 @@ describe('GroceryView API app', () => {
     assert.equal(priceAlerts.body.userId, 'demo');
     assert.equal(priceAlerts.body.trackedItemCount, 1);
     assert.equal(priceAlerts.body.alertCount, 1);
+    assert.equal(priceAlerts.body.alerts[0].productId, 'coffee');
     assert.equal(priceAlerts.body.alerts[0].type, 'target_price');
     assert.equal(priceAlerts.body.demo, undefined);
     assert.equal(priceHistoryExecutor.calls.some((call) => /from latest_prices/i.test(call.sql)), true);
