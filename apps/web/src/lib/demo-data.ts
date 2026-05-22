@@ -2050,6 +2050,86 @@ export const watchlistAlertBoard = {
   }
 };
 
+export const budgetEssentialsWatchlistInputs: { favoriteStoreIds: string[]; watchlist: WatchlistItem[]; products: (WatchlistProductSnapshot & { source: string; essentialCategory: string; weeklyNeed: string })[] } = {
+  favoriteStoreIds: ['willys-odenplan', 'tempo-hornstull', 'matmissionen-hagersten', 'hemkop-hornstull'],
+  watchlist: [
+    { productId: 'arla-milk-1l', targetPrice: 14, alertDealScoreAt: 70, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] },
+    { productId: 'eldorado-basmati-rice-1kg', targetPrice: 20, alertDealScoreAt: 72, favoriteStoresOnly: false, allowedPriceTypes: ['shelf', 'promotion'] },
+    { productId: 'garant-svensk-potatis-2kg', targetPrice: 25, alertDealScoreAt: 70, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] }
+  ],
+  products: [
+    {
+      productId: 'arla-milk-1l',
+      productName: 'Arla Mellanmjölk 1L',
+      bestPrice: 13.9,
+      bestStoreId: 'lidl-sveavagen',
+      bestPriceType: 'shelf' as const,
+      prices: [
+        { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 13.9, priceType: 'shelf' as const },
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 15.9, priceType: 'shelf' as const }
+      ],
+      dealScore: 73,
+      isNew52WeekLow: false,
+      source: 'visible shelf rows for milk staples',
+      essentialCategory: 'milk',
+      weeklyNeed: 'breakfast and packed lunch'
+    },
+    {
+      productId: 'eldorado-basmati-rice-1kg',
+      productName: 'Eldorado Basmati Rice 1kg',
+      bestPrice: 18.9,
+      bestStoreId: 'matmissionen-hagersten',
+      bestPriceType: 'shelf' as const,
+      prices: [
+        { storeId: 'matmissionen-hagersten', storeName: 'Matmissionen Hägersten', price: 18.9, priceType: 'shelf' as const },
+        { storeId: 'tempo-hornstull', storeName: 'Tempo Hornstull', price: 24.9, priceType: 'shelf' as const }
+      ],
+      dealScore: 78,
+      isNew52WeekLow: true,
+      source: 'visible community shelf row and staple basket comparison row',
+      essentialCategory: 'rice',
+      weeklyNeed: 'bulk dinner base'
+    },
+    {
+      productId: 'garant-svensk-potatis-2kg',
+      productName: 'Garant Svensk Potatis 2kg',
+      bestPrice: 24.9,
+      bestStoreId: 'tempo-hornstull',
+      bestPriceType: 'shelf' as const,
+      prices: [
+        { storeId: 'tempo-hornstull', storeName: 'Tempo Hornstull', price: 24.9, priceType: 'shelf' as const },
+        { storeId: 'coop-daglivs-fridhemsplan', storeName: 'Coop Daglivs Fridhemsplan', price: 29.9, priceType: 'shelf' as const }
+      ],
+      dealScore: 72,
+      isNew52WeekLow: false,
+      source: 'visible shelf rows for potatoes',
+      essentialCategory: 'staple vegetables',
+      weeklyNeed: 'low-cost dinner side'
+    }
+  ]
+};
+
+const budgetEssentialsAlerts = buildWatchlistAlerts(budgetEssentialsWatchlistInputs);
+
+export const budgetEssentialsPriceDropAlerts = {
+  persona: 'Budget-conscious / low-income',
+  title: 'Essentials price-drop alerts',
+  alerts: budgetEssentialsAlerts,
+  rows: budgetEssentialsWatchlistInputs.products.map((product) => ({
+    productId: product.productId,
+    productName: product.productName,
+    essentialCategory: product.essentialCategory,
+    weeklyNeed: product.weeklyNeed,
+    bestPrice: product.bestPrice,
+    dealScore: product.dealScore,
+    source: product.source,
+    alertCount: budgetEssentialsAlerts.filter((alert) => alert.productId === product.productId).length
+  })),
+  coverage: {
+    caveat: 'Essential alerts use visible shelf, online, or promotion rows only; missing store prices are not estimated for low-income shopping decisions.'
+  }
+};
+
 export const babyDiaperWatchlistInputs: { favoriteStoreIds: string[]; watchlist: WatchlistItem[]; products: (WatchlistProductSnapshot & { source: string; diaperUnitPrice: number })[] } = {
   favoriteStoreIds: ['willys-odenplan', 'hemkop-hornstull', 'coop-medborgarplatsen'],
   watchlist: [

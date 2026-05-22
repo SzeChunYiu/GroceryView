@@ -243,6 +243,18 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces budget essentials price-drop alerts using the real watchlist engine', async () => {
+    const source = await read('src/app/watchlist/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+    assert.match(demo, /budgetEssentialsPriceDropAlerts/);
+    assert.match(demo, /buildWatchlistAlerts/);
+    assert.match(source, /budgetEssentialsPriceDropAlerts/);
+    assert.match(source, /Essentials price-drop alerts/);
+    assert.match(source, /essentialCategory/);
+    assert.match(source, /weeklyNeed/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces a student cheapest-basics board using real basket comparison output', async () => {
     const source = await read('src/app/basket-ideas/page.tsx');
     assert.match(source, /studentBasicsBoard/);
