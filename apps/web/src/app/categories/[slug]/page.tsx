@@ -1,11 +1,19 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { summarizeCategoryDealLeaders } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
-import { categorySummaries, dataFreshnessBadges, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
+import { categoryDealLeaderCandidates, categorySummaries, dataFreshnessBadges, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 
 export function generateStaticParams() { return categorySummaries.map((category) => ({ slug: category.slug })); }
+
+function categoryDealLeadersFor(slug: string) {
+  return summarizeCategoryDealLeaders({
+    candidates: categoryDealLeaderCandidates.filter((candidate) => candidate.category === slug),
+    minimumSourceConfidence: 0.6
+  });
+}
 
 export default async function CategoryPage({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
@@ -13,11 +21,41 @@ export default async function CategoryPage({ params }: Readonly<{ params: Promis
   const chainRows = axfoodProducts.filter((product) => product.category === slug).slice(0, 24);
   const openRows = pricedProducts.filter((product) => product.category === slug).slice(0, 24);
   const categoryFreshnessBadges = dataFreshnessBadges.filter((badge) => badge.sourceKind === 'axfood' || badge.sourceKind === 'openprices');
+  const dealLeaders = categoryDealLeadersFor(slug);
   return (
     <PageShell>
       <Eyebrow>Category</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">{labelFromSlug(slug)}</h1>
       <p className="mt-3 text-lg text-slate-700">{chainRows.length} Axfood rows and {openRows.length} OpenPrices rows shown from verified source modules.</p>
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/60">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Category deal leaders</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Best trusted deal signals in this category</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-700">
+            This route calls summarizeCategoryDealLeaders over visible chain-price candidates only; sourceConfidence must clear 60% before a product appears.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {dealLeaders.map((leader) => (
+            <Link
+              className="rounded-2xl border border-emerald-100 bg-white p-4 hover:border-emerald-700"
+              href={`/products/${leader.productId}`}
+              key={leader.productId}
+            >
+              <p className="font-black text-slate-950">{leader.productName}</p>
+              <p className="mt-2 text-2xl font-black text-emerald-800">{leader.signal}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{leader.storeName} lowest · sourceConfidence {(leader.sourceConfidence * 100).toFixed(0)}%</p>
+            </Link>
+          ))}
+          {dealLeaders.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-emerald-200 bg-white p-4 text-sm font-semibold text-slate-700">
+              No trusted category deal leader yet; GroceryView will not fabricate a category deal without matched chain prices.
+            </p>
+          ) : null}
+        </div>
+      </Card>
       <Card className="mt-6 border-slate-200 bg-slate-50">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
