@@ -140,6 +140,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces elderly nearest-store and delivery options without private location data', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/shopping-trips/page.tsx');
+
+    assert.match(verified, /export const elderlyNearestDeliveryPlanner = /);
+    assert.match(route, /elderlyNearestDeliveryPlanner/);
+    assert.match(route, /Nearest-store \+ delivery options/);
+    assert.match(route, /mobilitySupport/);
+    assert.match(route, /no private home location/);
+    assert.match(route, /NoVerifiedData/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+  });
+
   it('surfaces fulfillment slot evidence guardrails on the shopping trips route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/shopping-trips/page.tsx');

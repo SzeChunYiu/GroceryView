@@ -1,5 +1,5 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { basketTripCostContract, fulfillmentSlotsContract } from '@/lib/verified-data';
+import { basketTripCostContract, elderlyNearestDeliveryPlanner, fulfillmentSlotsContract } from '@/lib/verified-data';
 
 const titles: Record<string, string> = {
   'weekly-basket': 'Weekly basket planner',
@@ -51,6 +51,25 @@ export default function FeaturePage() {
           </div>
         </div>
       </Card>
+      <Card className="mt-6 border-violet-200 bg-violet-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">{elderlyNearestDeliveryPlanner.persona}</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Nearest-store + delivery options</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          This senior trip planner keeps no private home location in the static snapshot. It pairs verified store records with delivery and pickup evidence so mobilitySupport options stay explicit until a signed-in shopper consents.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          {elderlyNearestDeliveryPlanner.mobilitySupport.map((option) => (
+            <div className="rounded-2xl bg-white p-4" key={option.label}>
+              <p className="font-black text-slate-950">{option.label}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{option.evidence}</p>
+            </div>
+          ))}
+        </div>
+        <ul className="mt-4 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-700">
+          {elderlyNearestDeliveryPlanner.guardrails.map((guardrail) => <li key={guardrail}>{guardrail}</li>)}
+        </ul>
+      </Card>
+
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Fulfillment evidence</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight">Delivery and pickup slot evidence: {fulfillmentSlotsContract.title}</h2>
