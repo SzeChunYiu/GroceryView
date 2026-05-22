@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, ServiceUnavailableException } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { groceryApi } from '../demo-data.js';
@@ -104,34 +104,28 @@ export class WatchlistsController {
   }
 
   @Get('price-alerts')
-  @ApiOkResponse({ description: 'Demo user active watchlist target-price alerts' })
+  @ApiOkResponse({ description: 'Active real watchlist target-price alerts for the demo user' })
   async priceAlerts() {
-    if (this.watchlists.isConfigured()) return this.watchlists.priceAlerts('demo');
-    return { ...groceryApi.getWatchlistPriceAlerts('demo'), demo: true };
+    if (!this.watchlists.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required for real watchlist price-alert data.');
+    }
+    return this.watchlists.priceAlerts('demo');
   }
 
   @Post('price-alerts')
   @ApiCreatedResponse({ description: 'Watchlist target-price alert created' })
   async createPriceAlert(@Body() body: WatchlistPriceAlertDto) {
     try {
-      if (this.watchlists.isConfigured()) {
-        const report = await this.watchlists.createPriceAlert('demo', {
-          productId: body.productId,
-          targetPrice: body.targetPrice,
-          favoriteStoresOnly: body.favoriteStoresOnly,
-          allowedPriceTypes: body.allowedPriceTypes
-        });
-        return report;
+      if (!this.watchlists.isConfigured()) {
+        throw new ServiceUnavailableException('DATABASE_URL is required for real watchlist price-alert data.');
       }
-      return {
-        ...groceryApi.addWatchlistPriceAlert('demo', {
-          productId: body.productId,
-          targetPrice: body.targetPrice,
-          favoriteStoresOnly: body.favoriteStoresOnly,
-          allowedPriceTypes: body.allowedPriceTypes
-        }),
-        demo: true
-      };
+      const report = await this.watchlists.createPriceAlert('demo', {
+        productId: body.productId,
+        targetPrice: body.targetPrice,
+        favoriteStoresOnly: body.favoriteStoresOnly,
+        allowedPriceTypes: body.allowedPriceTypes
+      });
+      return report;
     } catch (error) {
       asProductNotFound(error);
     }

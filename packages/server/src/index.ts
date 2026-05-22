@@ -1280,7 +1280,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           category: url.searchParams.get('category') ?? undefined,
           productId: url.searchParams.get('productId') ?? undefined
         };
-        return jsonResponse(authOptions.flyerOffersProvider ? await authOptions.flyerOffersProvider(query) : api.getFlyerOffers(query));
+        if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Flyer offers provider is not configured.');
+        return jsonResponse(await authOptions.flyerOffersProvider(query));
       }
 
       if (method === 'GET' && path === '/api/account/subscription-access') {
@@ -1530,13 +1531,10 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       const storeFlyerOffersMatch = path.match(/^\/api\/stores\/([^/]+)\/flyer-offers$/);
       if (method === 'GET' && storeFlyerOffersMatch) {
         const storeId = decodeURIComponent(storeFlyerOffersMatch[1]);
-        if (authOptions.storeFlyerOffersProvider) {
-          const report = await authOptions.storeFlyerOffersProvider(storeId, { asOf: url.searchParams.get('asOf') ?? undefined });
-          if (!report) return errorResponse(404, 'Store not found.');
-          return jsonResponse(report);
-        }
-        if (!api.getStore(storeId)) return errorResponse(404, 'Store not found.');
-        return jsonResponse(api.getStoreFlyerOffers(storeId, { asOf: url.searchParams.get('asOf') ?? undefined }));
+        if (!authOptions.storeFlyerOffersProvider) return errorResponse(503, 'Store flyer offers provider is not configured.');
+        const report = await authOptions.storeFlyerOffersProvider(storeId, { asOf: url.searchParams.get('asOf') ?? undefined });
+        if (!report) return errorResponse(404, 'Store not found.');
+        return jsonResponse(report);
       }
 
       const storePriceCoverageMatch = path.match(/^\/api\/stores\/([^/]+)\/price-coverage$/);
@@ -1673,7 +1671,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
         if (method === 'GET') {
-          return jsonResponse(authOptions.watchlistPriceAlertsProvider ? await authOptions.watchlistPriceAlertsProvider(user) : api.getWatchlistPriceAlerts(user));
+          if (!authOptions.watchlistPriceAlertsProvider) return errorResponse(503, 'Watchlist price-alert provider is not configured.');
+          return jsonResponse(await authOptions.watchlistPriceAlertsProvider(user));
         }
         if (method === 'POST') {
           const body = await readJson(request);
@@ -1683,10 +1682,9 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             favoriteStoresOnly: typeof body.favoriteStoresOnly === 'boolean' ? body.favoriteStoresOnly : undefined,
             allowedPriceTypes: optionalWatchlistPriceTypes(body.allowedPriceTypes)
           };
+          if (!authOptions.watchlistPriceAlertWriter) return errorResponse(503, 'Watchlist price-alert writer is not configured.');
           return jsonResponse(
-            authOptions.watchlistPriceAlertWriter
-              ? await authOptions.watchlistPriceAlertWriter(user, alert)
-              : api.addWatchlistPriceAlert(user, alert),
+            await authOptions.watchlistPriceAlertWriter(user, alert),
             { status: 201 }
           );
         }
