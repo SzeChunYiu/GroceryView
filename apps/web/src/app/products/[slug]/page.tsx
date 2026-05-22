@@ -817,6 +817,63 @@ function crossChainHistoryOverlayFor(product: NonNullable<ReturnType<typeof find
   };
 }
 
+function intraChainBranchSpreadFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const coverageRow = (chainLabel: string, visiblePrice: number | null, detail: string) => ({
+    chainLabel,
+    visiblePriceLabel: formatSek(visiblePrice),
+    branchObservationCount: 0,
+    cheapestBranchLabel: 'Not available',
+    dearestBranchLabel: 'Not available',
+    spreadLabel: 'Not calculated',
+    confidenceLabel: 'confidence/coverage blocked',
+    detail
+  });
+
+  if ('lowestPrice' in product) {
+    const branchSpreadRows = chainPriceRows(product).map((row) =>
+      coverageRow(
+        row.chain,
+        row.price,
+        'Chain-wide catalogue price is visible, but no per-branch shelf observations are bundled for this product and chain.'
+      )
+    );
+
+    return {
+      available: false,
+      title: 'intra-chain branch spread',
+      statusLabel: 'Not enough per-branch shelf observations',
+      branchSpreadRows,
+      chainCount: branchSpreadRows.length,
+      branchObservationCount: 0,
+      cheapestBranchLabel: 'Not available',
+      dearestBranchLabel: 'Not available',
+      detail:
+        'No branch spread is calculated from chain-wide catalogue prices. GroceryView needs per-branch shelf observations across the same chain before it can name a cheapest branch, dearest branch, box/violin distribution, or percent difference.'
+    };
+  }
+
+  const branchSpreadRows = [
+    coverageRow(
+      'OpenPrices community aggregate',
+      product.priceMedian,
+      'OpenPrices has dated observations for this product, but the bundled web driver does not identify a verified chain branch for each observation.'
+    )
+  ];
+
+  return {
+    available: false,
+    title: 'intra-chain branch spread',
+    statusLabel: 'Not enough per-branch shelf observations',
+    branchSpreadRows,
+    chainCount: 0,
+    branchObservationCount: 0,
+    cheapestBranchLabel: 'Not available',
+    dearestBranchLabel: 'Not available',
+    detail:
+      'No branch spread is calculated from aggregate OpenPrices observations without branch identity. GroceryView shows the coverage blocker instead of turning community medians into branch-price claims.'
+  };
+}
+
 function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceChartTerminalModel {
   const emptyWindows: PriceChartTerminalWindow[] = timeframeWindows.map((window) => ({
     label: window.label,
@@ -909,6 +966,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceChangeLog = priceChangeEventLogFor(product);
   const monthlySeasonality = seasonalMonthlyAveragesFor(product);
   const crossChainHistoryOverlay = crossChainHistoryOverlayFor(product);
+  const intraChainBranchSpread = intraChainBranchSpreadFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
@@ -1052,6 +1110,37 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           </div>
         )}
         <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{crossChainHistoryOverlay.detail}</p>
+      </Card>
+      <Card className="mt-6 overflow-hidden border-sky-200 bg-sky-50/80">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-800">intra-chain branch spread</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Branch-level price distribution gate</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Requires per-branch shelf observations for the same product inside a chain before GroceryView shows cheapest/dearest branch claims.
+            </p>
+          </div>
+          <div className="rounded-[2rem] bg-slate-950 p-5 text-right text-white shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-300">{intraChainBranchSpread.statusLabel}</p>
+            <p className="mt-2 text-3xl font-black">{intraChainBranchSpread.chainCount} chains</p>
+            <p className="mt-1 text-xs font-semibold text-slate-300">{intraChainBranchSpread.branchObservationCount} branch observations</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {intraChainBranchSpread.branchSpreadRows.map((row) => (
+            <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={`${row.chainLabel}-${row.visiblePriceLabel}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-800">{row.chainLabel}</p>
+              <p className="mt-2 text-2xl font-black text-slate-950">{row.visiblePriceLabel}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-600">{row.branchObservationCount} per-branch shelf observations</p>
+              <p className="mt-2 text-sm font-bold text-slate-700">Cheapest branch: {row.cheapestBranchLabel}</p>
+              <p className="mt-1 text-sm font-bold text-slate-700">Dearest branch: {row.dearestBranchLabel}</p>
+              <p className="mt-1 text-sm font-bold text-slate-700">Spread: {row.spreadLabel}</p>
+              <p className="mt-2 text-xs font-semibold text-slate-500">{row.confidenceLabel}</p>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{row.detail}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{intraChainBranchSpread.detail}</p>
       </Card>
       <Card className="mt-6 overflow-hidden border-lime-200 bg-lime-50/80">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
