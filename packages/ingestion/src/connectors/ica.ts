@@ -429,6 +429,56 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004250',
     storeName: 'ICA Kvantum Täby C',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003723',
+    storeName: 'ICA Supermarket Boström',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003490',
+    storeName: 'ICA Rylander',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004380',
+    storeName: 'Maxi ICA Stormarknad Enköping',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003784',
+    storeName: 'ICA Supermarket Örbyhus',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004388',
+    storeName: 'ICA Supermarket Stop Täby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003830',
+    storeName: 'ICA Trevehallen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004531',
+    storeName: 'ICA Supermarket Hässelby Torg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003442',
+    storeName: 'ICA Supermarket Åkersberga Centrum',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004173',
+    storeName: 'ICA Supermarket Favoriten',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004581',
+    storeName: 'ICA Kvantum Mall of Scandinavia',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
