@@ -166,6 +166,13 @@ export type FetchOpenFoodFactsRetailerEnrichmentsOptions = {
   retrievedAt?: string;
 };
 
+export type FetchOpenFoodFactsExportRetailerEnrichmentsOptions = {
+  candidates: readonly OpenFoodFactsRetailerProductCandidate[];
+  fetchImpl?: typeof fetch;
+  maxRows?: number;
+  retrievedAt?: string;
+};
+
 export function buildOpenFoodFactsProductUrl(code: string): string {
   const fields = OPENFOODFACTS_FIELDS.join(',');
   return `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}?fields=${encodeURIComponent(fields)}`;
@@ -246,6 +253,82 @@ export async function fetchOpenFoodFactsExportProducts(options: FetchOpenFoodFac
       if (row) {
         rows.push(row);
       }
+      if (rows.length >= maxRows) {
+        lines.close();
+        stream.destroy();
+        break;
+      }
+    }
+  } finally {
+    lines.close();
+    stream.destroy();
+  }
+
+  return rows;
+}
+
+export async function fetchOpenFoodFactsExportRetailerEnrichments(
+  options: FetchOpenFoodFactsExportRetailerEnrichmentsOptions
+): Promise<OpenFoodFactsRetailerEnrichment[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const candidatesByBarcode = groupOpenFoodFactsCandidatesByBarcode(options.candidates);
+  const maxRows = options.maxRows ?? candidatesByBarcode.size;
+  const response = await fetchImpl(OPENFOODFACTS_EXPORT_URL, {
+    headers: {
+      accept: 'application/gzip, text/tab-separated-values',
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`OpenFoodFacts export request failed: ${response.status}`);
+  }
+  if (!response.body) {
+    throw new Error('OpenFoodFacts export response did not include a body');
+  }
+
+  const rows: OpenFoodFactsRetailerEnrichment[] = [];
+  let headers: string[] | null = null;
+
+  const stream = Readable.fromWeb(response.body as unknown as NodeReadableStream<Uint8Array>).pipe(createGunzip());
+  const lines = createInterface({ input: stream, crlfDelay: Infinity });
+
+  try {
+    for await (const line of lines) {
+      if (!headers) {
+        headers = parseTsvLine(line);
+        continue;
+      }
+
+      const fields = parseTsvLine(line);
+      const record = Object.fromEntries(headers.map((header, index) => [header, fields[index] ?? '']));
+      const candidates = candidatesByBarcode.get(record.code);
+      if (!candidates) {
+        continue;
+      }
+
+      const row = normalizeOpenFoodFactsExportRecord(record, retrievedAt);
+      if (!row || !hasOpenFoodFactsNutrition(row.nutritionPer100g)) {
+        continue;
+      }
+
+      rows.push({
+        barcode: row.code,
+        name: row.name,
+        brands: row.brands,
+        quantity: row.quantity,
+        categories: row.categories,
+        labels: row.labels,
+        nutriscoreGrade: row.nutriscoreGrade,
+        nutritionPer100g: row.nutritionPer100g,
+        imageUrl: row.imageUrl,
+        productUrl: row.productUrl,
+        sourceUrl: row.sourceUrl,
+        retrievedAt: row.retrievedAt,
+        retailerMatches: candidates
+      });
+
       if (rows.length >= maxRows) {
         lines.close();
         stream.destroy();

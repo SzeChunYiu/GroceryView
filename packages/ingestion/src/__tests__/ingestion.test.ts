@@ -24,6 +24,7 @@ import {
   buildWillysWeeklyDiscountsUrl,
   extractOpenFoodFactsBarcodeFromAxfoodImageUrl,
   fetchOpenFoodFactsExportProducts,
+  fetchOpenFoodFactsExportRetailerEnrichments,
   fetchOpenFoodFactsProducts,
   fetchOpenFoodFactsRetailerEnrichments,
   fetchOverpassGroceryStores,
@@ -180,6 +181,66 @@ describe('fetchOpenFoodFactsExportProducts', () => {
     assert.equal(rows[0].nutritionPer100g.energyKcal, 43);
     assert.equal(rows[0].nutritionPer100g.sugars, 5.2);
     assert.equal(rows[0].sourceUrl, `${OPENFOODFACTS_EXPORT_URL}#code=7340083494406`);
+  });
+});
+
+describe('fetchOpenFoodFactsExportRetailerEnrichments', () => {
+  it('joins only retailer candidate barcodes from the export and skips nutrition-empty rows', async () => {
+    const tsv = [
+      'code\turl\tproduct_name\tquantity\tbrands\tcategories_tags\tlabels_tags\tnutriscore_grade\tenergy_100g\tenergy-kcal_100g\tfat_100g\tsaturated-fat_100g\tcarbohydrates_100g\tsugars_100g\tfiber_100g\tproteins_100g\tsalt_100g\tsodium_100g\timage_url',
+      '7310130003547\thttps://world.openfoodfacts.org/product/7310130003547/ideal-makaroner-kungsornen\tIdeal Makaroner\t750 g\tKungsörnen\ten:pastas\t\ta\t1509\t361\t2\t0.5\t72\t3\t3\t11\t0.01\t0.004\thttps://images.openfoodfacts.org/images/products/731/013/000/3547/front_sv.11.400.jpg',
+      '7310130000000\thttps://world.openfoodfacts.org/product/7310130000000/missing-nutrition\tMissing Nutrition\t1 kg\tTestbrand\ten:pastas\t\tunknown\t\t\t\t\t\t\t\t\t\t\t',
+      '7340083494406\thttps://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado\tHavredryck choklad\t1 l\tEldorado\ten:beverages\ten:vegan\td\t180\t43\t1.5\t0.2\t6.5\t5.2\t0.8\t1\t0.12\t0.048\thttps://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg'
+    ].join('\n');
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(gzipSync(tsv), { status: 200, headers: { 'content-type': 'application/gzip' } });
+    };
+
+    const rows = await fetchOpenFoodFactsExportRetailerEnrichments({
+      fetchImpl,
+      retrievedAt: '2026-05-22T09:54:39.728Z',
+      candidates: [
+        {
+          chain: 'willys',
+          productCode: '101205621_ST',
+          name: 'Idealmakaroner Gammaldags',
+          brand: 'Kungsörnen',
+          packageText: 'KUNGSÖRNEN, 750g',
+          imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
+          sourceUrl: 'https://www.willys.se/search?q=makaroner',
+          retrievedAt: '2026-05-20T23:54:12.788Z'
+        },
+        {
+          chain: 'coop',
+          productCode: '7310130000000',
+          name: 'Missing Nutrition',
+          brand: 'Testbrand',
+          packageText: '1 kg',
+          barcode: '7310130000000',
+          sourceUrl: 'https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1',
+          retrievedAt: '2026-05-21T01:29:42.710Z'
+        },
+        {
+          chain: 'coop',
+          productCode: 'not-in-export',
+          name: 'No Match',
+          brand: '',
+          packageText: '',
+          barcode: '00000000',
+          sourceUrl: 'https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1',
+          retrievedAt: '2026-05-21T01:29:42.710Z'
+        }
+      ]
+    });
+
+    assert.deepEqual(requestedUrls, [OPENFOODFACTS_EXPORT_URL]);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].barcode, '7310130003547');
+    assert.equal(rows[0].sourceUrl, `${OPENFOODFACTS_EXPORT_URL}#code=7310130003547`);
+    assert.equal(rows[0].nutritionPer100g.energyKcal, 361);
+    assert.deepEqual(rows[0].retailerMatches.map((match) => match.productCode), ['101205621_ST']);
   });
 });
 

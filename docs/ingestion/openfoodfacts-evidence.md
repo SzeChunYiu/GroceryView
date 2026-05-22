@@ -10,6 +10,13 @@
 
 The direct product API returned HTTP 429 during the 2026-05-22 probe. The official OpenFoodFacts export URL under `world.openfoodfacts.org/data` streamed successfully, so this iteration uses that public export. Candidate barcodes came only from current Willys/Hemkop/Coop ingested rows: Coop `ean` fields and Axfood EANs embedded in Willys/Hemkop image URLs. No-match and nutrition-empty products were skipped. Every emitted row includes its exact export source marker in `sourceUrl`, a product URL, and the retailer rows it matched by barcode.
 
+## Verification
+
+- Verified: 2026-05-22T10:21:01Z
+- Export join path: `fetchOpenFoodFactsExportRetailerEnrichments`
+- Unit coverage: `fetchOpenFoodFactsExportRetailerEnrichments` joins only retailer candidate barcodes from the export and skips nutrition-empty rows.
+- Artifact audit: `rowCount` 404 equals 404 emitted barcode rows; all 404 barcodes are unique; `candidateBarcodeCount` 786 equals the 786 unique usable current Willys/Hemkop/Coop candidate barcodes; every emitted barcode appears in those current candidates; zero emitted rows have empty nutrition; zero emitted rows use a source outside `https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=...`.
+
 ## Sample Retrieved Rows
 
 1. 2340398000007 | Ost Gräddis | ARLa | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=2340398000007
