@@ -72,15 +72,28 @@ type MatpriskollenApiOffer = {
 export const MATPRISKOLLEN_BASE_URL = 'https://matpriskollen.se';
 export const DEFAULT_MATPRISKOLLEN_LAT = 55.605;
 export const DEFAULT_MATPRISKOLLEN_LON = 13.0038;
+export const DEFAULT_MATPRISKOLLEN_REGIONS = [
+  { name: 'malmo', lat: 55.605, lon: 13.0038 },
+  { name: 'stockholm', lat: 59.3293, lon: 18.0686 },
+  { name: 'goteborg', lat: 57.7089, lon: 11.9746 },
+  { name: 'uppsala', lat: 59.8586, lon: 17.6389 }
+] as const;
 export const DEFAULT_MATPRISKOLLEN_STORE_LIMIT = 60;
 export const DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE = 200;
-export const DEFAULT_MATPRISKOLLEN_MAX_ROWS = 650;
+export const DEFAULT_MATPRISKOLLEN_MAX_ROWS = 1000;
 export const DEFAULT_MATPRISKOLLEN_GROCERY_STORE_PATTERN = /(willys|lidl|coop|ica|hemk[oö]p|city gross)/i;
+
+export type MatpriskollenRegion = {
+  name?: string;
+  lat: number;
+  lon: number;
+};
 
 export type FetchMatpriskollenOffersOptions = {
   fetchImpl?: typeof fetch;
   lat?: number;
   lon?: number;
+  regions?: readonly MatpriskollenRegion[];
   storeLimit?: number;
   offerLimitPerStore?: number;
   storeNamePattern?: RegExp | null;
@@ -126,57 +139,64 @@ export async function fetchMatpriskollenOffers(
     : options.storeNamePattern;
   const maxRows = options.maxRows ?? DEFAULT_MATPRISKOLLEN_MAX_ROWS;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
-  const storeUrl = buildMatpriskollenStoresUrl(lat, lon, storeLimit);
-  const storesResponse = await fetchImpl(storeUrl, {
-    headers: {
-      accept: 'application/json',
-      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-    }
-  });
-
-  if (!storesResponse.ok) {
-    throw new Error(`Matpriskollen stores request failed: ${storesResponse.status}`);
-  }
-
-  const stores = await storesResponse.json() as MatpriskollenStore[];
+  const regions = options.regions
+    ?? (options.lat !== undefined || options.lon !== undefined
+      ? [{ lat, lon }]
+      : DEFAULT_MATPRISKOLLEN_REGIONS);
   const rows: MatpriskollenOffer[] = [];
   const seenCodes = new Set<string>();
 
-  for (const store of stores) {
-    const storeKey = text(store.key);
-    const storeName = text(store.name);
-    if (!storeKey || numberValue(store.offerCount) <= 0 || (storeNamePattern && !storeNamePattern.test(storeName))) {
-      continue;
-    }
-
-    const sourceUrl = buildMatpriskollenStoreOffersUrl(storeKey, lat, lon, offerLimitPerStore);
-    const offersResponse = await fetchImpl(sourceUrl, {
+  for (const region of regions) {
+    const storeUrl = buildMatpriskollenStoresUrl(region.lat, region.lon, storeLimit);
+    const storesResponse = await fetchImpl(storeUrl, {
       headers: {
         accept: 'application/json',
         'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
       }
     });
 
-    if (!offersResponse.ok) {
-      continue;
+    if (!storesResponse.ok) {
+      throw new Error(`Matpriskollen stores request failed: ${storesResponse.status}`);
     }
 
-    const payload = await offersResponse.json() as MatpriskollenOffersResponse;
-    for (const offer of payload.offers ?? []) {
-      const row = normalizeMatpriskollenOffer(offer, {
-        sourceUrl,
-        retrievedAt,
-        storeName: text(payload.storeName) || storeName,
-        storeKey,
-        storeId: text(store.id)
-      });
-      if (!row || seenCodes.has(row.code)) {
+    const stores = await storesResponse.json() as MatpriskollenStore[];
+
+    for (const store of stores) {
+      const storeKey = text(store.key);
+      const storeName = text(store.name);
+      if (!storeKey || numberValue(store.offerCount) <= 0 || (storeNamePattern && !storeNamePattern.test(storeName))) {
         continue;
       }
-      seenCodes.add(row.code);
-      rows.push(row);
-      if (rows.length >= maxRows) {
-        return rows;
+
+      const sourceUrl = buildMatpriskollenStoreOffersUrl(storeKey, region.lat, region.lon, offerLimitPerStore);
+      const offersResponse = await fetchImpl(sourceUrl, {
+        headers: {
+          accept: 'application/json',
+          'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+        }
+      });
+
+      if (!offersResponse.ok) {
+        continue;
+      }
+
+      const payload = await offersResponse.json() as MatpriskollenOffersResponse;
+      for (const offer of payload.offers ?? []) {
+        const row = normalizeMatpriskollenOffer(offer, {
+          sourceUrl,
+          retrievedAt,
+          storeName: text(payload.storeName) || storeName,
+          storeKey,
+          storeId: text(store.id)
+        });
+        if (!row || seenCodes.has(row.code)) {
+          continue;
+        }
+        seenCodes.add(row.code);
+        rows.push(row);
+        if (rows.length >= maxRows) {
+          return rows;
+        }
       }
     }
   }
