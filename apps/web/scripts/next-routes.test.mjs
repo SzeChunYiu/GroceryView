@@ -2139,6 +2139,28 @@ ${seo}`;
     assert.match(store, /findStore/);
   });
 
+  it('ships metadataBase and hreflang alternates for the supported locale pair', async () => {
+    const seo = await read('src/lib/seo.ts');
+    const localeHome = await read('src/components/locale-home-page.tsx');
+    const routing = await read('src/lib/i18n-routing.ts');
+    const layout = await read('src/app/layout.tsx');
+
+    assert.match(routing, /supportedLocales = \['sv', 'en'\]/);
+    assert.match(layout, /metadataBase: new URL\(siteUrl\)/);
+    assert.match(seo, /metadataBase: new URL\(siteUrl\)/);
+    assert.match(seo, /languageAlternateUrls/);
+    assert.match(seo, /'sv-SE'/);
+    assert.match(seo, /'en-SE'/);
+    assert.match(seo, /'x-default'/);
+    assert.match(seo, /alternates: \{[\s\S]*canonical:[\s\S]*languages: languageAlternateUrls\(config\.path\)/);
+    assert.match(seo, /locale-negotiated current route/i);
+    assert.match(localeHome, /metadataBase: new URL\(siteUrl\)/);
+    assert.match(localeHome, /languageHomeAlternates/);
+    assert.match(localeHome, /\/sv/);
+    assert.match(localeHome, /\/en/);
+    assert.doesNotMatch(seo, /NoVerifiedData/);
+  });
+
   it('ships an installable PWA-first web manifest for mobile grocery checks', async () => {
     const manifestPath = 'src/app/manifest.ts';
     assert.equal(await fileExists(manifestPath), true, 'App Router should expose /manifest.webmanifest');
