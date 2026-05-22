@@ -327,7 +327,12 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '245050',
   '116385',
   '116418',
-  '135120'
+  '135120',
+  '086802',
+  '245060',
+  '235190',
+  '235220',
+  '235400'
 ] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
@@ -365,7 +370,19 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
 ];
 const COOP_LUND_STADION_FLYER_STORE_IDS = ['105860', '105760', '105740', '105710', '105830', '105630', '105810'] as const;
 const COOP_AVENYN_MATCHED_FLYER_STORE_IDS = ['163120', '135120'] as const;
-const COOP_SMALL_STORE_MATCHED_FLYER_STORE_IDS = ['056313', '196231', '245080', '245050', '116385', '116418'] as const;
+const COOP_SMALL_STORE_MATCHED_FLYER_STORE_IDS = [
+  '056313',
+  '196231',
+  '245080',
+  '245050',
+  '116385',
+  '116418',
+  '086802',
+  '245060',
+  '235190',
+  '235220',
+  '235400'
+] as const;
 export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[] = [
   {
     query: 'Färsk laxfilé Harbour',
