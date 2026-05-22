@@ -9,6 +9,9 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /schedule:/);
     assert.match(workflow, /cron:\s*['"]\d+\s+\d+\s+\*\s+\*\s+\*['"]/);
     assert.match(workflow, /workflow_dispatch:/);
+    const timeoutMatch = workflow.match(/timeout-minutes:\s*(\d+)/);
+    assert.ok(timeoutMatch, 'daily ingestion workflow must declare an explicit timeout');
+    assert.ok(Number(timeoutMatch[1]) >= 90, 'daily ingestion must allow slow all-store first-run backfills to finish');
     assert.match(workflow, /name: Preflight required production configuration/);
     assert.ok(
       workflow.indexOf('name: Preflight required production configuration') < workflow.indexOf('name: Install'),
