@@ -190,6 +190,15 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a family weekly meal planner from visible deals', async () => {
+    const source = await read('src/app/meal-planner/page.tsx');
+    assert.match(source, /familyMealPlannerFromDeals/);
+    assert.match(source, /suggestDealBasedMeals/);
+    assert.match(source, /Family weekly meal planner/);
+    assert.match(source, /lunchboxLeftovers/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces pantry replenishment on the pantry planner route using the real core pantry plan output', async () => {
     const source = await read('src/app/pantry-planner/page.tsx');
     assert.match(source, /pantryReplenishmentPlan/);
