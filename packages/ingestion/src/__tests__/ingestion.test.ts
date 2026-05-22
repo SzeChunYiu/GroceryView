@@ -2218,6 +2218,61 @@ describe('fetchCoopProductsForAllStores', () => {
       buildCoopSearchUrl('016141')
     ]);
   });
+
+  it('keeps Coop all-store ingestion moving when one branch product request fails', async () => {
+    const fetchImpl: typeof fetch = async (url, init) => {
+      if (String(url) === 'https://www.coop.se/handla/') {
+        return new Response([
+          'window.coopSettings={',
+          '"personalizationApiUrl":"https://external.api.coop.se/personalization",',
+          '"personalizationApiSubscriptionKey":"coop-key",',
+          '"personalizationApiVersion":"v1",',
+          '"storeApiUrl":"https://proxy.api.coop.se/external/store/",',
+          '"storeApiSubscriptionKey":"store-key"',
+          '};'
+        ].join(''), { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+      if (String(url).endsWith('/stores?api-version=v5')) {
+        return new Response(JSON.stringify({
+          stores: [
+            { ledgerAccountNumber: '251300' },
+            { ledgerAccountNumber: '016141' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url).includes('/stores/251300?')) {
+        return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323' }), { status: 200 });
+      }
+      if (String(url).includes('/stores/016141?')) {
+        return new Response(JSON.stringify({ ledgerAccountNumber: '016141', name: 'Coop Stockholm', city: 'Stockholm', address: 'Sveavägen 1', postalCode: '11157' }), { status: 200 });
+      }
+      const storeId = new URL(String(url)).searchParams.get('store');
+      if (storeId === '016141') throw new Error('simulated Coop branch timeout');
+      const body = JSON.parse(String(init?.body));
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: `coop-product-${storeId}`,
+            ean: `731000000${storeId}`,
+            name: `Coop kaffe ${storeId}`,
+            manufacturerName: 'Coop',
+            packageSizeInformation: body.query,
+            salesPriceData: { b2cPrice: 39.9 }
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopProductsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      queries: ['kaffe'],
+      maxRowsPerStore: 1,
+      retrievedAt: '2026-05-22T20:35:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['251300', 39.9]]);
+  });
 });
 
 describe('fetchWillysProductsForAllStores', () => {
