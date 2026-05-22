@@ -2407,6 +2407,7 @@ class DailyIngestionExecutor implements QueryExecutor {
     if (sql.includes('insert into source_runs')) return [{ id: 'source-run-db-1' }] as T[];
     if (sql.includes('update source_runs')) return [{ id: params[0] }] as T[];
     if (sql.includes('insert into chains')) return [{ id: `chain-db-${++this.sequence}` }] as T[];
+    if (sql.includes('insert into stores')) return [{ id: `store-db-${++this.sequence}` }] as T[];
     if (sql.includes('insert into products')) return [{ id: `product-db-${++this.sequence}` }] as T[];
     if (sql.includes('insert into aliases')) {
       return [{
@@ -2484,7 +2485,8 @@ describe('daily ingestion runner', () => {
           parserVersion: 'normalized-json-v1',
           robotsTxtStatus: 'not_applicable',
           legalReviewStatus: 'approved',
-          hasDataAgreement: true
+          hasDataAgreement: true,
+          stores: [{ storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' }]
         }
       ],
       fetchImpl: async () => new Response(JSON.stringify({
@@ -2523,6 +2525,47 @@ describe('daily ingestion runner', () => {
     });
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into raw_records')), true);
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into observations')), true);
+    const storeInsert = executor.calls.find((call) => call.sql.includes('insert into stores'));
+    assert.equal(storeInsert?.params[0], 'willys-odenplan');
+    const latestPriceInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
+    assert.equal(latestPriceInsert?.params[2], 'store-db-2');
+  });
+
+  it('fails closed before persistence when store-scoped prices omit configured branch metadata', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [{
+        connectorId: 'willys-normalized-json',
+        chainId: 'willys',
+        sourceType: 'official_api',
+        endpointUrl: 'https://sources.example.test/willys/products.json',
+        parserVersion: 'normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' }]
+      }],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [{
+          storeId: 'willys-unknown-branch',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Zoégas Skånerost 450g',
+          canonicalName: 'Zoégas Coffee 450g',
+          productId: 'zoegas-coffee-450g',
+          categoryId: 'coffee',
+          brand: 'Zoégas',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'blocked');
+    assert.deepEqual(result.blockers, ['willys:unknown_store_ids:willys-unknown-branch']);
+    assert.equal(executor.calls.length, 0);
   });
 
   it('fails closed before persistence when a required daily connector is blocked', async () => {

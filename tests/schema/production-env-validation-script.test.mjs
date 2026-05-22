@@ -16,6 +16,8 @@ describe('production env value validation script', () => {
       assert.match(script, new RegExp(`['"]${chain}['"]`));
     }
     assert.match(script, /requireEveryProductInEveryStore must be true/);
+    assert.match(script, /stores must list every branch/);
+    assert.match(script, /targetStores missing from connector stores/);
     assert.equal(pkg.scripts['ops:validate-production-env'], 'node scripts/ops/validate-production-env.mjs');
   });
 
@@ -24,8 +26,10 @@ describe('production env value validation script', () => {
     assert.deepEqual(JSON.parse(output), {
       status: 'ready',
       connectorCount: 6,
+      connectorStoreCount: 6,
+      connectorStoreCoverageCount: 6,
       coverageProductCount: 2,
-      coverageStoreCount: 2
+      coverageStoreCount: 6
     });
   });
 
@@ -35,5 +39,39 @@ describe('production env value validation script', () => {
     assert.match(result.stderr, /Missing required env/);
     assert.match(result.stderr, /GROCERYVIEW_DAILY_CONNECTORS_JSON/);
     assert.match(result.stderr, /CATALOG_COVERAGE_TARGETS_JSON/);
+  });
+
+  it('fails closed when catalog target stores are not covered by daily connector branch metadata', () => {
+    const chains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+    const env = {
+      AUTH_SECRET: 'test-auth-secret',
+      DATABASE_URL: 'postgres://example/groceryview',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'test-notification-webhook-secret',
+      BILLING_WEBHOOK_SECRET: 'test-billing-webhook-secret',
+      METRICS_TOKEN: 'test-metrics-token',
+      GROCERYVIEW_SERVER_URL: 'https://api.groceryview.example',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(chains.map((chainId) => ({
+        connectorId: `${chainId}-normalized-json`,
+        chainId,
+        sourceType: 'official_api',
+        endpointUrl: `https://sources.example.test/${chainId}/products.json`,
+        parserVersion: 'normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: `${chainId}-odenplan`, name: `${chainId} Odenplan`, address: 'Odenplan', city: 'Stockholm' }]
+      }))),
+      CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
+        targetProducts: ['coffee'],
+        targetCategories: ['coffee'],
+        targetChains: chains,
+        targetStores: ['willys-unknown-branch'],
+        requireEveryProductInEveryStore: true
+      })
+    };
+    const result = spawnSync(process.execPath, [scriptPath.pathname], { encoding: 'utf8', env });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /targetStores missing from connector stores: willys-unknown-branch/);
   });
 });
