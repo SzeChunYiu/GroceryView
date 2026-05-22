@@ -30,4 +30,10 @@ describe('catalog coverage target export script', () => {
     assert.doesNotMatch(script, /select id from stores order by id/);
     assert.equal(targets.requireEveryProductInEveryStore, true);
   });
+
+  it('self-test exports only connector-addressable external store refs', () => {
+    const output = execFileSync(process.execPath, [scriptPath.pathname, '--self-test-store-external-refs'], { encoding: 'utf8' });
+    const targets = JSON.parse(output);
+    assert.deepEqual(targets.targetStores, ['1004599', '216502']);
+  });
 });

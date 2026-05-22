@@ -32,7 +32,7 @@ export type OpenFoodFactsNutritionPer100g = {
 };
 
 export type OpenFoodFactsRetailerProductCandidate = {
-  chain: 'willys' | 'hemkop' | 'coop' | 'ica' | 'mathem' | 'matspar';
+  chain: 'citygross' | 'willys' | 'hemkop' | 'coop' | 'ica' | 'mathem' | 'matspar';
   productCode: string;
   name: string;
   brand: string;
