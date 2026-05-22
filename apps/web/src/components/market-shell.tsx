@@ -36,6 +36,12 @@ const elderlyAccessibilityMode = {
   controls: ['Bigger price cards', 'High-contrast colors', 'Short source labels'],
   evidence: 'contrast-safe shell uses verified route cards only'
 };
+const immigrantMultilingualUi = {
+  persona: 'Immigrants / new arrivals',
+  title: 'Multilingual UI starter',
+  languageOptions: ['Swedish', 'English', 'Arabic', 'Somali'],
+  guardrails: ['Verified prices stay numeric', 'No machine-translated prices', 'Source labels remain visible']
+};
 
 export function MarketShell() {
   return (
@@ -73,6 +79,30 @@ export function MarketShell() {
       </section>
 
       <div className="mt-6"><MetricGrid /></div>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">{immigrantMultilingualUi.persona}</p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">{immigrantMultilingualUi.title}</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              A language access entry point lets new shoppers choose translated navigation help while keeping verified SEK prices, product names, and source evidence unchanged.
+            </p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-4">
+            {immigrantMultilingualUi.languageOptions.map((language) => (
+              <div className="rounded-2xl bg-white px-4 py-3 text-center font-black text-slate-950" key={language}>
+                {language}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {immigrantMultilingualUi.guardrails.map((guardrail) => (
+            <p className="rounded-2xl border border-amber-200 bg-white p-4 text-sm font-bold text-slate-700" key={guardrail}>{guardrail}</p>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-slate-950 bg-slate-950 text-white">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
