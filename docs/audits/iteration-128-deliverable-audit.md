@@ -14,7 +14,7 @@ User asked to implement the research findings as real GroceryView product functi
 | Implement total trip-cost optimizer research finding | Core optimizer ranks complete options by verified basket total plus explicit travel/time/mode/delivery/split-shop costs and returns the best effective total. | Complete |
 | Keep product honest/fail-closed | Trip cost is separate from verified shelf totals; options with missing product prices cannot win complete rankings; static web still withholds private routes without signed-in basket/location preferences. | Complete |
 | Verify with tests | `rtk git diff --check`, `rtk npm test`, `rtk npm run build`, and `rtk npm run typecheck` passed on 2026-05-22. Next build emitted SWC native-load warnings but completed successfully using WASM bindings. Targeted TDD tests covered core, API, server HTTP/OpenAPI, Nest demo API, and web route contract. | Complete |
-| PR and merge to main | PR URL and merged state must be recorded after merge. | Pending until PR is merged |
+| PR and merge to main | PR #739 merged to `main` at 2026-05-22T08:55:03Z with merge commit `79d94090bc6536e84ce76fa8beb73b7e581491f2`: https://github.com/SzeChunYiu/GroceryView/pull/739 | Complete |
 
 ## Verification notes
 
