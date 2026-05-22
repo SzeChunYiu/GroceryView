@@ -1,9 +1,9 @@
-// AUTO-GENERATED from ICA Focus public weekly offers with e-magin flyer provenance.
-// Source URL: https://www.ica.se/erbjudanden/ica-focus-1004247/
-// Flyer URL: https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1
-// Flyer PDF API URL: https://api.e-magin.se/api/pdf/6h3pqb3k
-// Retrieved: 2026-05-22T09:30:22.424Z
-// Row count: 77 real weekly offer rows fetched from ica.se.
+// AUTO-GENERATED from ICA public weekly offers with e-magin flyer provenance.
+// Source URLs: https://www.ica.se/erbjudanden/ica-focus-1004247/, https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/
+// Flyer URLs: https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1, https://www.e-magin.se/latestpaper/n84c18k7/paper
+// Flyer PDF API URLs: https://api.e-magin.se/api/pdf/6h3pqb3k, https://api.e-magin.se/api/pdf/n84c18k7
+// Retrieved: 2026-05-22T11:10:32.630Z
+// Row count: 145 real weekly offer rows fetched from ica.se.
 
 export type IcaReklambladIngestedOffer = {
   code: string;
@@ -28,13 +28,25 @@ export type IcaReklambladIngestedOffer = {
 };
 
 export const icaReklambladSource = {
-  "source": "ica.se public weekly offers with e-magin reklamblad link",
-  "retrievedAt": "2026-05-22T09:30:22.424Z",
-  "rowCount": 77,
-  "store": "ICA Focus",
-  "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-  "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
-  "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k"
+  "source": "ica.se public weekly offers with e-magin reklamblad links",
+  "retrievedAt": "2026-05-22T11:10:32.630Z",
+  "rowCount": 145,
+  "stores": [
+    "ICA Focus",
+    "ICA Kvantum Kista"
+  ],
+  "sourceUrls": [
+    "https://www.ica.se/erbjudanden/ica-focus-1004247/",
+    "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/"
+  ],
+  "flyerUrls": [
+    "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
+    "https://www.e-magin.se/latestpaper/n84c18k7/paper"
+  ],
+  "flyerPdfUrls": [
+    "https://api.e-magin.se/api/pdf/6h3pqb3k",
+    "https://api.e-magin.se/api/pdf/n84c18k7"
+  ]
 } as const;
 
 export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
@@ -70,7 +82,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000374.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003918751",
@@ -93,7 +105,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690656753.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003918752",
@@ -116,7 +128,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690521419.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003918753",
@@ -148,7 +160,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7312690800024.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003918754",
@@ -184,7 +196,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310860007259.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957696",
@@ -209,7 +221,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7392672104104.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957968",
@@ -235,7 +247,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/57540573.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957970",
@@ -258,7 +270,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311070008708.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957971",
@@ -281,7 +293,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690108863.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003087280",
@@ -307,7 +319,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350107990821.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003586802",
@@ -336,7 +348,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7314720729015.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003660262",
@@ -359,7 +371,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/6408430102068.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003697911",
@@ -382,7 +394,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7312720080303.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003697917",
@@ -407,7 +419,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350092180245.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003697925",
@@ -434,7 +446,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350092180023.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003714763",
@@ -457,7 +469,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5038862130400.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003799412",
@@ -480,7 +492,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310520011770.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003808002",
@@ -503,7 +515,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7314720719702.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003808012",
@@ -528,7 +540,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310090155539.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003811729",
@@ -551,7 +563,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3168430372481.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003822894",
@@ -574,7 +586,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8710449956319.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2003857883",
@@ -601,7 +613,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7391196001296.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957910",
@@ -629,7 +641,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310865866424.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957911",
@@ -652,7 +664,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311800971005.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957912",
@@ -688,7 +700,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3600540784995.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957913",
@@ -711,7 +723,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7300206787006.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957914",
@@ -745,7 +757,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310350106844.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957915",
@@ -773,7 +785,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3600522287360.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957927",
@@ -796,7 +808,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2092452100009.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957928",
@@ -819,7 +831,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319100900003.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957929",
@@ -842,7 +854,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318693254079.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957930",
@@ -865,7 +877,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318693555824.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957932",
@@ -888,7 +900,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2092474500009.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957933",
@@ -911,7 +923,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690491958.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957934",
@@ -934,7 +946,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690492313.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957939",
@@ -959,7 +971,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5711953207877.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957941",
@@ -995,7 +1007,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350042720002.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957944",
@@ -1020,7 +1032,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5707196031836.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957945",
@@ -1045,7 +1057,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8445291628151.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957946",
@@ -1083,7 +1095,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7330797077132.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957947",
@@ -1106,7 +1118,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8001440136924.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957948",
@@ -1129,7 +1141,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690514725.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957949",
@@ -1152,7 +1164,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690166726.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957950",
@@ -1175,7 +1187,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690110002.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957951",
@@ -1202,7 +1214,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8410076420947.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957952",
@@ -1225,7 +1237,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3254474019274.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957963",
@@ -1248,7 +1260,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319232100005.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957964",
@@ -1272,7 +1284,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319277100008.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957965",
@@ -1295,7 +1307,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2320131600008.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957966",
@@ -1318,7 +1330,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319317900001.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957967",
@@ -1341,7 +1353,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690513452.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957972",
@@ -1368,7 +1380,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2340413400003.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957973",
@@ -1394,7 +1406,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690493808.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957974",
@@ -1417,7 +1429,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5000184321064.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957975",
@@ -1448,7 +1460,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690164012.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957982",
@@ -1471,7 +1483,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690080176.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957983",
@@ -1498,7 +1510,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690065685.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957986",
@@ -1532,7 +1544,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7613036961806.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957987",
@@ -1563,7 +1575,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310050001975.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957993",
@@ -1639,7 +1651,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7332531093248.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957994",
@@ -1663,7 +1675,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3574661011295.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957996",
@@ -1696,7 +1708,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8700216664844.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957998",
@@ -1719,7 +1731,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210187742.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003957999",
@@ -1742,7 +1754,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210187735.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003958000",
@@ -1765,7 +1777,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210176388.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003958004",
@@ -1788,7 +1800,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690127086.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003958005",
@@ -1813,7 +1825,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/4000177158227.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003958006",
@@ -1839,7 +1851,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7300328521007.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003958007",
@@ -1863,7 +1875,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2092318900002.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003958009",
@@ -1887,7 +1899,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7300207071005.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003958010",
@@ -1917,7 +1929,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8001665128674.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003958011",
@@ -1940,7 +1952,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690091028.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5003958012",
@@ -1969,7 +1981,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310070001832.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5004071575",
@@ -1992,7 +2004,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210182464.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5004071576",
@@ -2015,7 +2027,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210182464.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5004100191",
@@ -2054,7 +2066,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7038513866304.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5004100398",
@@ -2077,6 +2089,1795 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7330671127243.jpg",
-    "retrievedAt": "2026-05-22T09:30:22.424Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2003770437",
+    "name": "Jordgubbar i ask",
+    "brand": "",
+    "packageText": "400 g",
+    "category": "Frukt & Grönt",
+    "priceText": "35 kr/st",
+    "comparisonPrice": "87:50/kg",
+    "regularPriceText": "Ord.pris 78:45-80:34 kr.",
+    "validTo": "2026-05-22T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690144779",
+      "7318690492191"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690144779.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003918750",
+    "name": "Läsk",
+    "brand": "Trocadero, Loka crush, Champis",
+    "packageText": "140-150 cl",
+    "category": "Skafferivaror",
+    "priceText": "3 för 40 kr",
+    "comparisonPrice": "8:89-9:52/liter + pant",
+    "regularPriceText": "Ord.pris 16:94-18:83 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7310401000374",
+      "7310401000367",
+      "7310401014319",
+      "7310401014326",
+      "7310401034584",
+      "7310401050324",
+      "7310401047447",
+      "7310401056166",
+      "7310401058900",
+      "7310401055428",
+      "7310401057941",
+      "7310401057910"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000374.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003918751",
+    "name": "Fryst hamburgare",
+    "brand": "ICA",
+    "packageText": "720 g",
+    "category": "Djupfryst",
+    "priceText": "70 kr/st",
+    "comparisonPrice": "97:22/kg",
+    "regularPriceText": "Ord.pris 77:39 kr. 30dgr.pris 77:39 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690656753"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690656753.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003918752",
+    "name": "Mogen avokado 3-pack",
+    "brand": "ICA. Sydafrika/Peru",
+    "packageText": "330 g",
+    "category": "Frukt & Grönt",
+    "priceText": "25 kr/st",
+    "comparisonPrice": "75:76/kg",
+    "regularPriceText": "Ord.pris 37:76 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690521419"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690521419.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003918753",
+    "name": "Glass flerpack",
+    "brand": "SIA Glass",
+    "packageText": "4-6 pack",
+    "category": "Djupfryst",
+    "priceText": "2 för 70 kr",
+    "comparisonPrice": "5:83-8:75/st",
+    "regularPriceText": "Ord.pris 46:85-47:22 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7312690800024",
+      "7312690800048",
+      "7312690800079",
+      "7312690800086",
+      "7312690800185",
+      "7312690800192",
+      "7312690800246",
+      "7312690800284",
+      "7312690800291",
+      "7312690800345",
+      "7312690800338",
+      "7312690800369",
+      "7312690800376",
+      "7312690800383"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7312690800024.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003918754",
+    "name": "Juice",
+    "brand": "God Morgon",
+    "packageText": "1 liter",
+    "category": "Mejeri",
+    "priceText": "2 för 40 kr",
+    "comparisonPrice": "20:00/liter",
+    "regularPriceText": "Ord.pris 24:13-37:76 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7310860007259",
+      "7310860007396",
+      "7310860007372",
+      "7310865074225",
+      "7310865085498",
+      "7310865089045",
+      "7313619001638",
+      "7313619002147",
+      "7313619002246",
+      "7313619002307",
+      "7313619002413",
+      "7313619002376",
+      "7313619003083",
+      "7313619002987"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310860007259.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957696",
+    "name": "Turkisk, Grekisk Yoghurt",
+    "brand": "Salakis",
+    "packageText": "1 kg",
+    "category": "Mejeri",
+    "priceText": "25 kr/st",
+    "comparisonPrice": "25:00/kg",
+    "regularPriceText": "Ord.pris 30:88-40:72 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7392672104104",
+      "7310867104494",
+      "7310867004954"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7392672104104.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957904",
+    "name": "Aprikoser i ask",
+    "brand": "ICA. Spanien/Grekland",
+    "packageText": "500 g",
+    "category": "Frukt & Grönt",
+    "priceText": "25 kr/st",
+    "comparisonPrice": "50:00/kg",
+    "regularPriceText": "Ord.pris 47:41 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690162865"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690162865.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957905",
+    "name": "Fryst mango",
+    "brand": "ICA",
+    "packageText": "250 g",
+    "category": "Djupfryst",
+    "priceText": "2 för 24 kr",
+    "comparisonPrice": "48:00/kg",
+    "regularPriceText": "Ord.pris 21:00 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690062844"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690062844.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957968",
+    "name": "Marsipanbröd",
+    "brand": "Anthon Berg",
+    "packageText": "33-40 g",
+    "category": "Skafferivaror",
+    "priceText": "2 för 18 kr",
+    "comparisonPrice": "225:00-272:73/kg",
+    "regularPriceText": "Ord.pris 13:15 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "57540573",
+      "57540689",
+      "57540597",
+      "5774540980805"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/57540573.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957970",
+    "name": "Grötbröd, Müslibröd",
+    "brand": "Pågen",
+    "packageText": "650-780 g",
+    "category": "Bröd, kex & bageri",
+    "priceText": "2 för 40 kr",
+    "comparisonPrice": "25:64-30:77/kg",
+    "regularPriceText": "Ord.pris 30:19-32:65 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7311070008708",
+      "7311070004144"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311070008708.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957971",
+    "name": "Korvbröd surdeg",
+    "brand": "ICA",
+    "packageText": "8-pack",
+    "category": "Bröd, kex & bageri",
+    "priceText": "2 för 28 kr",
+    "comparisonPrice": "46:67/kg",
+    "regularPriceText": "Ord.pris 29:24 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690108863"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690108863.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957910",
+    "name": "Mild yoghurt",
+    "brand": "Arla",
+    "packageText": "1 kg",
+    "category": "Mejeri",
+    "priceText": "2 för 30 kr",
+    "comparisonPrice": "15:00/kg",
+    "regularPriceText": "Ord.pris 17:50-23:56 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7310865866424",
+      "7310865866585",
+      "7310865866486",
+      "7310865866356",
+      "7310865866394",
+      "7310865866448"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310865866424.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957911",
+    "name": "Jubileumskakor",
+    "brand": "Polarbröd",
+    "packageText": "450 g",
+    "category": "Bröd, kex & bageri",
+    "priceText": "2 för 40 kr",
+    "comparisonPrice": "44:44/kg",
+    "regularPriceText": "Ord.pris 27:35 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7311800971005"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311800971005.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957912",
+    "name": "Solvård",
+    "brand": "Ambre solaire",
+    "packageText": "30-270 ml",
+    "category": "Hälsa & skönhet",
+    "priceText": "25% rabatt",
+    "comparisonPrice": "",
+    "regularPriceText": "Ord.pris 67:90-191:00 kr. 30dgr.pris 67:90-191:00 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "3600542512855",
+      "3600542513920",
+      "3600542624855",
+      "3600542624954",
+      "3600542624718",
+      "3600542572651",
+      "3600542624770"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3600542512855.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957913",
+    "name": "Falukorv",
+    "brand": "Scan",
+    "packageText": "800 g",
+    "category": "Färskvaror",
+    "priceText": "2 för 65 kr",
+    "comparisonPrice": "40:62/kg",
+    "regularPriceText": "Ord.pris 50:06 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7300206787006"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7300206787006.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957914",
+    "name": "Gott & Blandat, Ahlgrens bilar",
+    "brand": "Malaco, Ahlgrens",
+    "packageText": "130-210 g",
+    "category": "Skafferivaror",
+    "priceText": "3 för 36 kr",
+    "comparisonPrice": "57:14-92:31/kg",
+    "regularPriceText": "Ord.pris 18:83-20:72 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7310350106844",
+      "7310350106837",
+      "7310350109906",
+      "7310350112050",
+      "7310350114153",
+      "7310350116249",
+      "7310350116447",
+      "7310350136254",
+      "7310350136698",
+      "7310350136353",
+      "7310350505548",
+      "7310350504947"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310350106844.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957915",
+    "name": "Dag-, natt-, ögonkräm",
+    "brand": "L´oréal Revitalift, Age perfect",
+    "packageText": "15-50 ml",
+    "category": "Hälsa & skönhet",
+    "priceText": "89 kr/st",
+    "comparisonPrice": "1 780:00-5 933:33/liter",
+    "regularPriceText": "Ord.pris 115:00-134:00 kr. 30dgr.pris 115:00-134:00 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "3600522287360",
+      "3600522287346",
+      "3600522287339",
+      "3600522287391",
+      "3600522287407",
+      "3600522417026"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3600522287360.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957927",
+    "name": "Grön sparris i bunt",
+    "brand": "Spanien/Italien/Ungern",
+    "packageText": "250 g",
+    "category": "Frukt & Grönt",
+    "priceText": "25 kr/st",
+    "comparisonPrice": "100:00/kg",
+    "regularPriceText": "Ord.pris 39:11 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "2092452100009"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2092452100009.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957928",
+    "name": "Karré med ben",
+    "brand": "Ursprung Sverige",
+    "packageText": "Ca 1000-2000 g",
+    "category": "Färskvaror",
+    "priceText": "69 kr/kg",
+    "comparisonPrice": "",
+    "regularPriceText": "Ord.pris 101:24-122:40 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "2319160400000",
+      "2319100900003"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319160400000.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957929",
+    "name": "Björnbär i ask",
+    "brand": "ICA. Portugal",
+    "packageText": "125 g",
+    "category": "Frukt & Grönt",
+    "priceText": "25 kr/st",
+    "comparisonPrice": "200:00/kg",
+    "regularPriceText": "Ord.pris 59:52 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318693254079"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318693254079.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957930",
+    "name": "Röda kärnfria druvor i ask",
+    "brand": "ICA. Chile",
+    "packageText": "500 g",
+    "category": "Frukt & Grönt",
+    "priceText": "28 kr/st",
+    "comparisonPrice": "56:00/kg",
+    "regularPriceText": "Ord.pris 40:60 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318693555824"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318693555824.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957931",
+    "name": "Röd spetspaprika i påse",
+    "brand": "ICA. Nederländerna",
+    "packageText": "200 g",
+    "category": "Frukt & Grönt",
+    "priceText": "15 kr/st",
+    "comparisonPrice": "75:00/kg",
+    "regularPriceText": "Ord.pris 19:90 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7330671127243"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7330671127243.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957932",
+    "name": "Svensk rabarber",
+    "brand": "",
+    "packageText": "",
+    "category": "Frukt & Grönt",
+    "priceText": "35 kr/kg",
+    "comparisonPrice": "",
+    "regularPriceText": "Ord.pris 56:68 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "2092474500009"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2092474500009.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957933",
+    "name": "Babyplommontomater i ask",
+    "brand": "ICA. Marocko/Spanien",
+    "packageText": "500 g",
+    "category": "Frukt & Grönt",
+    "priceText": "28 kr/st",
+    "comparisonPrice": "56:00/kg",
+    "regularPriceText": "Ord.pris 37:90 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690491958"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690491958.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957934",
+    "name": "Kastanjechampinjoner i ask",
+    "brand": "ICA. Polen/Litauen",
+    "packageText": "250 g",
+    "category": "Frukt & Grönt",
+    "priceText": "20 kr/st",
+    "comparisonPrice": "80:00/kg",
+    "regularPriceText": "Ord.pris 28:00 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690492313"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690492313.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957939",
+    "name": "Castello hårdost",
+    "brand": "Castello",
+    "packageText": "450-500 g",
+    "category": "Färskvaror",
+    "priceText": "55 kr/st",
+    "comparisonPrice": "110:00-122:22/kg",
+    "regularPriceText": "Ord.pris 73:72 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "5711953207877",
+      "5000246727094"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5711953207877.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957941",
+    "name": "Såser",
+    "brand": "Eriks såser",
+    "packageText": "170-230 ml",
+    "category": "Färskvaror",
+    "priceText": "2 för 32 kr",
+    "comparisonPrice": "69:57-94:12/liter",
+    "regularPriceText": "Ord.pris 26:40 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7350042720002",
+      "7350042720019",
+      "7350042720026",
+      "7350042720040",
+      "7350042720057",
+      "7350042720132",
+      "7350042720293",
+      "7350042721924",
+      "7350042722174",
+      "7350042722228",
+      "7350042722372",
+      "7350042721320",
+      "7350042722181",
+      "7350042721283"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350042720002.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957944",
+    "name": "Bacon",
+    "brand": "Tulip",
+    "packageText": "100-125 g",
+    "category": "Färskvaror",
+    "priceText": "2 för 26 kr",
+    "comparisonPrice": "104:00-130:00/kg",
+    "regularPriceText": "Ord.pris 16:92-17:88 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "5707196031836",
+      "5707196171938",
+      "5707196251012"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5707196031836.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957945",
+    "name": "Vegetariska produkter",
+    "brand": "Hälsans Kök",
+    "packageText": "440-450 g",
+    "category": "Djupfryst",
+    "priceText": "2 för 75 kr",
+    "comparisonPrice": "83:33-85:23/kg",
+    "regularPriceText": "Ord.pris 55:74 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "8445291628151",
+      "8445291679139",
+      "8445291678842"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8445291628151.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957946",
+    "name": "Smörgåsmat",
+    "brand": "Pärsons",
+    "packageText": "90-160 g",
+    "category": "Färskvaror",
+    "priceText": "2 för 38 kr",
+    "comparisonPrice": "118:75-211:11/kg",
+    "regularPriceText": "Ord.pris 25:45-31:13 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7330797077132",
+      "7330797077149",
+      "7330797077118",
+      "7330797077200",
+      "7330797077095",
+      "7330797077606",
+      "7330797077613",
+      "7330797077620",
+      "7330792077762",
+      "7330797077194",
+      "7330797077484",
+      "7330797077163",
+      "7330792006311",
+      "7330797077866",
+      "7330792010325",
+      "7330792059317"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7330797077132.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957947",
+    "name": "Krossade tomater",
+    "brand": "Cirio",
+    "packageText": "390 g",
+    "category": "Skafferivaror",
+    "priceText": "4 för 45 kr",
+    "comparisonPrice": "28:85/kg",
+    "regularPriceText": "Ord.pris 17:88 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "8001440136924"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8001440136924.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957948",
+    "name": "Surimisticks",
+    "brand": "ICA",
+    "packageText": "200",
+    "category": "Djupfryst",
+    "priceText": "2 för 28 kr",
+    "comparisonPrice": "70:00/kg",
+    "regularPriceText": "Ord.pris 17:88 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690514725"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690514725.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957949",
+    "name": "Pizzakit",
+    "brand": "ICA",
+    "packageText": "600 g",
+    "category": "Färskvaror",
+    "priceText": "2 för 38 kr",
+    "comparisonPrice": "31:67/kg",
+    "regularPriceText": "Ord.pris 31:13 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690166726"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690166726.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957950",
+    "name": "Rökt skinka strimlad",
+    "brand": "ICA",
+    "packageText": "180 g",
+    "category": "Färskvaror",
+    "priceText": "2 för 35 kr",
+    "comparisonPrice": "97:22/kg",
+    "regularPriceText": "Ord.pris 21:72 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690110002"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690110002.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957951",
+    "name": "Tacosås, Tortillabröd, Tacokrydda",
+    "brand": "Old el Paso",
+    "packageText": "226-230g, 326g, 25 g",
+    "category": "Skafferivaror",
+    "priceText": "5 för 45 kr",
+    "comparisonPrice": "27:61-360:00/kg",
+    "regularPriceText": "Ord.pris 12:20-19:77 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "8410076420947",
+      "8410076491916",
+      "8410076472403",
+      "8410076410115",
+      "8410076410122"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8410076420947.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957952",
+    "name": "Majs",
+    "brand": "Gröna jätten",
+    "packageText": "480 g",
+    "category": "Skafferivaror",
+    "priceText": "2 för 45 kr",
+    "comparisonPrice": "53:57/kg utan spad",
+    "regularPriceText": "Ord.pris 28:49 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "3254474019274"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3254474019274.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957963",
+    "name": "Ekologisk fläskytterfilé",
+    "brand": "ICA I love eco. Ursprung Sverige",
+    "packageText": "Ca 700 g",
+    "category": "Färskvaror",
+    "priceText": "129 kr/kg",
+    "comparisonPrice": "",
+    "regularPriceText": "Ord.pris 165:62 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "2319232100005"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319232100005.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957964",
+    "name": "Kassler",
+    "brand": "ICA. Ursprung Sverige",
+    "packageText": "Ca 600 g",
+    "category": "Färskvaror",
+    "priceText": "79 kr/kg",
+    "comparisonPrice": "",
+    "regularPriceText": "Ord.pris 99:37-108:83 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "2319277100008",
+      "2319316100006"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319277100008.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957965",
+    "name": "Grillspjut",
+    "brand": "Scan. Ursprung Sverige",
+    "packageText": "Ca 800 g",
+    "category": "Färskvaror",
+    "priceText": "99 kr/kg",
+    "comparisonPrice": "",
+    "regularPriceText": "Ord.pris 122:08 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "2320131600008"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2320131600008.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957966",
+    "name": "Spareribs smokey BBQ",
+    "brand": "ICA. Ursprung Sverige",
+    "packageText": "Ca 1300 g",
+    "category": "Färskvaror",
+    "priceText": "55 kr/kg",
+    "comparisonPrice": "",
+    "regularPriceText": "Ord.pris 66:15 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "2319317900001"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319317900001.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957967",
+    "name": "Skinkschnitzel",
+    "brand": "Ursprung Sverige",
+    "packageText": "300 g",
+    "category": "Färskvaror",
+    "priceText": "42 kr/st",
+    "comparisonPrice": "140:00/kg",
+    "regularPriceText": "Ord.pris 49:11 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690513452"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690513452.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957972",
+    "name": "Smakrike",
+    "brand": "Arla",
+    "packageText": "ca 500-800 g",
+    "category": "Färskvaror",
+    "priceText": "99 kr/kg",
+    "comparisonPrice": "",
+    "regularPriceText": "Ord.pris 124:92-141:01 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "2340413400003",
+      "2340413600007",
+      "2340413200009",
+      "2340413100002",
+      "2340412400004"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2340413400003.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957973",
+    "name": "Rismål",
+    "brand": "ICA",
+    "packageText": "175 g",
+    "category": "Mejeri",
+    "priceText": "3 för 24 kr",
+    "comparisonPrice": "45:71/kg",
+    "regularPriceText": "Ord.pris 10:31 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690493808",
+      "7318690493815",
+      "7318690493839",
+      "7318690506775"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690493808.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957974",
+    "name": "Majonnäs",
+    "brand": "Hellman's",
+    "packageText": "400 g",
+    "category": "Skafferivaror",
+    "priceText": "2 för 50 kr",
+    "comparisonPrice": "62:50/kg",
+    "regularPriceText": "Ord.pris 37:76 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "5000184321064"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5000184321064.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957975",
+    "name": "Småkakor",
+    "brand": "ICA",
+    "packageText": "300 g",
+    "category": "Bröd, kex & bageri",
+    "priceText": "2 för 30 kr",
+    "comparisonPrice": "50:00/kg",
+    "regularPriceText": "Ord.pris 21:67-23:56 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690164012",
+      "7318690164029",
+      "7318690164036",
+      "7318690164043",
+      "7318690164067",
+      "7318690164074",
+      "7318690177203",
+      "7318690487890",
+      "7318690491453"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690164012.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957982",
+    "name": "Minimarshmallows",
+    "brand": "ICA",
+    "packageText": "150 g",
+    "category": "Skafferivaror",
+    "priceText": "2 för 24 kr",
+    "comparisonPrice": "80:00/kg",
+    "regularPriceText": "Ord.pris 19:77 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690080176"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690080176.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957983",
+    "name": "Glassås",
+    "brand": "ICA",
+    "packageText": "300 g",
+    "category": "Skafferivaror",
+    "priceText": "2 för 38 kr",
+    "comparisonPrice": "63:33/kg",
+    "regularPriceText": "Ord.pris 29:24 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690065685",
+      "7318690065692",
+      "7318690077312",
+      "7318690163480"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690065685.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957986",
+    "name": "Kaffekapslar",
+    "brand": "Zoegas, Starbucks",
+    "packageText": "10-pack",
+    "category": "Skafferivaror",
+    "priceText": "3 för 95 kr",
+    "comparisonPrice": "3:17/st",
+    "regularPriceText": "Ord.pris 38:70-46:27 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7613036961806",
+      "7613036961721",
+      "8445291105737",
+      "7613036959001",
+      "8445291154063",
+      "7613036961608",
+      "7613287302137",
+      "8445291451780",
+      "8445291658110",
+      "8445291362710",
+      "8445291366329",
+      "8445291563377"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7613036961806.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957987",
+    "name": "Kaffe",
+    "brand": "Löfbergs",
+    "packageText": "450 g",
+    "category": "Skafferivaror",
+    "priceText": "2 för 110 kr",
+    "comparisonPrice": "122:22/kg",
+    "regularPriceText": "Ord.pris 63:79 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7310050001975",
+      "7310050001982",
+      "7310050001883",
+      "7310050003504",
+      "7310050001135",
+      "7310050001159",
+      "7310050010854",
+      "7310050001043",
+      "7310050001067"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310050001975.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957990",
+    "name": "Lavendel",
+    "brand": "ICA",
+    "packageText": "",
+    "category": "Hem & fritid",
+    "priceText": "3 för 99 kr",
+    "comparisonPrice": "33:00/st",
+    "regularPriceText": "Ord.pris 69:00 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690494478"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690494478.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957993",
+    "name": "Hårfärg",
+    "brand": "Schwarzkopf Brilliance, Live, Blonde, Natural & Easy",
+    "packageText": "1-pack",
+    "category": "Hälsa & skönhet",
+    "priceText": "2 för 119 kr",
+    "comparisonPrice": "396:67/liter, 59:50/st",
+    "regularPriceText": "Ord.pris 75:90-96:90 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7332531093248",
+      "7332531093569",
+      "7332531093484",
+      "7332531093644",
+      "7332531093729",
+      "7332531093804",
+      "7332531094177",
+      "7332531094771",
+      "7332531094856",
+      "7332531094931",
+      "7332531095013",
+      "7332531095099",
+      "7332531095174",
+      "7332531095259",
+      "7332531095433",
+      "7332531095518",
+      "7332531095594",
+      "7332531095679",
+      "7332531095754",
+      "7332531095990",
+      "7332531096072",
+      "7332531096157",
+      "7332531108492",
+      "7332531114448",
+      "7332531114523",
+      "7332531115766",
+      "7332531128766",
+      "7332531128421"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7332531093248.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957994",
+    "name": "Tamponger",
+    "brand": "o.b",
+    "packageText": "32-pack",
+    "category": "Hälsa & skönhet",
+    "priceText": "2 för 80 kr",
+    "comparisonPrice": "1:25/st",
+    "regularPriceText": "Ord.pris 55:90 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "3574661011295",
+      "3574661011288"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3574661011295.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957996",
+    "name": "Blöjor",
+    "brand": "Pampers Baby dry, Premium protection",
+    "packageText": "27-48 pack",
+    "category": "Hem & fritid",
+    "priceText": "2 för 189 kr",
+    "comparisonPrice": "1:97-3:50/st",
+    "regularPriceText": "Ord.pris 122:00-123:00 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "8700216664844",
+      "8700216665100",
+      "8700216664905",
+      "8700216664684",
+      "8700216596596",
+      "8700216664332",
+      "8700216679091",
+      "8700216679183",
+      "8700216596633",
+      "8700216596701",
+      "8700216596725"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8700216664844.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957998",
+    "name": "Mugg melamin Ambrosia 30cl",
+    "brand": "ICA",
+    "packageText": "",
+    "category": "Hem & fritid",
+    "priceText": "2 för 50 kr",
+    "comparisonPrice": "25:00/st",
+    "regularPriceText": "",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7331210187742"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210187742.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003957999",
+    "name": "Skål Ambrosia 16cm",
+    "brand": "ICA",
+    "packageText": "",
+    "category": "Hem & fritid",
+    "priceText": "2 för 60 kr",
+    "comparisonPrice": "30:00/st",
+    "regularPriceText": "",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7331210187735"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210187735.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003958004",
+    "name": "Mozzarella",
+    "brand": "ICA",
+    "packageText": "125 g",
+    "category": "Färskvaror",
+    "priceText": "2 för 24 kr",
+    "comparisonPrice": "96:00/kg utan spad",
+    "regularPriceText": "Ord.pris 15:77 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690127086"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690127086.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003958005",
+    "name": "Fruktdryck",
+    "brand": "Capri-Sun",
+    "packageText": "10 x 20 cl",
+    "category": "Skafferivaror",
+    "priceText": "2 för 65 kr",
+    "comparisonPrice": "16:25/liter",
+    "regularPriceText": "Ord.pris 40:60 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "4000177158227",
+      "4000177158425",
+      "4000177026700"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/4000177158227.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003958006",
+    "name": "Färsk Minutfilé",
+    "brand": "Kronfågel. Ursprung Sverige",
+    "packageText": "550-600 g",
+    "category": "Färskvaror",
+    "priceText": "2 för 125 kr",
+    "comparisonPrice": "104:17-113:64/kg",
+    "regularPriceText": "Ord.pris 89:81 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7300328521007",
+      "7300328530009",
+      "7300328527009",
+      "7300328531006"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7300328521007.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003958007",
+    "name": "Galia- och Honungsmeloner",
+    "brand": "ICA. Spanien",
+    "packageText": "",
+    "category": "Frukt & Grönt",
+    "priceText": "25 kr/kg",
+    "comparisonPrice": "",
+    "regularPriceText": "Ord.pris 30:63-44:90 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "2092318900002",
+      "2092323800007"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2092318900002.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003958009",
+    "name": "Grillkorv",
+    "brand": "Scan",
+    "packageText": "270-640 g",
+    "category": "Färskvaror",
+    "priceText": "33 kr/st",
+    "comparisonPrice": "51:56-122:22/kg",
+    "regularPriceText": "Ord.pris 44:38-51:01 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7300207071005",
+      "7300207769001",
+      "7300201432000",
+      "7300203756005"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7300207071005.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003958010",
+    "name": "Färsk fylld pasta",
+    "brand": "Rana",
+    "packageText": "250 g",
+    "category": "Färskvaror",
+    "priceText": "2 för 60 kr",
+    "comparisonPrice": "120:00/kg",
+    "regularPriceText": "Ord.pris 48:17 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "8001665128674",
+      "8001665128681",
+      "8001665128698",
+      "8001665128704",
+      "8001665128728",
+      "8001665700030",
+      "8001665700016",
+      "8001665728072"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8001665128674.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003958011",
+    "name": "Grillad paprika",
+    "brand": "ICA",
+    "packageText": "530 g",
+    "category": "Skafferivaror",
+    "priceText": "2 för 56 kr",
+    "comparisonPrice": "75:68/kg utan spad",
+    "regularPriceText": "Ord.pris 42:48 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7318690091028"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690091028.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5003958012",
+    "name": "Kolsyrat vatten",
+    "brand": "Ramlösa",
+    "packageText": "150 cl",
+    "category": "Skafferivaror",
+    "priceText": "3 för 28 kr",
+    "comparisonPrice": "6:22/liter + pant",
+    "regularPriceText": "Ord.pris 11:26 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7310070001832",
+      "7310070001900",
+      "7310070001849",
+      "7310070009968",
+      "7310070010001",
+      "7310070010155",
+      "7310070009944"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310070001832.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5004067380",
+    "name": "Trädgårdsnejlika, Stjärnöga",
+    "brand": ", Danmark",
+    "packageText": "",
+    "category": "Hem & fritid",
+    "priceText": "2 för 70 kr",
+    "comparisonPrice": "35:00/st",
+    "regularPriceText": "Ord.pris 54:95-59:95 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": true,
+    "eans": [
+      "5708869003266",
+      "7391679051800",
+      "7391679051817"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5708869003266.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5004071575",
+    "name": "Solcellspinne",
+    "brand": "",
+    "packageText": "",
+    "category": "Hem & fritid",
+    "priceText": "2 för 28 kr",
+    "comparisonPrice": "14:00/st",
+    "regularPriceText": "Ord.pris 15:90 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7331210182464"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210182464.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5004071576",
+    "name": "Solcellspinne",
+    "brand": "",
+    "packageText": "",
+    "category": "Hem & fritid",
+    "priceText": "6 för 70 kr",
+    "comparisonPrice": "11:67/st",
+    "regularPriceText": "Ord.pris 15:90 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7331210182464"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210182464.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5004104117",
+    "name": "Tandborste, barntandkräm",
+    "brand": "Jordan",
+    "packageText": "1-pack, 50 ml",
+    "category": "Hälsa & skönhet",
+    "priceText": "3 för 40 kr",
+    "comparisonPrice": "",
+    "regularPriceText": "Ord.pris 17:90-26:90 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Kvantum Kista",
+    "storeId": "16718",
+    "availableInStore": true,
+    "availableOnline": false,
+    "eans": [
+      "7038513866304",
+      "7038516220202",
+      "7038516220301",
+      "7038516550422",
+      "7038516550408",
+      "7038516550385",
+      "7038516550361",
+      "7046110063538",
+      "7046110063569",
+      "7046110075562",
+      "7046110071519",
+      "7046110028001",
+      "7046110031643",
+      "7046110054420",
+      "7046110054451",
+      "7046110058695",
+      "7046110058848"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/n84c18k7/paper",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/n84c18k7",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7038513866304.jpg",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   }
 ];
