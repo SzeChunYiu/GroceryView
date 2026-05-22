@@ -1,3 +1,4 @@
+import { AccountBillingActions } from '@/components/account-billing-actions';
 import { AccountMutationActions } from '@/components/account-mutation-actions';
 import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
@@ -95,6 +96,7 @@ export default function AccountPage() {
       </Card>
 
       <AccountMutationActions />
+      <AccountBillingActions />
       <AdDisclosureActions />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
