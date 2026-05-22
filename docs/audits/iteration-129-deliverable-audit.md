@@ -36,7 +36,7 @@ The implementation fails closed: unsupported checkout confirmation produces a cl
 | Full workspace tests | Pass | `rtk git diff --check && rtk npm test` |
 | Build | Pass | `rtk npm run build` |
 | Typecheck | Pass | `rtk npm run typecheck` |
-| PR and merge | Pending | Product PR not created yet. |
+| PR and merge | Pass | Product PR #757 merged to `main` at 2026-05-22T09:19:45Z with merge commit `3694447698a54aff80dae471c931a2ba59122359`; CI and release validation passed. |
 
 ## Code-review graph note
 
