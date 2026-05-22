@@ -1,8 +1,74 @@
 import { notFound } from 'next/navigation';
+import { calculateDealScore, scoreBand } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
+
+const REQUIRED_CHAIN_COVERAGE = 6;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function percentileForPrice(values: number[], currentPrice: number) {
+  const sorted = [...values].filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
+  if (sorted.length <= 1) return 50;
+  const firstAtOrAbove = sorted.findIndex((value) => value >= currentPrice);
+  const rank = firstAtOrAbove === -1 ? sorted.length - 1 : firstAtOrAbove;
+  return clamp((rank / (sorted.length - 1)) * 100, 0, 100);
+}
+
+function latestObservationFor(product: (typeof pricedProducts)[number]) {
+  return [...product.observations].sort((a, b) => b.date.localeCompare(a.date))[0];
+}
+
+function dealScoreVerdictFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product) {
+    const rows = chainPriceRows(product);
+    const crossChainSpreadPercentile = clamp(100 - product.spreadPct * 2, 0, 100);
+    const sourceConfidence = clamp(rows.length / REQUIRED_CHAIN_COVERAGE, 0, 1);
+    const score = calculateDealScore({
+      currentCityPercentile: crossChainSpreadPercentile,
+      knownPromoHistoryPercentile: crossChainSpreadPercentile,
+      equivalentUnitPricePercentile: rows.length > 1 ? 0 : 50,
+      discountDepthPercent: product.spreadPct,
+      sourceConfidence
+    });
+
+    return {
+      score,
+      band: scoreBand(score),
+      confidence: sourceConfidence,
+      evidence: `${rows.length} exact chain price rows`,
+      percentileLabel: `cross-chain spread percentile ${formatPct(crossChainSpreadPercentile)}`,
+      caveat: 'Full promotion history is missing, so calculateDealScore uses percentiles derived only from the observed cross-chain spread.'
+    };
+  }
+
+  const latest = latestObservationFor(product);
+  const currentPrice = latest?.price ?? product.priceMedian;
+  const historicalPrices = product.observations.map((observation) => observation.price);
+  const historyPercentile = percentileForPrice(historicalPrices, currentPrice);
+  const discountDepthPercent = product.priceMax > 0 ? clamp(((product.priceMax - currentPrice) / product.priceMax) * 100, 0, 100) : 0;
+  const sourceConfidence = clamp(product.observationCount / 30, 0, 1);
+  const score = calculateDealScore({
+    currentCityPercentile: historyPercentile,
+    knownPromoHistoryPercentile: historyPercentile,
+    equivalentUnitPricePercentile: historyPercentile,
+    discountDepthPercent,
+    sourceConfidence
+  });
+
+  return {
+    score,
+    band: scoreBand(score),
+    confidence: sourceConfidence,
+    evidence: `${product.observationCount} OpenPrices observations`,
+    percentileLabel: `observed-history percentile ${formatPct(historyPercentile)}`,
+    caveat: 'Uses OpenPrices price observations only; no retailer promotion or unobserved discount is inferred.'
+  };
+}
 
 export function generateStaticParams() {
   return [...axfoodProducts.slice(0, 40), ...pricedProducts.slice(0, 40)].map((product) => ({ slug: product.slug }));
@@ -13,6 +79,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const product = findProduct(slug);
   if (!product) notFound();
   const isChain = 'lowestPrice' in product;
+  const dealVerdict = dealScoreVerdictFor(product);
   return (
     <PageShell>
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
@@ -44,6 +111,27 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           </dl>
         </Card>
       </div>
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Buy/Wait signal</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Deal Score verdict</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Calls calculateDealScore and scoreBand with visible price evidence. {dealVerdict.caveat}
+            </p>
+          </div>
+          <div className="rounded-3xl bg-white p-5 text-right shadow-sm">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">Deal Score</p>
+            <p className="mt-2 text-5xl font-black text-emerald-950">{dealVerdict.score}</p>
+            <p className="mt-1 text-lg font-black text-slate-950">{dealVerdict.band.label} · {dealVerdict.band.verdict}</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{dealVerdict.percentileLabel}</p>
+          <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">confidence {formatPct(dealVerdict.confidence * 100)}</p>
+          <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{dealVerdict.evidence}</p>
+        </div>
+      </Card>
       {isChain ? (
         <Card className="mt-6">
           <h2 className="text-2xl font-black">Chain price rows</h2>
