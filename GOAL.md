@@ -234,6 +234,35 @@ confidence, reach a driver file, build/typecheck pass).
 5. **Flyer / digital-catalog ingestion** — promo coverage pure scraping misses
    (Blix, Mattilbud, Tańszy Koszyk start from the weekly flyer).
 
+## Commodity / unbranded products — fresh food (operator priority, 2026-05-22)
+
+Meat, vegetables, fruit, bakery and bulk have NO EAN and are sold by weight, so the
+barcode matching used for packaged goods does not apply. They are ~30–40% of the
+basket and where shoppers feel price pain most — and rivals are weak here. We match
+them via a **canonical commodity dimension** + **unit price** (kr/kg, kr/l, kr/st;
+already on `observations`), with honest confidence (barcode = high, commodity/alias
+match = medium, labelled). Schema landed in migration `010_commodity_taxonomy.sql`;
+starter taxonomy in `packages/catalog/src/commodities.ts`. One feature = one PR; tag
+`feat(commodity):`. Same hard rules (real data + confidence, reach a driver file).
+
+1. **Ingestion: classify + map loose items.** When a connector sees a no-barcode /
+   sold-by-weight item, set `product_kind='commodity'`, resolve `commodity_id` from
+   the taxonomy (fuzzy name + category via the `aliases` table), capture `unit_price`,
+   `variant`, `is_organic`, `origin_country`.
+2. **Cross-chain commodity comparison** on `products/[slug]` + `/compare`: cheapest
+   chain per commodity by **kr/kg** (not per-pack), cheapest highlighted, confidence
+   shown.
+3. **Per-chain fresh-food index** from the `is_staple` basket (`STAPLE_BASKET`) — a
+   watchdog-style representative basket so a chain gets a trustworthy fresh-food score
+   even when item-level matches are low-confidence. Surface on `/chain-index`.
+4. **Unit-price normalisation everywhere** — show kr/kg | kr/l | kr/st consistently on
+   product cards and tables so loose and packaged items compare on the same axis.
+5. **Curator/community review of mappings** — wire the existing
+   `human_review_assignments` + `community_reporter_trust` tables to validate
+   commodity↔item mappings; low-confidence maps surface for review, not to shoppers.
+6. **Receipt-fed mapping growth** — `packages/scanning` receipt items (chain label +
+   kr + weight) feed new aliases → grow commodity coverage over time.
+
 ## Market-entry sequencing (Nordic + beyond)
 
 Ranked by *(white space × prize × ease)*, NOT by map adjacency. Detail +

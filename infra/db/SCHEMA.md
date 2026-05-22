@@ -58,9 +58,15 @@ Indexes: `stores_position_gix` for location queries, plus `stores_name_trgm_idx`
 
 Canonical product records used by search, charts, baskets, and matching.
 
-Key columns: `slug`, `canonical_name`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`.
+Key columns: `slug`, `canonical_name`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`. Commodity columns (migration 010): `product_kind` (`branded`|`commodity`), `commodity_id`, `variant`, `is_organic`, `origin_country`.
 
-Indexes: `products_name_trgm_idx` and `products_slug_trgm_idx` for fuzzy product search.
+Indexes: `products_name_trgm_idx` and `products_slug_trgm_idx` for fuzzy product search; `products_commodity_idx` and `products_kind_idx` for commodity matching.
+
+### `commodities`
+
+Canonical generic products for unbranded / loose items (meat, vegetables, fruit, bakery, bulk) that have no EAN and are sold by weight. Chain loose items map here via `products.commodity_id`; cross-chain comparison is on `unit_price` (kr/kg, kr/l, kr/st), not barcode. `is_staple` marks the representative basket behind the per-chain fresh-food index. Starter taxonomy: `packages/catalog/src/commodities.ts`.
+
+Key columns: `slug`, `name_sv`, `name_en`, `category_path`, `comparable_unit` (`kg`|`l`|`st`), `default_variant`, `is_staple`.
 
 ### `aliases`
 
