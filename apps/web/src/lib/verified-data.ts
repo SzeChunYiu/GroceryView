@@ -177,8 +177,14 @@ export const immigrantFamiliarBrandSearch = productUniverse
   .filter((row) => row.reportedBrand !== 'Brand not reported')
   .sort((a, b) => a.reportedBrand.localeCompare(b.reportedBrand, 'sv') || a.productName.localeCompare(b.productName, 'sv'))
   .slice(0, 8);
+type ProductWithImage = (typeof productUniverse)[number] & { image: string };
+
+function hasProductImage(product: (typeof productUniverse)[number]): product is ProductWithImage {
+  return typeof product.image === 'string' && product.image.length > 0;
+}
+
 export const immigrantImageFirstBrowsing = productUniverse
-  .filter((product) => Boolean(product.image))
+  .filter(hasProductImage)
   .map((product) => {
     const isChainProduct = 'lowestPrice' in product;
     const reportedBrand = isChainProduct ? product.brand : product.brands || 'Brand not reported';

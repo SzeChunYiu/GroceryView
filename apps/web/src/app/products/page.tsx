@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
@@ -111,7 +112,7 @@ export default function ProductsPage() {
           {immigrantImageFirstBrowsing.map((item) => (
             <Link className="group overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-amber-700" href={`/products/${item.verifiedProductSlug}`} key={item.verifiedProductSlug}>
               <div className="flex aspect-square items-center justify-center bg-white p-3">
-                <img alt={item.visualAlt} className="max-h-full max-w-full object-contain transition group-hover:scale-105" src={item.imageUrl ?? ''} />
+                <Image alt={item.visualAlt} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={160} sizes="(min-width: 768px) 20vw, 50vw" src={item.imageUrl} width={160} />
               </div>
               <div className="border-t border-amber-100 p-3">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{item.reportedBrand}</p>
