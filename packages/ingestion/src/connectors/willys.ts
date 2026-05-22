@@ -42,6 +42,22 @@ export type WillysWeeklyDiscount = {
   retrievedAt: string;
 };
 
+export type WillysStore = {
+  storeId: string;
+  name: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  countryCode: string;
+  latitude: number | null;
+  longitude: number | null;
+  onlineStore: boolean;
+  clickAndCollect: boolean;
+  flyerUrl: string;
+  sourceUrl: string;
+  retrievedAt: string;
+};
+
 type WillysSearchProduct = {
   code?: unknown;
   name?: unknown;
@@ -103,8 +119,29 @@ type AxfoodCampaignResponse = {
   };
 };
 
+type WillysStoreAddress = {
+  line1?: unknown;
+  town?: unknown;
+  postalCode?: unknown;
+  country?: { isocode?: unknown };
+  formattedAddress?: unknown;
+  latitude?: unknown;
+  longitude?: unknown;
+};
+
+type WillysStoreApiRow = {
+  storeId?: unknown;
+  name?: unknown;
+  address?: WillysStoreAddress;
+  geoPoint?: { latitude?: unknown; longitude?: unknown };
+  onlineStore?: unknown;
+  clickAndCollect?: unknown;
+  flyerURL?: unknown;
+};
+
 export const WILLYS_SEARCH_BASE_URL = 'https://www.willys.se/search';
 export const WILLYS_WEEKLY_DISCOUNTS_BASE_URL = 'https://www.willys.se/search/campaigns/offline';
+export const WILLYS_STORE_API_URL = 'https://www.willys.se/axfood/rest/store';
 export const DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_ID = '2110';
 export const DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS = ['2110', '2187', '2102', '2149', '2355', '2268'] as const;
 
@@ -142,6 +179,14 @@ export type FetchWillysWeeklyDiscountsOptions = {
   retrievedAt?: string;
 };
 
+export type FetchWillysStoresOptions = {
+  fetchImpl?: typeof fetch;
+  online?: boolean;
+  maxRows?: number;
+  retrievedAt?: string;
+  storeApiUrl?: string;
+};
+
 export function buildWillysSearchUrl(query: string): string {
   const url = new URL(WILLYS_SEARCH_BASE_URL);
   url.searchParams.set('q', query);
@@ -159,6 +204,40 @@ export function buildWillysWeeklyDiscountsUrl(
   url.searchParams.set('page', String(page));
   url.searchParams.set('size', String(size));
   return url.toString();
+}
+
+export function buildWillysStoresUrl(
+  options: { online?: boolean; storeApiUrl?: string } = {}
+): string {
+  const url = new URL(options.storeApiUrl ?? WILLYS_STORE_API_URL);
+  if (options.online !== undefined) url.searchParams.set('online', String(options.online));
+  return url.toString();
+}
+
+export async function fetchWillysStores(options: FetchWillysStoresOptions = {}): Promise<WillysStore[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const sourceUrl = buildWillysStoresUrl({ online: options.online, storeApiUrl: options.storeApiUrl });
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const response = await fetchImpl(sourceUrl, {
+    headers: {
+      accept: 'application/json',
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+  if (!response.ok) throw new Error(`Willys store catalog request failed: ${response.status}`);
+  const payload = await response.json() as WillysStoreApiRow[];
+  if (!Array.isArray(payload)) throw new Error('Willys store catalog response must be an array.');
+  const rows: WillysStore[] = [];
+  const seenStoreIds = new Set<string>();
+  for (const store of payload) {
+    const row = normalizeWillysStore(store, sourceUrl, retrievedAt);
+    if (!row || seenStoreIds.has(row.storeId)) continue;
+    seenStoreIds.add(row.storeId);
+    rows.push(row);
+    if (options.maxRows && rows.length >= options.maxRows) break;
+  }
+  if (rows.length === 0) throw new Error('Willys store catalog had no usable stores.');
+  return rows;
 }
 
 export async function fetchWillysProducts(options: FetchWillysProductsOptions = {}): Promise<WillysProduct[]> {
@@ -259,6 +338,34 @@ export async function fetchWillysWeeklyDiscounts(
   }
 
   return rows;
+}
+
+export function normalizeWillysStore(
+  store: WillysStoreApiRow,
+  sourceUrl: string,
+  retrievedAt: string
+): WillysStore | null {
+  const storeId = text(store.storeId);
+  const name = text(store.name);
+  const address = text(store.address?.line1) || text(store.address?.formattedAddress);
+  const city = text(store.address?.town);
+  if (!storeId || !name || !address || !city) return null;
+
+  return {
+    storeId,
+    name,
+    address,
+    city,
+    postalCode: text(store.address?.postalCode),
+    countryCode: text(store.address?.country?.isocode) || 'SE',
+    latitude: numberOrNull(store.geoPoint?.latitude) ?? numberOrNull(store.address?.latitude),
+    longitude: numberOrNull(store.geoPoint?.longitude) ?? numberOrNull(store.address?.longitude),
+    onlineStore: store.onlineStore === true,
+    clickAndCollect: store.clickAndCollect === true,
+    flyerUrl: text(store.flyerURL),
+    sourceUrl,
+    retrievedAt
+  };
 }
 
 export function normalizeWillysProduct(

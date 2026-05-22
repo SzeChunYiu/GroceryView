@@ -45,6 +45,23 @@ Every `targetStores[]` entry must also appear in the matching daily connector
 `stores[]` metadata, otherwise ingestion cannot prove that product prices are
 branch-scoped before it writes `latest_prices`.
 
+## Export live Coop/Willys branch metadata
+
+Coop and Willys branch ids are fetched from their public store catalogs:
+
+- Willys: `https://www.willys.se/axfood/rest/store?online=true`
+- Coop: `https://proxy.api.coop.se/external/store/stores?api-version=v5`, with
+  store details from `/stores/{ledgerAccountNumber}`
+
+Generate connector-ready `stores[]` snippets:
+
+```bash
+npm run ops:daily-connector-stores > /tmp/daily-connector-stores.json
+```
+
+Use the `storesByChain.willys` and `storesByChain.coop` arrays in
+`GROCERYVIEW_DAILY_CONNECTORS_JSON` for those connectors.
+
 ## Validate values before relying on cron
 
 Run from an environment that has the real values loaded:

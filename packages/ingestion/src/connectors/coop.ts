@@ -46,6 +46,23 @@ export type CoopWeeklyDiscount = {
   retrievedAt: string;
 };
 
+export type CoopStore = {
+  storeId: string;
+  siteId: string;
+  ledgerAccountNumber: string;
+  name: string;
+  conceptName: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  latitude: number | null;
+  longitude: number | null;
+  weeklyOffersLink: string;
+  url: string;
+  sourceUrl: string;
+  retrievedAt: string;
+};
+
 type CoopSearchResponse = {
   results?: {
     count?: unknown;
@@ -88,11 +105,25 @@ type CoopPromotion = {
 };
 
 type CoopStoreResponse = {
+  id?: unknown;
+  storeId?: unknown;
+  siteId?: unknown;
   ledgerAccountNumber?: unknown;
   name?: unknown;
+  concept?: { name?: unknown };
+  conceptName?: unknown;
+  address?: unknown;
   city?: unknown;
+  postalCode?: unknown;
+  latitude?: unknown;
+  longitude?: unknown;
   weeklyOffersLink?: unknown;
+  url?: unknown;
   flyers?: CoopStoreFlyer[];
+};
+
+type CoopStoresResponse = {
+  stores?: CoopStoreResponse[];
 };
 
 type CoopStoreFlyer = {
@@ -206,6 +237,16 @@ export type FetchCoopWeeklyDiscountsOptions = {
   retrievedAt?: string;
 };
 
+export type FetchCoopStoresOptions = {
+  fetchImpl?: typeof fetch;
+  maxRows?: number;
+  storeApiVersion?: string;
+  storeApiUrl?: string;
+  storeApiSubscriptionKey?: string;
+  includeDetails?: boolean;
+  retrievedAt?: string;
+};
+
 export function buildCoopSearchUrl(
   storeId = DEFAULT_COOP_STORE_ID,
   device = DEFAULT_COOP_DEVICE,
@@ -231,6 +272,16 @@ export function buildCoopStoreInfoUrl(
   url.searchParams.set('api-version', storeApiVersion);
   url.searchParams.set('includeFlyers', 'true');
   url.searchParams.set('onlyVisibleOpeningHours', 'true');
+  return url.toString();
+}
+
+export function buildCoopStoresUrl(
+  storeApiVersion = DEFAULT_COOP_STORE_API_VERSION,
+  storeApiUrl = COOP_STORE_API_URL
+): string {
+  const baseUrl = storeApiUrl.endsWith('/') ? storeApiUrl : `${storeApiUrl}/`;
+  const url = new URL('stores', baseUrl);
+  url.searchParams.set('api-version', storeApiVersion);
   return url.toString();
 }
 
@@ -300,6 +351,71 @@ export async function fetchCoopPublicWeeklyServiceAccess(
     storeApiUrl,
     storeApiSubscriptionKey
   };
+}
+
+export async function fetchCoopStores(options: FetchCoopStoresOptions = {}): Promise<CoopStore[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const serviceAccess = options.storeApiSubscriptionKey
+    ? {
+        storeApiUrl: options.storeApiUrl ?? COOP_STORE_API_URL,
+        storeApiSubscriptionKey: options.storeApiSubscriptionKey
+      }
+    : await fetchCoopPublicWeeklyServiceAccess(fetchImpl);
+  const sourceUrl = buildCoopStoresUrl(
+    options.storeApiVersion ?? DEFAULT_COOP_STORE_API_VERSION,
+    serviceAccess.storeApiUrl
+  );
+  const response = await fetchImpl(sourceUrl, {
+    headers: {
+      accept: 'application/json',
+      'ocp-apim-subscription-key': serviceAccess.storeApiSubscriptionKey,
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+  if (!response.ok) throw new Error(`Coop store catalog request failed: ${response.status}`);
+  const payload = await response.json() as CoopStoresResponse;
+  const summaries = payload.stores ?? [];
+  const rows: CoopStore[] = [];
+  const seenStoreIds = new Set<string>();
+  for (const summary of summaries) {
+    const summaryStoreId = text(summary.ledgerAccountNumber) || text(summary.storeId) || text(summary.id);
+    const detail = options.includeDetails === false || !summaryStoreId
+      ? summary
+      : await fetchCoopStoreDetail({
+          fetchImpl,
+          storeId: summaryStoreId,
+          storeApiVersion: options.storeApiVersion ?? DEFAULT_COOP_STORE_API_VERSION,
+          storeApiUrl: serviceAccess.storeApiUrl,
+          storeApiSubscriptionKey: serviceAccess.storeApiSubscriptionKey
+        });
+    const row = normalizeCoopStore({ ...summary, ...detail }, sourceUrl, retrievedAt);
+    if (!row || seenStoreIds.has(row.storeId)) continue;
+    seenStoreIds.add(row.storeId);
+    rows.push(row);
+    if (options.maxRows && rows.length >= options.maxRows) break;
+  }
+  if (rows.length === 0) throw new Error('Coop store catalog had no usable stores.');
+  return rows;
+}
+
+async function fetchCoopStoreDetail(input: {
+  fetchImpl: typeof fetch;
+  storeId: string;
+  storeApiVersion: string;
+  storeApiUrl: string;
+  storeApiSubscriptionKey: string;
+}): Promise<CoopStoreResponse> {
+  const sourceUrl = buildCoopStoreInfoUrl(input.storeId, input.storeApiVersion, input.storeApiUrl);
+  const response = await input.fetchImpl(sourceUrl, {
+    headers: {
+      accept: 'application/json',
+      'ocp-apim-subscription-key': input.storeApiSubscriptionKey,
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+  if (!response.ok) throw new Error(`Coop store detail request failed for ${input.storeId}: ${response.status}`);
+  return await response.json() as CoopStoreResponse;
 }
 
 export async function fetchCoopProducts(options: FetchCoopProductsOptions = {}): Promise<CoopProduct[]> {
@@ -493,6 +609,34 @@ export function normalizeCoopProduct(
     sourceUrl,
     productUrl: buildCoopProductUrl(categoryPath, name, code),
     imageUrl: text(product.imageUrl),
+    retrievedAt
+  };
+}
+
+export function normalizeCoopStore(
+  store: CoopStoreResponse,
+  sourceUrl: string,
+  retrievedAt: string
+): CoopStore | null {
+  const ledgerAccountNumber = text(store.ledgerAccountNumber) || text(store.storeId) || text(store.id);
+  const name = text(store.name);
+  const address = text(store.address);
+  const city = text(store.city);
+  if (!ledgerAccountNumber || !name || !address || !city) return null;
+  return {
+    storeId: ledgerAccountNumber,
+    siteId: text(store.siteId),
+    ledgerAccountNumber,
+    name,
+    conceptName: text(store.concept?.name) || text(store.conceptName),
+    address,
+    city,
+    postalCode: text(store.postalCode),
+    latitude: numberOrNull(store.latitude),
+    longitude: numberOrNull(store.longitude),
+    weeklyOffersLink: text(store.weeklyOffersLink),
+    url: text(store.url),
+    sourceUrl,
     retrievedAt
   };
 }

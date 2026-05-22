@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "ops:catalog-coverage-targets": "node scripts/ops/print-catalog-coverage-targets.mjs",
     "ops:check-production-secrets": "node scripts/ops/check-production-secrets.mjs",
+    "ops:daily-connector-stores": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connector-stores.mjs",
     "ops:validate-production-env": "node scripts/ops/validate-production-env.mjs"
   },
   "devDependencies": {

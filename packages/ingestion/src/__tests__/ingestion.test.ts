@@ -4,6 +4,7 @@ import { gzipSync } from 'node:zlib';
 import {
   buildCoopSearchUrl,
   buildCoopStoreInfoUrl,
+  buildCoopStoresUrl,
   buildDailyConnectorConfigsFromEnv,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
@@ -21,6 +22,7 @@ import {
   cellCountForScbPxWebQueryFixture,
   confidenceForSource,
   buildWillysSearchUrl,
+  buildWillysStoresUrl,
   buildWillysWeeklyDiscountsUrl,
   extractOpenFoodFactsBarcodeFromAxfoodImageUrl,
   fetchOpenFoodFactsExportProducts,
@@ -31,6 +33,7 @@ import {
   fetchRetailerConnectorSnapshot,
   fetchCoopPublicServiceAccess,
   fetchCoopProducts,
+  fetchCoopStores,
   fetchCoopWeeklyDiscounts,
   fetchHemkopProducts,
   fetchHemkopWeeklyDiscounts,
@@ -41,6 +44,7 @@ import {
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
   fetchWillysProducts,
+  fetchWillysStores,
   fetchWillysWeeklyDiscounts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
@@ -328,6 +332,65 @@ describe('fetchOpenFoodFactsRetailerEnrichments', () => {
 });
 
 describe('fetchCoopProducts', () => {
+  it('fetches Coop branch catalog metadata from the public store API', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildCoopStoresUrl()) {
+        return new Response(JSON.stringify({
+          stores: [
+            { ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', siteId: 1658, conceptName: 'Stora Coop' },
+            { ledgerAccountNumber: '252700', name: 'Stora Coop Bromma', siteId: 1443, conceptName: 'Stora Coop' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = String(url).includes('/252700') ? '252700' : '251300';
+      return new Response(JSON.stringify({
+        ledgerAccountNumber: storeId,
+        siteId: storeId === '252700' ? 1443 : 1658,
+        name: storeId === '252700' ? 'Stora Coop Bromma' : 'Stora Coop Boländerna',
+        concept: { name: 'Stora Coop' },
+        address: storeId === '252700' ? 'Ulvsundavägen 185' : 'Rapsgatan 1b',
+        city: storeId === '252700' ? 'Bromma' : 'Uppsala',
+        postalCode: storeId === '252700' ? '16867' : '75323',
+        latitude: storeId === '252700' ? 59.354 : 59.8456428,
+        longitude: storeId === '252700' ? 17.955 : 17.6954236,
+        weeklyOffersLink: `https://dr.coop.se/butik/${storeId}`,
+        url: `/butiker-erbjudanden/coop/${storeId}/`
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopStores({
+      fetchImpl,
+      storeApiSubscriptionKey: 'public-store-test-key',
+      maxRows: 2,
+      retrievedAt: '2026-05-22T11:00:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopStoresUrl(),
+      buildCoopStoreInfoUrl('251300'),
+      buildCoopStoreInfoUrl('252700')
+    ]);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0], {
+      storeId: '251300',
+      siteId: '1658',
+      ledgerAccountNumber: '251300',
+      name: 'Stora Coop Boländerna',
+      conceptName: 'Stora Coop',
+      address: 'Rapsgatan 1b',
+      city: 'Uppsala',
+      postalCode: '75323',
+      latitude: 59.8456428,
+      longitude: 17.6954236,
+      weeklyOffersLink: 'https://dr.coop.se/butik/251300',
+      url: '/butiker-erbjudanden/coop/251300/',
+      sourceUrl: buildCoopStoresUrl(),
+      retrievedAt: '2026-05-22T11:00:00.000Z'
+    });
+  });
+
   it('fetches public Coop personalization rows with price provenance', async () => {
     const requestedUrls: string[] = [];
     let requestBody = '';
@@ -1318,6 +1381,70 @@ describe('fetchMatsparProducts', () => {
 });
 
 describe('fetchWillysProducts', () => {
+  it('fetches Willys branch catalog metadata from the public store API', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify([
+        {
+          storeId: '2149',
+          name: 'Willys Alingsås Hagaplan',
+          address: {
+            line1: 'Hagaplan',
+            town: 'Alingsås',
+            postalCode: '441 34',
+            country: { isocode: 'SE' },
+            latitude: 57.9374,
+            longitude: 12.5333
+          },
+          geoPoint: { latitude: 57.9374, longitude: 12.5333 },
+          onlineStore: true,
+          clickAndCollect: true,
+          flyerURL: 'https://viewer.ipaper.io/willys/2149'
+        },
+        {
+          storeId: '2268',
+          name: 'Willys Avesta',
+          address: {
+            line1: 'Dalahästen, Get Johannas Väg',
+            town: 'Avesta',
+            postalCode: '774 61',
+            country: { isocode: 'SE' }
+          },
+          geoPoint: { latitude: 60.1528, longitude: 16.1969 },
+          onlineStore: true,
+          clickAndCollect: true,
+          flyerURL: 'https://viewer.ipaper.io/willys/2268'
+        }
+      ]), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysStores({
+      online: true,
+      fetchImpl,
+      maxRows: 2,
+      retrievedAt: '2026-05-22T10:45:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildWillysStoresUrl({ online: true })]);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0], {
+      storeId: '2149',
+      name: 'Willys Alingsås Hagaplan',
+      address: 'Hagaplan',
+      city: 'Alingsås',
+      postalCode: '441 34',
+      countryCode: 'SE',
+      latitude: 57.9374,
+      longitude: 12.5333,
+      onlineStore: true,
+      clickAndCollect: true,
+      flyerUrl: 'https://viewer.ipaper.io/willys/2149',
+      sourceUrl: buildWillysStoresUrl({ online: true }),
+      retrievedAt: '2026-05-22T10:45:00.000Z'
+    });
+  });
+
   it('fetches public Willys search rows with price provenance', async () => {
     const requestedUrls: string[] = [];
     const fetchImpl: typeof fetch = async (url) => {
