@@ -91,7 +91,7 @@ schema. If disabled: try common queries `{ products(query:"mjolk"){...} }`.
 ### A9 · Open community datasets
 - **OpenFoodFacts** (world.openfoodfacts.org) — 25k Swedish products
 - **OpenPrices** (prices.openfoodfacts.org) — 2.8k SEK price obs as of 2026-05
-- **OpenStreetMap** (overpass-api.de) — 1041 Stockholm stores
+- **OpenStreetMap** (overpass-api.de) — Sweden-wide store extract generated from public Overpass area queries
 - **Wikidata** — chain metadata, ownership graphs
 - **Datakällan SCB** (scb.se) — Swedish consumer-price index per category
 
