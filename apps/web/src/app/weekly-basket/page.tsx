@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { familyBulkUnitPriceComparison, weeklyBasketOptimizer } from '@/lib/demo-data';
+import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, weeklyBasketOptimizer } from '@/lib/demo-data';
 import { recurringBasketDigestContract } from '@/lib/verified-data';
 
 function formatSek(value: number) {
@@ -34,6 +34,45 @@ export default function WeeklyBasketPage() {
           <p className="mt-3 font-semibold text-slate-700">{weeklyBasketOptimizer.confidence.caveat}</p>
         </Card>
       </div>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">{budgetStretchKronaOptimizer.persona}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Stretch your krona optimizer</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Uses compareBasketStrategies on the visible weekly basket to decide whether a split shop is worth it for low-income shoppers. The headline metric divides verified savings by extra stores, so the UI does not hide the effort cost.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Split total</span>
+                <span className="mt-1 block text-2xl font-black text-emerald-900">{formatSek(budgetStretchKronaOptimizer.comparison.cheapestByProduct.total)}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Saved per extra store</span>
+                <span className="mt-1 block text-2xl font-black text-emerald-900">{formatSek(budgetStretchKronaOptimizer.kronaSavedPerExtraStore)}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Extra stops</span>
+                <span className="mt-1 block text-2xl font-black text-slate-950">{Math.max(0, budgetStretchKronaOptimizer.comparison.splitStoreCount - 1)}</span>
+              </p>
+            </div>
+            <p className="mt-3 text-sm font-semibold leading-6 text-emerald-950">{budgetStretchKronaOptimizer.guardrail}</p>
+          </div>
+          <div className="rounded-[1.5rem] border border-emerald-100 bg-white p-4 shadow-sm">
+            <h3 className="text-lg font-black text-slate-950">Missing price blockers</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-600">The optimizer withholds full certainty where a favorite store is missing a visible price row.</p>
+            <div className="mt-3 space-y-2">
+              {budgetStretchKronaOptimizer.missingPriceBlockers.map((blocker) => (
+                <Link className="flex items-center justify-between rounded-2xl bg-slate-50 p-3 text-sm font-black hover:bg-emerald-50" href={`/products/${blocker.productId}`} key={blocker.productId}>
+                  <span>{blocker.productId}</span>
+                  <span>{blocker.missingStoreCount} missing stores</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <Card>

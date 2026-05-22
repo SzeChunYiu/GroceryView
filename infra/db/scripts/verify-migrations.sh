@@ -67,6 +67,7 @@ REQUIRED_TABLES=(
   watchlist_items
   weekly_baskets
   basket_items
+  basket_import_review_items
   human_review_assignments
   human_reviewers
   community_reporter_trust

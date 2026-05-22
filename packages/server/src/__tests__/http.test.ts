@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
-import { createGroceryViewApi } from '@groceryview/api';
+import { createGroceryViewApi, type BasketImportReviewItem } from '@groceryview/api';
 import { createHttpHandler } from '../index.js';
 
 async function json(response: Response) {
@@ -1353,6 +1353,64 @@ describe('createHttpHandler', () => {
       enforcementReasons: string[];
     };
     assert.deepEqual(missing.enforcementReasons, ['missing_subscription_entitlement']);
+  });
+
+  it('uses the runtime repository for account-bound basket import review persistence when configured', async () => {
+    const api = createGroceryViewApi();
+    const savedRows: Array<{ userId: string; items: Array<{ reviewItemId: string; rawName: string; status: string }> }> = [];
+    const openRows = new Map<string, BasketImportReviewItem[]>();
+    const handle = createHttpHandler(api, {
+      basketImportReviewRepository: {
+        async saveBasketImportReviewItems(userId, items) {
+          savedRows.push({ userId, items: items.map((item) => ({ reviewItemId: item.reviewItemId, rawName: item.rawName, status: item.status })) });
+          openRows.set(userId, items.map((item) => ({ ...item })));
+        },
+        async listOpenBasketImportReviewItems(userId) {
+          return openRows.get(userId)?.filter((item) => item.status === 'open') ?? [];
+        },
+        async resolveBasketImportReviewItem(userId, reviewItemId, resolution) {
+          const items = openRows.get(userId) ?? [];
+          const index = items.findIndex((item) => item.reviewItemId === reviewItemId && item.status === 'open');
+          if (index === -1) throw new Error(`Basket import review item not found: ${reviewItemId}`);
+          const resolved = {
+            ...items[index]!,
+            status: resolution.status,
+            resolvedAt: resolution.resolvedAt,
+            ...(resolution.resolvedProductId ? { resolvedProductId: resolution.resolvedProductId } : {}),
+            ...(resolution.quantity === undefined ? {} : { quantity: resolution.quantity })
+          };
+          openRows.set(userId, items.map((item, itemIndex) => itemIndex === index ? resolved : item));
+          return resolved;
+        }
+      }
+    });
+
+    await handle(new Request('http://localhost/api/basket/import-export?userId=user-db-import', {
+      method: 'POST',
+      body: JSON.stringify({
+        source: { sourceKind: 'bookmarklet', retailerId: 'willys', origin: 'https://www.willys.se', capturedAt: '2026-05-22T09:35:00.000Z', consentGranted: true },
+        capturedLines: [
+          { rawName: 'Retailer-only bakery bun', quantity: 3 }
+        ]
+      })
+    }));
+
+    assert.equal(savedRows[0]?.userId, 'user-db-import');
+    assert.equal(savedRows[0]?.items[0]?.rawName, 'Retailer-only bakery bun');
+    const queue = await json(await handle(new Request('http://localhost/api/basket/import-review?userId=user-db-import'))) as {
+      openItemCount: number;
+      items: Array<{ reviewItemId: string; rawName: string }>;
+    };
+    assert.equal(queue.openItemCount, 1);
+    assert.equal(queue.items[0]?.rawName, 'Retailer-only bakery bun');
+
+    const decision = await handle(new Request(`http://localhost/api/basket/import-review/${encodeURIComponent(queue.items[0]!.reviewItemId)}/decisions?userId=user-db-import`, {
+      method: 'POST',
+      body: JSON.stringify({ decision: 'dismiss' })
+    }));
+    assert.equal(decision.status, 200);
+    assert.equal((await json(decision) as { status: string }).status, 'dismissed');
+    assert.equal((await json(await handle(new Request('http://localhost/api/basket/import-review?userId=user-db-import'))) as { openItemCount: number }).openItemCount, 0);
   });
 
   it('accepts signed billing subscription events and persists entitlement mutations', async () => {

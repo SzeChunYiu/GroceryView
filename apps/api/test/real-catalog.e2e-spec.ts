@@ -99,7 +99,11 @@ const priceHistoryRows = [
   {
     id: 'obs-milk-promo',
     chain_id: 'chain-willys',
+    chain_slug: 'willys',
+    chain_name: 'Willys',
     store_id: 'store-willys',
+    store_slug: 'willys-hemma-stockholm-torsplan',
+    store_name: 'Willys Hemma Stockholm Torsplan',
     source_run_id: 'run-willys-2026-05-21',
     raw_record_id: 'raw-milk-promo',
     retailer_product_ref: 'willys-milk-1l',
@@ -123,7 +127,11 @@ const priceHistoryRows = [
   {
     id: 'obs-milk-shelf',
     chain_id: 'chain-coop',
+    chain_slug: 'coop',
+    chain_name: 'Coop',
     store_id: 'store-coop',
+    store_slug: 'coop-odenplan',
+    store_name: 'Coop Odenplan',
     source_run_id: 'run-coop-2026-05-10',
     raw_record_id: 'raw-milk-shelf',
     retailer_product_ref: 'coop-milk-1l',
@@ -263,6 +271,10 @@ describe('real catalog API endpoints', () => {
     assert.equal(response.body.pointCount, 2);
     assert.deepEqual(response.body.points.map((point: { observationId: string }) => point.observationId), ['obs-milk-shelf', 'obs-milk-promo']);
     assert.equal(response.body.points[1].priceType, 'promotion');
+    assert.equal(response.body.points[1].chainSlug, 'willys');
+    assert.equal(response.body.points[1].chainName, 'Willys');
+    assert.equal(response.body.points[1].storeSlug, 'willys-hemma-stockholm-torsplan');
+    assert.equal(response.body.points[1].storeName, 'Willys Hemma Stockholm Torsplan');
     assert.equal(response.body.points[1].price, 13.9);
     assert.equal(response.body.points[1].regularPrice, 14.9);
     assert.equal(response.body.points[1].provenance.rawSnapshotRef, 's3://raw/willys/milk-promo.json');
@@ -280,6 +292,8 @@ describe('real catalog API endpoints', () => {
       25
     ]);
     assert.match(observationsQuery?.sql ?? '', /from observations/i);
+    assert.match(observationsQuery?.sql ?? '', /left join chains/i);
+    assert.match(observationsQuery?.sql ?? '', /left join stores/i);
     assert.match(observationsQuery?.sql ?? '', /observed_at >=/i);
   });
 

@@ -5,9 +5,12 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
   buildFlyerOfferReport,
+  basketImportReviewGuardrails,
+  createBasketImportReviewItems,
   createGroceryViewApi,
   type BasketImportExportRequest,
   type BasketImportReviewDecisionRequest,
+  type BasketImportReviewItem,
   type CategoryBudgetPatch,
   type FlyerOfferObservationInput,
   type FlyerOfferReport,
@@ -104,6 +107,16 @@ export type AuthOptions = {
     listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
     saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
   };
+  basketImportReviewRepository?: {
+    saveBasketImportReviewItems(userId: string, items: BasketImportReviewItem[]): Promise<void>;
+    listOpenBasketImportReviewItems(userId: string): Promise<BasketImportReviewItem[]>;
+    resolveBasketImportReviewItem(userId: string, reviewItemId: string, resolution: {
+      status: 'accepted' | 'dismissed';
+      resolvedAt: string;
+      resolvedProductId?: string;
+      quantity?: number;
+    }): Promise<BasketImportReviewItem>;
+  };
   notificationWebhookSecret?: string;
   notificationSuppressionSink?: {
     upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
@@ -159,6 +172,14 @@ export type RuntimePersistenceRepository = {
   getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
+  saveBasketImportReviewItems?(userId: string, items: BasketImportReviewItem[]): Promise<void>;
+  listOpenBasketImportReviewItems?(userId: string): Promise<BasketImportReviewItem[]>;
+  resolveBasketImportReviewItem?(userId: string, reviewItemId: string, resolution: {
+    status: 'accepted' | 'dismissed';
+    resolvedAt: string;
+    resolvedProductId?: string;
+    quantity?: number;
+  }): Promise<BasketImportReviewItem>;
   upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
 };
 
@@ -1785,7 +1806,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (authError) return authError;
         if (method === 'POST') {
           const body = await readJson(request);
-          return jsonResponse(api.importBasketFromRetailerPage(user, basketImportExportRequestFromBody(body)), { status: 201 });
+          const report = api.importBasketFromRetailerPage(user, basketImportExportRequestFromBody(body));
+          if (authOptions.basketImportReviewRepository && report.reviewItems.length > 0) {
+            const existingOpen = await authOptions.basketImportReviewRepository.listOpenBasketImportReviewItems(user);
+            await authOptions.basketImportReviewRepository.saveBasketImportReviewItems(
+              user,
+              createBasketImportReviewItems(user, report.source, report.reviewItems, existingOpen.length)
+            );
+          }
+          return jsonResponse(report, { status: 201 });
         }
       }
 
@@ -1794,7 +1823,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
-        if (method === 'GET') return jsonResponse(api.getBasketImportReviewQueue(user));
+        if (method === 'GET') {
+          if (authOptions.basketImportReviewRepository) {
+            const items = await authOptions.basketImportReviewRepository.listOpenBasketImportReviewItems(user);
+            return jsonResponse({ userId: user, openItemCount: items.length, items, guardrails: basketImportReviewGuardrails });
+          }
+          return jsonResponse(api.getBasketImportReviewQueue(user));
+        }
       }
 
       const importReviewDecisionMatch = path.match(/^\/api\/basket\/import-review\/([^/]+)\/decisions$/);
@@ -1805,7 +1840,31 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (authError) return authError;
         if (method === 'POST') {
           const body = await readJson(request);
-          return jsonResponse(api.resolveBasketImportReviewItem(user, decodeURIComponent(importReviewDecisionMatch[1]!), basketImportReviewDecisionFromBody(body)));
+          const requestBody = basketImportReviewDecisionFromBody(body);
+          const reviewItemId = decodeURIComponent(importReviewDecisionMatch[1]!);
+          if (authOptions.basketImportReviewRepository) {
+            const openItems = await authOptions.basketImportReviewRepository.listOpenBasketImportReviewItems(user);
+            const reviewItem = openItems.find((item) => item.reviewItemId === reviewItemId);
+            if (!reviewItem) return errorResponse(404, `Basket import review item not found: ${reviewItemId}`);
+            if (requestBody.decision === 'accept_as_product') {
+              if (!requestBody.productId) return errorResponse(400, 'productId is required when accepting an import review item.');
+              if (!api.getProduct(requestBody.productId)) return errorResponse(400, `Unknown product: ${requestBody.productId}`);
+              if (requestBody.quantity !== undefined) requiredNumber(requestBody.quantity, 'quantity');
+              const quantity = requestBody.quantity ?? reviewItem.quantity;
+              api.addBasketItem(user, { productId: requestBody.productId, quantity });
+              return jsonResponse(await authOptions.basketImportReviewRepository.resolveBasketImportReviewItem(user, reviewItemId, {
+                status: 'accepted',
+                resolvedAt: (authOptions.now ?? new Date()).toISOString(),
+                resolvedProductId: requestBody.productId,
+                quantity
+              }));
+            }
+            return jsonResponse(await authOptions.basketImportReviewRepository.resolveBasketImportReviewItem(user, reviewItemId, {
+              status: 'dismissed',
+              resolvedAt: (authOptions.now ?? new Date()).toISOString()
+            }));
+          }
+          return jsonResponse(api.resolveBasketImportReviewItem(user, reviewItemId, requestBody));
         }
       }
 
@@ -2343,6 +2402,15 @@ export function buildRepositoryBackedAuthOptions(
       listOpenHumanReviewAssignments: () => repository.listOpenHumanReviewAssignments(),
       saveHumanReviewAssignment: (assignment) => repository.saveHumanReviewAssignment(assignment)
     },
+    ...(repository.saveBasketImportReviewItems && repository.listOpenBasketImportReviewItems && repository.resolveBasketImportReviewItem
+      ? {
+          basketImportReviewRepository: {
+            saveBasketImportReviewItems: (userId, items) => repository.saveBasketImportReviewItems!(userId, items),
+            listOpenBasketImportReviewItems: (userId) => repository.listOpenBasketImportReviewItems!(userId),
+            resolveBasketImportReviewItem: (userId, reviewItemId, resolution) => repository.resolveBasketImportReviewItem!(userId, reviewItemId, resolution)
+          }
+        }
+      : {}),
     notificationSuppressionSink: {
       upsertNotificationSuppression: (suppression) => repository.upsertNotificationSuppression(suppression)
     },
