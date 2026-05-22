@@ -30,6 +30,12 @@ const homepageChainSavings = chainSavingsLedger.slice(0, 2);
 const homepageRouteMap = sourceRouteMap.slice(0, 3);
 const homepageFreshOpenPrices = freshestOpenPrices.slice(3, 9);
 const homepageMapChainIndex = mapChainIndexScores.slice(0, 3);
+const elderlyAccessibilityMode = {
+  persona: 'Elderly / seniors',
+  title: 'Large-text high-contrast mode',
+  controls: ['Bigger price cards', 'High-contrast colors', 'Short source labels'],
+  evidence: 'contrast-safe shell uses verified route cards only'
+};
 
 export function MarketShell() {
   return (
@@ -67,6 +73,26 @@ export function MarketShell() {
       </section>
 
       <div className="mt-6"><MetricGrid /></div>
+
+      <Card className="mt-6 border-slate-950 bg-slate-950 text-white">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-300">{elderlyAccessibilityMode.persona}</p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">{elderlyAccessibilityMode.title}</h2>
+            <p className="mt-3 max-w-3xl text-2xl font-semibold leading-9 text-slate-100">
+              A contrast-safe entry point keeps prices, stores, and source labels large enough for seniors before they compare baskets or browse nearby stores.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[32rem]">
+            {elderlyAccessibilityMode.controls.map((control) => (
+              <div className="rounded-2xl border border-white/20 bg-white p-4 text-slate-950" key={control}>
+                <p className="text-2xl font-black">{control}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="mt-4 text-base font-semibold text-slate-200">{elderlyAccessibilityMode.evidence}</p>
+      </Card>
 
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
