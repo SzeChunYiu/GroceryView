@@ -759,6 +759,8 @@ describe('GroceryView API app', () => {
     assert.equal(cheapestNow.body.demo, undefined);
     assert.equal(cheapestNow.body.observedPriceCount, 3);
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /latest_prices/i);
+    assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /latest_prices\.price > 0/i);
+    assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /latest_prices\.unit_price > 0/i);
 
     const terminal = await request(app.getHttpServer()).get('/products/coffee/terminal').expect(200);
     assert.equal(terminal.body.productId, 'coffee');
