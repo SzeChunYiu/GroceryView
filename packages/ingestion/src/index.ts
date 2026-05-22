@@ -2610,7 +2610,7 @@ type BatchRawRecordIdRow = { ordinal: number; id: string };
 type BatchObservationIdRow = { id: string };
 type BatchProductIdRow = { slug: string; id: string };
 
-function chunkDailyRows<T>(rows: T[], size = 5000): T[][] {
+function chunkDailyRows<T>(rows: T[], size = 250): T[][] {
   const chunks: T[][] = [];
   for (let index = 0; index < rows.length; index += size) chunks.push(rows.slice(index, index + size));
   return chunks;
