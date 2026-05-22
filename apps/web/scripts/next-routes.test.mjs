@@ -226,6 +226,15 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a kids snack and lunchbox deal feed using real deal ranking output', async () => {
+    const source = await read('src/app/deals/page.tsx');
+    assert.match(source, /kidsSnackLunchboxDeals/);
+    assert.match(source, /rankDealOpportunities/);
+    assert.match(source, /Kids snack & lunchbox deals/);
+    assert.match(source, /lunchboxFit/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces nutrition per krona on the nutrition value route using the real core ranking output', async () => {
     const source = await read('src/app/nutrition-value/page.tsx');
     assert.match(source, /nutritionPerKrona/);

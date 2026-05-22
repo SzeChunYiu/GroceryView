@@ -2262,6 +2262,66 @@ export const singlePortionDealFinder = {
   }
 };
 
+export const kidsSnackLunchboxInputs = [
+  {
+    productId: 'pagen-lingongrova-500g',
+    productName: 'Pågen Lingongrova 500g',
+    storeId: 'coop-medborgarplatsen',
+    storeName: 'Coop Medborgarplatsen',
+    currentPrice: 33.9,
+    regularPrice: 42.9,
+    dealScore: 72,
+    sourceConfidence: 0.72,
+    lunchboxFit: 'sandwich base',
+    source: 'visible bread shelf row used in weekly basket'
+  },
+  {
+    productId: 'garant-gurka-300g',
+    productName: 'Garant Gurka 300g',
+    storeId: 'coop-medborgarplatsen',
+    storeName: 'Coop Medborgarplatsen',
+    currentPrice: 16.9,
+    regularPrice: 22.9,
+    dealScore: 69,
+    sourceConfidence: 0.66,
+    lunchboxFit: 'snack vegetable',
+    source: 'visible vegetable deal row from meal planner'
+  },
+  {
+    productId: 'bravo-apelsinjuice-1l',
+    productName: 'Bravo Apelsinjuice 1L',
+    storeId: 'hemkop-hornstull',
+    storeName: 'Hemköp Hornstull',
+    currentPrice: 22.9,
+    regularPrice: 27.9,
+    dealScore: 64,
+    sourceConfidence: 0.59,
+    lunchboxFit: 'breakfast drink',
+    source: 'visible weekly basket juice row'
+  }
+];
+
+export const kidsSnackLunchboxDeals = {
+  persona: 'Families with kids',
+  title: 'Kids snack & lunchbox deals',
+  rankedDeals: rankDealOpportunities({
+    deals: kidsSnackLunchboxInputs.map(({ lunchboxFit: _lunchboxFit, source: _source, ...deal }) => deal),
+    minimumDealScore: 60,
+    minimumSourceConfidence: 0.55
+  }).map((deal) => {
+    const sourceRow = kidsSnackLunchboxInputs.find((input) => input.productId === deal.productId && input.storeId === deal.storeId);
+    return {
+      ...deal,
+      lunchboxFit: sourceRow?.lunchboxFit ?? 'lunchbox item',
+      source: sourceRow?.source ?? 'visible lunchbox deal row'
+    };
+  }),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Lunchbox feed ranks visible snack-sized deal rows only; school policy, allergens, and child preferences require account data.'
+  }
+};
+
 export const nutritionPerKronaInputs = [
   {
     productId: 'kronfagel-kycklingfile-1kg',
