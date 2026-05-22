@@ -694,6 +694,22 @@ ${seo}`;
     assert.match(route, /chain-index proxy/);
   });
 
+  it('surfaces a fail-closed store price-percentile rank gate on store pages', async () => {
+    const route = await read('src/app/stores/[slug]/page.tsx');
+
+    assert.match(route, /storePricePercentileRankFor/);
+    assert.match(route, /storeUniverse/);
+    assert.match(route, /price-percentile rank/);
+    assert.match(route, /your store vs everyone/);
+    assert.match(route, /kommun cohort/);
+    assert.match(route, /national cohort/);
+    assert.match(route, /per-branch observations/);
+    assert.match(route, /No percentile is calculated without per-branch observations/);
+    assert.match(route, /confidence\/coverage/);
+    assert.doesNotMatch(route, /Math\.random/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
   it('surfaces verified OSM store brand coverage on the homepage', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
