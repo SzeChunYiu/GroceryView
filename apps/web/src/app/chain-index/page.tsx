@@ -3,7 +3,7 @@ import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryvie
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { buildBrandTierPriceObservations, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
 import { categorySummaries, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
-import { routeMetadata } from '@/lib/seo';
+import { routeMetadata, siteUrl } from '@/lib/seo';
 
 export function generateMetadata() {
   return routeMetadata('/chain-index');
@@ -15,6 +15,21 @@ const matchedBasketRefinedIndex = calculateChainPriceIndex([
   ...buildChainPriceObservations(),
   ...matchedBasketObservations
 ]);
+
+const widgetSourceConfidence = matchedBasketRefinedIndex.chains.reduce(
+  (summary, chain) => ({
+    ...summary,
+    [chain.confidence]: summary[chain.confidence] + 1
+  }),
+  { high: 0, medium: 0, low: 0 } as Record<'high' | 'medium' | 'low', number>
+);
+
+export const groceryIndexTickerWidget = {
+  route: '/widgets/grocery-index-ticker',
+  title: 'Embeddable Grocery Index ticker',
+  sourceConfidence: widgetSourceConfidence,
+  embedCode: `<iframe src="${siteUrl}/widgets/grocery-index-ticker" title="Grocery Index ticker" loading="lazy" width="100%" height="320"></iframe>`
+};
 
 function tierTone(value: number) {
   if (value < 95) return 'text-emerald-800 bg-emerald-50';
@@ -67,6 +82,30 @@ export default function ChainIndexPage() {
               <p className="mt-1 text-sm font-semibold text-blue-900">{chain.confidence} confidence · {chain.categoriesCovered} categories</p>
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-slate-200 bg-white">
+        <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <Eyebrow>{groceryIndexTickerWidget.title}</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Publish the 100-centred price pulse</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              Blogs, local newsrooms, and grocery roundups can embed the Grocery Index ticker as a compact iframe. It reuses the same calculateChainPriceIndex output, matched-basket observations, and confidence counts shown on this route.
+            </p>
+            <Link className="mt-4 inline-flex rounded-full bg-emerald-800 px-4 py-2 text-sm font-black text-white hover:bg-emerald-700" href={groceryIndexTickerWidget.route}>
+              Open widget route
+            </Link>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-950 p-4 text-white">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">iframe embed code</p>
+            <code className="mt-3 block whitespace-pre-wrap break-all rounded-xl bg-black/40 p-3 text-xs font-semibold leading-5 text-emerald-100">{groceryIndexTickerWidget.embedCode}</code>
+            <div className="mt-3 grid gap-2 text-sm font-bold text-slate-200 sm:grid-cols-3">
+              <span>High {groceryIndexTickerWidget.sourceConfidence.high}</span>
+              <span>Medium {groceryIndexTickerWidget.sourceConfidence.medium}</span>
+              <span>Low {groceryIndexTickerWidget.sourceConfidence.low}</span>
+            </div>
+          </div>
         </div>
       </Card>
 

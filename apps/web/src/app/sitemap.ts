@@ -25,6 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/meal-cost', 0.88, 'daily'),
     entry('/weekly-basket', 0.85, 'daily'),
     entry('/chain-index', 0.85, 'daily'),
+    entry('/widgets/grocery-index-ticker', 0.7, 'daily'),
     entry('/categories', 0.8, 'daily'),
     entry('/stores', 0.75, 'weekly'),
     entry('/map', 0.75, 'daily'),

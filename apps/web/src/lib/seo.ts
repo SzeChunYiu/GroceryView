@@ -68,6 +68,10 @@ export const routeMetadataCatalog = {
     title: 'Swedish grocery chain price index | GroceryView',
     description: 'Track chain price indices, brand-tier gaps, and matched-basket refinements on a 100-centred confidence-labelled scale.'
   },
+  '/widgets/grocery-index-ticker': {
+    title: 'Embeddable Grocery Index ticker | GroceryView',
+    description: 'Embed a compact 100-centred Swedish grocery chain index ticker with verified source confidence and matched-basket observations.'
+  },
   '/compare': {
     title: 'Compare grocery prices across chains | GroceryView',
     description: 'See matched Willys and Hemkop products, cheapest-chain highlights, catalogue savings, and real cross-chain price spreads.'

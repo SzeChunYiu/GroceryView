@@ -1567,6 +1567,7 @@ ${seo}`;
       'src/app/stores/[slug]/page.tsx',
       'src/app/unit-price-alerts/page.tsx',
       'src/app/watchlist/page.tsx',
+      'src/app/widgets/grocery-index-ticker/page.tsx',
       'src/app/weekly-basket/page.tsx',
       'src/app/[city]/billigaste/[slug]/page.tsx'
     ];
@@ -1811,6 +1812,23 @@ ${seo}`;
     assert.match(source, /Refined matched-basket index/);
     assert.match(source, /overallIndex\.toFixed/);
     assert.match(source, /100-centred/);
+  });
+
+  it('surfaces an embeddable Grocery Index ticker widget on chain-index', async () => {
+    const route = await read('src/app/chain-index/page.tsx');
+    const widgetRoute = await read('src/app/widgets/grocery-index-ticker/page.tsx');
+    const seo = await read('src/lib/seo.ts');
+
+    assert.match(route, /groceryIndexTickerWidget/);
+    assert.match(route, /Embeddable Grocery Index ticker/);
+    assert.match(route, /widgets\/grocery-index-ticker/);
+    assert.match(route, /iframe/);
+    assert.match(widgetRoute, /calculateChainPriceIndex/);
+    assert.match(widgetRoute, /buildChainPriceObservations/);
+    assert.match(widgetRoute, /Grocery Index ticker/);
+    assert.match(widgetRoute, /100-centred/);
+    assert.match(widgetRoute, /sourceConfidence/);
+    assert.match(seo, /widgets\/grocery-index-ticker/);
   });
 
   it('surfaces verified catalogue savings on its own route', async () => {
