@@ -592,10 +592,16 @@ export function normalizeOpenFoodFactsExportRecord(
   };
 }
 
+export function extractOpenFoodFactsBarcodeFromImageUrl(imageUrl: string): string {
+  const barcodeSegments = [...imageUrl.matchAll(/(?:^|[/_.-])(\d{8,14})(?=[/_.-]|$|\?)/g)]
+    .map((match) => match[1]);
+  return barcodeSegments.find((segment) => /^\d{8,14}$/.test(segment)) ?? '';
+}
+
 export function extractOpenFoodFactsBarcodeFromAxfoodImageUrl(imageUrl: string): string {
   const match = imageUrl.match(/\/(0\d{13})(?:_|$)/);
   if (!match) {
-    return '';
+    return extractOpenFoodFactsBarcodeFromImageUrl(imageUrl);
   }
   return match[1].replace(/^0(?=\d{13}$)/, '');
 }
