@@ -17,11 +17,12 @@ describe('daily connectors export script', () => {
   it('self-test emits native daily connector configs for all required chains with store coverage', () => {
     const output = execFileSync(process.execPath, [scriptPath.pathname, '--self-test'], { encoding: 'utf8' });
     const connectors = JSON.parse(output);
-    assert.deepEqual(connectors.map((connector) => connector.chainId), ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']);
+    assert.deepEqual(connectors.map((connector) => connector.chainId), ['ica', 'willys', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']);
     assert.equal(connectors.every((connector) => Array.isArray(connector.stores) && connector.stores.length > 0), true);
     assert.deepEqual(connectors.map((connector) => connector.endpointUrl), [
       'groceryview://daily/ica/store-promotions/default-stores',
       'groceryview://daily/willys/products/all-stores',
+      'groceryview://daily/willys/weekly-offers/all-stores',
       'groceryview://daily/coop/products/all-stores',
       'groceryview://daily/hemkop/weekly-offers/all-stores',
       'groceryview://daily/lidl/public-offers/all-stores',
@@ -30,6 +31,7 @@ describe('daily connectors export script', () => {
     assert.deepEqual(connectors.map((connector) => connector.parserVersion), [
       'ica-store-promotions-native-v1',
       'willys-products-native-v1',
+      'willys-weekly-native-v1',
       'coop-products-native-v1',
       'hemkop-weekly-native-v1',
       'lidl-public-offers-native-v1',

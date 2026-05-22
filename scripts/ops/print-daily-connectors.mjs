@@ -24,6 +24,16 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: true
   },
   {
+    connectorId: 'willys-weekly-all-stores',
+    chainId: 'willys',
+    sourceType: 'flyer_campaign',
+    endpointUrl: 'groceryview://daily/willys/weekly-offers/all-stores',
+    parserVersion: 'willys-weekly-native-v1',
+    robotsTxtStatus: 'not_applicable',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: true
+  },
+  {
     connectorId: 'coop-products-all-stores',
     chainId: 'coop',
     sourceType: 'official_api',
