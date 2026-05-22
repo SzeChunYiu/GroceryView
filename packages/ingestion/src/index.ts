@@ -25,6 +25,14 @@ import {
   type HemkopWeeklyDiscount
 } from './connectors/hemkop.js';
 import {
+  extractOpenFoodFactsBarcodeFromAxfoodImageUrl,
+  extractOpenFoodFactsBarcodeFromImageUrl,
+  fetchOpenFoodFactsExportProducts,
+  OPENFOODFACTS_EXPORT_URL,
+  type OpenFoodFactsProduct,
+  type OpenFoodFactsRetailerEnrichment
+} from './connectors/openfoodfacts.js';
+import {
   DEFAULT_ICA_STORE_CONFIGS,
   fetchIcaDefaultStoreProducts,
   type IcaProduct,
@@ -1601,16 +1609,28 @@ function dailyNativeStringListParam(url: URL, name: string): string[] | undefine
   return value.split(',').map((part) => part.trim()).filter(Boolean);
 }
 
+function validDailyBarcode(value: string | undefined): string | undefined {
+  const barcode = value?.trim();
+  return barcode && /^\d{8,14}$/.test(barcode) ? barcode : undefined;
+}
+
+function dailyProductIdForBarcode(prefix: string, fallback: string, barcode?: string): string {
+  const normalizedBarcode = validDailyBarcode(barcode);
+  return normalizedBarcode ? `ean-${stableKeyPart(normalizedBarcode)}` : `${prefix}-${stableKeyPart(fallback)}`;
+}
+
 function willysWeeklyDiscountToDailyItem(row: WillysWeeklyDiscount): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
   const regularPrice = nativePriceFromText(row.regularPriceText);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromAxfoodImageUrl(row.imageUrl));
   return {
     storeId: row.storeId,
     retailerProductId: row.code,
     rawName: row.name,
     canonicalName: row.name,
-    productId: `willys-${stableKeyPart(row.productCode || row.code)}`,
+    productId: dailyProductIdForBarcode('willys', row.productCode || row.code, barcode),
     categoryId: stableKeyPart(row.category || 'weekly-offers'),
+    barcode,
     brand: row.brand || undefined,
     packageSize: quantity.packageSize,
     packageUnit: quantity.packageUnit,
@@ -1625,13 +1645,15 @@ function willysWeeklyDiscountToDailyItem(row: WillysWeeklyDiscount): RetailerCon
 
 function willysStoreProductToDailyItem(row: WillysStoreProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromAxfoodImageUrl(row.imageUrl));
   return {
     storeId: row.storeId,
     retailerProductId: row.code,
     rawName: row.name,
     canonicalName: row.name,
-    productId: `willys-${stableKeyPart(row.code)}`,
+    productId: dailyProductIdForBarcode('willys', row.code, barcode),
     categoryId: stableKeyPart(row.category || 'willys-products'),
+    barcode,
     brand: row.brand || undefined,
     packageSize: quantity.packageSize,
     packageUnit: quantity.packageUnit,
@@ -1645,13 +1667,15 @@ function willysStoreProductToDailyItem(row: WillysStoreProduct): RetailerConnect
 function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
   const regularPrice = nativePriceFromText(row.regularPriceText);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromAxfoodImageUrl(row.imageUrl));
   return {
     storeId: row.storeId,
     retailerProductId: row.code,
     rawName: row.name,
     canonicalName: row.name,
-    productId: `hemkop-${stableKeyPart(row.productCode || row.code)}`,
+    productId: dailyProductIdForBarcode('hemkop', row.productCode || row.code, barcode),
     categoryId: stableKeyPart(row.category || 'weekly-offers'),
+    barcode,
     brand: row.brand || undefined,
     packageSize: quantity.packageSize,
     packageUnit: quantity.packageUnit,
@@ -1668,13 +1692,15 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
   const quantity = parseNativePackageText(row.packageSize);
   const price = row.promoPrice ?? row.price;
   if (price === null) throw new Error(`ICA product ${row.retailerProductId} had no current or promotion price.`);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromImageUrl(row.imageUrl));
   return {
     storeId: row.storeAccountId,
     retailerProductId: row.retailerProductId || row.code,
     rawName: row.name,
     canonicalName: row.name,
-    productId: `ica-${stableKeyPart(row.productId || row.retailerProductId || row.code)}`,
+    productId: dailyProductIdForBarcode('ica', row.productId || row.retailerProductId || row.code, barcode),
     categoryId: stableKeyPart(row.categories[0] || 'ica-store-promotions'),
+    barcode,
     brand: row.brand || undefined,
     packageSize: quantity.packageSize,
     packageUnit: quantity.packageUnit,
@@ -1689,13 +1715,15 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
 
 function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(row.ean);
   return {
     storeId: row.storeId,
     retailerProductId: row.code,
     rawName: row.name,
     canonicalName: row.name,
-    productId: `coop-${stableKeyPart(row.ean || row.code)}`,
+    productId: dailyProductIdForBarcode('coop', row.ean || row.code, barcode),
     categoryId: 'weekly-offers',
+    barcode,
     brand: row.brand || undefined,
     packageSize: quantity.packageSize,
     packageUnit: quantity.packageUnit,
@@ -1710,13 +1738,15 @@ function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnect
 
 function coopStoreProductToDailyItem(row: CoopStoreProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(row.ean);
   return {
     storeId: row.storeId,
     retailerProductId: row.code,
     rawName: row.name,
     canonicalName: row.name,
-    productId: `coop-${stableKeyPart(row.ean || row.code)}`,
+    productId: dailyProductIdForBarcode('coop', row.ean || row.code, barcode),
     categoryId: stableKeyPart(row.category || 'coop-products'),
+    barcode,
     brand: row.brand || undefined,
     packageSize: quantity.packageSize,
     packageUnit: quantity.packageUnit,
@@ -1752,13 +1782,15 @@ function lidlStoreOfferToDailyItem(row: LidlStoreOffer): RetailerConnectorParsed
 
 function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(row.gtin);
   return {
     storeId: row.storeId,
     retailerProductId: row.code,
     rawName: row.name,
     canonicalName: row.name,
-    productId: `citygross-${stableKeyPart(row.gtin || row.code)}`,
+    productId: dailyProductIdForBarcode('citygross', row.gtin || row.code, barcode),
     categoryId: stableKeyPart(row.category || 'city-gross-products'),
+    barcode,
     brand: row.brand || undefined,
     packageSize: quantity.packageSize,
     packageUnit: quantity.packageUnit,
@@ -2250,6 +2282,7 @@ export type IngestedProduct = {
   id: string;
   canonicalName: string;
   brand?: string;
+  barcode?: string;
   categoryId: string;
   productKind: 'branded' | 'commodity';
   commodityId?: string;
@@ -2415,6 +2448,7 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       id: input.productId,
       canonicalName: input.canonicalName,
       brand: input.brand,
+      barcode: input.barcode,
       categoryId: input.categoryId,
       productKind: classification.productKind,
       commodityId: classification.commodityId,
@@ -2509,7 +2543,14 @@ export type DailyIngestionConnectorConfig = Omit<RetailerConnectorPlanInput, 're
   requireStoreScopedPrices?: boolean;
 };
 
-export type DailyIngestionEnv = Partial<Record<'DATABASE_URL' | 'GROCERYVIEW_DAILY_CONNECTORS_JSON' | 'GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE', string>>;
+export type DailyIngestionEnv = Partial<Record<
+  | 'DATABASE_URL'
+  | 'GROCERYVIEW_DAILY_CONNECTORS_JSON'
+  | 'GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE'
+  | 'GROCERYVIEW_DATABASE_URL'
+  | 'GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES',
+  string
+>>;
 
 export type DailyIngestionEnvConfig = {
   databaseUrl: string;
@@ -2776,14 +2817,16 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
        slug,
        canonical_name,
        brand,
+       barcode,
        category_path,
        package_size,
        package_unit,
        comparable_unit
-     ) values ($1, $2, $3, $4, $5, $6, $7)
+     ) values ($1, $2, $3, $4, $5, $6, $7, $8)
      on conflict (slug) do update set
        canonical_name = excluded.canonical_name,
        brand = excluded.brand,
+       barcode = excluded.barcode,
        category_path = excluded.category_path,
        package_size = excluded.package_size,
        package_unit = excluded.package_unit,
@@ -2794,6 +2837,7 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
       normalizeDailySlug(product.id),
       product.canonicalName,
       product.brand ?? null,
+      product.barcode ?? null,
       product.categoryId ? [product.categoryId] : [],
       product.packageSize,
       product.packageUnit,
@@ -2818,6 +2862,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            slug text,
            canonical_name text,
            brand text,
+           barcode text,
            category_id text,
            package_size numeric,
            package_unit text,
@@ -2829,6 +2874,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            slug,
            canonical_name,
            brand,
+           barcode,
            category_path,
            package_size,
            package_unit,
@@ -2838,6 +2884,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            slug,
            canonical_name,
            brand,
+           barcode,
            case when category_id is null then '{}'::text[] else array[category_id] end,
            package_size,
            package_unit,
@@ -2846,6 +2893,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
          on conflict (slug) do update set
            canonical_name = excluded.canonical_name,
            brand = excluded.brand,
+           barcode = excluded.barcode,
            category_path = excluded.category_path,
            package_size = excluded.package_size,
            package_unit = excluded.package_unit,
@@ -2858,6 +2906,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
         slug: normalizeDailySlug(product.id),
         canonical_name: product.canonicalName,
         brand: product.brand ?? null,
+        barcode: product.barcode ?? null,
         category_id: product.categoryId ?? null,
         package_size: product.packageSize ?? null,
         package_unit: product.packageUnit ?? null,
@@ -2867,6 +2916,271 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
     for (const row of rows) ids.set(row.slug, row.id);
   }
   return ids;
+}
+
+export type OpenFoodFactsMetadataPersistenceResult = {
+  status: 'persisted' | 'partial';
+  sourceRunId: string;
+  updatedProductIds: string[];
+  rawRecordIds: string[];
+  skippedNoDbMatchCount: number;
+};
+
+export type OpenFoodFactsDbProductCandidate = {
+  productId: string;
+  slug: string;
+  barcode: string;
+  canonicalName: string;
+  brand?: string;
+};
+
+export type OpenFoodFactsProductMetadataEnrichmentRunResult = OpenFoodFactsMetadataPersistenceResult & {
+  candidateBarcodeCount: number;
+  exportMatchCount: number;
+  enrichmentRowCount: number;
+  skippedExportNoMatchCount: number;
+  skippedNoNutritionCount: number;
+  sourceUrl: string;
+  retrievedAt: string;
+};
+
+type OpenFoodFactsDbProductCandidateRow = {
+  id: string;
+  slug: string;
+  barcode: string;
+  canonical_name: string;
+  brand: string | null;
+};
+
+function openFoodFactsNutritionPayload(row: OpenFoodFactsRetailerEnrichment): Record<string, unknown> {
+  return {
+    source: 'openfoodfacts',
+    barcode: row.barcode,
+    productUrl: row.productUrl,
+    sourceUrl: row.sourceUrl,
+    retrievedAt: row.retrievedAt,
+    nutriscoreGrade: row.nutriscoreGrade,
+    per100g: row.nutritionPer100g
+  };
+}
+
+function hashOpenFoodFactsMetadataPayload(row: OpenFoodFactsRetailerEnrichment): string {
+  return `sha256:${createHash('sha256').update(JSON.stringify({
+    source: 'openfoodfacts',
+    barcode: row.barcode,
+    sourceUrl: row.sourceUrl,
+    retrievedAt: row.retrievedAt,
+    nutritionPer100g: row.nutritionPer100g
+  })).digest('hex')}`;
+}
+
+function hasOpenFoodFactsMetadataNutrition(row: OpenFoodFactsProduct | OpenFoodFactsRetailerEnrichment): boolean {
+  return Object.values(row.nutritionPer100g).some((value) => value !== null);
+}
+
+function openFoodFactsProductToMetadataRow(row: OpenFoodFactsProduct): OpenFoodFactsRetailerEnrichment {
+  return {
+    barcode: row.code,
+    name: row.name,
+    brands: row.brands,
+    quantity: row.quantity,
+    categories: row.categories,
+    labels: row.labels,
+    nutriscoreGrade: row.nutriscoreGrade,
+    nutritionPer100g: row.nutritionPer100g,
+    imageUrl: row.imageUrl,
+    productUrl: row.productUrl,
+    sourceUrl: row.sourceUrl,
+    retrievedAt: row.retrievedAt,
+    retailerMatches: []
+  };
+}
+
+export async function listOpenFoodFactsDbProductCandidates(
+  executor: QueryExecutor,
+  options: { limit?: number } = {}
+): Promise<OpenFoodFactsDbProductCandidate[]> {
+  const limit = Math.min(Math.max(Math.floor(options.limit ?? 5000), 1), 50000);
+  const rows = await executor.query<OpenFoodFactsDbProductCandidateRow>(
+    `select id,
+            slug,
+            barcode,
+            canonical_name,
+            brand
+     from products
+     where barcode is not null
+       and barcode ~ '^[0-9]{8,14}$'
+     order by updated_at desc, slug asc
+     limit $1`,
+    [limit]
+  );
+  return rows.map((row) => ({
+    productId: row.id,
+    slug: row.slug,
+    barcode: row.barcode,
+    canonicalName: row.canonical_name,
+    brand: row.brand ?? undefined
+  }));
+}
+
+export async function persistOpenFoodFactsProductMetadata(
+  executor: QueryExecutor,
+  rows: readonly OpenFoodFactsRetailerEnrichment[],
+  options: { retrievedAt: string; sourceUrl?: string; candidateCount?: number }
+): Promise<OpenFoodFactsMetadataPersistenceResult> {
+  const sourceUrl = options.sourceUrl ?? OPENFOODFACTS_EXPORT_URL;
+  if (!Number.isFinite(Date.parse(options.retrievedAt))) throw new Error('retrievedAt must be an ISO date.');
+
+  const sourceWriter = createPostgresSourceRecordWriter(executor);
+  const sourceRun = await sourceWriter.createSourceRun({
+    sourceType: 'official_api',
+    sourceName: 'OpenFoodFacts barcode nutrition enrichment',
+    sourceUrl,
+    startedAt: options.retrievedAt,
+    status: 'running',
+    provenance: {
+      source: 'openfoodfacts',
+      sourceUrl,
+      retrievedAt: options.retrievedAt,
+      candidateCount: options.candidateCount ?? rows.length
+    }
+  });
+
+  const rawRecordIds: string[] = [];
+  const updatedProductIds: string[] = [];
+  let skippedNoDbMatchCount = 0;
+
+  for (const row of rows) {
+    const barcode = validDailyBarcode(row.barcode);
+    if (!barcode || !Object.values(row.nutritionPer100g).some((value) => value !== null)) {
+      continue;
+    }
+
+    const updated = await executor.query<IdRow>(
+      `update products
+       set nutrition = $2::jsonb,
+           image_url = coalesce(nullif($3, ''), image_url),
+           updated_at = now()
+       where barcode = $1
+       returning id`,
+      [barcode, JSON.stringify(openFoodFactsNutritionPayload(row)), row.imageUrl || null]
+    );
+    const productId = updated[0]?.id;
+    if (!productId) {
+      skippedNoDbMatchCount += 1;
+      continue;
+    }
+    updatedProductIds.push(productId);
+
+    const rawRecord = await sourceWriter.upsertRawRecord({
+      sourceRunId: sourceRun.sourceRunId,
+      recordType: 'product',
+      externalRef: barcode,
+      observedAt: row.retrievedAt,
+      payload: {
+        barcode,
+        name: row.name,
+        brands: row.brands,
+        quantity: row.quantity,
+        categories: row.categories,
+        labels: row.labels,
+        nutriscoreGrade: row.nutriscoreGrade,
+        nutritionPer100g: row.nutritionPer100g,
+        productUrl: row.productUrl,
+        imageUrl: row.imageUrl,
+        sourceUrl: row.sourceUrl
+      },
+      payloadHash: hashOpenFoodFactsMetadataPayload(row),
+      provenance: {
+        source: 'openfoodfacts',
+        sourceUrl: row.sourceUrl,
+        retrievedAt: row.retrievedAt,
+        matchKey: 'barcode',
+        barcode
+      }
+    });
+    rawRecordIds.push(rawRecord.rawRecordId);
+  }
+
+  await sourceWriter.finishSourceRun({
+    sourceRunId: sourceRun.sourceRunId,
+    status: skippedNoDbMatchCount > 0 ? 'partial' : 'succeeded',
+    finishedAt: options.retrievedAt
+  });
+
+  return {
+    status: skippedNoDbMatchCount > 0 ? 'partial' : 'persisted',
+    sourceRunId: sourceRun.sourceRunId,
+    updatedProductIds,
+    rawRecordIds,
+    skippedNoDbMatchCount
+  };
+}
+
+export async function runOpenFoodFactsProductMetadataEnrichment(input: {
+  executor: QueryExecutor;
+  retrievedAt: string;
+  fetchImpl?: typeof fetch;
+  maxDbBarcodes?: number;
+  sourceUrl?: string;
+}): Promise<OpenFoodFactsProductMetadataEnrichmentRunResult> {
+  if (!Number.isFinite(Date.parse(input.retrievedAt))) throw new Error('retrievedAt must be an ISO date.');
+  const sourceUrl = input.sourceUrl ?? OPENFOODFACTS_EXPORT_URL;
+  const candidates = await listOpenFoodFactsDbProductCandidates(input.executor, { limit: input.maxDbBarcodes });
+  if (candidates.length === 0) throw new Error('No DB products with valid barcodes were available for OpenFoodFacts enrichment.');
+
+  const products = await fetchOpenFoodFactsExportProducts({
+    codes: candidates.map((candidate) => candidate.barcode),
+    fetchImpl: input.fetchImpl,
+    maxRows: candidates.length,
+    retrievedAt: input.retrievedAt
+  });
+  const rows = products
+    .filter(hasOpenFoodFactsMetadataNutrition)
+    .map(openFoodFactsProductToMetadataRow);
+  const matchedBarcodes = new Set(products.map((row) => row.code));
+
+  const persisted = await persistOpenFoodFactsProductMetadata(input.executor, rows, {
+    retrievedAt: input.retrievedAt,
+    sourceUrl,
+    candidateCount: candidates.length
+  });
+
+  return {
+    ...persisted,
+    candidateBarcodeCount: candidates.length,
+    exportMatchCount: products.length,
+    enrichmentRowCount: rows.length,
+    skippedExportNoMatchCount: candidates.filter((candidate) => !matchedBarcodes.has(candidate.barcode)).length,
+    skippedNoNutritionCount: products.length - rows.length,
+    sourceUrl,
+    retrievedAt: input.retrievedAt
+  };
+}
+
+export async function runOpenFoodFactsProductMetadataEnrichmentFromEnv(env: DailyIngestionEnv = process.env): Promise<OpenFoodFactsProductMetadataEnrichmentRunResult> {
+  const databaseUrl = env.GROCERYVIEW_DATABASE_URL?.trim();
+  if (!databaseUrl) throw new Error('GROCERYVIEW_DATABASE_URL is required for OpenFoodFacts DB metadata enrichment.');
+  const maxDbBarcodes = env.GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES?.trim()
+    ? Number(env.GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES)
+    : undefined;
+  if (maxDbBarcodes !== undefined && (!Number.isFinite(maxDbBarcodes) || maxDbBarcodes <= 0)) {
+    throw new Error('GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES must be a positive number when provided.');
+  }
+
+  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void> } };
+  if (!pg.Pool) throw new Error('pg Pool export is not available.');
+  const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
+  try {
+    await pool.query('set default_transaction_read_only=off');
+    return await runOpenFoodFactsProductMetadataEnrichment({
+      executor: createPgQueryExecutor(pool),
+      retrievedAt: new Date().toISOString(),
+      maxDbBarcodes
+    });
+  } finally {
+    await pool.end();
+  }
 }
 
 async function upsertDailyAliasBatch(executor: QueryExecutor, aliases: Array<{

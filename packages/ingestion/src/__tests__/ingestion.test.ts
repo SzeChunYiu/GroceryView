@@ -90,6 +90,7 @@ import {
   offerSelectorFixturesCanEmitOfferFacts,
   parseOpenPricesSnapshot,
   parseRetailerProductJsonSnapshot,
+  persistOpenFoodFactsProductMetadata,
   planIngestionBatch,
   planOfferVisibilityBoundary,
   planRetailerConnectorRun,
@@ -105,6 +106,7 @@ import {
   retailerRobotsPolicyMatrix,
   runRetailerConnector,
   runDailyIngestion,
+  runOpenFoodFactsProductMetadataEnrichment,
   stockholmStoreLocatorFixtures,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
@@ -2851,6 +2853,7 @@ describe('ingestRetailerProduct', () => {
       canonicalName: 'Zoégas Coffee 450g',
       productId: 'coffee-zoegas-450g',
       categoryId: 'coffee',
+      barcode: '7310130003547',
       brand: 'Zoégas',
       packageSize: 450,
       packageUnit: 'g',
@@ -2862,6 +2865,7 @@ describe('ingestRetailerProduct', () => {
     });
 
     assert.equal(output.product.id, 'coffee-zoegas-450g');
+    assert.equal(output.product.barcode, '7310130003547');
     assert.equal(output.alias.matchConfidence, 0.85);
     assert.equal(output.priceObservation.unitPrice, 110.8889);
     assert.equal(output.priceObservation.confidenceScore, 0.85);
@@ -3696,6 +3700,12 @@ class DailyIngestionExecutor implements QueryExecutor {
     this.calls.push({ sql, params });
     if (sql.includes('insert into source_runs')) return [{ id: 'source-run-db-1' }] as T[];
     if (sql.includes('update source_runs')) return [{ id: params[0] }] as T[];
+    if (sql.includes('from products') && sql.includes('barcode ~')) return [
+      { id: 'product-db-ean-7310130003547', slug: 'ean-7310130003547', barcode: '7310130003547', canonical_name: 'Ideal Makaroner', brand: 'Kungsörnen' },
+      { id: 'product-db-ean-7310130000000', slug: 'ean-7310130000000', barcode: '7310130000000', canonical_name: 'Missing Nutrition', brand: 'Testbrand' }
+    ] as T[];
+    if (sql.includes('update products') && params[0] === '7310130003547') return [{ id: 'product-db-ean-7310130003547' }] as T[];
+    if (sql.includes('update products')) return [] as T[];
     if (sql.includes('insert into chains')) return [{ id: `chain-db-${++this.sequence}` }] as T[];
     if (sql.includes('insert into stores')) return [{ id: `store-db-${++this.sequence}` }] as T[];
     if (sql.includes('jsonb_to_recordset') && sql.includes('insert into products')) {
@@ -3750,6 +3760,107 @@ function firstBatchObservation(executor: DailyIngestionExecutor) {
   const observations = JSON.parse(String(observationInsert?.params[0])) as Array<Record<string, unknown>>;
   return observations[0] ?? {};
 }
+
+describe('persistOpenFoodFactsProductMetadata', () => {
+  it('updates existing DB products by barcode with real OpenFoodFacts nutrition provenance', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await persistOpenFoodFactsProductMetadata(executor, [{
+      barcode: '7310130003547',
+      name: 'Ideal Makaroner',
+      brands: 'Kungsörnen',
+      quantity: '750 g',
+      categories: ['en:pastas'],
+      labels: [],
+      nutriscoreGrade: 'a',
+      nutritionPer100g: {
+        energyKj: 1509,
+        energyKcal: 361,
+        fat: 2,
+        saturatedFat: 0.5,
+        carbohydrates: 72,
+        sugars: 3,
+        fiber: 3,
+        proteins: 11,
+        salt: 0.01,
+        sodium: 0.004
+      },
+      imageUrl: 'https://images.openfoodfacts.org/images/products/731/013/000/3547/front_sv.11.400.jpg',
+      productUrl: 'https://world.openfoodfacts.org/product/7310130003547/ideal-makaroner-kungsornen',
+      sourceUrl: `${OPENFOODFACTS_EXPORT_URL}#code=7310130003547`,
+      retrievedAt: '2026-05-22T20:18:16.369Z',
+      retailerMatches: []
+    }, {
+      barcode: '00000000',
+      name: 'No local DB product',
+      brands: 'OpenFoodFacts',
+      quantity: '',
+      categories: [],
+      labels: [],
+      nutriscoreGrade: 'unknown',
+      nutritionPer100g: {
+        energyKj: 1,
+        energyKcal: null,
+        fat: null,
+        saturatedFat: null,
+        carbohydrates: null,
+        sugars: null,
+        fiber: null,
+        proteins: null,
+        salt: null,
+        sodium: null
+      },
+      imageUrl: '',
+      productUrl: 'https://world.openfoodfacts.org/product/00000000/no-local-db-product',
+      sourceUrl: `${OPENFOODFACTS_EXPORT_URL}#code=00000000`,
+      retrievedAt: '2026-05-22T20:18:16.369Z',
+      retailerMatches: []
+    }], {
+      retrievedAt: '2026-05-22T20:18:16.369Z'
+    });
+
+    assert.equal(result.status, 'partial');
+    assert.deepEqual(result.updatedProductIds, ['product-db-ean-7310130003547']);
+    assert.equal(result.rawRecordIds.length, 1);
+    assert.equal(result.skippedNoDbMatchCount, 1);
+    const sourceRunInsert = executor.calls.find((call) => call.sql.includes('insert into source_runs'));
+    assert.equal(sourceRunInsert?.params[0], 'official_api');
+    assert.equal(sourceRunInsert?.params[1], 'OpenFoodFacts barcode nutrition enrichment');
+    const productUpdate = executor.calls.find((call) => call.sql.includes('update products'));
+    assert.equal(productUpdate?.params[0], '7310130003547');
+    assert.equal(JSON.parse(String(productUpdate?.params[1])).per100g.energyKcal, 361);
+    const rawRecordInsert = executor.calls.find((call) => call.sql.includes('insert into raw_records'));
+    assert.equal(rawRecordInsert?.params[1], 'product');
+    assert.equal(rawRecordInsert?.params[2], '7310130003547');
+  });
+});
+
+describe('runOpenFoodFactsProductMetadataEnrichment', () => {
+  it('reads DB barcodes, fetches export matches, and persists only rows with nutrition', async () => {
+    const executor = new DailyIngestionExecutor();
+    const tsv = [
+      'code\turl\tproduct_name\tquantity\tbrands\tcategories_tags\tlabels_tags\tnutriscore_grade\tenergy_100g\tenergy-kcal_100g\tfat_100g\tsaturated-fat_100g\tcarbohydrates_100g\tsugars_100g\tfiber_100g\tproteins_100g\tsalt_100g\tsodium_100g\timage_url',
+      '7310130003547\thttps://world.openfoodfacts.org/product/7310130003547/ideal-makaroner-kungsornen\tIdeal Makaroner\t750 g\tKungsörnen\ten:pastas\t\ta\t1509\t361\t2\t0.5\t72\t3\t3\t11\t0.01\t0.004\thttps://images.openfoodfacts.org/images/products/731/013/000/3547/front_sv.11.400.jpg',
+      '7310130000000\thttps://world.openfoodfacts.org/product/7310130000000/missing-nutrition\tMissing Nutrition\t1 kg\tTestbrand\ten:pastas\t\tunknown\t\t\t\t\t\t\t\t\t\t\t'
+    ].join('\n');
+    const fetchImpl: typeof fetch = async () => new Response(gzipSync(tsv), { status: 200, headers: { 'content-type': 'application/gzip' } });
+
+    const result = await runOpenFoodFactsProductMetadataEnrichment({
+      executor,
+      fetchImpl,
+      retrievedAt: '2026-05-22T20:18:16.369Z'
+    });
+
+    assert.equal(result.status, 'persisted');
+    assert.equal(result.candidateBarcodeCount, 2);
+    assert.equal(result.exportMatchCount, 2);
+    assert.equal(result.enrichmentRowCount, 1);
+    assert.equal(result.skippedNoNutritionCount, 1);
+    assert.equal(result.skippedExportNoMatchCount, 0);
+    assert.deepEqual(result.updatedProductIds, ['product-db-ean-7310130003547']);
+    const sourceRunInsert = executor.calls.find((call) => call.sql.includes('insert into source_runs'));
+    assert.equal(JSON.parse(String(sourceRunInsert?.params[6])).candidateCount, 2);
+  });
+});
 
 describe('daily ingestion runner', () => {
   it('loads connector config from environment without exposing secrets', () => {
