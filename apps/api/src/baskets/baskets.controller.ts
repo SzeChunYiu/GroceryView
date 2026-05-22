@@ -39,6 +39,27 @@ export class BasketsController {
     return { ...groceryApi.getLocalOfferBasketReport('demo', asOf), demo: true };
   }
 
+  @Get('recurring-digest')
+  @ApiOkResponse({ description: 'Recurring basket changes since last shop' })
+  recurringDigest(
+    @Query('templateId') templateId = 'weekly-basics',
+    @Query('templateName') templateName = 'Weekly basics',
+    @Query('cadence') cadence: 'weekly' | 'biweekly' | 'monthly' = 'weekly',
+    @Query('asOf') asOf = '2026-05-22T08:00:00.000Z',
+    @Query('lastPurchasedAt') lastPurchasedAt?: string
+  ) {
+    return {
+      ...groceryApi.getRecurringBasketDigest('demo', {
+        templateId,
+        templateName,
+        cadence,
+        asOf,
+        ...(lastPurchasedAt ? { lastPurchasedAt } : {})
+      }),
+      demo: true
+    };
+  }
+
   @Get('stores/:storeId/quote')
   @ApiOkResponse({ description: 'Quote the demo basket at one store' })
   storeQuote(@Param('storeId') storeId: string) {

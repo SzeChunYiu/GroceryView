@@ -707,6 +707,39 @@ describe('createGroceryViewApi', () => {
     assert.equal(report.strategies[3]?.total, 82.7);
   });
 
+  it('returns recurring basket digest changes for the signed-in weekly shop', () => {
+    const api = createGroceryViewApi();
+
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.addBasketItem('user-1', { productId: 'butter', quantity: 1 });
+
+    const digest = api.getRecurringBasketDigest('user-1', {
+      templateId: 'weekly-basics',
+      templateName: 'Weekly basics',
+      cadence: 'weekly',
+      asOf: '2026-05-22T08:00:00.000Z'
+    });
+
+    assert.equal(digest.templateId, 'weekly-basics');
+    assert.equal(digest.lineCount, 3);
+    assert.equal(digest.comparableCurrentTotal, 132.6);
+    assert.equal(digest.comparablePreviousTotal, 146.6);
+    assert.equal(digest.comparableDelta, -14);
+    assert.deepEqual(digest.lines.map((line) => ({
+      productId: line.productId,
+      changeType: line.changeType,
+      currentStoreName: line.currentStoreName,
+      lineDelta: line.lineDelta
+    })), [
+      { productId: 'coffee', changeType: 'price_down', currentStoreName: 'Willys Odenplan', lineDelta: -10 },
+      { productId: 'milk', changeType: 'price_down', currentStoreName: 'Lidl Sveavägen', lineDelta: -6 },
+      { productId: 'butter', changeType: 'price_up', currentStoreName: 'Coop Odenplan', lineDelta: 2 }
+    ]);
+    assert.match(digest.headline, /Weekly basics is 9.55% lower/);
+    assert.match(digest.guardrails[1], /never rewrite a saved recurring basket automatically/);
+  });
+
   it('returns local offer basket reports for selected favorite stores', () => {
     const api = createGroceryViewApi();
 

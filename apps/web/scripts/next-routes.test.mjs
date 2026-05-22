@@ -74,6 +74,21 @@ describe('verified-data UI', () => {
     assert.match(login, /source timestamps from authenticated storage/);
   });
 
+  it('surfaces the recurring basket digest product contract on the weekly basket route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/weekly-basket/page.tsx');
+
+    assert.match(verified, /export const recurringBasketDigestContract = /);
+    assert.match(verified, /\/api\/basket\/recurring-digest/);
+    assert.match(route, /recurringBasketDigestContract/);
+    assert.match(route, /Recurring basket digest/);
+    assert.match(route, /Changed since last shop/);
+    assert.match(route, /missing-price blockers/);
+    assert.match(route, /NoVerifiedData/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
 
   it('surfaces personal grocery inflation on the savings dashboard using the real core-derived driver output', async () => {
     const source = await read('src/app/savings-dashboard/page.tsx');

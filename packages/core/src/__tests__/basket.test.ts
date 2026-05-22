@@ -1,6 +1,12 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { compareBasketStrategies, summarizeLocalOfferBasket, summarizeStoreBasketCoverage, validateBasketComparisonLineFixtures } from '../index.js';
+import {
+  compareBasketStrategies,
+  planRecurringBasketDigest,
+  summarizeLocalOfferBasket,
+  summarizeStoreBasketCoverage,
+  validateBasketComparisonLineFixtures
+} from '../index.js';
 
 describe('validateBasketComparisonLineFixtures', () => {
   it('accepts every basket comparison line status with explicit inclusion or exclusion fields', () => {
@@ -458,5 +464,90 @@ describe('summarizeLocalOfferBasket', () => {
     });
 
     assert.equal(summary.bestStore?.storeId, 'far-cheap-store');
+  });
+});
+
+describe('planRecurringBasketDigest', () => {
+  it('summarizes weekly basket changes against the previous shop with explicit missing-price blockers', () => {
+    const digest = planRecurringBasketDigest({
+      templateId: 'weekly-basics',
+      templateName: 'Weekly basics',
+      cadence: 'weekly',
+      asOf: '2026-05-22T08:00:00.000Z',
+      lastPurchasedAt: '2026-05-15T08:00:00.000Z',
+      lines: [
+        {
+          productId: 'coffee',
+          productName: 'Zoégas Coffee 450g',
+          quantity: 1,
+          currentUnitPrice: 49.9,
+          previousUnitPrice: 59.9,
+          currentStoreName: 'Willys Odenplan',
+          confidence: 0.92
+        },
+        {
+          productId: 'milk',
+          productName: 'Arla Milk 1L',
+          quantity: 2,
+          currentUnitPrice: 16.9,
+          previousUnitPrice: 13.9,
+          currentStoreName: 'Coop Odenplan',
+          substituteProductName: 'Willys private-label milk',
+          confidence: 0.88
+        },
+        {
+          productId: 'butter',
+          productName: 'Butter 500g',
+          quantity: 1,
+          currentUnitPrice: null,
+          previousUnitPrice: 39.9,
+          confidence: 0.2
+        }
+      ]
+    });
+
+    assert.equal(digest.templateId, 'weekly-basics');
+    assert.equal(digest.cadence, 'weekly');
+    assert.equal(digest.lineCount, 3);
+    assert.equal(digest.comparableCurrentTotal, 83.7);
+    assert.equal(digest.comparablePreviousTotal, 87.7);
+    assert.equal(digest.comparableDelta, -4);
+    assert.equal(digest.comparableDeltaPercent, -4.56);
+    assert.deepEqual(digest.missingCurrentPriceProductIds, ['butter']);
+    assert.deepEqual(digest.changeSummary, {
+      priceUp: 1,
+      priceDown: 1,
+      newItem: 0,
+      missingCurrentPrice: 1,
+      substituteAvailable: 1,
+      unchanged: 0
+    });
+    assert.deepEqual(digest.lines.map((line) => ({
+      productId: line.productId,
+      changeType: line.changeType,
+      lineDelta: line.lineDelta,
+      action: line.recommendedAction
+    })), [
+      {
+        productId: 'coffee',
+        changeType: 'price_down',
+        lineDelta: -10,
+        action: 'Keep in recurring basket; current verified price is lower than the previous shop.'
+      },
+      {
+        productId: 'milk',
+        changeType: 'substitute_available',
+        lineDelta: 6,
+        action: 'Review suggested substitute before checkout: Willys private-label milk.'
+      },
+      {
+        productId: 'butter',
+        changeType: 'missing_current_price',
+        lineDelta: null,
+        action: 'Do not auto-buy; current verified price is missing.'
+      }
+    ]);
+    assert.match(digest.headline, /4.56% lower than the previous shop/);
+    assert.match(digest.guardrails[0], /Only lines with both current and previous verified prices/);
   });
 });
