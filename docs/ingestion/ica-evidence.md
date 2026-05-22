@@ -1,14 +1,14 @@
 # ICA ingestion evidence
 
 - Source: ICA public store-scoped promotions JSON
-- Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C
-- Store locator retrieved: 2026-05-22T13:09:13.736Z
+- Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C, https://handla.ica.se/api/store/v1?latitude=59.2753&longitude=15.2134&customerType=B2C, https://handla.ica.se/api/store/v1?latitude=59.6099&longitude=16.5448&customerType=B2C, https://handla.ica.se/api/store/v1?latitude=57.7826&longitude=14.1618&customerType=B2C, https://handla.ica.se/api/store/v1?latitude=56.8790&longitude=14.8059&customerType=B2C, https://handla.ica.se/api/store/v1?latitude=59.3793&longitude=13.5036&customerType=B2C, https://handla.ica.se/api/store/v1?latitude=62.3908&longitude=17.3069&customerType=B2C, https://handla.ica.se/api/store/v1?latitude=60.6749&longitude=17.1413&customerType=B2C
+- Store locator retrieved: 2026-05-22T13:19:41.353Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 52200
+- Real rows fetched: 56700
 - Stores fetched: 174
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
-- Live verification: all 174 source URLs returned parseable public promotions JSON via `curl -A "GroceryView/0.1"`/connector-equivalent fetch on 2026-05-22, with source row counts recorded below.
+- Live verification: all 189 source URLs returned parseable public promotions JSON via `curl -A "GroceryView/0.1"`/connector-equivalent fetch on 2026-05-22, with source row counts recorded below.
 
 ## Source URLs
 
@@ -186,6 +186,21 @@
 - Source URL (1004534 ICA Supermarket Strömsbro, retrieved 2026-05-22T13:09:13.736Z, rows 300): https://handlaprivatkund.ica.se/stores/1004534/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Source URL (1158001 Maxi ICA Stormarknad Brynäs, retrieved 2026-05-22T13:09:13.736Z, rows 300): https://handlaprivatkund.ica.se/stores/1158001/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Source URL (1003987 Maxi ICA Stormarknad Gävle, retrieved 2026-05-22T13:09:13.736Z, rows 300): https://handlaprivatkund.ica.se/stores/1003987/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003764 ICA Supermarket Ettan, retrieved 2026-05-22T13:19:36.052Z, rows 300): https://handlaprivatkund.ica.se/stores/1003764/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004211 ICA Nära Pettersberg, retrieved 2026-05-22T13:19:36.410Z, rows 300): https://handlaprivatkund.ica.se/stores/1004211/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004356 ICA Nära Vallby, retrieved 2026-05-22T13:19:36.736Z, rows 300): https://handlaprivatkund.ica.se/stores/1004356/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003869 ICA Kvantum Västerås, retrieved 2026-05-22T13:19:37.064Z, rows 300): https://handlaprivatkund.ica.se/stores/1003869/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004015 Maxi ICA Stormarknad Jönköping, retrieved 2026-05-22T13:19:37.398Z, rows 300): https://handlaprivatkund.ica.se/stores/1004015/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003919 ICA Nära Hovslätt, retrieved 2026-05-22T13:19:37.745Z, rows 300): https://handlaprivatkund.ica.se/stores/1003919/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003571 Maxi ICA Stormarknad Växjö, retrieved 2026-05-22T13:19:38.422Z, rows 300): https://handlaprivatkund.ica.se/stores/1003571/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004593 ICA Kvantum Teleborg, retrieved 2026-05-22T13:19:38.801Z, rows 300): https://handlaprivatkund.ica.se/stores/1004593/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003792 ICA Supermarket Hovshaga, retrieved 2026-05-22T13:19:39.202Z, rows 300): https://handlaprivatkund.ica.se/stores/1003792/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004519 ICA Supermarket Fanfaren, retrieved 2026-05-22T13:19:39.561Z, rows 300): https://handlaprivatkund.ica.se/stores/1004519/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004029 Maxi ICA Stormarknad Karlstad, retrieved 2026-05-22T13:19:39.924Z, rows 300): https://handlaprivatkund.ica.se/stores/1004029/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004584 ICA Kvantum Hammarö, retrieved 2026-05-22T13:19:40.308Z, rows 300): https://handlaprivatkund.ica.se/stores/1004584/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003565 Maxi ICA Stormarknad Välsviken, retrieved 2026-05-22T13:19:40.658Z, rows 300): https://handlaprivatkund.ica.se/stores/1003565/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004396 ICA Kvantum Nacksta Sundsvall, retrieved 2026-05-22T13:19:41.008Z, rows 300): https://handlaprivatkund.ica.se/stores/1004396/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003423 Maxi ICA Stormarknad Sundsvall, retrieved 2026-05-22T13:19:41.353Z, rows 300): https://handlaprivatkund.ica.se/stores/1003423/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 
 Every emitted row came from a live store-scoped promotions response for the selected ICA store and includes the exact source URL plus retrieval timestamp. Rows preserve store account, region, ordinary price, unit price, promo price fields when ICA returned them, promotion description, and product detail URLs.
 
