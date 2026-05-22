@@ -1619,14 +1619,22 @@ export async function fetchIcaDefaultStoreProducts(
   options: FetchIcaDefaultStoreProductsOptions = {}
 ): Promise<IcaProduct[]> {
   const stores = options.stores ?? DEFAULT_ICA_STORE_CONFIGS;
-  const batches = await Promise.all(stores.map((store) => fetchIcaProducts({
+  const batches = await Promise.allSettled(stores.map((store) => fetchIcaProducts({
     ...options,
     storeAccountId: store.storeAccountId,
     storeName: store.storeName,
     regionId: store.regionId
   })));
+  const rows = batches.flatMap((batch) => batch.status === 'fulfilled' ? batch.value : []);
+  if (rows.length === 0) {
+    const firstFailure = batches.find((batch) => batch.status === 'rejected');
+    const reason = firstFailure?.status === 'rejected'
+      ? firstFailure.reason instanceof Error ? firstFailure.reason.message : String(firstFailure.reason)
+      : 'no ICA products returned';
+    throw new Error(`ICA store promotions returned no usable branch products: ${reason}`);
+  }
 
-  return batches.flat();
+  return rows;
 }
 
 export type ParseIcaStorePromotionsOptions = {
