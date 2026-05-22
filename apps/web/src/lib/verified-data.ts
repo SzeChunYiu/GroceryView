@@ -411,6 +411,29 @@ export const unavailablePanels = [
   }
 ];
 
+export const basketTripCostContract = {
+  endpoint: '/api/basket/trip-cost',
+  title: 'Basket + trip cost optimizer',
+  status: 'implemented_account_api',
+  requiredInputs: [
+    'signed-in userId',
+    'current basket quantities and favorite-store choices',
+    'travelMode plus optional time, vehicle, transit, delivery, and split-shop cost settings',
+    'current verified shelf totals for every ranked basket strategy'
+  ],
+  shippedBehaviors: [
+    'Ranks complete basket strategies by shelf total plus explicit travel and time cost.',
+    'Shows trip cost separately from verified shelf totals so price evidence stays auditable.',
+    'Keeps missing-price options out of complete rankings even when travel looks cheap.',
+    'Labels split-shop penalties instead of hiding extra effort inside product prices.'
+  ],
+  blockedInStaticSnapshot: [
+    'No authenticated home location, travel mode, or saved basket is bundled with this static build.',
+    'No retailer delivery or checkout confirmation is claimed from optimizer output.',
+    'No precise user location is rendered without explicit signed-in consent.'
+  ]
+};
+
 export const recurringBasketDigestContract = {
   endpoint: '/api/basket/recurring-digest',
   title: 'Recurring basket digest',

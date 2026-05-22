@@ -45,6 +45,7 @@ import {
   type PrivacyRequest,
   type PrivacyRequestStatus,
   type PrivacyRequestType,
+  type BasketTripCostTravelMode,
   type RecurringBasketCadence,
   type WatchlistPriceType
 } from '@groceryview/core';
@@ -210,6 +211,20 @@ function requiredPantryUnit(value: unknown): PantryInventoryItem['unit'] {
 function requiredRecurringCadence(value: unknown): RecurringBasketCadence {
   if (value === 'weekly' || value === 'biweekly' || value === 'monthly') return value;
   throw new Error('cadence must be weekly, biweekly, or monthly.');
+}
+
+
+function requiredTravelMode(value: unknown): BasketTripCostTravelMode {
+  if (value === 'walk' || value === 'bike' || value === 'transit' || value === 'car' || value === 'delivery') return value;
+  throw new Error('travelMode must be walk, bike, transit, car, or delivery.');
+}
+
+function optionalQueryNumber(url: URL, name: string): number | undefined {
+  const raw = url.searchParams.get(name);
+  if (raw === null || raw === '') return undefined;
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed)) throw new Error(`${name} must be a number.`);
+  return parsed;
 }
 
 function requiredAuthProvider(value: unknown): AuthProvider {
@@ -1358,6 +1373,22 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getLocalOfferBasketReport(user, url.searchParams.get('asOf') ?? undefined));
       }
 
+      if (path === '/api/basket/trip-cost') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          return jsonResponse(api.getBasketTripCostReport(user, {
+            travelMode: requiredTravelMode(url.searchParams.get('travelMode')),
+            valueOfTimePerHour: optionalQueryNumber(url, 'valueOfTimePerHour'),
+            carCostPerKm: optionalQueryNumber(url, 'carCostPerKm'),
+            transitFare: optionalQueryNumber(url, 'transitFare'),
+            splitTripPenalty: optionalQueryNumber(url, 'splitTripPenalty')
+          }));
+        }
+      }
+
       if (path === '/api/basket/recurring-digest') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1688,6 +1719,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/compare': { post: protectedOperation('Compare basket strategies.') },
       '/api/basket/comparison-report': { get: protectedOperation('Get basket comparison strategies with assignment and trust labels.') },
       '/api/basket/local-offers': { get: protectedOperation('Get local offer basket coverage, freshness, confidence, and savings by selected stores.') },
+      '/api/basket/trip-cost': { get: protectedOperation('Get basket totals ranked by shelf price plus explicit travel, time, delivery, and split-shop costs.') },
       '/api/basket/recurring-digest': { get: protectedOperation('Get recurring basket changes, missing-price blockers, and suggested review actions.') },
       '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },

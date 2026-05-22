@@ -74,6 +74,21 @@ describe('verified-data UI', () => {
     assert.match(login, /source timestamps from authenticated storage/);
   });
 
+
+  it('surfaces the basket trip-cost optimizer contract on the shopping trips route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/shopping-trips/page.tsx');
+
+    assert.match(verified, /export const basketTripCostContract = /);
+    assert.match(verified, /\/api\/basket\/trip-cost/);
+    assert.match(route, /basketTripCostContract/);
+    assert.match(route, /Basket \+ trip cost optimizer/);
+    assert.match(route, /travel-cost optimizer/);
+    assert.match(route, /NoVerifiedData/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces the recurring basket digest product contract on the weekly basket route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/weekly-basket/page.tsx');

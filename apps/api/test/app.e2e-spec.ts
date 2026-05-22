@@ -160,6 +160,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/alerts/inbox']);
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
     assert.ok(docs.body.paths['/users/demo/basket/recurring-digest']);
+    assert.ok(docs.body.paths['/users/demo/basket/trip-cost']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
   });
 
@@ -704,6 +705,15 @@ describe('GroceryView API app', () => {
     assert.equal(localOffers.body.bestStore.storeId, 'willys-odenplan');
     assert.equal(localOffers.body.bestStore.matchedProductIds[0], 'coffee');
     assert.equal(localOffers.body.guardrails.length, 3);
+
+    const tripCost = await request(app.getHttpServer())
+      .get('/users/demo/basket/trip-cost?travelMode=car&valueOfTimePerHour=120&carCostPerKm=3.5&splitTripPenalty=15')
+      .expect(200);
+    assert.equal(tripCost.body.userId, 'demo');
+    assert.equal(tripCost.body.demo, true);
+    assert.equal(tripCost.body.bestOption.strategyId, 'all_at_one_store');
+    assert.equal(tripCost.body.bestOption.effectiveTotal, 112.13);
+    assert.match(tripCost.body.guardrails[0], /separately from verified shelf totals/i);
 
     const recurringDigest = await request(app.getHttpServer())
       .get('/users/demo/basket/recurring-digest?templateId=weekly-basics&templateName=Weekly%20basics&cadence=weekly&asOf=2026-05-22T08:00:00.000Z')
