@@ -743,6 +743,35 @@ export const unavailablePanels = [
   }
 ];
 
+
+export const accountSavedShoppingContract = {
+  title: 'Saved baskets & favorite stores',
+  status: 'implemented_account_api',
+  favoriteStoresEndpoint: '/api/users/{userId}/favorite-stores',
+  favoriteStoreDeleteEndpoint: '/api/users/{userId}/favorite-stores/{storeId}',
+  basketTables: ['weekly_baskets', 'basket_items'],
+  requiredInputs: [
+    'signed-in userId from the authenticated session',
+    'favorite store id selected from verified GroceryView stores',
+    'weekly basket template name, cadence, product ids, quantities, and asOf timestamp',
+    'shopper consent before any favorite-store, watchlist, or saved-basket state is reused for alerts',
+    'production persistence through PostgreSQL-backed account tables before private rows are rendered'
+  ],
+  shippedBehaviors: [
+    'Lists, adds, and removes favorite stores through account-scoped server routes.',
+    'Keeps saved weekly basket rows in weekly_baskets and basket line rows in basket_items.',
+    'Uses favorite stores as inputs for watchlist alerts, basket comparison, trip-cost ranking, and recurring digest routes.',
+    'Keeps account shopping state separate from public catalogue evidence so prices remain auditable.',
+    'Requires a signed-in shopper before any private saved basket or favorite store can be read or mutated.'
+  ],
+  blockedInStaticSnapshot: [
+    'No private saved baskets or favorite-store rows are bundled with this static build.',
+    'No anonymous shopper can read or mutate another account’s saved shopping state.',
+    'No favorite store is inferred from public browsing or demo fixtures.',
+    'No saved basket is shown unless production authentication and account storage return verified rows.'
+  ]
+};
+
 export const basketImportExportContract = {
   endpoint: '/api/basket/import-export',
   title: 'Bookmarklet import/export',
