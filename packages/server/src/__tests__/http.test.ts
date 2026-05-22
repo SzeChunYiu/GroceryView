@@ -839,6 +839,38 @@ describe('createHttpHandler', () => {
     assert.match(handoff.unsupportedReasons[1] ?? '', /cannot claim purchase completion/i);
     assert.match(handoff.guardrails[0], /not checkout confirmation/i);
 
+
+    const importExport = await handle(new Request('http://localhost/api/basket/import-export?userId=user-import', {
+      method: 'POST',
+      body: JSON.stringify({
+        source: { sourceKind: 'bookmarklet', retailerId: 'willys', origin: 'https://www.willys.se', capturedAt: '2026-05-22T09:35:00.000Z', consentGranted: true },
+        capturedLines: [
+          { rawName: 'Zoégas Coffee 450g', productId: 'coffee', quantity: 1, productUrl: 'https://www.willys.se/produkt/coffee' },
+          { rawName: 'Arla Milk 1L', quantity: 2 },
+          { rawName: 'Retailer-only bakery bun', quantity: 3 }
+        ]
+      })
+    }));
+    assert.equal(importExport.status, 201);
+    const importExportBody = await json(importExport) as {
+      userId: string;
+      status: string;
+      importedItemCount: number;
+      reviewItemCount: number;
+      acceptedItems: Array<{ productId: string; quantity: number }>;
+      reviewItems: Array<{ rawName: string }>;
+      guardrails: string[];
+    };
+    assert.equal(importExportBody.userId, 'user-import');
+    assert.equal(importExportBody.status, 'needs_review');
+    assert.equal(importExportBody.importedItemCount, 2);
+    assert.equal(importExportBody.reviewItemCount, 1);
+    assert.deepEqual(importExportBody.acceptedItems.map((item) => [item.productId, item.quantity]), [['coffee', 1], ['milk', 2]]);
+    assert.equal(importExportBody.reviewItems[0]?.rawName, 'Retailer-only bakery bun');
+    assert.match(importExportBody.guardrails[0] ?? '', /explicit shopper consent/i);
+    const importedBasket = await json(await handle(new Request('http://localhost/api/basket/current?userId=user-import'))) as { items: Array<{ productId: string; quantity: number }> };
+    assert.deepEqual(importedBasket.items, [{ productId: 'coffee', quantity: 1 }, { productId: 'milk', quantity: 2 }]);
+
     const tripCost = await json(await handle(new Request('http://localhost/api/basket/trip-cost?userId=user-1&travelMode=car&valueOfTimePerHour=120&carCostPerKm=3.5&splitTripPenalty=15'))) as {
       userId: string;
       bestOption?: { strategyId: string; pricedBasketTotal: number; travelCost: number; effectiveTotal: number; storeIds: string[] };

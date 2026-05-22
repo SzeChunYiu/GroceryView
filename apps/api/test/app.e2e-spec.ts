@@ -409,6 +409,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/basket/recurring-digest']);
     assert.ok(docs.body.paths['/users/demo/basket/trip-cost']);
     assert.ok(docs.body.paths['/users/demo/basket/handoff/{retailerId}']);
+    assert.ok(docs.body.paths['/users/demo/basket/import-export']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
   });
 
@@ -1020,6 +1021,25 @@ describe('GroceryView API app', () => {
     assert.equal(storeQuote.body.priceGapVsCheapestComplete, 0);
     assert.deepEqual(storeQuote.body.missingProductIds, []);
     assert.equal(storeQuote.body.demo, true);
+
+    const importExport = await request(app.getHttpServer())
+      .post('/users/demo/basket/import-export')
+      .send({
+        source: { sourceKind: 'bookmarklet', retailerId: 'willys', origin: 'https://www.willys.se', capturedAt: '2026-05-22T09:35:00.000Z', consentGranted: true },
+        capturedLines: [
+          { rawName: 'Zoégas Coffee 450g', productId: 'coffee', quantity: 1, productUrl: 'https://www.willys.se/produkt/coffee' },
+          { rawName: 'Arla Milk 1L', quantity: 2 },
+          { rawName: 'Retailer-only bakery bun', quantity: 3 }
+        ]
+      })
+      .expect(201);
+    assert.equal(importExport.body.userId, 'demo');
+    assert.equal(importExport.body.demo, true);
+    assert.equal(importExport.body.status, 'needs_review');
+    assert.equal(importExport.body.importedItemCount, 2);
+    assert.equal(importExport.body.reviewItemCount, 1);
+    assert.deepEqual(importExport.body.acceptedItems.map((item: { productId: string; quantity: number }) => [item.productId, item.quantity]), [['coffee', 1], ['milk', 2]]);
+    assert.match(importExport.body.guardrails[0], /explicit shopper consent/i);
 
     const categoryMarket = await request(app.getHttpServer()).get('/categories/coffee/market').expect(200);
     assert.equal(categoryMarket.body.category, 'coffee');
