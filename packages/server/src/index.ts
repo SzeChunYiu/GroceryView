@@ -1236,6 +1236,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      if (method === 'GET' && path === '/api/openapi.json') return jsonResponse(buildOpenApiDocument());
       if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
       if (method === 'GET' && path === '/api/nutrition/value') return jsonResponse(api.getNutritionValueReport(optionalNutritionMetric(url.searchParams.get('metric'))));
       if (path === '/api/meal-plans/suggestions') {
@@ -2233,6 +2234,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
     },
     paths: {
       '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
+      '/api/openapi.json': { get: publicOperation('Get the public OpenAPI document for developer price and nutrition API integrations.') },
       '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/nutrition/value': { get: publicOperation('Get nutrition per krona rankings with sugar and salt warning guardrails.') },

@@ -115,6 +115,14 @@ describe('createHttpHandler', () => {
   it('serves market, store, product, and index GET endpoints as JSON', async () => {
     const handle = createHttpHandler();
 
+    const openApi = await handle(new Request('http://localhost/api/openapi.json'));
+    assert.equal(openApi.status, 200);
+    const openApiBody = await json(openApi) as { openapi: string; paths: Record<string, unknown> };
+    assert.equal(openApiBody.openapi, '3.1.0');
+    assert.ok(openApiBody.paths['/api/products/{id}/terminal']);
+    assert.ok(openApiBody.paths['/api/products/{id}/history']);
+    assert.ok(openApiBody.paths['/api/nutrition/value']);
+
     const market = await handle(new Request('http://localhost/api/market/overview'));
     assert.equal(market.status, 200);
     const marketBody = await json(market) as { city: string; movers: Array<{ productId: string; oneMonthMovePercent: number; stockholmMedianGap: number; verifiedHistoryPoints: number }> };

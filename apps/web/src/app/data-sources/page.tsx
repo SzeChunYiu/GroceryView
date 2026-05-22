@@ -5,6 +5,7 @@ import {
   commodityIngestionClassifierEvidence,
   formatPct,
   multiVerticalDomainFoundation,
+  publicApiDirectory,
   snapshot,
   sourceClaimLedger,
   sourceCoverage,
@@ -86,6 +87,37 @@ export default function DataSourcesPage() {
             </section>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-sky-800">feat(steal)</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Public price/nutrition API · {publicApiDirectory.title}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              {'The developer-facing OpenAPI contract is public at /api/openapi.json. It documents public price terminal /api/products/{id}/terminal, price-history, and nutrition per krona /api/nutrition/value endpoints while keeping account APIs protected.'}
+              {' '}
+              <code className="rounded bg-white px-1 font-black">{publicApiDirectory.openApiPath}</code>
+            </p>
+          </div>
+          <Link className="rounded-full bg-white px-4 py-2 text-sm font-black text-sky-900 shadow-sm" href={publicApiDirectory.openApiPath}>
+            Open {publicApiDirectory.openApiPath}
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {publicApiDirectory.examples.map((endpoint) => (
+            <section className="rounded-2xl border border-sky-100 bg-white p-4" key={endpoint.path}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-800">{endpoint.label}</p>
+              <p className="mt-2 font-mono text-sm font-black text-slate-950">{endpoint.path}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">{endpoint.supports}</p>
+            </section>
+          ))}
+        </div>
+        <ul className="mt-4 grid gap-2 text-sm font-semibold leading-6 text-slate-700 md:grid-cols-3">
+          {publicApiDirectory.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white p-3" key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
       </Card>
 
       <Card className="mt-6 border-lime-200 bg-lime-50/60">
