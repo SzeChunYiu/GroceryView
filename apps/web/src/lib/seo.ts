@@ -74,6 +74,10 @@ export const routeMetadataCatalog = {
     title: 'Coupon stack evidence gate | GroceryView',
     description: 'Coupon stacking is blocked from public rendering until verified production coupon and retailer records are available.'
   },
+  '/cookies': {
+    title: 'Cookie policy and consent settings | GroceryView',
+    description: 'Read GroceryView cookie categories, IAB TCF v2.2 consent signals, Google Consent Mode v2 defaults, and non-personalised ad guardrails.'
+  },
   '/data-sources': {
     title: 'GroceryView source coverage and claim ledger',
     description: 'Audit every public source, route map, freshness badge, allowed claim, and blocked claim behind the grocery price terminal.'
