@@ -49,6 +49,16 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004247',
     storeName: 'ICA Focus',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003714',
+    storeName: 'ICA Karlaplan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004228',
+    storeName: 'ICA Supermarket Fältöversten',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
