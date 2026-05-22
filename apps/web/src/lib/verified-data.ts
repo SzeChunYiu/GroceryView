@@ -1332,6 +1332,25 @@ export const loyaltyPriceChains = [
   { chain: 'City Gross', preferenceKey: 'citygross_member_prices', evidenceStatus: 'preference_only_until_account_offer_response' }
 ];
 
+
+export const priceAlertThresholdPreferenceContract = {
+  title: 'Custom price alert thresholds',
+  endpoint: '/api/account/watchlist-thresholds',
+  status: 'account_preference_contract',
+  thresholdTypes: [
+    { key: 'targetPrice', label: 'Target price', storedValue: 'SEK amount per watched product', engineInput: 'WatchlistItem.targetPrice' },
+    { key: 'dealScoreMinimum', label: 'Deal Score minimum', storedValue: '0-100 integer', engineInput: 'WatchlistItem.minimumDealScore' },
+    { key: 'newLowOnly', label: 'New-low only', storedValue: 'boolean', engineInput: 'WatchlistItem.notifyOnNewLow' },
+    { key: 'allowedPriceTypes', label: 'Allowed price types', storedValue: 'shelf, weekly deal, member promo', engineInput: 'WatchlistItem.allowedPriceTypes' }
+  ],
+  guardrails: [
+    'No anonymous thresholds are stored or applied to private watchlists.',
+    'Thresholds only filter verified product price rows passed into buildWatchlistAlerts.',
+    'Member-only thresholds must respect loyalty price preferences before member-price alerts can be sent.',
+    'Quiet hours and channel preferences still run through planNotifications after alert selection.'
+  ]
+};
+
 export const loyaltyPricePreferenceContract = {
   title: 'Loyalty price preferences',
   endpoint: '/api/account/loyalty-price-preferences',

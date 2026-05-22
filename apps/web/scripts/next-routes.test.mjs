@@ -504,6 +504,24 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+
+  it('surfaces account-safe custom price alert thresholds on the watchlist route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/watchlist/page.tsx');
+
+    assert.match(verified, /priceAlertThresholdPreferenceContract/);
+    assert.match(verified, /thresholdTypes/);
+    assert.match(verified, /targetPrice/);
+    assert.match(verified, /dealScoreMinimum/);
+    assert.match(route, /priceAlertThresholdPreferenceContract/);
+    assert.match(route, /Custom price alert thresholds/);
+    assert.match(route, /targetPrice/);
+    assert.match(route, /dealScoreMinimum/);
+    assert.match(route, /No anonymous thresholds/);
+    assert.match(route, /buildWatchlistAlerts/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces baby and diaper price tracking alerts using the real watchlist engine', async () => {
     const source = await read('src/app/watchlist/page.tsx');
     assert.match(source, /babyDiaperPriceTracker/);
