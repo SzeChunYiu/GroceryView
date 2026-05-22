@@ -1,5 +1,9 @@
 export const supportedLocales = ['sv', 'en'] as const;
 export type SupportedLocale = (typeof supportedLocales)[number];
+export const routedLocales = ['sv', 'en'] as const;
+export const blockedLocaleRoutes = ['ar', 'so'] as const;
+export type BlockedLocaleRoute = (typeof blockedLocaleRoutes)[number];
+export type LocaleRoute = SupportedLocale | BlockedLocaleRoute;
 
 export const defaultLocale: SupportedLocale = 'sv';
 export const localeCookieName = 'NEXT_LOCALE';
@@ -36,6 +40,20 @@ export function normalizeLocale(value: string | null | undefined): SupportedLoca
   if (!value) return null;
   const normalized = value.toLowerCase().split('-')[0];
   return supportedLocales.includes(normalized as SupportedLocale) ? normalized as SupportedLocale : null;
+}
+
+export function localeRoutePrefix(locale: LocaleRoute) {
+  return `/${locale}`;
+}
+
+export function localeFromPathname(pathname: string): SupportedLocale | null {
+  const segment = pathname.split('/').filter(Boolean)[0];
+  return routedLocales.includes(segment as SupportedLocale) ? segment as SupportedLocale : null;
+}
+
+export function blockedLocaleFromPathname(pathname: string): BlockedLocaleRoute | null {
+  const segment = pathname.split('/').filter(Boolean)[0];
+  return blockedLocaleRoutes.includes(segment as BlockedLocaleRoute) ? segment as BlockedLocaleRoute : null;
 }
 
 export function resolveLocaleFromAcceptLanguage(header: string | null | undefined): SupportedLocale {
