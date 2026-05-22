@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { personalGroceryInflation, savingsDashboard } from '@/lib/demo-data';
+import { personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
@@ -96,6 +96,41 @@ export default function SavingsDashboardPage() {
             </Link>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">{studentWeeklyBudgetTracker.persona}</p>
+        <h2 className="mt-2 text-2xl font-black">Weekly student budget</h2>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+          This tracker calls summarizeBudget for a student weekly plan, then keeps the visible planned basket rows underneath the budget status instead of estimating unknown receipts.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">After planned basket</p>
+            <p className="mt-2 text-3xl font-black text-emerald-800">{formatSek(studentWeeklyBudgetTracker.summary.weeklyRemainingAfterEstimate)}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">weeklyRemainingAfterEstimate from summarizeBudget</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Weekly actual</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(studentWeeklyBudgetTracker.summary.weeklyActualSpend)}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">{studentWeeklyBudgetTracker.summary.weeklyStatus} budget so far</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Monthly remaining</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(studentWeeklyBudgetTracker.summary.monthlyRemainingActual)}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">{studentWeeklyBudgetTracker.summary.monthlyStatus} monthly plan</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {studentWeeklyBudgetTracker.plannedRows.slice(0, 4).map((row) => (
+            <Link className="rounded-2xl border border-emerald-200 bg-white p-4 hover:border-emerald-700" href={`/products/${row.slug}`} key={row.slug}>
+              <p className="font-black text-slate-950">{row.name}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{row.qty} planned · {row.category}</p>
+              <p className="mt-2 text-xl font-black text-emerald-800">{formatSek(row.plannedSpend)}</p>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-4 text-sm font-semibold text-slate-700">{studentWeeklyBudgetTracker.coverage.caveat}</p>
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
