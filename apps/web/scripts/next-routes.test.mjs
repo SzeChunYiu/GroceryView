@@ -782,6 +782,35 @@ describe('verified-data UI', () => {
     assert.match(products, /No synthetic prices/);
   });
 
+  it('ships crawlable sitemap and robots metadata from verified route drivers', async () => {
+    const sitemap = await read('src/app/sitemap.ts');
+    const robots = await read('src/app/robots.ts');
+
+    assert.match(sitemap, /MetadataRoute\.Sitemap/);
+    assert.match(sitemap, /https:\/\/grocery-web-mu\.vercel\.app/);
+    assert.match(sitemap, /axfoodProducts\.slice\(0, 40\)/);
+    assert.match(sitemap, /pricedProducts\.slice\(0, 40\)/);
+    assert.doesNotMatch(sitemap, /productUniverse/);
+    assert.match(sitemap, /osmStores/);
+    assert.match(sitemap, /categoryLabels/);
+    assert.match(sitemap, /\/products\/\$\{product\.slug\}/);
+    assert.match(sitemap, /\/stores\/\$\{store\.slug\}/);
+    assert.match(sitemap, /\/categories\/\$\{slug\}/);
+    assert.match(sitemap, /\/chain-index/);
+    assert.match(sitemap, /\/chain-coverage/);
+    assert.match(sitemap, /changeFrequency/);
+    assert.match(sitemap, /lastModified/);
+    assert.doesNotMatch(sitemap, /@\/lib\/demo-data|@\/components\/sample-data/);
+
+    assert.match(robots, /MetadataRoute\.Robots/);
+    assert.match(robots, /https:\/\/grocery-web-mu\.vercel\.app\/sitemap\.xml/);
+    assert.match(robots, /userAgent: '\*'/);
+    assert.match(robots, /allow: '\/'/);
+    assert.match(robots, /disallow: \[/);
+    assert.match(robots, /\/account/);
+    assert.match(robots, /\/login/);
+  });
+
   it('surfaces adaptive total and unit price product cards with a compare-mode toggle', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
