@@ -113,6 +113,7 @@ export const DEFAULT_COOP_DEVICE = 'desktop';
 export const DEFAULT_COOP_API_VERSION = 'v1';
 export const DEFAULT_COOP_STORE_API_VERSION = 'v5';
 export const DEFAULT_COOP_SEARCH_QUERY = 'kaffe';
+export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [DEFAULT_COOP_STORE_ID, '252700'] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
   'Mini vattenmelon',
@@ -168,10 +169,11 @@ export type FetchCoopProductsOptions = {
 export type FetchCoopWeeklyDiscountsOptions = {
   fetchImpl?: typeof fetch;
   storeId?: string;
+  storeIds?: readonly string[];
   storeApiVersion?: string;
   storeApiUrl?: string;
   storeApiSubscriptionKey?: string;
-  productQueries?: string[];
+  productQueries?: readonly string[];
   maxRows?: number;
   device?: string;
   apiVersion?: string;
@@ -337,8 +339,8 @@ export async function fetchCoopWeeklyDiscounts(
   options: FetchCoopWeeklyDiscountsOptions = {}
 ): Promise<CoopWeeklyDiscount[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const storeId = options.storeId ?? DEFAULT_COOP_STORE_ID;
-  const maxRows = options.maxRows ?? 25;
+  const storeIds = options.storeIds ?? (options.storeId ? [options.storeId] : DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS);
+  const maxRows = options.maxRows ?? 50;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const serviceAccess = options.subscriptionKey && options.storeApiSubscriptionKey
     ? {
@@ -349,80 +351,84 @@ export async function fetchCoopWeeklyDiscounts(
         storeApiSubscriptionKey: options.storeApiSubscriptionKey
       }
     : await fetchCoopPublicWeeklyServiceAccess(fetchImpl);
-  const sourceUrl = buildCoopStoreInfoUrl(
-    storeId,
-    options.storeApiVersion ?? DEFAULT_COOP_STORE_API_VERSION,
-    serviceAccess.storeApiUrl
-  );
-  const storeResponse = await fetchImpl(sourceUrl, {
-    headers: {
-      accept: 'application/json',
-      'ocp-apim-subscription-key': serviceAccess.storeApiSubscriptionKey,
-      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-    }
-  });
-
-  if (!storeResponse.ok) {
-    throw new Error(`Coop store info request failed: ${storeResponse.status}`);
-  }
-
-  const store = await storeResponse.json() as CoopStoreResponse;
-  const currentFlyer = store.flyers?.find((flyer) => flyer.current === true && flyer.pdfExists === true && flyer.isHemmaBilaga !== true);
-  if (!currentFlyer) {
-    return [];
-  }
-
   const rows: CoopWeeklyDiscount[] = [];
-  const seenCodes = new Set<string>();
-  const productSearchUrl = buildCoopSearchUrl(
-    storeId,
-    options.device ?? DEFAULT_COOP_DEVICE,
-    serviceAccess.personalizationApiVersion,
-    serviceAccess.personalizationApiUrl
-  );
+  const seenStoreCodes = new Set<string>();
 
-  for (const query of options.productQueries ?? DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES) {
-    const response = await fetchImpl(productSearchUrl, {
-      method: 'POST',
+  for (const storeId of storeIds) {
+    const sourceUrl = buildCoopStoreInfoUrl(
+      storeId,
+      options.storeApiVersion ?? DEFAULT_COOP_STORE_API_VERSION,
+      serviceAccess.storeApiUrl
+    );
+    const storeResponse = await fetchImpl(sourceUrl, {
       headers: {
         accept: 'application/json',
-        'content-type': 'application/json',
-        'ocp-apim-subscription-key': serviceAccess.personalizationApiSubscriptionKey,
+        'ocp-apim-subscription-key': serviceAccess.storeApiSubscriptionKey,
         'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-      },
-      body: JSON.stringify({
-        query,
-        resultsOptions: { skip: 0, take: 8, sortBy: [], facets: [] },
-        relatedResultsOptions: { skip: 0, take: 0 }
-      })
+      }
     });
 
-    if (!response.ok) {
-      throw new Error(`Coop personalization discount search request failed: ${response.status}`);
+    if (!storeResponse.ok) {
+      throw new Error(`Coop store info request failed for ${storeId}: ${storeResponse.status}`);
     }
 
-    const payload = await response.json() as CoopSearchResponse;
-    for (const product of payload.results?.items ?? []) {
-      const row = normalizeCoopWeeklyDiscount(product, {
-        sourceUrl,
-        flyerUrl: text(currentFlyer.pdfUrl),
-        productSearchUrl,
-        retrievedAt,
-        storeId: text(store.ledgerAccountNumber) || storeId,
-        storeName: text(store.name),
-        region: text(store.city),
-        validFrom: text(currentFlyer.startDate),
-        validTo: text(currentFlyer.stopDate)
-      });
-      if (!row || seenCodes.has(row.code)) {
-        continue;
-      }
-      seenCodes.add(row.code);
-      rows.push(row);
-      break;
+    const store = await storeResponse.json() as CoopStoreResponse;
+    const currentFlyer = store.flyers?.find((flyer) => flyer.current === true && flyer.pdfExists === true && flyer.isHemmaBilaga !== true);
+    if (!currentFlyer) {
+      continue;
     }
-    if (rows.length >= maxRows) {
-      return rows;
+
+    const productSearchUrl = buildCoopSearchUrl(
+      storeId,
+      options.device ?? DEFAULT_COOP_DEVICE,
+      serviceAccess.personalizationApiVersion,
+      serviceAccess.personalizationApiUrl
+    );
+
+    for (const query of options.productQueries ?? DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES) {
+      const response = await fetchImpl(productSearchUrl, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          'ocp-apim-subscription-key': serviceAccess.personalizationApiSubscriptionKey,
+          'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+        },
+        body: JSON.stringify({
+          query,
+          resultsOptions: { skip: 0, take: 8, sortBy: [], facets: [] },
+          relatedResultsOptions: { skip: 0, take: 0 }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Coop personalization discount search request failed for ${storeId}: ${response.status}`);
+      }
+
+      const payload = await response.json() as CoopSearchResponse;
+      for (const product of payload.results?.items ?? []) {
+        const row = normalizeCoopWeeklyDiscount(product, {
+          sourceUrl,
+          flyerUrl: text(currentFlyer.pdfUrl),
+          productSearchUrl,
+          retrievedAt,
+          storeId: text(store.ledgerAccountNumber) || storeId,
+          storeName: text(store.name),
+          region: text(store.city),
+          validFrom: text(currentFlyer.startDate),
+          validTo: text(currentFlyer.stopDate)
+        });
+        const seenKey = row ? `${row.storeId}:${row.code}` : '';
+        if (!row || seenStoreCodes.has(seenKey)) {
+          continue;
+        }
+        seenStoreCodes.add(seenKey);
+        rows.push(row);
+        break;
+      }
+      if (rows.length >= maxRows) {
+        return rows;
+      }
     }
   }
 

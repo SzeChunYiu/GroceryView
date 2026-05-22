@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { gzipSync } from 'node:zlib';
 import {
   buildCoopSearchUrl,
+  buildCoopStoreInfoUrl,
   buildDailyConnectorConfigsFromEnv,
   buildHemkopSearchUrl,
   buildHemkopWeeklyDiscountsUrl,
@@ -27,6 +28,7 @@ import {
   fetchRetailerConnectorSnapshot,
   fetchCoopPublicServiceAccess,
   fetchCoopProducts,
+  fetchCoopWeeklyDiscounts,
   fetchHemkopProducts,
   fetchHemkopWeeklyDiscounts,
   fetchIcaDefaultStoreProducts,
@@ -348,6 +350,80 @@ describe('fetchCoopProducts', () => {
       personalizationApiSubscriptionKey: 'public-page-key',
       personalizationApiVersion: 'v1'
     });
+  });
+});
+
+describe('fetchCoopWeeklyDiscounts', () => {
+  it('fetches Coop weekly discounts for multiple public flyer branches', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url, init) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/stores/')) {
+        const storeId = String(url).includes('/252700') ? '252700' : '251300';
+        const storeName = storeId === '252700' ? 'Stora Coop Bromma' : 'Stora Coop Boländerna';
+        const city = storeId === '252700' ? 'Bromma' : 'Uppsala';
+        const flyerUrl = storeId === '252700'
+          ? 'https://dr.coop.se/Butik/Stora-Coop-Bromma'
+          : 'https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna';
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: storeId,
+          name: storeName,
+          city,
+          flyers: [{
+            startDate: '2026-05-18T00:00:00',
+            stopDate: '2026-05-24T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: flyerUrl,
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: '7310865005168',
+            ean: '7310865005168',
+            name: 'Smör Normalsaltat',
+            manufacturerName: 'Svenskt Smör från Arla',
+            packageSizeInformation: '500g',
+            salesPriceData: { b2cPrice: 61.45 },
+            comparativePriceText: 'kr/kg',
+            onlinePromotions: [{
+              id: '016001_41099',
+              message: 'Medlemspris-Smör 45 kr/st-1 för 45:-',
+              priceData: { b2cPrice: 45 },
+              comparativePrice: { b2cPrice: 90 },
+              medMeraRequired: true
+            }]
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscounts({
+      storeIds: ['251300', '252700'],
+      productQueries: ['Svenskt smör Arla 500 g'],
+      fetchImpl,
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-22T09:05:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopStoreInfoUrl('251300'),
+      buildCoopSearchUrl('251300'),
+      buildCoopStoreInfoUrl('252700'),
+      buildCoopSearchUrl('252700')
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.storeName, row.region, row.code]), [
+      ['251300', 'Stora Coop Boländerna', 'Uppsala', '7310865005168'],
+      ['252700', 'Stora Coop Bromma', 'Bromma', '7310865005168']
+    ]);
+    assert.equal(rows[0]?.ordinaryPrice, 61.45);
+    assert.equal(rows[0]?.offerPrice, 45);
+    assert.equal(rows[1]?.flyerUrl, 'https://dr.coop.se/Butik/Stora-Coop-Bromma');
   });
 });
 
