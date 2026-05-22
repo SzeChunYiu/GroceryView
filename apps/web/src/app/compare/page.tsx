@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { chainPriceRows, chainSavingsLedger, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
+import { budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
 
 export default function ComparePage() {
   return (
@@ -35,6 +35,33 @@ export default function ComparePage() {
               <p className="mt-2 text-sm leading-6 text-slate-600">
                 Top listed saving: {formatSek(chain.topSaving)} on {chain.topProductName}
               </p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">Budget-conscious / cross-chain</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Lowest price anywhere radar</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Highlights the cheapestChain for each exact matched product code and shows the priceGap to the priciest matched chain.
+              No branch-level discounts are inferred; every row links to the verifiedProductSlug evidence.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm">{budgetLowestPriceRadar.length} matched products</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {budgetLowestPriceRadar.map((item) => (
+            <Link className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-700" href={`/products/${item.verifiedProductSlug}`} key={item.verifiedProductSlug}>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">{item.cheapestChain}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{item.productName}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{item.reportedBrand}</p>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                <p className="rounded-xl bg-emerald-50 p-3 font-black text-emerald-950">Cheapest {formatSek(item.cheapestPrice)}</p>
+                <p className="rounded-xl bg-rose-50 p-3 font-black text-rose-950">Gap {formatSek(item.priceGap)}</p>
+              </div>
+              <p className="mt-3 text-xs font-semibold text-slate-500">{item.evidenceLabel} · {formatPct(item.spreadPct)}</p>
             </Link>
           ))}
         </div>
