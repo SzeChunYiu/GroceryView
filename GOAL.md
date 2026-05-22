@@ -138,6 +138,48 @@ core analytics into the already-scaffolded routes** (`/compare`, `/meal-planner`
 
 Already shipped this sprint (regression bars): `/map` (#575), `/chain-index` (#583).
 
+## Product north-star — "a financial terminal for groceries"
+
+GroceryView turns grocery prices into a market: every product is a **ticker**
+with a price chart, chains/categories/brands have **indices**, deals get a
+**Buy/Wait rating**, and shoppers **track, compare, and get alerted** — across
+chains and branches, over time. Reach full parity with Matspar (basket
+comparison) + Matpriskollen (offer/price tracking), THEN exceed them with
+best-in-class UX distilled from outside the grocery space. Workers: treat this
+section as the long-horizon backlog once the P1–P3 analytics items are shipped;
+one feature = one PR; every number must trace to real data + a confidence
+indicator, never fabricated.
+
+### Cross-domain distillation (steal the best, adapt to groceries)
+| Source | Feature to adopt | GroceryView application |
+|--------|------------------|--------------------------|
+| **TradingView** | multi-timeframe charts (1W/1M/3M/1Y/ALL), crosshair value readout, compare-overlay, watchlist sparklines, screener, heatmap | product price charts; overlay two products/chains; chain/category price heatmap; "deal screener" (biggest drops, cheapest /kg) |
+| **Investing.com** | technical "Buy/Sell" summary widget, economic calendar, news-tied-to-symbol, portfolio P/L | Deal-Score verdict widget; promo/seasonal calendar; "why did X move" notes; basket-as-portfolio savings |
+| **CamelCamelCamel / Keepa** | price-history graph + "lowest in 30/90/365 days" + drop alerts | per-product price history + 52-week-low badge + watchlist drop alerts |
+| **Google Flights / Skyscanner** | "prices currently low/high vs usual" + buy-now-vs-wait + price calendar | seasonal "buy now or wait" signal; price-vs-usual indicator |
+| **Airbnb** | instant faceted search, synced map+list, beautiful cards, wishlist (save), trust badges, mobile-first | grocery search w/ filters (category, label, /kg, chain, in-stock); /map ↔ list sync; product cards; watchlist heart; data-freshness/confidence badges |
+| **Robinhood** | approachable charts, portfolio value over time, delightful simple UX, push alerts | personal grocery-inflation curve; clean mobile charts; alert pushes |
+| **Yuka** | scan → health/score | receipt/barcode scan → nutrition-per-krona + track real spend vs index |
+| **Spotify / Netflix** | personalized "for you" rails | "deals for your watchlist", recommended swaps, seasonal picks |
+
+### Full feature catalog (build toward all; real data + confidence only)
+- **Markets / Index:** Grocery Index headline ticker; Chain Price Index + chart (compare chains over time); category & brand-tier sector indices; market heatmap; movers board (biggest weekly drops/rises).
+- **Product / Ticker:** product page = ticker — price chart (multi-timeframe), 7-day %, 52-week low/high, volatility, unit price, labels; cross-chain price table (cheapest highlighted); Deal Score + Buy/Wait verdict; smart swaps; "lowest in N days" badge.
+- **Compare:** cross-chain "who's cheapest now" per product + per basket; basket optimizer (single vs split shop); compare-overlay chart for 2+ items/chains.
+- **Discover / Search:** instant faceted search (category, label, dietary, /kg range, chain, in-stock); full-taxonomy category browse; weekly offers/flyer deals by store (per-branch discounts); `/deals` screener.
+- **Track / Alerts:** watchlist (follow products); price-target & %-drop alerts; weekly digest; notifications.
+- **Personal:** personal grocery inflation (your CPI) + trend; basket cost trend; budget tracker; shopping lists with live totals; household sharing; receipt scanning → real-spend vs index; pantry replenishment; deal-based meal planner.
+- **Map:** stores map + cheapest-near-me; markers colored by chain index; price-by-district heat; map↔list sync.
+- **Content / Trust:** "why prices moved" notes; seasonal/promo calendar; data-freshness + confidence badges everywhere; source citations.
+
+### UI/UX standard — "professional & beautiful" is a GATE, not a nice-to-have
+- **Aesthetic:** financial-terminal clarity (TradingView/Robinhood) + Airbnb-grade polish — color-coded up/down (green/red), tickers, sparklines, dense-but-legible, generous whitespace. No generic scaffold look.
+- **Charts:** use `lightweight-charts` (already a dependency) for price charts; sparklines on cards.
+- **Design system:** consistent tokens (type scale, spacing, color), light + dark, reusable components.
+- **Responsive & mobile-first** (groceries are a phone task); **accessible** (WCAG AA, keyboard, contrast); **fast** (skeleton states, no layout shift).
+- **Honesty in UI:** every figure traces to real data; show coverage/confidence; missing inputs are derived from real cross-chain spread/unit prices and labelled, never invented. Brand/source colors are tokens, not ad-hoc.
+- **Time-series features require the daily price DB** (see ingestion plan): charts may render from fixtures now but must swap to live DB observations — that price tape is what makes the index/terminal real.
+
 ## Updated by operator only
 
 The CEO MUST NOT edit this file. Only the operator (user or main Claude Code
