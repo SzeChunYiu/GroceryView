@@ -12,6 +12,11 @@ function signBillingWebhookBody(body: string, secret: string): string {
   return `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
 }
 
+function signStripeWebhookBody(body: string, secret: string, timestamp: number): string {
+  const signature = createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
+  return `t=${timestamp},v1=${signature}`;
+}
+
 describe('createHttpHandler', () => {
   it('serves runtime health without leaking configured secret values', async () => {
     const previousDatabaseUrl = process.env.DATABASE_URL;
@@ -1596,6 +1601,98 @@ describe('createHttpHandler', () => {
         updatedAt: '2026-05-20T12:00:00.000Z'
       }
     ]);
+  });
+
+  it('accepts provider-native Stripe signatures for Stripe-compatible subscription webhooks', async () => {
+    const persisted: unknown[] = [];
+    const secret = 'whsec_provider_native';
+    const body = JSON.stringify({
+      id: 'evt_stripe_native_signature_1',
+      type: 'customer.subscription.updated',
+      created: 1779278400,
+      data: {
+        object: {
+          id: 'sub_provider_native_1',
+          customer: 'cus_provider_native_1',
+          status: 'active',
+          current_period_end: 1810771200,
+          metadata: { userId: 'user-stripe-native' },
+          items: { data: [{ price: { id: 'price_monthly_native' } }] }
+        }
+      }
+    });
+    const handle = createHttpHandler(undefined, {
+      billingWebhookSecret: secret,
+      billingPriceIdPlanMap: { price_monthly_native: 'premium_monthly' },
+      now: new Date('2026-05-20T12:00:00.000Z'),
+      billingSubscriptionSink: {
+        async upsertSubscriptionEntitlement(entitlement) {
+          persisted.push(entitlement);
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'stripe-signature': signStripeWebhookBody(body, secret, 1779278400) },
+      body
+    }));
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await json(response), {
+      accepted: true,
+      persisted: true,
+      userId: 'user-stripe-native',
+      status: 'active'
+    });
+    assert.deepEqual(persisted, [{
+      userId: 'user-stripe-native',
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'active',
+      currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      providerCustomerId: 'cus_provider_native_1',
+      providerSubscriptionId: 'sub_provider_native_1',
+      updatedAt: '2026-05-20T12:00:00.000Z'
+    }]);
+  });
+
+  it('rejects stale provider-native Stripe billing webhook signatures', async () => {
+    const persisted: unknown[] = [];
+    const secret = 'whsec_provider_native';
+    const body = JSON.stringify({
+      id: 'evt_stale_stripe_native_signature_1',
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          id: 'sub_stale_provider_native_1',
+          customer: 'cus_stale_provider_native_1',
+          status: 'active',
+          metadata: { userId: 'user-stripe-native' },
+          items: { data: [{ price: { id: 'price_monthly_native' } }] }
+        }
+      }
+    });
+    const handle = createHttpHandler(undefined, {
+      billingWebhookSecret: secret,
+      billingPriceIdPlanMap: { price_monthly_native: 'premium_monthly' },
+      now: new Date('2026-05-20T12:10:01.000Z'),
+      billingSubscriptionSink: {
+        async upsertSubscriptionEntitlement(entitlement) {
+          persisted.push(entitlement);
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'stripe-signature': signStripeWebhookBody(body, secret, 1779278400) },
+      body
+    }));
+
+    assert.equal(response.status, 401);
+    assert.deepEqual(persisted, []);
   });
 
   it('fails billing subscription events closed without configured secret, valid signature, and sink', async () => {

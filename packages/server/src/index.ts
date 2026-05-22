@@ -926,14 +926,37 @@ function signBillingWebhookBody(body: string, secret: string): string {
   return `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
 }
 
-function hasValidBillingWebhookSignature(request: Request, body: string, secret: string): boolean {
-  const provided = request.headers.get('x-groceryview-billing-signature');
-  if (!provided) return false;
+const STRIPE_WEBHOOK_SIGNATURE_TOLERANCE_SECONDS = 300;
 
-  const expected = signBillingWebhookBody(body, secret);
+function hasConstantTimeEqualSignature(provided: string, expected: string): boolean {
   const providedBuffer = Buffer.from(provided);
   const expectedBuffer = Buffer.from(expected);
   return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
+}
+
+function hasValidStripeBillingWebhookSignature(request: Request, body: string, secret: string, now: Date): boolean {
+  const header = request.headers.get('stripe-signature');
+  if (!header) return false;
+  const parts = header.split(',').map((part) => part.trim()).filter(Boolean);
+  const timestamp = parts.find((part) => part.startsWith('t='))?.slice(2);
+  const signatures = parts.filter((part) => part.startsWith('v1=')).map((part) => part.slice(3));
+  if (!timestamp || signatures.length === 0) return false;
+  const timestampSeconds = Number(timestamp);
+  if (!Number.isInteger(timestampSeconds)) return false;
+  const ageSeconds = Math.abs(Math.floor(now.getTime() / 1000) - timestampSeconds);
+  if (ageSeconds > STRIPE_WEBHOOK_SIGNATURE_TOLERANCE_SECONDS) return false;
+
+  const expected = createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
+  return signatures.some((signature) => hasConstantTimeEqualSignature(signature, expected));
+}
+
+function hasValidBillingWebhookSignature(request: Request, body: string, secret: string, now: Date): boolean {
+  const provided = request.headers.get('x-groceryview-billing-signature');
+  if (provided) {
+    return hasConstantTimeEqualSignature(provided, signBillingWebhookBody(body, secret));
+  }
+
+  return hasValidStripeBillingWebhookSignature(request, body, secret, now);
 }
 
 function hasValidMetricsToken(request: Request, token: string): boolean {
@@ -1558,7 +1581,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (!authOptions.billingWebhookSecret) return errorResponse(503, 'Billing webhook secret is not configured.');
 
         const rawBody = request.body ? await request.text() : '';
-        if (!hasValidBillingWebhookSignature(request, rawBody, authOptions.billingWebhookSecret)) {
+        if (!hasValidBillingWebhookSignature(request, rawBody, authOptions.billingWebhookSecret, authOptions.now ?? new Date())) {
           return errorResponse(401, 'A valid billing webhook signature is required.');
         }
 
@@ -2196,6 +2219,7 @@ export type OpenApiSecurityRequirement = {
   metricsToken?: never[];
   webhookSignature?: never[];
   billingWebhookSignature?: never[];
+  stripeWebhookSignature?: never[];
 };
 
 export type OpenApiPathItem = Partial<Record<'get' | 'post' | 'put' | 'patch' | 'delete', OpenApiOperation>>;
@@ -2210,6 +2234,7 @@ export type OpenApiDocument = {
       metricsToken: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-metrics-token' };
       webhookSignature: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-signature' };
       billingWebhookSignature: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-billing-signature' };
+      stripeWebhookSignature: { type: 'apiKey'; in: 'header'; name: 'stripe-signature' };
     };
   };
 };
@@ -2218,7 +2243,7 @@ const protectedOperation = (summary: string): OpenApiOperation => ({ summary, se
 const publicOperation = (summary: string): OpenApiOperation => ({ summary });
 const metricsOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ metricsToken: [] }] });
 const webhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ webhookSignature: [] }] });
-const billingWebhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ billingWebhookSignature: [] }] });
+const billingWebhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ billingWebhookSignature: [] }, { stripeWebhookSignature: [] }] });
 
 export function buildOpenApiDocument(): OpenApiDocument {
   return {
@@ -2229,7 +2254,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
         bearerAuth: { type: 'http', scheme: 'bearer' },
         metricsToken: { type: 'apiKey', in: 'header', name: 'x-groceryview-metrics-token' },
         webhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' },
-        billingWebhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-billing-signature' }
+        billingWebhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-billing-signature' },
+        stripeWebhookSignature: { type: 'apiKey', in: 'header', name: 'stripe-signature' }
       }
     },
     paths: {
