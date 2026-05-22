@@ -1,0 +1,79 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { buildDbSiteSnapshotArtifact } from '../../scripts/ingestion/export-db-site-snapshot.mjs';
+
+const rootPackage = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+
+describe('DB-backed site snapshot export script', () => {
+  it('publishes a root operator command for DB-to-site snapshot generation', () => {
+    assert.equal(rootPackage.scripts['ingest:export-db-snapshot'], 'npm run build -w @groceryview/db && node scripts/ingestion/export-db-site-snapshot.mjs');
+  });
+
+  it('builds a static-site artifact from latest_prices rows without raw private payloads', () => {
+    const artifact = buildDbSiteSnapshotArtifact({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      rows: [{
+        productId: 'product-1',
+        productSlug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        brand: 'Rosteriet',
+        categoryPath: ['Pantry', 'Coffee'],
+        packageSize: 450,
+        packageUnit: 'g',
+        comparableUnit: 'kg',
+        chainId: 'chain-1',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        storeId: 'store-1',
+        storeSlug: 'willys-hemma-stockholm-torsplan',
+        storeExternalRef: 'seed:willys:torsplan',
+        storeName: 'Willys Hemma Stockholm Torsplan',
+        city: 'Stockholm',
+        priceType: 'promotion',
+        observationId: 'observation-2',
+        price: 44.9,
+        regularPrice: 59.9,
+        unitPrice: 99.7778,
+        currency: 'SEK',
+        observedAt: '2026-05-20T09:00:00.000Z',
+        confidence: 0.88,
+        provenance: { sourceType: 'retailer_page', rawSnapshotRef: 'raw://daily-ingestion/run/sha256-abcd' }
+      }]
+    });
+
+    assert.equal(artifact.status, 'passed');
+    assert.equal(artifact.generatedAt, '2026-05-22T21:20:00.000Z');
+    assert.equal(artifact.priceRows.length, 1);
+    assert.deepEqual(artifact.coverage, { products: 1, chains: 1, stores: 1, observations: 1 });
+    assert.deepEqual(artifact.priceRows[0], {
+      productSlug: 'bryggkaffe-450g',
+      canonicalName: 'Bryggkaffe mellanrost 450 g',
+      brand: 'Rosteriet',
+      categoryPath: ['Pantry', 'Coffee'],
+      packageSize: 450,
+      packageUnit: 'g',
+      comparableUnit: 'kg',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      storeSlug: 'willys-hemma-stockholm-torsplan',
+      storeExternalRef: 'seed:willys:torsplan',
+      storeName: 'Willys Hemma Stockholm Torsplan',
+      city: 'Stockholm',
+      priceType: 'promotion',
+      price: 44.9,
+      regularPrice: 59.9,
+      unitPrice: 99.7778,
+      currency: 'SEK',
+      observedAt: '2026-05-20T09:00:00.000Z',
+      confidence: 0.88,
+      observationId: 'observation-2',
+      provenance: { sourceType: 'retailer_page', rawSnapshotRef: 'raw://daily-ingestion/run/sha256-abcd' }
+    });
+    assert.equal(JSON.stringify(artifact).includes('rawPayload'), false);
+  });
+
+  it('fails closed when the database reader returns no latest price rows', () => {
+    assert.throws(() => buildDbSiteSnapshotArtifact({ generatedAt: '2026-05-22T21:20:00.000Z', rows: [] }), /No latest price rows available/);
+  });
+});

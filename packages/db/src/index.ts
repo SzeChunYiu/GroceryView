@@ -511,6 +511,31 @@ export type PostgresPriceReader = {
   listPriceObservationHistory(filter: PriceObservationHistoryFilter): Promise<PriceObservationHistoryRecord[]>;
 };
 
+export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
+  productSlug: string;
+  canonicalName: string;
+  brand?: string;
+  categoryPath: string[];
+  packageSize?: number;
+  packageUnit?: string;
+  comparableUnit: string;
+  chainSlug: string;
+  chainName: string;
+  storeSlug?: string;
+  storeExternalRef?: string;
+  storeName?: string;
+  city?: string;
+};
+
+export type SiteLatestPriceSnapshotFilter = {
+  minConfidence?: number;
+  limit?: number;
+};
+
+export type PostgresSiteSnapshotReader = {
+  listLatestPriceSnapshotRows(filter?: SiteLatestPriceSnapshotFilter): Promise<SiteLatestPriceSnapshotRow[]>;
+};
+
 export type SourceRunRecord = {
   sourceType: 'official_api' | 'retailer_api' | 'retailer_page' | 'weekly_leaflet' | 'receipt_ocr' | 'community_report' | 'manual_seed';
   sourceName: string;
@@ -1444,6 +1469,23 @@ type LatestPriceRow = {
   confidence: string | number;
   provenance: Record<string, unknown> | string | null;
 };
+
+
+type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
+  product_slug: string;
+  canonical_name: string;
+  brand: string | null;
+  category_path: string[] | string | null;
+  package_size: string | number | null;
+  package_unit: string | null;
+  comparable_unit: string;
+  chain_slug: string;
+  chain_name: string;
+  store_slug: string | null;
+  store_external_ref: string | null;
+  store_name: string | null;
+  city: string | null;
+};
 type PriceObservationHistoryRow = {
   id: string;
   product_id: string;
@@ -1585,6 +1627,39 @@ function mapLatestPrice(row: LatestPriceRow): LatestPriceRecord {
     observedAt: asIso(row.observed_at),
     confidence: Number(row.confidence),
     provenance: asRecord(row.provenance)
+  };
+}
+
+
+function asStringArray(value: string[] | string | null): string[] {
+  if (Array.isArray(value)) return value;
+  if (!value) return [];
+  const parsed = JSON.parse(value) as unknown;
+  return Array.isArray(parsed) ? parsed.map(String) : [];
+}
+
+function optionalNumberFromDb(value: string | number | null): number | undefined {
+  if (value === null) return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): SiteLatestPriceSnapshotRow {
+  return {
+    ...mapLatestPrice(row),
+    productSlug: row.product_slug,
+    canonicalName: row.canonical_name,
+    ...(row.brand ? { brand: row.brand } : {}),
+    categoryPath: asStringArray(row.category_path),
+    ...(optionalNumberFromDb(row.package_size) === undefined ? {} : { packageSize: optionalNumberFromDb(row.package_size) }),
+    ...(row.package_unit ? { packageUnit: row.package_unit } : {}),
+    comparableUnit: row.comparable_unit,
+    chainSlug: row.chain_slug,
+    chainName: row.chain_name,
+    ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
+    ...(row.store_external_ref ? { storeExternalRef: row.store_external_ref } : {}),
+    ...(row.store_name ? { storeName: row.store_name } : {}),
+    ...(row.city ? { city: row.city } : {})
   };
 }
 
@@ -3693,6 +3768,51 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
       );
 
       return { observationId };
+    }
+  };
+}
+
+export function createPostgresSiteSnapshotReader(executor: QueryExecutor): PostgresSiteSnapshotReader {
+  return {
+    async listLatestPriceSnapshotRows(filter = {}) {
+      const minConfidence = Math.min(Math.max(filter.minConfidence ?? 0, 0), 1);
+      const limit = Math.min(Math.max(filter.limit ?? 1000, 1), 10000);
+      const rows = await executor.query<SiteLatestPriceSnapshotRowSql>(
+        `select latest_prices.product_id,
+                products.slug as product_slug,
+                products.canonical_name,
+                products.brand,
+                products.category_path,
+                products.package_size,
+                products.package_unit,
+                products.comparable_unit,
+                latest_prices.chain_id,
+                chains.slug as chain_slug,
+                chains.name as chain_name,
+                latest_prices.store_id,
+                stores.slug as store_slug,
+                stores.external_ref as store_external_ref,
+                stores.name as store_name,
+                stores.city,
+                latest_prices.price_type,
+                latest_prices.observation_id,
+                latest_prices.price,
+                latest_prices.regular_price,
+                latest_prices.unit_price,
+                latest_prices.currency,
+                latest_prices.observed_at,
+                latest_prices.confidence,
+                latest_prices.provenance
+         from latest_prices
+         join products on products.id = latest_prices.product_id
+         join chains on chains.id = latest_prices.chain_id
+         left join stores on stores.id = latest_prices.store_id
+         where latest_prices.confidence >= $1
+         order by latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
+         limit $2`,
+        [minConfidence, limit]
+      );
+      return rows.map(mapSiteLatestPriceSnapshotRow);
     }
   };
 }

@@ -6,6 +6,7 @@ import {
   createPostgresPriceReader,
   createPostgresProductAliasRepository,
   createPostgresRepository,
+  createPostgresSiteSnapshotReader,
   createPostgresSourceRecordReader,
   createPostgresSourceRecordWriter,
   type QueryExecutor
@@ -326,6 +327,35 @@ class RecordingQueryExecutor implements QueryExecutor {
       provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
     }
   ];
+  siteSnapshotRows: unknown[] = [
+    {
+      product_id: 'product-1',
+      product_slug: 'bryggkaffe-450g',
+      canonical_name: 'Bryggkaffe mellanrost 450 g',
+      brand: 'Rosteriet',
+      category_path: ['Pantry', 'Coffee'],
+      package_size: '450.000',
+      package_unit: 'g',
+      comparable_unit: 'kg',
+      chain_id: 'chain-1',
+      chain_slug: 'willys',
+      chain_name: 'Willys',
+      store_id: 'store-1',
+      store_slug: 'willys-hemma-stockholm-torsplan',
+      store_external_ref: 'seed:willys:torsplan',
+      store_name: 'Willys Hemma Stockholm Torsplan',
+      city: 'Stockholm',
+      price_type: 'promotion',
+      observation_id: 'observation-2',
+      price: 44.9,
+      regular_price: '59.90',
+      unit_price: 99.7778,
+      currency: 'SEK',
+      observed_at: '2026-05-20T09:00:00.000Z',
+      confidence: 0.88,
+      provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
+    }
+  ];
   catalogCoverageRows: unknown[] = [
     {
       product_id: 'coffee',
@@ -350,6 +380,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('from raw_records')) return this.rawRecordRows as T[];
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
     if (sql.includes('left join latest_prices')) return this.catalogCoverageRows as T[];
+    if (sql.includes('join products on products.id = latest_prices.product_id')) return this.siteSnapshotRows as T[];
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
     if (sql.includes('from observations')) return this.observationHistoryRows as T[];
     if (sql.includes('from stores')) return this.storeRows as T[];
@@ -1584,6 +1615,50 @@ describe('createPostgresPriceObservationWriter', () => {
       /Price observation insert did not return an id/
     );
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into latest_prices')), false);
+  });
+});
+
+describe('createPostgresSiteSnapshotReader', () => {
+  it('exports latest_prices with product, chain, store, and provenance for static site snapshots', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresSiteSnapshotReader(executor);
+
+    assert.deepEqual(await reader.listLatestPriceSnapshotRows({ minConfidence: 0.8, limit: 25 }), [
+      {
+        productId: 'product-1',
+        productSlug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        brand: 'Rosteriet',
+        categoryPath: ['Pantry', 'Coffee'],
+        packageSize: 450,
+        packageUnit: 'g',
+        comparableUnit: 'kg',
+        chainId: 'chain-1',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        storeId: 'store-1',
+        storeSlug: 'willys-hemma-stockholm-torsplan',
+        storeExternalRef: 'seed:willys:torsplan',
+        storeName: 'Willys Hemma Stockholm Torsplan',
+        city: 'Stockholm',
+        priceType: 'promotion',
+        observationId: 'observation-2',
+        price: 44.9,
+        regularPrice: 59.9,
+        unitPrice: 99.7778,
+        currency: 'SEK',
+        observedAt: '2026-05-20T09:00:00.000Z',
+        confidence: 0.88,
+        provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
+      }
+    ]);
+
+    assert.match(executor.calls[0]!.sql, /from latest_prices/);
+    assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
+    assert.match(executor.calls[0]!.sql, /join chains on chains\.id = latest_prices\.chain_id/);
+    assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.confidence >= \$1/);
+    assert.deepEqual(executor.calls[0]!.params, [0.8, 25]);
   });
 });
 

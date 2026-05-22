@@ -19,4 +19,11 @@ describe('production daily ingestion readiness runbook', () => {
     assert.doesNotMatch(runbook, /GROCERYVIEW_DAILY_CONNECTORS_JSON=\$\(npm run --silent ops:daily-connectors\)/);
     assert.doesNotMatch(runbook, /Use the emitted JSON as the `GROCERYVIEW_DAILY_CONNECTORS_JSON` secret\/value/);
   });
+  it('documents DB-to-site snapshot generation after daily ingestion writes latest_prices', () => {
+    assert.match(runbook, /npm run --silent ingest:export-db-snapshot/);
+    assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_PATH=/);
+    assert.match(runbook, /postgres\.latest_prices/);
+    assert.match(runbook, /No latest price rows available/);
+  });
+
 });
