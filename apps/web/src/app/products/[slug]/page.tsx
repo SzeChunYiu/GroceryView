@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
+  buildPriceChartSeries,
   calculateDealScore,
   recommendSmartSwaps,
   scoreBand,
@@ -9,6 +10,7 @@ import {
   type BrandTier
 } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
@@ -18,6 +20,13 @@ const smartSwapPrivateLabelPreference = {
   acceptedTiers: ['standard_private_label', 'budget_private_label', 'organic_private_label', 'discount_chain_label'] as BrandTier[],
   blockedCategories: ['baby_formula']
 };
+const timeframeWindows = [
+  { label: '1W', rangeDays: 7, rangeLabel: 'last 7 days' },
+  { label: '1M', rangeDays: 30, rangeLabel: 'last 30 days' },
+  { label: '3M', rangeDays: 90, rangeLabel: 'last 90 days' },
+  { label: '1Y', rangeDays: 365, rangeLabel: 'last 365 days' },
+  { label: 'ALL', rangeDays: undefined, rangeLabel: 'all observed points' }
+] as const;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -216,6 +225,80 @@ function priceHistoryBadgeFor(product: NonNullable<ReturnType<typeof findProduct
   };
 }
 
+function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceChartTerminalModel {
+  const emptyWindows: PriceChartTerminalWindow[] = timeframeWindows.map((window) => ({
+    label: window.label,
+    rangeLabel: window.rangeLabel,
+    pointCount: 0,
+    markerCount: 0,
+    latestValueLabel: 'Not reported',
+    lowValueLabel: 'Not reported',
+    highValueLabel: 'Not reported',
+    series: []
+  }));
+
+  if ('lowestPrice' in product || product.observations.length === 0) {
+    return {
+      available: false,
+      title: 'Multi-timeframe chart withheld',
+      sourceLabel: 'No dated OpenPrices tape bundled for this source',
+      confidenceLabel: 'chart confidence unavailable',
+      caveat: 'This product source has no dated observation tape, so GroceryView does not render a synthetic chart.',
+      defaultWindow: 'ALL',
+      windows: emptyWindows
+    };
+  }
+
+  const latestObservedAt = latestObservationFor(product)?.date ?? product.lastObservedAt;
+  const asOf = `${latestObservedAt}T00:00:00.000Z`;
+  const sourceConfidence = clamp(product.observationCount / 30, 0, 1);
+  const observations = product.observations.map((observation) => ({
+    observedAt: `${observation.date}T00:00:00.000Z`,
+    price: observation.price,
+    storeId: 'openprices-community',
+    storeName: 'OpenPrices community',
+    sourceType: 'online' as const,
+    confidence: sourceConfidence,
+    provenanceLabel: `${product.observationCount} OpenPrices observations · ${product.code}`
+  }));
+
+  const windows = timeframeWindows.map((window): PriceChartTerminalWindow => {
+    const result = buildPriceChartSeries({
+      observations,
+      asOf,
+      rangeDays: window.rangeDays,
+      markerLimitPerSeries: 8
+    });
+    const points = result.series.flatMap((series) => series.points);
+    const values = points.map((point) => point.value);
+    const latestPoint = [...points].sort((a, b) => a.time.localeCompare(b.time)).at(-1);
+
+    return {
+      label: window.label,
+      rangeLabel: window.rangeLabel,
+      windowStart: result.windowStart,
+      windowEnd: result.windowEnd,
+      pointCount: points.length,
+      markerCount: result.series.reduce((total, series) => total + series.markers.length, 0),
+      latestValueLabel: latestPoint ? formatSek(latestPoint.value) : 'Not reported',
+      latestObservedAt: latestPoint?.time,
+      lowValueLabel: values.length ? formatSek(Math.min(...values)) : 'Not reported',
+      highValueLabel: values.length ? formatSek(Math.max(...values)) : 'Not reported',
+      series: result.series
+    };
+  });
+
+  return {
+    available: windows.some((window) => window.pointCount > 0),
+    title: 'Multi-timeframe OpenPrices tape',
+    sourceLabel: 'buildPriceChartSeries · OpenPrices community observations',
+    confidenceLabel: `${formatPct(sourceConfidence * 100)} chart confidence`,
+    caveat: 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred.',
+    defaultWindow: windows.find((window) => window.label === '1Y' && window.pointCount > 0)?.label ?? 'ALL',
+    windows
+  };
+}
+
 export function generateStaticParams() {
   return [...axfoodProducts.slice(0, 40), ...pricedProducts.slice(0, 40)].map((product) => ({ slug: product.slug }));
 }
@@ -228,6 +311,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const dealVerdict = dealScoreVerdictFor(product);
   const smartSwaps = smartSwapRecommendationsFor(product);
   const priceHistoryBadge = priceHistoryBadgeFor(product);
+  const priceChartTerminal = priceChartTerminalFor(product);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   return (
     <PageShell>
@@ -326,6 +410,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         )}
         <p className="mt-4 text-xs font-semibold text-slate-500">{smartSwaps.caveat}</p>
       </Card>
+      <PriceChartTerminal chart={priceChartTerminal} />
       <Card className="mt-6 border-sky-200 bg-sky-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
