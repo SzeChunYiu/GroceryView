@@ -260,7 +260,11 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '235900',
   '235410',
   '235510',
-  '135030'
+  '135030',
+  '074400',
+  '245040',
+  '086804',
+  '083700'
 ] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
