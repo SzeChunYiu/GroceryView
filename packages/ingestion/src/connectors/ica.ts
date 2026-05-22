@@ -809,6 +809,106 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003688',
     storeName: 'ICA Supermarket Skrea Strand',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003880',
+    storeName: 'ICA Supermarket Falköping',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004508',
+    storeName: 'ICA Supermarket Slätta',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003411',
+    storeName: 'Maxi ICA Stormarknad Falun',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003412',
+    storeName: 'ICA Kvantum Farsta',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004175',
+    storeName: 'ICA Kvantum Filipstad',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003606',
+    storeName: 'ICA Kvantum Flen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003837',
+    storeName: 'ICA Supermarket Forshaga',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004100',
+    storeName: 'ICA City Fristad',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003861',
+    storeName: 'ICA Supermarket Vallhalla',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004069',
+    storeName: 'ICA Supermarket Bunge',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003656',
+    storeName: 'ICA Kvantum Färjestaden',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004214',
+    storeName: 'ICA Kvantum Gislaved',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003868',
+    storeName: 'ICA Supermarket Klingan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004349',
+    storeName: 'ICA Nära Optimisten',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004551',
+    storeName: 'ICA Kvantum Gällivare',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003610',
+    storeName: 'ICA Nära Gällstad',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003587',
+    storeName: 'ICA Nära Bomhus',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004534',
+    storeName: 'ICA Supermarket Strömsbro',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1158001',
+    storeName: 'Maxi ICA Stormarknad Brynäs',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003987',
+    storeName: 'Maxi ICA Stormarknad Gävle',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 

@@ -11,7 +11,7 @@ describe('catalog coverage target export script', () => {
   it('exports production coverage target JSON from live catalog tables', () => {
     assert.match(script, /DATABASE_URL is required/);
     assert.match(script, /from products order by id/);
-    assert.match(script, /from stores order by id/);
+    assert.match(script, /from stores order by slug/);
     assert.match(script, /from chains order by slug/);
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
       assert.match(script, new RegExp(`['"]${chain}['"]`));
@@ -27,6 +27,7 @@ describe('catalog coverage target export script', () => {
     assert.deepEqual(JSON.parse(hyphenatedOutput).targetChains, ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']);
     assert.deepEqual(targets.targetProducts, ['coffee', 'milk']);
     assert.deepEqual(targets.targetStores, ['coop-odenplan', 'willys-odenplan']);
+    assert.doesNotMatch(script, /select id from stores order by id/);
     assert.equal(targets.requireEveryProductInEveryStore, true);
   });
 });
