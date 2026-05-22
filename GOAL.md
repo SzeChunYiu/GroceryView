@@ -307,6 +307,117 @@ per-rival feature gaps in [`COMPETITIVE-ANALYSIS.md`](COMPETITIVE-ANALYSIS.md).
 > right. Iceland yes (white space); Finland is one of the *hardest* entries, not
 > the easiest. Lead with Sweden→Iceland→Norway.
 
+## Production-readiness gaps — atomic, must-fill (operator 2026-05-22)
+
+Verified missing in the codebase. Atomic-perfection bar: every sub-item is its own
+PR; no known gap ships. Tags as noted.
+
+### `feat(consent):` consent + privacy (LEGAL P0 — gates compliant ad revenue)
+- CMP (IAB TCF v2.2) cookie banner: accept / reject-all / manage, granular categories
+  (necessary, analytics, ads, personalisation).
+- Google **Consent Mode v2** wired to gtag (default denied → update on choice); AdSense
+  serves non-personalised until consent.
+- Consent log/audit (proof + timestamp); re-prompt on policy version change.
+- Privacy policy + cookie policy pages (sv + en).
+- GDPR data-subject rights: in-app **export my data**, **delete my account/data**, view
+  stored data. Receipt data (sensitive): documented retention + deletion + encryption.
+
+### `feat(seo):` search visibility (highest-ROI growth — currently 0)
+- `app/sitemap.ts` (products, categories, stores, chains) + `app/robots.ts`.
+- `generateMetadata` on every route (title, description, canonical, OG, twitter).
+- JSON-LD: `Product` + `AggregateOffer` (cross-chain price range!), `BreadcrumbList`,
+  `Organization`, `WebSite`+SearchAction.
+- Programmatic landing pages: "billigaste <product>", "<product> pris jämförelse",
+  per-city — the category's main organic channel.
+- ISR/SSG for product/category/store pages (crawlable + fast); dynamic OG price images.
+- `hreflang` (pairs with i18n).
+
+### `feat(i18n):` localisation (blocks immigrant persona AND Nordic expansion)
+- next-intl (App Router) + locale-routed middleware (`/sv`, `/en`, + immigrant langs).
+- Extract all hardcoded strings → `messages/{locale}.json`.
+- Locale-aware currency/number/date/unit formatting; multi-currency display
+  (SEK/NOK/DKK/EUR/ISK) off `observations.currency`.
+- Language switcher + persisted pref + Accept-Language detection; RTL support (Arabic/
+  Somali common in SE). Translations native-quality only — never fabricate; mark MT.
+
+### `decision:` mobile — PWA-first vs native Expo (apps/mobile is logic-only stub)
+- **Operator-recommended: PWA-first** — installable, web-push, getUserMedia barcode,
+  reuses the web codebase; revisit native after traction. Decide before building.
+
+## Storage & performance optimization — the price tape at scale (operator 2026-05-22)
+
+Per-branch × EAN × daily = millions of rows/day. Self-hosted Postgres (docker), so
+TimescaleDB is available. SCHEMA.md already designs `observations_v2 partition by
+range (observed_at)` but it is NOT built. Tag `perf(db):` / `perf(web):`.
+
+### `perf(db):` storage
+- **Change-only writes (biggest win):** insert an observation only when price differs
+  from the last for (product, chain, store, price_type); keep `valid_from` (temporal /
+  SCD-2). Grocery prices change ~weekly → 5–10× fewer rows than daily snapshots.
+- **Range partition `observations` by `observed_at`** (monthly), auto-created
+  (pg_partman or declarative); enables cheap retention via partition drop.
+- **BRIN index on `observed_at`** (append-only time-series) + prune redundant btrees.
+- **Rollup tables / continuous aggregates** `price_daily` & `price_weekly`
+  (min/max/avg/last per product×chain) — charts + 52-week-low read these, never raw.
+- **Retention tiering:** raw obs hot ~13 months → downsample to daily → archive
+  (parquet/gzip to object storage) or drop; `raw_records` short TTL or object storage.
+- **Evaluate TimescaleDB** hypertables + native columnar compression (~10×) + retention
+  policies; fallback = pg_partman + scheduled matviews. (Recommended: adopt Timescale.)
+- Optional: store price as integer öre (smaller than `numeric`); format in UI.
+
+### `perf(web):` frontend + API
+- `next/image` everywhere (currently 0) — responsive, CDN, AVIF/WebP.
+- Expand ISR/SSG to all product/category/store pages; lazy-load `lightweight-charts`.
+- Bundle analysis + code-split; Core Web Vitals budget + Lighthouse CI gate.
+- API: Redis cache for hot endpoints (chain index, deals), cursor pagination,
+  pgbouncer pooling for serverless; analytics over long ranges hit rollups only.
+
+## Historic price & per-branch analytics — deepen (operator 2026-05-22)
+
+We have per-branch prices over time — lean into HISTORY and geography, not prediction.
+Operator directive: **drop price forecasting** (nobody can predict price); express
+"is now a good time?" purely from a product's own history. Reads off the price rollups
+(see `perf(db)` above). Tags `feat(history):` / `feat(geo):`.
+
+### `feat(history):` historic price (the honest replacement for forecast)
+- Per-product price chart, multi-timeframe (1W/1M/3M/1Y/ALL) with crosshair readout.
+- "Lowest / highest in 30 / 90 / 365 days" badges; 52-week-low flag.
+- **"vs usual" signal** — current price as a percentile of its own 1-year history
+  ("15% below its typical 28 kr"). This is the honest Buy/Wait — a fact, not a guess.
+- Typical range / volatility band ("usually 25–32 kr"); price-change event log
+  ("dropped 12% on 2026-05-10"); cross-chain history overlay.
+- Seasonal-by-month view (avg price per month across years) — feeds `feat(calendar)`.
+
+### `feat(geo):` per-branch visualisation & statistics (we have per-branch prices — unique edge)
+- **Price heatmap on the map** — colour each branch by its price for the viewed
+  product / basket / chain index; cheapest vs dearest areas at a glance.
+- **Intra-chain branch spread** — distribution of a product's price across a chain's
+  branches (box/violin); cheapest & dearest branch; "up to X% difference between
+  branches" stat.
+- Regional / district / city price statistics (consumer-org-survey-style numbers).
+- "Cheapest branch near me" highlight; basket-cost heatmap by area.
+- Every figure traces to real per-branch data + a confidence/coverage indicator.
+
+## Additional feature backlog — not yet planned (operator 2026-05-22)
+
+One feature = one PR; real data + confidence; reach a driver file. Personas/engine
+back most of these.
+
+- `feat(meal-cost):` ingredient-level dish/meal costing — build a dish from
+  ingredients (each mapped to a product/commodity), show **exact cost per meal + per
+  serving** + the cheapest chain to cook it, with a per-ingredient cost breakdown.
+  (Operator-requested 2026-05-22; behaviour as described, not a named third-party method.)
+- `feat(delivery):` online-delivery (Mathem/Coop-online) vs in-store total incl. fees.
+- `feat(dupe):` private-label "dupe finder" — "ICA Basic = this brand, −38%".
+- `feat(crowd):` crowd price submissions (photo + price) via `community_reporter_trust`
+  — the scalable path to loose meat/veg coverage.
+- `feat(loyalty):` member-offer aggregation + points (uses `price_type='member'`).
+- `feat(widget):` embeddable Grocery Index ticker for blogs/news (PR + backlinks).
+- `feat(digest):` weekly personalised email digest (watchlist + best deals).
+- `feat(calendar):` seasonal "best time to buy" produce calendar — from **historical**
+  monthly averages, not forecast (content + SEO + eco).
+- `feat(eco):` carbon/eco score per basket ("cheaper + greener").
+
 ## Updated by operator only
 
 The CEO MUST NOT edit this file. Only the operator (user or main Claude Code
