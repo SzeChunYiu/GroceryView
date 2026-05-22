@@ -151,7 +151,12 @@ export class RealCatalogService {
     return buildFacetedProductSearch({ rows: rows.map(mapCatalogRow), filters });
   }
 
-  async compareBasket(input: { userId?: string; items: RealBasketCompareItem[]; storeSlugs?: string[] }) {
+  async compareBasket(input: {
+    userId?: string;
+    items: RealBasketCompareItem[];
+    storeSlugs?: string[];
+    basketSource?: 'request_body' | 'weekly_baskets';
+  }) {
     if (input.items.length === 0) throw new BadRequestException('items must include at least one product.');
     for (const item of input.items) {
       if (!item.productId?.trim()) throw new BadRequestException('items.productId is required.');
@@ -174,7 +179,8 @@ export class RealCatalogService {
       userId: input.userId,
       items: input.items.map((item) => ({ ...item, productId: canonicalProductIds.get(item.productId) ?? item.productId })),
       selectedStoreSlugs: input.storeSlugs,
-      latestPrices: mappedRows
+      latestPrices: mappedRows,
+      basketSource: input.basketSource
     });
   }
 
@@ -198,6 +204,7 @@ export class RealCatalogService {
     return this.compareBasket({
       userId,
       storeSlugs,
+      basketSource: 'weekly_baskets',
       items: basketRows.map((row) => ({ productId: row.product_id, quantity: Number(row.quantity) }))
     });
   }
