@@ -268,6 +268,12 @@ describe('real catalog API endpoints', () => {
 
     assert.equal(response.body.productId, 'product-milk');
     assert.equal(response.body.productSlug, 'standardmjolk-1l');
+    assert.deepEqual(response.body.filters, {
+      priceType: 'promotion',
+      observedFrom: '2026-05-01T00:00:00.000Z',
+      observedTo: '2026-05-31T23:59:59.000Z',
+      limit: 25
+    });
     assert.equal(response.body.pointCount, 2);
     assert.deepEqual(response.body.points.map((point: { observationId: string }) => point.observationId), ['obs-milk-shelf', 'obs-milk-promo']);
     assert.equal(response.body.points[1].priceType, 'promotion');
@@ -287,6 +293,8 @@ describe('real catalog API endpoints', () => {
     assert.deepEqual(observationsQuery?.params, [
       'product-milk',
       'promotion',
+      null,
+      null,
       '2026-05-01T00:00:00.000Z',
       '2026-05-31T23:59:59.000Z',
       25
