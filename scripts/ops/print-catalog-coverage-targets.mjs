@@ -8,11 +8,15 @@ function uniqueSorted(values) {
   return [...new Set(values.filter((value) => typeof value === 'string' && value.trim()).map((value) => value.trim()))].sort();
 }
 
+function normalizeChainId(value) {
+  return value.trim().toLowerCase().replace(/-/g, '_');
+}
+
 export function buildCatalogCoverageTargets(rows) {
   const targetProducts = uniqueSorted(rows.products.map((row) => row.id));
   const targetCategories = uniqueSorted(rows.products.map((row) => row.category_id ?? 'uncategorized'));
   const targetStores = uniqueSorted(rows.stores.map((row) => row.id));
-  const observedChains = uniqueSorted(rows.chains.map((row) => row.id));
+  const observedChains = uniqueSorted(rows.chains.map((row) => normalizeChainId(row.id)));
   const missingRequiredChains = requiredDailyChainIds.filter((chainId) => !observedChains.includes(chainId));
   if (missingRequiredChains.length > 0) {
     throw new Error(`Catalog target DB is missing required chains: ${missingRequiredChains.join(', ')}`);
@@ -44,11 +48,14 @@ async function readCatalogRows(databaseUrl) {
 }
 
 async function main() {
-  if (process.argv.includes('--self-test')) {
+  if (process.argv.includes('--self-test') || process.argv.includes('--self-test-hyphenated-chain-slugs')) {
+    const chainIds = process.argv.includes('--self-test-hyphenated-chain-slugs')
+      ? requiredDailyChainIds.map((id) => id.replace(/_/g, '-'))
+      : requiredDailyChainIds;
     const targets = buildCatalogCoverageTargets({
       products: [{ id: 'coffee', category_id: 'coffee' }, { id: 'milk', category_id: 'dairy' }],
       stores: [{ id: 'willys-odenplan' }, { id: 'coop-odenplan' }],
-      chains: requiredDailyChainIds.map((id) => ({ id }))
+      chains: chainIds.map((id) => ({ id }))
     });
     process.stdout.write(`${JSON.stringify(targets)}\n`);
     return;
