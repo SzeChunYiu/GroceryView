@@ -12,10 +12,15 @@ function normalizeChainId(value) {
   return value.trim().toLowerCase().replace(/-/g, '_');
 }
 
+function connectorAddressableStoreRef(row) {
+  const externalRef = typeof row.external_ref === 'string' ? row.external_ref.trim() : '';
+  return externalRef && !externalRef.startsWith('seed:') ? externalRef : '';
+}
+
 export function buildCatalogCoverageTargets(rows) {
   const targetProducts = uniqueSorted(rows.products.map((row) => row.id));
   const targetCategories = uniqueSorted(rows.products.map((row) => row.category_id ?? 'uncategorized'));
-  const targetStores = uniqueSorted(rows.stores.map((row) => row.external_ref));
+  const targetStores = uniqueSorted(rows.stores.map(connectorAddressableStoreRef));
   const observedChains = uniqueSorted(rows.chains.map((row) => normalizeChainId(row.id)));
   const missingRequiredChains = requiredDailyChainIds.filter((chainId) => !observedChains.includes(chainId));
   if (missingRequiredChains.length > 0) {
@@ -57,6 +62,7 @@ async function main() {
     const stores = process.argv.includes('--self-test-store-external-refs')
       ? [
           { id: 'seed-coop-odenplan', slug: 'coop-odenplan', external_ref: null },
+          { id: 'seed-willys-torsplan', slug: 'willys-hemma-stockholm-torsplan', external_ref: 'seed:willys:torsplan' },
           { id: 'daily-coop-kirseberg', slug: '216502', external_ref: '216502' },
           { id: 'daily-ica-kungsholmen', slug: '1004599', external_ref: '1004599' }
         ]
