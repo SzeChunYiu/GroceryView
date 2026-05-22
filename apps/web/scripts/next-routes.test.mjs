@@ -613,6 +613,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces product smart swaps using the real core recommendation engine', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /recommendSmartSwaps/);
+    assert.match(source, /smartSwapRecommendationsFor/);
+    assert.match(source, /Smart swaps/);
+    assert.match(source, /savingsPercent/);
+    assert.match(source, /qualityRisk/);
+    assert.match(source, /private-label preference/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces verified catalogue savings on the compare route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/compare/page.tsx');

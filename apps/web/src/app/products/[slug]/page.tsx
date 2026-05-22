@@ -1,11 +1,16 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { calculateDealScore, scoreBand } from '@groceryview/core';
+import { calculateDealScore, recommendSmartSwaps, scoreBand, type BrandTier } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 
 const REQUIRED_CHAIN_COVERAGE = 6;
+const smartSwapPrivateLabelPreference = {
+  acceptedTiers: ['standard_private_label', 'budget_private_label', 'organic_private_label', 'discount_chain_label'] as BrandTier[],
+  blockedCategories: ['baby_formula']
+};
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -21,6 +26,55 @@ function percentileForPrice(values: number[], currentPrice: number) {
 
 function latestObservationFor(product: (typeof pricedProducts)[number]) {
   return [...product.observations].sort((a, b) => b.date.localeCompare(a.date))[0];
+}
+
+function packageEvidenceFrom(text: string) {
+  const match = text.toLowerCase().replace(',', '.').match(/(\d+(?:\.\d+)?)\s*(kg|g|l|ml|st)\b/);
+  if (!match) return null;
+  const amount = Number(match[1]);
+  const unit = match[2];
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+  if (unit === 'kg') return { packageSize: amount * 1000, packageUnit: 'g' };
+  if (unit === 'l') return { packageSize: amount * 1000, packageUnit: 'ml' };
+  if (unit === 'st') return { packageSize: amount, packageUnit: 'piece' };
+  return { packageSize: amount, packageUnit: unit };
+}
+
+function productPackageText(product: NonNullable<ReturnType<typeof findProduct>>) {
+  return 'lowestPrice' in product ? product.subline : product.quantity;
+}
+
+function productBrand(product: NonNullable<ReturnType<typeof findProduct>>) {
+  return 'lowestPrice' in product ? product.brand : product.brands || 'Brand not reported';
+}
+
+function productUnitPrice(product: NonNullable<ReturnType<typeof findProduct>>) {
+  return 'lowestPrice' in product ? product.lowestPrice : product.priceMedian;
+}
+
+function brandTierFor(brand: string, labels: string[] = []): BrandTier {
+  const lower = brand.toLowerCase();
+  const isRetailerPrivateLabel = lower.includes('garant') || lower.includes('ica') || lower.includes('coop') || lower.includes('änglamark');
+  if (lower.includes('garant eko') || (isRetailerPrivateLabel && (labels.includes('ecological') || labels.includes('eu_ecological')))) return 'organic_private_label';
+  if (lower.includes('eldorado') || lower.includes('x-tra') || lower.includes('basic')) return 'budget_private_label';
+  if (isRetailerPrivateLabel) return 'standard_private_label';
+  if (lower.includes('willys') || lower.includes('lidl') || lower.includes('city gross')) return 'discount_chain_label';
+  return 'national';
+}
+
+function productMatchInputFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const packageEvidence = packageEvidenceFrom(productPackageText(product));
+  const unitPrice = productUnitPrice(product);
+  if (!packageEvidence || unitPrice <= 0) return null;
+  const brand = productBrand(product);
+  return {
+    id: product.slug,
+    brand,
+    category: product.category,
+    brandTier: brandTierFor(brand, 'labels' in product ? product.labels : []),
+    unitPrice,
+    ...packageEvidence
+  };
 }
 
 function dealScoreVerdictFor(product: NonNullable<ReturnType<typeof findProduct>>) {
@@ -70,6 +124,50 @@ function dealScoreVerdictFor(product: NonNullable<ReturnType<typeof findProduct>
   };
 }
 
+function smartSwapRecommendationsFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const source = productMatchInputFor(product);
+  const productById = new Map([...axfoodProducts, ...pricedProducts].map((candidate) => [candidate.slug, candidate]));
+  if (!source) {
+    return {
+      rows: [],
+      caveat: 'Smart swaps are withheld because this product lacks verified package-size evidence.'
+    };
+  }
+
+  const candidates = [...axfoodProducts, ...pricedProducts]
+    .filter((candidate) => candidate.slug !== product.slug && candidate.category === product.category)
+    .map(productMatchInputFor)
+    .filter((candidate): candidate is NonNullable<ReturnType<typeof productMatchInputFor>> => candidate !== null && candidate.unitPrice < source.unitPrice);
+
+  const rows = recommendSmartSwaps({
+    source,
+    candidates,
+    acceptPrivateLabel: 'yes',
+    minimumSavingsPercent: 5,
+    privateLabelPreference: smartSwapPrivateLabelPreference
+  })
+    .map((swap) => {
+      const swapProduct = productById.get(swap.productId);
+      if (!swapProduct) return null;
+      return {
+        ...swap,
+        productName: swapProduct.name,
+        productSlug: swapProduct.slug,
+        brand: productBrand(swapProduct),
+        unitPrice: productUnitPrice(swapProduct)
+      };
+    })
+    .filter((swap): swap is NonNullable<typeof swap> => swap !== null)
+    .slice(0, 4);
+
+  return {
+    rows,
+    caveat: rows.length > 0
+      ? 'Recommendations require same category, comparable package size, verified lower unit price, and the visible private-label preference.'
+      : 'No same-size, lower-price substitute cleared recommendSmartSwaps for this product.'
+  };
+}
+
 export function generateStaticParams() {
   return [...axfoodProducts.slice(0, 40), ...pricedProducts.slice(0, 40)].map((product) => ({ slug: product.slug }));
 }
@@ -80,6 +178,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   if (!product) notFound();
   const isChain = 'lowestPrice' in product;
   const dealVerdict = dealScoreVerdictFor(product);
+  const smartSwaps = smartSwapRecommendationsFor(product);
   return (
     <PageShell>
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
@@ -131,6 +230,34 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">confidence {formatPct(dealVerdict.confidence * 100)}</p>
           <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{dealVerdict.evidence}</p>
         </div>
+      </Card>
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-500">Substitute engine</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Smart swaps</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Calls recommendSmartSwaps with visible package sizes and prices. The private-label preference accepts retailer/private-label tiers but blocks high-risk baby formula substitutions.
+            </p>
+          </div>
+          <p className="rounded-full bg-slate-100 px-4 py-2 text-sm font-black text-slate-700">{smartSwaps.rows.length} verified swaps</p>
+        </div>
+        {smartSwaps.rows.length > 0 ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {smartSwaps.rows.map((swap) => (
+              <Link className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-emerald-700" href={`/products/${swap.productSlug}`} key={swap.productId}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Save {formatPct(swap.savingsPercent)}</p>
+                <h3 className="mt-2 text-lg font-black text-slate-950">{swap.productName}</h3>
+                <p className="mt-1 text-sm font-semibold text-slate-600">{swap.brand} · {formatSek(swap.unitPrice)}</p>
+                <p className="mt-3 text-sm leading-6 text-slate-700">{swap.reason}</p>
+                <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">confidence {swap.confidence} · qualityRisk {swap.qualityRisk}</p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-950">{smartSwaps.caveat}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold text-slate-500">{smartSwaps.caveat}</p>
       </Card>
       {isChain ? (
         <Card className="mt-6">
