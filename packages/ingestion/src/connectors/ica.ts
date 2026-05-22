@@ -354,6 +354,81 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003793',
     storeName: 'ICA Kvantum Hörby',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004458',
+    storeName: 'ICA Supermarket Luthagens Livs',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004181',
+    storeName: 'ICA Folkes Livs',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003386',
+    storeName: 'ICA Nära Stabby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003426',
+    storeName: 'ICA Supermarket Årstahallen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003871',
+    storeName: 'ICA Kvantum Uppsala',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004488',
+    storeName: 'Maxi ICA Stormarknad Stenhagen Uppsala',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003521',
+    storeName: 'ICA Supermarket Sigtuna',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004562',
+    storeName: 'ICA Kvantum Märsta',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004504',
+    storeName: 'ICA Supermarket Bro',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003501',
+    storeName: 'ICA Kvantum Väsby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004501',
+    storeName: 'ICA Kvantum Vallentuna',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003415',
+    storeName: 'Maxi ICA Stormarknad Häggvik',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003673',
+    storeName: 'ICA Kvantum Sollentuna C',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1131004',
+    storeName: 'Maxi ICA Stormarknad Arninge',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004250',
+    storeName: 'ICA Kvantum Täby C',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
