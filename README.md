@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 09:54 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 14:11 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **312**
+- **Shipped `feat:`/`wire:` PRs to date:** **297**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,27 +42,26 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
-- #775 feat(ingest): expand Axfood weekly flyer discounts
-- #774 feat(ingest): add Coop branch weekly discounts
-- #773 feat(persona): add family bulk unit prices
-- #771 feat(ingest): refresh OpenFoodFacts barcode nutrition
-- #769 feat(persona): add student deal recipes
-- #765 feat(persona): add student budget tracker
-- #763 feat(ingest): add ICA Södermalm store prices
-- #764 feat(ingest): deepen public source rows
-- #762 feat(persona): add single-portion deals
-- #761 feat(ingest): deepen retailer product rows
-- #758 feat(persona): surface student basics board
-- #759 feat(ingest): add ICA Karlaplan store prices
-- #756 feat(api): serve real store flyer offers
-- #755 feat(ingest): enrich retailer barcodes with OpenFoodFacts nutrition
-- #754 feat(api): serve real latest prices
+- #939 feat(web): add product vs usual signal
+- #938 feat(ingest): expand Axfood weekly discounts
+- #937 feat(api): expose price history evidence
+- #935 feat(ingest): expand City Gross store products
+- #933 feat(ingest): add Coop weekly flyer branches
+- #931 feat(ingest): add Coop weekly flyer branches
+- #930 feat(ingest): refresh OpenFoodFacts barcode enrichment
+- #929 feat(web): add product history range badges
+- #927 feat(seo): add programmatic landing pages
+- #925 feat(ingest): expand Axfood weekly discounts
+- #922 feat(ingest): refresh OpenFoodFacts enrichment evidence
+- #920 feat(ingest): expand Coop weekly flyer discounts
+- #921 feat(seo): add route metadata coverage
+- #918 feat(web): add product price chart timeframes
+- #919 feat(seo): add structured JSON-LD metadata
 
 ## 🔄 In progress (open PRs)
 
-- #777 feat(persona): add family meal planner
-- #745 test(ingest): cover Coop weekly discounts connector _(draft)_
-- #730 feat(ingest): deepen real grocery data sources
+- #941 Add consent and session exchange gates
+- #940 feat(ingest): add ICA store promotions for 20 branches
 
 ## 📋 To-do (from GOAL.md backlog)
 
@@ -100,6 +99,12 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - Loyalty-adjusted basket comparison
 - Split-shop / cheapest-route basket optimizer
 - Flyer / digital-catalog ingestion
+- Ingestion: classify + map loose items.
+- Cross-chain commodity comparison
+- Per-chain fresh-food index
+- Unit-price normalisation everywhere
+- Curator/community review of mappings
+- Receipt-fed mapping growth
 - Sweden (home) — win first.
 - Iceland — cheap proof-of-concept.
 - Norway — the real expansion prize.
