@@ -104,6 +104,16 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003777',
     storeName: 'Maxi ICA Stormarknad Haninge',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004414',
+    storeName: 'ICA Banér',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003855',
+    storeName: 'ICA Supermarket Vanadis',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
