@@ -320,7 +320,13 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '185010',
   '106433',
   '035000',
-  '133700'
+  '133700',
+  '056313',
+  '196231',
+  '245080',
+  '245050',
+  '116385',
+  '116418'
 ] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
@@ -348,10 +354,17 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Marabou Chokladpraliner Hjärta',
   'Vanish White Gold',
   'NIVEA Q10 Energy',
-  'Bravo Juice Tropisk'
+  'Bravo Juice Tropisk',
+  'falukorv',
+  'avokado',
+  'spare ribs',
+  'finish',
+  'ost',
+  'fiskpinnar coop'
 ];
 const COOP_LUND_STADION_FLYER_STORE_IDS = ['105860', '105760', '105740', '105710', '105830', '105630', '105810'] as const;
 const COOP_KARLSKOGA_MATCHED_FLYER_STORE_IDS = ['163120'] as const;
+const COOP_SMALL_STORE_MATCHED_FLYER_STORE_IDS = ['056313', '196231', '245080', '245050', '116385', '116418'] as const;
 export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[] = [
   {
     query: 'Färsk laxfilé Harbour',
@@ -438,6 +451,14 @@ export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[
     ['Vanish White Gold', '5701092111067', 54.9, 116.81, '116.81 kr/kilo', 'Fläckborttagning White Gold-54:90 /st', false],
     ['NIVEA Q10 Energy', '4006000089874', 89, 1780, '1780.00 kr/liter', 'Dagkräm Q10 Energy spf 15-89:- /st', false],
     ['Bravo Juice Tropisk', '7310867561020', 34, 17, '17.00 kr/liter', 'Medlemspris-Juice Tropisk-34:- /st', true]
+  ]),
+  ...coopFlyerOfferHints(COOP_SMALL_STORE_MATCHED_FLYER_STORE_IDS, [
+    ['falukorv', '7300206787006', 35, 43.75, '43.75 kr/kg', 'Medlemspris-Falukorv-35:- /st', true],
+    ['avokado', '7300156589538', 27, 67.5, '67.50 kr/kg', 'Medlemspris-Ätmogen avokado 3-pack-27:- /förp', true],
+    ['spare ribs', '7300156498861', 55, 110, '110.00 kr/kg', 'Spare ribs-55:- /st', false],
+    ['finish', '5714970007970', 49.5, 1.18, '1.18 kr/tvätt/disk', 'Maskindisktabletter-2 för 99:-', false],
+    ['ost', '2340380300009', 75, 75, '75.00 kr/kg', 'Medlemspris-Ost familjefavoriter-75:- /kg', true],
+    ['fiskpinnar coop', '7340191175846', 30, 66.67, '66.67 kr/kg', 'Fiskpinnar-30:- /st', false]
   ])
 ];
 
