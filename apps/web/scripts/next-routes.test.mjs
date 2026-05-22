@@ -282,6 +282,17 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces an elderly fixed-income monthly budget using real budget summaries', async () => {
+    const source = await read('src/app/savings-dashboard/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+    assert.match(source, /elderlyFixedIncomeBudgetTracker/);
+    assert.match(source, /Fixed-income monthly budget/);
+    assert.match(source, /monthlyRemainingActual/);
+    assert.match(source, /pensionEnvelope/);
+    assert.match(demo, /summarizeBudget/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces elderly staples price stability using real price-history summaries', async () => {
     const source = await read('src/app/savings-dashboard/page.tsx');
     const demo = await read('src/lib/demo-data.ts');

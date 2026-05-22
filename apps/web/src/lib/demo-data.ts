@@ -2463,6 +2463,35 @@ export const studentWeeklyBudgetTracker = {
   }
 };
 
+
+export const elderlyFixedIncomeBudgetInput = {
+  weeklyBudget: 650,
+  monthlyBudget: 2800,
+  estimatedBasketTotal: 612.4,
+  receiptTotalsThisWeek: [184.5, 129.9, 96.7],
+  receiptTotalsThisMonth: [612.4, 548.2, 391.8, 228.5]
+};
+
+export const elderlyFixedIncomeBudgetTracker = {
+  persona: 'Elderly / seniors',
+  title: 'Fixed-income monthly budget',
+  pensionEnvelope: {
+    label: 'Food pension envelope',
+    amount: elderlyFixedIncomeBudgetInput.monthlyBudget,
+    cadence: 'monthly fixed-income plan'
+  },
+  summary: summarizeBudget(elderlyFixedIncomeBudgetInput),
+  guardrails: [
+    { label: 'Staples first', action: 'Reserve milk, oats, coffee, and pharmacy-adjacent household basics before discretionary deals.' },
+    { label: 'No estimate padding', action: 'Only scanned receipts and the visible planned basket count toward the monthly envelope.' },
+    { label: 'Overrun warning', action: 'Warn before adding promos when monthlyRemainingActual would fall below 300 SEK.' }
+  ],
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Fixed-income budget uses visible receipts and planned basket totals; cash purchases without receipts are not estimated.'
+  }
+};
+
 export const personalGroceryInflation = calculatePersonalGroceryInflation({
   baseDate: 'previous weekly basket',
   currentDate: '2026-05-21 visible weekly basket',
