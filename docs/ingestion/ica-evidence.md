@@ -2,10 +2,10 @@
 
 - Source: ICA public store-scoped promotions JSON
 - Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C
-- Store locator retrieved: 2026-05-22T17:36:29.664Z
+- Store locator retrieved: 2026-05-22T18:29:09.375Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 92950
-- Stores fetched: 312
+- Real rows fetched: 92965
+- Stores fetched: 313
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
 - Live verification: 1 newly added source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-22; the wired source row count is recorded below.
@@ -327,6 +327,8 @@
 - Source URL (1004477 ICA Supermarket Storuman, retrieved 2026-05-22T16:48:57.676Z, rows 100): https://handlaprivatkund.ica.se/stores/1004477/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
 
 - Source URL (1003751 ICA Supermarket BBB Sunne, retrieved 2026-05-22T17:36:29.664Z, rows 50): https://handlaprivatkund.ica.se/stores/1003751/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=50&maxPageSize=50
+
+- Source URL (1004393 ICA Supermarket Svenstavik, retrieved 2026-05-22T18:29:09.375Z, rows 15): https://handlaprivatkund.ica.se/stores/1004393/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=15&maxPageSize=15
 
 Every emitted row came from a live store-scoped promotions response for the selected ICA store and includes the exact source URL plus retrieval timestamp. Rows preserve store account, region, ordinary price, unit price, promo price fields when ICA returned them, promotion description, and product detail URLs.
 

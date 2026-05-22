@@ -1599,6 +1599,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003751',
     storeName: 'ICA Supermarket BBB Sunne',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004393',
+    storeName: 'ICA Supermarket Svenstavik',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
