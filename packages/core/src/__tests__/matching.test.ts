@@ -6,6 +6,7 @@ import {
   classifyProductMatch,
   compareCommodityUnitPrices,
   planCommunityReportAbuseControls,
+  planDietarySubstitutionAssistant,
   planStockoutSubstitutionOptions,
   planHumanReviewAssignments,
   planHumanReviewQueue,
@@ -232,6 +233,134 @@ describe('planStockoutSubstitutionOptions', () => {
     assert.equal(blocked.status, 'blocked');
     assert.deepEqual(blocked.options, []);
     assert.equal(blocked.rejectedCandidates[0]?.reason, 'Category should not be auto-substituted.');
+  });
+});
+
+describe('planDietarySubstitutionAssistant', () => {
+  it('recommends verified dietary swaps while keeping shopper confirmation required', () => {
+    const plan = planDietarySubstitutionAssistant({
+      source: {
+        productId: 'arla-milk',
+        productName: 'Arla Mellanmjölk 1l',
+        category: 'milk',
+        packageSize: 1,
+        packageUnit: 'l',
+        unitPrice: 16.9,
+        dietaryTags: ['dairy'],
+        brandTier: 'national'
+      },
+      preference: {
+        profileId: 'profile-vegan-lactose-free',
+        requiredDietaryTags: ['vegan', 'lactose_free'],
+        blockedDietaryTags: ['dairy'],
+        allergenAvoidanceTags: ['almond'],
+        substitutionIntent: 'dairy_free',
+        maxUnitPriceIncreasePercent: 20
+      },
+      candidates: [
+        {
+          productId: 'oatly-1l',
+          productName: 'Oatly Havredryck 1l',
+          category: 'dairy_substitute',
+          packageSize: 1,
+          packageUnit: 'l',
+          unitPrice: 18.9,
+          dietaryTags: ['vegan', 'lactose_free'],
+          allergenTags: ['oat'],
+          evidenceSource: 'OpenFoodFacts label',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          brandTier: 'national'
+        },
+        {
+          productId: 'almond-1l',
+          productName: 'Almond drink 1l',
+          category: 'dairy_substitute',
+          packageSize: 1,
+          packageUnit: 'l',
+          unitPrice: 17.5,
+          dietaryTags: ['vegan', 'lactose_free'],
+          allergenTags: ['almond'],
+          evidenceSource: 'OpenFoodFacts label',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          brandTier: 'national'
+        },
+        {
+          productId: 'regular-lactose-free',
+          productName: 'Laktosfri mjölk 1l',
+          category: 'milk',
+          packageSize: 1,
+          packageUnit: 'l',
+          unitPrice: 15.9,
+          dietaryTags: ['lactose_free', 'dairy'],
+          allergenTags: [],
+          evidenceSource: 'retailer label',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          brandTier: 'standard_private_label'
+        }
+      ]
+    });
+
+    assert.equal(plan.status, 'recommendations');
+    assert.deepEqual(plan.recommendations.map((recommendation) => ({
+      productId: recommendation.productId,
+      confirmationRequired: recommendation.confirmationRequired,
+      dietaryTagsMatched: recommendation.dietaryTagsMatched,
+      unitPriceDeltaPercent: recommendation.unitPriceDeltaPercent
+    })), [
+      {
+        productId: 'oatly-1l',
+        confirmationRequired: true,
+        dietaryTagsMatched: ['vegan', 'lactose_free'],
+        unitPriceDeltaPercent: 11.83
+      }
+    ]);
+    assert.deepEqual(plan.blockedCandidates.map((candidate) => candidate.reason), [
+      'Candidate contains blocked allergen evidence: almond.',
+      'Candidate is missing required dietary evidence: vegan.'
+    ]);
+    assert.match(plan.guardrails.join(' '), /No dietary swap is auto-applied/i);
+  });
+
+  it('fails closed for medical diet sources and missing verified dietary evidence', () => {
+    const plan = planDietarySubstitutionAssistant({
+      source: {
+        productId: 'formula-a',
+        productName: 'Baby formula',
+        category: 'baby_formula',
+        packageSize: 1,
+        packageUnit: 'piece',
+        unitPrice: 120,
+        dietaryTags: ['medical_diet'],
+        brandTier: 'national'
+      },
+      preference: {
+        profileId: 'profile-medical',
+        requiredDietaryTags: ['hypoallergenic'],
+        blockedDietaryTags: [],
+        allergenAvoidanceTags: [],
+        substitutionIntent: 'medical',
+        maxUnitPriceIncreasePercent: 0
+      },
+      candidates: [
+        {
+          productId: 'formula-b',
+          productName: 'Other formula',
+          category: 'baby_formula',
+          packageSize: 1,
+          packageUnit: 'piece',
+          unitPrice: 100,
+          dietaryTags: ['hypoallergenic'],
+          allergenTags: [],
+          evidenceSource: 'retailer label',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          brandTier: 'national'
+        }
+      ]
+    });
+
+    assert.equal(plan.status, 'blocked');
+    assert.deepEqual(plan.recommendations, []);
+    assert.equal(plan.blockedCandidates[0]?.reason, 'Medical or infant diet categories require professional confirmation and cannot be suggested automatically.');
   });
 });
 

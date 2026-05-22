@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { dealBasedMeals, familyMealPlannerFromDeals, studentDealRecipes } from '@/lib/demo-data';
+import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -137,6 +138,34 @@ export default function MealPlannerPage() {
           ))}
         </div>
         <p className="mt-4 text-sm font-semibold text-slate-700">{familyMealPlannerFromDeals.coverage.caveat}</p>
+      </Card>
+
+      <Card className="mt-6 border-violet-200 bg-violet-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">Account-safe substitutions</p>
+        <h2 className="mt-2 text-2xl font-black">Dietary substitution assistant</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          The planner contract calls <code className="rounded bg-white/80 px-1 py-0.5 text-violet-900">{dietarySubstitutionAssistantContract.corePlanner}</code> after a signed-in shopper saves dietary preferences. No dietary swap is auto-applied; requiredDietaryTags and allergenAvoidanceTags must match verified label evidence, and medical or infant diet categories require professional confirmation.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div className="rounded-3xl border border-violet-200 bg-white p-5">
+            <p className="font-black text-slate-950">Preference fields</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-700">
+              {dietarySubstitutionAssistantContract.preferenceFields.map((field) => <li key={field}>{field}</li>)}
+            </ul>
+          </div>
+          <div className="rounded-3xl border border-violet-200 bg-white p-5">
+            <p className="font-black text-slate-950">Example evidence</p>
+            <p className="mt-2 text-sm font-semibold text-slate-700">status: {dietarySubstitutionAssistantContract.examplePlan.status}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-700">intent: {dietarySubstitutionAssistantContract.examplePlan.substitutionIntent}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-700">recommendations: {dietarySubstitutionAssistantContract.examplePlan.recommendations.length}</p>
+          </div>
+          <div className="rounded-3xl border border-violet-200 bg-white p-5">
+            <p className="font-black text-slate-950">Guardrails</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-700">
+              {dietarySubstitutionAssistantContract.guardrails.map((guardrail) => <li key={guardrail}>{guardrail}</li>)}
+            </ul>
+          </div>
+        </div>
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">

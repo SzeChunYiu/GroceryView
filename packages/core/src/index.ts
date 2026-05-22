@@ -2841,6 +2841,190 @@ export function planStockoutSubstitutionOptions(input: {
   };
 }
 
+export type DietarySubstitutionIntent = 'dairy_free' | 'gluten_free' | 'vegan' | 'halal' | 'kosher' | 'medical' | 'general';
+
+export type DietarySubstitutionProduct = {
+  productId: string;
+  productName: string;
+  category: string;
+  packageSize: number;
+  packageUnit: string;
+  unitPrice: number;
+  dietaryTags: string[];
+  brandTier: BrandTier;
+};
+
+export type DietarySubstitutionCandidate = DietarySubstitutionProduct & {
+  allergenTags?: string[];
+  evidenceSource: string;
+  observedAt: string;
+};
+
+export type DietarySubstitutionPreference = {
+  profileId: string;
+  requiredDietaryTags: string[];
+  blockedDietaryTags: string[];
+  allergenAvoidanceTags: string[];
+  substitutionIntent: DietarySubstitutionIntent;
+  maxUnitPriceIncreasePercent: number;
+};
+
+export type DietarySubstitutionRecommendation = {
+  productId: string;
+  productName: string;
+  category: string;
+  unitPrice: number;
+  unitPriceDeltaPercent: number;
+  dietaryTagsMatched: string[];
+  evidenceSource: string;
+  observedAt: string;
+  confidence: MatchConfidence;
+  confirmationRequired: true;
+  reason: string;
+};
+
+export type BlockedDietarySubstitutionCandidate = {
+  productId: string;
+  reason: string;
+};
+
+export type DietarySubstitutionAssistantPlan = {
+  status: 'recommendations' | 'blocked';
+  profileId: string;
+  substitutionIntent: DietarySubstitutionIntent;
+  recommendations: DietarySubstitutionRecommendation[];
+  blockedCandidates: BlockedDietarySubstitutionCandidate[];
+  guardrails: string[];
+};
+
+const medicalDietCategories = new Set(['baby_formula', 'medical_diet', 'clinical_nutrition']);
+
+const dietaryEquivalentCategories: Partial<Record<DietarySubstitutionIntent, Record<string, string[]>>> = {
+  dairy_free: {
+    milk: ['milk', 'dairy_substitute', 'beverages'],
+    yogurt: ['yogurt', 'dairy_substitute'],
+    butter: ['butter', 'plant_based_spread']
+  },
+  vegan: {
+    milk: ['dairy_substitute', 'beverages'],
+    meat: ['plant_based_protein'],
+    yogurt: ['dairy_substitute']
+  },
+  gluten_free: {
+    pasta: ['pasta', 'gluten_free_pasta'],
+    bread: ['bread', 'gluten_free_bread']
+  }
+};
+
+function categoriesCompatibleForDietarySubstitution(source: DietarySubstitutionProduct, candidate: DietarySubstitutionCandidate, intent: DietarySubstitutionIntent): boolean {
+  if (source.category === candidate.category) return true;
+  return dietaryEquivalentCategories[intent]?.[source.category]?.includes(candidate.category) ?? false;
+}
+
+export function planDietarySubstitutionAssistant(input: {
+  source: DietarySubstitutionProduct;
+  preference: DietarySubstitutionPreference;
+  candidates: DietarySubstitutionCandidate[];
+}): DietarySubstitutionAssistantPlan {
+  requireNonBlank(input.preference.profileId, 'profileId');
+  requireNonBlank(input.source.productId, 'productId');
+  requireNonBlank(input.source.productName, 'productName');
+  if (input.preference.maxUnitPriceIncreasePercent < 0) throw new Error('maxUnitPriceIncreasePercent must be non-negative.');
+
+  const guardrails = [
+    'No dietary swap is auto-applied; the shopper must confirm every replacement.',
+    'Required dietary evidence and allergen avoidance rules fail closed before savings are considered.',
+    'Medical and infant diet substitutions require professional confirmation and are blocked from automatic recommendations.'
+  ];
+  const blockedCandidates: BlockedDietarySubstitutionCandidate[] = [];
+
+  if (medicalDietCategories.has(input.source.category) || input.preference.substitutionIntent === 'medical') {
+    return {
+      status: 'blocked',
+      profileId: input.preference.profileId,
+      substitutionIntent: input.preference.substitutionIntent,
+      recommendations: [],
+      blockedCandidates: input.candidates.map((candidate) => ({
+        productId: candidate.productId,
+        reason: 'Medical or infant diet categories require professional confirmation and cannot be suggested automatically.'
+      })),
+      guardrails
+    };
+  }
+
+  const requiredDietaryTags = input.preference.requiredDietaryTags;
+  const blockedDietaryTags = new Set(input.preference.blockedDietaryTags);
+  const allergenAvoidanceTags = new Set(input.preference.allergenAvoidanceTags);
+  const recommendations: DietarySubstitutionRecommendation[] = [];
+
+  for (const candidate of input.candidates) {
+    requireNonBlank(candidate.productId, 'candidate.productId');
+    requireNonBlank(candidate.productName, 'candidate.productName');
+    requireNonBlank(candidate.evidenceSource, 'candidate.evidenceSource');
+
+    const candidateDietaryTags = new Set(candidate.dietaryTags);
+    const candidateAllergenTags = new Set(candidate.allergenTags ?? []);
+    const missingDietaryTags = requiredDietaryTags.filter((tag) => !candidateDietaryTags.has(tag));
+    if (missingDietaryTags.length > 0) {
+      blockedCandidates.push({ productId: candidate.productId, reason: `Candidate is missing required dietary evidence: ${missingDietaryTags.join(', ')}.` });
+      continue;
+    }
+    const blockedTags = candidate.dietaryTags.filter((tag) => blockedDietaryTags.has(tag));
+    if (blockedTags.length > 0) {
+      blockedCandidates.push({ productId: candidate.productId, reason: `Candidate contains blocked dietary evidence: ${blockedTags.join(', ')}.` });
+      continue;
+    }
+    const blockedAllergens = [...candidateAllergenTags].filter((tag) => allergenAvoidanceTags.has(tag));
+    if (blockedAllergens.length > 0) {
+      blockedCandidates.push({ productId: candidate.productId, reason: `Candidate contains blocked allergen evidence: ${blockedAllergens.join(', ')}.` });
+      continue;
+    }
+    if (!categoriesCompatibleForDietarySubstitution(input.source, candidate, input.preference.substitutionIntent)) {
+      blockedCandidates.push({ productId: candidate.productId, reason: 'Candidate category is not compatible with the requested dietary substitution intent.' });
+      continue;
+    }
+    if (input.source.packageUnit.toLowerCase() !== candidate.packageUnit.toLowerCase() || Math.abs(input.source.packageSize - candidate.packageSize) > Math.max(1, input.source.packageSize * 0.1)) {
+      blockedCandidates.push({ productId: candidate.productId, reason: 'Candidate package size is not comparable for dietary substitution.' });
+      continue;
+    }
+
+    const unitPriceDeltaPercent = Math.round(((candidate.unitPrice - input.source.unitPrice) / input.source.unitPrice) * 10000) / 100;
+    if (unitPriceDeltaPercent > input.preference.maxUnitPriceIncreasePercent) {
+      blockedCandidates.push({ productId: candidate.productId, reason: `Unit price increase ${unitPriceDeltaPercent}% exceeds dietary preference limit ${input.preference.maxUnitPriceIncreasePercent}%.` });
+      continue;
+    }
+
+    recommendations.push({
+      productId: candidate.productId,
+      productName: candidate.productName,
+      category: candidate.category,
+      unitPrice: candidate.unitPrice,
+      unitPriceDeltaPercent,
+      dietaryTagsMatched: requiredDietaryTags.filter((tag) => candidateDietaryTags.has(tag)),
+      evidenceSource: candidate.evidenceSource,
+      observedAt: candidate.observedAt,
+      confidence: sourceAndCandidateShareCategory(input.source, candidate) ? 'high' : 'medium',
+      confirmationRequired: true,
+      reason: sourceAndCandidateShareCategory(input.source, candidate)
+        ? 'Same category and required dietary evidence match.'
+        : 'Dietary substitution intent allows this verified cross-category replacement.'
+    });
+  }
+
+  return {
+    status: recommendations.length > 0 ? 'recommendations' : 'blocked',
+    profileId: input.preference.profileId,
+    substitutionIntent: input.preference.substitutionIntent,
+    recommendations: recommendations.sort((a, b) => a.unitPriceDeltaPercent - b.unitPriceDeltaPercent || b.confidence.localeCompare(a.confidence)),
+    blockedCandidates,
+    guardrails
+  };
+}
+
+function sourceAndCandidateShareCategory(source: DietarySubstitutionProduct, candidate: DietarySubstitutionCandidate): boolean {
+  return source.category === candidate.category;
+}
+
 export type ComparableCommodityUnit = 'kg' | 'l' | 'st';
 
 export type CommodityPriceObservation = {

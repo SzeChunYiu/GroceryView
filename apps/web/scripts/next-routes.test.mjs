@@ -629,6 +629,22 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces an account-safe dietary substitution assistant on the meal planner route', async () => {
+    const route = await read('src/app/meal-planner/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+    const core = await read('../../packages/core/src/index.ts');
+
+    assert.match(core, /planDietarySubstitutionAssistant/);
+    assert.match(verified, /dietarySubstitutionAssistantContract/);
+    assert.match(verified, /requiredDietaryTags/);
+    assert.match(verified, /allergenAvoidanceTags/);
+    assert.match(route, /dietarySubstitutionAssistantContract/);
+    assert.match(route, /Dietary substitution assistant/);
+    assert.match(route, /No dietary swap is auto-applied/);
+    assert.match(route, /professional confirmation/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces ingredient-level meal costing with cheapest-chain evidence', async () => {
     const source = await read('src/app/meal-cost/page.tsx');
     const demo = await read('src/lib/demo-data.ts');
