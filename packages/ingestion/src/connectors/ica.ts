@@ -554,6 +554,61 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003937',
     storeName: 'Maxi ICA Stormarknad Hyllinge',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003382',
+    storeName: 'Maxi ICA Stormarknad Luleå',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004453',
+    storeName: 'ICA Kvantum Stormarknad, Luleå',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004142',
+    storeName: 'ICA Kvantum Boden',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003896',
+    storeName: 'ICA Kvantum Piteå',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003828',
+    storeName: 'Maxi ICA Stormarknad Umeå',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004229',
+    storeName: 'ICA Kvantum Kronoparken',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004425',
+    storeName: 'ICA Supermarket Sävar',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004559',
+    storeName: 'ICA Nära Börsen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003602',
+    storeName: 'ICA Supermarket Östra Husby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004034',
+    storeName: 'Maxi ICA Stormarknad Katrineholm',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003392',
+    storeName: 'ICA Supermarket Fyren',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
