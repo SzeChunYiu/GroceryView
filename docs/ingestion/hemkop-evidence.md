@@ -10,6 +10,25 @@
 
 Every emitted row includes a Hemkop product code, name, SEK price fields, source search URL, and retrieval timestamp.
 
+## Weekly Discount Rows
+
+- Source: hemkop.se public Axfood offline campaign JSON
+- Source URL: https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+- Retrieved: 2026-05-22T08:28:40.482Z
+- Store id: 4003
+- Validity window in retrieved rows: 18/05-2026 through 24/05-2026, with weekend rows starting 20/05-2026
+- Real weekly discount rows fetched and wired: 45
+
+Every weekly discount row includes an Axfood promotion code, product code, product name, campaign type, promotion price text, compare price text when present, regular price text when present, save-price text when present, validity dates, source URL, and retrieval timestamp.
+
+### Sample Weekly Discount Rows
+
+1. 2500309493 | 101291077_ST | Läsk | 6 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+2. 2500303429 | 100168667_ST | Lingongrova, Guldkorn | 19 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+3. 2500298172 | 101017249_ST | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+4. 2500298127 | 101183319_ST | Smörgåspålägg | 2 för 28 kr | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+5. 2500299506 | 101241262_ST | Kaffe | 59,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+
 ## Sample Retrieved Rows
 
 1. 101205621_ST | Idealmakaroner Gammaldags | Kungsörnen | 14,14 kr | https://www.hemkop.se/search?q=makaroner
@@ -27,3 +46,24 @@ Every emitted row includes a Hemkop product code, name, SEK price fields, source
 13. 101233933_ST | Mellanmjölk Längre Hållbarhet 1,5% | Garant | 18,45 kr | https://www.hemkop.se/search?q=mjolk
 14. 101266069_ST | Mellanmjölk Längre Hållbarhet Ekologisk 1,5% | Garant Eko | 22,24 kr | https://www.hemkop.se/search?q=mjolk
 15. 101205891_ST | Mjölk 3% | Garant | 13,72 kr | https://www.hemkop.se/search?q=mjolk
+
+## Hemköp weekly discounts 2026-05-22
+
+- Source: Hemköp public Axfood campaign JSON
+- Source URL: https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+- Retrieved: 2026-05-22T08:28:40.482Z
+- Store ID: 4003
+- Real discount rows fetched: 45
+- Web wire: apps/web/src/lib/ingested/hemkop.ts
+
+Sample rows:
+1. 2500309493 | Läsk | 6 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+2. 2500303429 | Lingongrova, Guldkorn | 19 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+3. 2500298172 | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+4. 2500298127 | Smörgåspålägg | 2 för 28 kr | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+5. 2500299506 | Kaffe | 59,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+6. 2500298024 | Kycklinginnerfilé | 46,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+7. 2500298454 | Styckglass | 10 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+8. 2500298365 | Olivolja Classico | 66 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+9. 2500298362 | Prosciutto Crudo | 18 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
+10. 2500298307 | Riven ost | 18 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=50
