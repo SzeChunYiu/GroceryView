@@ -598,6 +598,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a busy professional one-tap basket optimizer using real basket strategy output', async () => {
+    const source = await read('src/app/weekly-basket/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+
+    assert.match(demo, /oneTapBasketOptimizer/);
+    assert.match(demo, /compareBasketStrategies/);
+    assert.match(demo, /summarizeStoreBasketCoverage/);
+    assert.match(demo, /readyAction/);
+    assert.match(demo, /checkoutGuardrails/);
+    assert.match(source, /oneTapBasketOptimizer/);
+    assert.match(source, /One-tap basket optimizer/);
+    assert.match(source, /readyAction/);
+    assert.match(source, /checkoutGuardrails/);
+    assert.match(source, /signed-in/i);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces loyalty-adjusted basket comparison using eligible member prices only', async () => {
     const source = await read('src/app/weekly-basket/page.tsx');
     const demo = await read('src/lib/demo-data.ts');

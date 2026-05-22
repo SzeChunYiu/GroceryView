@@ -1820,6 +1820,34 @@ export const weeklyBasketOptimizer = {
 const budgetStretchKronaComparison = compareBasketStrategies(weeklyBasketOptimizerInput);
 const budgetStretchKronaExtraStores = Math.max(0, budgetStretchKronaComparison.splitStoreCount - 1);
 
+const oneTapBasketComparison = compareBasketStrategies(weeklyBasketOptimizerInput);
+const oneTapBasketCoverage = summarizeStoreBasketCoverage(weeklyBasketOptimizerInput);
+
+export const oneTapBasketOptimizer = {
+  persona: 'Busy professionals',
+  title: 'One-tap basket optimizer',
+  comparison: oneTapBasketComparison,
+  coverage: oneTapBasketCoverage,
+  readyAction: {
+    label: oneTapBasketComparison.savingsVsBestSingleStore > 0 ? 'Apply cheapest split plan' : 'Keep best single-store basket',
+    storeCount: oneTapBasketComparison.splitStoreCount,
+    assignmentCount: oneTapBasketComparison.cheapestByProduct.assignments.length,
+    total: oneTapBasketComparison.cheapestByProduct.total,
+    savingsVsBestSingleStore: oneTapBasketComparison.savingsVsBestSingleStore
+  },
+  quickestPath: oneTapBasketComparison.cheapestByProduct.assignments.slice(0, 4).map((assignment) => ({
+    productId: assignment.productId,
+    storeName: assignment.storeName,
+    lineTotal: assignment.lineTotal,
+    priceType: assignment.priceType
+  })),
+  checkoutGuardrails: [
+    'Requires a signed-in saved basket before GroceryView can prepare account-bound changes.',
+    'One tap prepares a reviewed optimization plan only; no retailer checkout is submitted automatically.',
+    'Missing prices and unsupported retailer handoffs remain visible blockers instead of hidden estimates.'
+  ]
+};
+
 export const budgetStretchKronaOptimizer = {
   persona: 'Budget-conscious / low-income',
   title: 'Stretch your krona optimizer',
