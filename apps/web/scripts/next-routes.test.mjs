@@ -1146,6 +1146,27 @@ ${seo}`;
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
+  it('surfaces real store price percentiles from branch-scoped Lidl observations when matched', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/stores/[slug]/page.tsx');
+
+    assert.match(verified, /storePricePercentileRanks/);
+    assert.match(verified, /lidlStoreOffers/);
+    assert.match(verified, /matchedPerBranchObservationCount/);
+    assert.match(verified, /nationalPricePercentile/);
+    assert.match(verified, /kommunPricePercentile/);
+    assert.match(verified, /cheaperThanNationalPct/);
+    assert.match(verified, /kommunDerivedFrom/);
+    assert.match(route, /storePricePercentileRanks/);
+    assert.match(route, /per-branch Lidl offer observations/);
+    assert.match(route, /cheaper than/);
+    assert.match(route, /nationalPricePercentile/);
+    assert.match(route, /kommunPricePercentile/);
+    assert.match(route, /confidence\/coverage/);
+    assert.doesNotMatch(route, /Math\.random/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
   it('surfaces verified OSM store brand coverage on the homepage', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
