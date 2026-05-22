@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 type ReviewStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
+type ReviewDecision = 'approve' | 'reject' | 'needs_more_info';
 type Assignment = { id: string; reviewId?: string; subjectType?: 'product_match' | 'community_report' | 'commodity_mapping'; subjectId?: string; priority?: string; reason?: string; assigneeId?: string; dueAt?: string; status?: string };
 type AssignmentResponse = { assignments?: Assignment[]; sla?: { status?: string; overdueAssignments?: number; breachedReviewIds?: string[] } };
 
@@ -52,7 +53,7 @@ export function PriceReportReviewActions() {
     setMessage(`Loaded ${body.assignments?.length ?? 0} reviewer assignments with SLA ${body.sla?.status ?? 'unknown'}.`);
   }
 
-  async function decideReview(decision: 'approve' | 'reject') {
+  async function decideReview(decision: ReviewDecision) {
     const session = requireSession();
     if (!session || !assignmentId.trim()) return;
     const { accessToken, userId } = session;
@@ -67,7 +68,7 @@ export function PriceReportReviewActions() {
       return;
     }
     setStatus('ready');
-    setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. community_report approvals map to accept_community_report and rejections map to dismiss_community_report; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
+    setMessage(`${decision} decision accepted with reviewedByHuman: true writeback. needs_more_info leaves assignment status in_progress; community_report approvals map to accept_community_report and rejections map to dismiss_community_report; commodity_mapping approvals map to approve_commodity_mapping and rejections map to reject_commodity_mapping.`);
   }
 
   return (
@@ -105,6 +106,7 @@ export function PriceReportReviewActions() {
       <div className="mt-3 flex flex-wrap gap-2">
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('approve')} type="button">Approve evidence</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" disabled={!assignmentId.trim()} onClick={() => decideReview('reject')} type="button">Reject evidence</button>
+        <button className="rounded-full border border-amber-300 px-4 py-2 text-sm font-black text-amber-900" disabled={!assignmentId.trim()} onClick={() => decideReview('needs_more_info')} type="button">Request more info</button>
       </div>
 
       {queue?.assignments?.length ? (
