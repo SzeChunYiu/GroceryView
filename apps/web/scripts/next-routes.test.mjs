@@ -540,6 +540,22 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces offer expiry reminders from real Matpriskollen validity windows', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/deals/page.tsx');
+
+    assert.match(verified, /matpriskollenOffers/);
+    assert.match(verified, /offerExpiryReminderBoard/);
+    assert.match(verified, /validFrom/);
+    assert.match(verified, /validTo/);
+    assert.match(route, /Offer expiry reminders/);
+    assert.match(route, /validTo/);
+    assert.match(route, /No deal starts tomorrow claim/);
+    assert.match(route, /sourceUrl/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+
   it('surfaces a student single-portion deal finder using real deal ranking output', async () => {
     const source = await read('src/app/deals/page.tsx');
     assert.match(source, /singlePortionDealFinder/);

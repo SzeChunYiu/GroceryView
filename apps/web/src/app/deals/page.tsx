@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { expiryDealRadar, expiryDealRadarReports, kidsSnackLunchboxDeals, singlePortionDealFinder } from '@/lib/demo-data';
+import { offerExpiryReminderBoard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -67,6 +68,43 @@ export default function DealsPage() {
             </Link>
           ))}
         </div>
+      </Card>
+
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Matpriskollen validity windows</p>
+        <h2 className="mt-2 text-2xl font-black">Offer expiry reminders</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          Built from {offerExpiryReminderBoard.retrievedOfferCount.toLocaleString('sv-SE')} real Matpriskollen offer rows. We show validFrom and validTo exactly as source evidence so shoppers can plan expiring deals without invented start dates.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          {offerExpiryReminderBoard.rows.map((offer) => (
+            <a className="block rounded-2xl border border-amber-200 bg-white p-4 hover:border-amber-700" href={offer.productUrl} key={`${offer.store}-${offer.name}-${offer.validTo}`} rel="noreferrer" target="_blank">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-lg font-black text-slate-950">{offer.name}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{offer.store} · {offer.brand || 'Brand not reported'} · {offer.category}</p>
+                </div>
+                <p className="text-2xl font-black text-amber-800">{offer.priceText}</p>
+              </div>
+              <div className="mt-3 grid gap-2 text-xs text-slate-700 sm:grid-cols-2">
+                <p className="rounded-2xl bg-amber-100 p-3 font-semibold">validFrom {offer.validFrom}</p>
+                <p className="rounded-2xl bg-amber-100 p-3 font-semibold">validTo {offer.validTo}</p>
+                <p className="rounded-2xl bg-amber-100 p-3 font-semibold">{offer.comparePriceText || 'Compare price not reported'}</p>
+                <p className="rounded-2xl bg-amber-100 p-3 font-semibold">{offer.requiresMembershipCard ? 'Membership card needed' : 'No membership flag'} · {offer.requiresCoupon ? 'coupon needed' : 'no coupon flag'}</p>
+              </div>
+              <p className="mt-3 break-all text-xs font-semibold text-slate-600">sourceUrl: {offer.sourceUrl}</p>
+            </a>
+          ))}
+        </div>
+        <p className="mt-4 rounded-2xl bg-white p-3 text-sm font-black text-amber-950">
+          No deal starts tomorrow claim unless a future validFrom date exists in source data.
+        </p>
+        <ul className="mt-4 space-y-2 text-sm font-semibold text-slate-700">
+          {offerExpiryReminderBoard.guardrails.map((guardrail) => (
+            <li key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
       </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">

@@ -1,6 +1,7 @@
 import { calculateDealScore, summarizeCategoryDealLeaders, summarizePriceHistory } from '@groceryview/core';
 import { axfoodProducts } from './axfood-products';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
+import { matpriskollenOffers } from './ingested/matpriskollen';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { osmStores } from './osm-stores';
 
@@ -153,6 +154,35 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
   };
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);
+
+export const offerExpiryReminderBoard = {
+  title: 'Offer expiry reminders',
+  source: 'Matpriskollen public offer validity windows',
+  retrievedOfferCount: matpriskollenOffers.length,
+  guardrails: [
+    'No deal starts tomorrow claim unless a future validFrom date exists in source data.',
+    'validTo is displayed as source evidence; expired windows should not be promoted as active deals.',
+    'sourceUrl remains visible so shoppers can inspect the retailer offer source.'
+  ],
+  rows: [...matpriskollenOffers]
+    .sort((a, b) => a.validTo.localeCompare(b.validTo) || a.name.localeCompare(b.name, 'sv'))
+    .slice(0, 8)
+    .map((offer) => ({
+      name: offer.name,
+      brand: offer.brand,
+      store: offer.store,
+      category: offer.category,
+      priceText: offer.priceText,
+      comparePriceText: offer.comparePriceText,
+      validFrom: offer.validFrom,
+      validTo: offer.validTo,
+      sourceUrl: offer.sourceUrl,
+      productUrl: offer.productUrl,
+      requiresMembershipCard: offer.requiresMembershipCard,
+      requiresCoupon: offer.requiresCoupon
+    }))
+};
+
 export const immigrantFamiliarBrandSearch = productUniverse
   .map((product) => {
     const isChainProduct = 'lowestPrice' in product;
