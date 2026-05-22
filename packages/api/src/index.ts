@@ -27,6 +27,7 @@ import {
   type BasketComparisonResult,
   type BasketImportExportCapturedLine,
   type BasketImportExportPlan,
+  type BasketImportExportReviewItem,
   type BasketImportExportSource,
   type BasketFulfillmentSlotsPlan,
   type BasketFulfillmentSlotInput,
@@ -121,6 +122,32 @@ export type BasketImportExportReport = BasketImportExportPlan & {
   importedItemCount: number;
   reviewItemCount: number;
   basketItemCount: number;
+};
+
+export type BasketImportReviewStatus = 'open' | 'accepted' | 'dismissed';
+
+export type BasketImportReviewItem = BasketImportExportReviewItem & {
+  reviewItemId: string;
+  retailerId: string;
+  sourceKind: BasketImportExportSource['sourceKind'];
+  capturedAt: string;
+  status: BasketImportReviewStatus;
+  createdAt: string;
+  resolvedAt?: string;
+  resolvedProductId?: string;
+};
+
+export type BasketImportReviewQueue = {
+  userId: string;
+  openItemCount: number;
+  items: BasketImportReviewItem[];
+  guardrails: string[];
+};
+
+export type BasketImportReviewDecisionRequest = {
+  decision: 'accept_as_product' | 'dismiss';
+  productId?: string;
+  quantity?: number;
 };
 
 export type ProductCheapestNowChainPrice = {
@@ -3443,6 +3470,21 @@ function basketImportKnownProducts() {
   }));
 }
 
+const basketImportReviewGuardrails = [
+  'Retailer basket review rows are account-bound and never visible across signed-in users.',
+  'Unmatched retailer rows stay out of the basket until a signed-in shopper accepts a verified GroceryView product match.',
+  'Dismissed retailer rows remain auditable and are not silently converted into products.'
+];
+
+function basketImportReviewId(userId: string, source: BasketImportExportSource, rawName: string, index: number): string {
+  const slug = rawName
+    .toLocaleLowerCase('sv-SE')
+    .replace(/[^a-z0-9åäö]+/gi, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48) || 'retailer-row';
+  return `basket-import-review-${userId}-${source.retailerId}-${Date.parse(source.capturedAt)}-${index}-${slug}`;
+}
+
 function storeFlyerOfferReport(storeId: string, asOf?: string): StoreFlyerOfferReport {
   requireKnownStore(storeId);
   const store = stores.find((candidate) => candidate.id === storeId)!;
@@ -3469,6 +3511,7 @@ export function createGroceryViewApi() {
   const categoryBudgets = new Map<string, CategoryBudgetPatch[]>();
   const subscriptionEntitlements = new Map<string, SubscriptionEntitlementSnapshot>();
   const householdPlans = new Map<string, HouseholdPlan>();
+  const basketImportReviews = new Map<string, BasketImportReviewItem[]>();
 
   const productSnapshots = () =>
     products.map((product) => {
@@ -4142,6 +4185,19 @@ export function createGroceryViewApi() {
         knownProducts: basketImportKnownProducts()
       });
       for (const item of plan.acceptedItems) this.addBasketItem(userId, { productId: item.productId, quantity: item.quantity });
+      if (plan.reviewItems.length > 0) {
+        const existing = basketImportReviews.get(userId) ?? [];
+        const created = plan.reviewItems.map((item, index): BasketImportReviewItem => ({
+          ...item,
+          reviewItemId: basketImportReviewId(userId, plan.source, item.rawName, existing.length + index),
+          retailerId: plan.source.retailerId,
+          sourceKind: plan.source.sourceKind,
+          capturedAt: plan.source.capturedAt,
+          status: 'open',
+          createdAt: plan.source.capturedAt
+        }));
+        basketImportReviews.set(userId, [...existing, ...created]);
+      }
       return {
         userId,
         ...plan,
@@ -4149,6 +4205,42 @@ export function createGroceryViewApi() {
         reviewItemCount: plan.reviewItems.length,
         basketItemCount: (baskets.get(userId) ?? []).length
       };
+    },
+
+    getBasketImportReviewQueue(userId: string): BasketImportReviewQueue {
+      requireNonEmptyId(userId, 'userId');
+      const items = basketImportReviews.get(userId) ?? [];
+      const openItems = items.filter((item) => item.status === 'open');
+      return {
+        userId,
+        openItemCount: openItems.length,
+        items: openItems,
+        guardrails: basketImportReviewGuardrails
+      };
+    },
+
+    resolveBasketImportReviewItem(userId: string, reviewItemId: string, request: BasketImportReviewDecisionRequest): BasketImportReviewItem {
+      requireNonEmptyId(userId, 'userId');
+      requireNonEmptyId(reviewItemId, 'reviewItemId');
+      const items = basketImportReviews.get(userId) ?? [];
+      const index = items.findIndex((item) => item.reviewItemId === reviewItemId && item.status === 'open');
+      if (index === -1) throw new Error(`Basket import review item not found: ${reviewItemId}`);
+      const item = items[index]!;
+      if (request.decision === 'accept_as_product') {
+        if (!request.productId) throw new Error('productId is required when accepting an import review item.');
+        requireKnownProduct(request.productId);
+        const quantity = request.quantity ?? item.quantity;
+        this.addBasketItem(userId, { productId: request.productId, quantity });
+        const resolved = { ...item, quantity, status: 'accepted' as const, resolvedAt: new Date(Date.parse(item.capturedAt) + 1).toISOString(), resolvedProductId: request.productId };
+        basketImportReviews.set(userId, items.map((candidate, candidateIndex) => candidateIndex === index ? resolved : candidate));
+        return resolved;
+      }
+      if (request.decision === 'dismiss') {
+        const resolved = { ...item, status: 'dismissed' as const, resolvedAt: new Date(Date.parse(item.capturedAt) + 1).toISOString() };
+        basketImportReviews.set(userId, items.map((candidate, candidateIndex) => candidateIndex === index ? resolved : candidate));
+        return resolved;
+      }
+      throw new Error('decision must be accept_as_product or dismiss.');
     },
 
     getLocalOfferBasketReport(userId: string, asOf = '2026-05-20T12:00:00.000Z'): LocalOfferBasketReport {

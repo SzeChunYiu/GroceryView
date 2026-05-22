@@ -66,6 +66,20 @@ class BasketImportExportDto {
   capturedLines!: BasketImportLineDto[];
 }
 
+class BasketImportReviewDecisionDto {
+  @IsString()
+  decision!: 'accept_as_product' | 'dismiss';
+
+  @IsOptional()
+  @IsString()
+  productId?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  quantity?: number;
+}
+
 class CompareBasketRequestDto {
   @IsArray()
   @ValidateNested({ each: true })
@@ -103,6 +117,25 @@ export class BasketsController {
   @ApiCreatedResponse({ description: 'Import consented bookmarklet or extension basket rows for review' })
   importExport(@Body() body: BasketImportExportDto) {
     return { ...groceryApi.importBasketFromRetailerPage('demo', body), demo: true };
+  }
+
+  @Get('import-review')
+  @ApiOkResponse({ description: 'Account-bound retailer basket import review rows' })
+  importReview() {
+    return { ...groceryApi.getBasketImportReviewQueue('demo'), demo: true };
+  }
+
+  @Post('import-review/:reviewItemId/decisions')
+  @ApiCreatedResponse({ description: 'Resolve an account-bound retailer basket import review row' })
+  importReviewDecision(@Param('reviewItemId') reviewItemId: string, @Body() body: BasketImportReviewDecisionDto) {
+    try {
+      return { ...groceryApi.resolveBasketImportReviewItem('demo', reviewItemId, body), demo: true };
+    } catch (error) {
+      if (error instanceof Error && /Basket import review item not found/.test(error.message)) {
+        throw new NotFoundException('Basket import review item not found');
+      }
+      throw error;
+    }
   }
 
   @Get('handoff/:retailerId')

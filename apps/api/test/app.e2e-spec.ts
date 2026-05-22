@@ -411,6 +411,8 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/basket/fulfillment-slots/{retailerId}/{storeId}']);
     assert.ok(docs.body.paths['/users/demo/basket/handoff/{retailerId}']);
     assert.ok(docs.body.paths['/users/demo/basket/import-export']);
+    assert.ok(docs.body.paths['/users/demo/basket/import-review']);
+    assert.ok(docs.body.paths['/users/demo/basket/import-review/{reviewItemId}/decisions']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
   });
 
@@ -1050,6 +1052,22 @@ describe('GroceryView API app', () => {
     assert.equal(importExport.body.reviewItemCount, 1);
     assert.deepEqual(importExport.body.acceptedItems.map((item: { productId: string; quantity: number }) => [item.productId, item.quantity]), [['coffee', 1], ['milk', 2]]);
     assert.match(importExport.body.guardrails[0], /explicit shopper consent/i);
+
+    const importReview = await request(app.getHttpServer())
+      .get('/users/demo/basket/import-review')
+      .expect(200);
+    assert.equal(importReview.body.userId, 'demo');
+    assert.equal(importReview.body.demo, true);
+    assert.equal(importReview.body.openItemCount, 1);
+    assert.equal(importReview.body.items[0].rawName, 'Retailer-only bakery bun');
+    assert.match(importReview.body.guardrails[0], /account-bound/i);
+
+    const importReviewDecision = await request(app.getHttpServer())
+      .post(`/users/demo/basket/import-review/${encodeURIComponent(importReview.body.items[0].reviewItemId)}/decisions`)
+      .send({ decision: 'dismiss' })
+      .expect(201);
+    assert.equal(importReviewDecision.body.demo, true);
+    assert.equal(importReviewDecision.body.status, 'dismissed');
 
     const categoryMarket = await request(app.getHttpServer()).get('/categories/coffee/market').expect(200);
     assert.equal(categoryMarket.body.category, 'coffee');

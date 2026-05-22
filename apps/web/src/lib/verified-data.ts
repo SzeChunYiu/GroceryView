@@ -436,6 +436,30 @@ export const basketImportExportContract = {
   ]
 };
 
+export const basketImportReviewContract = {
+  endpoint: '/api/basket/import-review',
+  decisionEndpoint: '/api/basket/import-review/{reviewItemId}/decisions',
+  title: 'Account-bound import review',
+  status: 'implemented_account_api',
+  requiredInputs: [
+    'signed-in userId from the authenticated session',
+    'reviewItemId created from a consented bookmarklet or browser-extension import',
+    'shopper decision to accept a verified GroceryView product match or dismiss the retailer row',
+    'verified GroceryView productId before any unmatched retailer row can update the basket'
+  ],
+  shippedBehaviors: [
+    'Lists only the signed-in shopper’s open retailer import review rows.',
+    'Keeps unmatched retailer rows stay out of the basket until a signed-in shopper accepts a verified GroceryView product match.',
+    'Allows dismissing retailer-only rows without converting them into verified products.',
+    'Marks accepted and dismissed rows resolved so they leave the open review queue.'
+  ],
+  blockedInStaticSnapshot: [
+    'No private review queue rows are bundled with this static build.',
+    'No unmatched retailer name is added to a basket without signed-in acceptance.',
+    'No review row from one account is visible to another account.'
+  ]
+};
+
 export const retailerHandoffContract = {
   endpoint: '/api/basket/handoff/{retailerId}',
   title: 'Retailer handoff support matrix',

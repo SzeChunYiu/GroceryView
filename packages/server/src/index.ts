@@ -7,6 +7,7 @@ import {
   buildFlyerOfferReport,
   createGroceryViewApi,
   type BasketImportExportRequest,
+  type BasketImportReviewDecisionRequest,
   type CategoryBudgetPatch,
   type FlyerOfferObservationInput,
   type FlyerOfferReport,
@@ -389,6 +390,16 @@ function basketImportExportRequestFromBody(body: JsonRecord): BasketImportExport
       ...(line.productId === undefined ? {} : { productId: requiredString(line.productId, `capturedLines[${index}].productId`) }),
       ...(line.productUrl === undefined ? {} : { productUrl: requiredString(line.productUrl, `capturedLines[${index}].productUrl`) })
     }))
+  };
+}
+
+function basketImportReviewDecisionFromBody(body: JsonRecord): BasketImportReviewDecisionRequest {
+  const decision = requiredString(body.decision, 'decision');
+  if (decision !== 'accept_as_product' && decision !== 'dismiss') throw new Error('decision must be accept_as_product or dismiss.');
+  return {
+    decision,
+    ...(body.productId === undefined ? {} : { productId: requiredString(body.productId, 'productId') }),
+    ...(body.quantity === undefined ? {} : { quantity: requiredNumber(body.quantity, 'quantity') })
   };
 }
 
@@ -1780,6 +1791,26 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      if (path === '/api/basket/import-review') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getBasketImportReviewQueue(user));
+      }
+
+      const importReviewDecisionMatch = path.match(/^\/api\/basket\/import-review\/([^/]+)\/decisions$/);
+      if (importReviewDecisionMatch) {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse(api.resolveBasketImportReviewItem(user, decodeURIComponent(importReviewDecisionMatch[1]!), basketImportReviewDecisionFromBody(body)));
+        }
+      }
+
       const fulfillmentSlotMatch = path.match(/^\/api\/basket\/fulfillment-slots\/([^/]+)\/([^/]+)$/);
       if (fulfillmentSlotMatch) {
         const user = userIdFrom(url);
@@ -2147,6 +2178,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/fulfillment-slots/{retailerId}/{storeId}': { get: protectedOperation('Get fulfillment slot evidence without claiming delivery, pickup, or checkout reservations.') },
       '/api/basket/handoff/{retailerId}': { get: protectedOperation('Get retailer handoff actions, support matrix fallbacks, and checkout-confirmation guardrails.') },
       '/api/basket/import-export': { post: protectedOperation('Import consented bookmarklet or extension basket rows and return unmatched review items.') },
+      '/api/basket/import-review': { get: protectedOperation('Get account-bound retailer basket import review rows.') },
+      '/api/basket/import-review/{reviewItemId}/decisions': { post: protectedOperation('Resolve an account-bound retailer basket import review row.') },
       '/api/basket/trip-cost': { get: protectedOperation('Get basket totals ranked by shelf price plus explicit travel, time, delivery, and split-shop costs.') },
       '/api/basket/recurring-digest': { get: protectedOperation('Get recurring basket changes, missing-price blockers, and suggested review actions.') },
       '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },
