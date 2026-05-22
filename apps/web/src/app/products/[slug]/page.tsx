@@ -722,6 +722,101 @@ function seasonalMonthlyAveragesFor(product: NonNullable<ReturnType<typeof findP
   };
 }
 
+function crossChainHistoryOverlayFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const emptyCrossChainOverlaySeries: {
+    chainLabel: string;
+    pointCount: number;
+    latestPriceLabel: string;
+    latestObservedAt: string | null;
+    lowValueLabel: string;
+    highValueLabel: string;
+    lineStyle: string;
+  }[] = [];
+  const coverageRow = (chainLabel: string, latestPrice: number | null, detail: string) => ({
+    chainLabel,
+    pointCount: 0,
+    latestPriceLabel: formatSek(latestPrice),
+    latestObservedAt: null as string | null,
+    lowValueLabel: 'Not reported',
+    highValueLabel: 'Not reported',
+    lineStyle: 'missing per-chain dated price tape',
+    detail
+  });
+
+  if ('lowestPrice' in product) {
+    const chainHistoryCoverageRows = chainPriceRows(product).map((row) =>
+      coverageRow(row.chain, row.price, 'Current chain quote is visible, but this source has no per-chain dated price tape for a cross-chain history overlay.')
+    );
+    return {
+      available: false,
+      title: 'Not enough per-chain dated observations',
+      crossChainOverlaySeries: emptyCrossChainOverlaySeries,
+      chainHistoryCoverageRows,
+      chainCount: chainHistoryCoverageRows.length,
+      observationCount: 0,
+      detail: 'Not enough per-chain dated observations exist for two or more chains, so GroceryView withholds the cross-chain history overlay. Current quotes are not backfilled into history. No forecast or synthetic chain history is shown.'
+    };
+  }
+
+  const latest = latestObservationFor(product);
+  const asOf = latest ? `${latest.date}T00:00:00.000Z` : undefined;
+  const sourceConfidence = clamp(product.observationCount / 30, 0, 1);
+  const overlayResult = buildPriceChartSeries({
+    observations: product.observations.map((observation) => ({
+      observedAt: `${observation.date}T00:00:00.000Z`,
+      price: observation.price,
+      storeId: 'openprices-community',
+      storeName: 'OpenPrices community aggregate',
+      sourceType: 'online' as const,
+      confidence: sourceConfidence,
+      provenanceLabel: `${product.observationCount} OpenPrices observations without chain attribution`
+    })),
+    ...(asOf ? { asOf } : {}),
+    rangeDays: 365,
+    markerLimitPerSeries: 4
+  });
+  const crossChainOverlaySeries = overlayResult.series.map((series) => {
+    const latestPoint = [...series.points].sort((a, b) => a.time.localeCompare(b.time)).at(-1);
+    const values = series.points.map((point) => point.value);
+    return {
+      chainLabel: series.storeName,
+      pointCount: series.points.length,
+      latestPriceLabel: latestPoint ? formatSek(latestPoint.value) : 'Not reported',
+      latestObservedAt: latestPoint?.time ?? null,
+      lowValueLabel: values.length ? formatSek(Math.min(...values)) : 'Not reported',
+      highValueLabel: values.length ? formatSek(Math.max(...values)) : 'Not reported',
+      lineStyle: series.lineStyle
+    };
+  });
+  const chainHistoryCoverageRows = crossChainOverlaySeries.map((series) => ({
+    ...series,
+    detail: 'OpenPrices has dated price history here, but it is an aggregate community series without chain identity, so it cannot be used as a per-chain overlay.'
+  }));
+  const observationCount = crossChainOverlaySeries.reduce((total, series) => total + series.pointCount, 0);
+
+  if (crossChainOverlaySeries.length < 2) {
+    return {
+      available: false,
+      title: 'Not enough per-chain dated observations',
+      crossChainOverlaySeries,
+      chainHistoryCoverageRows,
+      chainCount: crossChainOverlaySeries.length,
+      observationCount,
+      detail: 'Not enough per-chain dated observations exist for two or more chains. GroceryView renders the available dated tape as coverage evidence, but does not call it a cross-chain history overlay. No forecast or synthetic chain history is shown.'
+    };
+  }
+
+  return {
+    available: true,
+    title: 'cross-chain history overlay',
+    crossChainOverlaySeries,
+    chainHistoryCoverageRows,
+    chainCount: crossChainOverlaySeries.length,
+    observationCount,
+    detail: `cross-chain history overlay built with buildPriceChartSeries from ${crossChainOverlaySeries.length} per-chain dated price tape series. No forecast or synthetic chain history is shown.`
+  };
+}
+
 function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceChartTerminalModel {
   const emptyWindows: PriceChartTerminalWindow[] = timeframeWindows.map((window) => ({
     label: window.label,
@@ -813,6 +908,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const typicalRangeBand = priceTypicalRangeBandFor(product);
   const priceChangeLog = priceChangeEventLogFor(product);
   const monthlySeasonality = seasonalMonthlyAveragesFor(product);
+  const crossChainHistoryOverlay = crossChainHistoryOverlayFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
@@ -917,6 +1013,46 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         <p className="mt-4 text-xs font-semibold text-slate-500">{smartSwaps.caveat}</p>
       </Card>
       <PriceChartTerminal chart={priceChartTerminal} />
+      <Card className="mt-6 overflow-hidden border-cyan-200 bg-cyan-50/80">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-800">cross-chain history overlay</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Per-chain dated price tape coverage</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Uses buildPriceChartSeries only when at least two chains have dated observations for the same product. No forecast or synthetic chain history is shown.
+            </p>
+          </div>
+          <div className="rounded-[2rem] bg-slate-950 p-5 text-right text-white shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">{crossChainHistoryOverlay.title}</p>
+            <p className="mt-2 text-3xl font-black">{crossChainHistoryOverlay.chainCount} sources</p>
+            <p className="mt-1 text-xs font-semibold text-slate-300">{crossChainHistoryOverlay.observationCount} dated points</p>
+          </div>
+        </div>
+        {crossChainHistoryOverlay.available ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {crossChainHistoryOverlay.crossChainOverlaySeries.map((series) => (
+              <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={`${series.chainLabel}-${series.lineStyle}`}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">{series.chainLabel}</p>
+                <p className="mt-2 text-2xl font-black text-slate-950">{series.latestPriceLabel}</p>
+                <p className="mt-2 text-sm font-semibold text-slate-600">{series.pointCount} points · lineStyle {series.lineStyle}</p>
+                <p className="mt-2 text-sm font-bold text-slate-700">Range {series.lowValueLabel}–{series.highValueLabel}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {crossChainHistoryOverlay.chainHistoryCoverageRows.map((row) => (
+              <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={`${row.chainLabel}-${row.lineStyle}`}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">{row.chainLabel}</p>
+                <p className="mt-2 text-2xl font-black text-slate-950">{row.latestPriceLabel}</p>
+                <p className="mt-2 text-sm font-semibold text-slate-600">{row.pointCount} dated points · {row.lineStyle}</p>
+                <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{row.detail}</p>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{crossChainHistoryOverlay.detail}</p>
+      </Card>
       <Card className="mt-6 overflow-hidden border-lime-200 bg-lime-50/80">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>

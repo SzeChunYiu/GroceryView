@@ -852,6 +852,21 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces an honest cross-chain history overlay gate without synthetic chain history', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /crossChainHistoryOverlayFor/);
+    assert.match(source, /crossChainOverlaySeries/);
+    assert.match(source, /chainHistoryCoverageRows/);
+    assert.match(source, /cross-chain history overlay/);
+    assert.match(source, /per-chain dated price tape/);
+    assert.match(source, /No forecast or synthetic chain history is shown/);
+    assert.match(source, /Not enough per-chain dated observations/);
+    assert.match(source, /buildPriceChartSeries/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces product multi-timeframe price charts using the real core chart adapter and lightweight-charts', async () => {
     const product = await read('src/app/products/[slug]/page.tsx');
     const chart = await read('src/components/price-chart-terminal.tsx');
