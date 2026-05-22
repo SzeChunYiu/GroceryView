@@ -34,7 +34,7 @@ type MatsparPageProduct = {
   w_prices?: Record<string, unknown>;
 };
 
-export const MATSPAR_SEARCH_BASE_URL = 'https://www.matspar.se/kategori/';
+export const MATSPAR_SEARCH_BASE_URL = 'https://www.matspar.se/kategori';
 
 export const DEFAULT_MATSPAR_SEARCH_QUERIES = [
   'makaroner',
