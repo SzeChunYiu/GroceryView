@@ -806,6 +806,29 @@ describe('verified-data UI', () => {
     assert.match(products, /No synthetic prices/);
   });
 
+  it('ships JSON-LD organization, site search, product offer, and breadcrumb metadata', async () => {
+    const layout = await read('src/app/layout.tsx');
+    const productRoute = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(layout, /application\/ld\+json/);
+    assert.match(layout, /'@type': 'Organization'/);
+    assert.match(layout, /'@type': 'WebSite'/);
+    assert.match(layout, /SearchAction/);
+    assert.match(layout, /query-input/);
+    assert.match(layout, /https:\/\/grocery-web-mu\.vercel\.app/);
+
+    assert.match(productRoute, /productJsonLdFor/);
+    assert.match(productRoute, /'@type': 'Product'/);
+    assert.match(productRoute, /'@type': 'AggregateOffer'/);
+    assert.match(productRoute, /lowPrice/);
+    assert.match(productRoute, /highPrice/);
+    assert.match(productRoute, /priceCurrency: 'SEK'/);
+    assert.match(productRoute, /breadcrumbJsonLdFor/);
+    assert.match(productRoute, /'@type': 'BreadcrumbList'/);
+    assert.match(productRoute, /application\/ld\+json/);
+    assert.doesNotMatch(productRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
   it('ships crawlable sitemap and robots metadata from verified route drivers', async () => {
     const sitemap = await read('src/app/sitemap.ts');
     const robots = await read('src/app/robots.ts');

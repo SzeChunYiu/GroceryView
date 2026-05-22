@@ -14,6 +14,7 @@ import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 
 const REQUIRED_CHAIN_COVERAGE = 6;
+const siteUrl = 'https://grocery-web-mu.vercel.app';
 const smartSwapPrivateLabelPreference = {
   acceptedTiers: ['standard_private_label', 'budget_private_label', 'organic_private_label', 'discount_chain_label'] as BrandTier[],
   blockedCategories: ['baby_formula']
@@ -57,6 +58,58 @@ function productBrand(product: NonNullable<ReturnType<typeof findProduct>>) {
 
 function productUnitPrice(product: NonNullable<ReturnType<typeof findProduct>>) {
   return 'lowestPrice' in product ? product.lowestPrice : product.priceMedian;
+}
+
+function productOfferBounds(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product) {
+    const prices = chainPriceRows(product)
+      .map((row) => row.price)
+      .filter((price): price is number => typeof price === 'number' && Number.isFinite(price));
+    return {
+      lowPrice: prices.length ? Math.min(...prices) : product.lowestPrice,
+      highPrice: prices.length ? Math.max(...prices) : product.highestPrice,
+      offerCount: Math.max(prices.length, product.inChains.length)
+    };
+  }
+
+  return { lowPrice: product.priceMin, highPrice: product.priceMax, offerCount: product.observationCount };
+}
+
+function productJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const bounds = productOfferBounds(product);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: product.image ? [product.image] : undefined,
+    brand: { '@type': 'Brand', name: productBrand(product) },
+    category: labelFromSlug(product.category),
+    offers: {
+      '@type': 'AggregateOffer',
+      priceCurrency: 'SEK',
+      lowPrice: bounds.lowPrice,
+      highPrice: bounds.highPrice,
+      offerCount: bounds.offerCount,
+      availability: 'https://schema.org/InStock',
+      url: `${siteUrl}/products/${product.slug}`
+    }
+  };
+}
+
+function breadcrumbJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Products', item: `${siteUrl}/products` },
+      { '@type': 'ListItem', position: 2, name: labelFromSlug(product.category), item: `${siteUrl}/categories/${product.category}` },
+      { '@type': 'ListItem', position: 3, name: product.name, item: `${siteUrl}/products/${product.slug}` }
+    ]
+  };
+}
+
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
 function brandTierFor(brand: string, labels: string[] = []): BrandTier {
@@ -229,8 +282,12 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const smartSwaps = smartSwapRecommendationsFor(product);
   const priceHistoryBadge = priceHistoryBadgeFor(product);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
+  const productJsonLd = productJsonLdFor(product);
+  const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
   return (
     <PageShell>
+      <script dangerouslySetInnerHTML={{ __html: jsonLd(productJsonLd) }} type="application/ld+json" />
+      <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
       <h1 className="mt-2 max-w-4xl text-4xl font-black tracking-tight">{product.name}</h1>
       <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
