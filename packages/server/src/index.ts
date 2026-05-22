@@ -520,6 +520,11 @@ type WatchlistLatestPriceRow = {
   observed_at: string | Date;
 };
 
+type WatchlistProductIdentityRow = {
+  product_id: string;
+  product_slug: string;
+};
+
 function iso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
 }
@@ -714,15 +719,38 @@ async function watchlistProductsFromPostgres(executor: QueryExecutor, watchlist:
   });
 }
 
+async function normalizeWatchlistProductIds(executor: QueryExecutor, watchlist: readonly WatchlistItem[]): Promise<WatchlistItem[]> {
+  const productIds = [...new Set(watchlist.map((item) => item.productId))];
+  if (productIds.length === 0) return [...watchlist];
+  const rows = await executor.query<WatchlistProductIdentityRow>(
+    `select id::text as product_id,
+            slug as product_slug
+     from products
+     where id::text = any($1::text[])
+        or slug = any($1::text[])`,
+    [productIds]
+  );
+  const slugsByIdentifier = new Map<string, string>();
+  for (const row of rows) {
+    slugsByIdentifier.set(row.product_id, row.product_slug);
+    slugsByIdentifier.set(row.product_slug, row.product_slug);
+  }
+  return watchlist.map((item) => ({
+    ...item,
+    productId: slugsByIdentifier.get(item.productId) ?? item.productId
+  }));
+}
+
 async function queryWatchlistPriceAlertsFromPostgres(
   executor: QueryExecutor,
   repository: RuntimeWatchlistRepository,
   userId: string
 ): Promise<WatchlistPriceAlertReport> {
-  const [watchlist, favoriteStoreIds] = await Promise.all([
+  const [rawWatchlist, favoriteStoreIds] = await Promise.all([
     repository.getWatchlist(userId),
     repository.getFavoriteStoreIds(userId)
   ]);
+  const watchlist = await normalizeWatchlistProductIds(executor, rawWatchlist);
   const favoriteStoreRows = favoriteStoreIds.length === 0
     ? []
     : await executor.query<{ store_slug: string }>(
@@ -771,14 +799,14 @@ async function upsertWatchlistPriceAlertInPostgres(
       ]
     );
   } else {
-    const productRows = await executor.query<{ product_id: string }>(
-      'select id::text as product_id from products where id::text = $1 or slug = $1 limit 1',
+    const productRows = await executor.query<WatchlistProductIdentityRow>(
+      'select id::text as product_id, slug as product_slug from products where id::text = $1 or slug = $1 limit 1',
       [request.productId]
     );
-    const productId = productRows[0]?.product_id;
-    if (!productId) throw new Error(`Unknown productId: ${request.productId}`);
+    const productSlug = productRows[0]?.product_slug;
+    if (!productSlug) throw new Error(`Unknown productId: ${request.productId}`);
     await repository.addWatchlistItem(userId, {
-      productId,
+      productId: productSlug,
       targetPrice: request.targetPrice,
       favoriteStoresOnly: request.favoriteStoresOnly ?? true,
       allowedPriceTypes: request.allowedPriceTypes ?? ['shelf']
