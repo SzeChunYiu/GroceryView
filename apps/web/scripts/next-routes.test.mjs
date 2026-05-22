@@ -47,7 +47,7 @@ describe('verified-data UI', () => {
   });
 
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {
-    const featureRoutes = ['scanner','household','account','basket-ideas','coupon-stacks','price-reports','shopping-trips','privacy'];
+    const featureRoutes = ['scanner','household','account','coupon-stacks','price-reports','shopping-trips','privacy'];
     const verified = await read('src/lib/verified-data.ts');
     assert.match(verified, /privateFeatureCopy/);
     assert.match(verified, /verifiedSurface/);
@@ -85,8 +85,8 @@ describe('verified-data UI', () => {
     assert.match(route, /Retailer handoff support matrix/);
     assert.match(route, /basket transfer/);
     assert.match(route, /checkout confirmation/);
-    assert.match(route, /NoVerifiedData/);
-    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+    assert.match(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
@@ -131,6 +131,16 @@ describe('verified-data UI', () => {
     assert.match(source, /buildWatchlistAlerts/);
     assert.match(source, /planNotifications/);
     assert.match(source, /plannedNotifications/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('surfaces a student cheapest-basics board using real basket comparison output', async () => {
+    const source = await read('src/app/basket-ideas/page.tsx');
+    assert.match(source, /studentBasicsBoard/);
+    assert.match(source, /compareBasketStrategies/);
+    assert.match(source, /summarizeStoreBasketCoverage/);
+    assert.match(source, /cheapestByProduct/);
+    assert.match(source, /Student staples/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 

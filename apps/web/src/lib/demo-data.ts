@@ -1817,6 +1817,81 @@ export const weeklyBasketOptimizer = {
   }
 };
 
+export const studentBasicsInput: BasketComparisonInput = {
+  favoriteStoreIds: ['willys-odenplan', 'coop-medborgarplatsen', 'hemkop-hornstull'],
+  items: [
+    {
+      productId: 'garant-havregryn-1kg',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 23.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 25.9 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 24.9 }
+      ]
+    },
+    {
+      productId: 'eldorado-basmati-rice-1kg',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 24.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 27.9 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 26.9 }
+      ]
+    },
+    {
+      productId: 'barilla-spaghetti-1kg',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 29.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 31.9 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 27.9 }
+      ]
+    },
+    {
+      productId: 'pagen-lingongrova-500g',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 36.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 33.9 }
+      ]
+    },
+    {
+      productId: 'bravo-apelsinjuice-1l',
+      quantity: 1,
+      prices: [
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 25.9 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 22.9 }
+      ]
+    }
+  ]
+};
+
+const studentBasicsNames: Record<string, string> = {
+  'garant-havregryn-1kg': 'Garant Havregryn 1kg',
+  'eldorado-basmati-rice-1kg': 'Eldorado Basmati Rice 1kg',
+  'barilla-spaghetti-1kg': 'Barilla Spaghetti 1kg',
+  'pagen-lingongrova-500g': 'Pågen Lingongrova 500g',
+  'bravo-apelsinjuice-1l': 'Bravo Apelsinjuice 1L'
+};
+
+const studentBasicsComparison = compareBasketStrategies(studentBasicsInput);
+const studentBasicsCoverage = summarizeStoreBasketCoverage(studentBasicsInput);
+
+export const studentBasicsBoard = {
+  title: 'Student staples cheapest-basics board',
+  persona: 'Students / young singles',
+  comparison: studentBasicsComparison,
+  coverage: studentBasicsCoverage,
+  items: studentBasicsComparison.cheapestByProduct.assignments.map((assignment) => ({
+    ...assignment,
+    name: studentBasicsNames[assignment.productId] ?? assignment.productId
+  })),
+  confidence: {
+    level: 'medium',
+    caveat: 'Uses visible staple prices across favorite Stockholm stores; missing product-store rows reduce coverage and are not estimated.'
+  }
+};
+
 export const watchlistAlertInputs: { favoriteStoreIds: string[]; watchlist: WatchlistItem[]; products: (WatchlistProductSnapshot & { source: string })[] } = {
   favoriteStoreIds: ['willys-odenplan', 'coop-medborgarplatsen', 'hemkop-hornstull'],
   watchlist: [
