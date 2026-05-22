@@ -39,11 +39,12 @@ export class PricesController {
     @Query('chain') chain?: string,
     @Query('store') store?: string,
     @Query('sourceRun') sourceRun?: string,
+    @Query('minConfidence') minConfidence?: string,
     @Query('from') observedFrom?: string,
     @Query('to') observedTo?: string,
     @Query('limit') limit?: string
   ) {
-    const filter = parsePriceHistoryFilter({ priceType, chain, store, sourceRun, observedFrom, observedTo, limit });
+    const filter = parsePriceHistoryFilter({ priceType, chain, store, sourceRun, minConfidence, observedFrom, observedTo, limit });
     const report = await this.priceHistory.getProductPriceHistory(productId, filter);
     if (!report) throw new NotFoundException('Product not found');
     return report;
@@ -94,11 +95,19 @@ function parseOptionalLimit(value: string | undefined): number | undefined {
   return parsed;
 }
 
+function parseOptionalConfidence(value: string | undefined): number | undefined {
+  if (value === undefined) return undefined;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 1) throw new BadRequestException('minConfidence must be a number between 0 and 1.');
+  return parsed;
+}
+
 function parsePriceHistoryFilter(input: {
   priceType?: string;
   chain?: string;
   store?: string;
   sourceRun?: string;
+  minConfidence?: string;
   observedFrom?: string;
   observedTo?: string;
   limit?: string;
@@ -107,6 +116,7 @@ function parsePriceHistoryFilter(input: {
   const parsedChain = parseOptionalIdentifier(input.chain, 'chain');
   const parsedStore = parseOptionalIdentifier(input.store, 'store');
   const parsedSourceRun = parseOptionalIdentifier(input.sourceRun, 'sourceRun');
+  const parsedMinConfidence = parseOptionalConfidence(input.minConfidence);
   const parsedFrom = parseOptionalDate(input.observedFrom, 'from');
   const parsedTo = parseOptionalDate(input.observedTo, 'to');
   if (parsedFrom && parsedTo && Date.parse(parsedFrom) > Date.parse(parsedTo)) {
@@ -118,6 +128,7 @@ function parsePriceHistoryFilter(input: {
     ...(parsedChain ? { chain: parsedChain } : {}),
     ...(parsedStore ? { store: parsedStore } : {}),
     ...(parsedSourceRun ? { sourceRun: parsedSourceRun } : {}),
+    ...(parsedMinConfidence === undefined ? {} : { minConfidence: parsedMinConfidence }),
     ...(parsedFrom ? { observedFrom: parsedFrom } : {}),
     ...(parsedTo ? { observedTo: parsedTo } : {}),
     ...(parsedLimit ? { limit: parsedLimit } : {})

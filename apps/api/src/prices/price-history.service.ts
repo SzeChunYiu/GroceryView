@@ -13,6 +13,7 @@ export type ProductPriceHistoryFilter = {
   chain?: string;
   store?: string;
   sourceRun?: string;
+  minConfidence?: number;
   observedFrom?: string;
   observedTo?: string;
   limit?: number;
@@ -126,8 +127,9 @@ export class PriceHistoryService {
          and ($5::text is null or observations.source_run_id::text = $5)
          and ($6::timestamptz is null or observations.observed_at >= $6::timestamptz)
          and ($7::timestamptz is null or observations.observed_at <= $7::timestamptz)
+         and ($8::numeric is null or observations.confidence >= $8::numeric)
        order by observations.observed_at desc, chains.slug, stores.name, observations.price_type, observations.id
-       limit $8`,
+       limit $9`,
       [
         product.id,
         filter.priceType ?? null,
@@ -136,6 +138,7 @@ export class PriceHistoryService {
         filter.sourceRun ?? null,
         filter.observedFrom ?? null,
         filter.observedTo ?? null,
+        filter.minConfidence ?? null,
         filter.limit ?? 500
       ]
     );
