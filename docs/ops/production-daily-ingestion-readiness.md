@@ -88,6 +88,23 @@ This fails closed unless:
 - catalog target chains contain all six required chains
 - `requireEveryProductInEveryStore` is `true`
 
+## Export a DB-backed site snapshot
+
+After daily ingestion has written verified rows into `postgres.latest_prices`, export
+the public static-site snapshot artifact from the database instead of refreshing
+checked-in per-source fixtures:
+
+```bash
+DATABASE_URL="$DATABASE_URL" \
+GROCERYVIEW_DB_SITE_SNAPSHOT_PATH=/tmp/groceryview-db-site-snapshot.json \
+npm run --silent ingest:export-db-snapshot
+```
+
+The exporter fails closed with `No latest price rows available` when the database
+reader returns no public latest-price rows. The artifact summarizes product, chain,
+store, and observation coverage and carries only the normalized public row plus
+provenance; it does not include raw private payloads.
+
 ## Trigger and monitor the daily gate
 
 The scheduled workflow is `.github/workflows/daily-ingestion.yml`.

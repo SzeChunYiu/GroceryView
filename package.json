@@ -17,7 +17,8 @@
     "ops:check-production-secrets": "node scripts/ops/check-production-secrets.mjs",
     "ops:daily-connectors": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connectors.mjs",
     "ops:daily-connector-stores": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connector-stores.mjs",
-    "ops:validate-production-env": "node scripts/ops/validate-production-env.mjs"
+    "ops:validate-production-env": "node scripts/ops/validate-production-env.mjs",
+    "ingest:export-db-snapshot": "npm run build -w @groceryview/db && node scripts/ingestion/export-db-site-snapshot.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
