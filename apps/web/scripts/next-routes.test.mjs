@@ -583,6 +583,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('uses next/image for product visual discovery imagery', async () => {
+    const products = await read('src/app/products/page.tsx');
+    const nextConfig = await read('next.config.mjs');
+
+    assert.match(products, /import Image from 'next\/image'/);
+    assert.match(products, /<Image/);
+    assert.match(products, /width=\{160\}/);
+    assert.match(products, /height=\{160\}/);
+    assert.match(products, /sizes=/);
+    assert.doesNotMatch(products, /<img\b/);
+    assert.match(nextConfig, /remotePatterns/);
+    assert.match(nextConfig, /assets\.axfood\.se/);
+    assert.match(nextConfig, /images\.openfoodfacts\.org/);
+  });
+
   it('surfaces immigrant multilingual UI access in the public shell', async () => {
     const source = await read('src/components/market-shell.tsx');
     assert.match(source, /immigrantMultilingualUi/);
