@@ -218,7 +218,7 @@ describe('createGroceryViewApi', () => {
       userId: 'user-1',
       selectedStoreSlugs: ['willys-hemma-stockholm-torsplan', 'coop-odenplan'],
       items: [
-        { productId: 'product-milk', quantity: 2 },
+        { productId: ' product-milk ', quantity: 2 },
         { productId: 'product-butter', quantity: 1 },
         { productId: 'product-missing', quantity: 1 }
       ],

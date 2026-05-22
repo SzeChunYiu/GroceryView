@@ -1437,7 +1437,8 @@ export function buildFacetedProductSearch(input: {
 export function buildRealBasketComparison(input: RealBasketCompareInput): RealBasketCompareResult {
   const selectedStoreSlugs = normalizedList(input.selectedStoreSlugs);
   const basketSource = input.basketSource ?? 'request_body';
-  const itemOrder = new Map(input.items.map((item, index) => [item.productId, index]));
+  const items = input.items.map((item) => ({ ...item, productId: item.productId.trim() }));
+  const itemOrder = new Map(items.map((item, index) => [item.productId, index]));
   const rowsByProduct = new Map<string, RealCatalogSearchPriceRow[]>();
   const productNames = new Map<string, { slug: string; canonicalName: string }>();
 
@@ -1451,8 +1452,8 @@ export function buildRealBasketComparison(input: RealBasketCompareInput): RealBa
     rowsByProduct.set(row.productId, rows);
   }
 
-  const missingProductIds = input.items.filter((item) => !rowsByProduct.has(item.productId)).map((item) => item.productId);
-  const cheapestAssignments = input.items.map((item) => {
+  const missingProductIds = items.filter((item) => !rowsByProduct.has(item.productId)).map((item) => item.productId);
+  const cheapestAssignments = items.map((item) => {
     const product = productNames.get(item.productId);
     const prices = [...(rowsByProduct.get(item.productId) ?? [])].sort(
       (a, b) => (a.price ?? Number.POSITIVE_INFINITY) - (b.price ?? Number.POSITIVE_INFINITY) || (a.storeName ?? '').localeCompare(b.storeName ?? '')
@@ -1477,7 +1478,7 @@ export function buildRealBasketComparison(input: RealBasketCompareInput): RealBa
   const storeSlugs = selectedStoreSlugs.length > 0 ? selectedStoreSlugs : normalizedList(input.latestPrices.map((row) => row.storeSlug ?? ''));
   const completeStoreQuotes = storeSlugs
     .map((storeSlug) => {
-      const assignments = input.items.map((item) => {
+      const assignments = items.map((item) => {
         const product = productNames.get(item.productId);
         const best = [...(rowsByProduct.get(item.productId) ?? [])]
           .filter((row) => row.storeSlug === storeSlug)
@@ -1517,7 +1518,7 @@ export function buildRealBasketComparison(input: RealBasketCompareInput): RealBa
   return {
     userId: input.userId ?? null,
     currency: 'SEK',
-    itemCount: input.items.length,
+    itemCount: items.length,
     selectedStoreSlugs,
     strategies: [
       {
@@ -1538,7 +1539,7 @@ export function buildRealBasketComparison(input: RealBasketCompareInput): RealBa
         total: bestSingleStore?.total ?? null,
         storeCount: bestSingleStore ? 1 : 0,
         assignments: bestSingleStore?.assignments ?? [],
-        missingProductIds: bestSingleStore?.missingProductIds ?? input.items.map((item) => item.productId),
+        missingProductIds: bestSingleStore?.missingProductIds ?? items.map((item) => item.productId),
         warnings: bestSingleStore
           ? ['Single-store quote uses persisted latest_prices rows only.']
           : ['No selected store has persisted prices for every basket item.']
