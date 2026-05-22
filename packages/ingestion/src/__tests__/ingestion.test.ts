@@ -3474,7 +3474,12 @@ class DailyIngestionExecutor implements QueryExecutor {
     if (sql.includes('update source_runs')) return [{ id: params[0] }] as T[];
     if (sql.includes('insert into chains')) return [{ id: `chain-db-${++this.sequence}` }] as T[];
     if (sql.includes('insert into stores')) return [{ id: `store-db-${++this.sequence}` }] as T[];
+    if (sql.includes('jsonb_to_recordset') && sql.includes('insert into products')) {
+      const products = JSON.parse(String(params[0])) as Array<{ slug: string }>;
+      return products.map((product) => ({ slug: product.slug, id: `product-db-${product.slug}` })) as T[];
+    }
     if (sql.includes('insert into products')) return [{ id: `product-db-${++this.sequence}` }] as T[];
+    if (sql.includes('jsonb_to_recordset') && sql.includes('insert into aliases')) return [] as T[];
     if (sql.includes('insert into aliases')) {
       return [{
         id: `alias-db-${++this.sequence}`,
