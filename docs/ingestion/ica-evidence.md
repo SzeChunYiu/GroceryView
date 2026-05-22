@@ -2,13 +2,13 @@
 
 - Source: ICA public store-scoped promotions JSON
 - Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C
-- Store locator retrieved: 2026-05-22T15:51:12.864Z
+- Store locator retrieved: 2026-05-22T16:48:57.676Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 92700
-- Stores fetched: 309
+- Real rows fetched: 92800
+- Stores fetched: 310
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
-- Live verification: 8 newly added source URLs returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-22; all wired source row counts are recorded below.
+- Live verification: 1 newly added source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-22; the wired source row count is recorded below.
 
 ## Source URLs
 
@@ -321,6 +321,8 @@
 - Source URL (1003563 ICA Supermarket Väddö, retrieved 2026-05-22T15:51:12.864Z, rows 300): https://handlaprivatkund.ica.se/stores/1003563/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Source URL (1135007 ICA Supermarket Älta, retrieved 2026-05-22T15:51:12.864Z, rows 300): https://handlaprivatkund.ica.se/stores/1135007/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Source URL (1004436 ICA Nära Älvsjö, retrieved 2026-05-22T15:51:12.864Z, rows 300): https://handlaprivatkund.ica.se/stores/1004436/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+
+- Source URL (1004477 ICA Supermarket Storuman, retrieved 2026-05-22T16:48:57.676Z, rows 100): https://handlaprivatkund.ica.se/stores/1004477/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
 
 Every emitted row came from a live store-scoped promotions response for the selected ICA store and includes the exact source URL plus retrieval timestamp. Rows preserve store account, region, ordinary price, unit price, promo price fields when ICA returned them, promotion description, and product detail URLs.
 
