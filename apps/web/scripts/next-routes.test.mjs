@@ -105,6 +105,7 @@ describe('verified-data UI', () => {
     assert.match(route, /Account-bound import review/);
     assert.match(route, /unmatched retailer rows stay out of the basket/i);
     assert.match(route, /signed-in shopper accepts/i);
+    assert.match(route, /PostgreSQL-backed runtime repository/i);
     assert.doesNotMatch(route, /NoVerifiedData/);
     assert.match(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
@@ -549,6 +550,19 @@ describe('verified-data UI', () => {
     assert.match(route, /chain\.topProductSlug/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+  it('surfaces a budget lowest price anywhere radar from matched chain prices', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/compare/page.tsx');
+
+    assert.match(verified, /export const budgetLowestPriceRadar/);
+    assert.match(route, /budgetLowestPriceRadar/);
+    assert.match(route, /Lowest price anywhere radar/);
+    assert.match(route, /cheapestChain/);
+    assert.match(route, /verifiedProductSlug/);
+    assert.match(route, /priceGap/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
   it('surfaces verified OpenPrices observation depth on the homepage', async () => {

@@ -53,6 +53,7 @@ class RecordingPgPool {
           'watchlist_items',
           'weekly_baskets',
           'basket_items',
+          'basket_import_review_items',
           'human_review_assignments',
           'human_reviewers',
           'community_reporter_trust',
@@ -82,7 +83,8 @@ class RecordingPgPool {
           '006_source_runs_official_api',
           '007_receipt_uploads',
           '008_household_plans',
-          '009_retailer_source_policies'
+          '009_retailer_source_policies',
+          '010_basket_import_reviews'
         ].map((version) => ({ version }))
       };
     }
