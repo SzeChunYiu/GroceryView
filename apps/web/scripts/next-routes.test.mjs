@@ -272,6 +272,32 @@ describe('verified-data UI', () => {
     assert.match(server, /\/api\/account\/subscription-access/);
   });
 
+  it('ships signed-in price-report human review controls without anonymous moderation', async () => {
+    const priceReports = await read('src/app/price-reports/page.tsx');
+    const actions = await read('src/components/price-report-review-actions.tsx');
+    const server = await read('../../packages/server/src/index.ts');
+
+    assert.match(priceReports, /PriceReportReviewActions/);
+    assert.match(actions, /'use client'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(actions, /Authorization: `Bearer \$\{accessToken\}`/);
+    assert.match(actions, /\/api\/human-review\/assignments\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /\/api\/human-review\/assignments\/\$\{encodeURIComponent\(assignmentId\)\}\/decisions\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /method: 'GET'/);
+    assert.match(actions, /method: 'POST'/);
+    assert.match(actions, /accept_community_report/);
+    assert.match(actions, /dismiss_community_report/);
+    assert.match(actions, /reviewedByHuman: true/);
+    assert.match(actions, /Sign in first/);
+    assert.match(actions, /No anonymous price-report moderation/);
+    assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
+    assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
+    assert.match(server, /\/api\/human-review\/assignments/);
+    assert.match(server, /Session user is not a registered human reviewer/);
+  });
+
+
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/basket-ideas/page.tsx');
