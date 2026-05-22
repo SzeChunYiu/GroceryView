@@ -1,9 +1,18 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ColorType, createChart, LineSeries, LineStyle } from 'lightweight-charts';
 
 type LineStyleName = 'solid' | 'dashed' | 'dotted';
+type ChartLoadStatus = 'idle' | 'loading' | 'ready' | 'failed';
+type LightweightChartsModule = typeof import('lightweight-charts');
+type LightweightChartsValues = Pick<LightweightChartsModule, 'ColorType' | 'LineSeries' | 'LineStyle' | 'createChart'>;
+
+let lightweightChartsModulePromise: Promise<LightweightChartsModule> | null = null;
+
+function loadLightweightCharts() {
+  lightweightChartsModulePromise ??= import('lightweight-charts');
+  return lightweightChartsModulePromise;
+}
 
 export type PriceChartTerminalSeries = {
   id: string;
@@ -48,10 +57,10 @@ export type PriceChartTerminalModel = {
   windows: PriceChartTerminalWindow[];
 };
 
-function lineStyleFor(lineStyle: LineStyleName) {
-  if (lineStyle === 'dotted') return LineStyle.Dotted;
-  if (lineStyle === 'dashed') return LineStyle.Dashed;
-  return LineStyle.Solid;
+function lineStyleFor(lineStyle: LineStyleName, lineStyles: LightweightChartsValues['LineStyle']) {
+  if (lineStyle === 'dotted') return lineStyles.Dotted;
+  if (lineStyle === 'dashed') return lineStyles.Dashed;
+  return lineStyles.Solid;
 }
 
 function chartColorFor(index: number) {
@@ -60,6 +69,8 @@ function chartColorFor(index: number) {
 
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
   const [activeWindowLabel, setActiveWindowLabel] = useState(chart.defaultWindow);
+  const [chartLoadError, setChartLoadError] = useState<string | null>(null);
+  const [chartLoadStatus, setChartLoadStatus] = useState<ChartLoadStatus>('idle');
   const containerRef = useRef<HTMLDivElement>(null);
   const activeWindow = useMemo(
     () => chart.windows.find((window) => window.label === activeWindowLabel) ?? chart.windows[0],
@@ -72,44 +83,64 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
     const container = containerRef.current;
     if (!container || !chart.available || !activeWindow || activeWindow.series.length === 0) return;
 
-    const chartApi = createChart(container, {
-      autoSize: true,
-      height: 280,
-      layout: {
-        background: { type: ColorType.Solid, color: 'transparent' },
-        textColor: '#334155'
-      },
-      grid: {
-        vertLines: { color: 'rgba(148, 163, 184, 0.16)' },
-        horzLines: { color: 'rgba(148, 163, 184, 0.18)' }
-      },
-      rightPriceScale: { borderColor: 'rgba(15, 23, 42, 0.12)' },
-      timeScale: {
-        borderColor: 'rgba(15, 23, 42, 0.12)',
-        timeVisible: true
-      },
-      crosshair: {
-        vertLine: { color: '#0f766e', style: LineStyle.Dashed },
-        horzLine: { color: '#0f766e', style: LineStyle.Dashed }
-      }
-    });
+    let isDisposed = false;
+    let removeChart: (() => void) | undefined;
+    setChartLoadError(null);
+    setChartLoadStatus('loading');
 
-    activeWindow.series.forEach((series, index) => {
-      const line = chartApi.addSeries(LineSeries, {
-        color: chartColorFor(index),
-        lineWidth: 3,
-        lineStyle: lineStyleFor(series.lineStyle),
-        lastValueVisible: true,
-        priceLineVisible: true
+    loadLightweightCharts()
+      .then(({ ColorType, LineSeries, LineStyle, createChart }: LightweightChartsValues) => {
+        if (isDisposed || !container.isConnected) return;
+        const chartApi = createChart(container, {
+          autoSize: true,
+          height: 280,
+          layout: {
+            background: { type: ColorType.Solid, color: 'transparent' },
+            textColor: '#334155'
+          },
+          grid: {
+            vertLines: { color: 'rgba(148, 163, 184, 0.16)' },
+            horzLines: { color: 'rgba(148, 163, 184, 0.18)' }
+          },
+          rightPriceScale: { borderColor: 'rgba(15, 23, 42, 0.12)' },
+          timeScale: {
+            borderColor: 'rgba(15, 23, 42, 0.12)',
+            timeVisible: true
+          },
+          crosshair: {
+            vertLine: { color: '#0f766e', style: LineStyle.Dashed },
+            horzLine: { color: '#0f766e', style: LineStyle.Dashed }
+          }
+        });
+
+        activeWindow.series.forEach((series, index) => {
+          const line = chartApi.addSeries(LineSeries, {
+            color: chartColorFor(index),
+            lineWidth: 3,
+            lineStyle: lineStyleFor(series.lineStyle, LineStyle),
+            lastValueVisible: true,
+            priceLineVisible: true
+          });
+          line.setData(series.points.map((point) => ({
+            time: point.time.slice(0, 10),
+            value: point.value
+          })));
+        });
+
+        chartApi.timeScale().fitContent();
+        removeChart = () => chartApi.remove();
+        setChartLoadStatus('ready');
+      })
+      .catch((error: unknown) => {
+        if (isDisposed) return;
+        setChartLoadError(error instanceof Error ? error.message : 'Unknown chart renderer error');
+        setChartLoadStatus('failed');
       });
-      line.setData(series.points.map((point) => ({
-        time: point.time.slice(0, 10),
-        value: point.value
-      })));
-    });
 
-    chartApi.timeScale().fitContent();
-    return () => chartApi.remove();
+    return () => {
+      isDisposed = true;
+      removeChart?.();
+    };
   }, [activeWindow, chart.available]);
 
   return (
@@ -158,7 +189,18 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
               Points/markers: <span className="text-white">{activeWindow.pointCount}/{activeWindow.markerCount}</span>
             </p>
           </div>
+          <p aria-live="polite" className="sr-only">Chart renderer status: {chartLoadStatus}</p>
           <div ref={containerRef} className="mt-5 h-[280px] overflow-hidden rounded-3xl border border-white/10 bg-white" />
+          {chartLoadStatus === 'loading' ? (
+            <p className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 text-xs font-bold text-slate-200">
+              Loading interactive lightweight-charts renderer after the product data is visible.
+            </p>
+          ) : null}
+          {chartLoadStatus === 'failed' ? (
+            <p className="mt-3 rounded-2xl border border-amber-300/30 bg-amber-300/10 p-3 text-xs font-bold text-amber-100">
+              Interactive chart renderer failed to load; the verified price ranges and series summaries remain visible. {chartLoadError}
+            </p>
+          ) : null}
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {activeWindow.series.map((series) => (
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4" key={series.id}>
