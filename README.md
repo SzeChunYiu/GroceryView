@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 22:20 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 23:21 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **282**
+- **Shipped `feat:`/`wire:` PRs to date:** **281**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,26 +42,26 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1137 feat(ingest): enrich OpenFoodFacts alternate names
+- #1136 feat(account): add billing action controls
+- #1135 feat(ingest): add ICA Nära Klingan promotions
+- #1132 feat(seo): add hreflang alternates
+- #1131 feat(billing): add Stripe portal sessions
+- #1129 feat(persona): add multi-week stock-up list
+- #1128 feat(persona): add meal-prep bulk-buy optimizer
+- #1127 feat(ingest): refresh OpenFoodFacts barcode nutrition
+- #1125 feat(ingest): add Coop weekly daily connector
+- #1124 feat(persona): add local seasonal picks
+- #1121 feat(persona): add saved basket auto-reorder readiness
+- #1119 feat(persona): add premium tier tracking
 - #1117 feat(billing): add Stripe checkout sessions
 - #1115 feat(persona): add verified health label filters
 - #1114 feat(persona): add saved basket auto reorder
-- #1113 feat(i18n): add locale-aware price formatting
-- #1112 feat(billing): accept Stripe webhook signatures
-- #1110 feat(persona): add sustainable brand filter
-- #1107 feat(ingest): persist OpenFoodFacts nutrition metadata
-- #1108 feat(persona): add deal hunter alerts
-- #1105 feat(i18n): add locale routed entry points
-- #1104 feat(persona): add one tap basket optimizer
-- #1100 feat(ingest): export DB-backed site snapshots
-- #1099 feat(ingest): add Coop small-store flyer discounts
-- #1098 feat(persona): add freezer batch cook planner
-- #1096 feat(i18n): add next-intl language preference switching
-- #1095 feat(ingest): add bounded daily connector runner
 
 ## 🔄 In progress (open PRs)
 
-- #1121 feat(persona): add saved basket auto-reorder readiness
-- #1119 feat(persona): add premium tier tracking
+- #1139 feat(review): add more-info decision control
+- #1138 feat(ingest): refresh OpenFoodFacts barcode nutrition
 
 ## 📋 To-do (from GOAL.md backlog)
 
