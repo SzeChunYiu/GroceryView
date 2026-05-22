@@ -113,7 +113,23 @@ export const DEFAULT_COOP_DEVICE = 'desktop';
 export const DEFAULT_COOP_API_VERSION = 'v1';
 export const DEFAULT_COOP_STORE_API_VERSION = 'v5';
 export const DEFAULT_COOP_SEARCH_QUERY = 'kaffe';
-export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [DEFAULT_COOP_STORE_ID, '252700'] as const;
+export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
+  DEFAULT_COOP_STORE_ID,
+  '252700',
+  '256600',
+  '255700',
+  '015700',
+  '015810',
+  '015350',
+  '026000',
+  '015220',
+  '016141',
+  '255400',
+  '250800',
+  '015400',
+  '015470',
+  '250400'
+] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
   'Mini vattenmelon',
@@ -340,7 +356,7 @@ export async function fetchCoopWeeklyDiscounts(
 ): Promise<CoopWeeklyDiscount[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const storeIds = options.storeIds ?? (options.storeId ? [options.storeId] : DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS);
-  const maxRows = options.maxRows ?? 50;
+  const maxRows = options.maxRows ?? 400;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const serviceAccess = options.subscriptionKey && options.storeApiSubscriptionKey
     ? {
