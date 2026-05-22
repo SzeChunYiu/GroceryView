@@ -47,7 +47,7 @@ describe('verified-data UI', () => {
   });
 
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {
-    const featureRoutes = ['weekly-basket','watchlist','scanner','household','account','basket-ideas','coupon-stacks','pantry-planner','price-reports','shopping-trips','privacy'];
+    const featureRoutes = ['weekly-basket','scanner','household','account','basket-ideas','coupon-stacks','pantry-planner','price-reports','shopping-trips','privacy'];
     const verified = await read('src/lib/verified-data.ts');
     assert.match(verified, /privateFeatureCopy/);
     assert.match(verified, /verifiedSurface/);
@@ -92,6 +92,16 @@ describe('verified-data UI', () => {
 
 
 
+
+
+  it('surfaces watchlist alerts and notification planning using the real core outputs', async () => {
+    const source = await read('src/app/watchlist/page.tsx');
+    assert.match(source, /watchlistAlertBoard/);
+    assert.match(source, /buildWatchlistAlerts/);
+    assert.match(source, /planNotifications/);
+    assert.match(source, /plannedNotifications/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
 
   it('surfaces deal-based meals on the meal planner route using the real core meal output', async () => {
     const source = await read('src/app/meal-planner/page.tsx');
