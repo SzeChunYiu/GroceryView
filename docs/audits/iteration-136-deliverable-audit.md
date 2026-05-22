@@ -19,8 +19,8 @@ Turn another persona research finding into real GroceryView product by adding a 
 | Full repository tests | Pass | `rtk git diff --check && rtk npm test` exited 0 after rebase. |
 | Build | Pass | `rtk npm run build` completed the TypeScript package builds and Next.js production build for 203 static routes. |
 | Typecheck | Pass | `rtk npm run typecheck` (`tsc --noEmit -p tsconfig.json`) exited 0. |
-| Product PR merge | Pending | Product PR not opened yet. |
-| Audit PR merge | Pending | Requires follow-up after product PR lands. |
+| Product PR merge | Pass | PR #846 merged at 2026-05-22T11:45:38Z with merge commit `1d0ceb874d10d3c76031d4ec421bda55c88b9d82`; verified as an ancestor of `origin/main`. |
+| Audit PR merge | Pending | This follow-up audit branch records the product PR merge proof; merge proof must be added after this audit PR lands. |
 
 ## Guardrails checked
 
