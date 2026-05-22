@@ -809,6 +809,22 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces a seasonal-by-month view from historical monthly averages without forecasting', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /seasonalMonthlyAveragesFor/);
+    assert.match(source, /monthlySeasonalityRows/);
+    assert.match(source, /monthAverageLabel/);
+    assert.match(source, /monthObservationCount/);
+    assert.match(source, /seasonal-by-month view/);
+    assert.match(source, /historical monthly average/);
+    assert.match(source, /avg price per month/);
+    assert.match(source, /No forecast or seasonal prediction is shown/);
+    assert.match(source, /Not enough dated observations/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces product multi-timeframe price charts using the real core chart adapter and lightweight-charts', async () => {
     const product = await read('src/app/products/[slug]/page.tsx');
     const chart = await read('src/components/price-chart-terminal.tsx');
