@@ -4,6 +4,7 @@ import {
   applyHumanReviewDecision,
   authorizeHumanReviewAction,
   classifyProductMatch,
+  compareCommodityUnitPrices,
   planCommunityReportAbuseControls,
   planHumanReviewAssignments,
   planHumanReviewQueue,
@@ -89,6 +90,96 @@ describe('recommendSmartSwaps', () => {
     });
 
     assert.deepEqual(blocked, []);
+  });
+});
+
+describe('compareCommodityUnitPrices', () => {
+  it('ranks confidence-cleared commodity prices by comparable unit and fails closed on non-matching evidence', () => {
+    const comparison = compareCommodityUnitPrices({
+      commodityId: 'tomato',
+      commodityName: 'Tomat',
+      comparableUnit: 'kg',
+      minimumConfidence: 0.6,
+      observations: [
+        {
+          productId: 'willys-kvisttomat',
+          productName: 'Kvisttomat Klass 1',
+          chainId: 'willys',
+          chainName: 'Willys',
+          commodityId: 'tomato',
+          unitPrice: 34.9,
+          comparableUnit: 'kg',
+          sourceConfidence: 0.82,
+          observedAt: '2026-05-21T09:00:00.000Z'
+        },
+        {
+          productId: 'hemkop-kvisttomat',
+          productName: 'Kvisttomat Klass 1',
+          chainId: 'hemkop',
+          chainName: 'Hemköp',
+          commodityId: 'tomato',
+          unitPrice: 39.9,
+          comparableUnit: 'kg',
+          sourceConfidence: 0.78,
+          observedAt: '2026-05-21T09:00:00.000Z'
+        },
+        {
+          productId: 'hemkop-premium-tomato',
+          productName: 'Premium tomat',
+          chainId: 'hemkop',
+          chainName: 'Hemköp',
+          commodityId: 'tomato',
+          unitPrice: 43.6,
+          comparableUnit: 'kg',
+          sourceConfidence: 0.86,
+          observedAt: '2026-05-21T09:00:00.000Z'
+        },
+        {
+          productId: 'coop-tomato',
+          productName: 'Tomat styck',
+          chainId: 'coop',
+          chainName: 'Coop',
+          commodityId: 'tomato',
+          unitPrice: 9.9,
+          comparableUnit: 'st',
+          sourceConfidence: 0.9,
+          observedAt: '2026-05-21T09:00:00.000Z'
+        },
+        {
+          productId: 'ica-tomato',
+          productName: 'Tomat',
+          chainId: 'ica',
+          chainName: 'ICA',
+          commodityId: 'tomato',
+          unitPrice: 33.9,
+          comparableUnit: 'kg',
+          sourceConfidence: 0.3,
+          observedAt: '2026-05-21T09:00:00.000Z'
+        }
+      ]
+    });
+
+    assert.equal(comparison.status, 'priced');
+    assert.equal(comparison.cheapestChain?.chainId, 'willys');
+    assert.equal(comparison.cheapestChain?.priceGapToNext, 5);
+    assert.deepEqual(comparison.rows.map((row) => ({
+      rank: row.rank,
+      chainId: row.chainId,
+      productId: row.productId,
+      unitPrice: row.unitPrice,
+      savingsVsNextPercent: row.savingsVsNextPercent
+    })), [
+      { rank: 1, chainId: 'willys', productId: 'willys-kvisttomat', unitPrice: 34.9, savingsVsNextPercent: 12.53 },
+      { rank: 2, chainId: 'hemkop', productId: 'hemkop-kvisttomat', unitPrice: 39.9, savingsVsNextPercent: 0 }
+    ]);
+    assert.deepEqual(comparison.coverage, {
+      chainCount: 2,
+      observationCount: 3,
+      rejectedObservationCount: 2,
+      comparableUnit: 'kg'
+    });
+    assert.match(comparison.confidenceLabel, /2 chains/);
+    assert.match(comparison.confidenceLabel, /commodity\/alias match/);
   });
 });
 

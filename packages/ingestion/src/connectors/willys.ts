@@ -409,6 +409,18 @@ export type FetchWillysStoresOptions = {
   storeApiUrl?: string;
 };
 
+
+const WILLYS_REQUEST_TIMEOUT_MS = 20_000;
+
+function withWillysRequestTimeout(fetchImpl: typeof fetch): typeof fetch {
+  return async (input, init = {}) => {
+    const timeoutSignal = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+      ? AbortSignal.timeout(WILLYS_REQUEST_TIMEOUT_MS)
+      : undefined;
+    return fetchImpl(input, timeoutSignal ? { ...init, signal: init.signal ?? timeoutSignal } : init);
+  };
+}
+
 export function buildWillysSearchUrl(query: string, storeId?: string): string {
   const url = new URL(WILLYS_SEARCH_BASE_URL);
   url.searchParams.set('q', query);
@@ -438,7 +450,7 @@ export function buildWillysStoresUrl(
 }
 
 export async function fetchWillysStores(options: FetchWillysStoresOptions = {}): Promise<WillysStore[]> {
-  const fetchImpl = options.fetchImpl ?? fetch;
+  const fetchImpl = withWillysRequestTimeout(options.fetchImpl ?? fetch);
   const sourceUrl = buildWillysStoresUrl({ online: options.online, storeApiUrl: options.storeApiUrl });
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const response = await fetchImpl(sourceUrl, {

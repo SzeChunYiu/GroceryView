@@ -2527,6 +2527,138 @@ export function recommendSmartSwaps(input: SmartSwapInput): SmartSwapRecommendat
   return recommendations.sort((a, b) => b.savingsPercent - a.savingsPercent);
 }
 
+export type ComparableCommodityUnit = 'kg' | 'l' | 'st';
+
+export type CommodityPriceObservation = {
+  commodityId: string;
+  commodityName?: string;
+  productId: string;
+  productName: string;
+  chainId: string;
+  chainName?: string;
+  unitPrice: number;
+  comparableUnit: ComparableCommodityUnit;
+  sourceConfidence: number;
+  observedAt?: string;
+  variant?: string;
+  isOrganic?: boolean;
+  originCountry?: string;
+};
+
+export type CommodityComparisonRow = {
+  rank: number;
+  commodityId: string;
+  commodityName: string;
+  productId: string;
+  productName: string;
+  chainId: string;
+  chainName: string;
+  unitPrice: number;
+  comparableUnit: ComparableCommodityUnit;
+  sourceConfidence: number;
+  observedAt?: string;
+  variant?: string;
+  isOrganic?: boolean;
+  originCountry?: string;
+  priceGapToNext: number;
+  savingsVsNextPercent: number;
+};
+
+export type CommodityComparison = {
+  status: 'priced' | 'insufficient_coverage';
+  commodityId: string;
+  commodityName: string;
+  comparableUnit: ComparableCommodityUnit;
+  rows: CommodityComparisonRow[];
+  cheapestChain: CommodityComparisonRow | null;
+  coverage: {
+    chainCount: number;
+    observationCount: number;
+    rejectedObservationCount: number;
+    comparableUnit: ComparableCommodityUnit;
+  };
+  confidenceLabel: string;
+};
+
+export function compareCommodityUnitPrices(input: {
+  commodityId: string;
+  commodityName: string;
+  comparableUnit: ComparableCommodityUnit;
+  observations: CommodityPriceObservation[];
+  minimumConfidence?: number;
+}): CommodityComparison {
+  const minimumConfidence = input.minimumConfidence ?? 0.6;
+  const accepted = input.observations.filter((observation) =>
+    observation.commodityId === input.commodityId &&
+    observation.comparableUnit === input.comparableUnit &&
+    Number.isFinite(observation.unitPrice) &&
+    observation.unitPrice > 0 &&
+    clamp(observation.sourceConfidence, 0, 1) >= minimumConfidence
+  );
+  const rejectedObservationCount = input.observations.length - accepted.length;
+  const bestByChain = new Map<string, CommodityPriceObservation>();
+
+  for (const observation of accepted) {
+    const current = bestByChain.get(observation.chainId);
+    if (
+      !current ||
+      observation.unitPrice < current.unitPrice ||
+      (observation.unitPrice === current.unitPrice && observation.sourceConfidence > current.sourceConfidence) ||
+      (observation.unitPrice === current.unitPrice && observation.sourceConfidence === current.sourceConfidence && observation.productName.localeCompare(current.productName) < 0)
+    ) {
+      bestByChain.set(observation.chainId, observation);
+    }
+  }
+
+  const ranked = [...bestByChain.values()]
+    .sort((left, right) => left.unitPrice - right.unitPrice || right.sourceConfidence - left.sourceConfidence || left.chainId.localeCompare(right.chainId))
+    .map((observation, index, observations): CommodityComparisonRow => {
+      const next = observations[index + 1];
+      const priceGapToNext = next ? roundMoney(next.unitPrice - observation.unitPrice) : 0;
+      const savingsVsNextPercent = next && next.unitPrice > 0 ? roundMoney((priceGapToNext / next.unitPrice) * 100) : 0;
+      return {
+        rank: index + 1,
+        commodityId: input.commodityId,
+        commodityName: input.commodityName,
+        productId: observation.productId,
+        productName: observation.productName,
+        chainId: observation.chainId,
+        chainName: observation.chainName ?? storeNameFromId(observation.chainId),
+        unitPrice: roundMoney(observation.unitPrice),
+        comparableUnit: input.comparableUnit,
+        sourceConfidence: roundMoney(clamp(observation.sourceConfidence, 0, 1)),
+        observedAt: observation.observedAt,
+        variant: observation.variant,
+        isOrganic: observation.isOrganic,
+        originCountry: observation.originCountry,
+        priceGapToNext,
+        savingsVsNextPercent
+      };
+    });
+
+  const averageConfidence = accepted.length === 0 ? 0 : accepted.reduce((sum, observation) => sum + clamp(observation.sourceConfidence, 0, 1), 0) / accepted.length;
+  const status: CommodityComparison['status'] = ranked.length >= 2 ? 'priced' : 'insufficient_coverage';
+  const confidenceLabel = status === 'priced'
+    ? `${ranked.length} chains, ${accepted.length} confidence-cleared commodity/alias match rows; average source confidence ${roundMoney(averageConfidence * 100)}%.`
+    : `${accepted.length} confidence-cleared commodity/alias match rows, but fewer than two chains share ${input.comparableUnit} evidence.`;
+
+  return {
+    status,
+    commodityId: input.commodityId,
+    commodityName: input.commodityName,
+    comparableUnit: input.comparableUnit,
+    rows: ranked,
+    cheapestChain: ranked[0] ?? null,
+    coverage: {
+      chainCount: ranked.length,
+      observationCount: accepted.length,
+      rejectedObservationCount,
+      comparableUnit: input.comparableUnit
+    },
+    confidenceLabel
+  };
+}
+
 export type ProductMatchReviewCandidate = {
   id: string;
   sourceProductId: string;

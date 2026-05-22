@@ -437,6 +437,24 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces cross-chain commodity comparison by comparable unit on compare and product routes', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const compare = await read('src/app/compare/page.tsx');
+    const product = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(verified, /compareCommodityUnitPrices/);
+    assert.match(verified, /commodityComparisons/);
+    assert.match(verified, /commodityComparisonForProduct/);
+    assert.match(verified, /commodity\/alias match/);
+    assert.match(compare, /commodityComparisons/);
+    assert.match(compare, /Cross-chain commodity comparison/);
+    assert.match(compare, /kr\/\{comparison\.comparableUnit\}/);
+    assert.match(product, /commodityComparisonForProduct/);
+    assert.match(product, /Cheapest chain for this commodity/);
+    assert.match(product, /sourceConfidence/);
+    assert.doesNotMatch(compare, /NoVerifiedData/);
+  });
+
 
 
 
@@ -539,6 +557,22 @@ describe('verified-data UI', () => {
     assert.match(source, /staleReportIds/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
+
+  it('surfaces offer expiry reminders from real Matpriskollen validity windows', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/deals/page.tsx');
+
+    assert.match(verified, /matpriskollenOffers/);
+    assert.match(verified, /offerExpiryReminderBoard/);
+    assert.match(verified, /validFrom/);
+    assert.match(verified, /validTo/);
+    assert.match(route, /Offer expiry reminders/);
+    assert.match(route, /validTo/);
+    assert.match(route, /No deal starts tomorrow claim/);
+    assert.match(route, /sourceUrl/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
 
   it('surfaces a student single-portion deal finder using real deal ranking output', async () => {
     const source = await read('src/app/deals/page.tsx');
