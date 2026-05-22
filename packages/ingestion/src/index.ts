@@ -3229,6 +3229,7 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
 
   for (const config of input.connectors) {
     const runConfig = { ...config, requestedAt: input.requestedAt };
+    process.stderr.write(`[daily-ingestion] starting ${config.connectorId} (${config.chainId})\n`);
     const result = await runRetailerConnector({
       ...runConfig,
       fetcher: (plan) => fetchDailyConnectorSnapshot(plan, {
@@ -3239,6 +3240,8 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
       }),
       parser: parseRetailerProductJsonSnapshot
     });
+
+    process.stderr.write(`[daily-ingestion] fetched ${config.connectorId}: status=${result.status} accepted=${result.acceptedCount} rejected=${result.rejectedCount}\n`);
 
     if (result.status === 'blocked') {
       blockers.push(...result.requiredActions.map((action) => `${config.chainId}:${action}`));
@@ -3267,8 +3270,10 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
       sourceRunIds.push(...persisted.sourceRunIds);
       rawRecordIds.push(...persisted.rawRecordIds);
       observationIds.push(...persisted.observationIds);
+      process.stderr.write(`[daily-ingestion] persisted ${config.connectorId}: accepted=${persisted.acceptedCount} rejected=${persisted.rejectedCount} observations=${persisted.observationIds.length}\n`);
       if (persisted.rejectedCount > 0) blockers.push(`${config.chainId}:rejected_products:${persisted.rejectedCount}`);
     } catch (error) {
+      process.stderr.write(`[daily-ingestion] persistence failed ${config.connectorId}: ${error instanceof Error ? error.message : 'unknown_error'}\n`);
       blockers.push(`${config.chainId}:persistence_failed:${error instanceof Error ? error.message : 'unknown_error'}`);
     }
   }
