@@ -909,6 +909,81 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003987',
     storeName: 'Maxi ICA Stormarknad Gävle',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003764',
+    storeName: 'ICA Supermarket Ettan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004211',
+    storeName: 'ICA Nära Pettersberg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004356',
+    storeName: 'ICA Nära Vallby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003869',
+    storeName: 'ICA Kvantum Västerås',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004015',
+    storeName: 'Maxi ICA Stormarknad Jönköping',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003919',
+    storeName: 'ICA Nära Hovslätt',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003571',
+    storeName: 'Maxi ICA Stormarknad Växjö',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004593',
+    storeName: 'ICA Kvantum Teleborg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003792',
+    storeName: 'ICA Supermarket Hovshaga',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004519',
+    storeName: 'ICA Supermarket Fanfaren',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004029',
+    storeName: 'Maxi ICA Stormarknad Karlstad',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004584',
+    storeName: 'ICA Kvantum Hammarö',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003565',
+    storeName: 'Maxi ICA Stormarknad Välsviken',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004396',
+    storeName: 'ICA Kvantum Nacksta Sundsvall',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003423',
+    storeName: 'Maxi ICA Stormarknad Sundsvall',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
