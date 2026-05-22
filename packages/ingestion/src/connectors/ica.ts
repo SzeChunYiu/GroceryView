@@ -1284,6 +1284,106 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004558',
     storeName: 'ICA Supermarket Ljungskile',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004594',
+    storeName: 'ICA Kvantum Ludvika',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004459',
+    storeName: 'ICA Supermarket Lycksele',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004460',
+    storeName: 'ICA Supermarket Lysekil',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003614',
+    storeName: 'ICA Supermarket Malung',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004565',
+    storeName: 'ICA Supermarket Malå',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004572',
+    storeName: 'ICA Nära Mathörnan, Mariannelund',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004044',
+    storeName: 'ICA Kvantum Mariestad',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004499',
+    storeName: 'ICA Kvantum Markaryd',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003804',
+    storeName: 'ICA Supermarket Matfors',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004243',
+    storeName: 'Maxi ICA Stormarknad Mellbystrand',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003419',
+    storeName: 'Maxi ICA Stormarknad Mora',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003771',
+    storeName: 'ICA Supermarket Munka Ljungby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004021',
+    storeName: 'ICA Kvantum Sickla',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004282',
+    storeName: 'Maxi ICA Stormarknad Nacka',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004289',
+    storeName: 'ICA Supermarket Bommen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003532',
+    storeName: 'ICA Kvantum Flygfyren',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004294',
+    storeName: 'ICA Supermarket Norrköp',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004095',
+    storeName: 'ICA Supermarket Nossebro',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004303',
+    storeName: 'Maxi ICA Stormarknad Nyköping',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004590',
+    storeName: 'ICA Kvantum Nässjö',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
