@@ -36,11 +36,13 @@ export class PricesController {
   async priceHistoryReport(
     @Param('productId') productId: string,
     @Query('priceType') priceType?: string,
+    @Query('chain') chain?: string,
+    @Query('store') store?: string,
     @Query('from') observedFrom?: string,
     @Query('to') observedTo?: string,
     @Query('limit') limit?: string
   ) {
-    const filter = parsePriceHistoryFilter({ priceType, observedFrom, observedTo, limit });
+    const filter = parsePriceHistoryFilter({ priceType, chain, store, observedFrom, observedTo, limit });
     const report = await this.priceHistory.getProductPriceHistory(productId, filter);
     if (!report) throw new NotFoundException('Product not found');
     return report;
@@ -78,6 +80,12 @@ function parseOptionalDate(value: string | undefined, field: string): string | u
   return value;
 }
 
+function parseOptionalIdentifier(value: string | undefined, field: string): string | undefined {
+  if (value === undefined) return undefined;
+  if (!/^[a-zA-Z0-9:_-]+$/.test(value)) throw new BadRequestException(`${field} must be a slug or id.`);
+  return value;
+}
+
 function parseOptionalLimit(value: string | undefined): number | undefined {
   if (value === undefined) return undefined;
   const parsed = Number(value);
@@ -87,11 +95,15 @@ function parseOptionalLimit(value: string | undefined): number | undefined {
 
 function parsePriceHistoryFilter(input: {
   priceType?: string;
+  chain?: string;
+  store?: string;
   observedFrom?: string;
   observedTo?: string;
   limit?: string;
 }): ProductPriceHistoryFilter {
   const parsedPriceType = parseOptionalPriceType(input.priceType);
+  const parsedChain = parseOptionalIdentifier(input.chain, 'chain');
+  const parsedStore = parseOptionalIdentifier(input.store, 'store');
   const parsedFrom = parseOptionalDate(input.observedFrom, 'from');
   const parsedTo = parseOptionalDate(input.observedTo, 'to');
   if (parsedFrom && parsedTo && Date.parse(parsedFrom) > Date.parse(parsedTo)) {
@@ -100,6 +112,8 @@ function parsePriceHistoryFilter(input: {
   const parsedLimit = parseOptionalLimit(input.limit);
   return {
     ...(parsedPriceType ? { priceType: parsedPriceType } : {}),
+    ...(parsedChain ? { chain: parsedChain } : {}),
+    ...(parsedStore ? { store: parsedStore } : {}),
     ...(parsedFrom ? { observedFrom: parsedFrom } : {}),
     ...(parsedTo ? { observedTo: parsedTo } : {}),
     ...(parsedLimit ? { limit: parsedLimit } : {})

@@ -595,22 +595,33 @@ describe('GroceryView API app', () => {
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /latest_prices/i);
 
     const priceHistory = await request(app.getHttpServer())
-      .get('/products/bryggkaffe-450g/price-history?priceType=shelf&limit=5')
+      .get('/products/bryggkaffe-450g/price-history?priceType=shelf&chain=willys&store=willys-odenplan&limit=5')
       .expect(200);
     assert.equal(priceHistory.body.productId, 'product-coffee');
     assert.equal(priceHistory.body.productSlug, 'bryggkaffe-450g');
     assert.equal(priceHistory.body.demo, undefined);
+    assert.deepEqual(priceHistory.body.filters, {
+      priceType: 'shelf',
+      chain: 'willys',
+      store: 'willys-odenplan',
+      limit: 5
+    });
     assert.deepEqual(priceHistory.body.points.map((point: { observationId: string }) => point.observationId), [
       'obs-coffee-old',
       'obs-coffee-new'
     ]);
     assert.equal(priceHistory.body.summary.latestPrice, 49.9);
     assert.equal(priceHistory.body.summary.changeFromPrevious, -10);
-    assert.deepEqual(priceHistoryExecutor.calls.at(-1)?.params, ['product-coffee', 'shelf', null, null, 5]);
+    assert.deepEqual(priceHistoryExecutor.calls.at(-1)?.params, ['product-coffee', 'shelf', 'willys', 'willys-odenplan', null, null, 5]);
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /from observations/i);
+    assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /chains\.slug = \$3/);
+    assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /stores\.slug = \$4/);
 
     await request(app.getHttpServer())
       .get('/products/bryggkaffe-450g/price-history?from=2026-06-01T00:00:00.000Z&to=2026-05-01T00:00:00.000Z')
+      .expect(400);
+    await request(app.getHttpServer())
+      .get('/products/bryggkaffe-450g/price-history?chain=willys%20city')
       .expect(400);
 
     const cheapestNow = await request(app.getHttpServer()).get('/products/coffee/cheapest-now').expect(200);

@@ -717,6 +717,15 @@ export type ProductPriceHistoryProductInput = {
   productName: string;
 };
 
+export type ProductPriceHistoryAppliedFilters = {
+  priceType?: ProductPriceHistoryPriceType;
+  chain?: string;
+  store?: string;
+  observedFrom?: string;
+  observedTo?: string;
+  limit?: number;
+};
+
 export type ProductPriceHistoryPoint = ProductPriceHistoryObservationInput;
 
 export type ProductPriceHistoryReport = {
@@ -724,6 +733,7 @@ export type ProductPriceHistoryReport = {
   productSlug: string;
   productName: string;
   currency: 'SEK';
+  filters: ProductPriceHistoryAppliedFilters;
   pointCount: number;
   observedFrom: string | null;
   observedTo: string | null;
@@ -2467,7 +2477,8 @@ function assertIsoDate(value: string, field: string): void {
 }
 
 export function buildProductPriceHistoryReport(
-  observations: readonly ProductPriceHistoryObservationInput[]
+  observations: readonly ProductPriceHistoryObservationInput[],
+  filters: ProductPriceHistoryAppliedFilters = {}
 ): ProductPriceHistoryReport | null {
   if (observations.length === 0) return null;
   const productId = observations[0]!.productId;
@@ -2496,6 +2507,7 @@ export function buildProductPriceHistoryReport(
     productSlug,
     productName,
     currency: 'SEK',
+    filters,
     pointCount: points.length,
     observedFrom: points[0]?.observedAt ?? null,
     observedTo: points.at(-1)?.observedAt ?? null,
@@ -2510,12 +2522,16 @@ export function buildProductPriceHistoryReport(
   };
 }
 
-export function buildEmptyProductPriceHistoryReport(product: ProductPriceHistoryProductInput): ProductPriceHistoryReport {
+export function buildEmptyProductPriceHistoryReport(
+  product: ProductPriceHistoryProductInput,
+  filters: ProductPriceHistoryAppliedFilters = {}
+): ProductPriceHistoryReport {
   return {
     productId: product.productId,
     productSlug: product.productSlug,
     productName: product.productName,
     currency: 'SEK',
+    filters,
     pointCount: 0,
     observedFrom: null,
     observedTo: null,
