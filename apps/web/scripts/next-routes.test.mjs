@@ -612,6 +612,22 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a meal-prepper bulk-buy unit-price optimizer without price forecasts', async () => {
+    const demo = await read('src/lib/demo-data.ts');
+    const source = await read('src/app/weekly-basket/page.tsx');
+
+    assert.match(demo, /export const mealPrepBulkBuyOptimizer = /);
+    assert.match(demo, /stockUpDecision/);
+    assert.match(demo, /paybackMeals/);
+    assert.match(demo, /No forecast/);
+    assert.match(source, /mealPrepBulkBuyOptimizer/);
+    assert.match(source, /Meal-prepper bulk-buy optimizer/);
+    assert.match(source, /bulkUnitPrice/);
+    assert.match(source, /freezerPortions/);
+    assert.match(source, /coverageGuardrails/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces a budget stretch-krona basket optimizer using real basket strategy output', async () => {
     const source = await read('src/app/weekly-basket/page.tsx');
     const demo = await read('src/lib/demo-data.ts');
