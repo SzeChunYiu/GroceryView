@@ -4,10 +4,10 @@
 - Source URL: https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1
 - Request body: query kaffe, resultsOptions take 75, empty sort/facets, relatedResultsOptions take 16
 - Required public header: Ocp-Apim-Subscription-Key value exposed in window.coopSettings.serviceAccess.personalizationApiSubscriptionKey
-- Retrieved: 2026-05-22T09:20:43.762Z
+- Retrieved: 2026-05-22T10:32:35.907Z
 - Store: 251300
 - Device parameter: desktop
-- Real rows fetched: 150
+- Real rows fetched: 290
 - Connector: packages/ingestion/src/connectors/coop.ts
 - Web wire: apps/web/src/lib/ingested/coop.ts
 
