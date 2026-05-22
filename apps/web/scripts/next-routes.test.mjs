@@ -599,6 +599,20 @@ describe('verified-data UI', () => {
     assert.match(shell, /\/categories\/\$\{category\.slug\}/);
   });
 
+  it('surfaces deal score and Buy/Wait verdict on product pages using real core scoring', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /calculateDealScore/);
+    assert.match(source, /scoreBand/);
+    assert.match(source, /dealScoreVerdictFor/);
+    assert.match(source, /Deal Score verdict/);
+    assert.match(source, /Buy\/Wait signal/);
+    assert.match(source, /cross-chain spread percentile/);
+    assert.match(source, /confidence/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces verified catalogue savings on the compare route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/compare/page.tsx');
