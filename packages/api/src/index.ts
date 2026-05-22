@@ -721,6 +721,7 @@ export type ProductPriceHistoryAppliedFilters = {
   priceType?: ProductPriceHistoryPriceType;
   chain?: string;
   store?: string;
+  sourceRun?: string;
   observedFrom?: string;
   observedTo?: string;
   limit?: number;
