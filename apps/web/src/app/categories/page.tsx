@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { categorySummaries, formatPct, formatSek, immigrantAisleFinder } from '@/lib/verified-data';
+import { categorySummaries, dietaryScenarioFilters, formatPct, formatSek, immigrantAisleFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -25,6 +25,26 @@ export default function CategoriesIndexPage() {
               <p className="mt-2 text-sm font-semibold text-slate-600">verifiedCategorySlug: {aisle.verifiedCategorySlug}</p>
               <p className="mt-2 text-sm font-bold text-orange-900">dietaryTags: {aisle.dietaryTags.join(', ')}</p>
               <p className="mt-2 text-sm leading-6 text-slate-700">{aisle.caveat}</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Dietary scenario filters</p>
+        <h2 className="mt-2 text-2xl font-black">Swedish dietary filters from verified label evidence</h2>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+          Scenario filters for glutenfri, laktosfri, vegan, and KRAV/eko products are built from Axfood label fields and explicit product text, not inferred from browsing, profiles, or unverified substitutions.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {dietaryScenarioFilters.map((scenario) => (
+            <Link className="rounded-2xl border border-emerald-200 bg-white p-4 hover:border-emerald-700" href={scenario.sampleProductSlug ? `/products/${scenario.sampleProductSlug}` : `/categories/${scenario.categorySlug}`} key={scenario.id}>
+              <p className="font-black text-slate-950">{scenario.label}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-600">{scenario.verifiedProductCount.toLocaleString('sv-SE')} verified rows · {scenario.chainCount} chains</p>
+              <p className="mt-2 text-sm font-bold text-emerald-900">Query: {scenario.swedishQuery}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">Sample: {scenario.sampleProductName}</p>
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{scenario.evidenceLabels.join(', ') || 'text evidence'}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">{scenario.caveat}</p>
             </Link>
           ))}
         </div>

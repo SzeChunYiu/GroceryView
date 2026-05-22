@@ -346,6 +346,79 @@ export const immigrantAisleFinder = [
   }
 ];
 
+
+type DietaryScenarioDefinition = {
+  id: string;
+  label: string;
+  swedishQuery: string;
+  labelNeedles: string[];
+  textNeedles: string[];
+  caveat: string;
+};
+
+const dietaryScenarioDefinitions: DietaryScenarioDefinition[] = [
+  {
+    id: 'glutenfri',
+    label: 'Glutenfri staples',
+    swedishQuery: 'glutenfri',
+    labelNeedles: ['glutenfree', 'crossed_ax'],
+    textNeedles: ['glutenfri', 'glutenfritt', 'glutenfria'],
+    caveat: 'Uses verified label evidence such as glutenfree/crossed_ax or explicit product text; no allergy claim is inferred from browsing behavior.'
+  },
+  {
+    id: 'laktosfri',
+    label: 'Laktosfri dairy swaps',
+    swedishQuery: 'laktosfri',
+    labelNeedles: ['laktosfree'],
+    textNeedles: ['laktosfri', 'laktosfritt', 'låg laktos'],
+    caveat: 'Requires laktosfree labels or explicit package text before the filter shows a product.'
+  },
+  {
+    id: 'vegan',
+    label: 'Vegan quick basket',
+    swedishQuery: 'vegan',
+    labelNeedles: ['vegan', 'vegetarian'],
+    textNeedles: ['vegan', 'vegansk', 'veganska'],
+    caveat: 'Shows products with explicit vegan/vegetarian label or text evidence; ingredients are not guessed.'
+  },
+  {
+    id: 'krav-eko',
+    label: 'KRAV / ekologisk staples',
+    swedishQuery: 'KRAV eko',
+    labelNeedles: ['krav', 'ecological', 'eu_ecological'],
+    textNeedles: ['krav', 'eko', 'ekologisk', 'ekologiska'],
+    caveat: 'Requires KRAV/ecological label evidence or explicit product text before an eco scenario row is shown.'
+  }
+];
+
+function matchesDietaryScenario(product: (typeof axfoodProducts)[number], scenario: DietaryScenarioDefinition) {
+  const labels = product.labels.map((label) => label.toLowerCase());
+  const text = `${product.name} ${product.brand} ${product.subline}`.toLowerCase();
+  return scenario.labelNeedles.some((needle) => labels.includes(needle)) || scenario.textNeedles.some((needle) => text.includes(needle));
+}
+
+export const dietaryScenarioFilters = dietaryScenarioDefinitions
+  .map((scenario) => {
+    const matches = axfoodProducts
+      .filter((product) => matchesDietaryScenario(product, scenario))
+      .sort((a, b) => b.inChains.length - a.inChains.length || b.spreadPct - a.spreadPct || a.name.localeCompare(b.name, 'sv'));
+    const sample = matches[0] ?? null;
+    const categorySlug = sample?.category || matches.find((product) => product.category)?.category || 'categories';
+    return {
+      id: scenario.id,
+      label: scenario.label,
+      swedishQuery: scenario.swedishQuery,
+      categorySlug,
+      verifiedProductCount: matches.length,
+      chainCount: new Set(matches.flatMap((product) => product.inChains)).size,
+      evidenceLabels: [...new Set(matches.flatMap((product) => product.labels))].filter(Boolean).slice(0, 5),
+      sampleProductName: sample?.name ?? 'No verified product yet',
+      sampleProductSlug: sample?.slug ?? null,
+      caveat: scenario.caveat
+    };
+  })
+  .filter((scenario) => scenario.verifiedProductCount > 0);
+
 export const categoryQualityMatrix = categorySummaries
   .map((category) => {
     const openRows = pricedProducts.filter((product) => product.category === category.slug);

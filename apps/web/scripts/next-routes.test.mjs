@@ -590,6 +590,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces Swedish dietary scenario filters from verified labels only', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/categories/page.tsx');
+
+    assert.match(verified, /dietaryScenarioFilters/);
+    assert.match(verified, /glutenfree/);
+    assert.match(verified, /laktosfree/);
+    assert.match(verified, /krav|ecological/);
+    assert.match(route, /Dietary scenario filters/);
+    assert.match(route, /glutenfri/i);
+    assert.match(route, /laktosfri/i);
+    assert.match(route, /verified label evidence/i);
+    assert.match(route, /not inferred from browsing/i);
+    assert.doesNotMatch(route, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
+
   it('surfaces immigrant familiar-brand search from verified product rows', async () => {
     const source = await read('src/app/products/page.tsx');
     const verified = await read('src/lib/verified-data.ts');
