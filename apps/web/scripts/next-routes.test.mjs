@@ -310,6 +310,17 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a halal kosher and ethnic aisle finder from verified category rows', async () => {
+    const source = await read('src/app/categories/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+    assert.match(verified, /export const immigrantAisleFinder/);
+    assert.match(source, /immigrantAisleFinder/);
+    assert.match(source, /Halal, kosher & ethnic aisle finder/);
+    assert.match(source, /dietaryTags/);
+    assert.match(source, /verifiedCategorySlug/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces immigrant multilingual UI access in the public shell', async () => {
     const source = await read('src/components/market-shell.tsx');
     assert.match(source, /immigrantMultilingualUi/);
