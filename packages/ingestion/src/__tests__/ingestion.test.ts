@@ -4367,6 +4367,52 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.price, 14.9);
   });
 
+  it('runs daily connectors with bounded concurrency and retries transient fetch failures before DB persistence', async () => {
+    const executor = new DailyIngestionExecutor();
+    const active = { count: 0, max: 0 };
+    const attempts = new Map<string, number>();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T16:30:00.000Z',
+      maxConcurrency: 2,
+      connectorRetryAttempts: 1,
+      connectorRetryBaseDelayMs: 0,
+      connectors: ['ica', 'willys', 'coop'].map((chainId) => ({
+        ...dailyConnectorFixture(chainId),
+        requireStoreScopedPrices: false
+      })),
+      fetchImpl: async (url) => {
+        const chainId = String(url).split('/').at(-2) ?? 'unknown';
+        attempts.set(chainId, (attempts.get(chainId) ?? 0) + 1);
+        if (chainId === 'ica' && attempts.get(chainId) === 1) throw new Error('temporary upstream 503');
+        active.count += 1;
+        active.max = Math.max(active.max, active.count);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        active.count -= 1;
+        return new Response(JSON.stringify({
+          items: [{
+            retailerProductId: `${chainId}-coffee`,
+            rawName: `${chainId} Coffee 450g`,
+            canonicalName: `${chainId} Coffee 450g`,
+            productId: `${chainId}-coffee-450g`,
+            categoryId: 'coffee',
+            brand: chainId.toUpperCase(),
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 49.9
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.persistedRuns, 3);
+    assert.equal(result.acceptedCount, 3);
+    assert.equal(result.blockers.length, 0);
+    assert.equal(attempts.get('ica'), 2);
+    assert.equal(active.max, 2);
+  });
+
   it('fails closed before persistence when store-scoped prices omit configured branch metadata', async () => {
     const executor = new DailyIngestionExecutor();
     const result = await runDailyIngestion({
