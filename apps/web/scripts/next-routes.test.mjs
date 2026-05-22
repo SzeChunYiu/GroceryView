@@ -170,6 +170,15 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a student single-portion deal finder using real deal ranking output', async () => {
+    const source = await read('src/app/deals/page.tsx');
+    assert.match(source, /singlePortionDealFinder/);
+    assert.match(source, /rankDealOpportunities/);
+    assert.match(source, /Single-portion deals/);
+    assert.match(source, /portionLabel/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces nutrition per krona on the nutrition value route using the real core ranking output', async () => {
     const source = await read('src/app/nutrition-value/page.tsx');
     assert.match(source, /nutritionPerKrona/);
