@@ -137,6 +137,27 @@ export const categorySummaries = Object.entries(categoryLabels)
   .filter((category) => category.openPriceRows > 0 || category.chainRows > 0)
   .sort((a, b) => (b.openPriceRows + b.chainRows) - (a.openPriceRows + a.chainRows));
 
+export const immigrantAisleFinder = [
+  {
+    label: 'Halal-friendly protein aisle',
+    verifiedCategorySlug: 'meat-seafood',
+    dietaryTags: ['halal candidate', 'ask-store-confirmation'],
+    caveat: 'Uses verified meat and seafood category rows only; halal certification is not inferred from product name.'
+  },
+  {
+    label: 'Kosher pantry staples',
+    verifiedCategorySlug: 'pantry',
+    dietaryTags: ['kosher candidate', 'pack-label-check'],
+    caveat: 'Uses pantry category coverage and keeps kosher certification as a package-label check.'
+  },
+  {
+    label: 'Ethnic aisle basics',
+    verifiedCategorySlug: 'international',
+    dietaryTags: ['rice', 'spices', 'world foods'],
+    caveat: 'Shows verified category entry points without inventing store aisle numbers.'
+  }
+];
+
 export const categoryQualityMatrix = categorySummaries
   .map((category) => {
     const openRows = pricedProducts.filter((product) => product.category === category.slug);
