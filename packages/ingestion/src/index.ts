@@ -2603,6 +2603,12 @@ type BatchRawRecordIdRow = { ordinal: number; id: string };
 type BatchObservationIdRow = { id: string };
 type BatchProductIdRow = { slug: string; id: string };
 
+function chunkDailyRows<T>(rows: T[], size = 5000): T[][] {
+  const chunks: T[][] = [];
+  for (let index = 0; index < rows.length; index += size) chunks.push(rows.slice(index, index + size));
+  return chunks;
+}
+
 async function upsertDailyChain(executor: QueryExecutor, chainId: string): Promise<string> {
   const slug = normalizeDailySlug(chainId);
   const rows = await executor.query<IdRow>(
@@ -2713,60 +2719,64 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
 async function upsertDailyProductBatch(executor: QueryExecutor, products: IngestedProduct[]): Promise<Map<string, string>> {
   if (products.length === 0) return new Map();
   const uniqueProducts = [...new Map(products.map((product) => [normalizeDailySlug(product.id), product])).values()];
-  const rows = await executor.query<BatchProductIdRow>(
-    `with input as (
-       select *
-       from jsonb_to_recordset($1::jsonb) as x(
-         slug text,
-         canonical_name text,
-         brand text,
-         category_id text,
-         package_size numeric,
-         package_unit text,
-         comparable_unit text
+  const ids = new Map<string, string>();
+  for (const chunk of chunkDailyRows(uniqueProducts)) {
+    const rows = await executor.query<BatchProductIdRow>(
+      `with input as (
+         select *
+         from jsonb_to_recordset($1::jsonb) as x(
+           slug text,
+           canonical_name text,
+           brand text,
+           category_id text,
+           package_size numeric,
+           package_unit text,
+           comparable_unit text
+         )
+       ),
+       upserted as (
+         insert into products(
+           slug,
+           canonical_name,
+           brand,
+           category_path,
+           package_size,
+           package_unit,
+           comparable_unit
+         )
+         select
+           slug,
+           canonical_name,
+           brand,
+           case when category_id is null then '{}'::text[] else array[category_id] end,
+           package_size,
+           package_unit,
+           comparable_unit
+         from input
+         on conflict (slug) do update set
+           canonical_name = excluded.canonical_name,
+           brand = excluded.brand,
+           category_path = excluded.category_path,
+           package_size = excluded.package_size,
+           package_unit = excluded.package_unit,
+           comparable_unit = excluded.comparable_unit,
+           updated_at = now()
+         returning slug, id
        )
-     ),
-     upserted as (
-       insert into products(
-         slug,
-         canonical_name,
-         brand,
-         category_path,
-         package_size,
-         package_unit,
-         comparable_unit
-       )
-       select
-         slug,
-         canonical_name,
-         brand,
-         case when category_id is null then '{}'::text[] else array[category_id] end,
-         package_size,
-         package_unit,
-         comparable_unit
-       from input
-       on conflict (slug) do update set
-         canonical_name = excluded.canonical_name,
-         brand = excluded.brand,
-         category_path = excluded.category_path,
-         package_size = excluded.package_size,
-         package_unit = excluded.package_unit,
-         comparable_unit = excluded.comparable_unit,
-         updated_at = now()
-       returning slug, id
-     )
-     select slug, id from upserted`,
-    [JSON.stringify(uniqueProducts.map((product) => ({
-      slug: normalizeDailySlug(product.id),
-      canonical_name: product.canonicalName,
-      brand: product.brand ?? null,
-      category_id: product.categoryId ?? null,
-      package_size: product.packageSize ?? null,
-      package_unit: product.packageUnit ?? null,
-      comparable_unit: product.comparableUnit
-    })))]
-  );
-  return new Map(rows.map((row) => [row.slug, row.id]));
+       select slug, id from upserted`,
+      [JSON.stringify(chunk.map((product) => ({
+        slug: normalizeDailySlug(product.id),
+        canonical_name: product.canonicalName,
+        brand: product.brand ?? null,
+        category_id: product.categoryId ?? null,
+        package_size: product.packageSize ?? null,
+        package_unit: product.packageUnit ?? null,
+        comparable_unit: product.comparableUnit
+      })))]
+    );
+    for (const row of rows) ids.set(row.slug, row.id);
+  }
+  return ids;
 }
 
 async function upsertDailyAliasBatch(executor: QueryExecutor, aliases: Array<{
@@ -2778,41 +2788,43 @@ async function upsertDailyAliasBatch(executor: QueryExecutor, aliases: Array<{
 }>): Promise<void> {
   if (aliases.length === 0) return;
   const uniqueAliases = [...new Map(aliases.map((alias) => [`${alias.normalizedAlias}:${alias.sourceRef}`, alias])).values()];
-  await executor.query(
-    `with input as (
-       select *
-       from jsonb_to_recordset($1::jsonb) as x(
-         product_id uuid,
-         alias text,
-         normalized_alias text,
-         source_ref text,
-         match_confidence numeric
+  for (const chunk of chunkDailyRows(uniqueAliases)) {
+    await executor.query(
+      `with input as (
+         select *
+         from jsonb_to_recordset($1::jsonb) as x(
+           product_id uuid,
+           alias text,
+           normalized_alias text,
+           source_ref text,
+           match_confidence numeric
+         )
        )
-     )
-     insert into aliases(
-       product_id,
-       alias,
-       normalized_alias,
-       source_type,
-       source_ref,
-       match_confidence,
-       reviewed_at
-     )
-     select product_id, alias, normalized_alias, 'retailer', source_ref, match_confidence, null
-     from input
-     on conflict (normalized_alias, source_type, source_ref) do update set
-       product_id = excluded.product_id,
-       alias = excluded.alias,
-       match_confidence = excluded.match_confidence,
-       reviewed_at = excluded.reviewed_at`,
-    [JSON.stringify(uniqueAliases.map((alias) => ({
-      product_id: alias.productId,
-      alias: alias.alias,
-      normalized_alias: alias.normalizedAlias,
-      source_ref: alias.sourceRef,
-      match_confidence: alias.matchConfidence
-    })))]
-  );
+       insert into aliases(
+         product_id,
+         alias,
+         normalized_alias,
+         source_type,
+         source_ref,
+         match_confidence,
+         reviewed_at
+       )
+       select product_id, alias, normalized_alias, 'retailer', source_ref, match_confidence, null
+       from input
+       on conflict (normalized_alias, source_type, source_ref) do update set
+         product_id = excluded.product_id,
+         alias = excluded.alias,
+         match_confidence = excluded.match_confidence,
+         reviewed_at = excluded.reviewed_at`,
+      [JSON.stringify(chunk.map((alias) => ({
+        product_id: alias.productId,
+        alias: alias.alias,
+        normalized_alias: alias.normalizedAlias,
+        source_ref: alias.sourceRef,
+        match_confidence: alias.matchConfidence
+      })))]
+    );
+  }
 }
 
 async function persistDailyConnectorOutput(input: {
@@ -2875,7 +2887,9 @@ async function persistDailyConnectorOutput(input: {
     provenance: Record<string, unknown>;
   }>): Promise<Map<number, string>> {
     if (records.length === 0) return new Map();
-    const rows = await executor.query<BatchRawRecordIdRow>(
+    const ids = new Map<number, string>();
+    for (const chunk of chunkDailyRows(records)) {
+      const rows = await executor.query<BatchRawRecordIdRow>(
       `with input as (
          select *
          from jsonb_to_recordset($2::jsonb) as x(
@@ -2912,7 +2926,7 @@ async function persistDailyConnectorOutput(input: {
        from input
        join upserted on upserted.payload_hash = input.payload_hash
        order by input.ordinal`,
-      [sourceRun.sourceRunId, JSON.stringify(records.map((record) => ({
+      [sourceRun.sourceRunId, JSON.stringify(chunk.map((record) => ({
         ordinal: record.ordinal,
         record_type: record.recordType,
         external_ref: record.externalRef ?? null,
@@ -2921,8 +2935,10 @@ async function persistDailyConnectorOutput(input: {
         payload_hash: record.payloadHash,
         provenance: record.provenance
       })))]
-    );
-    return new Map(rows.map((row) => [Number(row.ordinal), row.id]));
+      );
+      for (const row of rows) ids.set(Number(row.ordinal), row.id);
+    }
+    return ids;
   }
 
   async function insertObservationBatch(observations: Array<{
@@ -2949,7 +2965,9 @@ async function persistDailyConnectorOutput(input: {
     provenance: Record<string, unknown>;
   }>): Promise<string[]> {
     if (observations.length === 0) return [];
-    const rows = await executor.query<BatchObservationIdRow>(
+    const ids: string[] = [];
+    for (const chunk of chunkDailyRows(observations)) {
+      const rows = await executor.query<BatchObservationIdRow>(
       `with input as (
          select *
          from jsonb_to_recordset($1::jsonb) as x(
@@ -3071,7 +3089,7 @@ async function persistDailyConnectorOutput(input: {
          returning 1
        )
        select id from inserted`,
-      [JSON.stringify(observations.map((observation) => ({
+      [JSON.stringify(chunk.map((observation) => ({
         product_id: observation.productId,
         chain_id: observation.chainId,
         store_id: observation.storeId ?? null,
@@ -3095,8 +3113,10 @@ async function persistDailyConnectorOutput(input: {
         confidence: observation.confidence,
         provenance: observation.provenance
       })))]
-    );
-    return rows.map((row) => row.id);
+      );
+      ids.push(...rows.map((row) => row.id));
+    }
+    return ids;
   }
 
   const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product));
