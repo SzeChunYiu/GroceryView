@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { readFileSync } from 'node:fs';
 import process from 'node:process';
 
 export const requiredDailyChainIds = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
@@ -10,15 +11,20 @@ export const requiredEnvNames = [
   'NOTIFICATION_WEBHOOK_SECRET',
   'BILLING_WEBHOOK_SECRET',
   'METRICS_TOKEN',
-  'GROCERYVIEW_DAILY_CONNECTORS_JSON',
   'GROCERYVIEW_SERVER_URL',
   'CATALOG_COVERAGE_TARGETS_JSON'
 ];
 
-function parseJsonEnv(env, name) {
+function readJsonValue(env, name) {
   const raw = env[name];
-  if (!raw?.trim()) throw new Error(`${name} is required.`);
-  return JSON.parse(raw);
+  if (raw?.trim()) return raw;
+  const filePath = env[`${name}_FILE`];
+  if (filePath?.trim()) return readFileSync(filePath.trim(), 'utf8');
+  throw new Error(`${name} or ${name}_FILE is required.`);
+}
+
+function parseJsonEnv(env, name) {
+  return JSON.parse(readJsonValue(env, name));
 }
 
 function requireNonEmptyStringArray(value, path) {
@@ -87,6 +93,9 @@ function validateConnectorStoreCoverage(connectorStoreIds, targetStores) {
 
 export function validateProductionEnv(env) {
   const missingEnv = requiredEnvNames.filter((name) => !env[name]?.trim());
+  if (!env.GROCERYVIEW_DAILY_CONNECTORS_JSON?.trim() && !env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE?.trim()) {
+    missingEnv.push('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE');
+  }
   if (missingEnv.length > 0) throw new Error(`Missing required env: ${missingEnv.join(', ')}`);
   new URL(env.PUBLIC_WEB_URL);
   new URL(env.GROCERYVIEW_SERVER_URL);

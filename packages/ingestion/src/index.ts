@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import {
   createPgQueryExecutor,
@@ -2434,7 +2435,7 @@ export type DailyIngestionConnectorConfig = Omit<RetailerConnectorPlanInput, 're
   requireStoreScopedPrices?: boolean;
 };
 
-export type DailyIngestionEnv = Partial<Record<'DATABASE_URL' | 'GROCERYVIEW_DAILY_CONNECTORS_JSON', string>>;
+export type DailyIngestionEnv = Partial<Record<'DATABASE_URL' | 'GROCERYVIEW_DAILY_CONNECTORS_JSON' | 'GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE', string>>;
 
 export type DailyIngestionEnvConfig = {
   databaseUrl: string;
@@ -2567,8 +2568,9 @@ function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[
 export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): DailyIngestionEnvConfig {
   const databaseUrl = env.DATABASE_URL?.trim();
   if (!databaseUrl) throw new Error('DATABASE_URL is required for daily ingestion.');
-  const connectorsJson = env.GROCERYVIEW_DAILY_CONNECTORS_JSON?.trim();
-  if (!connectorsJson) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON is required for daily ingestion.');
+  const connectorsJson = env.GROCERYVIEW_DAILY_CONNECTORS_JSON?.trim()
+    ?? (env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE?.trim() ? readFileSync(env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE.trim(), 'utf8') : undefined);
+  if (!connectorsJson) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE is required for daily ingestion.');
   return {
     databaseUrl,
     connectors: parseDailyConnectorsJson(connectorsJson)

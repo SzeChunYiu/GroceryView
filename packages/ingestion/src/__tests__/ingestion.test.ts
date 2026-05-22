@@ -1,5 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
   buildCoopSearchUrl,
@@ -3247,6 +3250,27 @@ describe('daily ingestion runner', () => {
     assert.equal(configs.databaseUrl, 'postgres://user:secret@example/groceryview');
     assert.equal(configs.connectors.length, 6);
     assert.equal(configs.connectors[0].chainId, 'ica');
+  });
+
+
+  it('loads connector config from a file path to avoid oversized process environments', () => {
+    const connectorPath = join(mkdtempSync(join(tmpdir(), 'groceryview-connectors-')), 'connectors.json');
+    writeFileSync(connectorPath, JSON.stringify([
+      dailyConnectorFixture('ica'),
+      dailyConnectorFixture('willys'),
+      dailyConnectorFixture('coop'),
+      dailyConnectorFixture('hemkop'),
+      dailyConnectorFixture('lidl'),
+      dailyConnectorFixture('city_gross')
+    ]));
+
+    const configs = buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE: connectorPath
+    });
+
+    assert.equal(configs.connectors.length, 6);
+    assert.equal(configs.connectors[5].chainId, 'city_gross');
   });
 
   it('fails closed when daily connector config omits any required chain', () => {
