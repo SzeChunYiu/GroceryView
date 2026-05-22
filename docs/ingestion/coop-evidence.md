@@ -2,9 +2,9 @@
 
 - Source: coop.se public personalization search API configured in the public handla page
 - Source URL: https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1
-- Request body: query kaffe, resultsOptions take 75, empty sort/facets, relatedResultsOptions take 16
+- Request body: query kaffe, resultsOptions take 1000, empty sort/facets, relatedResultsOptions take 16
 - Required public header: Ocp-Apim-Subscription-Key value exposed in window.coopSettings.serviceAccess.personalizationApiSubscriptionKey
-- Retrieved: 2026-05-22T10:32:35.907Z
+- Retrieved: 2026-05-22T12:58:35.902Z
 - Store: 251300
 - Device parameter: desktop
 - Real rows fetched: 290
@@ -21,7 +21,8 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 - Product search URLs: per-branch `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1`, listed in `apps/web/src/lib/ingested/coop.ts`
 - Request body: weekly flyer item queries listed in `DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES`, resultsOptions take 8, empty sort/facets, relatedResultsOptions take 0
 - Required public headers: `storeApiSubscriptionKey` for store metadata and `personalizationApiSubscriptionKey` for product search, both exposed in `window.coopSettings.serviceAccess` on https://www.coop.se/handla/
-- Retrieved: 2026-05-22T12:25:38.503Z
+- Retrieved: 2026-05-22T12:58:35.902Z
+- Added this iteration: 112000 Stora Coop Varberg; 254800 Stora Coop Nolhaga Skövde; 255900 Stora Coop Kungsbacka; 162000 Stora Coop Bergvik; 241800 Stora Coop Kalix; 205180 Stora Coop Hudiksvall; 072000 Stora Coop Jönköping; 241100 Stora Coop Gällivare
 - Stores:
   - 251300, Stora Coop Boländerna, Uppsala, 26 real discount rows
   - 252700, Stora Coop Bromma, Bromma, 24 real discount rows
@@ -57,8 +58,16 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
   - 231300, Stora Coop Sörböle, Skellefteå, 17 real discount rows
   - 241200, Stora Coop Kiruna, Kiruna, 24 real discount rows
   - 176110, Coop City Hallsberg, Hallsberg, 21 real discount rows
+  - 112000, Stora Coop Varberg, Varberg, 26 real discount rows
+  - 254800, Stora Coop Nolhaga Skövde, Skövde, 23 real discount rows
+  - 255900, Stora Coop Kungsbacka, Kungsbacka, 25 real discount rows
+  - 162000, Stora Coop Bergvik, Karlstad, 22 real discount rows
+  - 241800, Stora Coop Kalix, Kalix, 25 real discount rows
+  - 205180, Stora Coop Hudiksvall, Hudiksvall, 21 real discount rows
+  - 072000, Stora Coop Jönköping, Jönköping, 23 real discount rows
+  - 241100, Stora Coop Gällivare, Gällivare, 22 real discount rows
 - Flyer validity: 2026-05-18T00:00:00 through 2026-05-24T23:59:59
-- Real current flyer discount rows fetched: 798
+- Real current flyer discount rows fetched: 985
 
 Every weekly discount row includes Coop product id/EAN, product name, brand, package label, ordinary B2C SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL, and retrieval timestamp.
 

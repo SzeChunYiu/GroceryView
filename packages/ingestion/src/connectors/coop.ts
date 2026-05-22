@@ -184,7 +184,15 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '252500',
   '231300',
   '241200',
-  '176110'
+  '176110',
+  '112000',
+  '254800',
+  '255900',
+  '162000',
+  '241800',
+  '205180',
+  '072000',
+  '241100'
 ] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
@@ -550,7 +558,7 @@ export async function fetchCoopWeeklyDiscounts(
 ): Promise<CoopWeeklyDiscount[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const storeIds = options.storeIds ?? (options.storeId ? [options.storeId] : DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS);
-  const maxRows = options.maxRows ?? 1000;
+  const maxRows = options.maxRows ?? storeIds.length * (options.productQueries?.length ?? DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES.length);
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const serviceAccess = options.subscriptionKey && options.storeApiSubscriptionKey
     ? {
