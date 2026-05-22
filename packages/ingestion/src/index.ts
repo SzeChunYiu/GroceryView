@@ -24,6 +24,12 @@ import {
   type HemkopWeeklyDiscount
 } from './connectors/hemkop.js';
 import {
+  DEFAULT_ICA_STORE_CONFIGS,
+  fetchIcaDefaultStoreProducts,
+  type IcaProduct,
+  type IcaStoreConfig
+} from './connectors/ica.js';
+import {
   fetchLidlOffersForAllStores,
   type LidlStoreOffer
 } from './connectors/lidl.js';
@@ -1657,6 +1663,29 @@ function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerCon
   };
 }
 
+function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageSize);
+  const price = row.promoPrice ?? row.price;
+  if (price === null) throw new Error(`ICA product ${row.retailerProductId} had no current or promotion price.`);
+  return {
+    storeId: row.storeAccountId,
+    retailerProductId: row.retailerProductId || row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `ica-${stableKeyPart(row.productId || row.retailerProductId || row.code)}`,
+    categoryId: stableKeyPart(row.categories[0] || 'ica-store-promotions'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price,
+    regularPrice: row.promoPrice !== null && row.price !== null && row.price > row.promoPrice ? row.price : undefined,
+    promoText: row.promotionDescription || undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
   return {
@@ -1776,6 +1805,23 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const maxStores = dailyNativeNumberParam(url, 'maxStores');
+    const stores: readonly IcaStoreConfig[] | undefined = maxStores
+      ? DEFAULT_ICA_STORE_CONFIGS.slice(0, maxStores)
+      : undefined;
+    const rows = await fetchIcaDefaultStoreProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      stores,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      maxPageSize: dailyNativeNumberParam(url, 'maxPageSize'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(icaProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL}?`)) {
@@ -2438,6 +2484,7 @@ export const requiredDailyIngestionChainIds = [
 export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/willys/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/willys/products/all-stores';
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/ica/store-promotions/default-stores';
 export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lidl/public-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';

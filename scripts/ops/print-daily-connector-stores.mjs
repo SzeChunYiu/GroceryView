@@ -14,6 +14,16 @@ function toDailyStoreConfig(store) {
   };
 }
 
+function icaStoreToDailyStoreConfig(store) {
+  return {
+    storeId: store.storeAccountId,
+    name: store.storeName,
+    address: store.storeName,
+    city: store.city ?? 'Sweden',
+    countryCode: 'SE'
+  };
+}
+
 async function loadStoreFetchers() {
   try {
     return await import('../../packages/ingestion/dist/index.js');
@@ -24,6 +34,12 @@ async function loadStoreFetchers() {
 
 export async function printDailyConnectorStores({ fetchers, selfTest = false } = {}) {
   const source = fetchers ?? (selfTest ? {
+    DEFAULT_ICA_STORE_CONFIGS: [{
+      storeAccountId: '1004599',
+      storeName: 'ICA Kvantum Kungsholmen',
+      regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d',
+      city: 'Stockholm'
+    }],
     fetchWillysStores: async () => [{
       storeId: '2149',
       name: 'Willys Alingsås Hagaplan',
@@ -80,8 +96,9 @@ export async function printDailyConnectorStores({ fetchers, selfTest = false } =
 
   return {
     generatedAt: new Date().toISOString(),
-    supportedChains: ['willys', 'hemkop', 'coop', 'city_gross', 'lidl'],
+    supportedChains: ['ica', 'willys', 'hemkop', 'coop', 'city_gross', 'lidl'],
     storesByChain: {
+      ica: source.DEFAULT_ICA_STORE_CONFIGS.map(icaStoreToDailyStoreConfig),
       willys: willysStores.map(toDailyStoreConfig),
       hemkop: hemkopStores.map(toDailyStoreConfig),
       coop: coopStores.map(toDailyStoreConfig),

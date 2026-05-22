@@ -8,7 +8,8 @@ const script = readFileSync(scriptPath, 'utf8');
 const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
 
 describe('daily connector stores export script', () => {
-  it('documents the live City Gross, Coop, Hemkop, Lidl, and Willys store catalog APIs used for branch metadata', () => {
+  it('documents the live City Gross, Coop, Hemkop, ICA, Lidl, and Willys store catalog APIs used for branch metadata', () => {
+    assert.match(script, /DEFAULT_ICA_STORE_CONFIGS/);
     assert.match(script, /fetchWillysStores/);
     assert.match(script, /fetchHemkopStores/);
     assert.match(script, /fetchCoopStores/);
@@ -24,7 +25,8 @@ describe('daily connector stores export script', () => {
   it('self-test emits daily connector store metadata for supported branch-scoped chains', () => {
     const output = execFileSync(process.execPath, [scriptPath.pathname, '--self-test'], { encoding: 'utf8' });
     const body = JSON.parse(output);
-    assert.deepEqual(body.supportedChains, ['willys', 'hemkop', 'coop', 'city_gross', 'lidl']);
+    assert.deepEqual(body.supportedChains, ['ica', 'willys', 'hemkop', 'coop', 'city_gross', 'lidl']);
+    assert.equal(body.storesByChain.ica[0].storeId, '1004599');
     assert.equal(body.storesByChain.willys[0].storeId, '2149');
     assert.equal(body.storesByChain.hemkop[0].storeId, '4798');
     assert.equal(body.storesByChain.coop[0].storeId, '196183');

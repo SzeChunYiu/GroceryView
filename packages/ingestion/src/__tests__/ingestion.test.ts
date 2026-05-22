@@ -72,6 +72,7 @@ import {
   GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
+  GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
@@ -3374,6 +3375,55 @@ describe('daily ingestion runner', () => {
     assert.equal(observationInsert?.params[2], 'store-db-2');
     assert.equal(observationInsert?.params[7], 45);
     assert.equal(observationInsert?.params[13], 'Max 2 köp/hushåll');
+  });
+
+  it('materializes native ICA store promotion prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T14:30:00.000Z',
+      connectors: [{
+        connectorId: 'ica-store-promotions-default-stores',
+        chainId: 'ica',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL}?maxStores=1&maxRows=1`,
+        parserVersion: 'ica-store-promotions-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '1004599', name: 'ICA Kvantum Kungsholmen', address: 'ICA Kvantum Kungsholmen', city: 'Stockholm' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(JSON.stringify({
+          productGroups: [{
+            type: 'Kaffe',
+            decoratedProducts: [{
+              productId: 'ica-coffee-product',
+              retailerProductId: 'ica-retailer-coffee',
+              name: 'Bryggkaffe Mellanrost',
+              brand: 'ICA',
+              image: { src: 'https://assets.ica.se/coffee.png' },
+              packSizeDescription: '450 g',
+              price: { amount: 59.9, currency: 'SEK' },
+              promoPrice: { amount: 44.9, currency: 'SEK' },
+              unitPrice: { price: { amount: 133.11, currency: 'SEK' }, unit: 'kg' },
+              promotions: [{ description: 'Veckans pris' }]
+            }]
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(requestedUrls.length, 1);
+    assert.equal(new URL(requestedUrls[0]).pathname, '/stores/1004599/api/product-listing-pages/v1/pages/promotions');
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.equal(observationInsert?.params[2], 'store-db-2');
+    assert.equal(observationInsert?.params[7], 44.9);
+    assert.equal(observationInsert?.params[8], 59.9);
   });
 
   it('materializes native Willys all-store branch product prices into daily database observations', async () => {
