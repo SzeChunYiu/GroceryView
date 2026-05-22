@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
+import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -69,6 +69,38 @@ export default function ComparePage() {
               <p className="mt-3 text-xs font-semibold text-slate-500">{item.evidenceLabel} · {formatPct(item.spreadPct)}</p>
             </Link>
           ))}
+        </div>
+      </Card>
+      <Card className="mt-6 border-sky-200 bg-sky-50/70">
+        <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-sky-800">Steal-list / acquisition</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Retailer browser overlay</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              GroceryView can now run as an inline retailer overlay: mapped product tiles declare
+              <code className="mx-1 rounded bg-white px-1 font-black" data-groceryview-product-id="coffee">data-groceryview-product-id</code>
+              and the public script calls the cheapest-now API before showing a cheaper chain. No anonymous shopper profile or retailer account data is stored.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-sm">
+              <a className="rounded-full bg-sky-900 px-4 py-2 font-black text-white" href={browserExtensionOverlayContract.assetPath}>
+                Open overlay script
+              </a>
+              <code className="rounded-full bg-white px-4 py-2 font-black text-sky-950">{browserExtensionOverlayContract.apiEndpoint}</code>
+            </div>
+          </div>
+          <div className="rounded-3xl border border-sky-100 bg-white p-4">
+            <p className="text-sm font-black text-slate-950">Supported retailer host patterns</p>
+            <div className="mt-3 grid gap-2">
+              {browserExtensionOverlayContract.supportedRetailers.map((retailer) => (
+                <p className="rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-700" key={retailer.hostPattern}>
+                  <span className="font-black text-slate-950">{retailer.chain}</span> · {retailer.hostPattern} · {retailer.status}
+                </p>
+              ))}
+            </div>
+            <p className="mt-3 rounded-2xl bg-sky-50 p-3 text-sm font-bold text-sky-950">
+              Confidence: {browserExtensionOverlayContract.confidenceRule}
+            </p>
+          </div>
         </div>
       </Card>
       <div className="mt-6 space-y-4">

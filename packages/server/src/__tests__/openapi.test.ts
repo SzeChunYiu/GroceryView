@@ -55,6 +55,7 @@ describe('buildOpenApiDocument', () => {
       '/api/privacy/request-fulfillment',
       '/api/products/search',
       '/api/products/{id}',
+      '/api/products/{id}/cheapest-now',
       '/api/products/{id}/deal-score',
       '/api/products/{id}/equivalents',
       '/api/products/{id}/history',
@@ -152,6 +153,8 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/products/{id}/history-confidence'].get?.summary ?? '', /history confidence/i);
     assert.equal(doc.paths['/api/products/{id}/price-spread'].get?.security, undefined);
     assert.match(doc.paths['/api/products/{id}/price-spread'].get?.summary ?? '', /price spread/i);
+    assert.equal(doc.paths['/api/products/{id}/cheapest-now'].get?.security, undefined);
+    assert.match(doc.paths['/api/products/{id}/cheapest-now'].get?.summary ?? '', /cheapest.*product/i);
     assert.equal(doc.paths['/api/products/{id}/store-savings'].get?.security, undefined);
     assert.match(doc.paths['/api/products/{id}/store-savings'].get?.summary ?? '', /store savings/i);
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);

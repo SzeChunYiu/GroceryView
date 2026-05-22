@@ -1084,6 +1084,24 @@ export const privateFeatureCopy: Record<PrivateFeatureRoute, { verifiedSurface: 
   }
 };
 
+export const browserExtensionOverlayContract = {
+  title: 'Retailer browser overlay',
+  assetPath: '/extension/retailer-overlay.js',
+  apiEndpoint: '/api/products/{productId}/cheapest-now',
+  productIdAttribute: 'data-groceryview-product-id',
+  supportedRetailers: [
+    { chain: 'ICA', hostPattern: 'handlaprivatkund.ica.se', status: 'mapping-ready' },
+    { chain: 'Coop', hostPattern: 'coop.se', status: 'mapping-ready' },
+    { chain: 'Willys', hostPattern: 'willys.se', status: 'mapping-ready' }
+  ],
+  confidenceRule: 'High when the cheapest-now API returns at least two observed chains for the exact product id; limited when chains are missing.',
+  guardrails: [
+    'No anonymous visitor identity, basket, or retailer account data is stored by the overlay.',
+    'Retailer pages must provide a mapped data-groceryview-product-id before any cheaper alternative is shown.',
+    'Missing product mappings stay silent instead of estimating alternatives from names alone.'
+  ]
+};
+
 export function findProduct(slug: string) {
   return axfoodProducts.find((product) => product.slug === slug) ?? pricedProducts.find((product) => product.slug === slug);
 }

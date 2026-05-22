@@ -463,6 +463,57 @@ describe('createHttpHandler', () => {
     ]);
     assert.match(priceSpreadBody.guardrails[0] ?? '', /verified store quotes/i);
 
+    const cheapestNow = await handle(new Request('http://localhost/api/products/coffee/cheapest-now'));
+    assert.equal(cheapestNow.status, 200);
+    assert.deepEqual(await json(cheapestNow), {
+      productId: 'coffee',
+      productName: 'Zoégas Coffee 450g',
+      category: 'coffee',
+      currency: 'SEK',
+      cheapest: {
+        chain: 'willys',
+        storeId: 'willys-odenplan',
+        storeName: 'Willys Odenplan',
+        packagePrice: 49.9,
+        comparableUnitPrice: 110.89,
+        comparableUnit: 'kg'
+      },
+      chainPrices: [
+        {
+          chain: 'willys',
+          storeId: 'willys-odenplan',
+          storeName: 'Willys Odenplan',
+          packagePrice: 49.9,
+          comparableUnitPrice: 110.89,
+          comparableUnit: 'kg'
+        },
+        {
+          chain: 'lidl',
+          storeId: 'lidl-sveavagen',
+          storeName: 'Lidl Sveavägen',
+          packagePrice: 59.9,
+          comparableUnitPrice: 133.11,
+          comparableUnit: 'kg'
+        },
+        {
+          chain: 'coop',
+          storeId: 'coop-odenplan',
+          storeName: 'Coop Odenplan',
+          packagePrice: 64.9,
+          comparableUnitPrice: 144.22,
+          comparableUnit: 'kg'
+        }
+      ],
+      chainCount: 3,
+      observedPriceCount: 3,
+      lastObservedAt: '2026-05-19T00:00:00.000Z',
+      guardrails: [
+        'Cheapest-now compares only current observed prices for this exact product.',
+        'Each chain contributes at most its cheapest currently observed store row.',
+        'Missing chains stay absent instead of being estimated from other chains or products.'
+      ]
+    });
+
     const storeSavings = await handle(new Request('http://localhost/api/products/coffee/store-savings'));
     assert.equal(storeSavings.status, 200);
     const storeSavingsBody = await json(storeSavings) as {
@@ -657,6 +708,10 @@ describe('createHttpHandler', () => {
     const terminal = await handle(new Request('http://localhost/api/products/missing-product/terminal'));
     assert.equal(terminal.status, 404);
     assert.deepEqual(await json(terminal), { error: 'Product not found.' });
+
+    const cheapestNow = await handle(new Request('http://localhost/api/products/missing-product/cheapest-now'));
+    assert.equal(cheapestNow.status, 404);
+    assert.deepEqual(await json(cheapestNow), { error: 'Product not found.' });
 
     const priceSpread = await handle(new Request('http://localhost/api/products/missing-product/price-spread'));
     assert.equal(priceSpread.status, 404);
