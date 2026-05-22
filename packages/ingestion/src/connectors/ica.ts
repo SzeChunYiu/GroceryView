@@ -174,6 +174,46 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003471',
     storeName: 'ICA Kvantum Rimbo',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003458',
+    storeName: 'ICA Kvantum Ale',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003647',
+    storeName: 'Maxi ICA Stormarknad Alingsås',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003644',
+    storeName: 'ICA Nära Alexius Livs',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004242',
+    storeName: 'ICA Supermarket Alfta',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003645',
+    storeName: 'ICA Supermarket Algots Mönsterås',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004333',
+    storeName: 'ICA Nära Alléns',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003650',
+    storeName: 'ICA Nära Almunge',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003654',
+    storeName: 'ICA Supermarket Alunda',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
