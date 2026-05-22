@@ -49,8 +49,11 @@ describe('daily ingestion workflow', () => {
       assert.match(workflow, new RegExp(`missing production config: ${requiredConfigName}`));
     }
     assert.match(workflow, /CATALOG_COVERAGE_TARGETS_JSON/);
+    assert.match(workflow, /connectorChainIds/);
+    assert.match(workflow, /missingConnectorChains/);
     assert.match(workflow, /connectorStoreCoverageCount/);
     assert.match(workflow, /coverageStoreCount/);
+    assert.doesNotMatch(workflow, /connectorCount !== 6/);
     assert.match(workflow, /body\.status !== 'succeeded'/);
     assert.match(workflow, /missingProductStorePairs/);
     assert.match(workflow, /requiredActions/);

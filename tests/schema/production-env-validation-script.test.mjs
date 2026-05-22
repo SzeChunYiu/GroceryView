@@ -39,6 +39,7 @@ describe('production env value validation script', () => {
     assert.deepEqual(JSON.parse(output), {
       status: 'ready',
       connectorCount: 6,
+      connectorChainIds: ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys'],
       connectorStoreCount: 6,
       connectorStoreCoverageCount: 6,
       coverageProductCount: 2,
@@ -51,6 +52,7 @@ describe('production env value validation script', () => {
     assert.deepEqual(validateProductionEnv(parseEnvExample(envExample)), {
       status: 'ready',
       connectorCount: 6,
+      connectorChainIds: ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys'],
       connectorStoreCount: 6,
       connectorStoreCoverageCount: 6,
       coverageProductCount: 1,
