@@ -47,7 +47,7 @@ describe('verified-data UI', () => {
   });
 
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {
-    const featureRoutes = ['weekly-basket','watchlist','scanner','household','account','basket-ideas','coupon-stacks','deals','meal-planner','nutrition-value','pantry-planner','price-reports','shopping-trips','privacy'];
+    const featureRoutes = ['weekly-basket','watchlist','scanner','household','account','basket-ideas','coupon-stacks','deals','meal-planner','pantry-planner','price-reports','shopping-trips','privacy'];
     const verified = await read('src/lib/verified-data.ts');
     assert.match(verified, /privateFeatureCopy/);
     assert.match(verified, /verifiedSurface/);
@@ -74,6 +74,15 @@ describe('verified-data UI', () => {
     assert.match(login, /source timestamps from authenticated storage/);
   });
 
+
+
+  it('surfaces nutrition per krona on the nutrition value route using the real core ranking output', async () => {
+    const source = await read('src/app/nutrition-value/page.tsx');
+    assert.match(source, /nutritionPerKrona/);
+    assert.match(source, /rankNutritionPerKrona/);
+    assert.match(source, /valuePer10Sek/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
 
   it('surfaces personal grocery inflation on the savings dashboard using the real core-derived driver output', async () => {
     const source = await read('src/app/savings-dashboard/page.tsx');

@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { calculatePersonalGroceryInflation, rankDealOpportunities, summarizeCategoryDealLeaders } from '@groceryview/core';
+import { calculatePersonalGroceryInflation, rankDealOpportunities, rankNutritionPerKrona, summarizeCategoryDealLeaders } from '@groceryview/core';
 
 export const products = [
   {
@@ -1763,6 +1763,52 @@ export const watchlistAlerts = [
     nextAction: 'Add two kvarg tubs before the nutrition board locks the protein snack route.'
   }
 ];
+
+
+export const nutritionPerKronaInputs = [
+  {
+    productId: 'kronfagel-kycklingfile-1kg',
+    name: 'Kronfågel Kycklingfilé 1kg',
+    price: 109,
+    nutritionPerPackage: { proteinGrams: 230, calories: 1050, fiberGrams: 0, sugarGrams: 0, saltGrams: 1.6 },
+    source: 'visible weekly-deal product row + package nutrition label fixture'
+  },
+  {
+    productId: 'icas-egg-15p',
+    name: 'ICA Ägg 15-pack',
+    price: 39.95,
+    nutritionPerPackage: { proteinGrams: 95, calories: 1050, fiberGrams: 0, sugarGrams: 1, saltGrams: 2.1 },
+    source: 'visible shelf product row + package nutrition label fixture'
+  },
+  {
+    productId: 'lindahls-kvarg-500g',
+    name: 'Lindahls Kvarg Naturell 500g',
+    price: 19.9,
+    nutritionPerPackage: { proteinGrams: 55, calories: 300, fiberGrams: 0, sugarGrams: 17.5, saltGrams: 0.5 },
+    source: 'visible member-promo product row + package nutrition label fixture'
+  },
+  {
+    productId: 'garant-ekologisk-tofu-270g',
+    name: 'Garant Ekologisk Tofu 270g',
+    price: 21.9,
+    nutritionPerPackage: { proteinGrams: 35, calories: 335, fiberGrams: 2.7, sugarGrams: 0.8, saltGrams: 0.3 },
+    source: 'visible shelf product row + package nutrition label fixture'
+  }
+];
+
+export const nutritionPerKrona = {
+  metric: 'protein' as const,
+  rows: rankNutritionPerKrona(nutritionPerKronaInputs, 'protein').map((row) => ({
+    ...row,
+    source: nutritionPerKronaInputs.find((input) => input.productId === row.productId)?.source ?? 'visible product row'
+  })),
+  coverage: {
+    labelledProducts: nutritionPerKronaInputs.length,
+    visibleProducts: products.length,
+    confidence: 'medium',
+    caveat: 'Only products with a visible price row and a package nutrition-label fixture are ranked; missing labels are excluded instead of estimated.'
+  }
+};
 
 export const householdSavings = {
   weeklyTotal: '813.20 SEK',
