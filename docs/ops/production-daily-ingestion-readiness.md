@@ -41,6 +41,9 @@ node -e "const t=require('/tmp/catalog-coverage-targets.json'); console.log({pro
 ```
 
 Store the compact JSON as `CATALOG_COVERAGE_TARGETS_JSON` in the deployment/GitHub secret store.
+Every `targetStores[]` entry must also appear in the matching daily connector
+`stores[]` metadata, otherwise ingestion cannot prove that product prices are
+branch-scoped before it writes `latest_prices`.
 
 ## Validate values before relying on cron
 
@@ -53,6 +56,8 @@ npm run ops:validate-production-env
 This fails closed unless:
 
 - daily connector JSON has all six required chains: `ica`, `willys`, `coop`, `hemkop`, `lidl`, `city_gross`
+- every store-scoped connector lists the branch metadata it can emit in `stores[]`
+- catalog `targetStores[]` are covered by daily connector `stores[]`
 - catalog coverage targets have non-empty product/category/chain/store arrays
 - catalog target chains contain all six required chains
 - `requireEveryProductInEveryStore` is `true`
@@ -71,15 +76,19 @@ gh run list --workflow daily-ingestion.yml --repo SzeChunYiu/GroceryView --limit
 The workflow must pass these gates in order:
 
 1. DB and ingestion package tests
-2. configured daily ingestion runner
-3. `/api/readiness/postgres`
-4. `/api/readiness/source-runs`
-5. `/api/readiness/catalog-coverage`
+2. production ingestion configuration validator
+3. configured daily ingestion runner
+4. `/api/readiness/postgres`
+5. `/api/readiness/source-runs`
+6. `/api/readiness/catalog-coverage`
 
 ## Expected blocker meanings
 
 - `source_run_missing_fresh_chain:<chain>`: no fresh successful daily source run for that chain.
 - `source_run_insufficient_accepted_rows:<chain>:<count>/<min>`: source run completed but accepted too few rows.
+- `missing_store_scoped_prices:<products>`: connector output had accepted products without a branch/store id.
+- `unknown_store_ids:<stores>`: connector output referenced branch ids not declared in connector `stores[]`.
+- `CATALOG_COVERAGE_TARGETS_JSON.targetStores missing from connector stores: <stores>`: production env has target branches that no daily connector declares.
 - `backfill_product_store_pairs:<count>`: catalog coverage target requires product-store prices that are not in `latest_prices`.
 - `backfill_chains:<chains>`: coverage targets include chains with no observed latest prices.
 - `catalog_coverage_probe_failed`: readiness provider failed; check server logs without exposing secrets.

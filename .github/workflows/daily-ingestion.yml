@@ -30,6 +30,33 @@ jobs:
           npm run test -w @groceryview/db
           npm run test -w @groceryview/ingestion
 
+      - name: Validate production ingestion configuration
+        env:
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PUBLIC_WEB_URL: ${{ vars.PUBLIC_WEB_URL || secrets.PUBLIC_WEB_URL }}
+          NOTIFICATION_WEBHOOK_SECRET: ${{ secrets.NOTIFICATION_WEBHOOK_SECRET }}
+          BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+          GROCERYVIEW_DAILY_CONNECTORS_JSON: ${{ secrets.GROCERYVIEW_DAILY_CONNECTORS_JSON }}
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
+          CATALOG_COVERAGE_TARGETS_JSON: ${{ secrets.CATALOG_COVERAGE_TARGETS_JSON }}
+        run: |
+          set -euo pipefail
+          npm run ops:validate-production-env \
+            >/tmp/production-env-validation.json
+          node <<'NODE'
+          const body = require('/tmp/production-env-validation.json');
+          if (
+            body.status !== 'ready' ||
+            body.connectorCount !== 6 ||
+            body.connectorStoreCoverageCount !== body.coverageStoreCount
+          ) {
+            console.error(JSON.stringify(body));
+            process.exit(1);
+          }
+          NODE
+
       - name: Run configured daily ingestion
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}

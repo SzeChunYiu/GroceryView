@@ -2036,8 +2036,22 @@ export function planIngestionBatch(inputs: RetailerProductInput[]): IngestionBat
   return { accepted, rejected };
 }
 
+export type DailyIngestionStoreConfig = {
+  storeId: string;
+  name: string;
+  address: string;
+  city: string;
+  countryCode?: string;
+  district?: string;
+  latitude?: number;
+  longitude?: number;
+  storeType?: string;
+};
+
 export type DailyIngestionConnectorConfig = Omit<RetailerConnectorPlanInput, 'requestedAt'> & {
   requestedAt?: string;
+  stores?: DailyIngestionStoreConfig[];
+  requireStoreScopedPrices?: boolean;
 };
 
 export type DailyIngestionEnv = Partial<Record<'DATABASE_URL' | 'GROCERYVIEW_DAILY_CONNECTORS_JSON', string>>;
@@ -2089,6 +2103,43 @@ export const requiredDailyIngestionChainIds = [
 
 const requireForDailyIngestion = createRequire(import.meta.url);
 
+function parseDailyStoreConfigs(value: unknown, path: string): DailyIngestionStoreConfig[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) throw new Error(`${path} must be an array when provided.`);
+  return value.map((entry, index) => {
+    const storePath = `${path}[${index}]`;
+    if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) throw new Error(`${storePath} must be an object.`);
+    const record = entry as Record<string, unknown>;
+    for (const field of ['storeId', 'name', 'address', 'city']) {
+      if (typeof record[field] !== 'string' || !record[field].trim()) throw new Error(`${storePath}.${field} is required.`);
+    }
+    const optionalString = (field: string): string | undefined => {
+      const candidate = record[field];
+      if (candidate === undefined || candidate === null || candidate === '') return undefined;
+      if (typeof candidate !== 'string') throw new Error(`${storePath}.${field} must be a string.`);
+      return candidate.trim();
+    };
+    const optionalNumber = (field: string): number | undefined => {
+      const candidate = record[field];
+      if (candidate === undefined || candidate === null || candidate === '') return undefined;
+      const parsed = typeof candidate === 'number' ? candidate : Number(candidate);
+      if (!Number.isFinite(parsed)) throw new Error(`${storePath}.${field} must be a finite number.`);
+      return parsed;
+    };
+    return {
+      storeId: String(record.storeId).trim(),
+      name: String(record.name).trim(),
+      address: String(record.address).trim(),
+      city: String(record.city).trim(),
+      countryCode: optionalString('countryCode'),
+      district: optionalString('district'),
+      latitude: optionalNumber('latitude'),
+      longitude: optionalNumber('longitude'),
+      storeType: optionalString('storeType')
+    };
+  });
+}
+
 function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[] {
   const parsed = JSON.parse(value) as unknown;
   if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON must be a non-empty JSON array.');
@@ -2111,7 +2162,9 @@ function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[
       legalReviewStatus: record.legalReviewStatus as LegalReviewStatus,
       hasDataAgreement: Boolean(record.hasDataAgreement),
       endpointUrl: String(record.endpointUrl),
-      parserVersion: String(record.parserVersion)
+      parserVersion: String(record.parserVersion),
+      stores: parseDailyStoreConfigs(record.stores, `GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}].stores`),
+      requireStoreScopedPrices: record.requireStoreScopedPrices === undefined ? true : Boolean(record.requireStoreScopedPrices)
     };
   });
   const configuredChains = new Set(connectors.map((connector) => normalizeDailySlug(connector.chainId)));
@@ -2170,6 +2223,63 @@ async function upsertDailyChain(executor: QueryExecutor, chainId: string): Promi
   return id;
 }
 
+async function upsertDailyStore(executor: QueryExecutor, chainId: string, store: DailyIngestionStoreConfig): Promise<string> {
+  const slug = normalizeDailySlug(store.storeId);
+  const rows = await executor.query<IdRow>(
+    `insert into stores(slug, chain_id, external_ref, name, address_line1, city, region, country_code, position, store_type)
+     values (
+       $1, $2, $3, $4, $5, $6, $7, $8,
+       case
+         when $9::numeric is null or $10::numeric is null then null
+         else ST_SetSRID(ST_MakePoint($10::numeric, $9::numeric), 4326)::geography
+       end,
+       coalesce($11, 'supermarket')
+     )
+     on conflict (slug) do update set
+       chain_id = excluded.chain_id, external_ref = excluded.external_ref, name = excluded.name,
+       address_line1 = excluded.address_line1, city = excluded.city, region = excluded.region,
+       country_code = excluded.country_code, position = excluded.position,
+       store_type = excluded.store_type, updated_at = now()
+     returning id`,
+    [
+      slug,
+      chainId,
+      store.storeId,
+      store.name,
+      store.address,
+      store.city,
+      store.district ?? null,
+      store.countryCode ?? 'SE',
+      store.latitude ?? null,
+      store.longitude ?? null,
+      store.storeType ?? null
+    ]
+  );
+  const id = rows[0]?.id;
+  if (!id) throw new Error(`Daily ingestion store upsert did not return an id: ${store.storeId}`);
+  return id;
+}
+
+function validateStoreScopedConnectorOutput(config: DailyIngestionConnectorConfig, result: RetailerConnectorRunResult): string[] {
+  if (config.requireStoreScopedPrices === false) return [];
+  const configuredStores = new Set((config.stores ?? []).map((store) => normalizeDailySlug(store.storeId)));
+  const missingStoreProducts: string[] = [];
+  const unknownStores = new Set<string>();
+  for (const accepted of result.ingestion.accepted) {
+    const storeId = accepted.priceObservation.storeId;
+    if (!storeId?.trim()) {
+      missingStoreProducts.push(accepted.priceObservation.retailerProductId ?? accepted.product.id);
+      continue;
+    }
+    const normalizedStoreId = normalizeDailySlug(storeId);
+    if (!configuredStores.has(normalizedStoreId)) unknownStores.add(normalizedStoreId);
+  }
+  const blockers: string[] = [];
+  if (missingStoreProducts.length > 0) blockers.push(`${config.chainId}:missing_store_scoped_prices:${missingStoreProducts.slice(0, 10).join(',')}`);
+  if (unknownStores.size > 0) blockers.push(`${config.chainId}:unknown_store_ids:${[...unknownStores].sort().slice(0, 10).join(',')}`);
+  return blockers;
+}
+
 async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProduct): Promise<string> {
   const rows = await executor.query<IdRow>(
     `insert into products(
@@ -2214,6 +2324,7 @@ async function persistDailyConnectorOutput(input: {
   const sourceWriter = createPostgresSourceRecordWriter(executor);
   const aliasRepository = createPostgresProductAliasRepository(executor);
   const priceWriter = createPostgresPriceObservationWriter(executor);
+  const storesBySlug = new Map((config.stores ?? []).map((store) => [normalizeDailySlug(store.storeId), store]));
   const sourceRun = await sourceWriter.createSourceRun({
     sourceType: dbSourceTypeForConnector(config.sourceType),
     sourceName: config.connectorId,
@@ -2237,6 +2348,8 @@ async function persistDailyConnectorOutput(input: {
 
   for (const accepted of result.ingestion.accepted) {
     const chainId = await upsertDailyChain(executor, accepted.priceObservation.chainId);
+    const storeConfig = accepted.priceObservation.storeId ? storesBySlug.get(normalizeDailySlug(accepted.priceObservation.storeId)) : undefined;
+    const storeId = storeConfig ? await upsertDailyStore(executor, chainId, storeConfig) : undefined;
     const productId = await upsertDailyProduct(executor, accepted.product);
     await aliasRepository.upsertProductAlias({
       productId,
@@ -2279,6 +2392,7 @@ async function persistDailyConnectorOutput(input: {
     const observation = await priceWriter.recordPriceObservation({
       productId,
       chainId,
+      storeId,
       sourceRunId: sourceRun.sourceRunId,
       rawRecordId: rawRecord.rawRecordId,
       retailerProductRef: accepted.priceObservation.retailerProductId,
@@ -2354,14 +2468,24 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
       continue;
     }
 
-    const persisted = await persistDailyConnectorOutput({ executor: input.executor, config: runConfig, result });
-    persistedRuns += 1;
-    acceptedCount += persisted.acceptedCount;
-    rejectedCount += persisted.rejectedCount;
-    sourceRunIds.push(...persisted.sourceRunIds);
-    rawRecordIds.push(...persisted.rawRecordIds);
-    observationIds.push(...persisted.observationIds);
-    if (persisted.rejectedCount > 0) blockers.push(`${config.chainId}:rejected_products:${persisted.rejectedCount}`);
+    const storeScopeBlockers = validateStoreScopedConnectorOutput(runConfig, result);
+    if (storeScopeBlockers.length > 0) {
+      blockers.push(...storeScopeBlockers);
+      continue;
+    }
+
+    try {
+      const persisted = await persistDailyConnectorOutput({ executor: input.executor, config: runConfig, result });
+      persistedRuns += 1;
+      acceptedCount += persisted.acceptedCount;
+      rejectedCount += persisted.rejectedCount;
+      sourceRunIds.push(...persisted.sourceRunIds);
+      rawRecordIds.push(...persisted.rawRecordIds);
+      observationIds.push(...persisted.observationIds);
+      if (persisted.rejectedCount > 0) blockers.push(`${config.chainId}:rejected_products:${persisted.rejectedCount}`);
+    } catch (error) {
+      blockers.push(`${config.chainId}:persistence_failed:${error instanceof Error ? error.message : 'unknown_error'}`);
+    }
   }
 
   return {
