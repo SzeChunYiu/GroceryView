@@ -172,6 +172,17 @@ export const DEFAULT_COOP_PRODUCT_QUERIES = [
   'ris',
   'fisk'
 ] as const;
+
+const COOP_REQUEST_TIMEOUT_MS = 20_000;
+
+function withCoopRequestTimeout(fetchImpl: typeof fetch): typeof fetch {
+  return async (input, init = {}) => {
+    const timeoutSignal = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+      ? AbortSignal.timeout(COOP_REQUEST_TIMEOUT_MS)
+      : undefined;
+    return fetchImpl(input, timeoutSignal ? { ...init, signal: init.signal ?? timeoutSignal } : init);
+  };
+}
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   DEFAULT_COOP_STORE_ID,
   '252700',
@@ -558,6 +569,7 @@ export function buildCoopStoresUrl(
 export async function fetchCoopPublicServiceAccess(
   fetchImpl: typeof fetch = fetch
 ): Promise<CoopPublicServiceAccess> {
+  fetchImpl = withCoopRequestTimeout(fetchImpl);
   const response = await fetchImpl(COOP_HANDLA_URL, {
     headers: {
       accept: 'text/html,application/xhtml+xml',
@@ -587,6 +599,7 @@ export async function fetchCoopPublicServiceAccess(
 export async function fetchCoopPublicWeeklyServiceAccess(
   fetchImpl: typeof fetch = fetch
 ): Promise<CoopWeeklyServiceAccess> {
+  fetchImpl = withCoopRequestTimeout(fetchImpl);
   const response = await fetchImpl(COOP_HANDLA_URL, {
     headers: {
       accept: 'text/html,application/xhtml+xml',
@@ -624,7 +637,7 @@ export async function fetchCoopPublicWeeklyServiceAccess(
 }
 
 export async function fetchCoopStores(options: FetchCoopStoresOptions = {}): Promise<CoopStore[]> {
-  const fetchImpl = options.fetchImpl ?? fetch;
+  const fetchImpl = withCoopRequestTimeout(options.fetchImpl ?? fetch);
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const serviceAccess = options.storeApiSubscriptionKey
     ? {
@@ -648,21 +661,34 @@ export async function fetchCoopStores(options: FetchCoopStoresOptions = {}): Pro
   const summaries = payload.stores ?? [];
   const rows: CoopStore[] = [];
   const seenStoreIds = new Set<string>();
-  for (const summary of summaries) {
-    const summaryStoreId = text(summary.ledgerAccountNumber) || text(summary.storeId) || text(summary.id);
-    const detail = options.includeDetails === false || !summaryStoreId
-      ? summary
-      : await fetchCoopStoreDetail({
-          fetchImpl,
-          storeId: summaryStoreId,
-          storeApiVersion: options.storeApiVersion ?? DEFAULT_COOP_STORE_API_VERSION,
-          storeApiUrl: serviceAccess.storeApiUrl,
-          storeApiSubscriptionKey: serviceAccess.storeApiSubscriptionKey
-        });
-    const row = normalizeCoopStore({ ...summary, ...detail }, sourceUrl, retrievedAt);
-    if (!row || seenStoreIds.has(row.storeId)) continue;
-    seenStoreIds.add(row.storeId);
-    rows.push(row);
+  const maxSummaries = options.maxRows ? summaries.slice(0, options.maxRows) : summaries;
+  const concurrency = 8;
+  for (let index = 0; index < maxSummaries.length; index += concurrency) {
+    const batch = maxSummaries.slice(index, index + concurrency);
+    const settled = await Promise.allSettled(batch.map(async (summary) => {
+      const summaryStoreId = text(summary.ledgerAccountNumber) || text(summary.storeId) || text(summary.id);
+      const detail = options.includeDetails === false || !summaryStoreId
+        ? summary
+        : await fetchCoopStoreDetail({
+            fetchImpl,
+            storeId: summaryStoreId,
+            storeApiVersion: options.storeApiVersion ?? DEFAULT_COOP_STORE_API_VERSION,
+            storeApiUrl: serviceAccess.storeApiUrl,
+            storeApiSubscriptionKey: serviceAccess.storeApiSubscriptionKey
+          });
+      return normalizeCoopStore({ ...summary, ...detail }, sourceUrl, retrievedAt);
+    }));
+    for (let offset = 0; offset < settled.length; offset += 1) {
+      const result = settled[offset]!;
+      const summary = batch[offset]!;
+      const fallbackRow = result.status === 'rejected'
+        ? normalizeCoopStore(summary, sourceUrl, retrievedAt)
+        : result.value;
+      if (!fallbackRow || seenStoreIds.has(fallbackRow.storeId)) continue;
+      seenStoreIds.add(fallbackRow.storeId);
+      rows.push(fallbackRow);
+      if (options.maxRows && rows.length >= options.maxRows) break;
+    }
     if (options.maxRows && rows.length >= options.maxRows) break;
   }
   if (rows.length === 0) throw new Error('Coop store catalog had no usable stores.');
@@ -689,7 +715,7 @@ async function fetchCoopStoreDetail(input: {
 }
 
 export async function fetchCoopProducts(options: FetchCoopProductsOptions = {}): Promise<CoopProduct[]> {
-  const fetchImpl = options.fetchImpl ?? fetch;
+  const fetchImpl = withCoopRequestTimeout(options.fetchImpl ?? fetch);
   const query = options.query ?? DEFAULT_COOP_SEARCH_QUERY;
   const maxRows = options.maxRows ?? 1000;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
@@ -748,7 +774,7 @@ export async function fetchCoopProducts(options: FetchCoopProductsOptions = {}):
 export async function fetchCoopProductCatalog(
   options: FetchCoopProductCatalogOptions = {}
 ): Promise<CoopProduct[]> {
-  const fetchImpl = options.fetchImpl ?? fetch;
+  const fetchImpl = withCoopRequestTimeout(options.fetchImpl ?? fetch);
   const queries = options.queries ?? DEFAULT_COOP_PRODUCT_QUERIES;
   const maxRows = options.maxRows ?? Number.POSITIVE_INFINITY;
   const maxRowsPerQuery = options.maxRowsPerQuery ?? 1000;
@@ -789,38 +815,64 @@ export async function fetchCoopProductCatalog(
 export async function fetchCoopProductsForAllStores(
   options: FetchCoopProductsForAllStoresOptions = {}
 ): Promise<CoopStoreProduct[]> {
+  const fetchImpl = withCoopRequestTimeout(options.fetchImpl ?? fetch);
+  const serviceAccess = options.subscriptionKey && options.storeApiSubscriptionKey
+    ? {
+        personalizationApiUrl: options.personalizationApiUrl ?? COOP_PERSONALIZATION_API_URL,
+        personalizationApiSubscriptionKey: options.subscriptionKey,
+        personalizationApiVersion: options.apiVersion ?? DEFAULT_COOP_API_VERSION,
+        storeApiUrl: options.storeApiUrl ?? COOP_STORE_API_URL,
+        storeApiSubscriptionKey: options.storeApiSubscriptionKey
+      }
+    : await fetchCoopPublicWeeklyServiceAccess(fetchImpl);
   const stores = await fetchCoopStores({
-    fetchImpl: options.fetchImpl,
+    fetchImpl,
     maxRows: options.maxStores,
     storeApiVersion: options.storeApiVersion,
-    storeApiUrl: options.storeApiUrl,
-    storeApiSubscriptionKey: options.storeApiSubscriptionKey,
+    storeApiUrl: serviceAccess.storeApiUrl,
+    storeApiSubscriptionKey: serviceAccess.storeApiSubscriptionKey,
     includeDetails: options.includeStoreDetails,
     retrievedAt: options.retrievedAt
   });
   const rows: CoopStoreProduct[] = [];
+  const failures: string[] = [];
   const queries = options.queries ?? DEFAULT_COOP_PRODUCT_QUERIES;
-  for (const store of stores) {
-    for (const query of queries) {
-      const products = await fetchCoopProducts({
-        fetchImpl: options.fetchImpl,
-        query,
-        maxRows: options.maxRowsPerStore ?? options.maxRowsPerStore ?? 24,
-        storeId: store.storeId,
-        device: options.device,
-        apiVersion: options.apiVersion,
-        subscriptionKey: options.subscriptionKey,
-        personalizationApiUrl: options.personalizationApiUrl,
-        retrievedAt: options.retrievedAt
-      });
-      rows.push(...products.map((product) => ({
-        ...product,
-        storeId: store.storeId,
-        storeName: store.name,
-        city: store.city
-      })));
+  const concurrency = 8;
+  for (let index = 0; index < stores.length; index += concurrency) {
+    const batch = stores.slice(index, index + concurrency);
+    const settled = await Promise.allSettled(batch.map(async (store) => {
+      const storeRows: CoopStoreProduct[] = [];
+      for (const query of queries) {
+        const products = await fetchCoopProducts({
+          fetchImpl,
+          query,
+          maxRows: options.maxRowsPerStore ?? 24,
+          storeId: store.storeId,
+          device: options.device,
+          apiVersion: serviceAccess.personalizationApiVersion,
+          subscriptionKey: serviceAccess.personalizationApiSubscriptionKey,
+          personalizationApiUrl: serviceAccess.personalizationApiUrl,
+          retrievedAt: options.retrievedAt
+        });
+        storeRows.push(...products.map((product) => ({
+          ...product,
+          storeId: store.storeId,
+          storeName: store.name,
+          city: store.city
+        })));
+      }
+      return storeRows;
+    }));
+    for (let offset = 0; offset < settled.length; offset += 1) {
+      const result = settled[offset]!;
+      if (result.status === 'fulfilled') {
+        rows.push(...result.value);
+      } else {
+        failures.push(`${batch[offset]?.storeId ?? 'unknown'}:${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
+      }
     }
   }
+  if (rows.length === 0 && failures.length > 0) throw new Error(`Coop all-store product requests returned no usable branch products: ${failures[0]}`);
   return rows;
 }
 
