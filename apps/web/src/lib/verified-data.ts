@@ -1,3 +1,4 @@
+import { summarizePriceHistory } from '@groceryview/core';
 import { axfoodProducts } from './axfood-products';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
 import { categoryLabels, pricedProducts } from './openprices-products';
@@ -24,6 +25,26 @@ export function formatPct(value: number | null | undefined) {
 
 export function labelFromSlug(slug: string) {
   return categoryLabels[slug] ?? slug.split('-').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+}
+
+function median(values: number[]) {
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
+}
+
+function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
+  const pricesByDate = product.observations.reduce<Record<string, number[]>>((ledger, observation) => {
+    if (!observation.date || !Number.isFinite(observation.price)) return ledger;
+    ledger[observation.date] = [...(ledger[observation.date] ?? []), observation.price];
+    return ledger;
+  }, {});
+
+  return Object.entries(pricesByDate).map(([date, prices]) => ({
+    observedAt: `${date}T00:00:00.000Z`,
+    price: median(prices),
+    storeId: 'openprices-community'
+  }));
 }
 
 export const matchedChainProducts = axfoodProducts.filter((product) => product.inChains.length > 1 && product.lowestPrice > 0);
@@ -328,6 +349,34 @@ export const openPriceObservationDepth = Object.values(
   }))
   .sort((a, b) => b.observationTotal - a.observationTotal || a.label.localeCompare(b.label, 'sv'))
   .slice(0, 6);
+
+export const priceDropMoversBoard = pricedProducts
+  .flatMap((product) => {
+    const historyPoints = dailyObservedPricePoints(product);
+    if (historyPoints.length < 2) return [];
+
+    const summary = summarizePriceHistory(historyPoints);
+    const previousPrice = summary.previousPrice ?? summary.latestPrice;
+    return [{
+      productSlug: product.slug,
+      productName: product.name,
+      categoryLabel: labelFromSlug(product.category),
+      latestPrice: summary.latestPrice,
+      previousPrice,
+      changeFromPrevious: summary.changeFromPrevious,
+      changePercent: previousPrice > 0 ? (summary.changeFromPrevious / previousPrice) * 100 : 0,
+      lowestPrice: summary.lowestPrice,
+      highestPrice: summary.highestPrice,
+      isNewLow: summary.isNewLow,
+      observedCount: summary.observedCount,
+      rawObservationCount: product.observationCount,
+      latestObservedAt: summary.latestObservedAt,
+      legalCopy: 'observed low only'
+    }];
+  })
+  .filter((mover) => mover.changeFromPrevious < 0)
+  .sort((a, b) => a.changeFromPrevious - b.changeFromPrevious || b.observedCount - a.observedCount || a.productName.localeCompare(b.productName, 'sv'))
+  .slice(0, 8);
 
 export const sourceCoverage = [
   {

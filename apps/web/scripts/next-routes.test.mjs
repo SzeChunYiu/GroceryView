@@ -686,6 +686,25 @@ describe('verified-data UI', () => {
     assert.match(shell, /\/categories\/\$\{category\.slug\}/);
   });
 
+  it('surfaces a verified price-drop movers board on the homepage', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(verified, /summarizePriceHistory/);
+    assert.match(verified, /export const priceDropMoversBoard = /);
+    assert.match(verified, /changeFromPrevious/);
+    assert.match(verified, /isNewLow/);
+    assert.match(verified, /observed low only/);
+    assert.match(shell, /priceDropMoversBoard\.map/);
+    assert.match(shell, /Price-drop movers board/);
+    assert.match(shell, /latestPrice/);
+    assert.match(shell, /previousPrice/);
+    assert.match(shell, /New observed low/);
+    assert.match(shell, /\/products\/\$\{mover\.productSlug\}/);
+    assert.doesNotMatch(shell, /@\/lib\/demo-data/);
+    assert.doesNotMatch(shell, /@\/components\/sample-data/);
+  });
+
   it('surfaces household planning with verified market context only', async () => {
     const householdPage = await read('src/app/household/page.tsx');
 
