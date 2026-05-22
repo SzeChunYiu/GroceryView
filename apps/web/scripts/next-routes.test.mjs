@@ -598,6 +598,25 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces loyalty-adjusted basket comparison using eligible member prices only', async () => {
+    const source = await read('src/app/weekly-basket/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+    const core = await read('../../packages/core/src/index.ts');
+
+    assert.match(core, /enabledMemberStoreIds/);
+    assert.match(core, /excludedMemberPriceProductIds/);
+    assert.match(demo, /loyaltyAdjustedBasketComparison/);
+    assert.match(demo, /compareBasketStrategies/);
+    assert.match(demo, /enabledMemberStoreIds/);
+    assert.match(demo, /priceType: 'member'/);
+    assert.match(source, /loyaltyAdjustedBasketComparison/);
+    assert.match(source, /Loyalty-adjusted basket comparison/);
+    assert.match(source, /memberSavingsTotal/);
+    assert.match(source, /excludedMemberPriceProductIds/);
+    assert.match(source, /member prices are only counted for enabled loyalty chains/i);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces cross-chain commodity comparison by comparable unit on compare and product routes', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const compare = await read('src/app/compare/page.tsx');

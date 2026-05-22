@@ -1836,6 +1836,61 @@ export const budgetStretchKronaOptimizer = {
   guardrail: 'Splitting stores is recommended only when the real compareBasketStrategies savings beats the extra-store burden; missing prices remain blockers instead of estimates.'
 };
 
+export const loyaltyAdjustedBasketInput: BasketComparisonInput = {
+  favoriteStoreIds: ['willys-odenplan', 'coop-medborgarplatsen', 'hemkop-hornstull'],
+  enabledMemberStoreIds: ['willys-odenplan', 'coop-medborgarplatsen'],
+  items: [
+    {
+      productId: 'zoegas-coffee-450g',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 54.9, priceType: 'shelf' },
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9, priceType: 'member' },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 56.9, priceType: 'shelf' },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 54.9, priceType: 'shelf' }
+      ]
+    },
+    {
+      productId: 'pagen-lingongrova-500g',
+      quantity: 2,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 36.9, priceType: 'shelf' },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 35.9, priceType: 'shelf' },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 33.9, priceType: 'member' }
+      ]
+    },
+    {
+      productId: 'bravo-apelsinjuice-1l',
+      quantity: 2,
+      prices: [
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 25.9, priceType: 'shelf' },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 24.9, priceType: 'shelf' },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 22.9, priceType: 'member' }
+      ]
+    },
+    {
+      productId: 'garant-ekologisk-tofu-270g',
+      quantity: 3,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 21.9, priceType: 'shelf' },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 24.9, priceType: 'shelf' }
+      ]
+    }
+  ]
+};
+
+const loyaltyAdjustedBasketResult = compareBasketStrategies(loyaltyAdjustedBasketInput);
+
+export const loyaltyAdjustedBasketComparison = {
+  persona: 'Loyalty-aware basket shoppers',
+  title: 'Loyalty-adjusted basket comparison',
+  comparison: loyaltyAdjustedBasketResult,
+  enabledMemberStoreIds: loyaltyAdjustedBasketInput.enabledMemberStoreIds ?? [],
+  memberSavingsTotal: loyaltyAdjustedBasketResult.memberSavingsTotal,
+  excludedMemberPriceProductIds: loyaltyAdjustedBasketResult.excludedMemberPriceProductIds,
+  guardrail: 'Public shelf prices stay the baseline; member prices are only counted for enabled loyalty chains, and non-enabled member rows remain blockers instead of hidden savings.'
+};
+
 export const familyBulkUnitPriceComparison = {
   persona: 'Families with kids',
   title: 'Family-pack unit prices',

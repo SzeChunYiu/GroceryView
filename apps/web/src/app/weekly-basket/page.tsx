@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, weeklyBasketOptimizer } from '@/lib/demo-data';
+import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, weeklyBasketOptimizer } from '@/lib/demo-data';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -79,6 +79,44 @@ export default function WeeklyBasketPage() {
         </div>
       </Card>
 
+      <Card className="mt-6 border-violet-200 bg-violet-50/70">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-800">{loyaltyAdjustedBasketComparison.persona}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Loyalty-adjusted basket comparison</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              The same compareBasketStrategies engine now includes eligible member prices only after the shopper enables that chain. Public shelf rows remain the baseline; member prices are only counted for enabled loyalty chains.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Member-adjusted split</span>
+                <span className="mt-1 block text-2xl font-black text-violet-900">{formatSek(loyaltyAdjustedBasketComparison.comparison.cheapestByProduct.total)}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">memberSavingsTotal</span>
+                <span className="mt-1 block text-2xl font-black text-violet-900">{formatSek(loyaltyAdjustedBasketComparison.memberSavingsTotal)}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">enabledMemberStoreIds</span>
+                <span className="mt-1 block text-sm font-black text-slate-950">{loyaltyAdjustedBasketComparison.enabledMemberStoreIds.join(', ')}</span>
+              </p>
+            </div>
+            <p className="mt-3 text-sm font-semibold leading-6 text-violet-950">{loyaltyAdjustedBasketComparison.guardrail}</p>
+          </div>
+          <div className="rounded-[1.5rem] border border-violet-100 bg-white p-4 shadow-sm">
+            <h3 className="text-lg font-black text-slate-950">Excluded member price blockers</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              excludedMemberPriceProductIds are shown when a visible member row belongs to a chain the shopper has not enabled.
+            </p>
+            <div className="mt-3 space-y-2">
+              {loyaltyAdjustedBasketComparison.excludedMemberPriceProductIds.map((blocker) => (
+                <p className="rounded-2xl bg-violet-50 p-3 text-sm font-black text-violet-950" key={blocker}>{blocker}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <Card>
           <h2 className="text-2xl font-black">Cheapest assignment by product</h2>
@@ -88,7 +126,7 @@ export default function WeeklyBasketPage() {
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <p className="text-lg font-black text-slate-950">{assignment.productId}</p>
-                    <p className="mt-1 text-sm text-slate-600">{assignment.quantity} × {formatSek(assignment.unitPrice)} at {assignment.storeName}</p>
+                    <p className="mt-1 text-sm text-slate-600">{assignment.quantity} × {formatSek(assignment.unitPrice)} at {assignment.storeName} · {assignment.priceType}</p>
                   </div>
                   <p className="text-2xl font-black text-emerald-800">{formatSek(assignment.lineTotal)}</p>
                 </div>
