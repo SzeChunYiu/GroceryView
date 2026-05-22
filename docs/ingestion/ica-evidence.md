@@ -3,7 +3,8 @@
 - Source: ICA public store-scoped promotions JSON
 - Store locator source: https://handla.ica.se/api/store/v1?latitude=59.3293&longitude=18.0686&customerType=B2C
 - Store locator source: https://handla.ica.se/api/store/v1?latitude=57.7089&longitude=11.9746&customerType=B2C
-- Store locator retrieved: 2026-05-22T10:54:58.645Z
+- Store locator source: https://handla.ica.se/api/store/v1?latitude=55.604981&longitude=13.003822&customerType=B2C
+- Store locator retrieved: 2026-05-22T11:11:09.961Z
 - Source URL (1004599 ICA Kvantum Kungsholmen): https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Source URL (1004247 ICA Focus): https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Source URL (1003714 ICA Karlaplan): https://handlaprivatkund.ica.se/stores/1003714/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
@@ -54,6 +55,19 @@
 - Source URL (1003917 ICA Kvantum Kungsbacka): https://handlaprivatkund.ica.se/stores/1003917/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Source URL (1004291 ICA Supermarket Nordeviks): https://handlaprivatkund.ica.se/stores/1004291/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Source URL (1004520 ICA Supermarket Noltorp): https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004490 ICA Kvantum Malmborgs Caroli): https://handlaprivatkund.ica.se/stores/1004490/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003569 Maxi ICA Stormarknad Västra Hamnen): https://handlaprivatkund.ica.se/stores/1003569/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004037 ICA Kvantum Malmborgs Mobilia): https://handlaprivatkund.ica.se/stores/1004037/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004492 Maxi ICA Stormarknad Malmö): https://handlaprivatkund.ica.se/stores/1004492/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003428 Maxi ICA Stormarknad Burlöv): https://handlaprivatkund.ica.se/stores/1003428/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1088004 Maxi ICA Stormarknad Gunnesbo, Lund): https://handlaprivatkund.ica.se/stores/1088004/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004060 Maxi ICA Stormarknad Löddeköpinge): https://handlaprivatkund.ica.se/stores/1004060/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003612 ICA Kvantum Karlssons): https://handlaprivatkund.ica.se/stores/1003612/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003452 ICA Kvantum Södra Sandby): https://handlaprivatkund.ica.se/stores/1003452/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003620 Maxi ICA Stormarknad Trelleborg): https://handlaprivatkund.ica.se/stores/1003620/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004360 ICA Kvantum Sjöbo): https://handlaprivatkund.ica.se/stores/1004360/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003916 Maxi ICA Stormarknad Råå Helsingborg): https://handlaprivatkund.ica.se/stores/1003916/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003793 ICA Kvantum Hörby): https://handlaprivatkund.ica.se/stores/1003793/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Retrieved (1004599 ICA Kvantum Kungsholmen): 2026-05-22T09:16:04.478Z
 - Retrieved (1004247 ICA Focus): 2026-05-22T09:16:05.062Z
 - Retrieved (1003714 ICA Karlaplan): 2026-05-22T09:16:05.436Z
@@ -104,6 +118,19 @@
 - Retrieved (1003917 ICA Kvantum Kungsbacka): 2026-05-22T10:54:57.521Z
 - Retrieved (1004291 ICA Supermarket Nordeviks): 2026-05-22T10:54:57.876Z
 - Retrieved (1004520 ICA Supermarket Noltorp): 2026-05-22T10:54:58.241Z
+- Retrieved (1004490 ICA Kvantum Malmborgs Caroli): 2026-05-22T11:11:09.966Z
+- Retrieved (1003569 Maxi ICA Stormarknad Västra Hamnen): 2026-05-22T11:11:10.457Z
+- Retrieved (1004037 ICA Kvantum Malmborgs Mobilia): 2026-05-22T11:11:10.852Z
+- Retrieved (1004492 Maxi ICA Stormarknad Malmö): 2026-05-22T11:11:11.265Z
+- Retrieved (1003428 Maxi ICA Stormarknad Burlöv): 2026-05-22T11:11:11.606Z
+- Retrieved (1088004 Maxi ICA Stormarknad Gunnesbo, Lund): 2026-05-22T11:11:11.964Z
+- Retrieved (1004060 Maxi ICA Stormarknad Löddeköpinge): 2026-05-22T11:11:12.341Z
+- Retrieved (1003612 ICA Kvantum Karlssons): 2026-05-22T11:11:12.670Z
+- Retrieved (1003452 ICA Kvantum Södra Sandby): 2026-05-22T11:11:13.069Z
+- Retrieved (1003620 Maxi ICA Stormarknad Trelleborg): 2026-05-22T11:11:13.473Z
+- Retrieved (1004360 ICA Kvantum Sjöbo): 2026-05-22T11:11:13.827Z
+- Retrieved (1003916 Maxi ICA Stormarknad Råå Helsingborg): 2026-05-22T11:11:14.215Z
+- Retrieved (1003793 ICA Kvantum Hörby): 2026-05-22T11:11:14.595Z
 - Store: 1004599 ICA Kvantum Kungsholmen
 - Store: 1004247 ICA Focus
 - Store: 1003714 ICA Karlaplan
@@ -154,12 +181,25 @@
 - Store: 1003917 ICA Kvantum Kungsbacka
 - Store: 1004291 ICA Supermarket Nordeviks
 - Store: 1004520 ICA Supermarket Noltorp
+- Store: 1004490 ICA Kvantum Malmborgs Caroli
+- Store: 1003569 Maxi ICA Stormarknad Västra Hamnen
+- Store: 1004037 ICA Kvantum Malmborgs Mobilia
+- Store: 1004492 Maxi ICA Stormarknad Malmö
+- Store: 1003428 Maxi ICA Stormarknad Burlöv
+- Store: 1088004 Maxi ICA Stormarknad Gunnesbo, Lund
+- Store: 1004060 Maxi ICA Stormarknad Löddeköpinge
+- Store: 1003612 ICA Kvantum Karlssons
+- Store: 1003452 ICA Kvantum Södra Sandby
+- Store: 1003620 Maxi ICA Stormarknad Trelleborg
+- Store: 1004360 ICA Kvantum Sjöbo
+- Store: 1003916 Maxi ICA Stormarknad Råå Helsingborg
+- Store: 1003793 ICA Kvantum Hörby
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 15000
+- Real rows fetched: 18900
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
 
-Every emitted row came from a live store-scoped promotions response for the selected ICA store and includes the exact source URL plus retrieval timestamp. Store account ids for the newly added Göteborg-area stores were selected from the public ICA store locator response. Rows preserve store account, region, ordinary price, unit price, promo price fields when ICA returned them, promotion description, and product detail URLs.
+Every emitted row came from a live store-scoped promotions response for the selected ICA store and includes the exact source URL plus retrieval timestamp. Store account ids for the newly added Malmö/Skåne stores were selected from the public ICA store locator response. Rows preserve store account, region, ordinary price, unit price, promo price fields when ICA returned them, promotion description, and product detail URLs.
 
 ## Sample Retrieved Rows
 
@@ -171,15 +211,11 @@ Every emitted row came from a live store-scoped promotions response for the sele
 6. 1004599 ICA Kvantum Kungsholmen | 2014681 | Majs 3-p 480g Green Giant | price=28.6 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 7. 1004599 ICA Kvantum Kungsholmen | 1201853 | Juice Apelsin 1l God Morgon® | price=27.4 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 8. 1004599 ICA Kvantum Kungsholmen | 2092056 | Yoghurt Grekisk Naturell 10% 1000g Salakis | price=40.7 SEK | promo=25 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-9. 1004520 ICA Supermarket Noltorp | 2173745 | Fleecefilt Hjärtan | price=120 SEK | promo=60 SEK | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-10. 1004520 ICA Supermarket Noltorp | 2223420 | Hårfärg 880 Dark Brown 1-p Brillance Schwartzkopf | price=86 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-11. 1004520 ICA Supermarket Noltorp | 2151302 | Kaffekapslar NESP Ristretto 57g Starbucks | price=50.1 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-12. 1004520 ICA Supermarket Noltorp | 2382657 | Solskydd Kids Sensitive Advanced Colored Roll-on SPF50+ 50ml Ambre Solaire | price=96.9 SEK | promo=72.67 SEK | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-13. 1004520 ICA Supermarket Noltorp | 2074365 | Hårfärg Natural & Easy Satin Mörkblond 550 1-p Schwartzkopf | price=77 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-14. 1004520 ICA Supermarket Noltorp | 2174183 | Funny Sheep Caramel Milk Chocolate Popcorn 90g Smart Snack | price=21.67 SEK | promo=13 SEK | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-15. 1004520 ICA Supermarket Noltorp | 2153743 | Solskyddskräm Hydra 24H Protect SPF30 175ml Ambre Solaire | price=124 SEK | promo=93 SEK | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-16. 1004520 ICA Supermarket Noltorp | 2223418 | Hårfärg 862 Natural Brown 1-p Brillance Schwartzkopf | price=86 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-17. 1004520 ICA Supermarket Noltorp | 2090883 | Hårfärg 566 Matt Askbrun Natural & Easy 1-p Schwartzkopf | price=77 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-18. 1004520 ICA Supermarket Noltorp | 2074354 | Hårfärg Natural & Easy Kastanj 576 1-p Schwartzkopf | price=77 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-19. 1004520 ICA Supermarket Noltorp | 2105326 | Hårfärg 555 Mörk Honungsblond 1-p Natural & Easy Schwartzkopf | price=77 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-20. 1004520 ICA Supermarket Noltorp | 2108422 | Solskydd Kids Sensitive Advanced Hypoallergenic Face&Body Spray SPF 50+ 270ml Ambre Solaire | price=237 SEK | promo=177.75 SEK | https://handlaprivatkund.ica.se/stores/1004520/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+9. 1003793 ICA Kvantum Hörby | 2074365 | Hårfärg Natural & Easy Satin Mörkblond 550 1-p Schwartzkopf | price=77 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1003793/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+10. 1003793 ICA Kvantum Hörby | 2174183 | Funny Sheep Caramel Milk Chocolate Popcorn 90g Smart Snack | price=21.67 SEK | promo=13 SEK | https://handlaprivatkund.ica.se/stores/1003793/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+11. 1003793 ICA Kvantum Hörby | 2153743 | Solskyddskräm Hydra 24H Protect SPF30 175ml Ambre Solaire | price=124 SEK | promo=93 SEK | https://handlaprivatkund.ica.se/stores/1003793/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+12. 1003793 ICA Kvantum Hörby | 2223418 | Hårfärg 862 Natural Brown 1-p Brillance Schwartzkopf | price=86 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1003793/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+13. 1003793 ICA Kvantum Hörby | 2090883 | Hårfärg 566 Matt Askbrun Natural & Easy 1-p Schwartzkopf | price=77 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1003793/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+14. 1003793 ICA Kvantum Hörby | 2074354 | Hårfärg Natural & Easy Kastanj 576 1-p Schwartzkopf | price=77 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1003793/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+15. 1003793 ICA Kvantum Hörby | 2105326 | Hårfärg 555 Mörk Honungsblond 1-p Natural & Easy Schwartzkopf | price=77 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1003793/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+16. 1003793 ICA Kvantum Hörby | 2108422 | Solskydd Kids Sensitive Advanced Hypoallergenic Face&Body Spray SPF 50+ 270ml Ambre Solaire | price=237 SEK | promo=177.75 SEK | https://handlaprivatkund.ica.se/stores/1003793/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300

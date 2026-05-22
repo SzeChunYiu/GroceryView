@@ -169,6 +169,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
   });
 
+  it('surfaces budget cheapest-store-for-my-list routing without private location data', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/shopping-trips/page.tsx');
+
+    assert.match(verified, /export const budgetCheapestStoreRoutingPlanner = /);
+    assert.match(route, /budgetCheapestStoreRoutingPlanner/);
+    assert.match(route, /Cheapest-store-for-my-list routing/);
+    assert.match(route, /routeRankInputs/);
+    assert.match(route, /storeListGuardrails/);
+    assert.match(route, /NoVerifiedData/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces fulfillment slot evidence guardrails on the shopping trips route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/shopping-trips/page.tsx');
