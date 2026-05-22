@@ -1,5 +1,5 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { basketTripCostContract } from '@/lib/verified-data';
+import { basketTripCostContract, fulfillmentSlotsContract } from '@/lib/verified-data';
 
 const titles: Record<string, string> = {
   'weekly-basket': 'Weekly basket planner',
@@ -47,6 +47,33 @@ export default function FeaturePage() {
             <p className="font-black text-slate-950">Static snapshot remains closed</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
               {basketTripCostContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
+            </ul>
+          </div>
+        </div>
+      </Card>
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Fulfillment evidence</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Delivery and pickup slot evidence: {fulfillmentSlotsContract.title}</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          The fulfillment slot account API now exposes <code className="rounded bg-white/80 px-1 py-0.5 text-emerald-900">{fulfillmentSlotsContract.endpoint}</code> for signed-in baskets, but the report is explicitly not retailer reservations and must be re-confirmed inside the retailer checkout before delivery or pickup is booked.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div>
+            <p className="font-black text-slate-950">Required inputs</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {fulfillmentSlotsContract.requiredInputs.map((input) => <li key={input}>{input}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Shipped behavior</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {fulfillmentSlotsContract.shippedBehaviors.map((behavior) => <li key={behavior}>{behavior}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Static snapshot remains closed</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {fulfillmentSlotsContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
             </ul>
           </div>
         </div>

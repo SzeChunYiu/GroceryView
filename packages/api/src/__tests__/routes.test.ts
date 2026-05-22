@@ -1171,6 +1171,22 @@ describe('createGroceryViewApi', () => {
     assert.match(report.guardrails[0], /not checkout confirmation/i);
   });
 
+
+  it('returns fulfillment slot evidence without claiming reservations', () => {
+    const api = createGroceryViewApi();
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+
+    const report = api.getBasketFulfillmentSlots('user-1', 'willys', 'willys-odenplan');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.retailerId, 'willys');
+    assert.equal(report.status, 'evidence_available');
+    assert.equal(report.availableSlotCount, 1);
+    assert.deepEqual(report.availableSlots.map((slot) => [slot.slotId, slot.mode, slot.fee]), [['willys-pickup-tomorrow-0900', 'pickup', 0]]);
+    assert.match(report.guardrails[0], /not retailer reservations/i);
+    assert.match(report.guardrails[2], /cannot claim checkout completion/i);
+  });
+
   it('returns basket trip-cost optimizer reports with travel estimates separated from shelf totals', () => {
     const api = createGroceryViewApi();
 

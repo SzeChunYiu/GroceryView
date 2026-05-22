@@ -1780,6 +1780,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      const fulfillmentSlotMatch = path.match(/^\/api\/basket\/fulfillment-slots\/([^/]+)\/([^/]+)$/);
+      if (fulfillmentSlotMatch) {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getBasketFulfillmentSlots(user, decodeURIComponent(fulfillmentSlotMatch[1]!), decodeURIComponent(fulfillmentSlotMatch[2]!)));
+      }
+
       const handoffMatch = path.match(/^\/api\/basket\/handoff\/([^/]+)$/);
       if (handoffMatch) {
         const user = userIdFrom(url);
@@ -2135,6 +2144,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/compare': { post: protectedOperation('Compare basket strategies.') },
       '/api/basket/comparison-report': { get: protectedOperation('Get basket comparison strategies with assignment and trust labels.') },
       '/api/basket/local-offers': { get: protectedOperation('Get local offer basket coverage, freshness, confidence, and savings by selected stores.') },
+      '/api/basket/fulfillment-slots/{retailerId}/{storeId}': { get: protectedOperation('Get fulfillment slot evidence without claiming delivery, pickup, or checkout reservations.') },
       '/api/basket/handoff/{retailerId}': { get: protectedOperation('Get retailer handoff actions, support matrix fallbacks, and checkout-confirmation guardrails.') },
       '/api/basket/import-export': { post: protectedOperation('Import consented bookmarklet or extension basket rows and return unmatched review items.') },
       '/api/basket/trip-cost': { get: protectedOperation('Get basket totals ranked by shelf price plus explicit travel, time, delivery, and split-shop costs.') },

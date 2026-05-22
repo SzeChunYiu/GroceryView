@@ -871,6 +871,19 @@ describe('createHttpHandler', () => {
     const importedBasket = await json(await handle(new Request('http://localhost/api/basket/current?userId=user-import'))) as { items: Array<{ productId: string; quantity: number }> };
     assert.deepEqual(importedBasket.items, [{ productId: 'coffee', quantity: 1 }, { productId: 'milk', quantity: 2 }]);
 
+    const slots = await json(await handle(new Request('http://localhost/api/basket/fulfillment-slots/willys/willys-odenplan?userId=user-1'))) as {
+      userId: string;
+      status: string;
+      availableSlotCount: number;
+      availableSlots: Array<{ slotId: string; mode: string; fee: number }>;
+      guardrails: string[];
+    };
+    assert.equal(slots.userId, 'user-1');
+    assert.equal(slots.status, 'evidence_available');
+    assert.equal(slots.availableSlotCount, 1);
+    assert.deepEqual(slots.availableSlots.map((slot) => [slot.slotId, slot.mode, slot.fee]), [['willys-pickup-tomorrow-0900', 'pickup', 0]]);
+    assert.match(slots.guardrails[0], /not retailer reservations/i);
+
     const tripCost = await json(await handle(new Request('http://localhost/api/basket/trip-cost?userId=user-1&travelMode=car&valueOfTimePerHour=120&carCostPerKm=3.5&splitTripPenalty=15'))) as {
       userId: string;
       bestOption?: { strategyId: string; pricedBasketTotal: number; travelCost: number; effectiveTotal: number; storeIds: string[] };

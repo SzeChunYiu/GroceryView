@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   compareBasketStrategies,
+  planBasketFulfillmentSlots,
   planBasketImportExport,
   planBasketTripCost,
   planRetailerHandoff,
@@ -204,6 +205,40 @@ describe('validateBasketComparisonLineFixtures', () => {
   });
 });
 
+
+
+describe('planBasketFulfillmentSlots', () => {
+  it('plans delivery and pickup slot evidence without claiming retailer reservations', () => {
+    const plan = planBasketFulfillmentSlots({
+      retailerId: 'willys',
+      retailerName: 'Willys',
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      asOf: '2026-05-22T09:45:00.000Z',
+      basketProductIds: ['coffee', 'milk'],
+      source: {
+        access: 'manual_evidence',
+        evidenceUrl: 'https://www.willys.se/checkout/slots',
+        capturedAt: '2026-05-22T09:40:00.000Z',
+        shopperConsent: true
+      },
+      slots: [
+        { slotId: 'pickup-0900', mode: 'pickup', startsAt: '2026-05-23T09:00:00.000Z', endsAt: '2026-05-23T10:00:00.000Z', fee: 0, currency: 'SEK', available: true },
+        { slotId: 'delivery-1800', mode: 'delivery', startsAt: '2026-05-23T18:00:00.000Z', endsAt: '2026-05-23T20:00:00.000Z', fee: 59, currency: 'SEK', available: false }
+      ]
+    });
+
+    assert.equal(plan.status, 'evidence_available');
+    assert.equal(plan.availableSlotCount, 1);
+    assert.deepEqual(plan.availableSlots.map((slot) => [slot.slotId, slot.mode, slot.fee]), [['pickup-0900', 'pickup', 0]]);
+    assert.deepEqual(plan.blockedReasons, ['delivery-1800 is currently unavailable.']);
+    assert.deepEqual(plan.guardrails, [
+      'Fulfillment slots are evidence snapshots, not retailer reservations.',
+      'Delivery or pickup availability must be re-confirmed inside the retailer checkout.',
+      'GroceryView cannot claim checkout completion, delivery booking, or inventory reservation from slot evidence.'
+    ]);
+  });
+});
 
 
 

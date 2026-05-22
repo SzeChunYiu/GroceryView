@@ -7,6 +7,7 @@ import {
   calculateDealScore,
   calculateFixedBasketIndex,
   compareBasketStrategies,
+  planBasketFulfillmentSlots,
   planBasketImportExport,
   planBasketTripCost,
   planRetailerHandoff,
@@ -27,6 +28,8 @@ import {
   type BasketImportExportCapturedLine,
   type BasketImportExportPlan,
   type BasketImportExportSource,
+  type BasketFulfillmentSlotsPlan,
+  type BasketFulfillmentSlotInput,
   type BasketTripCostPlan,
   type BasketTripCostTravelMode,
   type RetailerHandoffPlan,
@@ -101,6 +104,12 @@ export type ProductDetail = SearchableProduct & {
   };
 };
 
+
+
+export type BasketFulfillmentSlotsReport = BasketFulfillmentSlotsPlan & {
+  userId: string;
+  basketItemCount: number;
+};
 
 export type BasketImportExportRequest = {
   source: BasketImportExportSource;
@@ -3401,6 +3410,31 @@ function flyerOfferReport(options: {
 }
 
 
+
+const fulfillmentSlotEvidence: Record<string, BasketFulfillmentSlotInput[]> = {
+  'willys-odenplan': [
+    { slotId: 'willys-pickup-tomorrow-0900', mode: 'pickup', startsAt: '2026-05-23T09:00:00.000Z', endsAt: '2026-05-23T10:00:00.000Z', fee: 0, currency: 'SEK', available: true },
+    { slotId: 'willys-delivery-tomorrow-1800', mode: 'delivery', startsAt: '2026-05-23T18:00:00.000Z', endsAt: '2026-05-23T20:00:00.000Z', fee: 59, currency: 'SEK', available: false }
+  ]
+};
+
+function buildBasketFulfillmentSlotsReport(userId: string, retailerId: string, storeId: string, basketItems: BasketItemRequest[]): BasketFulfillmentSlotsReport {
+  requireNonEmptyId(userId, 'userId');
+  requireKnownStore(storeId);
+  const store = stores.find((candidate) => candidate.id === storeId)!;
+  const plan = planBasketFulfillmentSlots({
+    retailerId,
+    retailerName: retailerId.charAt(0).toUpperCase() + retailerId.slice(1),
+    storeId,
+    storeName: store.name,
+    asOf: '2026-05-22T09:45:00.000Z',
+    basketProductIds: basketItems.map((item) => item.productId),
+    source: { access: 'manual_evidence', evidenceUrl: `https://www.${retailerId}.se/checkout/slots`, capturedAt: '2026-05-22T09:40:00.000Z', shopperConsent: true },
+    slots: fulfillmentSlotEvidence[storeId] ?? []
+  });
+  return { userId, basketItemCount: basketItems.length, ...plan };
+}
+
 function basketImportKnownProducts() {
   return products.map((product) => ({
     productId: product.id,
@@ -4085,6 +4119,10 @@ export function createGroceryViewApi() {
       return buildBasketComparisonReport(userId, favoriteStoreIds, baskets.get(userId) ?? []);
     },
 
+
+    getBasketFulfillmentSlots(userId: string, retailerId: string, storeId: string): BasketFulfillmentSlotsReport {
+      return buildBasketFulfillmentSlotsReport(userId, retailerId, storeId, baskets.get(userId) ?? []);
+    },
 
     getBasketTripCostReport(userId: string, request: BasketTripCostRequest): BasketTripCostReport {
       const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);

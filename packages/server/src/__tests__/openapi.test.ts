@@ -14,6 +14,7 @@ describe('buildOpenApiDocument', () => {
       '/api/basket/compare',
       '/api/basket/comparison-report',
       '/api/basket/current',
+      '/api/basket/fulfillment-slots/{retailerId}/{storeId}',
       '/api/basket/handoff/{retailerId}',
       '/api/basket/import-export',
       '/api/basket/items',
@@ -90,8 +91,10 @@ describe('buildOpenApiDocument', () => {
     assert.equal(doc.paths['/api/auth/session'].post?.security, undefined);
     assert.deepEqual(doc.paths['/api/billing/subscription-events'].post?.security, [{ billingWebhookSignature: [] }]);
     assert.deepEqual(doc.paths['/api/basket/comparison-report'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/basket/fulfillment-slots/{retailerId}/{storeId}'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/handoff/{retailerId}'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/import-export'].post?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/basket/fulfillment-slots/{retailerId}/{storeId}'].get?.summary ?? '', /fulfillment|slots/i);
     assert.match(doc.paths['/api/basket/handoff/{retailerId}'].get?.summary ?? '', /handoff/i);
     assert.match(doc.paths['/api/basket/import-export'].post?.summary ?? '', /bookmarklet|extension/i);
     assert.deepEqual(doc.paths['/api/basket/local-offers'].get?.security, [{ bearerAuth: [] }]);
