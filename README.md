@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 21:19 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 22:20 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **283**
+- **Shipped `feat:`/`wire:` PRs to date:** **282**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,28 +42,26 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
-- #1096 feat(i18n): add next-intl language preference switching
-- #1095 feat(ingest): add bounded daily connector runner
-- #1093 feat(persona): add high protein deal finder
-- #1086 feat(web): rebuild homepage as Grocery Index market terminal
-- #1090 feat(steal): compare loyalty adjusted baskets
-- #1089 feat(ingest): add ICA Lindvallen store prices
-- #1088 feat(steal): publish price nutrition api docs
-- #1084 feat(i18n): add persisted language preference switcher
-- #1085 feat(domain): add multi-vertical foundation
-- #1083 feat(commodity): classify loose ingestion items
-- #1081 feat(account): add signed-in ad disclosure controls
-- #1080 feat(commodity): surface mapping review queue
-- #1078 feat(ingest): refresh OpenFoodFacts barcode nutrition
-- #1074 feat(ingest): add ICA Sälen promotions
-- #1076 feat(web): rank matched store price percentiles
-
-## 🔄 In progress (open PRs)
-
-- #1101 feat(ingest): add ICA Klingan promotions
+- #1117 feat(billing): add Stripe checkout sessions
+- #1115 feat(persona): add verified health label filters
+- #1114 feat(persona): add saved basket auto reorder
+- #1113 feat(i18n): add locale-aware price formatting
+- #1112 feat(billing): accept Stripe webhook signatures
+- #1110 feat(persona): add sustainable brand filter
+- #1107 feat(ingest): persist OpenFoodFacts nutrition metadata
+- #1108 feat(persona): add deal hunter alerts
+- #1105 feat(i18n): add locale routed entry points
+- #1104 feat(persona): add one tap basket optimizer
 - #1100 feat(ingest): export DB-backed site snapshots
 - #1099 feat(ingest): add Coop small-store flyer discounts
 - #1098 feat(persona): add freezer batch cook planner
+- #1096 feat(i18n): add next-intl language preference switching
+- #1095 feat(ingest): add bounded daily connector runner
+
+## 🔄 In progress (open PRs)
+
+- #1121 feat(persona): add saved basket auto-reorder readiness
+- #1119 feat(persona): add premium tier tracking
 
 ## 📋 To-do (from GOAL.md backlog)
 
