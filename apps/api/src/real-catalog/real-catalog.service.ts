@@ -178,11 +178,17 @@ export class RealCatalogService {
 
   async compareSavedBasket(userId: string, storeSlugs?: string[]) {
     const basketRows = await this.database.query<BasketItemSqlRow>(
-      `select bi.product_id, bi.quantity
-       from weekly_baskets wb
-       join basket_items bi on bi.basket_id = wb.id
-       where wb.user_id = $1
-       order by wb.week_start desc, bi.id`,
+      `with latest_basket as (
+         select id
+         from weekly_baskets
+         where user_id = $1
+         order by week_start desc, id desc
+         limit 1
+       )
+       select bi.product_id, bi.quantity
+       from latest_basket lb
+       join basket_items bi on bi.basket_id = lb.id
+       order by bi.id`,
       [userId]
     );
     if (basketRows.length === 0) throw new NotFoundException('Saved basket not found.');
