@@ -4,7 +4,12 @@ import { groceryApi } from '../demo-data.js';
 import { CheapestNowService } from './cheapest-now.service.js';
 import { LatestPricesService } from './latest-prices.service.js';
 import { PriceHistoryService, type ProductPriceHistoryFilter } from './price-history.service.js';
-import { productPriceHistoryEndpoint, productPriceHistoryPriceTypes, type ProductPriceHistoryPriceType } from '@groceryview/api';
+import {
+  productCheapestNowEndpoint,
+  productPriceHistoryEndpoint,
+  productPriceHistoryPriceTypes,
+  type ProductPriceHistoryPriceType
+} from '@groceryview/api';
 
 @ApiTags('prices')
 @Controller('products/:productId')
@@ -15,7 +20,7 @@ export class PricesController {
     private readonly priceHistory: PriceHistoryService
   ) {}
 
-  @Get('cheapest-now')
+  @Get(productCheapestNowEndpoint.actionPath)
   @ApiOkResponse({ description: 'Cheapest current observed price per chain for one product' })
   async cheapestNow(@Param('productId') productId: string) {
     const cheapest = await this.cheapestNowService.getProductCheapestNow(productId);

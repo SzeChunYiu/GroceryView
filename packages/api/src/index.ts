@@ -231,6 +231,14 @@ export type ProductCheapestNowPriceRow = {
   storeName?: string;
 };
 
+export const productCheapestNowEndpoint = {
+  method: 'GET',
+  controllerPath: 'products/:productId',
+  actionPath: 'cheapest-now',
+  path: '/products/:productId/cheapest-now',
+  pathParams: ['productId']
+} as const;
+
 export type CategoryPriceIndex = {
   id: string;
   category: string;
@@ -254,6 +262,27 @@ export type BrandPriceIndexSummary = BrandTierIndexSummary & {
   generatedFrom: number;
   guardrails: string[];
 };
+
+export const realChainPriceIndicesEndpoint = {
+  method: 'GET',
+  controllerPath: 'indices',
+  actionPath: 'chains',
+  path: '/indices/chains'
+} as const;
+
+export const realCategoryPriceIndicesEndpoint = {
+  method: 'GET',
+  controllerPath: 'indices',
+  actionPath: 'categories',
+  path: '/indices/categories'
+} as const;
+
+export const realBrandPriceIndicesEndpoint = {
+  method: 'GET',
+  controllerPath: 'indices',
+  actionPath: 'brands',
+  path: '/indices/brands'
+} as const;
 
 export type RealPriceIndexRow = {
   productId: string;
