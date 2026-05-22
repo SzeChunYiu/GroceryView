@@ -47,7 +47,7 @@ describe('verified-data UI', () => {
   });
 
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {
-    const featureRoutes = ['weekly-basket','watchlist','scanner','household','account','basket-ideas','coupon-stacks','deals','meal-planner','nutrition-value','pantry-planner','price-reports','savings-dashboard','shopping-trips','privacy'];
+    const featureRoutes = ['weekly-basket','watchlist','scanner','household','account','basket-ideas','coupon-stacks','deals','meal-planner','nutrition-value','pantry-planner','price-reports','shopping-trips','privacy'];
     const verified = await read('src/lib/verified-data.ts');
     assert.match(verified, /privateFeatureCopy/);
     assert.match(verified, /verifiedSurface/);
@@ -72,6 +72,15 @@ describe('verified-data UI', () => {
     assert.match(login, /Session source/);
     assert.match(login, /production auth provider returns a verified session/);
     assert.match(login, /source timestamps from authenticated storage/);
+  });
+
+
+  it('surfaces personal grocery inflation on the savings dashboard using the real core-derived driver output', async () => {
+    const source = await read('src/app/savings-dashboard/page.tsx');
+    assert.match(source, /personalGroceryInflation/);
+    assert.match(source, /inflationPercent/);
+    assert.match(source, /itemContributions/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
   it('uses a readable global shell and provenance surfaces across the app', async () => {
