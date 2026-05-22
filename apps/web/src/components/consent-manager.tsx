@@ -123,9 +123,14 @@ export function ConsentManager() {
             We default analytics, ads, ad user data, and ad personalisation to denied. AdSense remains non-personalised until optional consent is granted.
             Your proof is stored locally with policyVersion and timestamp; a new policy version asks again.
           </p>
-          <Link className="mt-2 inline-block text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/privacy">
-            Read privacy and cookie details
-          </Link>
+          <div className="mt-2 flex flex-wrap gap-3 text-sm font-black text-emerald-800">
+            <Link className="underline decoration-emerald-300 underline-offset-4" href="/privacy">
+              Read privacy details
+            </Link>
+            <Link className="underline decoration-emerald-300 underline-offset-4" href="/cookies">
+              Read cookie details
+            </Link>
+          </div>
         </div>
         <div className="flex flex-wrap gap-2 lg:justify-end">
           <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" onClick={() => choose(denied, 'reject all')} type="button">Reject all</button>

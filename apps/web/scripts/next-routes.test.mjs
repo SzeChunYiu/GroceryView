@@ -1075,6 +1075,41 @@ ${seo}`;
     assert.match(cmp, /\/privacy/);
   });
 
+  it('ships Swedish and English privacy plus cookie policy pages for consent compliance', async () => {
+    const privacy = await read('src/app/privacy/page.tsx');
+    const cookies = await read('src/app/cookies/page.tsx');
+    const cmp = await read('src/components/consent-manager.tsx');
+    const seo = await read('src/lib/seo.ts');
+    const sitemap = await read('src/app/sitemap.ts');
+
+    assert.match(privacy, /Integritetspolicy/);
+    assert.match(privacy, /Privacy policy/);
+    assert.match(privacy, /Export my data/);
+    assert.match(privacy, /Delete my account/);
+    assert.match(privacy, /receipt/i);
+    assert.match(privacy, /retention/i);
+    assert.match(privacy, /encryption/i);
+    assert.match(privacy, /GDPR data subject rights/i);
+    assert.match(privacy, /No anonymous privacy requests/);
+    assert.doesNotMatch(privacy, /demo-data|sample-data|mock session/i);
+
+    assert.match(cookies, /Cookiepolicy/);
+    assert.match(cookies, /Cookie policy/);
+    assert.match(cookies, /IAB TCF v2\.2/);
+    assert.match(cookies, /Google Consent Mode v2/);
+    assert.match(cookies, /necessary/);
+    assert.match(cookies, /analytics/);
+    assert.match(cookies, /ads/);
+    assert.match(cookies, /personalisation/);
+    assert.match(cookies, /non-personalised/);
+    assert.match(cookies, /policyVersion/);
+    assert.match(cookies, /timestamp/);
+
+    assert.match(cmp, /\/cookies/);
+    assert.match(seo, /'\/cookies'/);
+    assert.match(sitemap, /entry\('\/cookies'/);
+  });
+
 
   it('wires login to the production auth session exchange without mock accounts', async () => {
     const login = await read('src/app/login/page.tsx');
@@ -1139,6 +1174,7 @@ ${seo}`;
       'src/app/chain-index/page.tsx',
       'src/app/compare/page.tsx',
       'src/app/coupon-stacks/page.tsx',
+      'src/app/cookies/page.tsx',
       'src/app/data-sources/page.tsx',
       'src/app/deals/page.tsx',
       'src/app/household/page.tsx',
