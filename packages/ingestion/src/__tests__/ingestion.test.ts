@@ -9,6 +9,7 @@ import {
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
   buildHemkopSearchUrl,
+  buildHemkopStoresUrl,
   buildHemkopWeeklyDiscountsUrl,
   buildEmaginPdfUrl,
   buildIcaStorePromotionsUrl,
@@ -37,7 +38,9 @@ import {
   fetchCoopWeeklyDiscounts,
   fetchCoopWeeklyDiscountsForAllStores,
   fetchHemkopProducts,
+  fetchHemkopStores,
   fetchHemkopWeeklyDiscounts,
+  fetchHemkopWeeklyDiscountsForAllStores,
   fetchIcaDefaultStoreProducts,
   fetchIcaProducts,
   fetchIcaReklambladOffers,
@@ -52,6 +55,7 @@ import {
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
+  GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
@@ -790,6 +794,96 @@ describe('fetchHemkopProducts', () => {
 });
 
 describe('fetchHemkopWeeklyDiscounts', () => {
+  it('fetches Hemkop branch metadata from the public Axfood store API', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify([
+        {
+          storeId: '4798',
+          name: 'Hemköp Bollnäs',
+          address: {
+            line1: 'Långgatan 10',
+            town: 'Bollnäs',
+            postalCode: '821 43',
+            country: { isocode: 'SE' }
+          },
+          geoPoint: { latitude: 61.3461, longitude: 16.0543 },
+          onlineStore: true,
+          clickAndCollect: true,
+          flyerURL: 'https://hemkop.eo.se/hkp/4798.pdf'
+        }
+      ]), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const stores = await fetchHemkopStores({
+      fetchImpl,
+      online: true,
+      maxRows: 1,
+      retrievedAt: '2026-05-22T12:20:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildHemkopStoresUrl({ online: true })]);
+    assert.deepEqual(stores, [{
+      storeId: '4798',
+      name: 'Hemköp Bollnäs',
+      address: 'Långgatan 10',
+      city: 'Bollnäs',
+      postalCode: '821 43',
+      countryCode: 'SE',
+      latitude: 61.3461,
+      longitude: 16.0543,
+      onlineStore: true,
+      clickAndCollect: true,
+      flyerUrl: 'https://hemkop.eo.se/hkp/4798.pdf',
+      sourceUrl: buildHemkopStoresUrl({ online: true }),
+      retrievedAt: '2026-05-22T12:20:00.000Z'
+    }]);
+  });
+
+  it('can expand Hemkop weekly discounts across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: { line1: 'Masthuggstorget 3', town: 'Göteborg' } },
+          { storeId: '4798', name: 'Hemköp Bollnäs', address: { line1: 'Långgatan 10', town: 'Bollnäs' } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('q') ?? 'unknown';
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 1 },
+        results: [{
+          name: `Catalog Hemkop offer ${storeId}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: `hemkop-all-store-promo-${storeId}`,
+            mainProductCode: `hemkop-all-store-product-${storeId}`,
+            name: `Catalog Hemkop offer ${storeId}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopWeeklyDiscountsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      pageSize: 1,
+      retrievedAt: '2026-05-22T12:21:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildHemkopStoresUrl({ online: true }),
+      buildHemkopWeeklyDiscountsUrl('4003', 1, 0),
+      buildHemkopWeeklyDiscountsUrl('4798', 1, 0)
+    ]);
+    assert.deepEqual(rows.map((row) => row.storeId), ['4003', '4798']);
+  });
+
   it('fetches public Hemkop Axfood weekly discount rows with promotion provenance', async () => {
     const requestedUrls: string[] = [];
     const fetchImpl: typeof fetch = async (url) => {
@@ -2857,6 +2951,64 @@ describe('daily ingestion runner', () => {
     assert.equal(observationInsert?.params[2], 'store-db-2');
     assert.equal(observationInsert?.params[7], 45);
     assert.equal(observationInsert?.params[13], 'Max 2 köp/hushåll');
+  });
+
+  it('materializes native Hemkop all-store weekly offers into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T12:03:00.000Z',
+      connectors: [{
+        connectorId: 'hemkop-weekly-all-stores',
+        chainId: 'hemkop',
+        sourceType: 'flyer_campaign',
+        endpointUrl: GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
+        parserVersion: 'hemkop-weekly-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: 'Masthuggstorget 3', city: 'Göteborg' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/axfood/rest/store')) {
+          return new Response(JSON.stringify([
+            { storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: { line1: 'Masthuggstorget 3', town: 'Göteborg' } }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({
+          pagination: { numberOfPages: 1 },
+          results: [{
+            name: 'Svenskt smör',
+            manufacturer: 'Arla',
+            googleAnalyticsCategory: 'Dairy',
+            displayVolume: '500g',
+            priceNoUnit: '62.41',
+            potentialPromotions: [{
+              code: 'hemkop-promo-4003',
+              mainProductCode: '101017249_ST',
+              name: 'Svenskt smör',
+              brands: ['Arla'],
+              price: 39.95,
+              cartLabel: '39,95 kr/st',
+              redeemLimitLabel: 'Max 3 köp'
+            }]
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildHemkopStoresUrl({ online: true }),
+      buildHemkopWeeklyDiscountsUrl('4003', 100, 0)
+    ]);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.equal(observationInsert?.params[2], 'store-db-2');
+    assert.equal(observationInsert?.params[7], 39.95);
+    assert.equal(observationInsert?.params[13], '39,95 kr/st');
   });
 
   it('materializes native Coop all-store weekly offers into daily database observations', async () => {
