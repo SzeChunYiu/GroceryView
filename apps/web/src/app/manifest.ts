@@ -1,0 +1,47 @@
+import type { MetadataRoute } from 'next';
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: 'GroceryView verified grocery terminal',
+    short_name: 'GroceryView',
+    description: 'Install GroceryView for mobile-first Swedish grocery price checks with verified prices and source confidence.',
+    id: '/',
+    start_url: '/',
+    scope: '/',
+    display: 'standalone',
+    orientation: 'portrait',
+    background_color: '#f8fafc',
+    theme_color: '#064e3b',
+    categories: ['shopping', 'finance', 'food'],
+    icons: [
+      {
+        src: '/pwa-icon.svg',
+        sizes: 'any',
+        type: 'image/svg+xml',
+        purpose: 'any'
+      },
+      {
+        src: '/pwa-maskable-icon.svg',
+        sizes: 'any',
+        type: 'image/svg+xml',
+        purpose: 'maskable'
+      }
+    ],
+    shortcuts: [
+      {
+        name: 'Compare chain prices',
+        short_name: 'Compare',
+        description: 'Open the verified chain price comparison route.',
+        url: '/compare',
+        icons: [{ src: '/pwa-icon.svg', sizes: 'any', type: 'image/svg+xml' }]
+      },
+      {
+        name: 'Browse verified stores',
+        short_name: 'Stores',
+        description: 'Open the verified Swedish grocery store directory.',
+        url: '/stores',
+        icons: [{ src: '/pwa-icon.svg', sizes: 'any', type: 'image/svg+xml' }]
+      }
+    ]
+  };
+}

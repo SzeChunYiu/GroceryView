@@ -105,6 +105,10 @@ export const routeMetadataCatalog = {
     title: 'Deal-based grocery meal planner | GroceryView',
     description: 'Build student and family meal ideas from verified deal rows, serving costs, leftovers, and source confidence.'
   },
+  '/meal-cost': {
+    title: 'Ingredient-level grocery meal costing | GroceryView',
+    description: 'Cost a meal from verified ingredient prices, package quantities, serving counts, and cheapest complete-chain evidence.'
+  },
   '/nutrition-value': {
     title: 'Nutrition per krona rankings | GroceryView',
     description: 'Rank grocery products by protein, calories, fibre, and macro value per SEK using real nutrition and price inputs.'
@@ -194,6 +198,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
   return {
     title,
     description,
+    manifest: '/manifest.webmanifest',
     alternates: { canonical: canonical },
     openGraph: {
       title,

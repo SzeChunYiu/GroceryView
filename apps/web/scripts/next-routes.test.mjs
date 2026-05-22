@@ -508,6 +508,20 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces ingredient-level meal costing with cheapest-chain evidence', async () => {
+    const source = await read('src/app/meal-cost/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+    assert.match(demo, /calculateMealCostBreakdown/);
+    assert.match(demo, /mealCostBreakdown/);
+    assert.match(source, /mealCostBreakdown/);
+    assert.match(source, /Ingredient-level meal costing/);
+    assert.match(source, /costPerServing/);
+    assert.match(source, /cheapestChain/);
+    assert.match(source, /ingredientCost/);
+    assert.match(source, /real ingredient offer rows/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces pantry replenishment on the pantry planner route using the real core pantry plan output', async () => {
     const source = await read('src/app/pantry-planner/page.tsx');
     assert.match(source, /pantryReplenishmentPlan/);
@@ -1408,6 +1422,33 @@ ${seo}`;
     assert.match(category, /categoryLabels/);
     assert.match(store, /metadataForStore/);
     assert.match(store, /findStore/);
+  });
+
+  it('ships an installable PWA-first web manifest for mobile grocery checks', async () => {
+    const manifestPath = 'src/app/manifest.ts';
+    assert.equal(await fileExists(manifestPath), true, 'App Router should expose /manifest.webmanifest');
+
+    const manifest = await read(manifestPath);
+    const seo = await read('src/lib/seo.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const pwaIcon = await read('public/pwa-icon.svg');
+    const maskableIcon = await read('public/pwa-maskable-icon.svg');
+
+    assert.match(manifest, /import type \{ MetadataRoute \} from 'next'/);
+    assert.match(manifest, /display: 'standalone'/);
+    assert.match(manifest, /start_url:/);
+    assert.match(manifest, /scope:/);
+    assert.match(manifest, /theme_color: '#064e3b'/);
+    assert.match(manifest, /pwa-icon\.svg/);
+    assert.match(manifest, /pwa-maskable-icon\.svg/);
+    assert.match(manifest, /purpose: 'maskable'/);
+    assert.match(seo, /manifest\.webmanifest/);
+    assert.match(shell, /PWA-first mobile install/);
+    assert.match(shell, /Install on phone/);
+    assert.match(shell, /manifest\.webmanifest/);
+    assert.match(shell, /verified prices load before the app shell asks for anything private/);
+    assert.match(pwaIcon, /GroceryView/);
+    assert.match(maskableIcon, /maskable GroceryView icon/);
   });
 
 
