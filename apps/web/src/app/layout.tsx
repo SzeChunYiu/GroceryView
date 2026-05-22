@@ -25,7 +25,8 @@ const websiteJsonLd = {
 
 export const metadata: Metadata = {
   title: 'GroceryView',
-  description: 'Sweden grocery price intelligence for products, stores, and weekly baskets.'
+  description: 'Sweden grocery price intelligence for products, stores, and weekly baskets.',
+  manifest: '/manifest.webmanifest'
 };
 
 function jsonLd(value: unknown) {
