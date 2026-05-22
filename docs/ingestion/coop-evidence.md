@@ -2,12 +2,14 @@
 
 - Source: coop.se public personalization search API configured in the public handla page
 - Source URL: https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1
-- Request body: query kaffe, resultsOptions take 1000, empty sort/facets, relatedResultsOptions take 16
+- Settings URL fetched with `curl -A "GroceryView/0.1"`: https://www.coop.se/handla/
+- Request bodies: queries kaffe, mjölk, pasta, kyckling, smör, yoghurt, banan, ris, fisk; resultsOptions take 1000, empty sort/facets, relatedResultsOptions take 16
 - Required public header: Ocp-Apim-Subscription-Key value exposed in window.coopSettings.serviceAccess.personalizationApiSubscriptionKey
-- Retrieved: 2026-05-22T12:58:35.902Z
+- Retrieved: 2026-05-22T15:33:12.096Z
 - Store: 251300
 - Device parameter: desktop
-- Real rows fetched: 290
+- Curl-inspected query counts: kaffe 289, mjölk 270, pasta 397, kyckling 406, smör 104, yoghurt 321, banan 97, ris 176, fisk 313
+- Real deduped product rows fetched: 2205
 - Connector: packages/ingestion/src/connectors/coop.ts
 - Web wire: apps/web/src/lib/ingested/coop.ts
 
