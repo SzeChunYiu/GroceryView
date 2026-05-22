@@ -36,6 +36,7 @@ import {
   buildWillysStoresUrl,
   buildWillysWeeklyDiscountsUrl,
   extractOpenFoodFactsBarcodeFromAxfoodImageUrl,
+  extractOpenFoodFactsBarcodeFromImageUrl,
   fetchOpenFoodFactsExportProducts,
   fetchOpenFoodFactsExportRetailerEnrichments,
   fetchOpenFoodFactsProducts,
@@ -486,6 +487,7 @@ describe('fetchOpenFoodFactsExportRetailerEnrichments', () => {
     });
 
     assert.deepEqual(requestedUrls, [OPENFOODFACTS_EXPORT_URL]);
+    assert.equal(extractOpenFoodFactsBarcodeFromImageUrl('https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000374.jpg'), '7310401000374');
     assert.equal(rows.length, 1);
     assert.equal(rows[0].barcode, '7310130003547');
     assert.equal(rows[0].sourceUrl, `${OPENFOODFACTS_EXPORT_URL}#code=7310130003547`);
