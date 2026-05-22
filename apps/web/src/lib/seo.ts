@@ -92,6 +92,10 @@ export const routeMetadataCatalog = {
     title: 'Verified grocery deal radar | GroceryView',
     description: 'Find expiry deals, single-portion deals, lunchbox deals, and trusted deal opportunities from visible source-backed rows.'
   },
+  '/fuel': {
+    title: 'Fuel price terminal foundation | GroceryView',
+    description: 'Preview the domain-scoped fuel station and fuel-grade price model without rendering non-grocery prices before verified observations exist.'
+  },
   '/household': {
     title: 'Household grocery planning gate | GroceryView',
     description: 'Household planning stays fail-closed until verified private profile and basket records are connected.'
@@ -124,6 +128,10 @@ export const routeMetadataCatalog = {
   '/pantry-planner': {
     title: 'Pantry replenishment planner | GroceryView',
     description: 'Plan pantry replenishment from verified basket needs, expiry signals, missing-price blockers, and source coverage.'
+  },
+  '/pharmacy': {
+    title: 'Pharmacy OTC price foundation | GroceryView',
+    description: 'Preview the domain-scoped OTC pharmacy price model while prescription and non-observed pharmacy prices remain withheld.'
   },
   '/price-reports': {
     title: 'Price report evidence gate | GroceryView',

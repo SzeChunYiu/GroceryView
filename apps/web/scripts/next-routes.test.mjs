@@ -1817,6 +1817,7 @@ ${seo}`;
       'src/app/cookies/page.tsx',
       'src/app/data-sources/page.tsx',
       'src/app/deals/page.tsx',
+      'src/app/fuel/page.tsx',
       'src/app/household/page.tsx',
       'src/app/login/page.tsx',
       'src/app/map/page.tsx',
@@ -1824,6 +1825,7 @@ ${seo}`;
       'src/app/nutrition-value/page.tsx',
       'src/app/openprices-depth/page.tsx',
       'src/app/pantry-planner/page.tsx',
+      'src/app/pharmacy/page.tsx',
       'src/app/price-reports/page.tsx',
       'src/app/privacy/page.tsx',
       'src/app/prisjamforelse/[slug]/page.tsx',
@@ -2132,5 +2134,48 @@ ${seo}`;
     assert.match(route, /@\/lib\/verified-data/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+  it('surfaces the multi-vertical domain foundation without fabricating non-grocery prices', async () => {
+    const catalogDomains = await read('../../packages/catalog/src/domains.ts');
+    const catalogIndex = await read('../../packages/catalog/src/index.ts');
+    const verified = await read('src/lib/verified-data.ts');
+    const dataSources = await read('src/app/data-sources/page.tsx');
+    const fuelRoute = await read('src/app/fuel/page.tsx');
+    const pharmacyRoute = await read('src/app/pharmacy/page.tsx');
+    const seo = await read('src/lib/seo.ts');
+    const domainMigration = await read('../../infra/db/migrations/011_multi_vertical_domains.sql');
+
+    assert.match(catalogDomains, /PriceDomain/);
+    assert.match(catalogDomains, /grocery/);
+    assert.match(catalogDomains, /fuel/);
+    assert.match(catalogDomains, /pharmacy/);
+    assert.match(catalogDomains, /fuel-95-e10/);
+    assert.match(catalogDomains, /otc-pharmacy/);
+    assert.match(catalogIndex, /SUPPORTED_PRICE_DOMAINS/);
+
+    assert.match(domainMigration, /alter table chains add column if not exists domain/);
+    assert.match(domainMigration, /alter table products add column if not exists domain/);
+    assert.match(domainMigration, /alter table observations add column if not exists domain/);
+    assert.match(domainMigration, /default 'grocery'/);
+    assert.match(domainMigration, /price_domain_check/);
+
+    assert.match(verified, /multiVerticalDomainFoundation/);
+    assert.match(verified, /SUPPORTED_PRICE_DOMAINS/);
+    assert.match(verified, /priceObservationsAvailable: domain\.slug === 'grocery' \? groceryObservationCount : 0/);
+    assert.match(verified, /No non-grocery prices are rendered until connector observations land/);
+    assert.match(dataSources, /multiVerticalDomainFoundation\.map/);
+    assert.match(dataSources, /Multi-vertical domain foundation/);
+
+    assert.match(fuelRoute, /domainSlug="fuel"/);
+    assert.match(fuelRoute, /No fuel price observations yet/);
+    assert.match(fuelRoute, /fuel\/pharmacy domain model/);
+    assert.match(pharmacyRoute, /domainSlug="pharmacy"/);
+    assert.match(pharmacyRoute, /No pharmacy price observations yet/);
+    assert.match(pharmacyRoute, /OTC/);
+    assert.match(seo, /\/fuel/);
+    assert.match(seo, /\/pharmacy/);
+    assert.doesNotMatch(fuelRoute, /@\/lib\/demo-data/);
+    assert.doesNotMatch(pharmacyRoute, /@\/components\/sample-data/);
   });
 });

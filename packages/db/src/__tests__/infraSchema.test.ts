@@ -129,6 +129,19 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(schemaDoc, /open prices/, 'Open Prices persistence docs missing');
   });
 
+  it('scopes catalog and price facts to supported price domains for future verticals', () => {
+    for (const table of ['chains', 'stores', 'products', 'observations', 'latest_prices']) {
+      assert.match(allMigrations, new RegExp(`alter table ${table} add column if not exists domain`), `${table}.domain migration missing`);
+      assert.match(allMigrations, new RegExp(`${table}_price_domain_check`), `${table} domain constraint missing`);
+      assert.match(schemaDoc, new RegExp(`### \`${table}\`[\\s\\S]*\\bdomain\\b`), `${table}.domain docs missing`);
+    }
+    assert.match(allMigrations, /domain in \('grocery', 'fuel', 'pharmacy'\)/);
+    assert.match(allMigrations, /default 'grocery'/);
+    assert.match(allMigrations, /observations_domain_observed_idx/);
+    assert.match(schemaDoc, /multi-vertical price domain model/);
+    assert.match(schemaDoc, /public routes must not render non-grocery prices until `observations\.domain`/);
+  });
+
   it('persists retailer source policy decisions before ingestion fetches run', () => {
     const sourcePolicies = sourcePolicyTableDefinition('retailer_source_policies');
     assert.match(sourcePolicies, /chain_id uuid not null references chains\(id\) on delete cascade/);

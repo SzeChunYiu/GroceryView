@@ -1,4 +1,4 @@
-import { COMMODITIES, STAPLE_BASKET, type Commodity, type ComparableUnit } from '@groceryview/catalog';
+import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
 import { calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
@@ -115,6 +115,33 @@ export const matchedChainProducts = axfoodProducts.filter((product) => product.i
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
+
+const groceryObservationCount = pricedProducts.reduce((sum, product) => sum + product.observationCount, 0);
+
+export const multiVerticalDomainFoundation = SUPPORTED_PRICE_DOMAINS.map((domain) => ({
+  slug: domain.slug,
+  label: domain.label,
+  route: domain.slug === 'grocery' ? '/' : domain.route,
+  status: domain.status,
+  itemMatchStrategy: domain.itemMatchStrategy,
+  locationStrategy: domain.locationStrategy,
+  observationsTable: domain.observationsTable,
+  seedItems: domain.seedItems,
+  seedItemCount: domain.seedItems.length,
+  priceObservationsAvailable: domain.slug === 'grocery' ? groceryObservationCount : 0,
+  confidence: domain.slug === 'grocery' ? 'active verified grocery rows' : 'foundation only',
+  priceClaim: domain.priceClaim,
+  claimBoundary: domain.slug === 'grocery'
+    ? 'Grocery can render verified price observations with source confidence.'
+    : 'No non-grocery prices are rendered until connector observations land.',
+  migrationFields: ['chains.domain', 'stores.domain', 'products.domain', 'observations.domain', 'latest_prices.domain'],
+  schemaDefault: "domain default 'grocery'",
+  guardrails: [
+    "Existing GroceryView rows default to domain='grocery'.",
+    'Fuel and pharmacy routes may show supported item and location models, but must not show prices before domain-scoped observations exist.',
+    'Non-grocery matching remains domain-scoped: fuel grades are not compared to grocery EANs, and pharmacy OTC rows exclude prescription claims.'
+  ]
+}));
 
 type DeliveryVsInStoreBasketPair = {
   matchedToken: string;
