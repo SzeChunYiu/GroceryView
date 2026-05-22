@@ -30,3 +30,7 @@ jobs:
         run: |
           echo "Deployment manifest verified."
           echo "Provider-specific deploy command intentionally not wired until hosting target is selected."
+      - name: Verify production visible artifact
+        env:
+          GROCERYVIEW_PRODUCTION_URL: ${{ vars.GROCERYVIEW_PRODUCTION_URL }}
+        run: node apps/web/scripts/check-production-visible-artifact.mjs
