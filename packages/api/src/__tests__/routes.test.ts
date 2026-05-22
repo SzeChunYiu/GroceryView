@@ -96,7 +96,11 @@ describe('createGroceryViewApi', () => {
         productSlug: 'bryggkaffe-450g',
         productName: 'Bryggkaffe mellanrost 450 g',
         chainId: 'chain-willys',
+        chainSlug: 'willys',
+        chainName: 'Willys',
         storeId: 'store-willys',
+        storeSlug: 'willys-odenplan',
+        storeName: 'Willys Odenplan',
         priceType: 'promotion',
         price: 49.9,
         regularPrice: 59.9,
@@ -127,6 +131,27 @@ describe('createGroceryViewApi', () => {
 
     assert.equal(report?.productSlug, 'bryggkaffe-450g');
     assert.deepEqual(report?.points.map((point) => point.observationId), ['obs-coffee-old', 'obs-coffee-new']);
+    assert.deepEqual(report?.points.at(-1), {
+      observationId: 'obs-coffee-new',
+      productId: 'product-coffee',
+      productSlug: 'bryggkaffe-450g',
+      productName: 'Bryggkaffe mellanrost 450 g',
+      chainId: 'chain-willys',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      storeId: 'store-willys',
+      storeSlug: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      priceType: 'promotion',
+      price: 49.9,
+      regularPrice: 59.9,
+      unitPrice: 110.89,
+      currency: 'SEK',
+      memberRequired: false,
+      observedAt: '2026-05-19T09:00:00.000Z',
+      confidence: 0.94,
+      provenance: { source: 'open_prices', rawSnapshotRef: 's3://raw/coffee-new.html' }
+    });
     assert.deepEqual(report?.priceTypes, ['promotion', 'shelf']);
     assert.equal(report?.summary?.latestPrice, 49.9);
     assert.equal(report?.summary?.changeFromPrevious, -10);

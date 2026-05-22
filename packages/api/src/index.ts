@@ -685,7 +685,11 @@ export type ProductPriceHistoryObservationInput = {
   productSlug: string;
   productName: string;
   chainId: string;
+  chainSlug?: string;
+  chainName?: string;
   storeId?: string;
+  storeSlug?: string;
+  storeName?: string;
   sourceRunId?: string;
   rawRecordId?: string;
   retailerProductRef?: string;

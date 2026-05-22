@@ -24,7 +24,11 @@ type ProductRow = {
 type PriceHistoryRow = {
   id: string;
   chain_id: string;
+  chain_slug: string | null;
+  chain_name: string | null;
   store_id: string | null;
+  store_slug: string | null;
+  store_name: string | null;
   source_run_id: string | null;
   raw_record_id: string | null;
   retailer_product_ref: string | null;
@@ -83,34 +87,40 @@ export class PriceHistoryService {
     if (!product) return null;
 
     const rows = await this.postgres.query<PriceHistoryRow>(
-      `select id,
-              chain_id,
-              store_id,
-              source_run_id,
-              raw_record_id,
-              retailer_product_ref,
-              price_type,
-              price,
-              regular_price,
-              unit_price,
-              currency,
-              quantity,
-              quantity_unit,
-              promotion_text,
-              promotion_starts_on,
-              promotion_ends_on,
-              member_required,
-              observed_at,
-              valid_from,
-              valid_until,
-              confidence,
-              provenance
+      `select observations.id::text as id,
+              observations.chain_id::text as chain_id,
+              chains.slug as chain_slug,
+              chains.name as chain_name,
+              observations.store_id::text as store_id,
+              stores.slug as store_slug,
+              stores.name as store_name,
+              observations.source_run_id::text as source_run_id,
+              observations.raw_record_id::text as raw_record_id,
+              observations.retailer_product_ref,
+              observations.price_type,
+              observations.price,
+              observations.regular_price,
+              observations.unit_price,
+              observations.currency,
+              observations.quantity,
+              observations.quantity_unit,
+              observations.promotion_text,
+              observations.promotion_starts_on,
+              observations.promotion_ends_on,
+              observations.member_required,
+              observations.observed_at,
+              observations.valid_from,
+              observations.valid_until,
+              observations.confidence,
+              observations.provenance
        from observations
-       where product_id = $1
-         and ($2::text is null or price_type = $2)
-         and ($3::timestamptz is null or observed_at >= $3::timestamptz)
-         and ($4::timestamptz is null or observed_at <= $4::timestamptz)
-       order by observed_at desc, chain_id, store_id, price_type, id
+       left join chains on chains.id = observations.chain_id
+       left join stores on stores.id = observations.store_id
+       where observations.product_id = $1
+         and ($2::text is null or observations.price_type = $2)
+         and ($3::timestamptz is null or observations.observed_at >= $3::timestamptz)
+         and ($4::timestamptz is null or observations.observed_at <= $4::timestamptz)
+       order by observations.observed_at desc, chains.slug, stores.name, observations.price_type, observations.id
        limit $5`,
       [
         product.id,
@@ -135,7 +145,11 @@ export class PriceHistoryService {
       productSlug: product.slug,
       productName: product.canonical_name,
       chainId: row.chain_id,
+      ...(row.chain_slug ? { chainSlug: row.chain_slug } : {}),
+      ...(row.chain_name ? { chainName: row.chain_name } : {}),
       ...(row.store_id ? { storeId: row.store_id } : {}),
+      ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
+      ...(row.store_name ? { storeName: row.store_name } : {}),
       ...(row.source_run_id ? { sourceRunId: row.source_run_id } : {}),
       ...(row.raw_record_id ? { rawRecordId: row.raw_record_id } : {}),
       ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {}),
