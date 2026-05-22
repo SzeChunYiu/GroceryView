@@ -1405,6 +1405,26 @@ export const retailerHandoffContract = {
   ]
 };
 
+export const retailerDeepLinkQualityContract = {
+  endpoint: '/api/basket/handoff/{retailerId}/deep-link-quality',
+  title: 'Deep-link quality scoring',
+  status: 'core_planner_contract',
+  corePlanner: 'scoreRetailerDeepLinkQuality',
+  evidenceFields: ['productUrl', 'httpStatus', 'canonicalProductId', 'lastCheckedAt', 'matched'],
+  qualityLabels: [
+    { label: 'verified', requirement: 'verified URL, HTTP 200, and canonical product evidence match the GroceryView product id' },
+    { label: 'unchecked', requirement: 'URL exists but needs current HTTP and canonical product verification' },
+    { label: 'broken', requirement: 'retailer URL returned a non-2xx/3xx status' },
+    { label: 'mismatch', requirement: 'canonicalProductId points to another retailer product' },
+    { label: 'missing', requirement: 'no verified retailer product URL is available for this basket line' }
+  ],
+  guardrails: [
+    'Deep-link quality is not checkout confirmation, purchase completion, inventory reservation, or delivery booking.',
+    'Broken, mismatched, or missing links must fall back to copy-list or retailer app search.',
+    'A link is not labeled verified unless the canonicalProductId agrees with the GroceryView product id.'
+  ]
+};
+
 export const retailerBasketTransferContract = {
   endpoint: '/api/basket/transfer/{retailerId}',
   title: 'Secure basket transfer preflight',

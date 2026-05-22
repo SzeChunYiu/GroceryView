@@ -6,6 +6,7 @@ import {
   planBasketImportExport,
   planBasketTripCost,
   planRetailerBasketTransferSession,
+  scoreRetailerDeepLinkQuality,
   planRetailerHandoff,
   planRecurringBasketDigest,
   summarizeLocalOfferBasket,
@@ -373,6 +374,73 @@ describe('planRetailerHandoff', () => {
       'Unsupported basket transfer falls back to copyable lists and product deep links.',
       'Missing product links remain visible and require shopper review before retailer handoff.'
     ]);
+  });
+});
+
+describe('scoreRetailerDeepLinkQuality', () => {
+  it('scores retailer deep links by verified URL, HTTP, and canonical product evidence', () => {
+    const report = scoreRetailerDeepLinkQuality({
+      retailerId: 'willys',
+      retailerName: 'Willys',
+      asOf: '2026-05-22T09:00:00.000Z',
+      links: [
+        {
+          productId: 'coffee',
+          productName: 'Coffee',
+          productUrl: 'https://www.willys.se/coffee',
+          matched: true,
+          httpStatus: 200,
+          canonicalProductId: 'coffee',
+          lastCheckedAt: '2026-05-22T08:50:00.000Z'
+        },
+        {
+          productId: 'milk',
+          productName: 'Milk',
+          productUrl: 'https://www.willys.se/milk',
+          matched: true,
+          httpStatus: 404,
+          canonicalProductId: 'milk',
+          lastCheckedAt: '2026-05-22T08:50:00.000Z'
+        },
+        {
+          productId: 'butter',
+          productName: 'Butter',
+          matched: false
+        }
+      ]
+    });
+
+    assert.equal(report.status, 'limited');
+    assert.equal(report.readyLinkCount, 1);
+    assert.equal(report.brokenLinkCount, 1);
+    assert.equal(report.unmatchedLineCount, 1);
+    assert.equal(report.rows[0]?.quality, 'verified');
+    assert.equal(report.rows[1]?.quality, 'broken');
+    assert.equal(report.rows[2]?.quality, 'missing');
+    assert.match(report.guardrails.join(' '), /not checkout confirmation/i);
+  });
+
+  it('requires canonical product agreement before calling a link verified', () => {
+    const report = scoreRetailerDeepLinkQuality({
+      retailerId: 'coop',
+      retailerName: 'Coop',
+      asOf: '2026-05-22T09:00:00.000Z',
+      links: [
+        {
+          productId: 'coffee',
+          productName: 'Coffee',
+          productUrl: 'https://www.coop.se/tea',
+          matched: true,
+          httpStatus: 200,
+          canonicalProductId: 'tea',
+          lastCheckedAt: '2026-05-22T08:50:00.000Z'
+        }
+      ]
+    });
+
+    assert.equal(report.status, 'blocked');
+    assert.equal(report.rows[0]?.quality, 'mismatch');
+    assert.equal(report.rows[0]?.reason, 'Retailer canonical product id does not match the GroceryView product id.');
   });
 });
 
