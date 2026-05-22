@@ -8926,7 +8926,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
   {
     "barcode": "6408432061233",
     "name": "Smör normalsaltat",
-    "brands": "Valio",
+    "brands": "Valio, Valio Oy, Valio Sverige AB",
     "quantity": "500g",
     "categories": [
       "en:dairies",
@@ -8943,7 +8943,7 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     "nutriscoreGrade": "e",
     "nutritionPer100g": {
       "energyKj": 2984,
-      "energyKcal": 7313.57552581261,
+      "energyKcal": 713,
       "fat": 80,
       "saturatedFat": 45,
       "carbohydrates": 0.8,
