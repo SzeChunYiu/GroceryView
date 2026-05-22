@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { categorySummaries, formatPct, formatSek, immigrantAisleFinder } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/categories');
+}
 
 export default function CategoriesIndexPage() {
   return (

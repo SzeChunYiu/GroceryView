@@ -1,5 +1,10 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { basketTripCostContract, budgetCheapestStoreRoutingPlanner, elderlyNearestDeliveryPlanner, fulfillmentSlotsContract } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/shopping-trips');
+}
 
 const titles: Record<string, string> = {
   'weekly-basket': 'Weekly basket planner',

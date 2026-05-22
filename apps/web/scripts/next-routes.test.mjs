@@ -483,6 +483,9 @@ describe('verified-data UI', () => {
     const nav = await read('src/components/app-nav.tsx');
     const shell = await read('src/components/market-shell.tsx');
     const page = await read('src/app/page.tsx');
+    const seo = await read('src/lib/seo.ts');
+    const homeMetadataSource = `${page}
+${seo}`;
     assert.match(globals, /radial-gradient/);
     assert.match(nav, /Verified grocery intelligence/);
     assert.match(shell, /zero placeholder rows/);
@@ -525,13 +528,13 @@ describe('verified-data UI', () => {
     assert.match(shell, /homepageMapChainIndex\.map/);
     assert.match(shell, /mapChainIndexScores\.slice/);
     assert.match(shell, /chain\.overallIndex\.toFixed/);
-    assert.match(page, /GroceryView verified grocery snapshot/);
-    assert.match(page, /product browsing/);
-    assert.match(page, /fresh OpenPrices observations/);
-    assert.match(page, /source route mapping/);
-    assert.match(page, /catalogue savings/);
-    assert.match(page, /map chain index signals/);
-    assert.match(page, /gated feature readiness/);
+    assert.match(homeMetadataSource, /GroceryView verified grocery snapshot/);
+    assert.match(homeMetadataSource, /product browsing/);
+    assert.match(homeMetadataSource, /fresh OpenPrices observations/);
+    assert.match(homeMetadataSource, /source route mapping/);
+    assert.match(homeMetadataSource, /catalogue savings/);
+    assert.match(homeMetadataSource, /map chain index signals/);
+    assert.match(homeMetadataSource, /gated feature readiness/);
   });
 
   it('colors map store markers by chain index and highlights the cheapest nearby chain', async () => {
@@ -829,6 +832,70 @@ describe('verified-data UI', () => {
     assert.match(robots, /disallow: \[/);
     assert.match(robots, /\/account/);
     assert.match(robots, /\/login/);
+  });
+
+  it('ships canonical generateMetadata coverage for every app route', async () => {
+    const routePages = [
+      'src/app/page.tsx',
+      'src/app/account/page.tsx',
+      'src/app/account/profile/page.tsx',
+      'src/app/basket-ideas/page.tsx',
+      'src/app/catalogue-savings/page.tsx',
+      'src/app/categories/page.tsx',
+      'src/app/categories/[slug]/page.tsx',
+      'src/app/chain-coverage/page.tsx',
+      'src/app/chain-index/page.tsx',
+      'src/app/compare/page.tsx',
+      'src/app/coupon-stacks/page.tsx',
+      'src/app/data-sources/page.tsx',
+      'src/app/deals/page.tsx',
+      'src/app/household/page.tsx',
+      'src/app/login/page.tsx',
+      'src/app/map/page.tsx',
+      'src/app/meal-planner/page.tsx',
+      'src/app/nutrition-value/page.tsx',
+      'src/app/openprices-depth/page.tsx',
+      'src/app/pantry-planner/page.tsx',
+      'src/app/price-reports/page.tsx',
+      'src/app/privacy/page.tsx',
+      'src/app/products/page.tsx',
+      'src/app/products/[slug]/page.tsx',
+      'src/app/savings-dashboard/page.tsx',
+      'src/app/scanner/page.tsx',
+      'src/app/shopping-trips/page.tsx',
+      'src/app/store-coverage/page.tsx',
+      'src/app/stores/page.tsx',
+      'src/app/stores/[slug]/page.tsx',
+      'src/app/unit-price-alerts/page.tsx',
+      'src/app/watchlist/page.tsx',
+      'src/app/weekly-basket/page.tsx'
+    ];
+    const seo = await read('src/lib/seo.ts');
+
+    assert.match(seo, /import type \{ Metadata \} from 'next'/);
+    assert.match(seo, /siteUrl = 'https:\/\/grocery-web-mu\.vercel\.app'/);
+    assert.match(seo, /alternates: \{ canonical:/);
+    assert.match(seo, /openGraph:/);
+    assert.match(seo, /twitter:/);
+    assert.match(seo, /robots:/);
+    assert.match(seo, /GroceryView/);
+
+    for (const page of routePages) {
+      const source = await read(page);
+      assert.match(source, /generateMetadata/, `${page} should export generateMetadata`);
+      assert.match(source, /routeMetadata|metadataForProduct|metadataForCategory|metadataForStore/, `${page} should use the shared SEO metadata helpers`);
+      assert.doesNotMatch(source, /export const metadata = /, `${page} should avoid stale metadata objects`);
+    }
+
+    const product = await read('src/app/products/[slug]/page.tsx');
+    const category = await read('src/app/categories/[slug]/page.tsx');
+    const store = await read('src/app/stores/[slug]/page.tsx');
+    assert.match(product, /metadataForProduct/);
+    assert.match(product, /findProduct/);
+    assert.match(category, /metadataForCategory/);
+    assert.match(category, /categoryLabels/);
+    assert.match(store, /metadataForStore/);
+    assert.match(store, /findStore/);
   });
 
   it('surfaces adaptive total and unit price product cards with a compare-mode toggle', async () => {

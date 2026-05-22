@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/compare');
+}
 
 export default function ComparePage() {
   return (

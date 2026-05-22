@@ -1,4 +1,9 @@
 import { NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/account/profile');
+}
 
 export const dynamic = 'force-static';
 

@@ -1,4 +1,9 @@
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/login');
+}
 
 export default function LoginPage() {
   return (

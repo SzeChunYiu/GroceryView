@@ -1,4 +1,9 @@
 import { NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/privacy');
+}
 
 const titles: Record<string, string> = {
   'weekly-basket': 'Weekly basket planner',

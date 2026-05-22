@@ -12,6 +12,14 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
+import { metadataForProduct } from '@/lib/seo';
+
+export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+  const { slug } = await params;
+  const product = findProduct(slug);
+  if (!product) notFound();
+  return metadataForProduct(product);
+}
 
 const REQUIRED_CHAIN_COVERAGE = 6;
 const smartSwapPrivateLabelPreference = {

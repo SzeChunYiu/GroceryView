@@ -1,5 +1,10 @@
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract } from '@/lib/verified-data';
+
+export function generateMetadata() {
+  return routeMetadata('/account');
+}
 
 export default function AccountPage() {
   return (

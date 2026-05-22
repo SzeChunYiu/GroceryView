@@ -3,6 +3,11 @@ import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryvie
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { buildBrandTierPriceObservations, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
 import { categorySummaries, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/chain-index');
+}
 
 const brandTierSummary = calculateBrandTierIndices(buildBrandTierPriceObservations());
 const matchedBasketObservations = buildMatchedBasketChainPriceObservations();

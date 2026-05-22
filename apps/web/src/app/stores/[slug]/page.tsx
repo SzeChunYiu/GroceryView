@@ -2,6 +2,14 @@ import { notFound } from 'next/navigation';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { osmStores } from '@/lib/osm-stores';
 import { findStore } from '@/lib/verified-data';
+import { metadataForStore } from '@/lib/seo';
+
+export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+  const { slug } = await params;
+  const store = findStore(slug);
+  if (!store) notFound();
+  return metadataForStore(store);
+}
 
 export function generateStaticParams() {
   return osmStores.slice(0, 80).map((store) => ({ slug: store.slug }));
