@@ -31,6 +31,7 @@ export const ICA_STORE_BASE_URL = 'https://handlaprivatkund.ica.se';
 export const DEFAULT_ICA_STORE_ACCOUNT_ID = '1004599';
 export const DEFAULT_ICA_STORE_NAME = 'ICA Kvantum Kungsholmen';
 export const DEFAULT_ICA_REGION_ID = '6ae1c52a-99a8-4b19-9464-dd01274df39d';
+export const DEFAULT_ICA_MAX_PRODUCTS = 200;
 
 export type FetchIcaProductsOptions = {
   fetchImpl?: typeof fetch;
@@ -45,7 +46,7 @@ export type FetchIcaProductsOptions = {
 export function buildIcaStorePromotionsUrl(
   storeAccountId = DEFAULT_ICA_STORE_ACCOUNT_ID,
   regionId = DEFAULT_ICA_REGION_ID,
-  maxPageSize = 100
+  maxPageSize = DEFAULT_ICA_MAX_PRODUCTS
 ): string {
   const url = new URL(`/stores/${storeAccountId}/api/product-listing-pages/v1/pages/promotions`, ICA_STORE_BASE_URL);
   url.searchParams.set('regionId', regionId);
@@ -64,7 +65,7 @@ export async function fetchIcaProducts(options: FetchIcaProductsOptions = {}): P
   const storeAccountId = options.storeAccountId ?? DEFAULT_ICA_STORE_ACCOUNT_ID;
   const storeName = options.storeName ?? DEFAULT_ICA_STORE_NAME;
   const regionId = options.regionId ?? DEFAULT_ICA_REGION_ID;
-  const maxRows = options.maxRows ?? 100;
+  const maxRows = options.maxRows ?? DEFAULT_ICA_MAX_PRODUCTS;
   const maxPageSize = options.maxPageSize ?? maxRows;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const sourceUrl = buildIcaStorePromotionsUrl(storeAccountId, regionId, maxPageSize);
