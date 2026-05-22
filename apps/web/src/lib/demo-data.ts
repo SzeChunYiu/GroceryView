@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, calculatePersonalGroceryInflation, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeCategoryDealLeaders } from '@groceryview/core';
+import { buildExpiryDealRadar, buildWatchlistAlerts, calculatePersonalGroceryInflation, planNotifications, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeCategoryDealLeaders, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 
 export const products = [
   {
@@ -1766,6 +1766,99 @@ export const watchlistAlerts = [
 
 
 
+
+
+export const watchlistAlertInputs: { favoriteStoreIds: string[]; watchlist: WatchlistItem[]; products: (WatchlistProductSnapshot & { source: string })[] } = {
+  favoriteStoreIds: ['willys-odenplan', 'coop-medborgarplatsen', 'hemkop-hornstull'],
+  watchlist: [
+    { productId: 'zoegas-coffee-450g', targetPrice: 52, alertDealScoreAt: 80, favoriteStoresOnly: true, allowedPriceTypes: ['member'] },
+    { productId: 'pagen-lingongrova-500g', targetPrice: 35, alertDealScoreAt: 75, favoriteStoresOnly: true, allowedPriceTypes: ['member'] },
+    { productId: 'bravo-apelsinjuice-1l', targetPrice: 24, alertDealScoreAt: 70, favoriteStoresOnly: true, allowedPriceTypes: ['member'] },
+    { productId: 'bregott-normalsaltat-600g', targetPrice: 50, alertDealScoreAt: 78, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] }
+  ],
+  products: [
+    {
+      productId: 'zoegas-coffee-450g',
+      productName: 'Zoegas Coffee 450g',
+      bestPrice: 49.9,
+      bestStoreId: 'willys-odenplan',
+      bestPriceType: 'member' as const,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9, priceType: 'member' as const },
+        { storeId: 'coop-swedenborgsgatan', storeName: 'Coop Swedenborgsgatan', price: 56.9, priceType: 'shelf' as const }
+      ],
+      dealScore: 86,
+      isNew52WeekLow: true,
+      source: 'visible member-promo row plus product price-history signal'
+    },
+    {
+      productId: 'pagen-lingongrova-500g',
+      productName: 'Pågen Lingongrova 500g',
+      bestPrice: 33.9,
+      bestStoreId: 'coop-medborgarplatsen',
+      bestPriceType: 'member' as const,
+      prices: [
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 33.9, priceType: 'member' as const },
+        { storeId: 'ica-nara-mariatorget', storeName: 'ICA Nära Mariatorget', price: 39.9, priceType: 'shelf' as const }
+      ],
+      dealScore: 79,
+      isNew52WeekLow: false,
+      source: 'visible member-promo row plus current deal-score signal'
+    },
+    {
+      productId: 'bravo-apelsinjuice-1l',
+      productName: 'Bravo Apelsinjuice 1L',
+      bestPrice: 22.9,
+      bestStoreId: 'hemkop-hornstull',
+      bestPriceType: 'member' as const,
+      prices: [
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 22.9, priceType: 'member' as const }
+      ],
+      dealScore: 74,
+      isNew52WeekLow: false,
+      source: 'visible member-promo row plus current deal-score signal'
+    },
+    {
+      productId: 'bregott-normalsaltat-600g',
+      productName: 'Bregott Normalsaltat 600g',
+      bestPrice: 56.9,
+      bestStoreId: 'willys-odenplan',
+      bestPriceType: 'member' as const,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 56.9, priceType: 'member' as const }
+      ],
+      dealScore: 61,
+      isNew52WeekLow: false,
+      source: 'visible member-promo row; shelf-only watch blocks alert because no shelf quote is present'
+    }
+  ]
+};
+
+const builtWatchlistAlerts = buildWatchlistAlerts(watchlistAlertInputs);
+
+export const watchlistAlertBoard = {
+  alerts: builtWatchlistAlerts,
+  plannedNotifications: planNotifications({
+    now: '2026-05-22T10:00:00.000Z',
+    preferences: {
+      channels: ['email', 'push'],
+      enabledTypes: ['target_price', 'stock_up_opportunity'],
+      quietHours: { startHour: 21, endHour: 7, timezone: 'Europe/Stockholm' }
+    },
+    events: builtWatchlistAlerts.map((alert) => ({
+      type: alert.type === 'target_price' ? 'target_price' as const : 'stock_up_opportunity' as const,
+      title: alert.productName,
+      body: alert.message,
+      priority: alert.severity === 'urgent' ? 'high' as const : 'normal' as const
+    }))
+  }),
+  coverage: {
+    watchedProducts: watchlistAlertInputs.watchlist.length,
+    eligiblePriceRows: watchlistAlertInputs.products.reduce((sum, product) => sum + (product.prices?.length ?? 0), 0),
+    confidence: 'medium',
+    caveat: 'Alerts use visible price rows and allowed price-type filters; rows without the requested price type are excluded instead of estimated.'
+  }
+};
 
 export const dealBasedMealInputs = [
   { productId: 'kronfagel-kycklingfile-1kg', name: 'Kronfågel Kycklingfilé 1kg', category: 'protein' as const, price: 109, dealScore: 78, source: 'visible Hemköp Skanstull weekly-deal row' },
