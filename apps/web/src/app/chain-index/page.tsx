@@ -1,10 +1,15 @@
 import Link from 'next/link';
-import { calculateBrandTierIndices } from '@groceryview/core';
+import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
-import { buildBrandTierPriceObservations } from '@/lib/chain-index-data';
+import { buildBrandTierPriceObservations, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
 import { categorySummaries, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
 
 const brandTierSummary = calculateBrandTierIndices(buildBrandTierPriceObservations());
+const matchedBasketObservations = buildMatchedBasketChainPriceObservations();
+const matchedBasketRefinedIndex = calculateChainPriceIndex([
+  ...buildChainPriceObservations(),
+  ...matchedBasketObservations
+]);
 
 function tierTone(value: number) {
   if (value < 95) return 'text-emerald-800 bg-emerald-50';
@@ -26,6 +31,39 @@ export default function ChainIndexPage() {
         <Card><p className="text-sm font-black text-slate-600">Average spread</p><p className="mt-2 text-4xl font-black text-emerald-800">{formatPct(averageSpread)}</p></Card>
         <Card><p className="text-sm font-black text-slate-600">Lowest-price wins</p><p className="mt-2 text-xl font-black text-slate-950">Willys {willysWins} · Hemköp {hemkopWins}</p></Card>
       </div>
+
+      <Card className="mt-6 border-blue-200 bg-blue-50">
+        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <Eyebrow>Matched basket refinement</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-blue-950">Refined matched-basket index</h2>
+            <p className="mt-3 text-sm leading-6 text-blue-950">
+              The chain index now calls calculateChainPriceIndex with the broad normalized feed plus buildMatchedBasketChainPriceObservations from cross-chain Axfood product matches. This keeps the 100-centred scale while raising confidence where Willys and Hemköp share exact matched basket rows.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">Matched rows</p>
+              <p className="mt-2 text-4xl font-black text-blue-950">{matchedBasketObservations.length}</p>
+              <p className="mt-2 text-sm font-semibold text-blue-900">Exact cross-chain observations added to the index input.</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">Generated from</p>
+              <p className="mt-2 text-4xl font-black text-blue-950">{matchedBasketRefinedIndex.generatedFrom}</p>
+              <p className="mt-2 text-sm font-semibold text-blue-900">Total observations after matched-basket refinement.</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {matchedBasketRefinedIndex.chains.slice(0, 6).map((chain) => (
+            <div className="rounded-2xl bg-white/80 p-4" key={chain.chainId}>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">{chain.chainId}</p>
+              <p className="mt-2 text-3xl font-black text-blue-950">{chain.overallIndex.toFixed(1)}</p>
+              <p className="mt-1 text-sm font-semibold text-blue-900">{chain.confidence} confidence · {chain.categoriesCovered} categories</p>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
