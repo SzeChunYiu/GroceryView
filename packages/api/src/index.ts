@@ -116,6 +116,46 @@ export type ProductCheapestNow = {
   guardrails: string[];
 };
 
+export type ProductLatestPriceConfidence = 'high' | 'medium' | 'low';
+
+export type ProductLatestPriceInput = {
+  observationId?: string;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  storeSlug?: string;
+  storeName?: string;
+  chainSlug?: string;
+  chainName?: string;
+  price?: number;
+  unitPrice?: number;
+  currency?: string;
+  priceType?: ProductPriceHistoryPriceType;
+  confidence?: number;
+  observedAt?: string;
+  provenance?: Record<string, unknown>;
+};
+
+export type ProductLatestPrice = {
+  observationId: string;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  storeId: string;
+  storeName: string;
+  chain: string;
+  chainName: string;
+  price: number;
+  unitPrice: number;
+  currency: 'SEK';
+  priceType: ProductPriceHistoryPriceType;
+  confidence: ProductLatestPriceConfidence;
+  confidenceScore: number;
+  observedAt: string;
+  sourceType: string;
+  provenance: Record<string, unknown>;
+};
+
 export type ProductCheapestNowPriceRow = {
   productId: string;
   productSlug: string;
@@ -1898,6 +1938,51 @@ function cheapestByChain(product: ProductDetail): ProductCheapestNowChainPrice[]
     }
   }
   return [...byChain.values()].sort((left, right) => left.packagePrice - right.packagePrice || left.chain.localeCompare(right.chain));
+}
+
+function confidenceLabel(confidence: number): ProductLatestPriceConfidence {
+  if (confidence >= 0.9) return 'high';
+  if (confidence >= 0.75) return 'medium';
+  return 'low';
+}
+
+export function buildProductLatestPrices(rows: ProductLatestPriceInput[]): ProductLatestPrice[] {
+  return rows.flatMap((row): ProductLatestPrice[] => {
+    if (
+      !row.observationId ||
+      !row.storeSlug ||
+      !row.storeName ||
+      !row.chainSlug ||
+      !row.chainName ||
+      row.price === undefined ||
+      row.unitPrice === undefined ||
+      !row.priceType ||
+      row.confidence === undefined ||
+      !row.observedAt
+    ) {
+      return [];
+    }
+    const provenance = row.provenance ?? {};
+    return [{
+      observationId: row.observationId,
+      productId: row.productSlug,
+      productSlug: row.productSlug,
+      productName: row.productName,
+      storeId: row.storeSlug,
+      storeName: row.storeName,
+      chain: row.chainSlug,
+      chainName: row.chainName,
+      price: roundPrice(row.price),
+      unitPrice: roundPrice(row.unitPrice),
+      currency: 'SEK',
+      priceType: row.priceType,
+      confidence: confidenceLabel(row.confidence),
+      confidenceScore: row.confidence,
+      observedAt: row.observedAt,
+      sourceType: typeof provenance.sourceType === 'string' ? provenance.sourceType : 'latest_prices',
+      provenance
+    }];
+  }).sort((left, right) => left.price - right.price || left.storeName.localeCompare(right.storeName) || left.priceType.localeCompare(right.priceType));
 }
 
 export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]): ProductCheapestNow | null {
