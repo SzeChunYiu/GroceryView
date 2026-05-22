@@ -749,6 +749,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
+  it('surfaces deal-hunter specialty and premium tier tracking from the real brand-tier index', async () => {
+    const route = await read('src/app/deals/page.tsx');
+
+    assert.match(route, /calculateBrandTierIndices/);
+    assert.match(route, /buildBrandTierPriceObservations/);
+    assert.match(route, /premiumTierTracking/);
+    assert.match(route, /Specialty & premium tier tracking/);
+    assert.match(route, /premiumGapPercent/);
+    assert.match(route, /premium tier/i);
+    assert.match(route, /specialty basket/i);
+    assert.match(route, /not a forecast/i);
+    assert.match(route, /observed brand-tier basket/i);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
   it('surfaces account-safe custom price alert thresholds on the watchlist route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/watchlist/page.tsx');
