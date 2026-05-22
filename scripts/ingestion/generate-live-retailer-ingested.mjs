@@ -40,7 +40,7 @@ const cityGrossProducts = await fetchCityGrossProductsForAllStores({
 await writeCityGross(cityGrossProducts);
 
 const lidlStoreOffers = await fetchLidlOffersForAllStores({
-  maxStores: 6,
+  maxStores: 20,
   offerPaths: LIDL_OFFER_PATHS,
   maxRows: 150,
   retrievedAt
