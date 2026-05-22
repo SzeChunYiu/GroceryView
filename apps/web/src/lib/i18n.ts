@@ -15,6 +15,8 @@ import {
 
 type GroceryMessages = typeof svMessages;
 export type LanguageAccessLocale = SupportedLocale | 'ar' | 'so';
+export const supportedCurrencies = ['SEK', 'NOK', 'DKK', 'EUR', 'ISK'] as const;
+export type SupportedCurrency = (typeof supportedCurrencies)[number];
 
 export type LocaleOption = {
   code: LanguageAccessLocale;
@@ -22,7 +24,7 @@ export type LocaleOption = {
   nativeLabel: string;
   htmlLang: string;
   dir: 'ltr' | 'rtl';
-  currency: 'SEK';
+  currency: SupportedCurrency;
   status: 'native_reviewed' | 'blocked_native_review_required';
 };
 
@@ -84,6 +86,56 @@ export function localeFromBrowserLanguages(languages: readonly string[] | undefi
 
 export function localeOptionFor(code: LanguageAccessLocale): LocaleOption {
   return languageAccessOptions.find((locale) => locale.code === code) ?? languageAccessOptions[0]!;
+}
+
+export function normalizeCurrency(value: string | null | undefined): SupportedCurrency {
+  const normalized = value?.trim().toUpperCase();
+  return supportedCurrencies.includes(normalized as SupportedCurrency) ? normalized as SupportedCurrency : 'SEK';
+}
+
+export function currencyFromObservation(observation: { currency?: string | null }): SupportedCurrency {
+  return normalizeCurrency(observation.currency);
+}
+
+type LocalizedFormatOptions = {
+  locale?: LanguageAccessLocale | null;
+  currency?: string | null;
+  maximumFractionDigits?: number;
+};
+
+function localeOptionForFormat(locale: LanguageAccessLocale | null | undefined) {
+  return localeOptionFor(locale ?? defaultLocale);
+}
+
+export function formatLocalizedMoney(value: number | null | undefined, options: LocalizedFormatOptions = {}) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 'Not reported';
+  const localeOption = localeOptionForFormat(options.locale);
+  return new Intl.NumberFormat(localeOption.htmlLang, {
+    style: 'currency',
+    currency: normalizeCurrency(options.currency ?? localeOption.currency),
+    maximumFractionDigits: options.maximumFractionDigits ?? 2
+  }).format(value);
+}
+
+export function formatLocalizedDate(value: string | Date | null | undefined, options: { locale?: LanguageAccessLocale | null } = {}) {
+  if (!value) return 'Not reported';
+  const date = typeof value === 'string' ? new Date(value.includes('T') ? value : `${value}T00:00:00.000Z`) : value;
+  if (Number.isNaN(date.getTime())) return 'Not reported';
+  const localeOption = localeOptionForFormat(options.locale);
+  return new Intl.DateTimeFormat(localeOption.htmlLang, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC'
+  }).format(date);
+}
+
+export function formatLocalizedUnitPrice(
+  value: number | null | undefined,
+  options: LocalizedFormatOptions & { unit: string }
+) {
+  const money = formatLocalizedMoney(value, options);
+  return money === 'Not reported' ? money : `${money}/${options.unit}`;
 }
 
 export const localizedShellCopy = supportedLocales.map((locale) => {

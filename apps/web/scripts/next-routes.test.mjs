@@ -2401,4 +2401,28 @@ ${seo}`;
     assert.match(arRoute, /BlockedLocalePage/);
     assert.match(soRoute, /BlockedLocalePage/);
   });
+
+  it('ships locale-aware money date and unit formatters for observation currencies', async () => {
+    const i18n = await read('src/lib/i18n.ts');
+    const verified = await read('src/lib/verified-data.ts');
+    const marketShell = await read('src/components/market-shell.tsx');
+
+    assert.match(i18n, /supportedCurrencies = \['SEK', 'NOK', 'DKK', 'EUR', 'ISK'\]/);
+    assert.match(i18n, /export type SupportedCurrency/);
+    assert.match(i18n, /normalizeCurrency/);
+    assert.match(i18n, /currencyFromObservation/);
+    assert.match(i18n, /formatLocalizedMoney/);
+    assert.match(i18n, /formatLocalizedDate/);
+    assert.match(i18n, /formatLocalizedUnitPrice/);
+    assert.match(i18n, /Intl\.NumberFormat\(localeOption\.htmlLang/);
+    assert.match(verified, /formatLocalizedMoney/);
+    assert.match(verified, /formatLocalizedDate/);
+    assert.match(verified, /formatLocalizedUnitPrice/);
+    assert.match(verified, /localeFormattingShowcase/);
+    assert.match(verified, /currencyFromObservation\(\{ currency: 'SEK' \}\)/);
+    assert.match(marketShell, /localeFormattingShowcase/);
+    assert.match(marketShell, /Multi-currency display follows observation currency/);
+    assert.match(marketShell, /SEK · NOK · DKK · EUR · ISK/);
+    assert.match(marketShell, /No currency conversion or fake price/);
+  });
 });

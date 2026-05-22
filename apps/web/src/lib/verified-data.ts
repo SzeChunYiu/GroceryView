@@ -9,6 +9,14 @@ import { lidlStoreOffers, lidlSource } from './ingested/lidl';
 import { matpriskollenOffers } from './ingested/matpriskollen';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { osmStores } from './osm-stores';
+import {
+  currencyFromObservation,
+  defaultLocale,
+  formatLocalizedDate,
+  formatLocalizedMoney,
+  formatLocalizedUnitPrice,
+  supportedCurrencies
+} from './i18n';
 
 export const snapshot = {
   retrievedLabel: '20-21 May 2026',
@@ -18,11 +26,11 @@ export const snapshot = {
   osmSource: 'OpenStreetMap Overpass Sweden extract'
 };
 
-const sek = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 });
+const observedSnapshotCurrency = currencyFromObservation({ currency: 'SEK' });
 const pct = new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 });
 
 export function formatSek(value: number | null | undefined) {
-  return typeof value === 'number' && Number.isFinite(value) ? sek.format(value) : 'Not reported';
+  return formatLocalizedMoney(value, { locale: defaultLocale, currency: observedSnapshotCurrency });
 }
 
 export function formatPct(value: number | null | undefined) {
@@ -1055,7 +1063,11 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     brand: isChainProduct ? product.brand : product.brands || 'Brand not reported',
     productKind,
     totalPriceLabel: formatSek(totalPrice),
-    unitPriceLabel: normalizedUnit ? `${formatSek(normalizedUnit.unitPrice)} / ${normalizedUnit.unitLabel.replace('kr/', '')}` : 'Unit price not reported',
+    unitPriceLabel: normalizedUnit ? formatLocalizedUnitPrice(normalizedUnit.unitPrice, {
+      locale: defaultLocale,
+      currency: observedSnapshotCurrency,
+      unit: normalizedUnit.unitLabel.replace('kr/', '')
+    }) : 'Unit price not reported',
     packageLabel: normalizedUnit?.packageLabel || packageText || 'Package size not reported',
     sourceLabel: isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
     confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
@@ -1066,6 +1078,27 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
   };
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);
+
+const localeFormattingSampleCard = adaptiveProductCards.find((card) => card.unitSortPrice !== null) ?? adaptiveProductCards[0];
+const localeFormattingSampleDate = freshestOpenPrices[0]?.lastObservedAt ?? null;
+
+export const localeFormattingShowcase = supportedCurrencies.map((currency) => {
+  const hasObservedRows = currency === observedSnapshotCurrency;
+  return {
+    currency,
+    status: hasObservedRows ? 'observed from OpenPrices currency=SEK' : 'awaiting observations.currency rows',
+    moneyLabel: hasObservedRows
+      ? formatLocalizedMoney(localeFormattingSampleCard?.totalSortPrice, { locale: defaultLocale, currency })
+      : 'No observed prices in this currency',
+    unitPriceLabel: hasObservedRows
+      ? localeFormattingSampleCard?.unitPriceLabel ?? 'Unit price not reported'
+      : 'No unit price until observation lands',
+    dateLabel: hasObservedRows
+      ? formatLocalizedDate(localeFormattingSampleDate, { locale: defaultLocale })
+      : 'No observed date',
+    guardrail: hasObservedRows ? 'Uses observed SEK price rows only' : 'No currency conversion or fake price'
+  };
+});
 
 const digitalCatalogueSampleOffers = icaReklambladOffers
   .filter((offer) => offer.priceText && offer.sourceUrl && offer.flyerUrl && offer.flyerPdfUrl)
