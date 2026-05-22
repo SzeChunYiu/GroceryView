@@ -1147,6 +1147,47 @@ describe('createGroceryViewApi', () => {
     assert.match(report.guardrails[0], /explicit shopper consent/);
   });
 
+  it('persists account-scoped retailer basket import reviews before adding unmatched rows', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.importBasketFromRetailerPage('user-1', {
+      source: {
+        sourceKind: 'browser_extension',
+        retailerId: 'willys',
+        origin: 'https://www.willys.se',
+        capturedAt: '2026-05-22T09:45:00.000Z',
+        consentGranted: true
+      },
+      capturedLines: [
+        { rawName: 'Retailer-only bakery bun', quantity: 3 },
+        { rawName: 'Zoégas Coffee 450g', productId: 'coffee', quantity: 1 }
+      ]
+    });
+
+    assert.equal(report.reviewItemCount, 1);
+    const queue = api.getBasketImportReviewQueue('user-1');
+    assert.equal(queue.userId, 'user-1');
+    assert.equal(queue.openItemCount, 1);
+    assert.equal(queue.items[0]?.rawName, 'Retailer-only bakery bun');
+    assert.equal(queue.items[0]?.status, 'open');
+    assert.equal(queue.items[0]?.retailerId, 'willys');
+    assert.match(queue.guardrails[0], /account-bound/);
+
+    const reviewItemId = queue.items[0]!.reviewItemId;
+    const decision = api.resolveBasketImportReviewItem('user-1', reviewItemId, { decision: 'accept_as_product', productId: 'milk', quantity: 3 });
+    assert.equal(decision.status, 'accepted');
+    assert.deepEqual(api.getBasket('user-1').items, [
+      { productId: 'coffee', quantity: 1 },
+      { productId: 'milk', quantity: 3 }
+    ]);
+    assert.equal(api.getBasketImportReviewQueue('user-1').openItemCount, 0);
+
+    assert.throws(
+      () => api.resolveBasketImportReviewItem('user-2', reviewItemId, { decision: 'dismiss' }),
+      /Basket import review item not found/
+    );
+  });
+
   it('returns retailer handoff plans with support matrix fallbacks and checkout guardrails', () => {
     const api = createGroceryViewApi();
 

@@ -871,6 +871,27 @@ describe('createHttpHandler', () => {
     const importedBasket = await json(await handle(new Request('http://localhost/api/basket/current?userId=user-import'))) as { items: Array<{ productId: string; quantity: number }> };
     assert.deepEqual(importedBasket.items, [{ productId: 'coffee', quantity: 1 }, { productId: 'milk', quantity: 2 }]);
 
+    const importReview = await json(await handle(new Request('http://localhost/api/basket/import-review?userId=user-import'))) as {
+      userId: string;
+      openItemCount: number;
+      items: Array<{ reviewItemId: string; rawName: string; status: string }>;
+      guardrails: string[];
+    };
+    assert.equal(importReview.userId, 'user-import');
+    assert.equal(importReview.openItemCount, 1);
+    assert.equal(importReview.items[0]?.rawName, 'Retailer-only bakery bun');
+    assert.match(importReview.guardrails[0] ?? '', /account-bound/i);
+
+    const importReviewDecision = await handle(new Request(`http://localhost/api/basket/import-review/${encodeURIComponent(importReview.items[0]!.reviewItemId)}/decisions?userId=user-import`, {
+      method: 'POST',
+      body: JSON.stringify({ decision: 'accept_as_product', productId: 'coffee', quantity: 3 })
+    }));
+    assert.equal(importReviewDecision.status, 200);
+    const importReviewDecisionBody = await json(importReviewDecision) as { status: string; resolvedProductId: string };
+    assert.equal(importReviewDecisionBody.status, 'accepted');
+    assert.equal(importReviewDecisionBody.resolvedProductId, 'coffee');
+    assert.equal((await json(await handle(new Request('http://localhost/api/basket/import-review?userId=user-import'))) as { openItemCount: number }).openItemCount, 0);
+
     const slots = await json(await handle(new Request('http://localhost/api/basket/fulfillment-slots/willys/willys-odenplan?userId=user-1'))) as {
       userId: string;
       status: string;

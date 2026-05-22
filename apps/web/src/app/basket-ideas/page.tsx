@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { studentBasicsBoard } from '@/lib/demo-data';
-import { basketImportExportContract, retailerHandoffContract } from '@/lib/verified-data';
+import { basketImportExportContract, basketImportReviewContract, retailerHandoffContract } from '@/lib/verified-data';
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
@@ -93,6 +93,34 @@ export default function BasketIdeasPage() {
             <p className="font-black text-slate-950">Static snapshot remains closed</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
               {basketImportExportContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
+            </ul>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Private review queue</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Account-bound import review: {basketImportReviewContract.title}</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          Unmatched retailer rows stay out of the basket until a signed-in shopper accepts a verified GroceryView match through <code className="rounded bg-white/80 px-1 py-0.5 text-cyan-900">{basketImportReviewContract.decisionEndpoint}</code>. The open queue is fetched from <code className="rounded bg-white/80 px-1 py-0.5 text-cyan-900">{basketImportReviewContract.endpoint}</code> and remains account-bound.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div>
+            <p className="font-black text-slate-950">Required inputs</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {basketImportReviewContract.requiredInputs.map((input) => <li key={input}>{input}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Shipped behavior</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {basketImportReviewContract.shippedBehaviors.map((behavior) => <li key={behavior}>{behavior}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Static snapshot remains closed</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {basketImportReviewContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
             </ul>
           </div>
         </div>

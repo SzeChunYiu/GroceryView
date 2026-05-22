@@ -95,6 +95,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces the account-bound basket import review contract on the basket ideas route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/basket-ideas/page.tsx');
+
+    assert.match(verified, /export const basketImportReviewContract = /);
+    assert.match(verified, /\/api\/basket\/import-review/);
+    assert.match(route, /basketImportReviewContract/);
+    assert.match(route, /Account-bound import review/);
+    assert.match(route, /unmatched retailer rows stay out of the basket/i);
+    assert.match(route, /signed-in shopper accepts/i);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+    assert.match(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/basket-ideas/page.tsx');
