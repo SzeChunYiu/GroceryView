@@ -684,6 +684,22 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces an honest product vs-usual signal from its own observed history', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /priceVsUsualSignalFor/);
+    assert.match(source, /typicalPriceLabel/);
+    assert.match(source, /historyPercentile/);
+    assert.match(source, /belowTypicalPercent/);
+    assert.match(source, /vs usual signal/);
+    assert.match(source, /product's own observed 1-year history/);
+    assert.match(source, /No forecast or seasonal prediction is shown/);
+    assert.match(source, /observed-history percentile/);
+    assert.match(source, /Not enough dated observations/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces product multi-timeframe price charts using the real core chart adapter and lightweight-charts', async () => {
     const product = await read('src/app/products/[slug]/page.tsx');
     const chart = await read('src/components/price-chart-terminal.tsx');

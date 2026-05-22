@@ -54,6 +54,13 @@ function percentileForPrice(values: number[], currentPrice: number) {
   return clamp((rank / (sorted.length - 1)) * 100, 0, 100);
 }
 
+function medianFor(values: number[]) {
+  const sorted = [...values].filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
+  if (sorted.length === 0) return null;
+  const midpoint = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[midpoint - 1]! + sorted[midpoint]!) / 2 : sorted[midpoint]!;
+}
+
 function latestObservationFor(product: (typeof pricedProducts)[number]) {
   return [...product.observations].sort((a, b) => b.date.localeCompare(a.date))[0];
 }
@@ -375,6 +382,76 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
   };
 }
 
+function priceVsUsualSignalFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product || product.observations.length < 3) {
+    return {
+      available: false,
+      title: 'Not enough dated observations',
+      signalLabel: 'vs usual signal withheld',
+      currentPriceLabel: 'Not reported',
+      typicalPriceLabel: 'Not reported',
+      historyPercentile: null as number | null,
+      belowTypicalPercent: null as number | null,
+      aboveTypicalPercent: null as number | null,
+      observationCount: 0,
+      detail: "Not enough dated observations exist to compare the current price with the product's own observed 1-year history."
+    };
+  }
+
+  const latest = latestObservationFor(product);
+  const latestObservedAt = latest?.date ?? product.lastObservedAt;
+  const latestTime = Date.parse(`${latestObservedAt}T00:00:00.000Z`);
+  const oneYearAgo = latestTime - 365 * 24 * 60 * 60 * 1000;
+  const windowPoints = product.observations
+    .map((observation) => ({
+      observedAt: observation.date,
+      observedTime: Date.parse(`${observation.date}T00:00:00.000Z`),
+      price: observation.price
+    }))
+    .filter((observation) => Number.isFinite(observation.observedTime) && observation.observedTime >= oneYearAgo && observation.observedTime <= latestTime)
+    .sort((a, b) => a.observedTime - b.observedTime);
+
+  if (!latest || windowPoints.length < 3) {
+    return {
+      available: false,
+      title: 'Not enough dated observations',
+      signalLabel: 'vs usual signal withheld',
+      currentPriceLabel: latest ? formatSek(latest.price) : 'Not reported',
+      typicalPriceLabel: 'Not reported',
+      historyPercentile: null,
+      belowTypicalPercent: null,
+      aboveTypicalPercent: null,
+      observationCount: windowPoints.length,
+      detail: 'Not enough dated observations fall inside the 1-year window, so GroceryView does not infer a usual price.'
+    };
+  }
+
+  const prices = windowPoints.map((point) => point.price);
+  const typicalPrice = medianFor(prices);
+  const currentPrice = latest.price;
+  const historyPercentile = percentileForPrice(prices, currentPrice);
+  const belowTypicalPercent = typicalPrice && typicalPrice > 0 ? clamp(((typicalPrice - currentPrice) / typicalPrice) * 100, 0, 100) : 0;
+  const aboveTypicalPercent = typicalPrice && typicalPrice > 0 ? clamp(((currentPrice - typicalPrice) / typicalPrice) * 100, 0, 100) : 0;
+  const signalLabel = belowTypicalPercent > 0
+    ? `${formatPct(belowTypicalPercent)} below typical`
+    : aboveTypicalPercent > 0
+      ? `${formatPct(aboveTypicalPercent)} above typical`
+      : 'in line with typical';
+
+  return {
+    available: true,
+    title: 'vs usual signal',
+    signalLabel,
+    currentPriceLabel: formatSek(currentPrice),
+    typicalPriceLabel: formatSek(typicalPrice),
+    historyPercentile,
+    belowTypicalPercent,
+    aboveTypicalPercent,
+    observationCount: windowPoints.length,
+    detail: `Current price is at the observed-history percentile ${formatPct(historyPercentile)} versus the product's own observed 1-year history. No forecast or seasonal prediction is shown.`
+  };
+}
+
 function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceChartTerminalModel {
   const emptyWindows: PriceChartTerminalWindow[] = timeframeWindows.map((window) => ({
     label: window.label,
@@ -462,6 +539,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const smartSwaps = smartSwapRecommendationsFor(product);
   const priceHistoryBadge = priceHistoryBadgeFor(product);
   const priceHistoryRangeBadges = priceHistoryRangeBadgesFor(product);
+  const priceVsUsualSignal = priceVsUsualSignalFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
@@ -566,6 +644,33 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         <p className="mt-4 text-xs font-semibold text-slate-500">{smartSwaps.caveat}</p>
       </Card>
       <PriceChartTerminal chart={priceChartTerminal} />
+      <Card className="mt-6 overflow-hidden border-lime-200 bg-lime-50/80">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-lime-800">vs usual signal</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Price vs the product&apos;s own observed 1-year history</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Compares the latest dated OpenPrices observation with the median observed price for this product only. No forecast or seasonal prediction is shown.
+            </p>
+          </div>
+          <div className="rounded-[2rem] bg-slate-950 p-5 text-right text-white shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-300">{priceVsUsualSignal.title}</p>
+            <p className="mt-2 text-3xl font-black">{priceVsUsualSignal.signalLabel}</p>
+            <p className="mt-1 text-xs font-semibold text-slate-300">{priceVsUsualSignal.observationCount} observed points</p>
+          </div>
+        </div>
+        {priceVsUsualSignal.available ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-4">
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">Current: <span className="block text-lg font-black text-slate-950">{priceVsUsualSignal.currentPriceLabel}</span></p>
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">Typical: <span className="block text-lg font-black text-slate-950">{priceVsUsualSignal.typicalPriceLabel}</span></p>
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">observed-history percentile <span className="block text-lg font-black text-slate-950">{formatPct(priceVsUsualSignal.historyPercentile)}</span></p>
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">belowTypicalPercent <span className="block text-lg font-black text-emerald-800">{formatPct(priceVsUsualSignal.belowTypicalPercent)}</span></p>
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{priceVsUsualSignal.detail}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{priceVsUsualSignal.detail}</p>
+      </Card>
       <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
