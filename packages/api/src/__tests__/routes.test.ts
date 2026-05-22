@@ -4,6 +4,7 @@ import {
   assertPriceObservationDto,
   buildFacetedProductSearch,
   buildFlyerOfferReport,
+  buildProductCheapestNowReport,
   buildProductPriceHistoryReport,
   buildRealBasketComparison,
   createGroceryViewApi,
@@ -180,6 +181,67 @@ describe('createGroceryViewApi', () => {
     ]);
     assert.deepEqual(report.missingProductIds, ['product-missing']);
     assert.match(report.strategies[0]?.warnings[0] ?? '', /missing persisted latest_prices/i);
+  });
+
+  it('builds cheapest-now reports from persisted latest price rows', () => {
+    const report = buildProductCheapestNowReport([
+      {
+        productId: 'product-milk',
+        productSlug: 'standardmjolk-1l',
+        productName: 'Standardmjolk 3% 1 l',
+        categoryPath: ['Dairy', 'Milk'],
+        comparableUnit: 'l',
+        price: 14.9,
+        unitPrice: 14.9,
+        currency: 'SEK',
+        observedAt: '2026-05-21T09:00:00.000Z',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        storeSlug: 'willys-hemma-stockholm-torsplan',
+        storeName: 'Willys Hemma Stockholm Torsplan'
+      },
+      {
+        productId: 'product-milk',
+        productSlug: 'standardmjolk-1l',
+        productName: 'Standardmjolk 3% 1 l',
+        categoryPath: ['Dairy', 'Milk'],
+        comparableUnit: 'l',
+        price: 15.5,
+        unitPrice: 15.5,
+        currency: 'SEK',
+        observedAt: '2026-05-21T08:00:00.000Z',
+        chainSlug: 'coop',
+        chainName: 'Coop',
+        storeSlug: 'coop-odenplan',
+        storeName: 'Coop Odenplan'
+      },
+      {
+        productId: 'product-milk',
+        productSlug: 'standardmjolk-1l',
+        productName: 'Standardmjolk 3% 1 l',
+        categoryPath: ['Dairy', 'Milk'],
+        comparableUnit: 'l',
+        price: 13.9,
+        unitPrice: 13.9,
+        currency: 'SEK',
+        observedAt: '2026-05-21T10:00:00.000Z',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        storeSlug: 'willys-odenplan',
+        storeName: 'Willys Odenplan'
+      }
+    ]);
+
+    assert.equal(report?.productId, 'product-milk');
+    assert.equal(report?.cheapest?.chain, 'willys');
+    assert.equal(report?.cheapest?.storeId, 'willys-odenplan');
+    assert.deepEqual(report?.chainPrices.map((row) => [row.chain, row.packagePrice]), [
+      ['willys', 13.9],
+      ['coop', 15.5]
+    ]);
+    assert.equal(report?.chainCount, 2);
+    assert.equal(report?.observedPriceCount, 3);
+    assert.equal(report?.lastObservedAt, '2026-05-21T10:00:00.000Z');
   });
 
   it('validates canonical price observation provenance DTOs', () => {

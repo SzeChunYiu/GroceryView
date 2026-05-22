@@ -116,6 +116,22 @@ export type ProductCheapestNow = {
   guardrails: string[];
 };
 
+export type ProductCheapestNowPriceRow = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+  categoryPath: string[];
+  comparableUnit: string;
+  price?: number;
+  unitPrice?: number;
+  currency?: string;
+  observedAt?: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeSlug?: string;
+  storeName?: string;
+};
+
 export type CategoryPriceIndex = {
   id: string;
   category: string;
@@ -1882,6 +1898,65 @@ function cheapestByChain(product: ProductDetail): ProductCheapestNowChainPrice[]
     }
   }
   return [...byChain.values()].sort((left, right) => left.packagePrice - right.packagePrice || left.chain.localeCompare(right.chain));
+}
+
+export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]): ProductCheapestNow | null {
+  const product = rows[0];
+  if (!product) return null;
+
+  const byChain = new Map<string, ProductCheapestNowChainPrice>();
+  const observedAtValues: string[] = [];
+  let observedPriceCount = 0;
+
+  for (const row of rows) {
+    if (row.observedAt) observedAtValues.push(row.observedAt);
+    if (
+      row.price === undefined ||
+      row.unitPrice === undefined ||
+      !row.chainSlug ||
+      !row.storeSlug ||
+      !row.storeName
+    ) {
+      continue;
+    }
+
+    observedPriceCount += 1;
+    const candidate: ProductCheapestNowChainPrice = {
+      chain: row.chainSlug,
+      storeId: row.storeSlug,
+      storeName: row.storeName,
+      packagePrice: roundPrice(row.price),
+      comparableUnitPrice: roundPrice(row.unitPrice),
+      comparableUnit: row.comparableUnit
+    };
+    const current = byChain.get(row.chainSlug);
+    if (
+      !current ||
+      candidate.packagePrice < current.packagePrice ||
+      (candidate.packagePrice === current.packagePrice && candidate.storeName.localeCompare(current.storeName) < 0)
+    ) {
+      byChain.set(row.chainSlug, candidate);
+    }
+  }
+
+  const chainPrices = [...byChain.values()].sort((left, right) => left.packagePrice - right.packagePrice || left.chain.localeCompare(right.chain));
+
+  return {
+    productId: product.productId,
+    productName: product.productName,
+    category: product.categoryPath[0] ?? 'uncategorized',
+    currency: 'SEK',
+    cheapest: chainPrices[0] ?? null,
+    chainPrices,
+    chainCount: chainPrices.length,
+    observedPriceCount,
+    lastObservedAt: observedAtValues.sort().at(-1) ?? null,
+    guardrails: [
+      'Cheapest-now rows are calculated only from persisted latest_prices observations for the requested product.',
+      'Each chain contributes at most one current lowest package price, preserving the store that supplied it.',
+      'No missing chain or product prices are filled with synthetic estimates.'
+    ]
+  };
 }
 
 function chainIndexObservations(): ChainPriceObservation[] {
