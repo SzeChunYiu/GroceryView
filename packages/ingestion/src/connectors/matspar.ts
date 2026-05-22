@@ -51,9 +51,24 @@ export const DEFAULT_MATSPAR_SEARCH_QUERIES = [
   'banan',
   'kyckling',
   'ketchup',
-  'havregryn'
+  'havregryn',
+  'juice',
+  'flingor',
+  'mjol',
+  'olja',
+  'tomat',
+  'fisk',
+  'kottfars',
+  'korv',
+  'glass',
+  'choklad',
+  'frukt',
+  'gronsaker',
+  'godis',
+  'soppa',
+  'tacos'
 ] as const;
-export const DEFAULT_MATSPAR_MAX_ROWS = 600;
+export const DEFAULT_MATSPAR_MAX_ROWS = 1200;
 
 export type FetchMatsparProductsOptions = {
   fetchImpl?: typeof fetch;
