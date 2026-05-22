@@ -1,3 +1,4 @@
+import { AccountMutationActions } from '@/components/account-mutation-actions';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract } from '@/lib/verified-data';
@@ -42,6 +43,8 @@ export default function AccountPage() {
           </div>
         </div>
       </Card>
+
+      <AccountMutationActions />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card>
