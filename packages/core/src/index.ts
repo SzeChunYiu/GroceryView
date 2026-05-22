@@ -3420,6 +3420,189 @@ export function suggestDealBasedMeals(input: { deals: MealDeal[]; maxMealCost: n
   ];
 }
 
+export type MealCostOffer = {
+  chainId: string;
+  storeName: string;
+  productId: string;
+  productName: string;
+  packageQuantity: number;
+  packageUnit: string;
+  packagePrice: number;
+  confidence: number;
+  source: string;
+};
+
+export type MealCostIngredient = {
+  ingredientId: string;
+  label: string;
+  quantityNeeded: number;
+  unit: string;
+  offers: MealCostOffer[];
+};
+
+export type MealCostBreakdownRow = {
+  ingredientId: string;
+  label: string;
+  quantityNeeded: number;
+  unit: string;
+  selectedProductId: string;
+  productName: string;
+  chainId: string;
+  storeName: string;
+  packageQuantity: number;
+  packageUnit: string;
+  packagePrice: number;
+  ingredientCost: number;
+  confidence: number;
+  source: string;
+};
+
+export type MealCostChainOption = {
+  chainId: string;
+  storeNames: string[];
+  coveredIngredients: number;
+  ingredientCount: number;
+  coverageShare: number;
+  totalCost: number;
+  costPerServing: number;
+  averageConfidence: number;
+  eligible: boolean;
+};
+
+export type MealCostBreakdown = {
+  mealId: string;
+  title: string;
+  servings: number;
+  status: 'priced' | 'insufficient_coverage';
+  totalCost: number;
+  costPerServing: number;
+  cheapestChain: MealCostChainOption | null;
+  breakdown: MealCostBreakdownRow[];
+  chainOptions: MealCostChainOption[];
+  coverage: {
+    ingredientCount: number;
+    matchedIngredients: number;
+    offerCount: number;
+    eligibleChainCount: number;
+    minimumConfidence: number;
+  };
+  confidenceLabel: string;
+  blockedReason?: string;
+};
+
+function ingredientOfferCost(ingredient: MealCostIngredient, offer: MealCostOffer): number | null {
+  if (ingredient.unit !== offer.packageUnit) return null;
+  if (offer.packageQuantity <= 0 || offer.packagePrice < 0 || ingredient.quantityNeeded <= 0) return null;
+  return roundMoney((ingredient.quantityNeeded / offer.packageQuantity) * offer.packagePrice);
+}
+
+function mealCostRowFor(ingredient: MealCostIngredient, offer: MealCostOffer): MealCostBreakdownRow | null {
+  const ingredientCost = ingredientOfferCost(ingredient, offer);
+  if (ingredientCost === null) return null;
+  return {
+    ingredientId: ingredient.ingredientId,
+    label: ingredient.label,
+    quantityNeeded: ingredient.quantityNeeded,
+    unit: ingredient.unit,
+    selectedProductId: offer.productId,
+    productName: offer.productName,
+    chainId: offer.chainId,
+    storeName: offer.storeName,
+    packageQuantity: offer.packageQuantity,
+    packageUnit: offer.packageUnit,
+    packagePrice: offer.packagePrice,
+    ingredientCost,
+    confidence: offer.confidence,
+    source: offer.source
+  };
+}
+
+function bestMealCostRowForChain(ingredient: MealCostIngredient, chainId: string, minimumConfidence: number): MealCostBreakdownRow | null {
+  return ingredient.offers
+    .filter((offer) => offer.chainId === chainId && offer.confidence >= minimumConfidence)
+    .map((offer) => mealCostRowFor(ingredient, offer))
+    .filter((row): row is MealCostBreakdownRow => row !== null)
+    .sort((a, b) => a.ingredientCost - b.ingredientCost || b.confidence - a.confidence || a.productName.localeCompare(b.productName))[0] ?? null;
+}
+
+export function calculateMealCostBreakdown(input: {
+  mealId: string;
+  title: string;
+  servings: number;
+  ingredients: MealCostIngredient[];
+  minimumConfidence?: number;
+}): MealCostBreakdown {
+  if (!input.mealId.trim()) throw new Error('mealId is required.');
+  if (!input.title.trim()) throw new Error('title is required.');
+  if (input.servings <= 0) throw new Error('servings must be positive.');
+  const minimumConfidence = input.minimumConfidence ?? 0.5;
+  if (minimumConfidence < 0 || minimumConfidence > 1) throw new Error('minimumConfidence must be between 0 and 1.');
+  for (const ingredient of input.ingredients) {
+    if (!ingredient.ingredientId.trim()) throw new Error('ingredientId is required.');
+    if (!ingredient.label.trim()) throw new Error(`label is required for ${ingredient.ingredientId}.`);
+    if (ingredient.quantityNeeded <= 0) throw new Error(`quantityNeeded must be positive for ${ingredient.ingredientId}.`);
+  }
+
+  const chainIds = [...new Set(input.ingredients.flatMap((ingredient) => ingredient.offers.map((offer) => offer.chainId)))].sort();
+  const chainRows = new Map<string, MealCostBreakdownRow[]>();
+  const chainOptions = chainIds.map((chainId): MealCostChainOption => {
+    const rows = input.ingredients
+      .map((ingredient) => bestMealCostRowForChain(ingredient, chainId, minimumConfidence))
+      .filter((row): row is MealCostBreakdownRow => row !== null);
+    chainRows.set(chainId, rows);
+    const totalCost = roundMoney(rows.reduce((sum, row) => sum + row.ingredientCost, 0));
+    const averageConfidence = rows.length === 0 ? 0 : Math.round((rows.reduce((sum, row) => sum + row.confidence, 0) / rows.length) * 100) / 100;
+    return {
+      chainId,
+      storeNames: [...new Set(rows.map((row) => row.storeName))].sort(),
+      coveredIngredients: rows.length,
+      ingredientCount: input.ingredients.length,
+      coverageShare: input.ingredients.length === 0 ? 0 : Math.round((rows.length / input.ingredients.length) * 100) / 100,
+      totalCost,
+      costPerServing: roundMoney(totalCost / input.servings),
+      averageConfidence,
+      eligible: rows.length === input.ingredients.length && input.ingredients.length > 0
+    };
+  }).sort((a, b) => {
+    if (a.eligible !== b.eligible) return a.eligible ? -1 : 1;
+    return a.totalCost - b.totalCost || b.averageConfidence - a.averageConfidence || a.chainId.localeCompare(b.chainId);
+  });
+
+  const cheapestChain = chainOptions.find((option) => option.eligible) ?? null;
+  const breakdown = cheapestChain ? (chainRows.get(cheapestChain.chainId) ?? []) : [];
+  const matchedIngredients = new Set(
+    input.ingredients
+      .filter((ingredient) => chainIds.some((chainId) => bestMealCostRowForChain(ingredient, chainId, minimumConfidence) !== null))
+      .map((ingredient) => ingredient.ingredientId)
+  ).size;
+  const offerCount = input.ingredients.reduce((sum, ingredient) => sum + ingredient.offers.filter((offer) => offer.confidence >= minimumConfidence && ingredientOfferCost(ingredient, offer) !== null).length, 0);
+  const status: MealCostBreakdown['status'] = cheapestChain ? 'priced' : 'insufficient_coverage';
+  const averageConfidencePct = cheapestChain ? Math.round(cheapestChain.averageConfidence * 100) : 0;
+
+  return {
+    mealId: input.mealId,
+    title: input.title,
+    servings: input.servings,
+    status,
+    totalCost: cheapestChain?.totalCost ?? 0,
+    costPerServing: cheapestChain?.costPerServing ?? 0,
+    cheapestChain,
+    breakdown,
+    chainOptions,
+    coverage: {
+      ingredientCount: input.ingredients.length,
+      matchedIngredients,
+      offerCount,
+      eligibleChainCount: chainOptions.filter((option) => option.eligible).length,
+      minimumConfidence
+    },
+    confidenceLabel: cheapestChain
+      ? `${matchedIngredients}/${input.ingredients.length} ingredients priced from real ingredient offer rows; ${chainOptions.filter((option) => option.eligible).length} eligible chains; average confidence ${averageConfidencePct}%.`
+      : `${matchedIngredients}/${input.ingredients.length} ingredients have real ingredient offer rows, but no single chain covers the full recipe.`,
+    ...(cheapestChain ? {} : { blockedReason: 'No single chain has confidence-cleared offers for every ingredient, so the meal cost stays withheld.' })
+  };
+}
+
 export type ExpiryDealReport = {
   id: string;
   productId: string;
