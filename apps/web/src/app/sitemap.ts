@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { categoryLabels } from '@/lib/openprices-products';
 import { osmStores } from '@/lib/osm-stores';
 import { productUniverse } from '@/lib/verified-data';
+import { seoLandingCities as landingCities, seoLandingProducts } from '@/lib/seo-landing-pages';
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
 const lastModified = new Date('2026-05-22T00:00:00.000Z');
@@ -35,6 +36,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const productRoutes = productUniverse.map((product) =>
     entry(`/products/${product.slug}`, 0.82, 'daily')
   );
+  const seoLandingRoutes = seoLandingProducts.flatMap((product) => [
+    entry(`/billigaste/${product.slug}`, 0.72, 'daily'),
+    entry(`/prisjamforelse/${product.slug}`, 0.72, 'daily'),
+    ...landingCities.map((city) => entry(`/stad/${city.slug}/${product.slug}`, 0.66, 'daily'))
+  ]);
   const categoryRoutes = Object.keys(categoryLabels).map((slug) =>
     entry(`/categories/${slug}`, 0.74, 'daily')
   );
@@ -45,6 +51,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticRoutes,
     ...productRoutes,
+    ...seoLandingRoutes,
     ...categoryRoutes,
     ...storeRoutes
   ];

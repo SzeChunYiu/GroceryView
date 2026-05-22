@@ -3,6 +3,7 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { adaptiveProductCards, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, topChainSpreads, freshestOpenPrices } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { landingFactsFor, seoLandingProducts } from '@/lib/seo-landing-pages';
 
 export function generateMetadata() {
   return routeMetadata('/products');
@@ -14,6 +15,35 @@ export default function ProductsPage() {
       <Eyebrow>Products</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Verified product catalogue</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Products are shown only when present in the Axfood chain snapshot or OpenPrices SEK observations. No synthetic prices or filler products are rendered.</p>
+      <Card className="mt-8 border-indigo-200 bg-indigo-50/70">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-indigo-800">SEO landing pages</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Crawlable billigaste and pris jämförelse pages</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              These landing pages are generated from verified product drivers and link back to the full ticker page. City pages keep a clear caveat when no branch-specific city price is available.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-indigo-900 shadow-sm">{seoLandingProducts.length} verified landing products</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {seoLandingProducts.slice(0, 6).map((landing) => {
+            const facts = landingFactsFor(landing);
+            return (
+              <div className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm" key={landing.slug}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-700">{facts.categoryLabel}</p>
+                <h3 className="mt-2 text-lg font-black text-slate-950">{landing.name}</h3>
+                <p className="mt-1 text-sm font-semibold text-slate-600">{facts.primaryPriceLabel} · {facts.evidenceLabel}</p>
+                <div className="mt-4 flex flex-wrap gap-2 text-xs font-black">
+                  <Link className="rounded-full bg-indigo-700 px-3 py-2 text-white" href={`/billigaste/${landing.slug}`}>Billigaste</Link>
+                  <Link className="rounded-full bg-slate-950 px-3 py-2 text-white" href={`/prisjamforelse/${landing.slug}`}>Pris jämförelse</Link>
+                  <Link className="rounded-full bg-white px-3 py-2 text-slate-700 ring-1 ring-slate-200" href={`/stad/stockholm/${landing.slug}`}>Stockholm</Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
       <Card className="mt-8 border-emerald-200 bg-emerald-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>

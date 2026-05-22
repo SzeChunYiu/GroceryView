@@ -857,6 +857,48 @@ ${seo}`;
     assert.doesNotMatch(productRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('ships programmatic SEO landing pages from verified product price drivers', async () => {
+    const cheapest = await read('src/app/billigaste/[slug]/page.tsx');
+    const comparison = await read('src/app/prisjamforelse/[slug]/page.tsx');
+    const city = await read('src/app/stad/[city]/[slug]/page.tsx');
+    const landing = await read('src/components/seo-product-landing.tsx');
+    const landingData = await read('src/lib/seo-landing-pages.ts');
+    const products = await read('src/app/products/page.tsx');
+    const sitemap = await read('src/app/sitemap.ts');
+
+    for (const route of [cheapest, comparison, city]) {
+      assert.match(route, /generateStaticParams/);
+      assert.match(route, /generateMetadata/);
+      assert.match(route, /findProduct/);
+      assert.match(route, /seoLandingProducts/);
+      assert.match(route, /SeoProductLanding/);
+      assert.doesNotMatch(route, /@\/lib\/demo-data|@\/components\/sample-data/);
+    }
+
+    assert.match(cheapest, /\/billigaste\/\$\{product\.slug\}/);
+    assert.match(comparison, /\/prisjamforelse\/\$\{product\.slug\}/);
+    assert.match(city, /\/stad\/\$\{city\.slug\}\/\$\{product\.slug\}/);
+    assert.match(landingData, /productUniverse\.slice\(0, 24\)/);
+    assert.match(landingData, /chainPriceRows/);
+    assert.match(landingData, /OpenPrices observations/);
+    assert.match(landing, /Billigaste/);
+    assert.match(landing, /pris jämförelse/);
+    assert.match(landing, /Stockholm/);
+    assert.match(landing, /No fabricated numbers/);
+    assert.match(landing, /No branch-specific city price is inferred/);
+    assert.match(products, /SEO landing pages/);
+    assert.match(products, /seoLandingProducts\.slice/);
+    assert.match(products, /landingFactsFor/);
+    assert.match(products, /\/billigaste\/\$\{landing\.slug\}/);
+    assert.match(products, /\/prisjamforelse\/\$\{landing\.slug\}/);
+    assert.match(products, /\/stad\/stockholm\/\$\{landing\.slug\}/);
+    assert.doesNotMatch(products, /@\/lib\/demo-data|@\/components\/sample-data/);
+    assert.match(sitemap, /seoLandingProducts/);
+    assert.match(sitemap, /\/billigaste\/\$\{product\.slug\}/);
+    assert.match(sitemap, /\/prisjamforelse\/\$\{product\.slug\}/);
+    assert.match(sitemap, /\/stad\/\$\{city\.slug\}\/\$\{product\.slug\}/);
+  });
+
   it('ships crawlable sitemap and robots metadata from verified route drivers', async () => {
     const sitemap = await read('src/app/sitemap.ts');
     const robots = await read('src/app/robots.ts');
