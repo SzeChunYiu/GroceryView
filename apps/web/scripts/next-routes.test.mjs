@@ -508,6 +508,20 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces ingredient-level meal costing with cheapest-chain evidence', async () => {
+    const source = await read('src/app/meal-cost/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+    assert.match(demo, /calculateMealCostBreakdown/);
+    assert.match(demo, /mealCostBreakdown/);
+    assert.match(source, /mealCostBreakdown/);
+    assert.match(source, /Ingredient-level meal costing/);
+    assert.match(source, /costPerServing/);
+    assert.match(source, /cheapestChain/);
+    assert.match(source, /ingredientCost/);
+    assert.match(source, /real ingredient offer rows/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces pantry replenishment on the pantry planner route using the real core pantry plan output', async () => {
     const source = await read('src/app/pantry-planner/page.tsx');
     assert.match(source, /pantryReplenishmentPlan/);
