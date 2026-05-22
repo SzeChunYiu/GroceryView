@@ -479,6 +479,81 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004581',
     storeName: 'ICA Kvantum Mall of Scandinavia',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003586',
+    storeName: 'ICA Supermarket Berga Centrum, Linköping',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003823',
+    storeName: 'Maxi ICA Stormarknad Linköping',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004066',
+    storeName: 'ICA Supermarket Rimforsa',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004546',
+    storeName: 'ICA Supermarket Åtvidaberg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003556',
+    storeName: 'ICA Supermarket Eneby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004539',
+    storeName: 'ICA Nära Tjällmo handel',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004267',
+    storeName: 'Maxi ICA Stormarknad Motala',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003690',
+    storeName: 'ICA Kvantum Mirum Galleria, Norrköping',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1051010',
+    storeName: 'Maxi ICA Stormarknad Norrköping',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003461',
+    storeName: 'ICA Supermarket Smedby, Norrköping',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004043',
+    storeName: 'ICA Nära Boxholm',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004592',
+    storeName: 'ICA Supermarket Söderköping',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003580',
+    storeName: 'ICA Supermarket Kisa',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004084',
+    storeName: 'Maxi ICA Stormarknad Helsingborg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003937',
+    storeName: 'Maxi ICA Stormarknad Hyllinge',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
