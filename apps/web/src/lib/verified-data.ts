@@ -639,6 +639,25 @@ export const elderlyNearestDeliveryPlanner = {
   ]
 };
 
+export const budgetCheapestStoreRoutingPlanner = {
+  persona: 'Budget-conscious / low-income',
+  title: 'Cheapest-store-for-my-list routing',
+  status: 'account_api_guardrail_surface',
+  routeRankInputs: [
+    'signed-in shopping list with verified product ids and quantities',
+    'favorite or reachable store ids selected from verified GroceryView stores',
+    'complete basket totals from the trip-cost optimizer for every ranked option',
+    'explicit travel mode and shopper-approved location or district context'
+  ],
+  storeListGuardrails: [
+    'No private home location is read or rendered in the public static snapshot.',
+    'Stores with missing basket prices remain blockers instead of being ranked as cheapest.',
+    'Routing ranks basket plus trip cost; it does not claim checkout, stock, or delivery reservation.',
+    'Cheapest-store copy must link back to verified shelf-total and travel-cost evidence.'
+  ],
+  nextStep: 'Use the account-only basket trip-cost endpoint once a shopper signs in, consents to location context, and has a current list.'
+};
+
 export const fulfillmentSlotsContract = {
   endpoint: '/api/basket/fulfillment-slots/{retailerId}/{storeId}',
   title: 'Delivery and pickup slot evidence',
