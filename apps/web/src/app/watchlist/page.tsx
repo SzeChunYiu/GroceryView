@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, watchlistAlertBoard, watchlistAlertInputs } from '@/lib/demo-data';
+import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, watchlistAlertBoard, watchlistAlertInputs, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -10,6 +10,10 @@ export function generateMetadata() {
 
 function priceSource(productId: string) {
   return watchlistAlertInputs.products.find((product) => product.productId === productId)?.source ?? 'visible price row';
+}
+
+function formatSek(value: number) {
+  return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
 
 export default function WatchlistPage() {
@@ -63,6 +67,64 @@ export default function WatchlistPage() {
             </Link>
           ))}
         </div>
+      </Card>
+
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">email digest</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Weekly personalised email digest</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          {weeklyPersonalizedEmailDigest.subject} is assembled from watchlistAlerts produced by buildWatchlistAlerts and bestDeals produced by rankDealOpportunities, then passed through planNotifications with email-only preferences.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">watchlistAlerts</p>
+            <p className="mt-1 text-4xl font-black text-indigo-900">{weeklyPersonalizedEmailDigest.watchlistAlerts.length}</p>
+            <p className="mt-2 text-sm font-semibold text-slate-600">Private watched products, target-price hits, and stock-up opportunities.</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">bestDeals</p>
+            <p className="mt-1 text-4xl font-black text-indigo-900">{weeklyPersonalizedEmailDigest.bestDeals.length}</p>
+            <p className="mt-2 text-sm font-semibold text-slate-600">Public ranked deal opportunities filtered by source confidence.</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">email sends</p>
+            <p className="mt-1 text-4xl font-black text-indigo-900">{weeklyPersonalizedEmailDigest.plannedEmails.length}</p>
+            <p className="mt-2 text-sm font-semibold text-slate-600">{weeklyPersonalizedEmailDigest.channelDefault.maxFrequency} · one-click unsubscribe {weeklyPersonalizedEmailDigest.channelDefault.requiresOneClickUnsubscribe ? 'required' : 'not required'}.</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-2xl border border-indigo-100 bg-white p-4">
+            <h3 className="text-lg font-black text-slate-950">Watchlist section</h3>
+            <div className="mt-3 space-y-2">
+              {weeklyPersonalizedEmailDigest.watchlistAlerts.map((alert) => (
+                <Link className="block rounded-2xl bg-indigo-50 p-3 text-sm font-semibold hover:bg-indigo-100" href={`/products/${alert.productId}`} key={`${alert.productId}-${alert.severity}`}>
+                  <strong>{alert.productName}</strong><br />{alert.message}<br /><span className="text-slate-600">{alert.source}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-indigo-100 bg-white p-4">
+            <h3 className="text-lg font-black text-slate-950">Best deals section</h3>
+            <div className="mt-3 space-y-2">
+              {weeklyPersonalizedEmailDigest.bestDeals.map((deal) => (
+                <Link className="block rounded-2xl bg-indigo-50 p-3 text-sm font-semibold hover:bg-indigo-100" href={`/products/${deal.productId}`} key={`${deal.productId}-${deal.storeName}`}>
+                  <strong>{deal.productName}</strong> · {deal.storeName}<br />{formatSek(deal.currentPrice)} now · Deal Score {deal.dealScore} · sourceConfidence {Math.round(deal.sourceConfidence * 100)}%
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {weeklyPersonalizedEmailDigest.plannedEmails.map((email, index) => (
+            <div className="rounded-2xl bg-white p-4 text-sm font-semibold text-slate-700 shadow-sm" key={`${email.title}-${index}`}>
+              <p className="font-black text-slate-950">{email.title}</p>
+              <p className="mt-1">{email.channel} · {email.type} · sendAt {email.sendAt}</p>
+              <p className="mt-2">{email.body}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 rounded-2xl bg-white p-3 text-sm font-black text-indigo-950">{weeklyPersonalizedEmailDigest.coverage.caveat}</p>
       </Card>
 
 
