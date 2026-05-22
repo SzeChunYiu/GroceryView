@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ConsentManager } from '@/components/consent-manager';
 import { Providers } from './providers';
 import './globals.css';
 
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           type="application/ld+json"
         />
         <Providers>{children}</Providers>
+        <ConsentManager />
       </body>
     </html>
   );
