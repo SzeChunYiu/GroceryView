@@ -522,6 +522,22 @@ describe('verified-data UI', () => {
   });
 
 
+  it('surfaces a weekly personalised email digest from watchlist alerts and best deals', async () => {
+    const route = await read('src/app/watchlist/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+
+    assert.match(demo, /weeklyPersonalizedEmailDigest/);
+    assert.match(demo, /builtWatchlistAlerts/);
+    assert.match(demo, /dealOpportunityRail/);
+    assert.match(demo, /channels: \['email'\]/);
+    assert.match(route, /weeklyPersonalizedEmailDigest/);
+    assert.match(route, /Weekly personalised email digest/);
+    assert.match(route, /watchlistAlerts/);
+    assert.match(route, /bestDeals/);
+    assert.match(route, /email/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
   it('surfaces account-safe custom price alert thresholds on the watchlist route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/watchlist/page.tsx');

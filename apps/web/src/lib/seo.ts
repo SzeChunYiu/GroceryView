@@ -163,7 +163,7 @@ export const routeMetadataCatalog = {
   },
   '/watchlist': {
     title: 'Grocery watchlist price alerts | GroceryView',
-    description: 'Track watchlist alerts, diaper price drops, budget essentials, and planned notifications from verified price rows.'
+    description: 'Track watchlist alerts, weekly personalised email digests, diaper price drops, budget essentials, and planned notifications from verified price rows.'
   },
   '/weekly-basket': {
     title: 'Weekly grocery basket optimizer | GroceryView',

@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildExpiryDealRadar, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 
 export const products = [
   {
@@ -2047,6 +2047,59 @@ export const watchlistAlertBoard = {
     eligiblePriceRows: watchlistAlertInputs.products.reduce((sum, product) => sum + (product.prices?.length ?? 0), 0),
     confidence: 'medium',
     caveat: 'Alerts use visible price rows and allowed price-type filters; rows without the requested price type are excluded instead of estimated.'
+  }
+};
+
+const weeklyDigestBestDeals = dealOpportunityRail.slice(0, 3);
+const weeklyWatchlistDigestChannelDefault = planGroceryAlertChannelDefault('weekly_watchlist_digest');
+const weeklyDigestEmailEvents = [
+  {
+    type: 'weekly_report' as const,
+    title: 'Weekly watchlist digest',
+    body: `${builtWatchlistAlerts.length} watchlist alerts and ${weeklyDigestBestDeals.length} best deals are ready for this week.`,
+    priority: builtWatchlistAlerts.some((alert) => alert.severity === 'urgent') ? 'high' as const : 'normal' as const
+  },
+  ...weeklyDigestBestDeals.map((deal) => ({
+    type: 'weekly_report' as const,
+    title: `Best deal: ${deal.productName}`,
+    body: `${deal.storeName} has ${deal.productName} for ${deal.currentPrice} SEK with Deal Score ${deal.dealScore}.`,
+    priority: 'normal' as const
+  }))
+];
+
+export const weeklyPersonalizedEmailDigest = {
+  title: 'Weekly personalised email digest',
+  subject: `Your GroceryView week: ${builtWatchlistAlerts.length} watchlist alerts + ${weeklyDigestBestDeals.length} best deals`,
+  cadence: 'weekly',
+  channelDefault: weeklyWatchlistDigestChannelDefault,
+  plannedEmails: planNotifications({
+    now: '2026-05-22T10:00:00.000Z',
+    preferences: {
+      channels: ['email'],
+      enabledTypes: ['weekly_report'],
+      quietHours: { startHour: 21, endHour: 7, timezone: 'Europe/Stockholm' }
+    },
+    events: weeklyDigestEmailEvents
+  }),
+  watchlistAlerts: builtWatchlistAlerts.slice(0, 3).map((alert) => ({
+    productId: alert.productId,
+    productName: alert.productName,
+    message: alert.message,
+    severity: alert.severity,
+    source: watchlistAlertInputs.products.find((product) => product.productId === alert.productId)?.source ?? 'visible watchlist price row'
+  })),
+  bestDeals: weeklyDigestBestDeals.map((deal) => ({
+    productId: deal.productId,
+    productName: deal.productName,
+    storeName: deal.storeName,
+    currentPrice: deal.currentPrice,
+    regularPrice: deal.regularPrice,
+    dealScore: deal.dealScore,
+    sourceConfidence: deal.sourceConfidence
+  })),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Weekly digest combines buildWatchlistAlerts and rankDealOpportunities outputs from visible rows; email delivery requires explicit opt-in, preference links, and one-click unsubscribe.'
   }
 };
 
