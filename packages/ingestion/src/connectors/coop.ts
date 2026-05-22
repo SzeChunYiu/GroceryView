@@ -326,7 +326,8 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '245080',
   '245050',
   '116385',
-  '116418'
+  '116418',
+  '135120'
 ] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
@@ -360,11 +361,16 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'spare ribs',
   'finish',
   'ost',
-  'fiskpinnar coop'
+  'fiskpinnar coop',
+  'ost familjefavoriter arla',
+  'grillkorv scan',
+  'Pepsi Zingo 6-pack',
+  'glass flerpack gb glace'
 ];
 const COOP_LUND_STADION_FLYER_STORE_IDS = ['105860', '105760', '105740', '105710', '105830', '105630', '105810'] as const;
 const COOP_KARLSKOGA_MATCHED_FLYER_STORE_IDS = ['163120'] as const;
 const COOP_SMALL_STORE_MATCHED_FLYER_STORE_IDS = ['056313', '196231', '245080', '245050', '116385', '116418'] as const;
+const COOP_AMAL_MATCHED_FLYER_STORE_IDS = ['135120'] as const;
 export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[] = [
   {
     query: 'Färsk laxfilé Harbour',
@@ -459,6 +465,13 @@ export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[
     ['finish', '5714970007970', 49.5, 1.18, '1.18 kr/tvätt/disk', 'Maskindisktabletter-2 för 99:-', false],
     ['ost', '2340380300009', 75, 75, '75.00 kr/kg', 'Medlemspris-Ost familjefavoriter-75:- /kg', true],
     ['fiskpinnar coop', '7340191175846', 30, 66.67, '66.67 kr/kg', 'Fiskpinnar-30:- /st', false]
+  ]),
+  ...coopFlyerOfferHints(COOP_AMAL_MATCHED_FLYER_STORE_IDS, [
+    ['falukorv', '7300206787006', 35, 43.75, '43.75 kr/kg', 'Medlemspris-Falukorv-35:- /st', true],
+    ['ost familjefavoriter arla', '2340380300009', 75, 75, '75.00 kr/kg', 'Medlemspris-Ost familjefavoriter-75:- /kg', true],
+    ['grillkorv scan', '7300207071005', 39, 60.94, '60.94 kr/kg', 'Medlemspris-Grillkorv-39:- /st', true],
+    ['Pepsi Zingo 6-pack', '7310072000635', 32.5, 16.41, '16.41 kr/lit', 'Medlemspris-Läsk 6-pack-2 för 65:-', true],
+    ['glass flerpack gb glace', '8722700132523', 32.5, 5.42, '5.42 kr/st', 'Medlemspris-Glass flerpack-2 för 65:-', true]
   ])
 ];
 
