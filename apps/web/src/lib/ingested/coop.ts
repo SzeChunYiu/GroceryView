@@ -5,11 +5,12 @@
 // Retrieved: 2026-05-22T12:58:35.902Z
 // Row count: 290 real product rows fetched from coop.se.
 //
-// Weekly discounts source URLs: https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true
-// Weekly discounts flyer URLs: https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna | https://dr.coop.se/Butik/Stora-Coop-Bromma | https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga | https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik | https://dr.coop.se/Butik/Stora-Coop-Danderyd | https://dr.coop.se/Butik/Stora-Coop-Sundby-Park | https://dr.coop.se/Butik/Stora-Coop-Huddinge | https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta | https://dr.coop.se/Butik/Stora-Coop-Stuvsta | https://dr.coop.se/Butik/Stora-Coop-Orminge | https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6 | https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje | https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga | https://dr.coop.se/Butik/Stora-Coop-Arninge | https://dr.coop.se/Butik/Stora-Coop-Haninge | https://dr.coop.se/Butik/Stora-Coop-Kristinehamn | https://dr.coop.se/Butik/Stora-Coop-Ersboda | https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand | https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik | https://dr.coop.se/Butik/Stora-Coop-Karlshamn | https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan | https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund | https://dr.coop.se/Butik/Stora-Coop-Vinsta | https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6 | https://dr.coop.se/Butik/Stora-Coop-Visby | https://dr.coop.se/Butik/Stora-Coop-Valbo | https://dr.coop.se/Butik/Stora-Coop-Storheden | https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n | https://dr.coop.se/Butik/Stora-Coop-Skara | https://dr.coop.se/Butik/Stora-Coop-Backaplan | https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol | https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le | https://dr.coop.se/Butik/Stora-Coop-Kiruna | https://dr.coop.se/Butik/Coop-City-Hallsberg | https://dr.coop.se/Butik/Stora-Coop-Varberg | https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde | https://dr.coop.se/Butik/Stora-Coop-Kungsbacka | https://dr.coop.se/Butik/Stora-Coop-Bergvik | https://dr.coop.se/Butik/Stora-Coop--Kalix | https://dr.coop.se/Butik/Stora-Coop-Hudiksvall | https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping | https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare | https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby | https://dr.coop.se/Butik/Coop-Bredden | https://dr.coop.se/Butik/Stora-Coop-Marieberg | https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping | https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten | https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s | https://dr.coop.se/Butik/Stora-Coop-Eskilstuna | https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s | https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s | https://dr.coop.se/Butik/Stora-Coop-Palmviken | https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen | https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6
-// Weekly discounts product search URLs: https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1
-// Weekly discounts retrieved: 2026-05-22T13:24:42.059Z
-// Weekly discounts row count: 1250 real current flyer discount rows for 54 Coop branches, valid 2026-05-18T00:00:00 through 2026-05-24T23:59:59.
+// Weekly discounts source URLs: https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true
+// Weekly discounts flyer URLs: https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna | https://dr.coop.se/Butik/Stora-Coop-Bromma | https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga | https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik | https://dr.coop.se/Butik/Stora-Coop-Danderyd | https://dr.coop.se/Butik/Stora-Coop-Sundby-Park | https://dr.coop.se/Butik/Stora-Coop-Huddinge | https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta | https://dr.coop.se/Butik/Stora-Coop-Stuvsta | https://dr.coop.se/Butik/Stora-Coop-Orminge | https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6 | https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje | https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga | https://dr.coop.se/Butik/Stora-Coop-Arninge | https://dr.coop.se/Butik/Stora-Coop-Haninge | https://dr.coop.se/Butik/Stora-Coop-Kristinehamn | https://dr.coop.se/Butik/Stora-Coop-Ersboda | https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand | https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik | https://dr.coop.se/Butik/Stora-Coop-Karlshamn | https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan | https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund | https://dr.coop.se/Butik/Stora-Coop-Vinsta | https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6 | https://dr.coop.se/Butik/Stora-Coop-Visby | https://dr.coop.se/Butik/Stora-Coop-Valbo | https://dr.coop.se/Butik/Stora-Coop-Storheden | https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n | https://dr.coop.se/Butik/Stora-Coop-Skara | https://dr.coop.se/Butik/Stora-Coop-Backaplan | https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol | https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le | https://dr.coop.se/Butik/Stora-Coop-Kiruna | https://dr.coop.se/Butik/Coop-City-Hallsberg | https://dr.coop.se/Butik/Stora-Coop-Varberg | https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde | https://dr.coop.se/Butik/Stora-Coop-Kungsbacka | https://dr.coop.se/Butik/Stora-Coop-Bergvik | https://dr.coop.se/Butik/Stora-Coop--Kalix | https://dr.coop.se/Butik/Stora-Coop-Hudiksvall | https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping | https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare | https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby | https://dr.coop.se/Butik/Coop-Bredden | https://dr.coop.se/Butik/Stora-Coop-Marieberg | https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping | https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten | https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s | https://dr.coop.se/Butik/Stora-Coop-Eskilstuna | https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s | https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s | https://dr.coop.se/Butik/Stora-Coop-Palmviken | https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen | https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6 | https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s | https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta | https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping | https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng
+// Weekly discounts product search URLs: https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1
+// Weekly discounts retrieved: 2026-05-22T13:46:23.654Z
+// Weekly discounts row count: 1345 real current flyer discount rows for 58 Coop branches, valid 2026-05-18T00:00:00 through 2026-05-24T23:59:59.
+
 export type CoopIngestedProduct = {
   code: string;
   ean: string;
@@ -69,8 +70,8 @@ export const coopSource = {
 
 export const coopWeeklyDiscountSource = {
   "source": "Coop public store API current flyer plus public personalization product search",
-  "retrievedAt": "2026-05-22T13:24:42.059Z",
-  "rowCount": 1250,
+  "retrievedAt": "2026-05-22T13:46:23.654Z",
+  "rowCount": 1345,
   "storeIds": [
     "251300",
     "252700",
@@ -125,7 +126,11 @@ export const coopWeeklyDiscountSource = {
     "205140",
     "163300",
     "165400",
-    "163800"
+    "163800",
+    "185510",
+    "232000",
+    "254900",
+    "054000"
   ],
   "stores": [
     {
@@ -559,177 +564,39 @@ export const coopWeeklyDiscountSource = {
       "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
       "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
       "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1"
+    },
+    {
+      "storeId": "185510",
+      "storeName": "Stora Coop Stenby Västerås",
+      "region": "Västerås",
+      "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+      "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+      "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1"
+    },
+    {
+      "storeId": "232000",
+      "storeName": "Stora Coop Sundsvall",
+      "region": "Sundsvall",
+      "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+      "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+      "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1"
+    },
+    {
+      "storeId": "254900",
+      "storeName": "Stora Coop Enköping",
+      "region": "Enköping",
+      "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+      "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+      "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1"
+    },
+    {
+      "storeId": "054000",
+      "storeName": "Stora Coop Finspång",
+      "region": "Finspång",
+      "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+      "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+      "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1"
     }
-  ],
-  "validFrom": "2026-05-18T00:00:00",
-  "validTo": "2026-05-24T23:59:59",
-  "sourceUrls": [
-    "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true"
-  ],
-  "flyerUrls": [
-    "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
-    "https://dr.coop.se/Butik/Stora-Coop-Bromma",
-    "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
-    "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
-    "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
-    "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
-    "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
-    "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
-    "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
-    "https://dr.coop.se/Butik/Stora-Coop-Orminge",
-    "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
-    "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
-    "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
-    "https://dr.coop.se/Butik/Stora-Coop-Arninge",
-    "https://dr.coop.se/Butik/Stora-Coop-Haninge",
-    "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
-    "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
-    "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
-    "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
-    "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
-    "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
-    "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
-    "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
-    "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
-    "https://dr.coop.se/Butik/Stora-Coop-Visby",
-    "https://dr.coop.se/Butik/Stora-Coop-Valbo",
-    "https://dr.coop.se/Butik/Stora-Coop-Storheden",
-    "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
-    "https://dr.coop.se/Butik/Stora-Coop-Skara",
-    "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
-    "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
-    "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
-    "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
-    "https://dr.coop.se/Butik/Coop-City-Hallsberg",
-    "https://dr.coop.se/Butik/Stora-Coop-Varberg",
-    "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
-    "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
-    "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
-    "https://dr.coop.se/Butik/Stora-Coop--Kalix",
-    "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
-    "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
-    "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
-    "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
-    "https://dr.coop.se/Butik/Coop-Bredden",
-    "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
-    "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
-    "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
-    "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
-    "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
-    "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
-    "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
-    "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
-    "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
-    "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6"
-  ],
-  "productSearchUrls": [
-    "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
-    "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1"
   ]
 } as const;
 
@@ -757,7 +624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -782,7 +649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -807,7 +674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -832,7 +699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -857,7 +724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -882,7 +749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -907,7 +774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -932,7 +799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -957,7 +824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -982,7 +849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -1007,7 +874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -1032,7 +899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -1057,7 +924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -1082,7 +949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -1107,7 +974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -1132,7 +999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -1157,7 +1024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -1182,7 +1049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -1207,7 +1074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -1232,7 +1099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -1257,7 +1124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -1282,7 +1149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -1307,7 +1174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -1332,7 +1199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -1357,7 +1224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -1382,7 +1249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -1407,7 +1274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -1432,7 +1299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -1457,7 +1324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -1482,7 +1349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -1507,7 +1374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -1532,7 +1399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -1557,7 +1424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -1582,7 +1449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -1607,7 +1474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -1632,7 +1499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -1657,7 +1524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -1682,7 +1549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -1707,7 +1574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -1732,7 +1599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -1757,7 +1624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -1782,7 +1649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -1807,7 +1674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -1832,7 +1699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -1857,7 +1724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -1882,7 +1749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -1907,7 +1774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -1932,7 +1799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -1957,7 +1824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -1982,7 +1849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -2007,7 +1874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -2032,7 +1899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -2057,7 +1924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -2082,7 +1949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -2107,7 +1974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -2132,7 +1999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -2157,7 +2024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -2182,7 +2049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -2207,7 +2074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -2232,7 +2099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -2257,7 +2124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -2282,7 +2149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -2307,7 +2174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -2332,7 +2199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074009230",
@@ -2357,7 +2224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -2382,7 +2249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -2407,7 +2274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -2432,7 +2299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -2457,7 +2324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -2482,7 +2349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -2507,7 +2374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -2532,7 +2399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -2557,7 +2424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -2582,7 +2449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -2607,7 +2474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -2632,7 +2499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -2657,7 +2524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -2682,7 +2549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -2707,7 +2574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -2732,7 +2599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -2757,7 +2624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -2782,7 +2649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -2807,7 +2674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -2832,7 +2699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -2857,7 +2724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -2882,7 +2749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -2907,7 +2774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -2932,7 +2799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -2957,7 +2824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -2982,7 +2849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -3007,7 +2874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -3032,7 +2899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -3057,7 +2924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -3082,7 +2949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -3107,7 +2974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -3132,7 +2999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -3157,7 +3024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -3182,7 +3049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -3207,7 +3074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -3232,7 +3099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -3257,7 +3124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -3282,7 +3149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -3307,7 +3174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -3332,7 +3199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -3357,7 +3224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -3382,7 +3249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -3407,7 +3274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -3432,7 +3299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -3457,7 +3324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -3482,7 +3349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -3507,7 +3374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -3532,7 +3399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -3557,7 +3424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -3582,7 +3449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -3607,7 +3474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -3632,7 +3499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -3657,7 +3524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -3682,7 +3549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -3707,7 +3574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -3732,7 +3599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -3757,7 +3624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -3782,7 +3649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -3807,7 +3674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -3832,7 +3699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -3857,7 +3724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -3882,7 +3749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -3907,7 +3774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -3932,7 +3799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -3957,7 +3824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -3982,7 +3849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -4007,7 +3874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -4032,7 +3899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -4057,7 +3924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -4082,7 +3949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -4107,7 +3974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -4132,7 +3999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -4157,7 +4024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -4182,7 +4049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -4207,7 +4074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -4232,7 +4099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -4257,7 +4124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -4282,7 +4149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -4307,7 +4174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -4332,7 +4199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -4357,7 +4224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -4382,7 +4249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -4407,7 +4274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -4432,7 +4299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -4457,7 +4324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -4482,7 +4349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -4507,7 +4374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -4532,7 +4399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -4557,7 +4424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -4582,7 +4449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -4607,7 +4474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -4632,7 +4499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -4657,7 +4524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -4682,7 +4549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -4707,7 +4574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -4732,7 +4599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -4757,7 +4624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -4782,7 +4649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -4807,7 +4674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -4832,7 +4699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -4857,7 +4724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -4882,7 +4749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -4907,7 +4774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -4932,7 +4799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -4957,7 +4824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -4982,7 +4849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -5007,7 +4874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -5032,7 +4899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -5057,7 +4924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -5082,7 +4949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -5107,7 +4974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -5132,7 +4999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -5157,7 +5024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -5182,7 +5049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -5207,7 +5074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -5232,7 +5099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -5257,7 +5124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -5282,7 +5149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -5307,7 +5174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -5332,7 +5199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -5357,7 +5224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -5382,7 +5249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -5407,7 +5274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -5432,7 +5299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -5457,7 +5324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -5482,7 +5349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -5507,7 +5374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -5532,7 +5399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -5557,7 +5424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -5582,7 +5449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -5607,7 +5474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -5632,7 +5499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -5657,7 +5524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -5682,7 +5549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -5707,7 +5574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -5732,7 +5599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -5757,7 +5624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -5782,7 +5649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -5807,7 +5674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -5832,7 +5699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -5857,7 +5724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -5882,7 +5749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -5907,7 +5774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -5932,7 +5799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -5957,7 +5824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -5982,7 +5849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -6007,7 +5874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -6032,7 +5899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -6057,7 +5924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -6082,7 +5949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -6107,7 +5974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -6132,7 +5999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -6157,7 +6024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -6182,7 +6049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -6207,7 +6074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -6232,7 +6099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -6257,7 +6124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -6282,7 +6149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -6307,7 +6174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -6332,7 +6199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -6357,7 +6224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -6382,7 +6249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -6407,7 +6274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -6432,7 +6299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -6457,7 +6324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -6482,7 +6349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -6507,7 +6374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -6532,7 +6399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -6557,7 +6424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -6582,7 +6449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -6607,7 +6474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -6632,7 +6499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -6657,7 +6524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -6682,7 +6549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -6707,7 +6574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -6732,7 +6599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -6757,7 +6624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -6782,7 +6649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -6807,7 +6674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -6832,7 +6699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -6857,7 +6724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -6882,7 +6749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -6907,7 +6774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -6932,7 +6799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -6957,7 +6824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -6982,7 +6849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -7007,7 +6874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -7032,7 +6899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -7057,7 +6924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -7082,7 +6949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -7107,7 +6974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -7132,7 +6999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -7157,7 +7024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -7182,7 +7049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -7207,7 +7074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -7232,7 +7099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -7257,7 +7124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -7282,7 +7149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -7307,7 +7174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -7332,7 +7199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -7357,7 +7224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -7382,7 +7249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -7407,7 +7274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -7432,7 +7299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -7457,7 +7324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -7482,7 +7349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -7507,7 +7374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -7532,7 +7399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -7557,7 +7424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -7582,7 +7449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -7607,7 +7474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -7632,7 +7499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -7657,7 +7524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -7682,7 +7549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -7707,7 +7574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074009230",
@@ -7732,7 +7599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -7757,7 +7624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -7782,7 +7649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -7807,7 +7674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -7832,7 +7699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -7857,7 +7724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -7882,7 +7749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -7907,7 +7774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -7932,7 +7799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -7957,7 +7824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -7982,7 +7849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -8007,7 +7874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -8032,7 +7899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -8057,7 +7924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -8082,7 +7949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -8107,7 +7974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -8132,7 +7999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -8157,7 +8024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -8182,7 +8049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -8207,7 +8074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -8232,7 +8099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -8257,7 +8124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -8282,7 +8149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -8307,7 +8174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -8332,7 +8199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -8357,7 +8224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -8382,7 +8249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -8407,7 +8274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -8432,7 +8299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -8457,7 +8324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -8482,7 +8349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -8507,7 +8374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -8532,7 +8399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -8557,7 +8424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -8582,7 +8449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -8607,7 +8474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -8632,7 +8499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -8657,7 +8524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -8682,7 +8549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -8707,7 +8574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -8732,7 +8599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -8757,7 +8624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -8782,7 +8649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -8807,7 +8674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -8832,7 +8699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -8857,7 +8724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074009230",
@@ -8882,7 +8749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -8907,7 +8774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -8932,7 +8799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -8957,7 +8824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -8982,7 +8849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -9007,7 +8874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -9032,7 +8899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -9057,7 +8924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -9082,7 +8949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -9107,7 +8974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -9132,7 +8999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -9157,7 +9024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -9182,7 +9049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -9207,7 +9074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -9232,7 +9099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -9257,7 +9124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -9282,7 +9149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -9307,7 +9174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -9332,7 +9199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -9357,7 +9224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -9382,7 +9249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -9407,7 +9274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -9432,7 +9299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -9457,7 +9324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -9482,7 +9349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -9507,7 +9374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -9532,7 +9399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -9557,7 +9424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -9582,7 +9449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -9607,7 +9474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -9632,7 +9499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -9657,7 +9524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -9682,7 +9549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -9707,7 +9574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -9732,7 +9599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -9757,7 +9624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -9782,7 +9649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -9807,7 +9674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -9832,7 +9699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -9857,7 +9724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -9882,7 +9749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -9907,7 +9774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -9932,7 +9799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -9957,7 +9824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -9982,7 +9849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -10007,7 +9874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -10032,7 +9899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -10057,7 +9924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -10082,7 +9949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -10107,7 +9974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -10132,7 +9999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -10157,7 +10024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -10182,7 +10049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -10207,7 +10074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -10232,7 +10099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -10257,7 +10124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -10282,7 +10149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -10307,7 +10174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -10332,7 +10199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kristinehamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -10357,7 +10224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -10382,7 +10249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -10407,7 +10274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -10432,7 +10299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -10457,7 +10324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -10482,7 +10349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -10507,7 +10374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -10532,7 +10399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -10557,7 +10424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -10582,7 +10449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -10607,7 +10474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -10632,7 +10499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -10657,7 +10524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -10682,7 +10549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -10707,7 +10574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -10732,7 +10599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -10757,7 +10624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -10782,7 +10649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -10807,7 +10674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -10832,7 +10699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -10857,7 +10724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -10882,7 +10749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -10907,7 +10774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Ersboda",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -10932,7 +10799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -10957,7 +10824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -10982,7 +10849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -11007,7 +10874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -11032,7 +10899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -11057,7 +10924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -11082,7 +10949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -11107,7 +10974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -11132,7 +10999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -11157,7 +11024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -11182,7 +11049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -11207,7 +11074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -11232,7 +11099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -11257,7 +11124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -11282,7 +11149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -11307,7 +11174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -11332,7 +11199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -11357,7 +11224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -11382,7 +11249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -11407,7 +11274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -11432,7 +11299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -11457,7 +11324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -11482,7 +11349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -11507,7 +11374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4rn%C3%B6sand",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -11532,7 +11399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -11557,7 +11424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -11582,7 +11449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -11607,7 +11474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -11632,7 +11499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -11657,7 +11524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -11682,7 +11549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -11707,7 +11574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -11732,7 +11599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -11757,7 +11624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -11782,7 +11649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -11807,7 +11674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -11832,7 +11699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -11857,7 +11724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -11882,7 +11749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -11907,7 +11774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -11932,7 +11799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -11957,7 +11824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -11982,7 +11849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -12007,7 +11874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -12032,7 +11899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -12057,7 +11924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -12082,7 +11949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -12107,7 +11974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -12132,7 +11999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -12157,7 +12024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96rnsk%C3%B6ldsvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -12182,7 +12049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -12207,7 +12074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -12232,7 +12099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -12257,7 +12124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -12282,7 +12149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -12307,7 +12174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -12332,7 +12199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -12357,7 +12224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -12382,7 +12249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -12407,7 +12274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -12432,7 +12299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -12457,7 +12324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -12482,7 +12349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -12507,7 +12374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -12532,7 +12399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -12557,7 +12424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -12582,7 +12449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -12607,7 +12474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -12632,7 +12499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -12657,7 +12524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -12682,7 +12549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -12707,7 +12574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -12732,7 +12599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Karlshamn",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=093200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/093200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -12757,7 +12624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -12782,7 +12649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -12807,7 +12674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -12832,7 +12699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -12857,7 +12724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -12882,7 +12749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -12907,7 +12774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072627",
@@ -12932,7 +12799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -12957,7 +12824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -12982,7 +12849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -13007,7 +12874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -13032,7 +12899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -13057,7 +12924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -13082,7 +12949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -13107,7 +12974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -13132,7 +12999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -13157,7 +13024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -13182,7 +13049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -13207,7 +13074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -13232,7 +13099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -13257,7 +13124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -13282,7 +13149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96verby-Trollh%C3%A4ttan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=133100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -13307,7 +13174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -13332,7 +13199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -13357,7 +13224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -13382,7 +13249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -13407,7 +13274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -13432,7 +13299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -13457,7 +13324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -13482,7 +13349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -13507,7 +13374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -13532,7 +13399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -13557,7 +13424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -13582,7 +13449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -13607,7 +13474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -13632,7 +13499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -13657,7 +13524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -13682,7 +13549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -13707,7 +13574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -13732,7 +13599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -13757,7 +13624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -13782,7 +13649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -13807,7 +13674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -13832,7 +13699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -13857,7 +13724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -13882,7 +13749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%96stersund",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -13907,7 +13774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -13932,7 +13799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -13957,7 +13824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -13982,7 +13849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -14007,7 +13874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -14032,7 +13899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -14057,7 +13924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -14082,7 +13949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -14107,7 +13974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -14132,7 +13999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -14157,7 +14024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -14182,7 +14049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074009230",
@@ -14207,7 +14074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -14232,7 +14099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -14257,7 +14124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -14282,7 +14149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -14307,7 +14174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -14332,7 +14199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -14357,7 +14224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -14382,7 +14249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -14407,7 +14274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Vinsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=030500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/030500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -14432,7 +14299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -14457,7 +14324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -14482,7 +14349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -14507,7 +14374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -14532,7 +14399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -14557,7 +14424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -14582,7 +14449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -14607,7 +14474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -14632,7 +14499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -14657,7 +14524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -14682,7 +14549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -14707,7 +14574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -14732,7 +14599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -14757,7 +14624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -14782,7 +14649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -14807,7 +14674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -14832,7 +14699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -14857,7 +14724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -14882,7 +14749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -14907,7 +14774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -14932,7 +14799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -14957,7 +14824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -14982,7 +14849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -15007,7 +14874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norremark-V%C3%A4xj%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=075800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/075800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -15032,7 +14899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -15057,7 +14924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -15082,7 +14949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -15107,7 +14974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -15132,7 +14999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -15157,7 +15024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -15182,7 +15049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -15207,7 +15074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -15232,7 +15099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -15257,7 +15124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -15282,7 +15149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -15307,7 +15174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -15332,7 +15199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -15357,7 +15224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -15382,7 +15249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -15407,7 +15274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -15432,7 +15299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -15457,7 +15324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -15482,7 +15349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -15507,7 +15374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -15532,7 +15399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -15557,7 +15424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -15582,7 +15449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -15607,7 +15474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -15632,7 +15499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Visby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=022500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/022500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -15657,7 +15524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -15682,7 +15549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -15707,7 +15574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -15732,7 +15599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -15757,7 +15624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -15782,7 +15649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -15807,7 +15674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -15832,7 +15699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -15857,7 +15724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -15882,7 +15749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -15907,7 +15774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -15932,7 +15799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -15957,7 +15824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -15982,7 +15849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -16007,7 +15874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -16032,7 +15899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -16057,7 +15924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -16082,7 +15949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -16107,7 +15974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -16132,7 +15999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Valbo",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=201700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/201700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -16157,7 +16024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -16182,7 +16049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -16207,7 +16074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -16232,7 +16099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -16257,7 +16124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -16282,7 +16149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -16307,7 +16174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -16332,7 +16199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -16357,7 +16224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -16382,7 +16249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -16407,7 +16274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -16432,7 +16299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -16457,7 +16324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -16482,7 +16349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -16507,7 +16374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -16532,7 +16399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -16557,7 +16424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -16582,7 +16449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -16607,7 +16474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -16632,7 +16499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -16657,7 +16524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -16682,7 +16549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -16707,7 +16574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -16732,7 +16599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Storheden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=242200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/242200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -16757,7 +16624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -16782,7 +16649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -16807,7 +16674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -16832,7 +16699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -16857,7 +16724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -16882,7 +16749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -16907,7 +16774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -16932,7 +16799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -16957,7 +16824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -16982,7 +16849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -17007,7 +16874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -17032,7 +16899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -17057,7 +16924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -17082,7 +16949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -17107,7 +16974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -17132,7 +16999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -17157,7 +17024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -17182,7 +17049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -17207,7 +17074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -17232,7 +17099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -17257,7 +17124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -17282,7 +17149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -17307,7 +17174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -17332,7 +17199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sisj%C3%B6n",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -17357,7 +17224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -17382,7 +17249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -17407,7 +17274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -17432,7 +17299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -17457,7 +17324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -17482,7 +17349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -17507,7 +17374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -17532,7 +17399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -17557,7 +17424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -17582,7 +17449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -17607,7 +17474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -17632,7 +17499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -17657,7 +17524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -17682,7 +17549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -17707,7 +17574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -17732,7 +17599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -17757,7 +17624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -17782,7 +17649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -17807,7 +17674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -17832,7 +17699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -17857,7 +17724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -17882,7 +17749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -17907,7 +17774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -17932,7 +17799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -17957,7 +17824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -17982,7 +17849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Skara",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -18007,7 +17874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -18032,7 +17899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -18057,7 +17924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -18082,7 +17949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -18107,7 +17974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -18132,7 +17999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -18157,7 +18024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -18182,7 +18049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -18207,7 +18074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -18232,7 +18099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -18257,7 +18124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -18282,7 +18149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -18307,7 +18174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -18332,7 +18199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -18357,7 +18224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -18382,7 +18249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -18407,7 +18274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -18432,7 +18299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -18457,7 +18324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -18482,7 +18349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -18507,7 +18374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -18532,7 +18399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -18557,7 +18424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -18582,7 +18449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Backaplan",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -18607,7 +18474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -18632,7 +18499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -18657,7 +18524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -18682,7 +18549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -18707,7 +18574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -18732,7 +18599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -18757,7 +18624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -18782,7 +18649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -18807,7 +18674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -18832,7 +18699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -18857,7 +18724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -18882,7 +18749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -18907,7 +18774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -18932,7 +18799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -18957,7 +18824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -18982,7 +18849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -19007,7 +18874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -19032,7 +18899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -19057,7 +18924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -19082,7 +18949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -19107,7 +18974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -19132,7 +18999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-B%C3%A4ckebol",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -19157,7 +19024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -19182,7 +19049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -19207,7 +19074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340420500000",
@@ -19232,7 +19099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -19257,7 +19124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -19282,7 +19149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -19307,7 +19174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -19332,7 +19199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -19357,7 +19224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -19382,7 +19249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -19407,7 +19274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -19432,7 +19299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -19457,7 +19324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -19482,7 +19349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -19507,7 +19374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -19532,7 +19399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -19557,7 +19424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6rb%C3%B6le",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=231300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/231300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -19582,7 +19449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -19607,7 +19474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -19632,7 +19499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -19657,7 +19524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -19682,7 +19549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -19707,7 +19574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -19732,7 +19599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -19757,7 +19624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -19782,7 +19649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -19807,7 +19674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -19832,7 +19699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -19857,7 +19724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -19882,7 +19749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -19907,7 +19774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -19932,7 +19799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -19957,7 +19824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -19982,7 +19849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -20007,7 +19874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -20032,7 +19899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -20057,7 +19924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -20082,7 +19949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -20107,7 +19974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -20132,7 +19999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -20157,7 +20024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kiruna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -20182,7 +20049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -20207,7 +20074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -20232,7 +20099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -20257,7 +20124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -20282,7 +20149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -20307,7 +20174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -20332,7 +20199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -20357,7 +20224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -20382,7 +20249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -20407,7 +20274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -20432,7 +20299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -20457,7 +20324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -20482,7 +20349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -20507,7 +20374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -20532,7 +20399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -20557,7 +20424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -20582,7 +20449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -20607,7 +20474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -20632,7 +20499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -20657,7 +20524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -20682,7 +20549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-City-Hallsberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=176110&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/176110?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -20707,7 +20574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -20732,7 +20599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -20757,7 +20624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -20782,7 +20649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -20807,7 +20674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -20832,7 +20699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -20857,7 +20724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -20882,7 +20749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -20907,7 +20774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -20932,7 +20799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -20957,7 +20824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -20982,7 +20849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -21007,7 +20874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -21032,7 +20899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -21057,7 +20924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -21082,7 +20949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -21107,7 +20974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -21132,7 +20999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -21157,7 +21024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -21182,7 +21049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -21207,7 +21074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -21232,7 +21099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -21257,7 +21124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -21282,7 +21149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -21307,7 +21174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -21332,7 +21199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Varberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=112000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/112000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -21357,7 +21224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -21382,7 +21249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340420500000",
@@ -21407,7 +21274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -21432,7 +21299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -21457,7 +21324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -21482,7 +21349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -21507,7 +21374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -21532,7 +21399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -21557,7 +21424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -21582,7 +21449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -21607,7 +21474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -21632,7 +21499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -21657,7 +21524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -21682,7 +21549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -21707,7 +21574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -21732,7 +21599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -21757,7 +21624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -21782,7 +21649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -21807,7 +21674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -21832,7 +21699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -21857,7 +21724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -21882,7 +21749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -21907,7 +21774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nolhaga-Sk%C3%B6vde",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -21932,7 +21799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -21957,7 +21824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -21982,7 +21849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -22007,7 +21874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -22032,7 +21899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -22057,7 +21924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -22082,7 +21949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -22107,7 +21974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -22132,7 +21999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -22157,7 +22024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -22182,7 +22049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -22207,7 +22074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -22232,7 +22099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -22257,7 +22124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074009230",
@@ -22282,7 +22149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -22307,7 +22174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -22332,7 +22199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -22357,7 +22224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -22382,7 +22249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -22407,7 +22274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -22432,7 +22299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -22457,7 +22324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -22482,7 +22349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -22507,7 +22374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -22532,7 +22399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Kungsbacka",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255900&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -22557,7 +22424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -22582,7 +22449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -22607,7 +22474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -22632,7 +22499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -22657,7 +22524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -22682,7 +22549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -22707,7 +22574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -22732,7 +22599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -22757,7 +22624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -22782,7 +22649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -22807,7 +22674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -22832,7 +22699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -22857,7 +22724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -22882,7 +22749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -22907,7 +22774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -22932,7 +22799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -22957,7 +22824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -22982,7 +22849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -23007,7 +22874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -23032,7 +22899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -23057,7 +22924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -23082,7 +22949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bergvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=162000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/162000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -23107,7 +22974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -23132,7 +22999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -23157,7 +23024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -23182,7 +23049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -23207,7 +23074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -23232,7 +23099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -23257,7 +23124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -23282,7 +23149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -23307,7 +23174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -23332,7 +23199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -23357,7 +23224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -23382,7 +23249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -23407,7 +23274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -23432,7 +23299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -23457,7 +23324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -23482,7 +23349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -23507,7 +23374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -23532,7 +23399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -23557,7 +23424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -23582,7 +23449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -23607,7 +23474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -23632,7 +23499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -23657,7 +23524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -23682,7 +23549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -23707,7 +23574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Kalix",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -23732,7 +23599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -23757,7 +23624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -23782,7 +23649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -23807,7 +23674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -23832,7 +23699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -23857,7 +23724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072627",
@@ -23882,7 +23749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -23907,7 +23774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -23932,7 +23799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -23957,7 +23824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -23982,7 +23849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -24007,7 +23874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -24032,7 +23899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -24057,7 +23924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -24082,7 +23949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -24107,7 +23974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -24132,7 +23999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -24157,7 +24024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -24182,7 +24049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -24207,7 +24074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -24232,7 +24099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hudiksvall",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205180&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205180?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -24257,7 +24124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -24282,7 +24149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -24307,7 +24174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -24332,7 +24199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -24357,7 +24224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -24382,7 +24249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -24407,7 +24274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -24432,7 +24299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -24457,7 +24324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -24482,7 +24349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -24507,7 +24374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -24532,7 +24399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -24557,7 +24424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -24582,7 +24449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -24607,7 +24474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -24632,7 +24499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -24657,7 +24524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -24682,7 +24549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -24707,7 +24574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -24732,7 +24599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -24757,7 +24624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -24782,7 +24649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -24807,7 +24674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-J%C3%B6nk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=072000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/072000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -24832,7 +24699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -24857,7 +24724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -24882,7 +24749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -24907,7 +24774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -24932,7 +24799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -24957,7 +24824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -24982,7 +24849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -25007,7 +24874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -25032,7 +24899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -25057,7 +24924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -25082,7 +24949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -25107,7 +24974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -25132,7 +24999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -25157,7 +25024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -25182,7 +25049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -25207,7 +25074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -25232,7 +25099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -25257,7 +25124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -25282,7 +25149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -25307,7 +25174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -25332,7 +25199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -25357,7 +25224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-G%C3%A4llivare",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=241100&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/241100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -25382,7 +25249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -25407,7 +25274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -25432,7 +25299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -25457,7 +25324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -25482,7 +25349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -25507,7 +25374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -25532,7 +25399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -25557,7 +25424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -25582,7 +25449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -25607,7 +25474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -25632,7 +25499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -25657,7 +25524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -25682,7 +25549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Fiskaregatan-Vimmerby",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=056230&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/056230?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -25707,7 +25574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -25732,7 +25599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005304",
@@ -25757,7 +25624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340420500000",
@@ -25782,7 +25649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -25807,7 +25674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -25832,7 +25699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -25857,7 +25724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -25882,7 +25749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -25907,7 +25774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -25932,7 +25799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -25957,7 +25824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -25982,7 +25849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -26007,7 +25874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -26032,7 +25899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -26057,7 +25924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111050",
@@ -26082,7 +25949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Coop-Bredden",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026500&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026500?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -26107,7 +25974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -26132,7 +25999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -26157,7 +26024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -26182,7 +26049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -26207,7 +26074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -26232,7 +26099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -26257,7 +26124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -26282,7 +26149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -26307,7 +26174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -26332,7 +26199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -26357,7 +26224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -26382,7 +26249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -26407,7 +26274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -26432,7 +26299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -26457,7 +26324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -26482,7 +26349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -26507,7 +26374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -26532,7 +26399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -26557,7 +26424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -26582,7 +26449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -26607,7 +26474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -26632,7 +26499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Marieberg",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=175010&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/175010?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -26657,7 +26524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -26682,7 +26549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -26707,7 +26574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -26732,7 +26599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -26757,7 +26624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -26782,7 +26649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -26807,7 +26674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -26832,7 +26699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -26857,7 +26724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -26882,7 +26749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -26907,7 +26774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -26932,7 +26799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -26957,7 +26824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -26982,7 +26849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074009230",
@@ -27007,7 +26874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -27032,7 +26899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -27057,7 +26924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -27082,7 +26949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -27107,7 +26974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -27132,7 +26999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -27157,7 +27024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -27182,7 +27049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -27207,7 +27074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -27232,7 +27099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Nyk%C3%B6ping",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -27257,7 +27124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -27282,7 +27149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -27307,7 +27174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -27332,7 +27199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -27357,7 +27224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -27382,7 +27249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -27407,7 +27274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -27432,7 +27299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -27457,7 +27324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -27482,7 +27349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -27507,7 +27374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -27532,7 +27399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -27557,7 +27424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -27582,7 +27449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -27607,7 +27474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -27632,7 +27499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -27657,7 +27524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -27682,7 +27549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -27707,7 +27574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -27732,7 +27599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -27757,7 +27624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -27782,7 +27649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -27807,7 +27674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -27832,7 +27699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Norrteljeporten",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=036968&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/036968?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -27857,7 +27724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -27882,7 +27749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -27907,7 +27774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -27932,7 +27799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -27957,7 +27824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -27982,7 +27849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -28007,7 +27874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -28032,7 +27899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -28057,7 +27924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -28082,7 +27949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -28107,7 +27974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -28132,7 +27999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -28157,7 +28024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -28182,7 +28049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -28207,7 +28074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -28232,7 +28099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -28257,7 +28124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -28282,7 +28149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -28307,7 +28174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -28332,7 +28199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -28357,7 +28224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -28382,7 +28249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -28407,7 +28274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -28432,7 +28299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -28457,7 +28324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Str%C3%A4ngn%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=257400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/257400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -28482,7 +28349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -28507,7 +28374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -28532,7 +28399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -28557,7 +28424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -28582,7 +28449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072627",
@@ -28607,7 +28474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -28632,7 +28499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -28657,7 +28524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -28682,7 +28549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -28707,7 +28574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -28732,7 +28599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074009230",
@@ -28757,7 +28624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -28782,7 +28649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -28807,7 +28674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -28832,7 +28699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -28857,7 +28724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -28882,7 +28749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -28907,7 +28774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -28932,7 +28799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -28957,7 +28824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Eskilstuna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=253000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/253000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -28982,7 +28849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -29007,7 +28874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -29032,7 +28899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -29057,7 +28924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -29082,7 +28949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -29107,7 +28974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -29132,7 +28999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -29157,7 +29024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -29182,7 +29049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -29207,7 +29074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -29232,7 +29099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -29257,7 +29124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -29282,7 +29149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -29307,7 +29174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -29332,7 +29199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -29357,7 +29224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -29382,7 +29249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -29407,7 +29274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -29432,7 +29299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -29457,7 +29324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -29482,7 +29349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -29507,7 +29374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -29532,7 +29399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -29557,7 +29424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -29582,7 +29449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bor%C3%A5s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252200&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252200?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -29607,7 +29474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -29632,7 +29499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -29657,7 +29524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -29682,7 +29549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -29707,7 +29574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -29732,7 +29599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -29757,7 +29624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -29782,7 +29649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -29807,7 +29674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -29832,7 +29699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -29857,7 +29724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -29882,7 +29749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -29907,7 +29774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -29932,7 +29799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -29957,7 +29824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074009230",
@@ -29982,7 +29849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -30007,7 +29874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -30032,7 +29899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -30057,7 +29924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -30082,7 +29949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -30107,7 +29974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -30132,7 +29999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -30157,7 +30024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -30182,7 +30049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -30207,7 +30074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop--Bolln%C3%A4s",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=205140&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/205140?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -30232,7 +30099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -30257,7 +30124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -30282,7 +30149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340420500000",
@@ -30307,7 +30174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -30332,7 +30199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -30357,7 +30224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -30382,7 +30249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -30407,7 +30274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -30432,7 +30299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -30457,7 +30324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -30482,7 +30349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -30507,7 +30374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -30532,7 +30399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -30557,7 +30424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -30582,7 +30449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -30607,7 +30474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -30632,7 +30499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2097474500004",
@@ -30657,7 +30524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -30682,7 +30549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -30707,7 +30574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -30732,7 +30599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -30757,7 +30624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -30782,7 +30649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -30807,7 +30674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Palmviken",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2383471000006",
@@ -30832,7 +30699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -30857,7 +30724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -30882,7 +30749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -30907,7 +30774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -30932,7 +30799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -30957,7 +30824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -30982,7 +30849,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -31007,7 +30874,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -31032,7 +30899,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2385912200006",
@@ -31057,7 +30924,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317264300004",
@@ -31082,7 +30949,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -31107,7 +30974,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317075000001",
@@ -31132,7 +30999,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -31157,7 +31024,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -31182,7 +31049,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -31207,7 +31074,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -31232,7 +31099,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -31257,7 +31124,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2097474500004",
@@ -31282,7 +31149,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -31307,7 +31174,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -31332,7 +31199,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -31357,7 +31224,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -31382,7 +31249,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -31407,7 +31274,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -31432,7 +31299,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Styck%C3%A5sen",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=165400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/165400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317342100007",
@@ -31457,7 +31324,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865005168",
@@ -31482,7 +31349,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2340375400004",
@@ -31507,7 +31374,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7340191179691",
@@ -31532,7 +31399,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300206718000",
@@ -31557,7 +31424,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310865095466",
@@ -31582,7 +31449,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "80508816",
@@ -31607,7 +31474,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7331044072573",
@@ -31632,7 +31499,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2307125100003",
@@ -31657,7 +31524,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5740301203124",
@@ -31682,7 +31549,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2330120500004",
@@ -31707,7 +31574,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310074014630",
@@ -31732,7 +31599,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300207071005",
@@ -31757,7 +31624,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7300156596727",
@@ -31782,7 +31649,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "2317474500003",
@@ -31807,7 +31674,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7314873525014",
@@ -31832,7 +31699,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7311070330243",
@@ -31857,7 +31724,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7350051211164",
@@ -31882,7 +31749,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7622210929525",
@@ -31907,7 +31774,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "5701092111067",
@@ -31932,7 +31799,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "4006000089874",
@@ -31957,7 +31824,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   },
   {
     "code": "7310867561020",
@@ -31982,7 +31849,2382 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Hammar%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=163800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/163800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T13:24:42.059Z"
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2383471000006",
+    "ean": "2383471000006",
+    "name": "Laxfilé",
+    "brand": "Harbour",
+    "packageText": "1450 gram/bit ungefärlig vikt",
+    "ordinaryPrice": 249.86,
+    "ordinaryPriceText": "249.86 SEK",
+    "offerPrice": 149,
+    "offerPriceText": "149.00 SEK",
+    "offerUnitPrice": 149,
+    "offerUnitPriceText": "149.00 kr/kg",
+    "offerMechanicText": "149 kr/kg",
+    "promotionId": "v.21 DR 2026 Laxfilé",
+    "medMeraRequired": true,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317342100007",
+    "ean": "2317342100007",
+    "name": "Vattenmelon Mini",
+    "brand": "",
+    "packageText": "2450 gram ungefärlig vikt",
+    "ordinaryPrice": 26.45,
+    "ordinaryPriceText": "26.45 SEK",
+    "offerPrice": 20,
+    "offerPriceText": "20.00 SEK",
+    "offerUnitPrice": 20,
+    "offerUnitPriceText": "20.00 kr/kg",
+    "offerMechanicText": "Medlemspris-Vattenmelon Mini-20:- /kg",
+    "promotionId": "016001_141239",
+    "medMeraRequired": true,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310865005168",
+    "ean": "7310865005168",
+    "name": "Smör Normalsaltat",
+    "brand": "Svenskt Smör från Arla",
+    "packageText": "500g",
+    "ordinaryPrice": 61.45,
+    "ordinaryPriceText": "61.45 SEK",
+    "offerPrice": 45,
+    "offerPriceText": "45.00 SEK",
+    "offerUnitPrice": 90,
+    "offerUnitPriceText": "90.00 kr/kg",
+    "offerMechanicText": "Medlemspris-Smör 45 kr/st-1 för 45:-",
+    "promotionId": "016001_41099",
+    "medMeraRequired": true,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2340375400004",
+    "ean": "2340375400004",
+    "name": "Hushållsost",
+    "brand": "Arla®",
+    "packageText": "1100 gram/st ungefärlig vikt",
+    "ordinaryPrice": 118.3,
+    "ordinaryPriceText": "118.30 SEK",
+    "offerPrice": 74.9,
+    "offerPriceText": "74.90 SEK",
+    "offerUnitPrice": 74.9,
+    "offerUnitPriceText": "74.90 kr/kg",
+    "offerMechanicText": "Medlemspris-Hushållsost-74:90 /kg",
+    "promotionId": "016001_141234",
+    "medMeraRequired": true,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7340191179691",
+    "ean": "7340191179691",
+    "name": "Toalettpapper Nice & Soft 24-pack",
+    "brand": "Coop",
+    "packageText": "2332 G",
+    "ordinaryPrice": 119,
+    "ordinaryPriceText": "119.00 SEK",
+    "offerPrice": 99,
+    "offerPriceText": "99.00 SEK",
+    "offerUnitPrice": 42.45,
+    "offerUnitPriceText": "42.45 kr/kg",
+    "offerMechanicText": "Toalettpapper Nice & Soft 24-pack-99:- /st",
+    "promotionId": "016001_141210",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7300206718000",
+    "ean": "7300206718000",
+    "name": "Bacon 3-pack",
+    "brand": "Scan",
+    "packageText": "3x140g",
+    "ordinaryPrice": 42.65,
+    "ordinaryPriceText": "42.65 SEK",
+    "offerPrice": 37.9,
+    "offerPriceText": "37.90 SEK",
+    "offerUnitPrice": 90.24,
+    "offerUnitPriceText": "90.24 kr/kg",
+    "offerMechanicText": "Bacon 3-pack-37:90 /st",
+    "promotionId": "016001_141220",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310865095466",
+    "ean": "7310865095466",
+    "name": "Grekisk yoghurt 10%",
+    "brand": "Arla Köket®",
+    "packageText": "1000 g",
+    "ordinaryPrice": 36.86,
+    "ordinaryPriceText": "36.86 SEK",
+    "offerPrice": 29.9,
+    "offerPriceText": "29.90 SEK",
+    "offerUnitPrice": 29.9,
+    "offerUnitPriceText": "29.90 kr/kg",
+    "offerMechanicText": "Grekisk yoghurt 10%-29:90 /st",
+    "promotionId": "016001_141197",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "80508816",
+    "ean": "80508816",
+    "name": "Olivolja Classico",
+    "brand": "Monini",
+    "packageText": "750 ml",
+    "ordinaryPrice": 97.48,
+    "ordinaryPriceText": "97.48 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 118.66,
+    "offerUnitPriceText": "118.66 kr/lit",
+    "offerMechanicText": "Olivolja Classico-89:- /st",
+    "promotionId": "016001_141147",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7331044072573",
+    "ean": "7331044072573",
+    "name": "Kalkonbröstfilé",
+    "brand": "Ingelsta Kalkon",
+    "packageText": "400G",
+    "ordinaryPrice": 85.13,
+    "ordinaryPriceText": "85.13 SEK",
+    "offerPrice": 76.9,
+    "offerPriceText": "76.90 SEK",
+    "offerUnitPrice": 192.25,
+    "offerUnitPriceText": "192.25 kr/kg",
+    "offerMechanicText": "Kalkonbröstfilé-76:90 /st",
+    "promotionId": "016001_141207",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2385912200006",
+    "ean": "2385912200006",
+    "name": "Fläskfilé",
+    "brand": "Danish Crown",
+    "packageText": "650 gram ungefärlig vikt",
+    "ordinaryPrice": 125.87,
+    "ordinaryPriceText": "125.87 SEK",
+    "offerPrice": 99,
+    "offerPriceText": "99.00 SEK",
+    "offerUnitPrice": 99,
+    "offerUnitPriceText": "99.00 kr/kg",
+    "offerMechanicText": "99 kg/kg",
+    "promotionId": "v.21 DR 2026 fläskfilé",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317264300004",
+    "ean": "2317264300004",
+    "name": "Stekfläsk Skivor",
+    "brand": "Coop",
+    "packageText": "ca 1000 g",
+    "ordinaryPrice": 101.27,
+    "ordinaryPriceText": "101.27 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 89,
+    "offerUnitPriceText": "89.00 kr/kg",
+    "offerMechanicText": "Stekfläsk Skivor-89:- /kg",
+    "promotionId": "016001_141152",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2307125100003",
+    "ean": "2307125100003",
+    "name": "Kycklingbröstfilé Tvådelad Marinerad Mango Chili Glaze",
+    "brand": "Guldfågeln",
+    "packageText": "900 gram ungefärlig vikt",
+    "ordinaryPrice": 178.87,
+    "ordinaryPriceText": "178.87 SEK",
+    "offerPrice": 149,
+    "offerPriceText": "149.00 SEK",
+    "offerUnitPrice": 149,
+    "offerUnitPriceText": "149.00 kr/kg",
+    "offerMechanicText": "Kycklingbröstfilé Tvådelad Marinerad Mango Chili Glaze-149:- /kg",
+    "promotionId": "016001_141150",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317075000001",
+    "ean": "2317075000001",
+    "name": "Lövbiff av fransyska",
+    "brand": "Coop",
+    "packageText": "950 gram ungefärlig vikt",
+    "ordinaryPrice": 203.58,
+    "ordinaryPriceText": "203.58 SEK",
+    "offerPrice": 179,
+    "offerPriceText": "179.00 SEK",
+    "offerUnitPrice": 179,
+    "offerUnitPriceText": "179.00 kr/kg",
+    "offerMechanicText": "Lövbiff av fransyska-179:- /kg",
+    "promotionId": "016001_141151",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "5740301203124",
+    "ean": "5740301203124",
+    "name": "Torskryggfilé 3-pack",
+    "brand": "Royal Greenland",
+    "packageText": "375 g",
+    "ordinaryPrice": 155.21,
+    "ordinaryPriceText": "155.21 SEK",
+    "offerPrice": 119,
+    "offerPriceText": "119.00 SEK",
+    "offerUnitPrice": 317.33,
+    "offerUnitPriceText": "317.33 kr/kg",
+    "offerMechanicText": "Torskryggfilé 3-pack-119:- /st",
+    "promotionId": "016001_141136",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2330120500004",
+    "ean": "2330120500004",
+    "name": "Karré Eld & rök",
+    "brand": "Dalsjöfors",
+    "packageText": "800 gram ungefärlig vikt",
+    "ordinaryPrice": 92.75,
+    "ordinaryPriceText": "92.75 SEK",
+    "offerPrice": 79.9,
+    "offerPriceText": "79.90 SEK",
+    "offerUnitPrice": 79.9,
+    "offerUnitPriceText": "79.90 kr/kg",
+    "offerMechanicText": "Karré Eld & rök-79:90 /kg",
+    "promotionId": "016001_141232",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310074014630",
+    "ean": "7310074014630",
+    "name": "Pepsi Max 20-pack",
+    "brand": "Pepsi",
+    "packageText": "20x33cl",
+    "ordinaryPrice": 118.3,
+    "ordinaryPriceText": "118.30 SEK",
+    "offerPrice": 84,
+    "offerPriceText": "84.00 SEK",
+    "offerUnitPrice": 12.72,
+    "offerUnitPriceText": "12.72 kr/lit",
+    "offerMechanicText": "Pepsi Max 20-pack-84:- /st",
+    "promotionId": "016001_141222",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7300207071005",
+    "ean": "7300207071005",
+    "name": "Grillkorv med tunt skinn",
+    "brand": "Scan",
+    "packageText": "640 g",
+    "ordinaryPrice": 47.27,
+    "ordinaryPriceText": "47.27 SEK",
+    "offerPrice": 39,
+    "offerPriceText": "39.00 SEK",
+    "offerUnitPrice": 60.94,
+    "offerUnitPriceText": "60.94 kr/kg",
+    "offerMechanicText": "Medlemspris-Grillkorv med tunt skinn-39:- /st",
+    "promotionId": "016001_141257",
+    "medMeraRequired": true,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7300156596727",
+    "ean": "7300156596727",
+    "name": "Lök Gul Eko",
+    "brand": "Änglamark",
+    "packageText": "500 g",
+    "ordinaryPrice": 17.94,
+    "ordinaryPriceText": "17.94 SEK",
+    "offerPrice": 13,
+    "offerPriceText": "13.00 SEK",
+    "offerUnitPrice": 26,
+    "offerUnitPriceText": "26.00 kr/kg",
+    "offerMechanicText": "Lök Gul Eko-13:- /st",
+    "promotionId": "016001_141200",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317474500003",
+    "ean": "2317474500003",
+    "name": "Rabarber",
+    "brand": "",
+    "packageText": "1 kg",
+    "ordinaryPrice": 59.58,
+    "ordinaryPriceText": "59.58 SEK",
+    "offerPrice": 38,
+    "offerPriceText": "38.00 SEK",
+    "offerUnitPrice": 38,
+    "offerUnitPriceText": "38.00 kr/kg",
+    "offerMechanicText": "Rabarber-38:- /kg",
+    "promotionId": "016001_141141",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7314873525014",
+    "ean": "7314873525014",
+    "name": "Lantbröd Havssalt",
+    "brand": "Fazer",
+    "packageText": "600g",
+    "ordinaryPrice": 32.13,
+    "ordinaryPriceText": "32.13 SEK",
+    "offerPrice": 25,
+    "offerPriceText": "25.00 SEK",
+    "offerUnitPrice": 41.67,
+    "offerUnitPriceText": "41.67 kr/kg",
+    "offerMechanicText": "Lantbröd Havssalt-25:- /st",
+    "promotionId": "016001_141204",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7311070330243",
+    "ean": "7311070330243",
+    "name": "Lingongrova Special",
+    "brand": "Pågen",
+    "packageText": "500 g",
+    "ordinaryPrice": 27.4,
+    "ordinaryPriceText": "27.40 SEK",
+    "offerPrice": 20,
+    "offerPriceText": "20.00 SEK",
+    "offerUnitPrice": 40,
+    "offerUnitPriceText": "40.00 kr/kg",
+    "offerMechanicText": "Lingongrova Special-20:- /st",
+    "promotionId": "016001_141201",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7350051211164",
+    "ean": "7350051211164",
+    "name": "Salami Milano",
+    "brand": "Engelmanns",
+    "packageText": "80 gr",
+    "ordinaryPrice": 50.11,
+    "ordinaryPriceText": "50.11 SEK",
+    "offerPrice": 39.9,
+    "offerPriceText": "39.90 SEK",
+    "offerUnitPrice": 498.75,
+    "offerUnitPriceText": "498.75 kr/kg",
+    "offerMechanicText": "Salami Milano-39:90 /st",
+    "promotionId": "016001_141214",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7622210929525",
+    "ean": "7622210929525",
+    "name": "Chokladpraliner Hjärta",
+    "brand": "Marabou",
+    "packageText": "165g",
+    "ordinaryPrice": 65.26,
+    "ordinaryPriceText": "65.26 SEK",
+    "offerPrice": 45,
+    "offerPriceText": "45.00 SEK",
+    "offerUnitPrice": 272.73,
+    "offerUnitPriceText": "272.73 kr/kg",
+    "offerMechanicText": "Chokladpraliner Hjärta-45:- /st",
+    "promotionId": "016001_141219",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "5701092111067",
+    "ean": "5701092111067",
+    "name": "Fläckborttagning White Gold",
+    "brand": "Vanish",
+    "packageText": "470g",
+    "ordinaryPrice": 62.95,
+    "ordinaryPriceText": "62.95 SEK",
+    "offerPrice": 54.9,
+    "offerPriceText": "54.90 SEK",
+    "offerUnitPrice": 116.81,
+    "offerUnitPriceText": "116.81 kr/kg",
+    "offerMechanicText": "Fläckborttagning White Gold-54:90 /st",
+    "promotionId": "016001_141140",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "4006000089874",
+    "ean": "4006000089874",
+    "name": "Dagkräm Q10 Energy spf 15",
+    "brand": "NIVEA",
+    "packageText": "50 ml",
+    "ordinaryPrice": 119,
+    "ordinaryPriceText": "119.00 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 1780,
+    "offerUnitPriceText": "1780.00 kr/lit",
+    "offerMechanicText": "Dagkräm Q10 Energy spf 15-89:- /st",
+    "promotionId": "016001_141231",
+    "medMeraRequired": false,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310867561020",
+    "ean": "7310867561020",
+    "name": "Juice Tropisk",
+    "brand": "Bravo",
+    "packageText": "2 L",
+    "ordinaryPrice": 37.81,
+    "ordinaryPriceText": "37.81 SEK",
+    "offerPrice": 34,
+    "offerPriceText": "34.00 SEK",
+    "offerUnitPrice": 17,
+    "offerUnitPriceText": "17.00 kr/lit",
+    "offerMechanicText": "Medlemspris-Juice Tropisk-34:- /st",
+    "promotionId": "016001_141252",
+    "medMeraRequired": true,
+    "storeId": "185510",
+    "storeName": "Stora Coop Stenby Västerås",
+    "region": "Västerås",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stenby-V%C3%A4ster%C3%A5s",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=185510&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/185510?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317342100007",
+    "ean": "2317342100007",
+    "name": "Vattenmelon Mini",
+    "brand": "",
+    "packageText": "2450 gram ungefärlig vikt",
+    "ordinaryPrice": 27.4,
+    "ordinaryPriceText": "27.40 SEK",
+    "offerPrice": 20,
+    "offerPriceText": "20.00 SEK",
+    "offerUnitPrice": 20,
+    "offerUnitPriceText": "20.00 kr/kg",
+    "offerMechanicText": "Medlemspris-Vattenmelon Mini-20:- /kg",
+    "promotionId": "016001_141239",
+    "medMeraRequired": true,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310865005168",
+    "ean": "7310865005168",
+    "name": "Smör Normalsaltat",
+    "brand": "Svenskt Smör från Arla",
+    "packageText": "500g",
+    "ordinaryPrice": 61.47,
+    "ordinaryPriceText": "61.47 SEK",
+    "offerPrice": 45,
+    "offerPriceText": "45.00 SEK",
+    "offerUnitPrice": 90,
+    "offerUnitPriceText": "90.00 kr/kg",
+    "offerMechanicText": "Medlemspris-Smör 45 kr/st-1 för 45:-",
+    "promotionId": "016001_41099",
+    "medMeraRequired": true,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2340375400004",
+    "ean": "2340375400004",
+    "name": "Hushållsost",
+    "brand": "Arla®",
+    "packageText": "1100 gram/st ungefärlig vikt",
+    "ordinaryPrice": 114.95,
+    "ordinaryPriceText": "114.95 SEK",
+    "offerPrice": 74.9,
+    "offerPriceText": "74.90 SEK",
+    "offerUnitPrice": 74.9,
+    "offerUnitPriceText": "74.90 kr/kg",
+    "offerMechanicText": "Medlemspris-Hushållsost-74:90 /kg",
+    "promotionId": "016001_141234",
+    "medMeraRequired": true,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7340191179691",
+    "ean": "7340191179691",
+    "name": "Toalettpapper Nice & Soft 24-pack",
+    "brand": "Coop",
+    "packageText": "2332 G",
+    "ordinaryPrice": 127,
+    "ordinaryPriceText": "127.00 SEK",
+    "offerPrice": 99,
+    "offerPriceText": "99.00 SEK",
+    "offerUnitPrice": 42.45,
+    "offerUnitPriceText": "42.45 kr/kg",
+    "offerMechanicText": "Toalettpapper Nice & Soft 24-pack-99:- /st",
+    "promotionId": "016001_141210",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7300206718000",
+    "ean": "7300206718000",
+    "name": "Bacon 3-pack",
+    "brand": "Scan",
+    "packageText": "3x140g",
+    "ordinaryPrice": 40.65,
+    "ordinaryPriceText": "40.65 SEK",
+    "offerPrice": 37.9,
+    "offerPriceText": "37.90 SEK",
+    "offerUnitPrice": 90.24,
+    "offerUnitPriceText": "90.24 kr/kg",
+    "offerMechanicText": "Bacon 3-pack-37:90 /st",
+    "promotionId": "016001_141220",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310865095466",
+    "ean": "7310865095466",
+    "name": "Grekisk yoghurt 10%",
+    "brand": "Arla Köket®",
+    "packageText": "1000 g",
+    "ordinaryPrice": 39.28,
+    "ordinaryPriceText": "39.28 SEK",
+    "offerPrice": 29.9,
+    "offerPriceText": "29.90 SEK",
+    "offerUnitPrice": 29.9,
+    "offerUnitPriceText": "29.90 kr/kg",
+    "offerMechanicText": "Grekisk yoghurt 10%-29:90 /st",
+    "promotionId": "016001_141197",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "80508816",
+    "ean": "80508816",
+    "name": "Olivolja Classico",
+    "brand": "Monini",
+    "packageText": "750 ml",
+    "ordinaryPrice": 101.27,
+    "ordinaryPriceText": "101.27 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 118.67,
+    "offerUnitPriceText": "118.67 kr/lit",
+    "offerMechanicText": "Olivolja Classico-89:- /st",
+    "promotionId": "016001_141147",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2385912200006",
+    "ean": "2385912200006",
+    "name": "Fläskfilé",
+    "brand": "Danish Crown",
+    "packageText": "650 gram ungefärlig vikt",
+    "ordinaryPrice": 125.87,
+    "ordinaryPriceText": "125.87 SEK",
+    "offerPrice": 99,
+    "offerPriceText": "99.00 SEK",
+    "offerUnitPrice": 99,
+    "offerUnitPriceText": "99.00 kr/kg",
+    "offerMechanicText": "99 kg/kg",
+    "promotionId": "v.21 DR 2026 fläskfilé",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317264300004",
+    "ean": "2317264300004",
+    "name": "Stekfläsk Skivor",
+    "brand": "Coop",
+    "packageText": "ca 1000 g",
+    "ordinaryPrice": 101.27,
+    "ordinaryPriceText": "101.27 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 89,
+    "offerUnitPriceText": "89.00 kr/kg",
+    "offerMechanicText": "Stekfläsk Skivor-89:- /kg",
+    "promotionId": "016001_141152",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2307125100003",
+    "ean": "2307125100003",
+    "name": "Kycklingbröstfilé Tvådelad Marinerad Mango Chili Glaze",
+    "brand": "Guldfågeln",
+    "packageText": "900 gram ungefärlig vikt",
+    "ordinaryPrice": 188.34,
+    "ordinaryPriceText": "188.34 SEK",
+    "offerPrice": 149,
+    "offerPriceText": "149.00 SEK",
+    "offerUnitPrice": 149,
+    "offerUnitPriceText": "149.00 kr/kg",
+    "offerMechanicText": "Kycklingbröstfilé Tvådelad Marinerad Mango Chili Glaze-149:- /kg",
+    "promotionId": "016001_141150",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317075000001",
+    "ean": "2317075000001",
+    "name": "Lövbiff av fransyska",
+    "brand": "Coop",
+    "packageText": "950 gram ungefärlig vikt",
+    "ordinaryPrice": 203.58,
+    "ordinaryPriceText": "203.58 SEK",
+    "offerPrice": 179,
+    "offerPriceText": "179.00 SEK",
+    "offerUnitPrice": 179,
+    "offerUnitPriceText": "179.00 kr/kg",
+    "offerMechanicText": "Lövbiff av fransyska-179:- /kg",
+    "promotionId": "016001_141151",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "5740301203124",
+    "ean": "5740301203124",
+    "name": "Torskryggfilé 3-pack",
+    "brand": "Royal Greenland",
+    "packageText": "375 g",
+    "ordinaryPrice": 163.73,
+    "ordinaryPriceText": "163.73 SEK",
+    "offerPrice": 119,
+    "offerPriceText": "119.00 SEK",
+    "offerUnitPrice": 317.33,
+    "offerUnitPriceText": "317.33 kr/kg",
+    "offerMechanicText": "Torskryggfilé 3-pack-119:- /st",
+    "promotionId": "016001_141136",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2330120500004",
+    "ean": "2330120500004",
+    "name": "Karré Eld & rök",
+    "brand": "Dalsjöfors",
+    "packageText": "800 gram ungefärlig vikt",
+    "ordinaryPrice": 92.75,
+    "ordinaryPriceText": "92.75 SEK",
+    "offerPrice": 79.9,
+    "offerPriceText": "79.90 SEK",
+    "offerUnitPrice": 79.9,
+    "offerUnitPriceText": "79.90 kr/kg",
+    "offerMechanicText": "Karré Eld & rök-79:90 /kg",
+    "promotionId": "016001_141232",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310074014630",
+    "ean": "7310074014630",
+    "name": "Pepsi Max 20-pack",
+    "brand": "Pepsi",
+    "packageText": "20x33cl",
+    "ordinaryPrice": 125.87,
+    "ordinaryPriceText": "125.87 SEK",
+    "offerPrice": 84,
+    "offerPriceText": "84.00 SEK",
+    "offerUnitPrice": 12.73,
+    "offerUnitPriceText": "12.73 kr/lit",
+    "offerMechanicText": "Pepsi Max 20-pack-84:- /st",
+    "promotionId": "016001_141222",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7300207071005",
+    "ean": "7300207071005",
+    "name": "Grillkorv med tunt skinn",
+    "brand": "Scan",
+    "packageText": "640 g",
+    "ordinaryPrice": 49.69,
+    "ordinaryPriceText": "49.69 SEK",
+    "offerPrice": 39,
+    "offerPriceText": "39.00 SEK",
+    "offerUnitPrice": 60.94,
+    "offerUnitPriceText": "60.94 kr/kg",
+    "offerMechanicText": "Medlemspris-Grillkorv med tunt skinn-39:- /st",
+    "promotionId": "016001_141257",
+    "medMeraRequired": true,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7300156596727",
+    "ean": "7300156596727",
+    "name": "Lök Gul Eko",
+    "brand": "Änglamark",
+    "packageText": "500 g",
+    "ordinaryPrice": 16.99,
+    "ordinaryPriceText": "16.99 SEK",
+    "offerPrice": 13,
+    "offerPriceText": "13.00 SEK",
+    "offerUnitPrice": 26,
+    "offerUnitPriceText": "26.00 kr/kg",
+    "offerMechanicText": "Lök Gul Eko-13:- /st",
+    "promotionId": "016001_141200",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317474500003",
+    "ean": "2317474500003",
+    "name": "Rabarber",
+    "brand": "",
+    "packageText": "1 kg",
+    "ordinaryPrice": 59.58,
+    "ordinaryPriceText": "59.58 SEK",
+    "offerPrice": 38,
+    "offerPriceText": "38.00 SEK",
+    "offerUnitPrice": 38,
+    "offerUnitPriceText": "38.00 kr/kg",
+    "offerMechanicText": "Rabarber-38:- /kg",
+    "promotionId": "016001_141141",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7314873525014",
+    "ean": "7314873525014",
+    "name": "Lantbröd Havssalt",
+    "brand": "Fazer",
+    "packageText": "600g",
+    "ordinaryPrice": 31.95,
+    "ordinaryPriceText": "31.95 SEK",
+    "offerPrice": 25,
+    "offerPriceText": "25.00 SEK",
+    "offerUnitPrice": 41.67,
+    "offerUnitPriceText": "41.67 kr/kg",
+    "offerMechanicText": "Lantbröd Havssalt-25:- /st",
+    "promotionId": "016001_141204",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7311070330243",
+    "ean": "7311070330243",
+    "name": "Lingongrova Special",
+    "brand": "Pågen",
+    "packageText": "500 g",
+    "ordinaryPrice": 26.03,
+    "ordinaryPriceText": "26.03 SEK",
+    "offerPrice": 20,
+    "offerPriceText": "20.00 SEK",
+    "offerUnitPrice": 40,
+    "offerUnitPriceText": "40.00 kr/kg",
+    "offerMechanicText": "Lingongrova Special-20:- /st",
+    "promotionId": "016001_141201",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7350051211164",
+    "ean": "7350051211164",
+    "name": "Salami Milano",
+    "brand": "Engelmanns",
+    "packageText": "80 gr",
+    "ordinaryPrice": 52.95,
+    "ordinaryPriceText": "52.95 SEK",
+    "offerPrice": 39.9,
+    "offerPriceText": "39.90 SEK",
+    "offerUnitPrice": 498.75,
+    "offerUnitPriceText": "498.75 kr/kg",
+    "offerMechanicText": "Salami Milano-39:90 /st",
+    "promotionId": "016001_141214",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7622210929525",
+    "ean": "7622210929525",
+    "name": "Chokladpraliner Hjärta",
+    "brand": "Marabou",
+    "packageText": "165g",
+    "ordinaryPrice": 67.15,
+    "ordinaryPriceText": "67.15 SEK",
+    "offerPrice": 45,
+    "offerPriceText": "45.00 SEK",
+    "offerUnitPrice": 272.73,
+    "offerUnitPriceText": "272.73 kr/kg",
+    "offerMechanicText": "Chokladpraliner Hjärta-45:- /st",
+    "promotionId": "016001_141219",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "5701092111067",
+    "ean": "5701092111067",
+    "name": "Fläckborttagning White Gold",
+    "brand": "Vanish",
+    "packageText": "470g",
+    "ordinaryPrice": 66.95,
+    "ordinaryPriceText": "66.95 SEK",
+    "offerPrice": 54.9,
+    "offerPriceText": "54.90 SEK",
+    "offerUnitPrice": 116.81,
+    "offerUnitPriceText": "116.81 kr/kg",
+    "offerMechanicText": "Fläckborttagning White Gold-54:90 /st",
+    "promotionId": "016001_141140",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "4006000089874",
+    "ean": "4006000089874",
+    "name": "Dagkräm Q10 Energy spf 15",
+    "brand": "NIVEA",
+    "packageText": "50 ml",
+    "ordinaryPrice": 127,
+    "ordinaryPriceText": "127.00 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 1780,
+    "offerUnitPriceText": "1780.00 kr/lit",
+    "offerMechanicText": "Dagkräm Q10 Energy spf 15-89:- /st",
+    "promotionId": "016001_141231",
+    "medMeraRequired": false,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310867561020",
+    "ean": "7310867561020",
+    "name": "Juice Tropisk",
+    "brand": "Bravo",
+    "packageText": "2 L",
+    "ordinaryPrice": 37.81,
+    "ordinaryPriceText": "37.81 SEK",
+    "offerPrice": 34,
+    "offerPriceText": "34.00 SEK",
+    "offerUnitPrice": 17,
+    "offerUnitPriceText": "17.00 kr/lit",
+    "offerMechanicText": "Medlemspris-Juice Tropisk-34:- /st",
+    "promotionId": "016001_141252",
+    "medMeraRequired": true,
+    "storeId": "232000",
+    "storeName": "Stora Coop Sundsvall",
+    "region": "Sundsvall",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundsvall-Birsta",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=232000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/232000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317342100007",
+    "ean": "2317342100007",
+    "name": "Vattenmelon Mini",
+    "brand": "",
+    "packageText": "2450 gram ungefärlig vikt",
+    "ordinaryPrice": 26.45,
+    "ordinaryPriceText": "26.45 SEK",
+    "offerPrice": 20,
+    "offerPriceText": "20.00 SEK",
+    "offerUnitPrice": 20,
+    "offerUnitPriceText": "20.00 kr/kg",
+    "offerMechanicText": "Medlemspris-Vattenmelon Mini-20:- /kg",
+    "promotionId": "016001_141239",
+    "medMeraRequired": true,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310865005168",
+    "ean": "7310865005168",
+    "name": "Smör Normalsaltat",
+    "brand": "Svenskt Smör från Arla",
+    "packageText": "500g",
+    "ordinaryPrice": 61.45,
+    "ordinaryPriceText": "61.45 SEK",
+    "offerPrice": 45,
+    "offerPriceText": "45.00 SEK",
+    "offerUnitPrice": 90,
+    "offerUnitPriceText": "90.00 kr/kg",
+    "offerMechanicText": "Medlemspris-Smör 45 kr/st-1 för 45:-",
+    "promotionId": "016001_41099",
+    "medMeraRequired": true,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2340375400004",
+    "ean": "2340375400004",
+    "name": "Hushållsost",
+    "brand": "Arla®",
+    "packageText": "1100 gram/st ungefärlig vikt",
+    "ordinaryPrice": 114.5,
+    "ordinaryPriceText": "114.50 SEK",
+    "offerPrice": 74.9,
+    "offerPriceText": "74.90 SEK",
+    "offerUnitPrice": 74.9,
+    "offerUnitPriceText": "74.90 kr/kg",
+    "offerMechanicText": "Medlemspris-Hushållsost-74:90 /kg",
+    "promotionId": "016001_141234",
+    "medMeraRequired": true,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7340191179691",
+    "ean": "7340191179691",
+    "name": "Toalettpapper Nice & Soft 24-pack",
+    "brand": "Coop",
+    "packageText": "2332 G",
+    "ordinaryPrice": 124,
+    "ordinaryPriceText": "124.00 SEK",
+    "offerPrice": 99,
+    "offerPriceText": "99.00 SEK",
+    "offerUnitPrice": 42.45,
+    "offerUnitPriceText": "42.45 kr/kg",
+    "offerMechanicText": "Toalettpapper Nice & Soft 24-pack-99:- /st",
+    "promotionId": "016001_141210",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7300206718000",
+    "ean": "7300206718000",
+    "name": "Bacon 3-pack",
+    "brand": "Scan",
+    "packageText": "3x140g",
+    "ordinaryPrice": 40.65,
+    "ordinaryPriceText": "40.65 SEK",
+    "offerPrice": 37.9,
+    "offerPriceText": "37.90 SEK",
+    "offerUnitPrice": 90.24,
+    "offerUnitPriceText": "90.24 kr/kg",
+    "offerMechanicText": "Bacon 3-pack-37:90 /st",
+    "promotionId": "016001_141220",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310865095466",
+    "ean": "7310865095466",
+    "name": "Grekisk yoghurt 10%",
+    "brand": "Arla Köket®",
+    "packageText": "1000 g",
+    "ordinaryPrice": 37.81,
+    "ordinaryPriceText": "37.81 SEK",
+    "offerPrice": 29.9,
+    "offerPriceText": "29.90 SEK",
+    "offerUnitPrice": 29.9,
+    "offerUnitPriceText": "29.90 kr/kg",
+    "offerMechanicText": "Grekisk yoghurt 10%-29:90 /st",
+    "promotionId": "016001_141197",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "80508816",
+    "ean": "80508816",
+    "name": "Olivolja Classico",
+    "brand": "Monini",
+    "packageText": "750 ml",
+    "ordinaryPrice": 99.37,
+    "ordinaryPriceText": "99.37 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 118.66,
+    "offerUnitPriceText": "118.66 kr/lit",
+    "offerMechanicText": "Olivolja Classico-89:- /st",
+    "promotionId": "016001_141147",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7331044072573",
+    "ean": "7331044072573",
+    "name": "Kalkonbröstfilé",
+    "brand": "Ingelsta Kalkon",
+    "packageText": "400G",
+    "ordinaryPrice": 88.96,
+    "ordinaryPriceText": "88.96 SEK",
+    "offerPrice": 76.9,
+    "offerPriceText": "76.90 SEK",
+    "offerUnitPrice": 192.25,
+    "offerUnitPriceText": "192.25 kr/kg",
+    "offerMechanicText": "Kalkonbröstfilé-76:90 /st",
+    "promotionId": "016001_141207",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2385912200006",
+    "ean": "2385912200006",
+    "name": "Fläskfilé",
+    "brand": "Danish Crown",
+    "packageText": "650 gram ungefärlig vikt",
+    "ordinaryPrice": 125.87,
+    "ordinaryPriceText": "125.87 SEK",
+    "offerPrice": 99,
+    "offerPriceText": "99.00 SEK",
+    "offerUnitPrice": 99,
+    "offerUnitPriceText": "99.00 kr/kg",
+    "offerMechanicText": "99 kg/kg",
+    "promotionId": "v.21 DR 2026 fläskfilé",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317264300004",
+    "ean": "2317264300004",
+    "name": "Stekfläsk Skivor",
+    "brand": "Coop",
+    "packageText": "ca 1000 g",
+    "ordinaryPrice": 101.27,
+    "ordinaryPriceText": "101.27 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 89,
+    "offerUnitPriceText": "89.00 kr/kg",
+    "offerMechanicText": "Stekfläsk Skivor-89:- /kg",
+    "promotionId": "016001_141152",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "5740301203124",
+    "ean": "5740301203124",
+    "name": "Torskryggfilé 3-pack",
+    "brand": "Royal Greenland",
+    "packageText": "375 g",
+    "ordinaryPrice": 159.95,
+    "ordinaryPriceText": "159.95 SEK",
+    "offerPrice": 119,
+    "offerPriceText": "119.00 SEK",
+    "offerUnitPrice": 317.33,
+    "offerUnitPriceText": "317.33 kr/kg",
+    "offerMechanicText": "Torskryggfilé 3-pack-119:- /st",
+    "promotionId": "016001_141136",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310074014630",
+    "ean": "7310074014630",
+    "name": "Pepsi Max 20-pack",
+    "brand": "Pepsi",
+    "packageText": "20x33cl",
+    "ordinaryPrice": 122.09,
+    "ordinaryPriceText": "122.09 SEK",
+    "offerPrice": 84,
+    "offerPriceText": "84.00 SEK",
+    "offerUnitPrice": 12.73,
+    "offerUnitPriceText": "12.73 kr/lit",
+    "offerMechanicText": "Pepsi Max 20-pack-84:- /st",
+    "promotionId": "016001_141222",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7300207071005",
+    "ean": "7300207071005",
+    "name": "Grillkorv med tunt skinn",
+    "brand": "Scan",
+    "packageText": "640 g",
+    "ordinaryPrice": 47.27,
+    "ordinaryPriceText": "47.27 SEK",
+    "offerPrice": 39,
+    "offerPriceText": "39.00 SEK",
+    "offerUnitPrice": 60.94,
+    "offerUnitPriceText": "60.94 kr/kg",
+    "offerMechanicText": "Medlemspris-Grillkorv med tunt skinn-39:- /st",
+    "promotionId": "016001_141257",
+    "medMeraRequired": true,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317474500003",
+    "ean": "2317474500003",
+    "name": "Rabarber",
+    "brand": "",
+    "packageText": "1 kg",
+    "ordinaryPrice": 59.58,
+    "ordinaryPriceText": "59.58 SEK",
+    "offerPrice": 38,
+    "offerPriceText": "38.00 SEK",
+    "offerUnitPrice": 38,
+    "offerUnitPriceText": "38.00 kr/kg",
+    "offerMechanicText": "Rabarber-38:- /kg",
+    "promotionId": "016001_141141",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7314873525014",
+    "ean": "7314873525014",
+    "name": "Lantbröd Havssalt",
+    "brand": "Fazer",
+    "packageText": "600g",
+    "ordinaryPrice": 33.08,
+    "ordinaryPriceText": "33.08 SEK",
+    "offerPrice": 25,
+    "offerPriceText": "25.00 SEK",
+    "offerUnitPrice": 41.66,
+    "offerUnitPriceText": "41.66 kr/kg",
+    "offerMechanicText": "Lantbröd Havssalt-25:- /st",
+    "promotionId": "016001_141204",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7311070330243",
+    "ean": "7311070330243",
+    "name": "Lingongrova Special",
+    "brand": "Pågen",
+    "packageText": "500 g",
+    "ordinaryPrice": 28.35,
+    "ordinaryPriceText": "28.35 SEK",
+    "offerPrice": 20,
+    "offerPriceText": "20.00 SEK",
+    "offerUnitPrice": 40,
+    "offerUnitPriceText": "40.00 kr/kg",
+    "offerMechanicText": "Lingongrova Special-20:- /st",
+    "promotionId": "016001_141201",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7622210929525",
+    "ean": "7622210929525",
+    "name": "Chokladpraliner Hjärta",
+    "brand": "Marabou",
+    "packageText": "165g",
+    "ordinaryPrice": 67.15,
+    "ordinaryPriceText": "67.15 SEK",
+    "offerPrice": 45,
+    "offerPriceText": "45.00 SEK",
+    "offerUnitPrice": 272.73,
+    "offerUnitPriceText": "272.73 kr/kg",
+    "offerMechanicText": "Chokladpraliner Hjärta-45:- /st",
+    "promotionId": "016001_141219",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "5701092111067",
+    "ean": "5701092111067",
+    "name": "Fläckborttagning White Gold",
+    "brand": "Vanish",
+    "packageText": "470g",
+    "ordinaryPrice": 65.95,
+    "ordinaryPriceText": "65.95 SEK",
+    "offerPrice": 54.9,
+    "offerPriceText": "54.90 SEK",
+    "offerUnitPrice": 116.81,
+    "offerUnitPriceText": "116.81 kr/kg",
+    "offerMechanicText": "Fläckborttagning White Gold-54:90 /st",
+    "promotionId": "016001_141140",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "4006000089874",
+    "ean": "4006000089874",
+    "name": "Dagkräm Q10 Energy spf 15",
+    "brand": "NIVEA",
+    "packageText": "50 ml",
+    "ordinaryPrice": 124,
+    "ordinaryPriceText": "124.00 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 1780,
+    "offerUnitPriceText": "1780.00 kr/lit",
+    "offerMechanicText": "Dagkräm Q10 Energy spf 15-89:- /st",
+    "promotionId": "016001_141231",
+    "medMeraRequired": false,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310867561020",
+    "ean": "7310867561020",
+    "name": "Juice Tropisk",
+    "brand": "Bravo",
+    "packageText": "2 L",
+    "ordinaryPrice": 37.81,
+    "ordinaryPriceText": "37.81 SEK",
+    "offerPrice": 34,
+    "offerPriceText": "34.00 SEK",
+    "offerUnitPrice": 17,
+    "offerUnitPriceText": "17.00 kr/lit",
+    "offerMechanicText": "Medlemspris-Juice Tropisk-34:- /st",
+    "promotionId": "016001_141252",
+    "medMeraRequired": true,
+    "storeId": "254900",
+    "storeName": "Stora Coop Enköping",
+    "region": "Enköping",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Enk%C3%B6ping",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=254900&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/254900?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2383471000006",
+    "ean": "2383471000006",
+    "name": "Laxfilé",
+    "brand": "Harbour",
+    "packageText": "1450 gram/bit ungefärlig vikt",
+    "ordinaryPrice": 259.32,
+    "ordinaryPriceText": "259.32 SEK",
+    "offerPrice": 149,
+    "offerPriceText": "149.00 SEK",
+    "offerUnitPrice": 149,
+    "offerUnitPriceText": "149.00 kr/kg",
+    "offerMechanicText": "149 kr/kg",
+    "promotionId": "v.21 DR 2026 Laxfilé",
+    "medMeraRequired": true,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317342100007",
+    "ean": "2317342100007",
+    "name": "Vattenmelon Mini",
+    "brand": "",
+    "packageText": "2450 gram ungefärlig vikt",
+    "ordinaryPrice": 26.45,
+    "ordinaryPriceText": "26.45 SEK",
+    "offerPrice": 20,
+    "offerPriceText": "20.00 SEK",
+    "offerUnitPrice": 20,
+    "offerUnitPriceText": "20.00 kr/kg",
+    "offerMechanicText": "Medlemspris-Vattenmelon Mini-20:- /kg",
+    "promotionId": "016001_141239",
+    "medMeraRequired": true,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310865005168",
+    "ean": "7310865005168",
+    "name": "Smör Normalsaltat",
+    "brand": "Svenskt Smör från Arla",
+    "packageText": "500g",
+    "ordinaryPrice": 61.45,
+    "ordinaryPriceText": "61.45 SEK",
+    "offerPrice": 45,
+    "offerPriceText": "45.00 SEK",
+    "offerUnitPrice": 90,
+    "offerUnitPriceText": "90.00 kr/kg",
+    "offerMechanicText": "Medlemspris-Smör 45 kr/st-1 för 45:-",
+    "promotionId": "016001_41099",
+    "medMeraRequired": true,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2340375400004",
+    "ean": "2340375400004",
+    "name": "Hushållsost",
+    "brand": "Arla®",
+    "packageText": "1100 gram/st ungefärlig vikt",
+    "ordinaryPrice": 114.5,
+    "ordinaryPriceText": "114.50 SEK",
+    "offerPrice": 74.9,
+    "offerPriceText": "74.90 SEK",
+    "offerUnitPrice": 74.9,
+    "offerUnitPriceText": "74.90 kr/kg",
+    "offerMechanicText": "Medlemspris-Hushållsost-74:90 /kg",
+    "promotionId": "016001_141234",
+    "medMeraRequired": true,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7340191179691",
+    "ean": "7340191179691",
+    "name": "Toalettpapper Nice & Soft 24-pack",
+    "brand": "Coop",
+    "packageText": "2332 G",
+    "ordinaryPrice": 124,
+    "ordinaryPriceText": "124.00 SEK",
+    "offerPrice": 99,
+    "offerPriceText": "99.00 SEK",
+    "offerUnitPrice": 42.45,
+    "offerUnitPriceText": "42.45 kr/kg",
+    "offerMechanicText": "Toalettpapper Nice & Soft 24-pack-99:- /st",
+    "promotionId": "016001_141210",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7300206718000",
+    "ean": "7300206718000",
+    "name": "Bacon 3-pack",
+    "brand": "Scan",
+    "packageText": "3x140g",
+    "ordinaryPrice": 40.65,
+    "ordinaryPriceText": "40.65 SEK",
+    "offerPrice": 37.9,
+    "offerPriceText": "37.90 SEK",
+    "offerUnitPrice": 90.24,
+    "offerUnitPriceText": "90.24 kr/kg",
+    "offerMechanicText": "Bacon 3-pack-37:90 /st",
+    "promotionId": "016001_141220",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310865095466",
+    "ean": "7310865095466",
+    "name": "Grekisk yoghurt 10%",
+    "brand": "Arla Köket®",
+    "packageText": "1000 g",
+    "ordinaryPrice": 37.81,
+    "ordinaryPriceText": "37.81 SEK",
+    "offerPrice": 29.9,
+    "offerPriceText": "29.90 SEK",
+    "offerUnitPrice": 29.9,
+    "offerUnitPriceText": "29.90 kr/kg",
+    "offerMechanicText": "Grekisk yoghurt 10%-29:90 /st",
+    "promotionId": "016001_141197",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "80508816",
+    "ean": "80508816",
+    "name": "Olivolja Classico",
+    "brand": "Monini",
+    "packageText": "750 ml",
+    "ordinaryPrice": 99.37,
+    "ordinaryPriceText": "99.37 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 118.66,
+    "offerUnitPriceText": "118.66 kr/lit",
+    "offerMechanicText": "Olivolja Classico-89:- /st",
+    "promotionId": "016001_141147",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7331044072573",
+    "ean": "7331044072573",
+    "name": "Kalkonbröstfilé",
+    "brand": "Ingelsta Kalkon",
+    "packageText": "400G",
+    "ordinaryPrice": 88.96,
+    "ordinaryPriceText": "88.96 SEK",
+    "offerPrice": 76.9,
+    "offerPriceText": "76.90 SEK",
+    "offerUnitPrice": 192.25,
+    "offerUnitPriceText": "192.25 kr/kg",
+    "offerMechanicText": "Kalkonbröstfilé-76:90 /st",
+    "promotionId": "016001_141207",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2385912200006",
+    "ean": "2385912200006",
+    "name": "Fläskfilé",
+    "brand": "Danish Crown",
+    "packageText": "650 gram ungefärlig vikt",
+    "ordinaryPrice": 125.87,
+    "ordinaryPriceText": "125.87 SEK",
+    "offerPrice": 99,
+    "offerPriceText": "99.00 SEK",
+    "offerUnitPrice": 99,
+    "offerUnitPriceText": "99.00 kr/kg",
+    "offerMechanicText": "99 kg/kg",
+    "promotionId": "v.21 DR 2026 fläskfilé",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317264300004",
+    "ean": "2317264300004",
+    "name": "Stekfläsk Skivor",
+    "brand": "Coop",
+    "packageText": "ca 1000 g",
+    "ordinaryPrice": 101.27,
+    "ordinaryPriceText": "101.27 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 89,
+    "offerUnitPriceText": "89.00 kr/kg",
+    "offerMechanicText": "Stekfläsk Skivor-89:- /kg",
+    "promotionId": "016001_141152",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2307125100003",
+    "ean": "2307125100003",
+    "name": "Kycklingbröstfilé Tvådelad Marinerad Mango Chili Glaze",
+    "brand": "Guldfågeln",
+    "packageText": "900 gram ungefärlig vikt",
+    "ordinaryPrice": 188.34,
+    "ordinaryPriceText": "188.34 SEK",
+    "offerPrice": 149,
+    "offerPriceText": "149.00 SEK",
+    "offerUnitPrice": 149,
+    "offerUnitPriceText": "149.00 kr/kg",
+    "offerMechanicText": "Kycklingbröstfilé Tvådelad Marinerad Mango Chili Glaze-149:- /kg",
+    "promotionId": "016001_141150",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317075000001",
+    "ean": "2317075000001",
+    "name": "Lövbiff av fransyska",
+    "brand": "Coop",
+    "packageText": "950 gram ungefärlig vikt",
+    "ordinaryPrice": 214,
+    "ordinaryPriceText": "214.00 SEK",
+    "offerPrice": 179,
+    "offerPriceText": "179.00 SEK",
+    "offerUnitPrice": 179,
+    "offerUnitPriceText": "179.00 kr/kg",
+    "offerMechanicText": "Lövbiff av fransyska-179:- /kg",
+    "promotionId": "016001_141151",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2330120500004",
+    "ean": "2330120500004",
+    "name": "Karré Eld & rök",
+    "brand": "Dalsjöfors",
+    "packageText": "800 gram ungefärlig vikt",
+    "ordinaryPrice": 92.75,
+    "ordinaryPriceText": "92.75 SEK",
+    "offerPrice": 79.9,
+    "offerPriceText": "79.90 SEK",
+    "offerUnitPrice": 79.9,
+    "offerUnitPriceText": "79.90 kr/kg",
+    "offerMechanicText": "Karré Eld & rök-79:90 /kg",
+    "promotionId": "016001_141232",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310074014630",
+    "ean": "7310074014630",
+    "name": "Pepsi Max 20-pack",
+    "brand": "Pepsi",
+    "packageText": "20x33cl",
+    "ordinaryPrice": 122.09,
+    "ordinaryPriceText": "122.09 SEK",
+    "offerPrice": 84,
+    "offerPriceText": "84.00 SEK",
+    "offerUnitPrice": 12.73,
+    "offerUnitPriceText": "12.73 kr/lit",
+    "offerMechanicText": "Pepsi Max 20-pack-84:- /st",
+    "promotionId": "016001_141222",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7300207071005",
+    "ean": "7300207071005",
+    "name": "Grillkorv med tunt skinn",
+    "brand": "Scan",
+    "packageText": "640 g",
+    "ordinaryPrice": 47.27,
+    "ordinaryPriceText": "47.27 SEK",
+    "offerPrice": 39,
+    "offerPriceText": "39.00 SEK",
+    "offerUnitPrice": 60.94,
+    "offerUnitPriceText": "60.94 kr/kg",
+    "offerMechanicText": "Medlemspris-Grillkorv med tunt skinn-39:- /st",
+    "promotionId": "016001_141257",
+    "medMeraRequired": true,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7300156596727",
+    "ean": "7300156596727",
+    "name": "Lök Gul Eko",
+    "brand": "Änglamark",
+    "packageText": "500 g",
+    "ordinaryPrice": 17.94,
+    "ordinaryPriceText": "17.94 SEK",
+    "offerPrice": 13,
+    "offerPriceText": "13.00 SEK",
+    "offerUnitPrice": 26,
+    "offerUnitPriceText": "26.00 kr/kg",
+    "offerMechanicText": "Lök Gul Eko-13:- /st",
+    "promotionId": "016001_141200",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "2317474500003",
+    "ean": "2317474500003",
+    "name": "Rabarber",
+    "brand": "",
+    "packageText": "1 kg",
+    "ordinaryPrice": 59.58,
+    "ordinaryPriceText": "59.58 SEK",
+    "offerPrice": 38,
+    "offerPriceText": "38.00 SEK",
+    "offerUnitPrice": 38,
+    "offerUnitPriceText": "38.00 kr/kg",
+    "offerMechanicText": "Rabarber-38:- /kg",
+    "promotionId": "016001_141141",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7314873525014",
+    "ean": "7314873525014",
+    "name": "Lantbröd Havssalt",
+    "brand": "Fazer",
+    "packageText": "600g",
+    "ordinaryPrice": 33.08,
+    "ordinaryPriceText": "33.08 SEK",
+    "offerPrice": 25,
+    "offerPriceText": "25.00 SEK",
+    "offerUnitPrice": 41.66,
+    "offerUnitPriceText": "41.66 kr/kg",
+    "offerMechanicText": "Lantbröd Havssalt-25:- /st",
+    "promotionId": "016001_141204",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7311070330243",
+    "ean": "7311070330243",
+    "name": "Lingongrova Special",
+    "brand": "Pågen",
+    "packageText": "500 g",
+    "ordinaryPrice": 28.35,
+    "ordinaryPriceText": "28.35 SEK",
+    "offerPrice": 20,
+    "offerPriceText": "20.00 SEK",
+    "offerUnitPrice": 40,
+    "offerUnitPriceText": "40.00 kr/kg",
+    "offerMechanicText": "Lingongrova Special-20:- /st",
+    "promotionId": "016001_141201",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7350051211164",
+    "ean": "7350051211164",
+    "name": "Salami Milano",
+    "brand": "Engelmanns",
+    "packageText": "80 gr",
+    "ordinaryPrice": 52.01,
+    "ordinaryPriceText": "52.01 SEK",
+    "offerPrice": 39.9,
+    "offerPriceText": "39.90 SEK",
+    "offerUnitPrice": 498.75,
+    "offerUnitPriceText": "498.75 kr/kg",
+    "offerMechanicText": "Salami Milano-39:90 /st",
+    "promotionId": "016001_141214",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7622210929525",
+    "ean": "7622210929525",
+    "name": "Chokladpraliner Hjärta",
+    "brand": "Marabou",
+    "packageText": "165g",
+    "ordinaryPrice": 67.15,
+    "ordinaryPriceText": "67.15 SEK",
+    "offerPrice": 45,
+    "offerPriceText": "45.00 SEK",
+    "offerUnitPrice": 272.73,
+    "offerUnitPriceText": "272.73 kr/kg",
+    "offerMechanicText": "Chokladpraliner Hjärta-45:- /st",
+    "promotionId": "016001_141219",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "5701092111067",
+    "ean": "5701092111067",
+    "name": "Fläckborttagning White Gold",
+    "brand": "Vanish",
+    "packageText": "470g",
+    "ordinaryPrice": 65.95,
+    "ordinaryPriceText": "65.95 SEK",
+    "offerPrice": 54.9,
+    "offerPriceText": "54.90 SEK",
+    "offerUnitPrice": 116.81,
+    "offerUnitPriceText": "116.81 kr/kg",
+    "offerMechanicText": "Fläckborttagning White Gold-54:90 /st",
+    "promotionId": "016001_141140",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "4006000089874",
+    "ean": "4006000089874",
+    "name": "Dagkräm Q10 Energy spf 15",
+    "brand": "NIVEA",
+    "packageText": "50 ml",
+    "ordinaryPrice": 124,
+    "ordinaryPriceText": "124.00 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 1780,
+    "offerUnitPriceText": "1780.00 kr/lit",
+    "offerMechanicText": "Dagkräm Q10 Energy spf 15-89:- /st",
+    "promotionId": "016001_141231",
+    "medMeraRequired": false,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
+  },
+  {
+    "code": "7310867561020",
+    "ean": "7310867561020",
+    "name": "Juice Tropisk",
+    "brand": "Bravo",
+    "packageText": "2 L",
+    "ordinaryPrice": 37.81,
+    "ordinaryPriceText": "37.81 SEK",
+    "offerPrice": 34,
+    "offerPriceText": "34.00 SEK",
+    "offerUnitPrice": 17,
+    "offerUnitPriceText": "17.00 kr/lit",
+    "offerMechanicText": "Medlemspris-Juice Tropisk-34:- /st",
+    "promotionId": "016001_141252",
+    "medMeraRequired": true,
+    "storeId": "054000",
+    "storeName": "Stora Coop Finspång",
+    "region": "Finspång",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Viberga-Finsp%C3%A5ng",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=054000&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/054000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T13:46:23.654Z"
   }
 ];
 
