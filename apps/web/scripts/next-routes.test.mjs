@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 
 const appFiles = [
   'src/app/page.tsx',
@@ -25,6 +25,15 @@ const appFiles = [
 
 async function read(relative) {
   return readFile(new URL(`../${relative}`, import.meta.url), 'utf8');
+}
+
+async function fileExists(relative) {
+  try {
+    await access(new URL(`../${relative}`, import.meta.url));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 describe('verified-data UI', () => {
@@ -1241,6 +1250,35 @@ ${seo}`;
     assert.match(category, /categoryLabels/);
     assert.match(store, /metadataForStore/);
     assert.match(store, /findStore/);
+  });
+
+
+  it('ships dynamic product OG price images from verified price data', async () => {
+    const ogPath = 'src/app/products/[slug]/opengraph-image.tsx';
+    assert.equal(await fileExists(ogPath), true, 'product pages should expose a dynamic opengraph-image route');
+
+    const ogImage = await read(ogPath);
+    const seo = await read('src/lib/seo.ts');
+    const productRoute = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(ogImage, /ImageResponse/);
+    assert.match(ogImage, /from 'next\/og'/);
+    assert.match(ogImage, /export const size = \{ width: 1200, height: 630 \}/);
+    assert.match(ogImage, /export const contentType = 'image\/png'/);
+    assert.match(ogImage, /generateStaticParams/);
+    assert.match(ogImage, /productUniverse/);
+    assert.match(ogImage, /findProduct/);
+    assert.match(ogImage, /notFound/);
+    assert.match(ogImage, /chainPriceRows/);
+    assert.match(ogImage, /formatSek/);
+    assert.match(ogImage, /No synthetic prices/);
+    assert.match(ogImage, /Verified price signal/);
+    assert.doesNotMatch(ogImage, /@\/lib\/demo-data|@\/components\/sample-data/);
+
+    assert.match(seo, /opengraph-image/);
+    assert.match(seo, /openGraph:[\s\S]*images/);
+    assert.match(seo, /twitter:[\s\S]*images/);
+    assert.match(productRoute, /metadataForProduct/);
   });
 
   it('ships programmatic SEO landing pages from verified price spreads', async () => {

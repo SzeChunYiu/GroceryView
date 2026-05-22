@@ -10,6 +10,8 @@ type RouteMetadataConfig = {
   title: string;
   description: string;
   noIndex?: boolean;
+  imagePath?: string;
+  imageAlt?: string;
 };
 
 type ProductSeoInput = {
@@ -174,6 +176,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
   const canonical = absoluteUrl(config.path);
   const title = config.title;
   const description = truncateDescription(config.description || defaultDescription);
+  const image = config.imagePath ? [{ url: absoluteUrl(config.imagePath), width: 1200, height: 630, alt: config.imageAlt ?? title }] : undefined;
   const robots = config.noIndex
     ? { index: false, follow: false }
     : {
@@ -198,12 +201,14 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
       url: canonical,
       siteName,
       locale: 'sv_SE',
-      type: 'website'
+      type: 'website',
+      ...(image ? { images: image } : {})
     },
     twitter: {
       card: 'summary_large_image',
       title,
-      description
+      description,
+      ...(image ? { images: image.map(({ url, alt }) => ({ url, alt })) } : {})
     },
     robots: robots
   };
@@ -216,7 +221,9 @@ export function metadataForProduct(product: ProductSeoInput): Metadata {
   return routeMetadata({
     path: `/products/${product.slug}`,
     title: `${product.name} price ticker | GroceryView`,
-    description: `Compare ${product.name}${brand ? ` from ${brand}` : ''} across Swedish grocery data with deal score, unit price, smart swaps, and confidence labels.${priceCopy}`
+    description: `Compare ${product.name}${brand ? ` from ${brand}` : ''} across Swedish grocery data with deal score, unit price, smart swaps, and confidence labels.${priceCopy}`,
+    imagePath: `/products/${product.slug}/opengraph-image`,
+    imageAlt: `${product.name} verified GroceryView price image`
   });
 }
 
