@@ -25,8 +25,8 @@ Turn the remaining P0 OSM nationwide-store research finding into real GroceryVie
 | Full repository tests | Pass | `rtk git diff --check && rtk npm test` exited 0 on this branch. |
 | Build | Pass | `rtk npm run build` completed workspace TypeScript builds and the Next.js production build for 203 static routes. |
 | Typecheck | Pass | `rtk npm run typecheck` (`tsc --noEmit -p tsconfig.json`) exited 0. |
-| Product PR merge | Pending | Product PR not opened yet. |
-| Audit PR merge | Pending | Requires follow-up after product PR lands. |
+| Product PR merge | Pass | PR #855 merged at 2026-05-22T12:01:54Z with merge commit `c2adfe7f4410a2ab6574fea5b0ea5baf95bc9802`; verified as an ancestor of `origin/main`. |
+| Audit PR merge | Pending | This follow-up audit branch records the product PR merge proof; merge proof must be added after this audit PR lands. |
 
 ## Guardrails checked
 
