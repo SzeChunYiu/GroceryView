@@ -452,6 +452,31 @@ export const chainSavingsLedger = Object.values(
   }))
   .sort((a, b) => b.totalSavings - a.totalSavings || a.chain.localeCompare(b.chain, 'sv'));
 
+export const budgetLowestPriceRadar = matchedChainProducts
+  .map((product) => {
+    const pricedRows = chainPriceRows(product).sort((a, b) => (a.price ?? Number.POSITIVE_INFINITY) - (b.price ?? Number.POSITIVE_INFINITY));
+    const cheapest = pricedRows[0];
+    const priciest = pricedRows[pricedRows.length - 1];
+    const cheapestPrice = cheapest?.price ?? product.lowestPrice;
+    const expensivePrice = priciest?.price ?? product.highestPrice;
+
+    return {
+      productName: product.name,
+      reportedBrand: product.brand,
+      verifiedProductSlug: product.slug,
+      cheapestChain: cheapest?.chain ?? product.lowestChain,
+      cheapestPrice,
+      expensiveChain: priciest?.chain ?? '',
+      expensivePrice,
+      priceGap: expensivePrice - cheapestPrice,
+      spreadPct: product.spreadPct,
+      evidenceLabel: `${pricedRows.length} matched chain prices`
+    };
+  })
+  .filter((row) => row.priceGap > 0)
+  .sort((a, b) => b.priceGap - a.priceGap || b.spreadPct - a.spreadPct)
+  .slice(0, 8);
+
 export const keyMetrics = [
   { label: 'Verified price rows', value: (axfoodProducts.length + pricedProducts.length).toLocaleString('sv-SE'), detail: 'Axfood products plus OpenPrices observations rendered from generated modules.' },
   { label: 'Matched Willys/Hemköp products', value: matchedChainProducts.length.toLocaleString('sv-SE'), detail: 'Only products present in both chain catalogues are compared.' },
@@ -512,6 +537,7 @@ export const basketImportReviewContract = {
   ],
   shippedBehaviors: [
     'Lists only the signed-in shopper’s open retailer import review rows.',
+    'Persists open and resolved review rows through the PostgreSQL-backed runtime repository when DATABASE_URL is configured.',
     'Keeps unmatched retailer rows stay out of the basket until a signed-in shopper accepts a verified GroceryView product match.',
     'Allows dismissing retailer-only rows without converting them into verified products.',
     'Marks accepted and dismissed rows resolved so they leave the open review queue.'

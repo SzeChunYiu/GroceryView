@@ -61,6 +61,10 @@ type HemkopSearchProduct = {
 
 type HemkopSearchResponse = {
   results?: HemkopSearchProduct[];
+  pagination?: {
+    numberOfPages?: unknown;
+    currentPage?: unknown;
+  };
 };
 
 type AxfoodCampaignPromotion = {
@@ -143,6 +147,7 @@ export type FetchHemkopProductsOptions = {
   fetchImpl?: typeof fetch;
   queries?: readonly string[];
   maxRows?: number;
+  pageSize?: number;
   retrievedAt?: string;
 };
 
@@ -155,9 +160,13 @@ export type FetchHemkopWeeklyDiscountsOptions = {
   retrievedAt?: string;
 };
 
-export function buildHemkopSearchUrl(query: string): string {
+export function buildHemkopSearchUrl(query: string, size?: number, page = 0): string {
   const url = new URL(HEMKOP_SEARCH_BASE_URL);
   url.searchParams.set('q', query);
+  if (size !== undefined) {
+    url.searchParams.set('page', String(page));
+    url.searchParams.set('size', String(size));
+  }
   return url.toString();
 }
 
@@ -177,35 +186,50 @@ export function buildHemkopWeeklyDiscountsUrl(
 export async function fetchHemkopProducts(options: FetchHemkopProductsOptions = {}): Promise<HemkopProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const queries = options.queries ?? DEFAULT_HEMKOP_SEARCH_QUERIES;
-  const maxRows = options.maxRows ?? 150;
+  const maxRows = options.maxRows ?? Number.POSITIVE_INFINITY;
+  const pageSize = options.pageSize ?? 100;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: HemkopProduct[] = [];
   const seenCodes = new Set<string>();
 
   for (const query of queries) {
-    const sourceUrl = buildHemkopSearchUrl(query);
-    const response = await fetchImpl(sourceUrl, {
-      headers: {
-        accept: 'application/json',
-        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-      }
-    });
+    let page = 0;
+    let pageCount: number | null = null;
 
-    if (!response.ok) {
-      throw new Error(`Hemkop search request failed for ${query}: ${response.status}`);
-    }
+    while (rows.length < maxRows && (pageCount === null || page < pageCount)) {
+      const sourceUrl = buildHemkopSearchUrl(query, pageSize, page);
+      const response = await fetchImpl(sourceUrl, {
+        headers: {
+          accept: 'application/json',
+          'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+        }
+      });
 
-    const payload = await response.json() as HemkopSearchResponse;
-    for (const product of payload.results ?? []) {
-      const row = normalizeHemkopProduct(product, sourceUrl, retrievedAt);
-      if (!row || seenCodes.has(row.code)) {
-        continue;
+      if (!response.ok) {
+        throw new Error(`Hemkop search request failed for ${query}: ${response.status}`);
       }
-      seenCodes.add(row.code);
-      rows.push(row);
-      if (rows.length >= maxRows) {
-        return rows;
+
+      const payload = await response.json() as HemkopSearchResponse;
+      const results = payload.results ?? [];
+      const responsePageCount = numberOrNull(payload.pagination?.numberOfPages);
+      pageCount = responsePageCount && responsePageCount > 0 ? responsePageCount : page + 1;
+
+      for (const product of results) {
+        const row = normalizeHemkopProduct(product, sourceUrl, retrievedAt);
+        if (!row || seenCodes.has(row.code)) {
+          continue;
+        }
+        seenCodes.add(row.code);
+        rows.push(row);
+        if (rows.length >= maxRows) {
+          return rows;
+        }
       }
+
+      if (results.length === 0) {
+        break;
+      }
+      page += 1;
     }
   }
 

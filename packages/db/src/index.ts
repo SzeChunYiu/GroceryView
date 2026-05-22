@@ -241,6 +241,29 @@ export type BasketRecord = {
   quantity: number;
 };
 
+export type BasketImportReviewStatus = 'open' | 'accepted' | 'dismissed';
+
+export type BasketImportReviewRecord = {
+  reviewItemId: string;
+  rawName: string;
+  quantity: number;
+  reason: string;
+  retailerId: string;
+  sourceKind: 'bookmarklet' | 'browser_extension' | 'copy_paste';
+  capturedAt: string;
+  status: BasketImportReviewStatus;
+  createdAt: string;
+  resolvedAt?: string;
+  resolvedProductId?: string;
+};
+
+export type BasketImportReviewResolution = {
+  status: Exclude<BasketImportReviewStatus, 'open'>;
+  resolvedAt: string;
+  resolvedProductId?: string;
+  quantity?: number;
+};
+
 export type PantryItemRecord = {
   id: string;
   userId: string;
@@ -786,6 +809,9 @@ export type GroceryViewRepository = {
   getWatchlist(userId: string): Promise<WatchlistRecord[]>;
   addBasketItem(userId: string, item: BasketRecord): Promise<void>;
   getBasket(userId: string): Promise<BasketRecord[]>;
+  saveBasketImportReviewItems(userId: string, items: BasketImportReviewRecord[]): Promise<void>;
+  listOpenBasketImportReviewItems(userId: string): Promise<BasketImportReviewRecord[]>;
+  resolveBasketImportReviewItem(userId: string, reviewItemId: string, resolution: BasketImportReviewResolution): Promise<BasketImportReviewRecord>;
   upsertPantryItem(item: PantryItemRecord): Promise<void>;
   listPantryItems(userId: string): Promise<PantryItemRecord[]>;
   upsertReceiptUpload(upload: ReceiptUploadRecord): Promise<void>;
@@ -1041,6 +1067,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const subscriptionEntitlements = new Map<string, SubscriptionEntitlementRecord>();
   const watchlists = new Map<string, WatchlistRecord[]>();
   const baskets = new Map<string, BasketRecord[]>();
+  const basketImportReviewItems = new Map<string, BasketImportReviewRecord[]>();
   const pantryItems = new Map<string, PantryItemRecord>();
   const receiptUploads = new Map<string, ReceiptUploadRecord>();
   const householdPlans = new Map<string, HouseholdPlanRecord>();
@@ -1108,6 +1135,38 @@ export function createMemoryRepository(): GroceryViewRepository {
     async getBasket(userId) {
       requireUser(users, userId);
       return (baskets.get(userId) ?? []).map((item) => ({ ...item }));
+    },
+
+    async saveBasketImportReviewItems(userId, items) {
+      requireUser(users, userId);
+      basketImportReviewItems.set(userId, [
+        ...(basketImportReviewItems.get(userId) ?? []),
+        ...items.map((item) => ({ ...item }))
+      ]);
+    },
+
+    async listOpenBasketImportReviewItems(userId) {
+      requireUser(users, userId);
+      return (basketImportReviewItems.get(userId) ?? [])
+        .filter((item) => item.status === 'open')
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.reviewItemId.localeCompare(b.reviewItemId))
+        .map((item) => ({ ...item }));
+    },
+
+    async resolveBasketImportReviewItem(userId, reviewItemId, resolution) {
+      requireUser(users, userId);
+      const items = basketImportReviewItems.get(userId) ?? [];
+      const index = items.findIndex((item) => item.reviewItemId === reviewItemId && item.status === 'open');
+      if (index === -1) throw new Error(`Basket import review item not found: ${reviewItemId}`);
+      const resolved = {
+        ...items[index]!,
+        status: resolution.status,
+        resolvedAt: resolution.resolvedAt,
+        ...(resolution.resolvedProductId ? { resolvedProductId: resolution.resolvedProductId } : {}),
+        ...(resolution.quantity === undefined ? {} : { quantity: resolution.quantity })
+      };
+      basketImportReviewItems.set(userId, items.map((item, itemIndex) => itemIndex === index ? resolved : item));
+      return { ...resolved };
     },
 
     async upsertPantryItem(item) {
@@ -1488,6 +1547,19 @@ type ProductAliasRow = {
   reviewed_at: string | Date | null;
   created_at: string | Date;
 };
+type BasketImportReviewRow = {
+  review_item_id: string;
+  raw_name: string;
+  quantity: string | number;
+  reason: string;
+  retailer_id: string;
+  source_kind: BasketImportReviewRecord['sourceKind'];
+  captured_at: string | Date;
+  status: BasketImportReviewStatus;
+  created_at: string | Date;
+  resolved_at: string | Date | null;
+  resolved_product_id: string | null;
+};
 
 function asIso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
@@ -1641,6 +1713,22 @@ function mapProductAlias(row: ProductAliasRow): ProductAliasRecord {
     matchConfidence: Number(row.match_confidence),
     ...(row.reviewed_at ? { reviewedAt: asIso(row.reviewed_at) } : {}),
     createdAt: asIso(row.created_at)
+  };
+}
+
+function mapBasketImportReview(row: BasketImportReviewRow): BasketImportReviewRecord {
+  return {
+    reviewItemId: row.review_item_id,
+    rawName: row.raw_name,
+    quantity: Number(row.quantity),
+    reason: row.reason,
+    retailerId: row.retailer_id,
+    sourceKind: row.source_kind,
+    capturedAt: asIso(row.captured_at),
+    status: row.status,
+    createdAt: asIso(row.created_at),
+    ...(row.resolved_at ? { resolvedAt: asIso(row.resolved_at) } : {}),
+    ...(row.resolved_product_id ? { resolvedProductId: row.resolved_product_id } : {})
   };
 }
 
@@ -1935,6 +2023,68 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         [userId]
       );
       return rows.map((row) => ({ productId: row.product_id, quantity: Number(row.quantity) }));
+    },
+
+    async saveBasketImportReviewItems(userId, items) {
+      for (const item of items) {
+        await executor.query(
+          `insert into basket_import_review_items(
+             user_id, review_item_id, raw_name, quantity, reason, retailer_id, source_kind, captured_at, status, created_at, resolved_at, resolved_product_id
+           ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+           on conflict (user_id, review_item_id) do update set
+             raw_name = excluded.raw_name,
+             quantity = excluded.quantity,
+             reason = excluded.reason,
+             retailer_id = excluded.retailer_id,
+             source_kind = excluded.source_kind,
+             captured_at = excluded.captured_at,
+             status = excluded.status,
+             created_at = excluded.created_at,
+             resolved_at = excluded.resolved_at,
+             resolved_product_id = excluded.resolved_product_id`,
+          [
+            userId,
+            item.reviewItemId,
+            item.rawName,
+            item.quantity,
+            item.reason,
+            item.retailerId,
+            item.sourceKind,
+            item.capturedAt,
+            item.status,
+            item.createdAt,
+            item.resolvedAt ?? null,
+            item.resolvedProductId ?? null
+          ]
+        );
+      }
+    },
+
+    async listOpenBasketImportReviewItems(userId) {
+      const rows = await executor.query<BasketImportReviewRow>(
+        `select review_item_id, raw_name, quantity, reason, retailer_id, source_kind, captured_at, status, created_at, resolved_at, resolved_product_id
+         from basket_import_review_items
+         where user_id = $1 and status = 'open'
+         order by created_at, review_item_id`,
+        [userId]
+      );
+      return rows.map(mapBasketImportReview);
+    },
+
+    async resolveBasketImportReviewItem(userId, reviewItemId, resolution) {
+      const rows = await executor.query<BasketImportReviewRow>(
+        `update basket_import_review_items
+         set status = $3,
+             resolved_at = $4,
+             resolved_product_id = $5,
+             quantity = coalesce($6, quantity)
+         where user_id = $1 and review_item_id = $2 and status = 'open'
+         returning review_item_id, raw_name, quantity, reason, retailer_id, source_kind, captured_at, status, created_at, resolved_at, resolved_product_id`,
+        [userId, reviewItemId, resolution.status, resolution.resolvedAt, resolution.resolvedProductId ?? null, resolution.quantity ?? null]
+      );
+      const row = rows[0];
+      if (!row) throw new Error(`Basket import review item not found: ${reviewItemId}`);
+      return mapBasketImportReview(row);
     },
 
     async upsertPantryItem(item) {
@@ -2936,6 +3086,7 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'watchlist_items',
   'weekly_baskets',
   'basket_items',
+  'basket_import_review_items',
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
@@ -2962,7 +3113,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '006_source_runs_official_api',
   '007_receipt_uploads',
   '008_household_plans',
-  '009_retailer_source_policies'
+  '009_retailer_source_policies',
+  '010_basket_import_reviews'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -2979,6 +3131,7 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
   const receiptId = `postgres-probe-receipt-${safeId}`;
   const receiptItemId = `postgres-probe-receipt-item-${safeId}`;
   const householdId = `postgres-probe-household-${safeId}`;
+  const basketImportReviewId = `postgres-probe-basket-import-review-${safeId}`;
   const providerSubscriptionId = `postgres-probe-subscription-${safeId}`;
   const storeId = `postgres-probe-store-${safeId}`;
   const groceryProductId = `postgres-probe-grocery-${safeId}`;
@@ -3038,6 +3191,31 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
         assertProbe(favoriteStoreIds.includes(storeId), 'favorite store probe row was not readable');
         assertProbe(watchlist.some((item) => item.productId === groceryProductId), 'watchlist probe row was not readable');
         assertProbe(basket.some((item) => item.productId === groceryProductId && item.quantity === 2), 'basket probe row was not readable');
+      }
+    },
+    {
+      name: 'basket_import_review_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.upsertUser({ id: userId, email: `${userId}@example.invalid` });
+        await repository.saveBasketImportReviewItems(userId, [{
+          reviewItemId: basketImportReviewId,
+          rawName: 'Postgres Probe Unmatched Retailer Row',
+          quantity: 1,
+          reason: 'PostgreSQL integration smoke probe.',
+          retailerId: 'willys',
+          sourceKind: 'bookmarklet',
+          capturedAt: input.now,
+          status: 'open',
+          createdAt: input.now
+        }]);
+        const openItems = await repository.listOpenBasketImportReviewItems(userId);
+        assertProbe(openItems.some((item) => item.reviewItemId === basketImportReviewId && item.status === 'open'), 'basket import review probe row was not readable');
+        const resolved = await repository.resolveBasketImportReviewItem(userId, basketImportReviewId, {
+          status: 'dismissed',
+          resolvedAt: input.now
+        });
+        assertProbe(resolved.status === 'dismissed', 'basket import review probe row was not resolvable');
       }
     },
     {

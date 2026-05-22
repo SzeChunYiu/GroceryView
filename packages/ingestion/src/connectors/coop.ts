@@ -237,6 +237,11 @@ export type FetchCoopWeeklyDiscountsOptions = {
   retrievedAt?: string;
 };
 
+export type FetchCoopAllStoreWeeklyDiscountsOptions = Omit<FetchCoopWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & {
+  maxStores?: number;
+  includeStoreDetails?: boolean;
+};
+
 export type FetchCoopStoresOptions = {
   fetchImpl?: typeof fetch;
   maxRows?: number;
@@ -421,7 +426,7 @@ async function fetchCoopStoreDetail(input: {
 export async function fetchCoopProducts(options: FetchCoopProductsOptions = {}): Promise<CoopProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const query = options.query ?? DEFAULT_COOP_SEARCH_QUERY;
-  const maxRows = options.maxRows ?? 150;
+  const maxRows = options.maxRows ?? 1000;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const serviceAccess = options.subscriptionKey
     ? {
@@ -573,6 +578,34 @@ export async function fetchCoopWeeklyDiscounts(
   }
 
   return rows;
+}
+
+export async function fetchCoopWeeklyDiscountsForAllStores(
+  options: FetchCoopAllStoreWeeklyDiscountsOptions = {}
+): Promise<CoopWeeklyDiscount[]> {
+  const stores = await fetchCoopStores({
+    fetchImpl: options.fetchImpl,
+    maxRows: options.maxStores,
+    storeApiVersion: options.storeApiVersion,
+    storeApiUrl: options.storeApiUrl,
+    storeApiSubscriptionKey: options.storeApiSubscriptionKey,
+    includeDetails: options.includeStoreDetails,
+    retrievedAt: options.retrievedAt
+  });
+  return await fetchCoopWeeklyDiscounts({
+    fetchImpl: options.fetchImpl,
+    storeIds: stores.map((store) => store.storeId),
+    storeApiVersion: options.storeApiVersion,
+    storeApiUrl: options.storeApiUrl,
+    storeApiSubscriptionKey: options.storeApiSubscriptionKey,
+    productQueries: options.productQueries,
+    maxRows: options.maxRows ?? stores.length * (options.productQueries?.length ?? DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES.length),
+    device: options.device,
+    apiVersion: options.apiVersion,
+    subscriptionKey: options.subscriptionKey,
+    personalizationApiUrl: options.personalizationApiUrl,
+    retrievedAt: options.retrievedAt
+  });
 }
 
 export function normalizeCoopProduct(

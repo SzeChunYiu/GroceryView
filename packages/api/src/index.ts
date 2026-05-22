@@ -3505,7 +3505,7 @@ function basketImportKnownProducts() {
   }));
 }
 
-const basketImportReviewGuardrails = [
+export const basketImportReviewGuardrails = [
   'Retailer basket review rows are account-bound and never visible across signed-in users.',
   'Unmatched retailer rows stay out of the basket until a signed-in shopper accepts a verified GroceryView product match.',
   'Dismissed retailer rows remain auditable and are not silently converted into products.'
@@ -3518,6 +3518,23 @@ function basketImportReviewId(userId: string, source: BasketImportExportSource, 
     .replace(/^-+|-+$/g, '')
     .slice(0, 48) || 'retailer-row';
   return `basket-import-review-${userId}-${source.retailerId}-${Date.parse(source.capturedAt)}-${index}-${slug}`;
+}
+
+export function createBasketImportReviewItems(
+  userId: string,
+  source: BasketImportExportSource,
+  reviewItems: BasketImportExportReviewItem[],
+  existingCount = 0
+): BasketImportReviewItem[] {
+  return reviewItems.map((item, index): BasketImportReviewItem => ({
+    ...item,
+    reviewItemId: basketImportReviewId(userId, source, item.rawName, existingCount + index),
+    retailerId: source.retailerId,
+    sourceKind: source.sourceKind,
+    capturedAt: source.capturedAt,
+    status: 'open',
+    createdAt: source.capturedAt
+  }));
 }
 
 function storeFlyerOfferReport(storeId: string, asOf?: string): StoreFlyerOfferReport {
@@ -4226,15 +4243,7 @@ export function createGroceryViewApi() {
       for (const item of plan.acceptedItems) this.addBasketItem(userId, { productId: item.productId, quantity: item.quantity });
       if (plan.reviewItems.length > 0) {
         const existing = basketImportReviews.get(userId) ?? [];
-        const created = plan.reviewItems.map((item, index): BasketImportReviewItem => ({
-          ...item,
-          reviewItemId: basketImportReviewId(userId, plan.source, item.rawName, existing.length + index),
-          retailerId: plan.source.retailerId,
-          sourceKind: plan.source.sourceKind,
-          capturedAt: plan.source.capturedAt,
-          status: 'open',
-          createdAt: plan.source.capturedAt
-        }));
+        const created = createBasketImportReviewItems(userId, plan.source, plan.reviewItems, existing.length);
         basketImportReviews.set(userId, [...existing, ...created]);
       }
       return {

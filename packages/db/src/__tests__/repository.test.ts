@@ -38,6 +38,61 @@ describe('createMemoryRepository', () => {
     assert.deepEqual(await repo.getBasket('user-1'), [{ productId: 'coffee', quantity: 2 }]);
   });
 
+  it('persists account-bound basket import review rows and resolves only open rows', async () => {
+    const repo = createMemoryRepository();
+
+    await repo.upsertUser({ id: 'user-1', email: 'importer@example.com' });
+    await repo.upsertUser({ id: 'user-2', email: 'other@example.com' });
+
+    await repo.saveBasketImportReviewItems('user-1', [
+      {
+        reviewItemId: 'review-1',
+        rawName: 'Retailer-only bakery bun',
+        quantity: 3,
+        reason: 'No verified GroceryView product match.',
+        retailerId: 'willys',
+        sourceKind: 'bookmarklet',
+        capturedAt: '2026-05-22T09:35:00.000Z',
+        status: 'open',
+        createdAt: '2026-05-22T09:35:00.000Z'
+      }
+    ]);
+
+    assert.deepEqual(await repo.listOpenBasketImportReviewItems('user-1'), [
+      {
+        reviewItemId: 'review-1',
+        rawName: 'Retailer-only bakery bun',
+        quantity: 3,
+        reason: 'No verified GroceryView product match.',
+        retailerId: 'willys',
+        sourceKind: 'bookmarklet',
+        capturedAt: '2026-05-22T09:35:00.000Z',
+        status: 'open',
+        createdAt: '2026-05-22T09:35:00.000Z'
+      }
+    ]);
+    assert.deepEqual(await repo.listOpenBasketImportReviewItems('user-2'), []);
+
+    const resolved = await repo.resolveBasketImportReviewItem('user-1', 'review-1', {
+      status: 'accepted',
+      resolvedAt: '2026-05-22T09:36:00.000Z',
+      resolvedProductId: 'coffee',
+      quantity: 2
+    });
+
+    assert.equal(resolved.status, 'accepted');
+    assert.equal(resolved.resolvedProductId, 'coffee');
+    assert.equal(resolved.quantity, 2);
+    assert.deepEqual(await repo.listOpenBasketImportReviewItems('user-1'), []);
+    await assert.rejects(
+      repo.resolveBasketImportReviewItem('user-2', 'review-1', {
+        status: 'dismissed',
+        resolvedAt: '2026-05-22T09:37:00.000Z'
+      }),
+      /Basket import review item not found: review-1/
+    );
+  });
+
   it('upserts subscription entitlements by user for premium account enforcement', async () => {
     const repo = createMemoryRepository();
 

@@ -6,6 +6,17 @@ import { readFileSync } from 'node:fs';
 const scriptPath = new URL('../../scripts/ops/validate-production-env.mjs', import.meta.url);
 const script = readFileSync(scriptPath, 'utf8');
 const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+const envExample = readFileSync(new URL('../../.env.example', import.meta.url), 'utf8');
+
+function parseEnvExample(text) {
+  return Object.fromEntries(text.split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith('#') && line.includes('='))
+    .map((line) => {
+      const index = line.indexOf('=');
+      return [line.slice(0, index), line.slice(index + 1)];
+    }));
+}
 
 describe('production env value validation script', () => {
   it('validates daily connectors and catalog coverage targets for all required chains', () => {
@@ -29,6 +40,18 @@ describe('production env value validation script', () => {
       connectorStoreCount: 6,
       connectorStoreCoverageCount: 6,
       coverageProductCount: 2,
+      coverageStoreCount: 6
+    });
+  });
+
+  it('keeps .env.example aligned with required production ingestion validation shape', async () => {
+    const { validateProductionEnv } = await import(scriptPath);
+    assert.deepEqual(validateProductionEnv(parseEnvExample(envExample)), {
+      status: 'ready',
+      connectorCount: 6,
+      connectorStoreCount: 6,
+      connectorStoreCoverageCount: 6,
+      coverageProductCount: 1,
       coverageStoreCount: 6
     });
   });
