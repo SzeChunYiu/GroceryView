@@ -263,13 +263,14 @@ describe('real catalog API endpoints', () => {
 
   it('serves product price history from persisted observation rows', async () => {
     const response = await request(app.getHttpServer())
-      .get('/products/standardmjolk-1l/price-history?priceType=promotion&from=2026-05-01T00:00:00.000Z&to=2026-05-31T23:59:59.000Z&limit=25')
+      .get('/products/standardmjolk-1l/price-history?priceType=promotion&sourceRun=run-willys-2026-05-21&from=2026-05-01T00:00:00.000Z&to=2026-05-31T23:59:59.000Z&limit=25')
       .expect(200);
 
     assert.equal(response.body.productId, 'product-milk');
     assert.equal(response.body.productSlug, 'standardmjolk-1l');
     assert.deepEqual(response.body.filters, {
       priceType: 'promotion',
+      sourceRun: 'run-willys-2026-05-21',
       observedFrom: '2026-05-01T00:00:00.000Z',
       observedTo: '2026-05-31T23:59:59.000Z',
       limit: 25
@@ -295,6 +296,7 @@ describe('real catalog API endpoints', () => {
       'promotion',
       null,
       null,
+      'run-willys-2026-05-21',
       '2026-05-01T00:00:00.000Z',
       '2026-05-31T23:59:59.000Z',
       25
@@ -302,6 +304,7 @@ describe('real catalog API endpoints', () => {
     assert.match(observationsQuery?.sql ?? '', /from observations/i);
     assert.match(observationsQuery?.sql ?? '', /left join chains/i);
     assert.match(observationsQuery?.sql ?? '', /left join stores/i);
+    assert.match(observationsQuery?.sql ?? '', /source_run_id::text = \$5/i);
     assert.match(observationsQuery?.sql ?? '', /observed_at >=/i);
   });
 

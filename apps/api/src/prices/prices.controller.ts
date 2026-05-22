@@ -38,11 +38,12 @@ export class PricesController {
     @Query('priceType') priceType?: string,
     @Query('chain') chain?: string,
     @Query('store') store?: string,
+    @Query('sourceRun') sourceRun?: string,
     @Query('from') observedFrom?: string,
     @Query('to') observedTo?: string,
     @Query('limit') limit?: string
   ) {
-    const filter = parsePriceHistoryFilter({ priceType, chain, store, observedFrom, observedTo, limit });
+    const filter = parsePriceHistoryFilter({ priceType, chain, store, sourceRun, observedFrom, observedTo, limit });
     const report = await this.priceHistory.getProductPriceHistory(productId, filter);
     if (!report) throw new NotFoundException('Product not found');
     return report;
@@ -97,6 +98,7 @@ function parsePriceHistoryFilter(input: {
   priceType?: string;
   chain?: string;
   store?: string;
+  sourceRun?: string;
   observedFrom?: string;
   observedTo?: string;
   limit?: string;
@@ -104,6 +106,7 @@ function parsePriceHistoryFilter(input: {
   const parsedPriceType = parseOptionalPriceType(input.priceType);
   const parsedChain = parseOptionalIdentifier(input.chain, 'chain');
   const parsedStore = parseOptionalIdentifier(input.store, 'store');
+  const parsedSourceRun = parseOptionalIdentifier(input.sourceRun, 'sourceRun');
   const parsedFrom = parseOptionalDate(input.observedFrom, 'from');
   const parsedTo = parseOptionalDate(input.observedTo, 'to');
   if (parsedFrom && parsedTo && Date.parse(parsedFrom) > Date.parse(parsedTo)) {
@@ -114,6 +117,7 @@ function parsePriceHistoryFilter(input: {
     ...(parsedPriceType ? { priceType: parsedPriceType } : {}),
     ...(parsedChain ? { chain: parsedChain } : {}),
     ...(parsedStore ? { store: parsedStore } : {}),
+    ...(parsedSourceRun ? { sourceRun: parsedSourceRun } : {}),
     ...(parsedFrom ? { observedFrom: parsedFrom } : {}),
     ...(parsedTo ? { observedTo: parsedTo } : {}),
     ...(parsedLimit ? { limit: parsedLimit } : {})

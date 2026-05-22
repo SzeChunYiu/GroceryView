@@ -127,7 +127,7 @@ describe('createGroceryViewApi', () => {
         confidence: 0.91,
         provenance: { source: 'open_prices', rawSnapshotRef: 's3://raw/coffee-old.html' }
       }
-    ], { priceType: 'shelf', chain: 'willys', store: 'willys-odenplan', limit: 100 });
+    ], { priceType: 'shelf', chain: 'willys', store: 'willys-odenplan', sourceRun: 'run-open-prices-1', limit: 100 });
 
     assert.equal(report?.productSlug, 'bryggkaffe-450g');
     assert.deepEqual(report?.points.map((point) => point.observationId), ['obs-coffee-old', 'obs-coffee-new']);
@@ -153,7 +153,13 @@ describe('createGroceryViewApi', () => {
       provenance: { source: 'open_prices', rawSnapshotRef: 's3://raw/coffee-new.html' }
     });
     assert.deepEqual(report?.priceTypes, ['promotion', 'shelf']);
-    assert.deepEqual(report?.filters, { priceType: 'shelf', chain: 'willys', store: 'willys-odenplan', limit: 100 });
+    assert.deepEqual(report?.filters, {
+      priceType: 'shelf',
+      chain: 'willys',
+      store: 'willys-odenplan',
+      sourceRun: 'run-open-prices-1',
+      limit: 100
+    });
     assert.equal(report?.summary?.latestPrice, 49.9);
     assert.equal(report?.summary?.changeFromPrevious, -10);
     assert.equal(report?.guardrails.some((guardrail) => /persisted observation rows/i.test(guardrail)), true);
