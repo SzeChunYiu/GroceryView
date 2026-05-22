@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">GroceryView maskable icon</title>
+  <desc id="desc">maskable GroceryView icon with safe padding for mobile launchers.</desc>
+  <rect width="512" height="512" fill="#064e3b"/>
+  <circle cx="256" cy="256" r="148" fill="#ecfdf5"/>
+  <path d="M177 288h157l18-89H200l-8-34h-42" fill="none" stroke="#064e3b" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="219" cy="337" r="18" fill="#10b981"/>
+  <circle cx="320" cy="337" r="18" fill="#10b981"/>
+  <path d="M204 235h104" stroke="#10b981" stroke-width="20" stroke-linecap="round"/>
+  <path d="M204 266h74" stroke="#0f766e" stroke-width="20" stroke-linecap="round"/>
+</svg>

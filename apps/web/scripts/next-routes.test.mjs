@@ -1410,6 +1410,33 @@ ${seo}`;
     assert.match(store, /findStore/);
   });
 
+  it('ships an installable PWA-first web manifest for mobile grocery checks', async () => {
+    const manifestPath = 'src/app/manifest.ts';
+    assert.equal(await fileExists(manifestPath), true, 'App Router should expose /manifest.webmanifest');
+
+    const manifest = await read(manifestPath);
+    const seo = await read('src/lib/seo.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const pwaIcon = await read('public/pwa-icon.svg');
+    const maskableIcon = await read('public/pwa-maskable-icon.svg');
+
+    assert.match(manifest, /import type \{ MetadataRoute \} from 'next'/);
+    assert.match(manifest, /display: 'standalone'/);
+    assert.match(manifest, /start_url:/);
+    assert.match(manifest, /scope:/);
+    assert.match(manifest, /theme_color: '#064e3b'/);
+    assert.match(manifest, /pwa-icon\.svg/);
+    assert.match(manifest, /pwa-maskable-icon\.svg/);
+    assert.match(manifest, /purpose: 'maskable'/);
+    assert.match(seo, /manifest\.webmanifest/);
+    assert.match(shell, /PWA-first mobile install/);
+    assert.match(shell, /Install on phone/);
+    assert.match(shell, /manifest\.webmanifest/);
+    assert.match(shell, /verified prices load before the app shell asks for anything private/);
+    assert.match(pwaIcon, /GroceryView/);
+    assert.match(maskableIcon, /maskable GroceryView icon/);
+  });
+
 
   it('ships dynamic product OG price images from verified price data', async () => {
     const ogPath = 'src/app/products/[slug]/opengraph-image.tsx';

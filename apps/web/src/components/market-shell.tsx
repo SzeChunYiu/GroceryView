@@ -46,6 +46,13 @@ const immigrantMultilingualUi = {
   languageOptions: ['Swedish', 'English', 'Arabic', 'Somali'],
   guardrails: ['Verified prices stay numeric', 'No machine-translated prices', 'Source labels remain visible']
 };
+const pwaFirstInstall = {
+  persona: 'Busy mobile shoppers',
+  title: 'PWA-first mobile install',
+  actions: ['Install on phone', 'Open compare offline shell', 'Jump to stores'],
+  manifestPath: '/manifest.webmanifest',
+  evidence: 'verified prices load before the app shell asks for anything private'
+};
 
 export function MarketShell() {
   return (
@@ -83,6 +90,27 @@ export function MarketShell() {
       </section>
 
       <div className="mt-6"><MetricGrid /></div>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">{pwaFirstInstall.persona}</p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">{pwaFirstInstall.title}</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              GroceryView chooses the PWA-first mobile path first: the terminal can be installed from the browser, opens verified public routes quickly, and keeps account-bound actions gated until a real session exists.
+            </p>
+          </div>
+          <a className="rounded-full bg-emerald-700 px-5 py-3 text-center text-sm font-black text-white" href={pwaFirstInstall.manifestPath}>
+            {pwaFirstInstall.manifestPath}
+          </a>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {pwaFirstInstall.actions.map((action) => (
+            <p className="rounded-2xl bg-white p-4 text-sm font-black text-emerald-950" key={action}>{action}</p>
+          ))}
+        </div>
+        <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-emerald-900">{pwaFirstInstall.evidence}</p>
+      </Card>
 
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

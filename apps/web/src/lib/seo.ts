@@ -194,6 +194,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
   return {
     title,
     description,
+    manifest: '/manifest.webmanifest',
     alternates: { canonical: canonical },
     openGraph: {
       title,
