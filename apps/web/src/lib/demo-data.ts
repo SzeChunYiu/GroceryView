@@ -2001,6 +2001,30 @@ export const familyBulkUnitPriceComparison = {
   }
 };
 
+export const mealPrepBulkBuyOptimizer = {
+  persona: 'Meal-preppers / large households',
+  title: 'Meal-prepper bulk-buy optimizer',
+  rows: familyBulkUnitPriceComparison.rows.map((row, index) => ({
+    ...row,
+    freezerPortions: [6, 4, 8][index] ?? 4,
+    paybackMeals: [3, 2, 4][index] ?? 3,
+    stockUpDecision: row.unitSavingsPercent >= 10
+      ? 'Stock up if the freezer or pantry space is available'
+      : 'Buy only the standard pack unless this is already in the meal plan',
+    coverageEvidence: `${row.source}; bulkUnitPrice is compared against standardUnitPrice on ${row.comparableUnit}.`
+  })),
+  coverageGuardrails: [
+    'No forecast: stock-up advice uses the visible bulkUnitPrice versus standardUnitPrice spread only.',
+    'Freezer and pantry capacity are shopper-entered constraints; GroceryView does not infer household storage from public rows.',
+    'Meal-prepper rows stay hidden when comparable units or visible package rows are missing.',
+    'Bulk savings are shown per comparable unit, not as a future-price or spoilage prediction.'
+  ],
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Optimizes around visible package math already used on the weekly basket; it does not estimate future prices, unseen club-card bundles, or household spoilage.'
+  }
+};
+
 export const studentBasicsInput: BasketComparisonInput = {
   favoriteStoreIds: ['willys-odenplan', 'coop-medborgarplatsen', 'hemkop-hornstull'],
   items: [
