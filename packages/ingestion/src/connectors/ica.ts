@@ -64,6 +64,21 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004222',
     storeName: 'ICA Kvantum Södermalm',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003754',
+    storeName: 'ICA Supermarket Sjöstaden',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003380',
+    storeName: 'Maxi ICA Stormarknad Solna',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1015001',
+    storeName: 'Maxi ICA Stormarknad Bromma',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
