@@ -742,6 +742,22 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces a factual price-change event log from consecutive observed prices', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /priceChangeEventLogFor/);
+    assert.match(source, /priceChangeEvents/);
+    assert.match(source, /changePercentLabel/);
+    assert.match(source, /price-change event log/);
+    assert.match(source, /consecutive dated observations/);
+    assert.match(source, /dropped/);
+    assert.match(source, /rose/);
+    assert.match(source, /No forecast or seasonal prediction is shown/);
+    assert.match(source, /Not enough dated observations/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces product multi-timeframe price charts using the real core chart adapter and lightweight-charts', async () => {
     const product = await read('src/app/products/[slug]/page.tsx');
     const chart = await read('src/components/price-chart-terminal.tsx');
