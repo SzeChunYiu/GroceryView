@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { gzipSync } from 'node:zlib';
 import {
   buildCoopSearchUrl,
+  buildCoopStoreInfoUrl,
   buildDailyConnectorConfigsFromEnv,
   buildHemkopSearchUrl,
   buildHemkopWeeklyDiscountsUrl,
@@ -26,7 +27,9 @@ import {
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
   fetchCoopPublicServiceAccess,
+  fetchCoopPublicWeeklyServiceAccess,
   fetchCoopProducts,
+  fetchCoopWeeklyDiscounts,
   fetchHemkopProducts,
   fetchHemkopWeeklyDiscounts,
   fetchIcaDefaultStoreProducts,
@@ -348,6 +351,114 @@ describe('fetchCoopProducts', () => {
       personalizationApiSubscriptionKey: 'public-page-key',
       personalizationApiVersion: 'v1'
     });
+  });
+
+  it('reads Coop weekly discount API settings from the public handla page', async () => {
+    const fetchImpl: typeof fetch = async () => new Response(`
+      <script>
+        window.coopSettings = {
+          "serviceAccess": {
+            "personalizationApiUrl": "https://external.api.coop.se/personalization",
+            "personalizationApiSubscriptionKey": "public-page-key",
+            "personalizationApiVersion": "v1",
+            "storeApiUrl": "https://proxy.api.coop.se/external/store/",
+            "storeApiSubscriptionKey": "public-store-key"
+          }
+        };
+      </script>
+    `, { status: 200, headers: { 'content-type': 'text/html' } });
+
+    assert.deepEqual(await fetchCoopPublicWeeklyServiceAccess(fetchImpl), {
+      personalizationApiUrl: 'https://external.api.coop.se/personalization',
+      personalizationApiSubscriptionKey: 'public-page-key',
+      personalizationApiVersion: 'v1',
+      storeApiUrl: 'https://proxy.api.coop.se/external/store/',
+      storeApiSubscriptionKey: 'public-store-key'
+    });
+  });
+
+  it('fetches public Coop weekly flyer discount rows with store provenance', async () => {
+    const requestedUrls: string[] = [];
+    let productSearchBody = '';
+    const fetchImpl: typeof fetch = async (url, init) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildCoopStoreInfoUrl()) {
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: '251300',
+          name: 'Stora Coop Boländerna',
+          city: 'Uppsala',
+          flyers: [{
+            startDate: '2026-05-18T00:00:00',
+            stopDate: '2026-05-24T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: 'https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna',
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+
+      assert.equal(String(url), buildCoopSearchUrl());
+      assert.equal(init?.method, 'POST');
+      productSearchBody = String(init?.body);
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: '7310865005168',
+            ean: '7310865005168',
+            name: 'Smör Normalsaltat',
+            manufacturerName: 'Svenskt Smör från Arla',
+            packageSizeInformation: '500g',
+            salesPriceData: { b2cPrice: 61.45 },
+            comparativePriceText: 'kr/kg',
+            onlinePromotions: [{
+              id: '016001_41099',
+              message: 'Medlemspris-Smör 45 kr/st-1 för 45:-',
+              priceData: { b2cPrice: 45 },
+              comparativePrice: { b2cPrice: 90 },
+              medMeraRequired: true
+            }]
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscounts({
+      fetchImpl,
+      subscriptionKey: 'public-page-key',
+      storeApiSubscriptionKey: 'public-store-key',
+      productQueries: ['Svenskt smör Arla 500 g'],
+      maxRows: 1,
+      retrievedAt: '2026-05-22T08:39:41.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildCoopStoreInfoUrl(), buildCoopSearchUrl()]);
+    assert.equal(JSON.parse(productSearchBody).query, 'Svenskt smör Arla 500 g');
+    assert.deepEqual(rows, [{
+      code: '7310865005168',
+      ean: '7310865005168',
+      name: 'Smör Normalsaltat',
+      brand: 'Svenskt Smör från Arla',
+      packageText: '500g',
+      ordinaryPrice: 61.45,
+      ordinaryPriceText: '61.45 SEK',
+      offerPrice: 45,
+      offerPriceText: '45.00 SEK',
+      offerUnitPrice: 90,
+      offerUnitPriceText: '90.00 kr/kg',
+      offerMechanicText: 'Medlemspris-Smör 45 kr/st-1 för 45:-',
+      promotionId: '016001_41099',
+      medMeraRequired: true,
+      storeId: '251300',
+      storeName: 'Stora Coop Boländerna',
+      region: 'Uppsala',
+      validFrom: '2026-05-18T00:00:00',
+      validTo: '2026-05-24T23:59:59',
+      flyerUrl: 'https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna',
+      productSearchUrl: buildCoopSearchUrl(),
+      sourceUrl: buildCoopStoreInfoUrl(),
+      retrievedAt: '2026-05-22T08:39:41.000Z'
+    }]);
   });
 });
 
