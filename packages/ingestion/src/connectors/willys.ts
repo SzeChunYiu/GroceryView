@@ -16,6 +16,12 @@ export type WillysProduct = {
   retrievedAt: string;
 };
 
+export type WillysStoreProduct = WillysProduct & {
+  storeId: string;
+  storeName: string;
+  city: string;
+};
+
 export type WillysWeeklyDiscount = {
   code: string;
   productCode: string;
@@ -179,8 +185,15 @@ export const DEFAULT_WILLYS_SEARCH_QUERIES = [
 export type FetchWillysProductsOptions = {
   fetchImpl?: typeof fetch;
   queries?: readonly string[];
+  storeId?: string;
   maxRows?: number;
   retrievedAt?: string;
+};
+
+export type FetchWillysProductsForAllStoresOptions = Omit<FetchWillysProductsOptions, 'storeId' | 'maxRows'> & {
+  storeApiUrl?: string;
+  maxStores?: number;
+  maxRowsPerStore?: number;
 };
 
 export type FetchWillysWeeklyDiscountsOptions = {
@@ -205,9 +218,10 @@ export type FetchWillysStoresOptions = {
   storeApiUrl?: string;
 };
 
-export function buildWillysSearchUrl(query: string): string {
+export function buildWillysSearchUrl(query: string, storeId?: string): string {
   const url = new URL(WILLYS_SEARCH_BASE_URL);
   url.searchParams.set('q', query);
+  if (storeId) url.searchParams.set('store', storeId);
   return url.toString();
 }
 
@@ -267,7 +281,7 @@ export async function fetchWillysProducts(options: FetchWillysProductsOptions = 
   const seenCodes = new Set<string>();
 
   for (const query of queries) {
-    const sourceUrl = buildWillysSearchUrl(query);
+    const sourceUrl = buildWillysSearchUrl(query, options.storeId);
     const response = await fetchImpl(sourceUrl, {
       headers: {
         accept: 'application/json',
@@ -293,6 +307,35 @@ export async function fetchWillysProducts(options: FetchWillysProductsOptions = 
     }
   }
 
+  return rows;
+}
+
+export async function fetchWillysProductsForAllStores(
+  options: FetchWillysProductsForAllStoresOptions = {}
+): Promise<WillysStoreProduct[]> {
+  const stores = await fetchWillysStores({
+    fetchImpl: options.fetchImpl,
+    online: true,
+    maxRows: options.maxStores,
+    retrievedAt: options.retrievedAt,
+    storeApiUrl: options.storeApiUrl
+  });
+  const rows: WillysStoreProduct[] = [];
+  for (const store of stores) {
+    const products = await fetchWillysProducts({
+      fetchImpl: options.fetchImpl,
+      queries: options.queries,
+      storeId: store.storeId,
+      maxRows: options.maxRowsPerStore ?? 24,
+      retrievedAt: options.retrievedAt
+    });
+    rows.push(...products.map((product) => ({
+      ...product,
+      storeId: store.storeId,
+      storeName: store.name,
+      city: store.city
+    })));
+  }
   return rows;
 }
 

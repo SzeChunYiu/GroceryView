@@ -20,6 +20,12 @@ export type CoopProduct = {
   retrievedAt: string;
 };
 
+export type CoopStoreProduct = CoopProduct & {
+  storeId: string;
+  storeName: string;
+  city: string;
+};
+
 export type CoopWeeklyDiscount = {
   code: string;
   ean: string;
@@ -219,6 +225,16 @@ export type FetchCoopProductsOptions = {
   subscriptionKey?: string;
   personalizationApiUrl?: string;
   retrievedAt?: string;
+};
+
+export type FetchCoopProductsForAllStoresOptions = Omit<FetchCoopProductsOptions, 'storeId' | 'query' | 'maxRows'> & {
+  queries?: readonly string[];
+  maxStores?: number;
+  maxRowsPerStore?: number;
+  includeStoreDetails?: boolean;
+  storeApiVersion?: string;
+  storeApiUrl?: string;
+  storeApiSubscriptionKey?: string;
 };
 
 export type FetchCoopWeeklyDiscountsOptions = {
@@ -477,6 +493,44 @@ export async function fetchCoopProducts(options: FetchCoopProductsOptions = {}):
     }
   }
 
+  return rows;
+}
+
+export async function fetchCoopProductsForAllStores(
+  options: FetchCoopProductsForAllStoresOptions = {}
+): Promise<CoopStoreProduct[]> {
+  const stores = await fetchCoopStores({
+    fetchImpl: options.fetchImpl,
+    maxRows: options.maxStores,
+    storeApiVersion: options.storeApiVersion,
+    storeApiUrl: options.storeApiUrl,
+    storeApiSubscriptionKey: options.storeApiSubscriptionKey,
+    includeDetails: options.includeStoreDetails,
+    retrievedAt: options.retrievedAt
+  });
+  const rows: CoopStoreProduct[] = [];
+  const queries = options.queries ?? [DEFAULT_COOP_SEARCH_QUERY];
+  for (const store of stores) {
+    for (const query of queries) {
+      const products = await fetchCoopProducts({
+        fetchImpl: options.fetchImpl,
+        query,
+        maxRows: options.maxRowsPerStore ?? options.maxRowsPerStore ?? 24,
+        storeId: store.storeId,
+        device: options.device,
+        apiVersion: options.apiVersion,
+        subscriptionKey: options.subscriptionKey,
+        personalizationApiUrl: options.personalizationApiUrl,
+        retrievedAt: options.retrievedAt
+      });
+      rows.push(...products.map((product) => ({
+        ...product,
+        storeId: store.storeId,
+        storeName: store.name,
+        city: store.city
+      })));
+    }
+  }
   return rows;
 }
 
