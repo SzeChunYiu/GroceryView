@@ -1848,6 +1848,41 @@ export const oneTapBasketOptimizer = {
   ]
 };
 
+const savedBasketAutoReorderComparison = compareBasketStrategies(weeklyBasketOptimizerInput);
+
+export const savedBasketAutoReorderPlan = {
+  persona: 'Busy professionals',
+  title: 'Saved basket auto-reorder readiness',
+  comparison: savedBasketAutoReorderComparison,
+  autoReorderEligibleLines: savedBasketAutoReorderComparison.cheapestByProduct.assignments
+    .filter((assignment) => assignment.priceType !== 'member')
+    .map((assignment) => ({
+      productId: assignment.productId,
+      storeName: assignment.storeName,
+      quantity: assignment.quantity,
+      lineTotal: assignment.lineTotal,
+      priceType: assignment.priceType
+    })),
+  manualReviewRequired: weeklyBasketOptimizerInput.items
+    .filter((item) => item.prices.length < weeklyBasketOptimizerInput.favoriteStoreIds.length)
+    .map((item) => ({
+      productId: item.productId,
+      reason: 'Missing favorite-store price rows block unattended reorder.',
+      missingStoreCount: weeklyBasketOptimizerInput.favoriteStoreIds.length - item.prices.length
+    })),
+  readyAction: {
+    label: 'Prepare reviewed auto-reorder draft',
+    nextRunLabel: 'weekly saved-basket review',
+    estimatedTotal: savedBasketAutoReorderComparison.cheapestByProduct.total,
+    storeCount: savedBasketAutoReorderComparison.splitStoreCount
+  },
+  guardrails: [
+    'Requires a signed-in saved basket and explicit shopper approval before GroceryView can prepare a reorder draft.',
+    'No retailer checkout or payment is submitted automatically.',
+    'manualReviewRequired lines stay blocked when favorite-store prices or retailer handoff support are missing.'
+  ]
+};
+
 export const budgetStretchKronaOptimizer = {
   persona: 'Budget-conscious / low-income',
   title: 'Stretch your krona optimizer',
