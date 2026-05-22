@@ -1741,6 +1741,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getLocalOfferBasketReport(user, url.searchParams.get('asOf') ?? undefined));
       }
 
+      const handoffMatch = path.match(/^\/api\/basket\/handoff\/([^/]+)$/);
+      if (handoffMatch) {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getRetailerHandoffPlan(user, decodeURIComponent(handoffMatch[1])));
+      }
+
       if (path === '/api/basket/trip-cost') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -2087,6 +2096,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/compare': { post: protectedOperation('Compare basket strategies.') },
       '/api/basket/comparison-report': { get: protectedOperation('Get basket comparison strategies with assignment and trust labels.') },
       '/api/basket/local-offers': { get: protectedOperation('Get local offer basket coverage, freshness, confidence, and savings by selected stores.') },
+      '/api/basket/handoff/{retailerId}': { get: protectedOperation('Get retailer handoff actions, support matrix fallbacks, and checkout-confirmation guardrails.') },
       '/api/basket/trip-cost': { get: protectedOperation('Get basket totals ranked by shelf price plus explicit travel, time, delivery, and split-shop costs.') },
       '/api/basket/recurring-digest': { get: protectedOperation('Get recurring basket changes, missing-price blockers, and suggested review actions.') },
       '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },

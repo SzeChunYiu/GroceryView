@@ -401,6 +401,129 @@ export type BasketTripCostPlan = {
   guardrails: string[];
 };
 
+
+export type RetailerHandoffSupportLevel = 'supported' | 'manual' | 'unsupported';
+
+export type RetailerHandoffSupport = {
+  productDeepLinks: RetailerHandoffSupportLevel;
+  basketTransfer: RetailerHandoffSupportLevel;
+  copyList: RetailerHandoffSupportLevel;
+  retailerAppSearch: RetailerHandoffSupportLevel;
+  checkoutConfirmation: RetailerHandoffSupportLevel;
+};
+
+export type RetailerHandoffLineInput = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  productUrl?: string;
+  matched: boolean;
+};
+
+export type RetailerHandoffInput = {
+  retailerId: string;
+  retailerName: string;
+  basketId: string;
+  lines: RetailerHandoffLineInput[];
+  support: RetailerHandoffSupport;
+};
+
+export type RetailerHandoffActionType = 'basket_transfer' | 'product_deep_links' | 'copy_list' | 'retailer_app_search';
+export type RetailerHandoffActionStatus = 'ready' | 'partial' | 'manual_review' | 'unsupported';
+
+export type RetailerHandoffAction = {
+  actionType: RetailerHandoffActionType;
+  status: RetailerHandoffActionStatus;
+  label: string;
+  lineCount: number;
+  productIds: string[];
+  urlCount: number;
+  requiresRetailerConfirmation: boolean;
+  reason: string;
+};
+
+export type RetailerHandoffPlan = {
+  retailerId: string;
+  retailerName: string;
+  basketId: string;
+  primaryAction: RetailerHandoffAction;
+  actions: RetailerHandoffAction[];
+  unsupportedReasons: string[];
+  guardrails: string[];
+};
+
+export function planRetailerHandoff(input: RetailerHandoffInput): RetailerHandoffPlan {
+  requireNonBlank(input.retailerId, 'retailerId');
+  requireNonBlank(input.retailerName, 'retailerName');
+  requireNonBlank(input.basketId, 'basketId');
+  const lines = input.lines.map((line) => {
+    requireNonBlank(line.productId, 'productId');
+    requireNonBlank(line.productName, 'productName');
+    if (!Number.isInteger(line.quantity) || line.quantity <= 0) throw new Error('quantity must be a positive integer.');
+    return line;
+  });
+  const matchedLines = lines.filter((line) => line.matched);
+  const linkedLines = matchedLines.filter((line) => Boolean(line.productUrl));
+  const allProductIds = lines.map((line) => line.productId);
+
+  const action = (
+    actionType: RetailerHandoffActionType,
+    support: RetailerHandoffSupportLevel,
+    readyLines: RetailerHandoffLineInput[],
+    label: string,
+    manualReason: string,
+    unsupportedReason: string
+  ): RetailerHandoffAction => {
+    if (support === 'unsupported') {
+      return { actionType, status: 'unsupported', label, lineCount: 0, productIds: [], urlCount: 0, requiresRetailerConfirmation: true, reason: unsupportedReason };
+    }
+    if (support === 'manual') {
+      return { actionType, status: 'manual_review', label, lineCount: lines.length, productIds: allProductIds, urlCount: 0, requiresRetailerConfirmation: true, reason: manualReason };
+    }
+    const status: RetailerHandoffActionStatus = readyLines.length === lines.length ? 'ready' : readyLines.length > 0 ? 'partial' : 'manual_review';
+    return {
+      actionType,
+      status,
+      label,
+      lineCount: readyLines.length,
+      productIds: readyLines.map((line) => line.productId),
+      urlCount: readyLines.filter((line) => Boolean(line.productUrl)).length,
+      requiresRetailerConfirmation: true,
+      reason: status === 'ready' ? `${label} is ready for all basket lines.` : `${label} needs shopper review for unmatched or unlinked basket lines.`
+    };
+  };
+
+  const actions: RetailerHandoffAction[] = [
+    action('copy_list', input.support.copyList, lines, 'Copy list', 'Copy the list into the retailer app manually.', `${input.retailerName} copy-list handoff is not supported.`),
+    action('product_deep_links', input.support.productDeepLinks, linkedLines, 'Product deep links', 'Open product searches manually in the retailer app.', `${input.retailerName} product deep links are not supported.`),
+    action('retailer_app_search', input.support.retailerAppSearch, lines, 'Retailer app search', 'Search each item in the retailer app and confirm matches.', `${input.retailerName} app search handoff is not supported.`),
+    action('basket_transfer', input.support.basketTransfer, matchedLines, 'Basket transfer', 'Transfer requires retailer-side confirmation before GroceryView can call it complete.', `${input.retailerName} does not currently support verified basket transfer.`)
+  ];
+
+  const priority: RetailerHandoffActionStatus[] = ['ready', 'partial', 'manual_review', 'unsupported'];
+  const primaryAction = [...actions].sort((a, b) => priority.indexOf(a.status) - priority.indexOf(b.status))[0] ?? actions[0]!;
+  const unsupportedReasons = actions
+    .filter((item) => item.status === 'unsupported' && item.actionType === 'basket_transfer')
+    .map((item) => item.reason);
+  if (input.support.checkoutConfirmation === 'unsupported') {
+    unsupportedReasons.push('Checkout confirmation is not available, so GroceryView cannot claim purchase completion.');
+  }
+
+  return {
+    retailerId: input.retailerId,
+    retailerName: input.retailerName,
+    basketId: input.basketId,
+    primaryAction,
+    actions,
+    unsupportedReasons,
+    guardrails: [
+      'Retailer handoff is an action aid, not checkout confirmation.',
+      'Unsupported basket transfer falls back to copyable lists and product deep links.',
+      'Missing product links remain visible and require shopper review before retailer handoff.'
+    ]
+  };
+}
+
 export function planBasketTripCost(input: BasketTripCostInput): BasketTripCostPlan {
   const valueOfTimePerHour = input.valueOfTimePerHour ?? 0;
   const carCostPerKm = input.carCostPerKm ?? 0;

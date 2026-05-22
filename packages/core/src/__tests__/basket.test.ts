@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   compareBasketStrategies,
   planBasketTripCost,
+  planRetailerHandoff,
   planRecurringBasketDigest,
   summarizeLocalOfferBasket,
   summarizeStoreBasketCoverage,
@@ -203,6 +204,48 @@ describe('validateBasketComparisonLineFixtures', () => {
 });
 
 
+
+
+
+describe('planRetailerHandoff', () => {
+  it('plans deep-link and basket-transfer actions with explicit unsupported and confirmation states', () => {
+    const plan = planRetailerHandoff({
+      retailerId: 'willys',
+      retailerName: 'Willys',
+      basketId: 'weekly-basics',
+      lines: [
+        { productId: 'coffee', productName: 'Coffee', quantity: 1, productUrl: 'https://www.willys.se/coffee', matched: true },
+        { productId: 'milk', productName: 'Milk', quantity: 2, productUrl: 'https://www.willys.se/milk', matched: true },
+        { productId: 'butter', productName: 'Butter', quantity: 1, matched: false }
+      ],
+      support: {
+        productDeepLinks: 'supported',
+        basketTransfer: 'unsupported',
+        copyList: 'supported',
+        retailerAppSearch: 'manual',
+        checkoutConfirmation: 'unsupported'
+      }
+    });
+
+    assert.equal(plan.primaryAction.actionType, 'copy_list');
+    assert.equal(plan.primaryAction.status, 'ready');
+    assert.deepEqual(plan.actions.map((action) => ({ actionType: action.actionType, status: action.status, lineCount: action.lineCount })), [
+      { actionType: 'copy_list', status: 'ready', lineCount: 3 },
+      { actionType: 'product_deep_links', status: 'partial', lineCount: 2 },
+      { actionType: 'retailer_app_search', status: 'manual_review', lineCount: 3 },
+      { actionType: 'basket_transfer', status: 'unsupported', lineCount: 0 }
+    ]);
+    assert.deepEqual(plan.unsupportedReasons, [
+      'Willys does not currently support verified basket transfer.',
+      'Checkout confirmation is not available, so GroceryView cannot claim purchase completion.'
+    ]);
+    assert.deepEqual(plan.guardrails, [
+      'Retailer handoff is an action aid, not checkout confirmation.',
+      'Unsupported basket transfer falls back to copyable lists and product deep links.',
+      'Missing product links remain visible and require shopper review before retailer handoff.'
+    ]);
+  });
+});
 
 describe('planBasketTripCost', () => {
   it('ranks basket options by basket plus travel cost while keeping missing-price blockers explicit', () => {

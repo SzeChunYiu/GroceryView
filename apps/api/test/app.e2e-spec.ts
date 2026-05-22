@@ -408,6 +408,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
     assert.ok(docs.body.paths['/users/demo/basket/recurring-digest']);
     assert.ok(docs.body.paths['/users/demo/basket/trip-cost']);
+    assert.ok(docs.body.paths['/users/demo/basket/handoff/{retailerId}']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
   });
 
@@ -984,6 +985,15 @@ describe('GroceryView API app', () => {
     assert.equal(localOffers.body.bestStore.storeId, 'willys-odenplan');
     assert.equal(localOffers.body.bestStore.matchedProductIds[0], 'coffee');
     assert.equal(localOffers.body.guardrails.length, 3);
+
+    const handoff = await request(app.getHttpServer())
+      .get('/users/demo/basket/handoff/willys')
+      .expect(200);
+    assert.equal(handoff.body.userId, 'demo');
+    assert.equal(handoff.body.demo, true);
+    assert.equal(handoff.body.retailerId, 'willys');
+    assert.equal(handoff.body.primaryAction.actionType, 'copy_list');
+    assert.match(handoff.body.unsupportedReasons[1], /cannot claim purchase completion/i);
 
     const tripCost = await request(app.getHttpServer())
       .get('/users/demo/basket/trip-cost?travelMode=car&valueOfTimePerHour=120&carCostPerKm=3.5&splitTripPenalty=15')

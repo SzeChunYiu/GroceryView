@@ -1113,6 +1113,31 @@ describe('createGroceryViewApi', () => {
   });
 
 
+
+  it('returns retailer handoff plans with support matrix fallbacks and checkout guardrails', () => {
+    const api = createGroceryViewApi();
+
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+
+    const report = api.getRetailerHandoffPlan('user-1', 'willys');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.retailerId, 'willys');
+    assert.equal(report.primaryAction.actionType, 'copy_list');
+    assert.deepEqual(report.actions.map((action) => ({ actionType: action.actionType, status: action.status, lineCount: action.lineCount })), [
+      { actionType: 'copy_list', status: 'ready', lineCount: 2 },
+      { actionType: 'product_deep_links', status: 'ready', lineCount: 2 },
+      { actionType: 'retailer_app_search', status: 'manual_review', lineCount: 2 },
+      { actionType: 'basket_transfer', status: 'unsupported', lineCount: 0 }
+    ]);
+    assert.deepEqual(report.unsupportedReasons, [
+      'Willys does not currently support verified basket transfer.',
+      'Checkout confirmation is not available, so GroceryView cannot claim purchase completion.'
+    ]);
+    assert.match(report.guardrails[0], /not checkout confirmation/i);
+  });
+
   it('returns basket trip-cost optimizer reports with travel estimates separated from shelf totals', () => {
     const api = createGroceryViewApi();
 

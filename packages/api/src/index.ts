@@ -8,6 +8,7 @@ import {
   calculateFixedBasketIndex,
   compareBasketStrategies,
   planBasketTripCost,
+  planRetailerHandoff,
   createHouseholdState,
   rankNutritionPerKrona,
   planPantryReplenishment,
@@ -24,6 +25,8 @@ import {
   type BasketComparisonResult,
   type BasketTripCostPlan,
   type BasketTripCostTravelMode,
+  type RetailerHandoffPlan,
+  type RetailerHandoffSupport,
   type BrandTierIndexSummary,
   type BrandTierPriceObservation,
   type BudgetSummary,
@@ -417,6 +420,11 @@ export type BasketTripCostReport = BasketTripCostPlan & {
   userId: string;
   itemCount: number;
   favoriteStoreIds: string[];
+};
+
+export type RetailerHandoffReport = RetailerHandoffPlan & {
+  userId: string;
+  itemCount: number;
 };
 
 export type StoreBasketQuoteLine = {
@@ -1440,6 +1448,41 @@ const storeTravelProfiles: Record<string, { distanceKm: number; durationMinutes:
   'willys-odenplan': { distanceKm: 0.5, durationMinutes: 5.29 },
   'lidl-sveavagen': { distanceKm: 0.8, durationMinutes: 7 },
   'coop-odenplan': { distanceKm: 0.4, durationMinutes: 4 }
+};
+
+const retailerHandoffSupport: Record<string, { retailerName: string; support: RetailerHandoffSupport; productUrlBase?: string }> = {
+  willys: {
+    retailerName: 'Willys',
+    productUrlBase: 'https://www.willys.se/sok?q=',
+    support: {
+      productDeepLinks: 'supported',
+      basketTransfer: 'unsupported',
+      copyList: 'supported',
+      retailerAppSearch: 'manual',
+      checkoutConfirmation: 'unsupported'
+    }
+  },
+  coop: {
+    retailerName: 'Coop',
+    productUrlBase: 'https://www.coop.se/sok/?q=',
+    support: {
+      productDeepLinks: 'supported',
+      basketTransfer: 'unsupported',
+      copyList: 'supported',
+      retailerAppSearch: 'manual',
+      checkoutConfirmation: 'unsupported'
+    }
+  },
+  lidl: {
+    retailerName: 'Lidl',
+    support: {
+      productDeepLinks: 'manual',
+      basketTransfer: 'unsupported',
+      copyList: 'supported',
+      retailerAppSearch: 'manual',
+      checkoutConfirmation: 'unsupported'
+    }
+  }
 };
 
 const products: ProductDetail[] = [
@@ -2853,6 +2896,36 @@ function strategyStoreIds(strategy: BasketComparisonReportStrategy): string[] {
   return [...new Set(strategy.assignments.map((assignment) => assignment.storeId))].sort();
 }
 
+
+function productUrlForRetailer(product: ProductDetail, retailerId: string): string | undefined {
+  const support = retailerHandoffSupport[retailerId];
+  if (!support?.productUrlBase) return undefined;
+  return `${support.productUrlBase}${encodeURIComponent(product.name)}`;
+}
+
+function buildRetailerHandoffReport(userId: string, retailerId: string, userItems: BasketItemRequest[]): RetailerHandoffReport {
+  requireNonEmptyId(userId, 'userId');
+  const support = retailerHandoffSupport[retailerId];
+  if (!support) throw new Error(`Unsupported retailerId: ${retailerId}`);
+  const plan = planRetailerHandoff({
+    retailerId,
+    retailerName: support.retailerName,
+    basketId: `${userId}:current-basket`,
+    support: support.support,
+    lines: userItems.map((item) => {
+      const product = products.find((candidate) => candidate.id === item.productId);
+      return {
+        productId: item.productId,
+        productName: product?.name ?? item.productId,
+        quantity: item.quantity,
+        matched: Boolean(product?.availableChains.includes(retailerId)),
+        ...(product ? { productUrl: productUrlForRetailer(product, retailerId) } : {})
+      };
+    })
+  });
+  return { ...plan, userId, itemCount: userItems.length };
+}
+
 function buildBasketTripCostReport(userId: string, favoriteStoreIds: string[], userItems: BasketItemRequest[], request: BasketTripCostRequest): BasketTripCostReport {
   requireNonEmptyId(userId, 'userId');
   const comparisonStoreIds = favoriteStoreIds.length > 0 ? favoriteStoreIds : stores.map((store) => store.id);
@@ -3990,6 +4063,11 @@ export function createGroceryViewApi() {
     getBasketTripCostReport(userId: string, request: BasketTripCostRequest): BasketTripCostReport {
       const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
       return buildBasketTripCostReport(userId, favoriteStoreIds, baskets.get(userId) ?? [], request);
+    },
+
+
+    getRetailerHandoffPlan(userId: string, retailerId: string): RetailerHandoffReport {
+      return buildRetailerHandoffReport(userId, retailerId, baskets.get(userId) ?? []);
     },
 
     getLocalOfferBasketReport(userId: string, asOf = '2026-05-20T12:00:00.000Z'): LocalOfferBasketReport {

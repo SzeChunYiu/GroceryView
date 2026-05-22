@@ -53,6 +53,19 @@ export class BasketsController {
     return { ...groceryApi.getLocalOfferBasketReport('demo', asOf), demo: true };
   }
 
+  @Get('handoff/:retailerId')
+  @ApiOkResponse({ description: 'Retailer handoff actions and support matrix guardrails' })
+  handoff(@Param('retailerId') retailerId: string) {
+    try {
+      return { ...groceryApi.getRetailerHandoffPlan('demo', retailerId), demo: true };
+    } catch (error) {
+      if (error instanceof Error && /Unsupported retailerId/.test(error.message)) {
+        throw new NotFoundException('Retailer handoff not supported');
+      }
+      throw error;
+    }
+  }
+
   @Get('trip-cost')
   @ApiOkResponse({ description: 'Basket plus travel-cost optimizer' })
   tripCost(
