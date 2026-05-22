@@ -282,6 +282,16 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces elderly staples price stability using real price-history summaries', async () => {
+    const source = await read('src/app/savings-dashboard/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+    assert.match(source, /elderlyStaplesStabilityTracker/);
+    assert.match(source, /Staples price stability/);
+    assert.match(source, /stabilityBand/);
+    assert.match(demo, /summarizePriceHistory/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces personal grocery inflation on the savings dashboard using the real core-derived driver output', async () => {
     const source = await read('src/app/savings-dashboard/page.tsx');
     assert.match(source, /personalGroceryInflation/);

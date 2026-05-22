@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildWatchlistAlerts, calculatePersonalGroceryInflation, compareBasketStrategies, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildExpiryDealRadar, buildWatchlistAlerts, calculatePersonalGroceryInflation, compareBasketStrategies, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 
 export const products = [
   {
@@ -2486,6 +2486,57 @@ export const personalGroceryInflation = calculatePersonalGroceryInflation({
     .filter((row) => !products.some((product) => product.slug === row.slug))
     .map((row) => row.slug)
 });
+
+
+const elderlyStaplesHistoryInputs = [
+  {
+    productId: 'arla-milk-1l',
+    productName: 'Arla Mellanmjölk 1L',
+    stabilityBand: 'stable',
+    points: [
+      { observedAt: '2026-05-01', price: 13.7 },
+      { observedAt: '2026-05-08', price: 13.9 },
+      { observedAt: '2026-05-15', price: 13.8 },
+      { observedAt: '2026-05-21', price: 13.9 }
+    ]
+  },
+  {
+    productId: 'havregryn-extra-fylliga-101758934-st',
+    productName: 'Havregryn Extra Fylliga',
+    stabilityBand: 'watch',
+    points: [
+      { observedAt: '2026-05-01', price: 18.5 },
+      { observedAt: '2026-05-08', price: 18.9 },
+      { observedAt: '2026-05-15', price: 19.4 },
+      { observedAt: '2026-05-21', price: 19.9 }
+    ]
+  },
+  {
+    productId: 'zoegas-coffee-450g',
+    productName: 'Zoegas Coffee 450g',
+    stabilityBand: 'buy-window',
+    points: [
+      { observedAt: '2026-05-01', price: 54.9 },
+      { observedAt: '2026-05-08', price: 52.9 },
+      { observedAt: '2026-05-15', price: 51.9 },
+      { observedAt: '2026-05-21', price: 49.9 }
+    ]
+  }
+] as const;
+
+export const elderlyStaplesStabilityTracker = {
+  persona: 'Elderly / seniors',
+  title: 'Staples price stability',
+  rows: elderlyStaplesHistoryInputs.map((item) => ({
+    ...item,
+    history: summarizePriceHistory([...item.points]),
+    stabilityBand: item.stabilityBand
+  })),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Staples stability uses observed price-history points only; unobserved store weeks stay out of the band instead of being estimated.'
+  }
+};
 
 export const savingsDashboard = {
   monthToDate: {

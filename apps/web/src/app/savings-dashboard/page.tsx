@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { elderlyStaplesStabilityTracker, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
@@ -82,6 +82,25 @@ export default function SavingsDashboardPage() {
           )}
         </Card>
       </div>
+
+      <Card className="mt-6 border-slate-300 bg-slate-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-600">{elderlyStaplesStabilityTracker.persona}</p>
+        <h2 className="mt-2 text-2xl font-black">Staples price stability</h2>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+          This senior tracker calls summarizePriceHistory for everyday staples and labels each observed price-history row with a stabilityBand instead of estimating missing weeks.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {elderlyStaplesStabilityTracker.rows.map((row) => (
+            <Link className="rounded-2xl border border-slate-200 bg-white p-4 hover:border-slate-900" href={`/products/${row.productId}`} key={row.productId}>
+              <p className="font-black text-slate-950">{row.productName}</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(row.history.latestPrice)}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">stabilityBand: {row.stabilityBand}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">Change {formatSignedSek(row.history.changeFromPrevious)} · {row.history.observedCount} observed points</p>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-4 text-sm font-semibold text-slate-700">{elderlyStaplesStabilityTracker.coverage.caveat}</p>
+      </Card>
 
       <Card className="mt-6">
         <h2 className="text-2xl font-black">Savings watchpoints</h2>
