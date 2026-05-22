@@ -1,4 +1,5 @@
 import { NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { ScannerUploadActions } from '@/components/scanner-upload-actions';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -13,6 +14,7 @@ export default function ScannerPage() {
   return (
     <PageShell>
       <NoVerifiedData route={route} title="Receipt scanner has no production uploads in this static snapshot" />
+      <ScannerUploadActions />
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <TopSpreads limit={5} />
         <SourceCoverage />
