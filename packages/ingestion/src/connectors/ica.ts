@@ -1619,6 +1619,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004707',
     storeName: 'ICA Supermarket Lindvallen',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004032',
+    storeName: 'ICA Nära Klingan',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
