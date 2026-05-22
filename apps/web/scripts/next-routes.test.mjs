@@ -666,6 +666,24 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces lowest and highest observed prices for 30, 90, and 365 day history windows', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /historyWindowDefinitions/);
+    assert.match(source, /priceHistoryRangeBadgesFor/);
+    assert.match(source, /rangeDays: 30/);
+    assert.match(source, /rangeDays: 90/);
+    assert.match(source, /rangeDays: 365/);
+    assert.match(source, /Lowest \/ highest in 30 \/ 90 \/ 365 days/);
+    assert.match(source, /Observed 30-day low\/high/);
+    assert.match(source, /Observed 90-day low\/high/);
+    assert.match(source, /Observed 365-day low\/high/);
+    assert.match(source, /canClaimLowestInWindow/);
+    assert.match(source, /window.observationCount/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces product multi-timeframe price charts using the real core chart adapter and lightweight-charts', async () => {
     const product = await read('src/app/products/[slug]/page.tsx');
     const chart = await read('src/components/price-chart-terminal.tsx');
