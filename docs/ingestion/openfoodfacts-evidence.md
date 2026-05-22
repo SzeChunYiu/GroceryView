@@ -2,9 +2,9 @@
 
 - Source: official OpenFoodFacts world data export
 - Source URL: https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
-- Retrieved: 2026-05-22T15:27:35.260Z
+- Retrieved: 2026-05-22T15:46:41.765Z
 - Candidate barcode count checked from current City Gross/Willys/Hemkop/Coop/ICA ingested rows: 3855
-- Candidate source surfaces: citygross/products 24 unique barcodes from 960/960 rows; willys/products 353 unique barcodes from 353/354 rows; willys/weeklyDiscounts 201 unique barcodes from 14331/14548 rows; hemkop/products 2099 unique barcodes from 2099/2100 rows; hemkop/weeklyDiscounts 247 unique barcodes from 17650/17650 rows; coop/products 290 unique barcodes from 290/290 rows; coop/weeklyDiscounts 32 unique barcodes from 1882/1882 rows; ica/reklambladOffers 1153 unique barcodes from 638/638 rows; ica/storePromotions 5 unique barcodes from 1345/86700 rows
+- Candidate source surfaces: citygross/products 24 unique barcodes from 960/960 rows; willys/products 353 unique barcodes from 353/354 rows; willys/weeklyDiscounts 201 unique barcodes from 14331/14548 rows; hemkop/products 2099 unique barcodes from 2099/2100 rows; hemkop/weeklyDiscounts 247 unique barcodes from 17650/17650 rows; coop/products 290 unique barcodes from 290/290 rows; coop/weeklyDiscounts 32 unique barcodes from 1882/1882 rows; ica/reklambladOffers 1153 unique barcodes from 638/638 rows; ica/storePromotions 5 unique barcodes from 1405/90300 rows
 - Export rows scanned: 4528597
 - Candidate barcodes present in export: 2267
 - Candidate barcodes not present in export and skipped: 1588
@@ -19,7 +19,7 @@ The official OpenFoodFacts export URL under `world.openfoodfacts.org/data` strea
 
 ## Verification
 
-- Verified: 2026-05-22T15:27:35.260Z
+- Verified: 2026-05-22T15:46:41.765Z
 - Export join path: `fetchOpenFoodFactsExportRetailerEnrichments` plus checked-in generator candidate extraction
 - Unit coverage: `fetchOpenFoodFactsExportRetailerEnrichments` joins only retailer candidate barcodes from the export and skips nutrition-empty rows; barcode image extraction covers Axfood and generic digit filename segments.
 - Artifact audit: `rowCount` 1902 equals 1902 emitted barcode rows; `retailerMatchCount` 21253 equals emitted retailer match links; all emitted barcodes are unique; `candidateBarcodeCount` 3855 equals the unique usable current candidate barcodes; every emitted barcode appears in those current candidates; zero emitted rows have empty nutrition; zero emitted rows use a source outside `https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=...`.
