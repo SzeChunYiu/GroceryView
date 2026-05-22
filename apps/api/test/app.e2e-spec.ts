@@ -420,6 +420,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/basket/trip-cost']);
     assert.ok(docs.body.paths['/users/demo/basket/fulfillment-slots/{retailerId}/{storeId}']);
     assert.ok(docs.body.paths['/users/demo/basket/handoff/{retailerId}']);
+    assert.ok(docs.body.paths['/users/demo/basket/transfer/{retailerId}']);
     assert.ok(docs.body.paths['/users/demo/basket/import-export']);
     assert.ok(docs.body.paths['/users/demo/basket/import-review']);
     assert.ok(docs.body.paths['/users/demo/basket/import-review/{reviewItemId}/decisions']);
@@ -1012,6 +1013,15 @@ describe('GroceryView API app', () => {
     assert.equal(handoff.body.retailerId, 'willys');
     assert.equal(handoff.body.primaryAction.actionType, 'copy_list');
     assert.match(handoff.body.unsupportedReasons[1], /cannot claim purchase completion/i);
+
+    const transfer = await request(app.getHttpServer())
+      .get('/users/demo/basket/transfer/willys')
+      .expect(200);
+    assert.equal(transfer.body.userId, 'demo');
+    assert.equal(transfer.body.demo, true);
+    assert.equal(transfer.body.status, 'blocked');
+    assert.equal(transfer.body.canAttemptTransfer, false);
+    assert.match(transfer.body.blockedReasons[0], /not verified as supported/);
 
     const slots = await request(app.getHttpServer())
       .get('/users/demo/basket/fulfillment-slots/willys/willys-odenplan')

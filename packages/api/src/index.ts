@@ -10,6 +10,7 @@ import {
   planBasketFulfillmentSlots,
   planBasketImportExport,
   planBasketTripCost,
+  planRetailerBasketTransferSession,
   planRetailerHandoff,
   createHouseholdState,
   rankNutritionPerKrona,
@@ -33,6 +34,7 @@ import {
   type BasketFulfillmentSlotInput,
   type BasketTripCostPlan,
   type BasketTripCostTravelMode,
+  type RetailerBasketTransferSession,
   type RetailerHandoffPlan,
   type RetailerHandoffSupport,
   type BrandTierIndexSummary,
@@ -476,6 +478,11 @@ export type BasketTripCostReport = BasketTripCostPlan & {
 };
 
 export type RetailerHandoffReport = RetailerHandoffPlan & {
+  userId: string;
+  itemCount: number;
+};
+
+export type RetailerBasketTransferSessionReport = RetailerBasketTransferSession & {
   userId: string;
   itemCount: number;
 };
@@ -2981,6 +2988,32 @@ function buildRetailerHandoffReport(userId: string, retailerId: string, userItem
   return { ...plan, userId, itemCount: userItems.length };
 }
 
+function buildRetailerBasketTransferSession(userId: string, retailerId: string, userItems: BasketItemRequest[]): RetailerBasketTransferSessionReport {
+  requireNonEmptyId(userId, 'userId');
+  const support = retailerHandoffSupport[retailerId];
+  if (!support) throw new Error(`Unsupported retailerId: ${retailerId}`);
+  const plan = planRetailerBasketTransferSession({
+    retailerId,
+    retailerName: support.retailerName,
+    basketId: `${userId}:current-basket`,
+    support: support.support,
+    shopperSessionPresent: true,
+    transferEndpoint: undefined,
+    signedPayload: undefined,
+    lines: userItems.map((item) => {
+      const product = products.find((candidate) => candidate.id === item.productId);
+      return {
+        productId: item.productId,
+        productName: product?.name ?? item.productId,
+        quantity: item.quantity,
+        matched: Boolean(product?.availableChains.includes(retailerId)),
+        ...(product ? { productUrl: productUrlForRetailer(product, retailerId) } : {})
+      };
+    })
+  });
+  return { ...plan, userId, itemCount: userItems.length };
+}
+
 function buildBasketTripCostReport(userId: string, favoriteStoreIds: string[], userItems: BasketItemRequest[], request: BasketTripCostRequest): BasketTripCostReport {
   requireNonEmptyId(userId, 'userId');
   const comparisonStoreIds = favoriteStoreIds.length > 0 ? favoriteStoreIds : stores.map((store) => store.id);
@@ -4177,6 +4210,10 @@ export function createGroceryViewApi() {
 
     getRetailerHandoffPlan(userId: string, retailerId: string): RetailerHandoffReport {
       return buildRetailerHandoffReport(userId, retailerId, baskets.get(userId) ?? []);
+    },
+
+    getRetailerBasketTransferSession(userId: string, retailerId: string): RetailerBasketTransferSessionReport {
+      return buildRetailerBasketTransferSession(userId, retailerId, baskets.get(userId) ?? []);
     },
 
     importBasketFromRetailerPage(userId: string, request: BasketImportExportRequest): BasketImportExportReport {

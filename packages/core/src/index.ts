@@ -651,6 +651,74 @@ export type RetailerHandoffPlan = {
   guardrails: string[];
 };
 
+export type RetailerBasketTransferInput = RetailerHandoffInput & {
+  transferEndpoint?: string;
+  signedPayload?: string;
+  shopperSessionPresent: boolean;
+};
+
+export type RetailerBasketTransferSession = {
+  retailerId: string;
+  retailerName: string;
+  basketId: string;
+  status: 'ready' | 'blocked' | 'manual_review';
+  canAttemptTransfer: boolean;
+  transferLineCount: number;
+  endpoint: string | null;
+  productIds: string[];
+  blockedReasons: string[];
+  requiresRetailerConfirmation: boolean;
+  guardrails: string[];
+};
+
+export function planRetailerBasketTransferSession(input: RetailerBasketTransferInput): RetailerBasketTransferSession {
+  requireNonBlank(input.retailerId, 'retailerId');
+  requireNonBlank(input.retailerName, 'retailerName');
+  requireNonBlank(input.basketId, 'basketId');
+  const blockedReasons: string[] = [];
+  if (input.support.basketTransfer !== 'supported') {
+    blockedReasons.push(`${input.retailerName} basket transfer is not verified as supported.`);
+  }
+  if (!input.shopperSessionPresent) {
+    blockedReasons.push('A signed-in shopper retailer session is required before transfer can be attempted.');
+  }
+  if (!input.transferEndpoint?.trim()) {
+    blockedReasons.push('A verified retailer transfer endpoint is required.');
+  }
+  if (!input.signedPayload?.trim()) {
+    blockedReasons.push('A signed transfer payload is required.');
+  }
+
+  const transferableLines = input.lines.filter((line) => {
+    requireNonBlank(line.productId, 'productId');
+    requireNonBlank(line.productName, 'productName');
+    if (!Number.isInteger(line.quantity) || line.quantity <= 0) throw new Error('quantity must be a positive integer.');
+    return line.matched && Boolean(line.productUrl);
+  });
+  if (transferableLines.length !== input.lines.length) {
+    blockedReasons.push('Every basket line needs a verified retailer product match and product URL before transfer.');
+  }
+
+  const status = blockedReasons.length > 0 ? 'blocked' : 'ready';
+  return {
+    retailerId: input.retailerId,
+    retailerName: input.retailerName,
+    basketId: input.basketId,
+    status,
+    canAttemptTransfer: status === 'ready',
+    transferLineCount: status === 'ready' ? transferableLines.length : 0,
+    endpoint: status === 'ready' ? input.transferEndpoint!.trim() : null,
+    productIds: status === 'ready' ? transferableLines.map((line) => line.productId) : [],
+    blockedReasons,
+    requiresRetailerConfirmation: true,
+    guardrails: [
+      'Basket transfer requires a verified retailer capability, endpoint, and signed payload.',
+      'Every transferred line must use a verified GroceryView product match and retailer product URL.',
+      'A transfer attempt is not checkout confirmation, payment, delivery booking, or inventory reservation.'
+    ]
+  };
+}
+
 export function planRetailerHandoff(input: RetailerHandoffInput): RetailerHandoffPlan {
   requireNonBlank(input.retailerId, 'retailerId');
   requireNonBlank(input.retailerName, 'retailerName');

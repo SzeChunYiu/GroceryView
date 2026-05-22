@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { studentBasicsBoard } from '@/lib/demo-data';
-import { basketImportExportContract, basketImportReviewContract, retailerHandoffContract } from '@/lib/verified-data';
+import { basketImportExportContract, basketImportReviewContract, retailerBasketTransferContract, retailerHandoffContract } from '@/lib/verified-data';
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
@@ -151,6 +151,34 @@ export default function BasketIdeasPage() {
             <p className="font-black text-slate-950">Shipped behavior</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
               {retailerHandoffContract.shippedBehaviors.map((behavior) => <li key={behavior}>{behavior}</li>)}
+            </ul>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-rose-200 bg-rose-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-rose-800">Secure transfer gate</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Secure basket transfer preflight: {retailerBasketTransferContract.title}</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          The transfer preflight API <code className="rounded bg-white/80 px-1 py-0.5 text-rose-900">{retailerBasketTransferContract.endpoint}</code> will block unless capability is verified, every line has a retailer product match, and the request carries a signed payload. A transfer attempt is not checkout confirmation, payment, delivery booking, or inventory reservation.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div>
+            <p className="font-black text-slate-950">Required inputs</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {retailerBasketTransferContract.requiredInputs.map((input) => <li key={input}>{input}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Shipped behavior</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {retailerBasketTransferContract.shippedBehaviors.map((behavior) => <li key={behavior}>{behavior}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Static snapshot remains closed</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {retailerBasketTransferContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
             </ul>
           </div>
         </div>
