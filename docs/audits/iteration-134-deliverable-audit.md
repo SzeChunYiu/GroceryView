@@ -23,8 +23,8 @@ Turn the next remaining research finding into real GroceryView product by moving
 | Full repository tests | Pass | `rtk npm test` |
 | Build | Pass | `rtk npm run build` |
 | Typecheck | Pass | `rtk npm run typecheck` |
-| Product PR merge | Pending | Product PR not opened yet. |
-| Audit PR merge | Pending | Audit merge proof requires a follow-up after product PR lands. |
+| Product PR merge | Pass | PR #819 merged at 2026-05-22T11:02:12Z as `38d416451e836dde71533cc82827fc55e63420e1`; verified merge commit is an ancestor of `origin/main`. |
+| Audit PR merge | Pending | This follow-up audit PR records product merge proof; its own merge must be verified after landing. |
 
 ## Guardrails checked
 
