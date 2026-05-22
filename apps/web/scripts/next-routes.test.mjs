@@ -706,6 +706,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
+  it('surfaces deal-hunter new-product and price-drop alerts using real alert outputs', async () => {
+    const route = await read('src/app/watchlist/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+
+    assert.match(demo, /dealHunterNewProductPriceDropAlerts/);
+    assert.match(demo, /buildWatchlistAlerts/);
+    assert.match(demo, /rankDealOpportunities/);
+    assert.match(demo, /newProductSignals/);
+    assert.match(demo, /priceDropAlerts/);
+    assert.match(route, /dealHunterNewProductPriceDropAlerts/);
+    assert.match(route, /New-product & price-drop alerts/);
+    assert.match(route, /newProductSignals/);
+    assert.match(route, /priceDropAlerts/);
+    assert.match(route, /not a retailer launch claim/i);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
   it('surfaces account-safe custom price alert thresholds on the watchlist route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/watchlist/page.tsx');
