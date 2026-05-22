@@ -1596,6 +1596,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
+    storeAccountId: '1004563',
+    storeName: 'ICA Kvantum Säffle',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
     storeAccountId: '1003751',
     storeName: 'ICA Supermarket BBB Sunne',
     regionId: DEFAULT_ICA_REGION_ID
