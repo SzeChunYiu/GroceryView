@@ -7,6 +7,7 @@ import {
   calculateDealScore,
   calculateFixedBasketIndex,
   compareBasketStrategies,
+  planBasketTripCost,
   createHouseholdState,
   rankNutritionPerKrona,
   planPantryReplenishment,
@@ -21,6 +22,8 @@ import {
   summarizeLocalOfferBasket,
   suggestDealBasedMeals,
   type BasketComparisonResult,
+  type BasketTripCostPlan,
+  type BasketTripCostTravelMode,
   type BrandTierIndexSummary,
   type BrandTierPriceObservation,
   type BudgetSummary,
@@ -343,6 +346,21 @@ export type RecurringBasketDigestRequest = {
   cadence: RecurringBasketCadence;
   asOf: string;
   lastPurchasedAt?: string;
+};
+
+
+export type BasketTripCostRequest = {
+  travelMode: BasketTripCostTravelMode;
+  valueOfTimePerHour?: number;
+  carCostPerKm?: number;
+  transitFare?: number;
+  splitTripPenalty?: number;
+};
+
+export type BasketTripCostReport = BasketTripCostPlan & {
+  userId: string;
+  itemCount: number;
+  favoriteStoreIds: string[];
 };
 
 export type StoreBasketQuoteLine = {
@@ -1360,6 +1378,13 @@ const stores: Store[] = [
   { id: 'lidl-sveavagen', name: 'Lidl Sveavägen', chain: 'lidl', district: 'Norrmalm', address: 'Sveavägen, Stockholm', confidence: 'medium' },
   { id: 'coop-odenplan', name: 'Coop Odenplan', chain: 'coop', district: 'Odenplan', address: 'Odenplan, Stockholm', confidence: 'medium' }
 ];
+
+
+const storeTravelProfiles: Record<string, { distanceKm: number; durationMinutes: number }> = {
+  'willys-odenplan': { distanceKm: 0.5, durationMinutes: 5.29 },
+  'lidl-sveavagen': { distanceKm: 0.8, durationMinutes: 7 },
+  'coop-odenplan': { distanceKm: 0.4, durationMinutes: 4 }
+};
 
 const products: ProductDetail[] = [
   {
@@ -2652,6 +2677,55 @@ function privateLabelStrategy(
   };
 }
 
+
+function travelProfileForStores(storeIds: string[]): { distanceKm: number; durationMinutes: number } {
+  return storeIds.reduce((total, storeId) => {
+    const profile = storeTravelProfiles[storeId];
+    if (!profile) return total;
+    return {
+      distanceKm: roundPrice(total.distanceKm + profile.distanceKm),
+      durationMinutes: roundPrice(total.durationMinutes + profile.durationMinutes)
+    };
+  }, { distanceKm: 0, durationMinutes: 0 });
+}
+
+function strategyStoreIds(strategy: BasketComparisonReportStrategy): string[] {
+  return [...new Set(strategy.assignments.map((assignment) => assignment.storeId))].sort();
+}
+
+function buildBasketTripCostReport(userId: string, favoriteStoreIds: string[], userItems: BasketItemRequest[], request: BasketTripCostRequest): BasketTripCostReport {
+  requireNonEmptyId(userId, 'userId');
+  const comparisonStoreIds = favoriteStoreIds.length > 0 ? favoriteStoreIds : stores.map((store) => store.id);
+  const comparison = buildBasketComparisonReport(userId, comparisonStoreIds, userItems);
+  const plan = planBasketTripCost({
+    currency: 'SEK',
+    travelMode: request.travelMode,
+    valueOfTimePerHour: request.valueOfTimePerHour,
+    carCostPerKm: request.carCostPerKm,
+    transitFare: request.transitFare,
+    splitTripPenalty: request.splitTripPenalty,
+    options: comparison.strategies.map((strategy) => {
+      const storeIds = strategyStoreIds(strategy);
+      const travel = travelProfileForStores(storeIds);
+      return {
+        strategyId: strategy.id,
+        label: strategy.label,
+        basketTotal: strategy.total,
+        storeIds,
+        distanceKm: travel.distanceKm,
+        durationMinutes: travel.durationMinutes,
+        missingProductIds: strategy.missingProductIds
+      };
+    })
+  });
+  return {
+    ...plan,
+    userId,
+    itemCount: comparison.itemCount,
+    favoriteStoreIds
+  };
+}
+
 function buildBasketComparisonReport(userId: string, favoriteStoreIds: string[], userItems: BasketItemRequest[]): BasketComparisonReport {
   const comparison = compareBasketStrategies({ favoriteStoreIds, items: basketInputItems(userItems) });
   const cheapestAssignments = comparison.cheapestByProduct.assignments.map((assignment) => reportAssignment(assignment));
@@ -3750,6 +3824,12 @@ export function createGroceryViewApi() {
     compareBasketReport(userId: string): BasketComparisonReport {
       const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
       return buildBasketComparisonReport(userId, favoriteStoreIds, baskets.get(userId) ?? []);
+    },
+
+
+    getBasketTripCostReport(userId: string, request: BasketTripCostRequest): BasketTripCostReport {
+      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
+      return buildBasketTripCostReport(userId, favoriteStoreIds, baskets.get(userId) ?? [], request);
     },
 
     getLocalOfferBasketReport(userId: string, asOf = '2026-05-20T12:00:00.000Z'): LocalOfferBasketReport {

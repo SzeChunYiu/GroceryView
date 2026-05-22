@@ -808,6 +808,29 @@ describe('createHttpHandler', () => {
       priceLabel: assignment.priceLabel
     })), [{ productId: 'coffee', lineTotal: 99.8, priceLabel: 'verified_shelf' }]);
 
+
+    const tripCost = await json(await handle(new Request('http://localhost/api/basket/trip-cost?userId=user-1&travelMode=car&valueOfTimePerHour=120&carCostPerKm=3.5&splitTripPenalty=15'))) as {
+      userId: string;
+      bestOption?: { strategyId: string; pricedBasketTotal: number; travelCost: number; effectiveTotal: number; storeIds: string[] };
+      guardrails: string[];
+    };
+    assert.equal(tripCost.userId, 'user-1');
+    assert.deepEqual(tripCost.bestOption, {
+      strategyId: 'all_at_one_store',
+      label: 'All at one store',
+      basketTotal: 99.8,
+      storeIds: ['willys-odenplan'],
+      distanceKm: 0.5,
+      durationMinutes: 5.29,
+      missingProductIds: [],
+      pricedBasketTotal: 99.8,
+      travelCost: 12.33,
+      effectiveTotal: 112.13,
+      complete: true,
+      warnings: []
+    });
+    assert.match(tripCost.guardrails[2], /not retailer checkout or delivery confirmations/i);
+
     const localOffers = await json(await handle(new Request('http://localhost/api/basket/local-offers?userId=user-1&asOf=2026-05-20T12:00:00.000Z'))) as {
       storeIds: string[];
       basketItemCount: number;

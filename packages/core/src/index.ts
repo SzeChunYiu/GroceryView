@@ -361,6 +361,104 @@ export type StoreBasketCoverageSummary = {
   fullCoverageStoreIds: string[];
 };
 
+
+export type BasketTripCostTravelMode = 'walk' | 'bike' | 'transit' | 'car' | 'delivery';
+
+export type BasketTripCostOptionInput = {
+  strategyId: string;
+  label: string;
+  basketTotal: number | null;
+  storeIds: string[];
+  distanceKm?: number;
+  durationMinutes?: number;
+  deliveryFee?: number;
+  missingProductIds?: string[];
+};
+
+export type BasketTripCostInput = {
+  currency: 'SEK';
+  travelMode: BasketTripCostTravelMode;
+  options: BasketTripCostOptionInput[];
+  valueOfTimePerHour?: number;
+  carCostPerKm?: number;
+  transitFare?: number;
+  splitTripPenalty?: number;
+};
+
+export type BasketTripCostOption = BasketTripCostOptionInput & {
+  pricedBasketTotal: number | null;
+  travelCost: number;
+  effectiveTotal: number | null;
+  complete: boolean;
+  warnings: string[];
+};
+
+export type BasketTripCostPlan = {
+  currency: 'SEK';
+  travelMode: BasketTripCostTravelMode;
+  bestOption?: BasketTripCostOption;
+  options: BasketTripCostOption[];
+  guardrails: string[];
+};
+
+export function planBasketTripCost(input: BasketTripCostInput): BasketTripCostPlan {
+  const valueOfTimePerHour = input.valueOfTimePerHour ?? 0;
+  const carCostPerKm = input.carCostPerKm ?? 0;
+  const transitFare = input.transitFare ?? 0;
+  const splitTripPenalty = input.splitTripPenalty ?? 0;
+  if (valueOfTimePerHour < 0 || carCostPerKm < 0 || transitFare < 0 || splitTripPenalty < 0) {
+    throw new Error('Travel cost parameters must be non-negative.');
+  }
+
+  const options = input.options.map((option): BasketTripCostOption => {
+    requireNonBlank(option.strategyId, 'strategyId');
+    requireNonBlank(option.label, 'label');
+    if (option.basketTotal !== null && option.basketTotal < 0) throw new Error('basketTotal must be non-negative or null.');
+    if (option.distanceKm !== undefined && option.distanceKm < 0) throw new Error('distanceKm must be non-negative.');
+    if (option.durationMinutes !== undefined && option.durationMinutes < 0) throw new Error('durationMinutes must be non-negative.');
+    if (option.deliveryFee !== undefined && option.deliveryFee < 0) throw new Error('deliveryFee must be non-negative.');
+
+    const distanceCost = input.travelMode === 'car' ? (option.distanceKm ?? 0) * carCostPerKm : 0;
+    const timeCost = ((option.durationMinutes ?? 0) / 60) * valueOfTimePerHour;
+    const modeCost = input.travelMode === 'transit' ? transitFare : input.travelMode === 'delivery' ? (option.deliveryFee ?? 0) : 0;
+    const splitCost = option.storeIds.length > 1 ? splitTripPenalty : 0;
+    const travelCost = roundMoney(distanceCost + timeCost + modeCost + splitCost);
+    const missingProductIds = option.missingProductIds ?? [];
+    const complete = option.basketTotal !== null && missingProductIds.length === 0;
+    const warnings: string[] = [];
+    if (missingProductIds.length > 0) warnings.push(`Missing verified prices for: ${missingProductIds.join(', ')}.`);
+    if (option.basketTotal === null) warnings.push('Basket total is unavailable because at least one required line is not priced.');
+    if (splitCost > 0) warnings.push(`Split shop adds ${formatSek(splitCost)} handling/time penalty.`);
+
+    return {
+      ...option,
+      missingProductIds,
+      pricedBasketTotal: option.basketTotal,
+      travelCost,
+      effectiveTotal: complete ? roundMoney((option.basketTotal ?? 0) + travelCost) : null,
+      complete,
+      warnings
+    };
+  }).sort((a, b) => {
+    if (a.complete !== b.complete) return a.complete ? -1 : 1;
+    if (a.effectiveTotal !== null && b.effectiveTotal !== null && a.effectiveTotal !== b.effectiveTotal) return a.effectiveTotal - b.effectiveTotal;
+    if (a.pricedBasketTotal !== null && b.pricedBasketTotal !== null && a.pricedBasketTotal !== b.pricedBasketTotal) return a.pricedBasketTotal - b.pricedBasketTotal;
+    return a.label.localeCompare(b.label);
+  });
+
+  return {
+    currency: input.currency,
+    travelMode: input.travelMode,
+    bestOption: options.find((option) => option.complete),
+    options,
+    guardrails: [
+      'Trip cost is shown separately from verified shelf totals.',
+      'Options with missing product prices are not ranked as complete even when travel looks cheap.',
+      'Travel estimates are planning aids, not retailer checkout or delivery confirmations.'
+    ]
+  };
+}
+
 export type LocalOfferSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
 
 export type LocalOfferBasketItem = {

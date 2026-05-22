@@ -997,6 +997,69 @@ describe('createGroceryViewApi', () => {
     assert.equal(report.strategies[3]?.total, 82.7);
   });
 
+
+  it('returns basket trip-cost optimizer reports with travel estimates separated from shelf totals', () => {
+    const api = createGroceryViewApi();
+
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.addBasketItem('user-1', { productId: 'butter', quantity: 1 });
+
+    const report = api.getBasketTripCostReport('user-1', {
+      travelMode: 'car',
+      valueOfTimePerHour: 120,
+      carCostPerKm: 3.5,
+      splitTripPenalty: 15
+    });
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.currency, 'SEK');
+    assert.equal(report.bestOption?.strategyId, 'private_label_substitution');
+    assert.deepEqual(report.options.map((option) => ({
+      strategyId: option.strategyId,
+      pricedBasketTotal: option.pricedBasketTotal,
+      travelCost: option.travelCost,
+      effectiveTotal: option.effectiveTotal,
+      storeIds: option.storeIds,
+      missingProductIds: option.missingProductIds
+    })), [
+      {
+        strategyId: 'private_label_substitution',
+        pricedBasketTotal: 82.7,
+        travelCost: 12.33,
+        effectiveTotal: 95.03,
+        storeIds: ['willys-odenplan'],
+        missingProductIds: []
+      },
+      {
+        strategyId: 'all_at_one_store',
+        pricedBasketTotal: 86.7,
+        travelCost: 12.33,
+        effectiveTotal: 99.03,
+        storeIds: ['willys-odenplan'],
+        missingProductIds: []
+      },
+      {
+        strategyId: 'cheapest_across_selected',
+        pricedBasketTotal: 84.7,
+        travelCost: 44.13,
+        effectiveTotal: 128.83,
+        storeIds: ['lidl-sveavagen', 'willys-odenplan'],
+        missingProductIds: []
+      },
+      {
+        strategyId: 'favorite_only',
+        pricedBasketTotal: 84.7,
+        travelCost: 44.13,
+        effectiveTotal: 128.83,
+        storeIds: ['lidl-sveavagen', 'willys-odenplan'],
+        missingProductIds: []
+      }
+    ]);
+    assert.match(report.guardrails[0], /separately from verified shelf totals/i);
+  });
+
   it('returns recurring basket digest changes for the signed-in weekly shop', () => {
     const api = createGroceryViewApi();
 

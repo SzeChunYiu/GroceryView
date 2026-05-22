@@ -19,6 +19,7 @@ describe('buildOpenApiDocument', () => {
       '/api/basket/local-offers',
       '/api/basket/recurring-digest',
       '/api/basket/stores/{storeId}/quote',
+      '/api/basket/trip-cost',
       '/api/billing/subscription-events',
       '/api/budget',
       '/api/budget/categories',
@@ -89,6 +90,8 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/basket/comparison-report'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/local-offers'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/recurring-digest'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/basket/trip-cost'].get?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/basket/trip-cost'].get?.summary ?? '', /travel/i);
     assert.deepEqual(doc.paths['/api/expiry-deals/radar'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/meal-plans/suggestions'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/budget/categories'].get?.security, [{ bearerAuth: [] }]);

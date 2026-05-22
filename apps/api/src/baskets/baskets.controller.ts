@@ -53,6 +53,27 @@ export class BasketsController {
     return { ...groceryApi.getLocalOfferBasketReport('demo', asOf), demo: true };
   }
 
+  @Get('trip-cost')
+  @ApiOkResponse({ description: 'Basket plus travel-cost optimizer' })
+  tripCost(
+    @Query('travelMode') travelMode: 'walk' | 'bike' | 'transit' | 'car' | 'delivery' = 'car',
+    @Query('valueOfTimePerHour') valueOfTimePerHour = '120',
+    @Query('carCostPerKm') carCostPerKm = '3.5',
+    @Query('transitFare') transitFare?: string,
+    @Query('splitTripPenalty') splitTripPenalty = '15'
+  ) {
+    return {
+      ...groceryApi.getBasketTripCostReport('demo', {
+        travelMode,
+        valueOfTimePerHour: Number(valueOfTimePerHour),
+        carCostPerKm: Number(carCostPerKm),
+        ...(transitFare === undefined ? {} : { transitFare: Number(transitFare) }),
+        splitTripPenalty: Number(splitTripPenalty)
+      }),
+      demo: true
+    };
+  }
+
   @Get('recurring-digest')
   @ApiOkResponse({ description: 'Recurring basket changes since last shop' })
   recurringDigest(

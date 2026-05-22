@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   compareBasketStrategies,
+  planBasketTripCost,
   planRecurringBasketDigest,
   summarizeLocalOfferBasket,
   summarizeStoreBasketCoverage,
@@ -198,6 +199,85 @@ describe('validateBasketComparisonLineFixtures', () => {
     assert.ok(validation.issues.includes('substitution_offered_acceptance_required:line:bad-sub'));
     assert.ok(validation.issues.includes('substitution_offered_reason_required:line:bad-sub'));
     assert.ok(validation.issues.includes('substitution_offered_has_line_total:line:bad-sub'));
+  });
+});
+
+
+
+describe('planBasketTripCost', () => {
+  it('ranks basket options by basket plus travel cost while keeping missing-price blockers explicit', () => {
+    const plan = planBasketTripCost({
+      currency: 'SEK',
+      travelMode: 'car',
+      valueOfTimePerHour: 120,
+      carCostPerKm: 3.5,
+      splitTripPenalty: 15,
+      options: [
+        {
+          strategyId: 'cheap-far-split',
+          label: 'Cheapest shelf prices across Willys and Lidl',
+          basketTotal: 150,
+          storeIds: ['willys-odenplan', 'lidl-sveavagen'],
+          distanceKm: 8,
+          durationMinutes: 28,
+          missingProductIds: []
+        },
+        {
+          strategyId: 'near-one-store',
+          label: 'Nearby Coop one-stop shop',
+          basketTotal: 164,
+          storeIds: ['coop-odenplan'],
+          distanceKm: 1.2,
+          durationMinutes: 8,
+          missingProductIds: []
+        },
+        {
+          strategyId: 'missing-price',
+          label: 'Incomplete store quote',
+          basketTotal: 130,
+          storeIds: ['ica-unknown'],
+          distanceKm: 0.6,
+          durationMinutes: 6,
+          missingProductIds: ['butter']
+        }
+      ]
+    });
+
+    assert.equal(plan.bestOption?.strategyId, 'near-one-store');
+    assert.deepEqual(plan.options.map((option) => ({
+      strategyId: option.strategyId,
+      travelCost: option.travelCost,
+      effectiveTotal: option.effectiveTotal,
+      missingProductIds: option.missingProductIds,
+      warnings: option.warnings
+    })), [
+      {
+        strategyId: 'near-one-store',
+        travelCost: 20.2,
+        effectiveTotal: 184.2,
+        missingProductIds: [],
+        warnings: []
+      },
+      {
+        strategyId: 'cheap-far-split',
+        travelCost: 99,
+        effectiveTotal: 249,
+        missingProductIds: [],
+        warnings: ['Split shop adds 15.00 SEK handling/time penalty.']
+      },
+      {
+        strategyId: 'missing-price',
+        travelCost: 14.1,
+        effectiveTotal: null,
+        missingProductIds: ['butter'],
+        warnings: ['Missing verified prices for: butter.']
+      }
+    ]);
+    assert.deepEqual(plan.guardrails, [
+      'Trip cost is shown separately from verified shelf totals.',
+      'Options with missing product prices are not ranked as complete even when travel looks cheap.',
+      'Travel estimates are planning aids, not retailer checkout or delivery confirmations.'
+    ]);
   });
 });
 
