@@ -21,8 +21,8 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 - Product search URLs: per-branch `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1`, listed in `apps/web/src/lib/ingested/coop.ts`
 - Request body: weekly flyer item queries listed in `DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES`, resultsOptions take 8, empty sort/facets, relatedResultsOptions take 0
 - Required public headers: `storeApiSubscriptionKey` for store metadata and `personalizationApiSubscriptionKey` for product search, both exposed in `window.coopSettings.serviceAccess` on https://www.coop.se/handla/
-- Retrieved: 2026-05-22T14:18:16.300Z
-- Added this iteration: 105610 Stora Coop Halmstad; 195020 Stora Coop Norra Backa; 163000 Stora Coop Välsviken; 196000 Stora Coop Ludvika; 026810 Stora Coop Kungsängen; 056010 Stora Coop Garnisonen Linköping; 195030 Stora Coop Falun; 015430 Stora Coop Tumba; 133800 Stora Coop Torp; 201510 Stora Coop Ljusdal; 165270 Stora Coop Kil; 165290 Stora Coop Torsby
+- Retrieved: 2026-05-22T15:07:27.837Z
+- Added this iteration: 015320 Coop Västerhaninge Centrum; 245200 Coop Haparanda; 163900 Coop Sunne; 163500 Coop Hagfors; 136251 Coop Hunnebostrand; 135220 Coop Kungshamn; 205150 Coop Sandviken; 066452 Coop Torup; 075220 Coop Sävsjö; 086811 Coop Högsby; 165500 Coop Sysslebäck; 196311 Coop Sollerön; 235160 Coop Byske; 235180 Coop Norsjö; 235200 Coop Malå
 - Stores:
   - 251300, Stora Coop Boländerna, Uppsala, 26 real discount rows
   - 252700, Stora Coop Bromma, Bromma, 24 real discount rows
@@ -94,8 +94,23 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
   - 201510, Stora Coop Ljusdal, Ljusdal, 23 real discount rows
   - 165270, Stora Coop Kil, Kil, 26 real discount rows
   - 165290, Stora Coop Torsby, Torsby, 20 real discount rows
+  - 015320, Coop Västerhaninge Centrum, Västerhaninge, 17 real discount rows
+  - 245200, Coop Haparanda, Haparanda, 20 real discount rows
+  - 163900, Coop Sunne, Sunne, 22 real discount rows
+  - 163500, Coop Hagfors, Hagfors, 17 real discount rows
+  - 136251, Coop Hunnebostrand, Hunnebostrand, 20 real discount rows
+  - 135220, Coop Kungshamn, Kungshamn, 18 real discount rows
+  - 205150, Coop Sandviken, Sandviken, 21 real discount rows
+  - 066452, Coop Torup, Torup, 17 real discount rows
+  - 075220, Coop Sävsjö, Sävsjö, 20 real discount rows
+  - 086811, Coop Högsby, Högsby, 17 real discount rows
+  - 165500, Coop Sysslebäck, Sysslebäck, 15 real discount rows
+  - 196311, Coop Sollerön, Sollerön, 13 real discount rows
+  - 235160, Coop Byske, Byske, 10 real discount rows
+  - 235180, Coop Norsjö, Norsjö, 16 real discount rows
+  - 235200, Coop Malå, Malå, 13 real discount rows
 - Flyer validity: 2026-05-18T00:00:00 through 2026-05-24T23:59:59
-- Real current flyer discount rows fetched: 1626
+- Real current flyer discount rows fetched: 1882
 
 Every weekly discount row includes Coop product id/EAN, product name, brand, package label, ordinary B2C SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL, and retrieval timestamp.
 
@@ -109,6 +124,9 @@ Every weekly discount row includes Coop product id/EAN, product name, brand, pac
 6. 7300206718000 | Bacon 3-pack | Scan | Stora Coop Boländerna | ordinary 40.65 SEK | offer 37.90 SEK | 90.24 kr/kg | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
 7. 7310865095466 | Grekisk yoghurt 10% | Arla Köket® | Stora Coop Boländerna | ordinary 37.81 SEK | offer 29.90 SEK | 29.90 kr/kg | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
 8. 80508816 | Olivolja Classico | Monini | Stora Coop Boländerna | ordinary 99.37 SEK | offer 89.00 SEK | 118.66 kr/lit | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
+9. 2383471000006 | Laxfilé | Harbour | Coop Västerhaninge Centrum | ordinary 264.05 SEK | offer 149.00 SEK | 149.00 kr/kg | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
+10. 7310865005168 | Smör Normalsaltat | Svenskt Smör från Arla | Coop Västerhaninge Centrum | ordinary 68.10 SEK | offer 45.00 SEK | 90.00 kr/kg | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
+11. 7340191179691 | Toalettpapper Nice & Soft 24-pack | Coop | Coop Västerhaninge Centrum | ordinary 137.00 SEK | offer 99.00 SEK | 42.45 kr/kg | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
 
 ## Sample Retrieved Rows
 
