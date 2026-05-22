@@ -351,6 +351,62 @@ export const seasonalProduceCalendar = {
   ]
 };
 
+const swedishOriginEvidenceLabels = ['swedish_flag', 'from_sweden', 'meat_from_sweden'];
+
+function swedishOriginEvidenceFor(product: (typeof axfoodProducts)[number]) {
+  return product.labels
+    .filter((label) => swedishOriginEvidenceLabels.includes(label))
+    .map((label) => `${label} · Swedish origin label`);
+}
+
+const localOriginRows = axfoodProducts
+  .map((product) => ({ product, originEvidence: swedishOriginEvidenceFor(product) }))
+  .filter((row) => row.originEvidence.length > 0)
+  .filter((row) => ['frukt-och-gront', 'mejeri-ost-och-agg', 'kott-fagel-och-chark', 'fisk-och-skaldjur'].includes(row.product.category))
+  .sort((left, right) =>
+    right.product.inChains.length - left.product.inChains.length ||
+    right.product.spreadPct - left.product.spreadPct ||
+    left.product.name.localeCompare(right.product.name, 'sv')
+  )
+  .slice(0, 6)
+  .map(({ product, originEvidence }) => ({
+    slug: product.slug,
+    productName: product.name,
+    brand: product.brand,
+    categoryLabel: labelFromSlug(product.category),
+    lowestChain: product.lowestChain,
+    lowestPrice: product.lowestPrice,
+    lowestPriceLabel: formatSek(product.lowestPrice),
+    spreadPct: product.spreadPct,
+    originEvidence,
+    labelEvidence: product.labels,
+    claimBoundary: 'Local pick requires an explicit Swedish-origin label; GroceryView does not infer origin from store, month, or brand name.'
+  }));
+
+export const localSeasonalPicks = {
+  title: 'Local & seasonal picks',
+  persona: 'Eco-conscious',
+  status: 'explicit_origin_plus_historical_seasonality',
+  sourceLabels: [snapshot.axfoodSource, snapshot.openPricesSource],
+  localOriginRows,
+  seasonalEvidenceRows: seasonalProduceCalendar.topBestBuys.slice(0, 6).map((row) => ({
+    slug: row.slug,
+    productName: row.productName,
+    bestBuyMonth: row.bestBuyMonth,
+    historicalMonthlyAverage: row.historicalMonthlyAverage,
+    historicalMonthlyAverageLabel: row.historicalMonthlyAverageLabel,
+    seasonalEvidence: row.evidenceLabel,
+    confidenceLabel: row.confidenceLabel,
+    claimBoundary: 'Seasonal pick means lowest observed historicalMonthlyAverage, not a harvest, origin, or future price claim.'
+  })),
+  guardrails: [
+    'No carbon or harvest claim is made from month, brand, category, or Swedish-origin labels.',
+    'A local pick requires an explicit Swedish-origin label such as from_sweden, swedish_flag, or meat_from_sweden.',
+    'A seasonal pick requires dated OpenPrices monthly history and remains separate from originEvidence unless both evidence types are present.',
+    'Missing origin or seasonal evidence stays absent instead of being inferred from store proximity.'
+  ]
+};
+
 function cheapestMathemProductFor(token: string, aliases: string[] = []) {
   return mathemProducts
     .filter((product) => product.available && Number.isFinite(product.price) && product.price > 0)
