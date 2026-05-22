@@ -263,6 +263,27 @@ starter taxonomy in `packages/catalog/src/commodities.ts`. One feature = one PR;
 6. **Receipt-fed mapping growth** — `packages/scanning` receipt items (chain label +
    kr + weight) feed new aliases → grow commodity coverage over time.
 
+## Product-card display — adaptive unit/total price (operator decision 2026-05-22)
+
+Default listing card. Chosen over price-only and unit-only: show **both** numbers, the
+dominant one **adaptive to product kind**, plus a global compare toggle. NEVER hide the
+actual price behind a click — Swedish shelf labels show selling price + jämförpris
+together and shoppers expect both; they also budget in real kronor. The detail page is
+for price history / per-chain table / Buy-Wait verdict, not for first revealing price.
+Drives off `observations.unit_price` + `price` (both already in schema). Tag `feat(ui):`.
+
+- **Commodity (`product_kind='commodity'`):** unit price (kr/kg | kr/l | kr/st) is the
+  PRIMARY/big number; pack price + size + chain secondary.
+  e.g. `59,80 kr/kg` over `~29,90 kr · 500 g · Willys`.
+- **Branded:** pack price PRIMARY/big; kr/unit + size secondary.
+  e.g. `24,90 kr` over `62,25 kr/kg · 400 g`.
+- **Global "Compare by: Total ⇄ Per kg" toggle** (Skyscanner-style): flips the dominant
+  number across every card AND sets the listing sort key. Persist the choice per user.
+- **Cheapest-per-unit highlight badge** on the card (e.g. `🟢 -18%/kg vs chain avg`),
+  derived from the real cross-chain `unit_price` spread; confidence-gated, never faked.
+- **Consistent unit normalisation** across chains (kr/kg, kr/l, kr/st; per-100 g for
+  small items) so loose and packaged items compare on the same axis.
+
 ## Market-entry sequencing (Nordic + beyond)
 
 Ranked by *(white space × prize × ease)*, NOT by map adjacency. Detail +
