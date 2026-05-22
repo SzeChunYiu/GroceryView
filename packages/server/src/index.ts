@@ -2103,20 +2103,29 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
   };
 }
 
+export async function handleNodeHttpRequest(
+  incoming: IncomingMessage,
+  outgoing: ServerResponse,
+  handler: HttpHandler = createHttpHandler()
+): Promise<void> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of incoming) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  const body = chunks.length > 0 ? Buffer.concat(chunks) : undefined;
+  const protocol = incoming.headers['x-forwarded-proto'] ?? 'http';
+  const request = new Request(`${Array.isArray(protocol) ? protocol[0] : protocol}://${incoming.headers.host ?? 'localhost'}${incoming.url ?? '/'}`, {
+    method: incoming.method,
+    headers: incoming.headers as HeadersInit,
+    body: body && body.length > 0 ? body : undefined
+  });
+  const response = await handler(request);
+  outgoing.statusCode = response.status;
+  response.headers.forEach((value, key) => outgoing.setHeader(key, value));
+  outgoing.end(Buffer.from(await response.arrayBuffer()));
+}
+
 export function createNodeServer(handler: HttpHandler = createHttpHandler()) {
-  return createServer(async (incoming: IncomingMessage, outgoing: ServerResponse) => {
-    const chunks: Buffer[] = [];
-    for await (const chunk of incoming) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-    const body = chunks.length > 0 ? Buffer.concat(chunks) : undefined;
-    const request = new Request(`http://${incoming.headers.host ?? 'localhost'}${incoming.url ?? '/'}`, {
-      method: incoming.method,
-      headers: incoming.headers as HeadersInit,
-      body: body && body.length > 0 ? body : undefined
-    });
-    const response = await handler(request);
-    outgoing.statusCode = response.status;
-    response.headers.forEach((value, key) => outgoing.setHeader(key, value));
-    outgoing.end(Buffer.from(await response.arrayBuffer()));
+  return createServer((incoming: IncomingMessage, outgoing: ServerResponse) => {
+    void handleNodeHttpRequest(incoming, outgoing, handler);
   });
 }
 
