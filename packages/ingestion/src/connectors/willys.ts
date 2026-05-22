@@ -209,7 +209,19 @@ export const DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS = [
   '2145',
   '2153',
   '2117',
-  '2290'
+  '2290',
+  '2358',
+  '2210',
+  '2334',
+  '2266',
+  '2108',
+  '2337',
+  '2275',
+  '2104',
+  '2201',
+  '2198',
+  '2269',
+  '2105'
 ] as const;
 
 export const DEFAULT_WILLYS_SEARCH_QUERIES = [
