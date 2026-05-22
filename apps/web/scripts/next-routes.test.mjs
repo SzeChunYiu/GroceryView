@@ -1046,6 +1046,16 @@ ${seo}`;
     assert.match(shell, /\/stores\/\$\{brand\.sampleSlug\}/);
   });
 
+  it('surfaces launch fixture store slugs on the homepage visible artifact', async () => {
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(shell, /launchFixtureStores/);
+    assert.match(shell, /willys-odenplan/);
+    assert.match(shell, /ica-nara-sergels-torg/);
+    assert.match(shell, /coop-swedenborgsgatan/);
+    assert.match(shell, /lidl-sveavagen/);
+  });
+
   it('ships an OSM nationwide refresh script and surfaces Sweden-wide copy', async () => {
     const script = await read('scripts/refresh-osm-stores.mjs');
     const verified = await read('src/lib/verified-data.ts');
