@@ -649,6 +649,66 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004536',
     storeName: 'ICA Supermarket Nora',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003883',
+    storeName: 'ICA Supermarket Alvesta',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003551',
+    storeName: 'ICA Nära Vilstahallen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1166011',
+    storeName: 'Maxi ICA Stormarknad Arvika',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004027',
+    storeName: 'Maxi ICA Stormarknad Karlshamn',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004685',
+    storeName: 'ICA Torghallen, Askersund',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004517',
+    storeName: 'ICA Kvantum Avesta',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004061',
+    storeName: 'ICA Supermarket Hagsätra',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003507',
+    storeName: 'ICA Supermarket Bankeryd',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003704',
+    storeName: 'ICA Supermarket Bjästa',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1051012',
+    storeName: 'Maxi ICA Stormarknad Bollnäs',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004119',
+    storeName: 'Maxi ICA Stormarknad Borlänge',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004101',
+    storeName: 'ICA City Knalleland',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
