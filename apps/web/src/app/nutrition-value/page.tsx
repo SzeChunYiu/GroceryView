@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { nutritionPerKrona } from '@/lib/demo-data';
+import { healthMacroOptimizer, nutritionPerKrona } from '@/lib/demo-data';
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
@@ -55,6 +55,46 @@ export default function NutritionValuePage() {
                 <p className={`rounded-2xl p-3 font-semibold ${row.saltWarning ? 'bg-amber-50 text-amber-950' : 'bg-emerald-50 text-emerald-950'}`}>{row.saltWarning ? 'Salt warning' : 'No salt warning'}</p>
               </div>
             </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">{healthMacroOptimizer.persona}</p>
+            <h2 className="mt-2 text-2xl font-black">Macro optimizer</h2>
+            <p className="mt-2 max-w-2xl text-sm font-semibold text-slate-700">{healthMacroOptimizer.coverage.caveat}</p>
+          </div>
+          <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-right">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">topProtein</p>
+            <p className="text-lg font-black text-emerald-950">{healthMacroOptimizer.topProtein?.name}</p>
+            <p className="mt-1 text-xs font-semibold text-emerald-800">topFiber: {healthMacroOptimizer.topFiber?.name}</p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {healthMacroOptimizer.macroTargets.map((target) => (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={target.metric}>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">macroTargets · {target.metric}</p>
+              <p className="mt-2 text-2xl font-black text-slate-950">{target.valuePer10Sek.toFixed(2)}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-700">{target.target}</p>
+              <p className="mt-2 text-xs font-semibold text-slate-500">{target.topProductId}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200">
+          {healthMacroOptimizer.rows.map((row) => (
+            <div className="grid gap-3 border-b border-slate-200 p-4 last:border-b-0 md:grid-cols-[1.4fr_1fr_1fr_1fr]" key={row.productId}>
+              <div>
+                <p className="font-black text-slate-950">{row.name}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-500">{row.source}</p>
+              </div>
+              <p className="font-semibold text-slate-700">Protein {row.proteinPer10Sek.toFixed(2)}g / 10 SEK</p>
+              <p className="font-semibold text-slate-700">Fiber {row.fiberPer10Sek.toFixed(2)}g / 10 SEK</p>
+              <p className="font-semibold text-slate-700">Calories {row.caloriesPer10Sek.toFixed(0)} / 10 SEK</p>
+            </div>
           ))}
         </div>
       </Card>

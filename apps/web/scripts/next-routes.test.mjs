@@ -348,6 +348,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a health macro optimizer using real nutrition rankings', async () => {
+    const source = await read('src/app/nutrition-value/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+    assert.match(demo, /healthMacroOptimizer/);
+    assert.match(demo, /rankNutritionPerKrona/);
+    assert.match(source, /healthMacroOptimizer/);
+    assert.match(source, /Macro optimizer/);
+    assert.match(source, /macroTargets/);
+    assert.match(source, /topProtein/);
+    assert.match(source, /topFiber/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces a halal kosher and ethnic aisle finder from verified category rows', async () => {
     const source = await read('src/app/categories/page.tsx');
     const verified = await read('src/lib/verified-data.ts');
