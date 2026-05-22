@@ -584,6 +584,29 @@ describe('verified-data UI', () => {
   });
 
 
+  it('ships signed-in notification inbox controls without anonymous delivery state', async () => {
+    const route = await read('src/app/watchlist/page.tsx');
+    const actions = await read('src/components/notification-inbox-actions.tsx');
+    const server = await read('../../packages/server/src/index.ts');
+
+    assert.match(route, /NotificationInboxActions/);
+    assert.match(actions, /'use client'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(actions, /Authorization: `Bearer \${accessToken}`/);
+    assert.match(actions, /\/api\/notifications\/inbox\?userId=\${encodeURIComponent\(userId\)}/);
+    assert.match(actions, /method: 'GET'/);
+    assert.match(actions, /deliveryGuardrails/);
+    assert.match(actions, /suppression/);
+    assert.match(actions, /quiet-hour holds/);
+    assert.match(actions, /Sign in first/);
+    assert.match(actions, /No anonymous notification inbox/);
+    assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
+    assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
+    assert.match(server, /\/api\/notifications\/inbox/);
+  });
+
+
   it('surfaces a weekly personalised email digest from watchlist alerts and best deals', async () => {
     const route = await read('src/app/watchlist/page.tsx');
     const demo = await read('src/lib/demo-data.ts');

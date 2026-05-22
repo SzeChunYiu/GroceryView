@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { NotificationInboxActions } from '@/components/notification-inbox-actions';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, watchlistAlertBoard, watchlistAlertInputs, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -69,6 +70,8 @@ export default function WatchlistPage() {
         </div>
       </Card>
 
+
+      <NotificationInboxActions />
 
       <Card className="mt-6 border-indigo-200 bg-indigo-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">email digest</p>
