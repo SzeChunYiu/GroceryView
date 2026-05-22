@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, calculatePersonalGroceryInflation, rankDealOpportunities, rankNutritionPerKrona, summarizeCategoryDealLeaders } from '@groceryview/core';
+import { buildExpiryDealRadar, calculatePersonalGroceryInflation, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeCategoryDealLeaders } from '@groceryview/core';
 
 export const products = [
   {
@@ -1765,6 +1765,34 @@ export const watchlistAlerts = [
 ];
 
 
+
+
+export const dealBasedMealInputs = [
+  { productId: 'kronfagel-kycklingfile-1kg', name: 'Kronfågel Kycklingfilé 1kg', category: 'protein' as const, price: 109, dealScore: 78, source: 'visible Hemköp Skanstull weekly-deal row' },
+  { productId: 'barilla-spaghetti-1kg', name: 'Barilla Spaghetti 1kg', category: 'pantry' as const, price: 27.9, dealScore: 71, source: 'visible City Gross online row' },
+  { productId: 'garant-korsbarstomater-250g', name: 'Garant Körsbärstomater 250g', category: 'vegetables' as const, price: 19.9, dealScore: 74, source: 'visible Coop Daglivs shelf row' },
+  { productId: 'garant-ekologisk-tofu-270g', name: 'Garant Ekologisk Tofu 270g', category: 'protein' as const, price: 21.9, dealScore: 82, source: 'visible Willys shelf row' },
+  { productId: 'zeta-kikartor-380g', name: 'Zeta Kikärtor 380g', category: 'pantry' as const, price: 14.9, dealScore: 76, source: 'visible Hemköp shelf row' },
+  { productId: 'garant-gurka-300g', name: 'Garant Gurka 300g', category: 'vegetables' as const, price: 16.9, dealScore: 69, source: 'visible Coop Medborgarplatsen shelf row' }
+];
+
+export const dealBasedMeals = {
+  servings: 4,
+  maxMealCost: 120,
+  suggestions: suggestDealBasedMeals({
+    deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
+    maxMealCost: 120,
+    servings: 4
+  }).map((suggestion) => ({
+    ...suggestion,
+    ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean)
+  })),
+  coverage: {
+    confidence: 'medium',
+    dealCount: dealBasedMealInputs.length,
+    caveat: 'Meal suggestions use visible price rows with deal scores; diet, allergen, and household preference data are not inferred.'
+  }
+};
 
 export const expiryDealRadarReports = [
   {
