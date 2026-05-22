@@ -1714,6 +1714,85 @@ export const dietaryScenarioFilters = dietaryScenarioDefinitions
   })
   .filter((scenario) => scenario.verifiedProductCount > 0);
 
+type HealthLabelFilterDefinition = {
+  id: string;
+  label: string;
+  swedishQuery: string;
+  labelNeedles: string[];
+  textNeedles: string[];
+  healthUse: string;
+  guardrail: string;
+};
+
+const healthLabelFilterDefinitions: HealthLabelFilterDefinition[] = [
+  {
+    id: 'keyhole',
+    label: 'Keyhole-labelled staples',
+    swedishQuery: 'nyckelhål keyhole',
+    labelNeedles: ['keyhole'],
+    textNeedles: ['nyckelhål', 'keyhole'],
+    healthUse: 'Quickly find products with verified Keyhole label evidence before comparing protein, fiber, and price.',
+    guardrail: 'Keyhole is rendered only when the source label or explicit package text is present; it is not a medical claim.'
+  },
+  {
+    id: 'organic',
+    label: 'Organic / ekologisk picks',
+    swedishQuery: 'ekologisk organic KRAV',
+    labelNeedles: ['ecological', 'eu_ecological', 'krav'],
+    textNeedles: ['ekologisk', 'ekologiska', 'organic', 'krav', 'eko'],
+    healthUse: 'Filter organic-labelled products while preserving the same price and nutrition-per-krona comparison context.',
+    guardrail: 'Organic filters use ecological/KRAV evidence only and do not infer nutrition superiority or sustainability impact.'
+  },
+  {
+    id: 'vegan',
+    label: 'Vegan verified rows',
+    swedishQuery: 'vegan vegansk',
+    labelNeedles: ['vegan'],
+    textNeedles: ['vegan', 'vegansk', 'veganska'],
+    healthUse: 'Find explicit vegan rows for plant-based shoppers before opening the product page for current price evidence.',
+    guardrail: 'Vegan status requires explicit label or product-text evidence; ingredients are not guessed and not inferred from browsing.'
+  }
+];
+
+function matchesHealthLabelFilter(product: (typeof axfoodProducts)[number], filter: HealthLabelFilterDefinition) {
+  const labels = product.labels.map((label) => label.toLowerCase());
+  const text = `${product.name} ${product.brand} ${product.subline}`.toLowerCase();
+  return filter.labelNeedles.some((needle) => labels.includes(needle)) || filter.textNeedles.some((needle) => text.includes(needle));
+}
+
+export const healthVerifiedLabelFilters = healthLabelFilterDefinitions
+  .map((filter) => {
+    const matches = axfoodProducts
+      .filter((product) => matchesHealthLabelFilter(product, filter))
+      .sort((a, b) => b.inChains.length - a.inChains.length || b.spreadPct - a.spreadPct || a.name.localeCompare(b.name, 'sv'));
+    const sample = matches[0] ?? null;
+    return {
+      id: filter.id,
+      label: filter.label,
+      swedishQuery: filter.swedishQuery,
+      healthUse: filter.healthUse,
+      verifiedProductCount: matches.length,
+      chainCount: new Set(matches.flatMap((product) => product.inChains)).size,
+      evidenceLabels: [...new Set(matches.flatMap((product) => product.labels))].filter(Boolean).slice(0, 6),
+      sampleProductName: sample?.name ?? 'No verified product yet',
+      sampleProductSlug: sample?.slug ?? null,
+      sampleChain: sample?.lowestChain ?? 'No verified chain yet',
+      samplePrice: sample?.lowestPrice ?? null,
+      products: matches.slice(0, 3).map((product) => ({
+        slug: product.slug,
+        productName: product.name,
+        brand: product.brand,
+        lowestChain: product.lowestChain,
+        lowestPrice: product.lowestPrice,
+        spreadPct: product.spreadPct,
+        evidenceLabels: product.labels.filter((label) => filter.labelNeedles.includes(label.toLowerCase()) || filter.textNeedles.includes(label.toLowerCase()))
+      })),
+      guardrail: filter.guardrail,
+      caveat: 'Health filters use verified label or package-text evidence only; they are not a medical claim and are not inferred from browsing behavior.'
+    };
+  })
+  .filter((filter) => filter.verifiedProductCount > 0);
+
 export const categoryQualityMatrix = categorySummaries
   .map((category) => {
     const openRows = pricedProducts.filter((product) => product.category === category.slug);

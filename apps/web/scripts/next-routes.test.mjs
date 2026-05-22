@@ -1026,6 +1026,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces organic Keyhole and vegan health filters from verified labels', async () => {
+    const source = await read('src/app/nutrition-value/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+
+    assert.match(verified, /export const healthVerifiedLabelFilters = /);
+    assert.match(verified, /keyhole/);
+    assert.match(verified, /organic|ecological|eu_ecological/);
+    assert.match(verified, /vegan/);
+    assert.match(source, /healthVerifiedLabelFilters/);
+    assert.match(source, /Organic, Keyhole & vegan filters/);
+    assert.match(source, /verifiedProductCount/);
+    assert.match(source, /evidenceLabels/);
+    assert.match(source, /not a medical claim/i);
+    assert.match(source, /not inferred from browsing/i);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces a halal kosher and ethnic aisle finder from verified category rows', async () => {
     const source = await read('src/app/categories/page.tsx');
     const verified = await read('src/lib/verified-data.ts');
