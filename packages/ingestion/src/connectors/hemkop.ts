@@ -135,6 +135,7 @@ export type FetchHemkopProductsOptions = {
 export type FetchHemkopWeeklyDiscountsOptions = {
   fetchImpl?: typeof fetch;
   storeId?: string;
+  storeIds?: readonly string[];
   maxRows?: number;
   pageSize?: number;
   retrievedAt?: string;
@@ -201,51 +202,57 @@ export async function fetchHemkopWeeklyDiscounts(
   options: FetchHemkopWeeklyDiscountsOptions = {}
 ): Promise<HemkopWeeklyDiscount[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const storeId = options.storeId ?? DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_ID;
+  const storeIds = options.storeIds && options.storeIds.length > 0
+    ? options.storeIds
+    : [options.storeId ?? DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_ID];
   const maxRows = options.maxRows ?? 300;
   const pageSize = options.pageSize ?? Math.min(maxRows, 100);
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: HemkopWeeklyDiscount[] = [];
   const seenCodes = new Set<string>();
-  let page = 0;
-  let pageCount: number | null = null;
 
-  while (rows.length < maxRows && (pageCount === null || page < pageCount)) {
-    const sourceUrl = buildHemkopWeeklyDiscountsUrl(storeId, pageSize, page);
-    const response = await fetchImpl(sourceUrl, {
-      headers: {
-        accept: 'application/json',
-        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-      }
-    });
+  for (const storeId of storeIds) {
+    let page = 0;
+    let pageCount: number | null = null;
 
-    if (!response.ok) {
-      throw new Error(`Hemkop weekly discounts request failed for ${storeId}: ${response.status}`);
-    }
-
-    const payload = await response.json() as AxfoodCampaignResponse;
-    const results = payload.results ?? [];
-    const responsePageCount = numberOrNull(payload.pagination?.numberOfPages);
-    pageCount = responsePageCount && responsePageCount > 0 ? responsePageCount : page + 1;
-
-    for (const product of results) {
-      for (const promotion of product.potentialPromotions ?? []) {
-        const row = normalizeHemkopWeeklyDiscount(product, promotion, sourceUrl, retrievedAt, storeId);
-        if (!row || seenCodes.has(row.code)) {
-          continue;
+    while (rows.length < maxRows && (pageCount === null || page < pageCount)) {
+      const sourceUrl = buildHemkopWeeklyDiscountsUrl(storeId, pageSize, page);
+      const response = await fetchImpl(sourceUrl, {
+        headers: {
+          accept: 'application/json',
+          'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
         }
-        seenCodes.add(row.code);
-        rows.push(row);
-        if (rows.length >= maxRows) {
-          return rows;
+      });
+
+      if (!response.ok) {
+        throw new Error(`Hemkop weekly discounts request failed for ${storeId}: ${response.status}`);
+      }
+
+      const payload = await response.json() as AxfoodCampaignResponse;
+      const results = payload.results ?? [];
+      const responsePageCount = numberOrNull(payload.pagination?.numberOfPages);
+      pageCount = responsePageCount && responsePageCount > 0 ? responsePageCount : page + 1;
+
+      for (const product of results) {
+        for (const promotion of product.potentialPromotions ?? []) {
+          const row = normalizeHemkopWeeklyDiscount(product, promotion, sourceUrl, retrievedAt, storeId);
+          const rowKey = row ? `${row.storeId}:${row.code}` : '';
+          if (!row || seenCodes.has(rowKey)) {
+            continue;
+          }
+          seenCodes.add(rowKey);
+          rows.push(row);
+          if (rows.length >= maxRows) {
+            return rows;
+          }
         }
       }
-    }
 
-    if (results.length === 0) {
-      break;
+      if (results.length === 0) {
+        break;
+      }
+      page += 1;
     }
-    page += 1;
   }
 
   return rows;
