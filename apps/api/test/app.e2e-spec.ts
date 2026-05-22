@@ -596,6 +596,10 @@ describe('GroceryView API app', () => {
     assert.deepEqual(priceHistoryExecutor.calls.at(-1)?.params, ['product-coffee', 'shelf', null, null, 5]);
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /from observations/i);
 
+    await request(app.getHttpServer())
+      .get('/products/bryggkaffe-450g/price-history?from=2026-06-01T00:00:00.000Z&to=2026-05-01T00:00:00.000Z')
+      .expect(400);
+
     const cheapestNow = await request(app.getHttpServer()).get('/products/coffee/cheapest-now').expect(200);
     assert.equal(cheapestNow.body.cheapest.chain, 'willys');
     assert.equal(cheapestNow.body.cheapest.packagePrice, 49.9);

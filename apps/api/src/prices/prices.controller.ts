@@ -4,7 +4,7 @@ import { groceryApi } from '../demo-data.js';
 import { CheapestNowService } from './cheapest-now.service.js';
 import { LatestPricesService } from './latest-prices.service.js';
 import { PriceHistoryService, type ProductPriceHistoryFilter } from './price-history.service.js';
-import type { ProductPriceHistoryPriceType } from '@groceryview/api';
+import { productPriceHistoryPriceTypes, type ProductPriceHistoryPriceType } from '@groceryview/api';
 
 @ApiTags('prices')
 @Controller('products/:productId')
@@ -64,12 +64,10 @@ export class PricesController {
   }
 }
 
-const priceHistoryTypes = ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated'] as const;
-
 function parseOptionalPriceType(value: string | undefined): ProductPriceHistoryPriceType | undefined {
   if (value === undefined) return undefined;
-  if (!(priceHistoryTypes as readonly string[]).includes(value)) {
-    throw new BadRequestException(`priceType must be one of: ${priceHistoryTypes.join(', ')}.`);
+  if (!(productPriceHistoryPriceTypes as readonly string[]).includes(value)) {
+    throw new BadRequestException(`priceType must be one of: ${productPriceHistoryPriceTypes.join(', ')}.`);
   }
   return value as ProductPriceHistoryPriceType;
 }
@@ -96,6 +94,9 @@ function parsePriceHistoryFilter(input: {
   const parsedPriceType = parseOptionalPriceType(input.priceType);
   const parsedFrom = parseOptionalDate(input.observedFrom, 'from');
   const parsedTo = parseOptionalDate(input.observedTo, 'to');
+  if (parsedFrom && parsedTo && Date.parse(parsedFrom) > Date.parse(parsedTo)) {
+    throw new BadRequestException('from must be before or equal to to.');
+  }
   const parsedLimit = parseOptionalLimit(input.limit);
   return {
     ...(parsedPriceType ? { priceType: parsedPriceType } : {}),

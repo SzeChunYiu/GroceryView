@@ -643,6 +643,8 @@ export type ProductHistoryConfidenceReport = {
 
 export type ProductPriceHistoryPriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
 
+export const productPriceHistoryPriceTypes = ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated'] as const satisfies readonly ProductPriceHistoryPriceType[];
+
 export type ProductPriceHistoryObservationInput = {
   observationId: string;
   productId: string;
