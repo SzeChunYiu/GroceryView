@@ -81,3 +81,21 @@ Sample rows:
 1. 2500309493 | 4003 | Läsk | 6 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
 2. 2500303429 | 4003 | Lingongrova, Guldkorn | 19 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
 3. 2500298172 | 4003 | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+
+## Hemköp weekly discounts 24-store expansion 2026-05-22
+
+- Source: hemkop.se public Axfood campaign JSON
+- Store catalog source: https://www.hemkop.se/axfood/rest/store?online=true
+- Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-22T11:57:50.378Z
+- Store IDs: 4003, 4127, 4190, 4798, 4660, 4775, 4196, 4111, 4162, 4273, 4349, 4359, 4734, 4773, 4239, 4667, 4221, 4203, 4521, 4930, 4524, 4146, 4222, 4219
+- Real weekly discount rows fetched and wired: 5966
+- Web wire: apps/web/src/lib/ingested/hemkop.ts
+- Connector: packages/ingestion/src/connectors/hemkop.ts
+
+Sample rows:
+1. 2500309493 | 4003 | Läsk | 6 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500303429 | 4003 | Lingongrova, Guldkorn | 19 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500298172 | 4003 | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+4. 2500309493 | 4734 | Läsk | 6 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4734&type=PERSONAL_GENERAL&page=0&size=100
+5. 2500303429 | 4734 | Lingongrova, Guldkorn | 19 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4734&type=PERSONAL_GENERAL&page=0&size=100

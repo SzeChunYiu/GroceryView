@@ -159,7 +159,19 @@ export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS = [
   '4162',
   '4273',
   '4349',
-  '4359'
+  '4359',
+  '4734',
+  '4773',
+  '4239',
+  '4667',
+  '4221',
+  '4203',
+  '4521',
+  '4930',
+  '4524',
+  '4146',
+  '4222',
+  '4219'
 ] as const;
 
 export const DEFAULT_HEMKOP_SEARCH_QUERIES = [
