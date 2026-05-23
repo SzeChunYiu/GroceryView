@@ -11,6 +11,10 @@ describe('production secret audit script', () => {
   it('tracks every secret needed by daily ingestion and runtime readiness', () => {
     for (const secret of [
       'DATABASE_URL',
+      'REPLACEMENT_DATABASE_URL',
+      'CANDIDATE_DATABASE_URL',
+      'SUPABASE_ACCESS_TOKEN',
+      'SUPABASE_PROJECT_REF',
       'GROCERYVIEW_SERVER_URL',
       'GROCERYVIEW_API_BASE_URL',
       'EXPO_TOKEN',
@@ -89,6 +93,32 @@ describe('production secret audit script', () => {
       'GROCERYVIEW_SCANNER_BEARER_TOKEN'
     ]);
     assert.ok(output.missingRuntimeSecrets.includes('STRIPE_SECRET_KEY'));
+    assert.deepEqual(output.replacementDbCandidateSecrets, ['REPLACEMENT_DATABASE_URL', 'CANDIDATE_DATABASE_URL']);
+    assert.equal(output.hasReplacementDbCandidate, false);
+    assert.deepEqual(output.missingDbCutoverCandidateSecrets, ['REPLACEMENT_DATABASE_URL', 'CANDIDATE_DATABASE_URL']);
+    assert.deepEqual(output.missingDbRecoverySecrets, ['SUPABASE_ACCESS_TOKEN']);
+    assert.deepEqual(output.missingDbRecoveryVariables, ['SUPABASE_PROJECT_REF']);
+  });
+
+
+  it('treats either replacement DB candidate secret as satisfying cutover candidate readiness', () => {
+    const result = spawnSync(process.execPath, [scriptPath.pathname, '--from-env'], {
+      encoding: 'utf8',
+      env: {
+        DATABASE_URL: 'postgres://current',
+        CANDIDATE_DATABASE_URL: 'postgres://candidate',
+        SUPABASE_ACCESS_TOKEN: 'sbp_secret',
+        SUPABASE_PROJECT_REF: 'dgsoqwanrkqgdichtgzl'
+      }
+    });
+    const output = JSON.parse(result.stdout);
+    assert.equal(output.hasReplacementDbCandidate, true);
+    assert.deepEqual(output.missingDbCutoverSecrets, []);
+    assert.deepEqual(output.missingDbCutoverCandidateSecrets, []);
+    assert.deepEqual(output.missingDbRecoverySecrets, []);
+    assert.deepEqual(output.missingDbRecoveryVariables, []);
+    assert.equal(JSON.stringify(output).includes('postgres://candidate'), false);
+    assert.equal(JSON.stringify(output).includes('sbp_secret'), false);
   });
 
   it('self-test reports missing required secrets', () => {

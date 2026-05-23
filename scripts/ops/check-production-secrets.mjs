@@ -20,6 +20,23 @@ export const requiredGithubActionVariables = [
   'GROCERYVIEW_SCANNER_USER_ID'
 ];
 
+export const requiredDbCutoverSecrets = [
+  'DATABASE_URL'
+];
+
+export const replacementDbCandidateSecrets = [
+  'REPLACEMENT_DATABASE_URL',
+  'CANDIDATE_DATABASE_URL'
+];
+
+export const requiredDbRecoverySecrets = [
+  'SUPABASE_ACCESS_TOKEN'
+];
+
+export const requiredDbRecoveryVariables = [
+  'SUPABASE_PROJECT_REF'
+];
+
 export const requiredRuntimeSecrets = [
   'AUTH_SECRET',
   'DATABASE_URL',
@@ -52,7 +69,22 @@ export function findMissingSecrets(requiredNames, listedNames) {
 }
 
 function uniqueSecretNames() {
-  return Array.from(new Set([...requiredGithubActionSecrets, ...requiredRuntimeSecrets]));
+  return Array.from(new Set([
+    ...requiredGithubActionSecrets,
+    ...requiredRuntimeSecrets,
+    ...requiredDbCutoverSecrets,
+    ...replacementDbCandidateSecrets,
+    ...requiredDbRecoverySecrets
+  ]));
+}
+
+function uniqueVariableNames() {
+  return Array.from(new Set([...requiredGithubActionVariables, ...requiredDbRecoveryVariables]));
+}
+
+function hasAnySecret(candidateNames, listedNames) {
+  const listed = new Set(listedNames);
+  return candidateNames.some((name) => listed.has(name));
 }
 
 function parseGhList(output) {
@@ -105,14 +137,25 @@ function main() {
   const environment = envIndex >= 0 ? process.argv[envIndex + 1] : undefined;
   const secretNames = fromEnvironment ? readEnvironmentSecretNames(uniqueSecretNames()) : readGithubSecretNames(repo, environment);
   const variableNames = fromEnvironment
-    ? readEnvironmentSecretNames(requiredGithubActionVariables)
+    ? readEnvironmentSecretNames(uniqueVariableNames())
     : readGithubVariableNames(repo, environment);
   const missingGithubActionSecrets = findMissingSecrets(requiredGithubActionSecrets, secretNames);
   const missingGithubActionVariables = findMissingSecrets(requiredGithubActionVariables, variableNames);
   const missingRuntimeSecrets = findMissingSecrets(requiredRuntimeSecrets, secretNames);
+  const missingDbCutoverSecrets = findMissingSecrets(requiredDbCutoverSecrets, secretNames);
+  const hasReplacementDbCandidate = hasAnySecret(replacementDbCandidateSecrets, secretNames);
+  const missingDbCutoverCandidateSecrets = hasReplacementDbCandidate ? [] : replacementDbCandidateSecrets;
+  const missingDbRecoverySecrets = findMissingSecrets(requiredDbRecoverySecrets, secretNames);
+  const missingDbRecoveryVariables = findMissingSecrets(requiredDbRecoveryVariables, variableNames);
   const result = {
     status:
-      missingGithubActionSecrets.length === 0 && missingGithubActionVariables.length === 0 && missingRuntimeSecrets.length === 0
+      missingGithubActionSecrets.length === 0 &&
+      missingGithubActionVariables.length === 0 &&
+      missingRuntimeSecrets.length === 0 &&
+      missingDbCutoverSecrets.length === 0 &&
+      missingDbCutoverCandidateSecrets.length === 0 &&
+      missingDbRecoverySecrets.length === 0 &&
+      missingDbRecoveryVariables.length === 0
         ? 'ready'
         : 'blocked',
     checkedSecretNames: secretNames.sort(),
@@ -121,7 +164,13 @@ function main() {
     source: fromEnvironment ? 'environment' : 'github',
     missingGithubActionSecrets,
     missingGithubActionVariables,
-    missingRuntimeSecrets
+    missingRuntimeSecrets,
+    missingDbCutoverSecrets,
+    replacementDbCandidateSecrets,
+    hasReplacementDbCandidate,
+    missingDbCutoverCandidateSecrets,
+    missingDbRecoverySecrets,
+    missingDbRecoveryVariables
   };
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   if (result.status !== 'ready') process.exitCode = 1;
