@@ -27,6 +27,7 @@ describe('daily ingestion workflow', () => {
       'npm run --silent ops:catalog-coverage-targets',
       'npm run --silent ops:validate-production-env',
       'npm run --silent ops:check-daily-db-connectivity',
+      'npm run --silent ops:apply-db-migrations',
       'node packages/ingestion/dist/index.js',
       '/api/readiness/postgres',
       '/api/readiness/source-runs',
@@ -72,6 +73,19 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS \|\| '30000' \}\}/);
     assert.match(workflow, /name:\s*groceryview-daily-db-connectivity/);
     assert.match(workflow, /path:\s*\/tmp\/daily-db-connectivity\.json/);
+    assert.match(workflow, /name: Apply production DB migrations/);
+    assert.ok(
+      workflow.indexOf('name: Check production DB write connectivity') < workflow.indexOf('name: Apply production DB migrations'),
+      'DB migrations must only run after the write connectivity diagnostic proves the target database accepts writes'
+    );
+    assert.ok(
+      workflow.indexOf('name: Apply production DB migrations') < workflow.indexOf('name: Run configured daily ingestion'),
+      'daily ingestion must run only after the target database has the canonical schema'
+    );
+    assert.match(workflow, /\/tmp\/production-db-migrations\.json/);
+    assert.match(workflow, /body\.status !== 'ready'/);
+    assert.match(workflow, /name:\s*groceryview-production-db-migrations/);
+    assert.match(workflow, /path:\s*\/tmp\/production-db-migrations\.json/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=\/tmp\/groceryview-daily-connectors\.json/);
     assert.match(workflow, /GROCERYVIEW_DAILY_MAX_CONCURRENCY:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_MAX_CONCURRENCY \|\| '2' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS \|\| '250' \}\}/);
