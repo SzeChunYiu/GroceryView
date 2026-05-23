@@ -33,6 +33,9 @@ export const requiredDbRecoverySecrets = [
   'SUPABASE_ACCESS_TOKEN'
 ];
 
+export const supabaseManagementTokenRequirement =
+  'SUPABASE_ACCESS_TOKEN must be a Supabase Management API personal access token beginning with sbp_.';
+
 export const requiredDbRecoveryVariables = [
   'SUPABASE_PROJECT_REF'
 ];
@@ -81,6 +84,20 @@ export function findMissingRuntimeSecrets(requiredNames, listedSecretNames, list
     if (listedSecrets.has(name)) return false;
     return !(variableBackedRuntimeNames.has(name) && listedVariables.has(name));
   });
+}
+
+export function isSupabaseManagementAccessTokenShape(value) {
+  const token = String(value ?? '').trim();
+  return token.startsWith('sbp_') && token.length > 'sbp_'.length;
+}
+
+export function findInvalidDbRecoverySecrets(env) {
+  const invalid = [];
+  const token = env.SUPABASE_ACCESS_TOKEN;
+  if (typeof token === 'string' && token.trim().length > 0 && !isSupabaseManagementAccessTokenShape(token)) {
+    invalid.push('SUPABASE_ACCESS_TOKEN');
+  }
+  return invalid;
 }
 
 function uniqueSecretNames() {
@@ -144,7 +161,9 @@ function readEnvironmentSecretNames(requiredNames) {
 
 function scopeStatus(scope, checks) {
   if (scope === 'db-recovery') {
-    return checks.missingDbRecoverySecrets.length === 0 && checks.missingDbRecoveryVariables.length === 0
+    return checks.missingDbRecoverySecrets.length === 0 &&
+      checks.missingDbRecoveryVariables.length === 0 &&
+      checks.invalidDbRecoverySecrets.length === 0
       ? 'ready'
       : 'blocked';
   }
@@ -159,9 +178,27 @@ function scopeStatus(scope, checks) {
     checks.missingDbCutoverSecrets.length === 0 &&
     checks.missingDbCutoverCandidateSecrets.length === 0 &&
     checks.missingDbRecoverySecrets.length === 0 &&
-    checks.missingDbRecoveryVariables.length === 0
+    checks.missingDbRecoveryVariables.length === 0 &&
+    checks.invalidDbRecoverySecrets.length === 0
     ? 'ready'
     : 'blocked';
+}
+
+function resultBlocker(scope, checks) {
+  if (checks.invalidDbRecoverySecrets.length > 0) return 'db_recovery_secret_invalid_format';
+  if (scope === 'db-recovery' && (
+    checks.missingDbRecoverySecrets.length > 0 ||
+    checks.missingDbRecoveryVariables.length > 0
+  )) return 'db_recovery_prerequisites_missing';
+  if (scope === 'db-cutover' && (
+    checks.missingDbCutoverSecrets.length > 0 ||
+    checks.missingDbCutoverCandidateSecrets.length > 0
+  )) return 'db_cutover_prerequisites_missing';
+  if (scope === 'all') {
+    const hasMissing = Object.values(checks).some((value) => Array.isArray(value) && value.length > 0);
+    if (hasMissing) return 'production_secret_audit_blocked';
+  }
+  return undefined;
 }
 
 function readOption(name) {
@@ -201,6 +238,7 @@ function main() {
   const missingDbCutoverCandidateSecrets = hasReplacementDbCandidate ? [] : replacementDbCandidateSecrets;
   const missingDbRecoverySecrets = findMissingSecrets(requiredDbRecoverySecrets, secretNames);
   const missingDbRecoveryVariables = findMissingSecrets(requiredDbRecoveryVariables, variableNames);
+  const invalidDbRecoverySecrets = fromEnvironment ? findInvalidDbRecoverySecrets(process.env) : [];
   const checks = {
     missingGithubActionSecrets,
     missingGithubActionVariables,
@@ -208,15 +246,18 @@ function main() {
     missingDbCutoverSecrets,
     missingDbCutoverCandidateSecrets,
     missingDbRecoverySecrets,
-    missingDbRecoveryVariables
+    missingDbRecoveryVariables,
+    invalidDbRecoverySecrets
   };
+  const status = scopeStatus(scope, checks);
   const result = {
-    status: scopeStatus(scope, checks),
+    status,
     scope,
     checkedSecretNames: secretNames.sort(),
     checkedVariableNames: variableNames.sort(),
     environment: environment ?? null,
     source: fromEnvironment ? 'environment' : 'github',
+    blocker: status === 'ready' ? undefined : resultBlocker(scope, checks),
     missingGithubActionSecrets,
     missingGithubActionVariables,
     missingRuntimeSecrets,
@@ -225,7 +266,18 @@ function main() {
     hasReplacementDbCandidate,
     missingDbCutoverCandidateSecrets,
     missingDbRecoverySecrets,
-    missingDbRecoveryVariables
+    missingDbRecoveryVariables,
+    invalidDbRecoverySecrets,
+    dbRecoverySecretValidation: fromEnvironment
+      ? {
+          validated: true,
+          requirement: supabaseManagementTokenRequirement
+        }
+      : {
+          validated: false,
+          reason: 'GitHub secret values are not readable from gh secret list; run with --from-env inside the workflow to validate secret shape.',
+          requirement: supabaseManagementTokenRequirement
+        }
   };
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   if (result.status !== 'ready') process.exitCode = 1;

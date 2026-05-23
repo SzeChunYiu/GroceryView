@@ -50,6 +50,8 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /ops:db-recovery-packet/);
     assert.match(runbook, /SUPABASE_ACCESS_TOKEN/);
     assert.match(runbook, /SUPABASE_PROJECT_REF/);
+    assert.match(runbook, /sbp_/);
+    assert.match(runbook, /db_recovery_secret_invalid_format/);
   });
 
 
