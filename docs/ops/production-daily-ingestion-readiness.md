@@ -178,16 +178,24 @@ gates before a production cutover is allowed:
 1. `ops:validate-db-cutover` proves the replacement DB accepts write-mode and
    `select 1` connectivity.
 2. `ops:apply-db-migrations` applies the canonical schema to the replacement DB
-   and uploads `groceryview-replacement-db-migrations`.
+   and uploads `groceryview-replacement-db-migrations`; if the downstream
+   migration step unexpectedly loses its resolved database URL after candidate
+   validation, it writes `replacement_database_url_config_missing` before failing.
 3. the generated all-chain daily connector config is run against the replacement
-   DB; if connector generation fails before JSON, the workflow writes
-   `replacement_daily_connectors_diagnostic_missing`, if catalog target generation
-   fails before JSON, it writes `replacement_catalog_targets_diagnostic_missing`,
+   DB; if this downstream ingestion step unexpectedly loses its resolved database
+   URL after candidate validation, it writes
+   `replacement_ingestion_database_url_config_missing` to each ingestion evidence
+   file before failing. If connector generation fails before JSON, the workflow
+   writes `replacement_daily_connectors_diagnostic_missing`, if catalog target
+   generation fails before JSON, it writes `replacement_catalog_targets_diagnostic_missing`,
    otherwise `chainSummaries` must include `ica`, `willys`, `coop`, `hemkop`,
    `lidl`, and `city_gross`, every summary must be `succeeded`, and every
    required chain must have at least one persisted observation.
 4. `ingest:export-db-snapshot` exports a replacement DB-backed site snapshot with
-   all required chains, stores, products, categories, and price types covered.
+   all required chains, stores, products, categories, and price types covered; if
+   the downstream snapshot step unexpectedly loses its resolved database URL, it
+   writes `replacement_snapshot_database_url_config_missing` to the snapshot
+   evidence before failing.
 5. artifacts `groceryview-db-cutover-validation`,
    `groceryview-replacement-db-migrations`, `groceryview-replacement-db-ingestion`,
    and `groceryview-replacement-db-site-snapshot` are available for review, and
@@ -203,6 +211,17 @@ Expected replacement DB blockers:
   current production DB, so it is not a safe cutover target.
 - `replacement_database_not_writable`: the candidate exists but does not prove
   write-mode connectivity.
+- `replacement_database_url_config_missing`: the candidate passed initial URL
+  validation, but the downstream migration step did not receive the resolved
+  database URL, so the workflow preserved migration evidence and failed closed.
+- `replacement_ingestion_database_url_config_missing`: the candidate passed
+  initial URL validation, but the downstream all-store ingestion step did not
+  receive the resolved database URL, so the workflow preserved ingestion evidence
+  and failed closed before writing to an unknown target.
+- `replacement_snapshot_database_url_config_missing`: the candidate passed
+  initial URL validation, but the downstream DB-backed site snapshot step did not
+  receive the resolved database URL, so the workflow preserved snapshot evidence
+  and failed closed before reading from an unknown target.
 - `replacement_db_migrations_diagnostic_missing`: migration application failed
   before producing its normal JSON evidence.
 - `replacement_daily_connectors_diagnostic_missing`: replacement all-store
