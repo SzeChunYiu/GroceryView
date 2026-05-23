@@ -3,6 +3,7 @@ import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from
 import { ProductPriceCards } from './product-price-cards';
 import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedShellCopy } from '@/lib/i18n';
+import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
   chainSavingsLedger,
@@ -44,6 +45,7 @@ const homepageMapChainIndex = mapChainIndexScores.slice(0, 3);
 const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
 const homepageMarketHeatmap = marketHeatmapTiles.slice(0, 6);
 const homepageChainIndexTrend = buildChainIndexTrendSeries().series.slice(0, 2);
+const homepageBasketCostHeatmap = basketCostHeatmap.rows.slice(0, 3);
 const homepageMarketTerminal = {
   title: 'Grocery Index market terminal',
   indexLabel: mapChainIndexScores[0]?.chainId ?? 'chain-index unavailable',
@@ -245,6 +247,46 @@ export function MarketShell() {
               <p className="mt-2 text-xs font-semibold leading-5 opacity-80">{tile.detail}</p>
               <p className="mt-3 rounded-xl bg-white/70 p-2 text-xs font-bold leading-5 opacity-80">{tile.confidenceLabel}</p>
             </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <Eyebrow>Basket-cost heatmap</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Basket-cost heatmap by area</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-fuchsia-950">
+              The homepage previews the map's area basket view using compareBasketStrategies totals from visible weekly basket rows. It is a coverage-gated guide, not a branch checkout quote; missing favorite-store prices remain visible.
+            </p>
+          </div>
+          <Link className="rounded-full bg-fuchsia-700 px-5 py-3 text-center text-sm font-black text-white" href="/map">
+            Open area heatmap
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {homepageBasketCostHeatmap.map((row) => (
+            <Link
+              className="rounded-2xl border border-fuchsia-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-fuchsia-700 hover:shadow-lg"
+              data-basket-cost-heatmap={row.area}
+              href="/map"
+              key={row.storeId}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-700">{row.area}</p>
+                  <p className="mt-2 text-lg font-black text-slate-950">{row.storeName}</p>
+                </div>
+                <p className="rounded-full bg-fuchsia-100 px-3 py-2 text-xl font-black text-fuchsia-950">{row.relativeBasketIndex.toFixed(1)}</p>
+              </div>
+              <p className="mt-3 text-sm font-black text-fuchsia-950">{formatSek(row.knownBasketTotal)} known basket total</p>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{formatPct(row.coveragePercent)} coverage · {row.missingProductCount} missing products</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          {basketCostHeatmap.guardrails.map((guardrail) => (
+            <p className="rounded-2xl bg-white/80 p-3 text-xs font-bold leading-5 text-fuchsia-950" key={guardrail}>{guardrail}</p>
           ))}
         </div>
       </Card>
