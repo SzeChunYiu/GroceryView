@@ -28,6 +28,8 @@ describe('production secret audit script', () => {
       'STRIPE_SECRET_KEY',
       'STRIPE_PRICE_PREMIUM_MONTHLY',
       'STRIPE_PRICE_PREMIUM_YEARLY',
+      'OCR_SPACE_API_KEY',
+      'OPENFOODFACTS_USER_AGENT',
       'CATALOG_COVERAGE_TARGETS_JSON'
     ]) {
       assert.match(script, new RegExp(`['"]${secret}['"]`));

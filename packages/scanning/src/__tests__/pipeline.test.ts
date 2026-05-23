@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildScanProviderReadinessReport, createOcrSpaceReceiptProvider, planReceiptAliasGrowth, planScanReviewWorkItems, prepareScanUploadTicket, processScanUpload } from '../index.js';
+import { buildScanProviderReadinessReport, createOcrSpaceReceiptProvider, createOpenFoodFactsBarcodeProvider, planReceiptAliasGrowth, planScanReviewWorkItems, prepareScanUploadTicket, processScanUpload } from '../index.js';
 
 describe('buildScanProviderReadinessReport', () => {
   it('fails closed when barcode or receipt OCR providers are missing credentials or health checks', () => {
@@ -413,6 +413,54 @@ describe('planReceiptAliasGrowth', () => {
     assert.deepEqual(plan.rejectedRows, [
       { scanId: 'receipt-commodity-2', rawName: 'Tomat', reason: 'chain_label_required' }
     ]);
+  });
+});
+
+describe('createOpenFoodFactsBarcodeProvider', () => {
+  it('fetches OpenFoodFacts product metadata with a declared user agent and normalizes a barcode match', async () => {
+    const calls: Array<{ url: string; init: RequestInit }> = [];
+    const provider = createOpenFoodFactsBarcodeProvider({
+      userAgent: 'GroceryView/1.0 contact@groceryview.se',
+      fetch: async (url, init = {}) => {
+        calls.push({ url: String(url), init });
+        return new Response(JSON.stringify({
+          status: 1,
+          code: '0735000123456',
+          product: { product_name: 'Zoegas Skånerost 450g', brands: 'Zoegas' }
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    const result = await provider.lookup('0735000123456');
+
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0]?.url, 'https://world.openfoodfacts.org/api/v2/product/0735000123456.json?fields=code%2Cproduct_name%2Cbrands%2Cquantity%2Cstatus');
+    assert.equal((calls[0]?.init.headers as Record<string, string>)['user-agent'], 'GroceryView/1.0 contact@groceryview.se');
+    assert.deepEqual(result, {
+      productId: 'openfoodfacts:0735000123456',
+      barcode: '0735000123456',
+      confidence: 0.86,
+      needsHumanReview: false
+    });
+  });
+
+  it('fails closed on missing user agent, invalid barcodes, HTTP failures, and missing products', async () => {
+    assert.throws(() => createOpenFoodFactsBarcodeProvider({ userAgent: ' ' }), /OPENFOODFACTS_USER_AGENT is required/);
+
+    const provider = createOpenFoodFactsBarcodeProvider({
+      userAgent: 'GroceryView/1.0 contact@groceryview.se',
+      fetch: async () => new Response(JSON.stringify({ status: 0 }), { status: 200 })
+    });
+
+    await assert.rejects(() => provider.lookup('not-a-barcode'), /barcode must contain 8 to 14 digits/);
+    await assert.rejects(() => provider.lookup('0735000123456'), /OpenFoodFacts did not resolve barcode 0735000123456/);
+
+    const failingProvider = createOpenFoodFactsBarcodeProvider({
+      userAgent: 'GroceryView/1.0 contact@groceryview.se',
+      fetch: async () => new Response('rate limited', { status: 429 })
+    });
+
+    await assert.rejects(() => failingProvider.lookup('0735000123456'), /OpenFoodFacts HTTP 429/);
   });
 });
 

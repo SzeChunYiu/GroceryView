@@ -90,6 +90,7 @@ import {
 } from '@groceryview/notifications';
 import {
   createOcrSpaceReceiptProvider,
+  createOpenFoodFactsBarcodeProvider,
   planScanReviewWorkItems,
   prepareScanUploadTicket,
   processScanUpload,
@@ -2551,6 +2552,7 @@ export type RuntimeConfig = {
   expoPushAccessToken?: string;
   metricsToken?: string;
   ocrSpaceApiKey?: string;
+  openFoodFactsUserAgent?: string;
   catalogCoverageTargets?: Omit<CatalogCoverageInput, 'products'>;
 };
 
@@ -2617,6 +2619,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.BILLING_WEBHOOK_SECRET) throw new Error('BILLING_WEBHOOK_SECRET is required in production.');
     if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
     if (!env.OCR_SPACE_API_KEY) throw new Error('OCR_SPACE_API_KEY is required in production.');
+    if (!env.OPENFOODFACTS_USER_AGENT) throw new Error('OPENFOODFACTS_USER_AGENT is required in production.');
     if (!env.CATALOG_COVERAGE_TARGETS_JSON) throw new Error('CATALOG_COVERAGE_TARGETS_JSON is required in production.');
   }
   validatePublicWebUrl(env.PUBLIC_WEB_URL);
@@ -2640,6 +2643,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     ...(Object.keys(stripePriceIds).length > 0 ? { stripePriceIds } : {}),
     metricsToken: env.METRICS_TOKEN,
     ...(env.OCR_SPACE_API_KEY ? { ocrSpaceApiKey: env.OCR_SPACE_API_KEY } : {}),
+    ...(env.OPENFOODFACTS_USER_AGENT ? { openFoodFactsUserAgent: env.OPENFOODFACTS_USER_AGENT } : {}),
     ...(catalogCoverageTargets ? { catalogCoverageTargets } : {})
   };
 }
@@ -2690,6 +2694,24 @@ function buildRuntimeNotificationWorkerRunner(
 }
 
 export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): AuthOptions {
+  const scanProviders: ScanProviders = {
+    ...(config.openFoodFactsUserAgent
+      ? {
+          barcode: createOpenFoodFactsBarcodeProvider({
+            userAgent: config.openFoodFactsUserAgent,
+            ...(options.scanProviderFetch ? { fetch: options.scanProviderFetch } : {})
+          })
+        }
+      : {}),
+    ...(config.ocrSpaceApiKey
+      ? {
+          receiptOcr: createOcrSpaceReceiptProvider({
+            apiKey: config.ocrSpaceApiKey,
+            ...(options.scanProviderFetch ? { fetch: options.scanProviderFetch } : {})
+          })
+        }
+      : {})
+  };
   return {
     runtimeConfig: config,
     authSecret: config.authSecret,
@@ -2713,16 +2735,7 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     storeFlyerOffersProvider: options.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider,
     watchlistPriceAlertWriter: options.watchlistPriceAlertWriter,
-    ...(config.ocrSpaceApiKey
-      ? {
-          scanProviders: {
-            receiptOcr: createOcrSpaceReceiptProvider({
-              apiKey: config.ocrSpaceApiKey,
-              ...(options.scanProviderFetch ? { fetch: options.scanProviderFetch } : {})
-            })
-          }
-        }
-      : {})
+    ...(Object.keys(scanProviders).length > 0 ? { scanProviders } : {})
   };
 }
 

@@ -453,6 +453,61 @@ export async function processScanUpload(input: { upload: ScanUpload; providers: 
   };
 }
 
+
+export type OpenFoodFactsBarcodeProviderOptions = {
+  userAgent: string;
+  endpoint?: string;
+  fetch?: typeof fetch;
+};
+
+type OpenFoodFactsProductResponse = {
+  status?: number;
+  code?: string;
+  product?: {
+    product_name?: string;
+    brands?: string;
+    quantity?: string;
+  };
+};
+
+function requiredOpenFoodFactsUserAgent(userAgent: string): string {
+  const normalized = userAgent.trim();
+  if (!normalized) throw new Error('OPENFOODFACTS_USER_AGENT is required.');
+  return normalized;
+}
+
+function normalizeBarcode(barcode: string): string {
+  const normalized = barcode.trim();
+  if (!/^\d{8,14}$/.test(normalized)) throw new Error('barcode must contain 8 to 14 digits.');
+  return normalized;
+}
+
+export function createOpenFoodFactsBarcodeProvider(options: OpenFoodFactsBarcodeProviderOptions): NonNullable<ScanProviders['barcode']> {
+  const userAgent = requiredOpenFoodFactsUserAgent(options.userAgent);
+  const endpoint = options.endpoint ?? 'https://world.openfoodfacts.org/api/v2/product';
+  const fetcher = options.fetch ?? fetch;
+  return {
+    async lookup(barcode: string): Promise<BarcodeLookup> {
+      const normalizedBarcode = normalizeBarcode(barcode);
+      const fields = new URLSearchParams({ fields: 'code,product_name,brands,quantity,status' });
+      const response = await fetcher(`${endpoint}/${encodeURIComponent(normalizedBarcode)}.json?${fields.toString()}`, {
+        method: 'GET',
+        headers: { 'user-agent': userAgent, accept: 'application/json' }
+      });
+      if (!response.ok) throw new Error(`OpenFoodFacts HTTP ${response.status}`);
+      const parsed = await response.json() as OpenFoodFactsProductResponse;
+      if (parsed.status !== 1 || !parsed.product) throw new Error(`OpenFoodFacts did not resolve barcode ${normalizedBarcode}.`);
+      const hasName = Boolean(parsed.product.product_name?.trim());
+      return {
+        productId: `openfoodfacts:${parsed.code?.trim() || normalizedBarcode}`,
+        barcode: normalizedBarcode,
+        confidence: hasName ? 0.86 : 0.65,
+        needsHumanReview: !hasName
+      };
+    }
+  };
+}
+
 export type OcrSpaceReceiptProviderOptions = {
   apiKey: string;
   endpoint?: string;

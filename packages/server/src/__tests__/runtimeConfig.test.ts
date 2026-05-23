@@ -252,6 +252,7 @@ describe('runtime config', () => {
       STRIPE_PRICE_PREMIUM_YEARLY: 'price_yearly_runtime',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
+      OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se',
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -280,6 +281,7 @@ describe('runtime config', () => {
       },
       metricsToken: 'metrics-token',
       ocrSpaceApiKey: 'ocr-runtime-key',
+      openFoodFactsUserAgent: 'GroceryView/1.0 contact@groceryview.se',
       catalogCoverageTargets: {
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -292,6 +294,27 @@ describe('runtime config', () => {
     });
   });
 
+
+
+  it('wires OpenFoodFacts barcode lookup into runtime scan providers', async () => {
+    const config = loadRuntimeConfig({ NODE_ENV: 'development', OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se' });
+    const authOptions = buildRuntimeAuthOptions(config, {
+      scanProviderFetch: async () => new Response(JSON.stringify({
+        status: 1,
+        code: '0735000123456',
+        product: { product_name: 'Zoegas Skånerost 450g' }
+      }), { status: 200 })
+    });
+
+    const result = await authOptions.scanProviders?.barcode?.lookup('0735000123456');
+
+    assert.deepEqual(result, {
+      productId: 'openfoodfacts:0735000123456',
+      barcode: '0735000123456',
+      confidence: 0.86,
+      needsHumanReview: false
+    });
+  });
 
   it('wires OCR.space receipt scanning into runtime scan providers', async () => {
     const config = loadRuntimeConfig({ NODE_ENV: 'development', OCR_SPACE_API_KEY: 'ocr-runtime-key' });
@@ -435,6 +458,21 @@ describe('runtime config', () => {
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key'
+    }), /OPENFOODFACTS_USER_AGENT is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
+      METRICS_TOKEN: 'metrics-token',
+      OCR_SPACE_API_KEY: 'ocr-runtime-key',
+      OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se'
     }), /CATALOG_COVERAGE_TARGETS_JSON is required/);
   });
 
@@ -457,6 +495,7 @@ describe('runtime config', () => {
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
+      OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se',
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
