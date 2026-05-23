@@ -1,13 +1,20 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import {
+  DEFAULT_COOP_PRODUCT_QUERIES,
+  DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES,
   DEFAULT_CITY_GROSS_PRODUCT_QUERIES,
   DEFAULT_HEMKOP_SEARCH_QUERIES,
   DEFAULT_LIDL_OFFER_PATHS,
+  DEFAULT_MATSPAR_SEARCH_PAGES,
+  DEFAULT_MATSPAR_SEARCH_QUERIES,
   DEFAULT_WILLYS_SEARCH_QUERIES,
   fetchCityGrossProductsForAllStores,
+  fetchCoopProductsForAllStores,
+  fetchCoopWeeklyDiscountsForAllStores,
   fetchHemkopProducts,
   fetchHemkopWeeklyDiscountsForAllStores,
   fetchLidlOffersForAllStores,
+  fetchMatsparProducts,
   fetchWillysProducts,
   fetchWillysWeeklyDiscountsForAllStores
 } from '../../packages/ingestion/dist/index.js';
@@ -16,9 +23,13 @@ const REPO_ROOT = new URL('../../', import.meta.url);
 const INGESTED_DIR = new URL('apps/web/src/lib/ingested/', REPO_ROOT);
 
 const CITY_GROSS_QUERIES = [DEFAULT_CITY_GROSS_PRODUCT_QUERIES[0]];
+const COOP_QUERIES = DEFAULT_COOP_PRODUCT_QUERIES;
+const COOP_WEEKLY_QUERIES = DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES;
 const WILLYS_QUERIES = DEFAULT_WILLYS_SEARCH_QUERIES;
 const HEMKOP_QUERIES = DEFAULT_HEMKOP_SEARCH_QUERIES;
 const LIDL_OFFER_PATHS = DEFAULT_LIDL_OFFER_PATHS;
+const MATSPAR_QUERIES = DEFAULT_MATSPAR_SEARCH_QUERIES;
+const MATSPAR_PAGES = DEFAULT_MATSPAR_SEARCH_PAGES;
 
 const retrievedAt = new Date().toISOString();
 
@@ -27,11 +38,25 @@ await mkdir(INGESTED_DIR, { recursive: true });
 const cityGrossProducts = await fetchCityGrossProductsForAllStores({
   maxStores: 40,
   queries: CITY_GROSS_QUERIES,
-  maxRowsPerStore: 120,
+  maxRowsPerStore: 180,
   pageSize: 24,
   retrievedAt
 });
 await writeCityGross(cityGrossProducts);
+
+const coopProducts = await fetchCoopProductsForAllStores({
+  queries: COOP_QUERIES,
+  maxStores: 11,
+  maxRowsPerStore: 260,
+  retrievedAt
+});
+const coopWeeklyDiscounts = await fetchCoopWeeklyDiscountsForAllStores({
+  productQueries: COOP_WEEKLY_QUERIES,
+  maxStores: 199,
+  maxRows: 4000,
+  retrievedAt
+});
+await writeCoop(coopProducts, coopWeeklyDiscounts);
 
 const willysProducts = await fetchWillysProducts({
   queries: WILLYS_QUERIES,
@@ -59,21 +84,32 @@ const hemkopWeeklyDiscounts = await fetchHemkopWeeklyDiscountsForAllStores({
 await writeHemkop(hemkopProducts, hemkopWeeklyDiscounts);
 
 const lidlStoreOffers = await fetchLidlOffersForAllStores({
-  maxStores: 40,
+  maxStores: 47,
   offerPaths: LIDL_OFFER_PATHS,
   maxRows: 150,
   retrievedAt
 });
 await writeLidl(lidlStoreOffers);
 
+const matsparProducts = await fetchMatsparProducts({
+  queries: MATSPAR_QUERIES,
+  pages: MATSPAR_PAGES,
+  maxRows: 3000,
+  retrievedAt
+});
+await writeMatspar(matsparProducts);
+
 console.log(JSON.stringify({
   retrievedAt,
   cityGrossProducts: cityGrossProducts.length,
+  coopProducts: coopProducts.length,
+  coopWeeklyDiscounts: coopWeeklyDiscounts.length,
   willysProducts: willysProducts.length,
   willysWeeklyDiscounts: willysWeeklyDiscounts.length,
   hemkopProducts: hemkopProducts.length,
   hemkopWeeklyDiscounts: hemkopWeeklyDiscounts.length,
-  lidlStoreOffers: lidlStoreOffers.length
+  lidlStoreOffers: lidlStoreOffers.length,
+  matsparProducts: matsparProducts.length
 }, null, 2));
 
 async function writeCityGross(rows) {
@@ -118,6 +154,99 @@ async function writeCityGross(rows) {
     })} as const;`,
     '',
     `export const cityGrossProducts: CityGrossIngestedProduct[] = ${literal(rows)};`,
+    ''
+  ]);
+}
+
+async function writeCoop(products, weeklyDiscounts) {
+  const productSourceUrls = unique(products.map((row) => row.sourceUrl));
+  const productStoreIds = unique(products.map((row) => row.storeId));
+  const weeklySourceUrls = unique(weeklyDiscounts.map((row) => row.sourceUrl));
+  const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
+  await writeGeneratedFile('coop.ts', [
+    '// AUTO-GENERATED from Coop public personalization search API.',
+    `// Product source URL pattern: https://external.api.coop.se/personalization/search/products?store={storeId}&device=desktop&direct=true&api-version=v1`,
+    `// Product source URLs: ${productSourceUrls.join(' | ')}`,
+    `// Product queries: ${COOP_QUERIES.join(', ')}`,
+    `// Product retrieved: ${retrievedAt}`,
+    `// Product row count: ${products.length} real product rows fetched from coop.se across ${productStoreIds.length} online-price stores.`,
+    '//',
+    `// Weekly discounts source URLs: ${weeklySourceUrls.join(' | ')}`,
+    `// Weekly discounts retrieved: ${retrievedAt}`,
+    `// Weekly discounts row count: ${weeklyDiscounts.length} real current flyer discount rows for ${weeklyStoreIds.length} Coop branches.`,
+    '',
+    'export type CoopIngestedProduct = {',
+    '  code: string;',
+    '  ean: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  packageText: string;',
+    '  category: string;',
+    '  price: number;',
+    '  priceText: string;',
+    '  unitPrice: number | null;',
+    '  unitPriceText: string;',
+    '  unitPriceUnit: string;',
+    '  promotionText: string;',
+    '  promotionPrice: number | null;',
+    '  medMeraRequired: boolean;',
+    '  availableOnline: boolean;',
+    '  storeId: string;',
+    '  storeName: string;',
+    '  city: string;',
+    '  sourceUrl: string;',
+    '  productUrl: string;',
+    '  imageUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    'export type CoopIngestedWeeklyDiscount = {',
+    '  code: string;',
+    '  ean: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  packageText: string;',
+    '  ordinaryPrice: number;',
+    '  ordinaryPriceText: string;',
+    '  offerPrice: number;',
+    '  offerPriceText: string;',
+    '  offerUnitPrice: number | null;',
+    '  offerUnitPriceText: string;',
+    '  offerMechanicText: string;',
+    '  promotionId: string;',
+    '  medMeraRequired: boolean;',
+    '  storeId: string;',
+    '  storeName: string;',
+    '  region: string;',
+    '  validFrom: string;',
+    '  validTo: string;',
+    '  flyerUrl: string;',
+    '  productSearchUrl: string;',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const coopSource = ${literal({
+      source: 'coop.se public personalization search API',
+      retrievedAt,
+      rowCount: products.length,
+      sourceUrlPattern: 'https://external.api.coop.se/personalization/search/products?store={storeId}&device=desktop&direct=true&api-version=v1',
+      queries: COOP_QUERIES,
+      storeIds: productStoreIds,
+      sourceUrls: productSourceUrls
+    })} as const;`,
+    '',
+    `export const coopWeeklyDiscountSource = ${literal({
+      source: 'Coop public store API current flyer plus public personalization product search',
+      retrievedAt,
+      rowCount: weeklyDiscounts.length,
+      storeIds: weeklyStoreIds,
+      sourceUrls: weeklySourceUrls
+    })} as const;`,
+    '',
+    `export const coopProducts: CoopIngestedProduct[] = ${literal(products)};`,
+    '',
+    `export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = ${literal(weeklyDiscounts)};`,
     ''
   ]);
 }
@@ -343,6 +472,46 @@ async function writeLidl(rows) {
     })} as const;`,
     '',
     `export const lidlStoreOffers: LidlIngestedStoreOffer[] = ${literal(rows)};`,
+    ''
+  ]);
+}
+
+async function writeMatspar(rows) {
+  const sourceUrls = unique(rows.map((row) => row.sourceUrl));
+  await writeGeneratedFile('matspar.ts', [
+    '// AUTO-GENERATED from Matspar public search pages with embedded __PAGEDATA__.',
+    `// Source URL pattern: https://www.matspar.se/kategori?q={query}&page={page}`,
+    `// Source URLs: ${sourceUrls.join('; ')}`,
+    `// Retrieved: ${retrievedAt}`,
+    `// Row count: ${rows.length} real product rows fetched from matspar.se.`,
+    '',
+    'export type MatsparIngestedProduct = {',
+    '  code: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  packageText: string;',
+    '  countryFrom: string;',
+    '  price: number;',
+    '  priceText: string;',
+    '  medianPrice: number | null;',
+    '  warehousePriceCount: number;',
+    '  sourceUrl: string;',
+    '  productUrl: string;',
+    '  imageHash: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const matsparSource = ${literal({
+      source: 'matspar.se public search page embedded __PAGEDATA__',
+      retrievedAt,
+      rowCount: rows.length,
+      sourceUrlPattern: 'https://www.matspar.se/kategori?q={query}&page={page}',
+      queries: MATSPAR_QUERIES,
+      pages: MATSPAR_PAGES,
+      sourceUrls
+    })} as const;`,
+    '',
+    `export const matsparProducts: MatsparIngestedProduct[] = ${literal(rows)};`,
     ''
   ]);
 }
