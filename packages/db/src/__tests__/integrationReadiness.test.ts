@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import {
   POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS,
   POSTGRES_INTEGRATION_REQUIRED_TABLES,
+  TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS,
+  TIMESCALEDB_EVALUATION_FALLBACK_TABLES,
+  buildTimescaleDbEvaluationReport,
   buildPostgresIntegrationReadinessReport,
   buildPostgresRepositorySmokeProbes,
   checkPostgresIntegrationReadiness,
@@ -495,6 +498,82 @@ describe('summarizePostgresIntegrationReadinessReport', () => {
         repositoryChecks: 1
       }
     });
+  });
+});
+
+describe('buildTimescaleDbEvaluationReport', () => {
+  it('keeps the price tape ready on declarative partitions when TimescaleDB is not installed', () => {
+    const report = buildTimescaleDbEvaluationReport({
+      timescaleExtensionAvailable: false,
+      hypertables: [],
+      compressionPolicies: [],
+      retentionPolicies: [],
+      fallbackTables: [...TIMESCALEDB_EVALUATION_FALLBACK_TABLES],
+      fallbackFunctions: [...TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS]
+    });
+
+    assert.equal(report.status, 'fallback_ready');
+    assert.deepEqual(report.blockers, []);
+    assert.deepEqual(report.timescaleGaps, [
+      'timescaledb_extension_not_installed',
+      'missing_hypertable:observations_v2',
+      'missing_compression_policy:observations_v2',
+      'missing_retention_policy:observations_v2'
+    ]);
+    assert.match(report.recommendation, /Use declarative monthly partitions/);
+    assert.equal(report.evidence.includes('fallback_table:observations_v2'), true);
+    assert.equal(report.evidence.includes('fallback_table:price_daily'), true);
+    assert.equal(report.evidence.includes('fallback_function:drop_observations_partitions_before'), true);
+  });
+
+  it('marks TimescaleDB ready only when hypertable, compression, and retention evidence exists', () => {
+    const report = buildTimescaleDbEvaluationReport({
+      timescaleExtensionAvailable: true,
+      hypertables: ['observations_v2'],
+      compressionPolicies: ['observations_v2'],
+      retentionPolicies: ['observations_v2'],
+      fallbackTables: [...TIMESCALEDB_EVALUATION_FALLBACK_TABLES],
+      fallbackFunctions: [...TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS]
+    });
+
+    assert.deepEqual(report, {
+      status: 'timescale_ready',
+      blockers: [],
+      timescaleGaps: [],
+      evidence: [
+        'timescaledb_extension:available',
+        'hypertable:observations_v2',
+        'compression_policy:observations_v2',
+        'retention_policy:observations_v2',
+        'fallback_table:observations_v2',
+        'fallback_table:price_daily',
+        'fallback_table:price_weekly',
+        'fallback_function:create_observations_partitions',
+        'fallback_function:drop_observations_partitions_before'
+      ],
+      recommendation: 'TimescaleDB is ready for observations_v2 hypertable compression and retention policies.',
+      summary: 'TimescaleDB evaluation is ready.'
+    });
+  });
+
+  it('blocks the evaluation when neither TimescaleDB policies nor the partition fallback are complete', () => {
+    const report = buildTimescaleDbEvaluationReport({
+      timescaleExtensionAvailable: false,
+      hypertables: [],
+      compressionPolicies: [],
+      retentionPolicies: [],
+      fallbackTables: ['observations_v2'],
+      fallbackFunctions: []
+    });
+
+    assert.equal(report.status, 'blocked');
+    assert.deepEqual(report.blockers, [
+      'missing_fallback_table:price_daily',
+      'missing_fallback_table:price_weekly',
+      'missing_fallback_function:create_observations_partitions',
+      'missing_fallback_function:drop_observations_partitions_before'
+    ]);
+    assert.match(report.summary, /blocked/);
   });
 });
 

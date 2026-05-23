@@ -11,7 +11,7 @@ module.exports = {
       url: terminalUrls,
       startServerCommand: 'npm run start -- --hostname 127.0.0.1 --port 3000',
       startServerReadyPattern: 'Ready',
-      numberOfRuns: 1,
+      numberOfRuns: 3,
       settings: {
         chromeFlags: '--headless=new --no-sandbox --disable-dev-shm-usage',
         onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'],

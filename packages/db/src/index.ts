@@ -3170,6 +3170,33 @@ export type PostgresIntegrationProbe = {
   }>;
 };
 
+export type TimescaleDbEvaluationProbe = {
+  timescaleExtensionAvailable: boolean;
+  hypertables: string[];
+  compressionPolicies: string[];
+  retentionPolicies: string[];
+  fallbackTables: string[];
+  fallbackFunctions: string[];
+};
+
+export type TimescaleDbEvaluationReport = {
+  status: 'timescale_ready' | 'fallback_ready' | 'blocked';
+  blockers: string[];
+  timescaleGaps: string[];
+  evidence: string[];
+  recommendation: string;
+  summary: string;
+};
+
+export const TIMESCALEDB_EVALUATION_HYPERTABLES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_RETENTION_POLICIES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_FALLBACK_TABLES = ['observations_v2', 'price_daily', 'price_weekly'] as const;
+export const TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS = [
+  'create_observations_partitions',
+  'drop_observations_partitions_before'
+] as const;
+
 export type PostgresRepositoryProbe = {
   name: string;
   run(executor: QueryExecutor): Promise<void>;
@@ -4058,6 +4085,137 @@ export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrati
     evidence,
     summary: blockers.length === 0 ? 'PostgreSQL integration contract is ready.' : 'PostgreSQL integration contract is blocked.'
   };
+}
+
+export function buildTimescaleDbEvaluationReport(input: TimescaleDbEvaluationProbe): TimescaleDbEvaluationReport {
+  const hypertables = new Set(input.hypertables);
+  const compressionPolicies = new Set(input.compressionPolicies);
+  const retentionPolicies = new Set(input.retentionPolicies);
+  const fallbackTables = new Set(input.fallbackTables);
+  const fallbackFunctions = new Set(input.fallbackFunctions);
+  const timescaleGaps: string[] = [];
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+
+  if (input.timescaleExtensionAvailable) {
+    evidence.push('timescaledb_extension:available');
+  } else {
+    timescaleGaps.push('timescaledb_extension_not_installed');
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_HYPERTABLES) {
+    if (hypertables.has(table)) evidence.push(`hypertable:${table}`);
+    else timescaleGaps.push(`missing_hypertable:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES) {
+    if (compressionPolicies.has(table)) evidence.push(`compression_policy:${table}`);
+    else timescaleGaps.push(`missing_compression_policy:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_RETENTION_POLICIES) {
+    if (retentionPolicies.has(table)) evidence.push(`retention_policy:${table}`);
+    else timescaleGaps.push(`missing_retention_policy:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_FALLBACK_TABLES) {
+    if (fallbackTables.has(table)) evidence.push(`fallback_table:${table}`);
+    else blockers.push(`missing_fallback_table:${table}`);
+  }
+
+  for (const routine of TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS) {
+    if (fallbackFunctions.has(routine)) evidence.push(`fallback_function:${routine}`);
+    else blockers.push(`missing_fallback_function:${routine}`);
+  }
+
+  if (timescaleGaps.length === 0) {
+    return {
+      status: 'timescale_ready',
+      blockers,
+      timescaleGaps: [],
+      evidence,
+      recommendation: 'TimescaleDB is ready for observations_v2 hypertable compression and retention policies.',
+      summary: blockers.length === 0 ? 'TimescaleDB evaluation is ready.' : 'TimescaleDB evaluation is blocked by missing fallback evidence.'
+    };
+  }
+
+  if (blockers.length === 0) {
+    return {
+      status: 'fallback_ready',
+      blockers: [],
+      timescaleGaps,
+      evidence,
+      recommendation: 'Use declarative monthly partitions, BRIN pruning, price_daily/price_weekly rollups, and partition-drop retention until TimescaleDB is installed.',
+      summary: 'TimescaleDB is not fully configured; the declarative partition fallback is ready.'
+    };
+  }
+
+  return {
+    status: 'blocked',
+    blockers,
+    timescaleGaps,
+    evidence,
+    recommendation: 'Block price-tape scale claims until either TimescaleDB policies or the declarative partition fallback are fully present.',
+    summary: 'TimescaleDB evaluation is blocked.'
+  };
+}
+
+export async function collectTimescaleDbEvaluationProbe(executor: QueryExecutor): Promise<TimescaleDbEvaluationProbe> {
+  const extensionRows = await executor.query<{ installed_version: string | null }>(
+    "select installed_version from pg_available_extensions where name = 'timescaledb'"
+  );
+  const timescaleExtensionAvailable = Boolean(extensionRows[0]?.installed_version);
+  const fallbackTableRows = await executor.query<{ table_name: string }>(
+    'select table_name from information_schema.tables where table_schema = current_schema() and table_name = any($1)',
+    [[...TIMESCALEDB_EVALUATION_FALLBACK_TABLES]]
+  );
+  const fallbackFunctionRows = await executor.query<{ routine_name: string }>(
+    'select routine_name from information_schema.routines where routine_schema = current_schema() and routine_name = any($1)',
+    [[...TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS]]
+  );
+
+  const probe: TimescaleDbEvaluationProbe = {
+    timescaleExtensionAvailable,
+    hypertables: [],
+    compressionPolicies: [],
+    retentionPolicies: [],
+    fallbackTables: fallbackTableRows.map((row) => row.table_name),
+    fallbackFunctions: fallbackFunctionRows.map((row) => row.routine_name)
+  };
+
+  if (!timescaleExtensionAvailable) return probe;
+
+  try {
+    const hypertableRows = await executor.query<{ hypertable_name: string }>(
+      'select hypertable_name from timescaledb_information.hypertables where hypertable_name = any($1)',
+      [[...TIMESCALEDB_EVALUATION_HYPERTABLES]]
+    );
+    probe.hypertables = hypertableRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.hypertables = [];
+  }
+
+  try {
+    const compressionRows = await executor.query<{ hypertable_name: string }>(
+      "select hypertable_name from timescaledb_information.jobs where proc_name = 'policy_compression' and hypertable_name = any($1)",
+      [[...TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES]]
+    );
+    probe.compressionPolicies = compressionRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.compressionPolicies = [];
+  }
+
+  try {
+    const retentionRows = await executor.query<{ hypertable_name: string }>(
+      "select hypertable_name from timescaledb_information.jobs where proc_name = 'policy_retention' and hypertable_name = any($1)",
+      [[...TIMESCALEDB_EVALUATION_RETENTION_POLICIES]]
+    );
+    probe.retentionPolicies = retentionRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.retentionPolicies = [];
+  }
+
+  return probe;
 }
 
 export function summarizePostgresIntegrationReadinessReport(
