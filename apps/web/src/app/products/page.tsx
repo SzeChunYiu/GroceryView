@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
+import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
@@ -18,6 +19,21 @@ export default function ProductsPage() {
       <Eyebrow>Products</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Verified product catalogue</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Products are shown only when present in the Axfood chain snapshot or OpenPrices SEK observations. No synthetic prices or filler products are rendered.</p>
+      <Card className="mt-8 border-indigo-200 bg-indigo-50/70">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-indigo-800">Pharmacy catalog</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Apohem + Apotek Hjärtat OTC rows</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              {apohemSource.rowCount.toLocaleString('sv-SE')} EAN-coded OTC, supplement, and beauty rows are surfaced on
+              the pharmacy route with prescription products and medical advice excluded.
+            </p>
+          </div>
+          <Link className="rounded-full bg-indigo-700 px-5 py-3 text-center text-sm font-black text-white" href="/pharmacy">
+            Open pharmacy catalog
+          </Link>
+        </div>
+      </Card>
       <Card className="mt-8 border-violet-200 bg-violet-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>

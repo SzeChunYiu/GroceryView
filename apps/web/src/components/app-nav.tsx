@@ -13,6 +13,7 @@ import {
   Map,
   PackageSearch,
   PiggyBank,
+  Pill,
   Search,
   ShoppingBasket,
   Store,
@@ -52,6 +53,7 @@ const navGroups: NavGroup[] = [
     icon: PackageSearch,
     items: [
       { href: '/products', label: 'Browse', icon: PackageSearch },
+      { href: '/pharmacy', label: 'Pharmacy', icon: Pill },
       { href: '/compare', label: 'Compare', icon: ListChecks }
     ]
   },
