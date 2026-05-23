@@ -13,9 +13,18 @@ describe('deploy workflow', () => {
     assert.match(workflow, /deploy\/groceryview\.manifest\.json/);
     assert.match(workflow, /environment:\s*production/);
     assert.match(workflow, /ops:check-production-secrets -- --from-env/);
-    for (const variable of ['GROCERYVIEW_PRODUCTION_URL', 'GROCERYVIEW_TERMINAL_PRODUCT_ID', 'GROCERYVIEW_SCANNER_USER_ID', 'SUPABASE_PROJECT_REF']) {
+    for (const variable of [
+      'GROCERYVIEW_PRODUCTION_URL',
+      'GROCERYVIEW_TERMINAL_PRODUCT_ID',
+      'GROCERYVIEW_SCANNER_USER_ID',
+      'SUPABASE_PROJECT_REF'
+    ]) {
       assert.match(workflow, new RegExp(`${variable}:\\s*\\$\\{\\{ vars\\.${variable} \\}\\}`));
     }
+    assert.match(
+      workflow,
+      /GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN:\s*\$\{\{ vars\.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN \|\| secrets\.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN \}\}/
+    );
     assert.doesNotMatch(workflow, /gh secret list/);
   });
 
@@ -38,7 +47,6 @@ describe('deploy workflow', () => {
       'STRIPE_PRICE_PREMIUM_MONTHLY',
       'STRIPE_PRICE_PREMIUM_YEARLY',
       'GROCERYVIEW_SCANNER_BEARER_TOKEN',
-      'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
       'CATALOG_COVERAGE_TARGETS_JSON',
       'SUPABASE_ACCESS_TOKEN',
       'REPLACEMENT_DATABASE_URL',
