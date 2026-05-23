@@ -95,6 +95,19 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: true
   },
   {
+    connectorId: 'pharmacy-public-products',
+    chainId: 'pharmacy',
+    domain: 'pharmacy',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'groceryview://daily/pharmacy/products/public',
+    parserVersion: 'pharmacy-public-products-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
     connectorId: 'okq8-fuel-prices',
     chainId: 'okq8',
     domain: 'fuel',

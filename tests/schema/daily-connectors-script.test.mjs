@@ -27,6 +27,7 @@ describe('daily connectors export script', () => {
       'hemkop',
       'lidl',
       'city_gross',
+      'pharmacy',
       'okq8'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.connectorId), [
@@ -39,6 +40,7 @@ describe('daily connectors export script', () => {
       'hemkop-weekly-all-stores',
       'lidl-public-offers-all-stores',
       'city-gross-public-products-all-stores',
+      'pharmacy-public-products',
       'okq8-fuel-prices'
     ]);
     assert.equal(
@@ -51,6 +53,10 @@ describe('daily connectors export script', () => {
     assert.equal(okq8FuelConnector.domain, 'fuel');
     assert.equal(okq8FuelConnector.requireStoreScopedPrices, false);
     assert.deepEqual(okq8FuelConnector.stores, []);
+    const pharmacyConnector = connectors.find((connector) => connector.connectorId === 'pharmacy-public-products');
+    assert.equal(pharmacyConnector.domain, 'pharmacy');
+    assert.equal(pharmacyConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(pharmacyConnector.stores, []);
     const coopProductConnector = connectors.find((connector) => connector.connectorId === 'coop-products-all-stores');
     const coopWeeklyConnector = connectors.find((connector) => connector.connectorId === 'coop-weekly-all-stores');
     assert.deepEqual(coopProductConnector.stores.map((store) => store.storeId), ['176110']);
@@ -65,6 +71,7 @@ describe('daily connectors export script', () => {
       'groceryview://daily/hemkop/weekly-offers/all-stores',
       'groceryview://daily/lidl/public-offers/all-stores',
       'groceryview://daily/city-gross/public-products/all-stores',
+      'groceryview://daily/pharmacy/products/public',
       'https://www.okq8.se/foretag/priser/'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.parserVersion), [
@@ -77,6 +84,7 @@ describe('daily connectors export script', () => {
       'hemkop-weekly-native-v1',
       'lidl-public-offers-native-v1',
       'citygross-products-native-v1',
+      'pharmacy-public-products-v1',
       'okq8-fuel-prices-v1'
     ]);
   });
