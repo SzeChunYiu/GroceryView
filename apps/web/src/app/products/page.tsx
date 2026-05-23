@@ -17,6 +17,7 @@ type SearchParams = {
   q?: string | string[];
   category?: string | string[];
   label?: string | string[];
+  dietary?: string | string[];
   chain?: string | string[];
   minPrice?: string | string[];
   maxPrice?: string | string[];
@@ -44,10 +45,19 @@ function setFirstParam(params: URLSearchParams, key: keyof SearchParams, value: 
   if (raw?.trim()) params.set(key, raw.trim());
 }
 
+function setAllParams(params: URLSearchParams, key: keyof SearchParams, value: string | string[] | undefined) {
+  const rawValues = Array.isArray(value) ? value : value ? [value] : [];
+  for (const rawValue of rawValues.flatMap((item) => item.split(','))) {
+    const trimmed = rawValue.trim();
+    if (trimmed) params.append(key, trimmed);
+  }
+}
+
 function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'q', source.q);
   setFirstParam(params, 'category', source.category);
   setFirstParam(params, 'label', source.label);
+  setAllParams(params, 'dietary', source.dietary);
   setFirstParam(params, 'chain', source.chain);
   setFirstParam(params, 'minPrice', source.minPrice);
   setFirstParam(params, 'maxPrice', source.maxPrice);
@@ -81,7 +91,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
 
-  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
     copySearchParams(params, resolvedSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
@@ -131,7 +141,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_0.6fr_0.6fr_0.6fr_auto]" method="get">
           {selectedBrand ? <input name="brand" type="hidden" value={selectedBrand} /> : null}
           {search.filters.categories.length > 0 ? <input name="category" type="hidden" value={search.filters.categories.join(',')} /> : null}
-          {search.filters.labels.length > 0 ? <input name="label" type="hidden" value={search.filters.labels.join(',')} /> : null}
+          {search.labelFilters.length > 0 ? <input name="label" type="hidden" value={search.labelFilters.join(',')} /> : null}
           {search.filters.chains.length > 0 ? <input name="chain" type="hidden" value={search.filters.chains.join(',')} /> : null}
           <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
             Search
@@ -149,6 +159,23 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             Min confidence
             <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.minConfidence ?? ''} id="product-search-confidence" max="1" min="0" name="minConfidence" step="0.01" type="number" />
           </label>
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-3 lg:col-span-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Dietary filters</p>
+            <div className="mt-2 grid gap-2 sm:grid-cols-3">
+              {search.dietaryFilters.map((filter) => (
+                <label className="flex items-start gap-2 rounded-2xl bg-white px-3 py-2 text-sm font-black text-emerald-950 shadow-sm" key={filter.value}>
+                  <input className="mt-1" defaultChecked={filter.checked} name="dietary" type="checkbox" value={filter.value} />
+                  <span>
+                    {filter.label}
+                    <span className="block text-xs font-semibold text-emerald-700">{filter.count.toLocaleString('sv-SE')} evidence rows · {filter.evidenceSummary}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+            <p className="mt-2 text-xs font-semibold leading-5 text-emerald-900">
+              Gluten-free, lactose-free, and vegan filters require verified label metadata or explicit product text; GroceryView does not infer dietary status from shopper profiles.
+            </p>
+          </div>
           <div className="flex flex-col justify-end gap-2">
             <label className="flex items-center gap-2 rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950">
               <input defaultChecked={search.filters.inStockOnly} name="inStockOnly" type="checkbox" value="true" />

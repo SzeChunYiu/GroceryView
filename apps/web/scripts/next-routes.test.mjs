@@ -2987,6 +2987,33 @@ ${seo}`;
     assert.doesNotMatch(api, /Math\.random|placeholder/i);
   });
 
+  it('adds common dietary allergen checkbox filters to product listing search', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const products = await read('src/app/products/page.tsx');
+
+    assert.match(verified, /export const commonDietaryFilterOptions = /);
+    assert.match(verified, /value: 'glutenfree'/);
+    assert.match(verified, /label: 'Gluten-free'/);
+    assert.match(verified, /value: 'laktosfree'/);
+    assert.match(verified, /label: 'Lactose-free'/);
+    assert.match(verified, /value: 'vegan'/);
+    assert.match(verified, /dietaryLabelsForProduct/);
+    assert.match(verified, /dietary\?: SearchParamValue/);
+    assert.match(verified, /const dietaryLabels = dietarySearchValues\(searchParams\.dietary\)/);
+    assert.match(verified, /const labels = \[\.\.\.new Set\(\[\.\.\.labelFilters, \.\.\.dietaryLabels\]\)\]/);
+    assert.match(verified, /dietaryFilters: commonDietaryFilterOptions\.map/);
+    assert.match(verified, /dietary=\$\{dietaryFilterLabel/);
+
+    assert.match(products, /dietary\?: string \| string\[\]/);
+    assert.match(products, /setAllParams\(params, 'dietary', source\.dietary\)/);
+    assert.match(products, /Dietary filters/);
+    assert.match(products, /search\.dietaryFilters\.map/);
+    assert.match(products, /name="dietary"/);
+    assert.match(products, /value=\{filter\.value\}/);
+    assert.match(products, /defaultChecked=\{filter\.checked\}/);
+    assert.match(products, /filter\.label/);
+  });
+
   it('surfaces account-bound save-to-watchlist hearts on product cards', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
