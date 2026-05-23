@@ -11,6 +11,10 @@ function cohortKeyFor(store: (typeof storeUniverse)[number]) {
   return store.city || store.district || 'kommun not reported';
 }
 
+function confidenceLevelForRank(matchedRank: NonNullable<ReturnType<typeof storePricePercentileRankForStore>>): ConfidenceLevel {
+  return matchedRank.matchedPerBranchObservationCount >= 30 && matchedRank.regularPriceObservationCount >= 12 ? 'high' : 'medium';
+}
+
 function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
   const matchedRank = storePricePercentileRankForStore(store.slug);
   if (matchedRank) {
@@ -29,7 +33,7 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
       coverageLabel: matchedRank.coverageLabel,
       confidenceLabel: matchedRank.confidenceLabel,
       matchedPerBranchObservationCount: matchedRank.matchedPerBranchObservationCount,
-      confidenceLevel: (matchedRank.matchedPerBranchObservationCount >= 30 && matchedRank.regularPriceObservationCount >= 12 ? 'high' : 'medium') satisfies ConfidenceLevel,
+      confidenceLevel: confidenceLevelForRank(matchedRank),
       detail:
         `Ranked from ${matchedRank.matchedPerBranchObservationCount.toLocaleString('sv-SE')} per-branch Lidl offer observations matched to ${matchedRank.externalStoreId}. Lower index means the branch has deeper public offer prices versus regular-price baselines.`,
       cohorts: [
@@ -57,6 +61,7 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
   const kommunCohortKey = cohortKeyFor(store);
   const kommunStores = storeUniverse.filter((candidate) => cohortKeyFor(candidate) === kommunCohortKey);
   const sameBrandStores = storeUniverse.filter((candidate) => candidate.brand === store.brand);
+  const confidenceLevel: ConfidenceLevel = 'low';
 
   return {
     title: 'store price-percentile rank',
@@ -72,7 +77,7 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
     averageRelativeIndexLabel: 'Not reported',
     coverageLabel: `${storePricePercentileRanks.length.toLocaleString('sv-SE')} matched Lidl stores have per-branch offer ranks; this OSM record is not matched.`,
     confidenceLabel: 'coverage blocker',
-    confidenceLevel: 'low',
+    confidenceLevel,
     matchedPerBranchObservationCount: 0,
     cohorts: [
       {
