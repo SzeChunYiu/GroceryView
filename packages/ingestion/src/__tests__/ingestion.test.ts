@@ -77,6 +77,7 @@ import {
   fetchIcaDefaultStoreProducts,
   fetchIcaProducts,
   fetchIcaReklambladOffers,
+  fetchLidlBulkProducts,
   fetchLidlOffers,
   fetchLidlOffersForAllStores,
   fetchLidlStores,
@@ -150,6 +151,7 @@ import {
   parseCoopStoreServiceAccess,
   parseIcaInitialStores,
   parseIcaStoresHtml,
+  extractLidlBulkOfferPaths,
   parseLidlCityStores,
   parseLidlOverviewLinks,
   parseOsmSupermarkets,
@@ -3393,6 +3395,72 @@ describe('fetchLidlOffers', () => {
       buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
       buildLidlOfferPageUrl('/c/lidl-plus-erbjudanden/a10094682')
     ]);
+  });
+});
+
+describe('fetchLidlBulkProducts', () => {
+  it('discovers Lidl offer category pages from the Lidl category index and fetches product rows', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      const parsed = new URL(String(url));
+      requestedUrls.push(parsed.toString());
+      const source = parsed.pathname;
+      if (source === '/c/') {
+        return new Response(`
+          <a href="/c/veckans-frukt-groent/a10094676">Frukt och grönt</a>
+          <a href="/c/lidl-plus-erbjudanden/a10094682">Lidl Plus</a>
+          <a href="/c/verktyg-traedgard/a10094393">Verktyg</a>
+        `, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+
+      if (source === '/c/veckans-frukt-groent/a10094676' || source === '/c/lidl-plus-erbjudanden/a10094682' || source === '/c/verktyg-traedgard/a10094393') {
+        const productId = source === '/c/veckans-frukt-groent/a10094676' ? 11029834 : (source === '/c/lidl-plus-erbjudanden/a10094682' ? 11029717 : 21000401);
+        const code = String(productId);
+        const gridData = {
+          title: `Product ${code}`,
+          productId,
+          regions: [1],
+          canonicalUrl: `/p/test/product-${code}`,
+          imageList_V1: [{ image: `https://www.lidl.se/assets/${code}.png` }],
+          price: { price: 12.9 + productId % 10, currencyCode: 'SEK', basePrice: { text: '/kg' }, startDate: '2026-05-20T00:00:00Z', endDate: '2026-05-30T00:00:00Z' },
+          currentLidlPlusPrice: { price: { price: 12.9 + productId % 10 } },
+          regionsPrices: {
+            1: {
+              currentPrice: { price: 12.9 + productId % 10, currencyCode: 'SEK', basePrice: { text: '/kg' } }
+            }
+          }
+        };
+        return new Response(`<div data-grid-data="${JSON.stringify(gridData).replaceAll('"', '&quot;')}"></div>`, { status: 200 });
+      }
+
+      return new Response('not found', { status: 404 });
+    };
+
+    const rows = await fetchLidlBulkProducts({
+      fetchImpl,
+      maxRows: 50,
+      minRows: 3,
+      retrievedAt: '2026-05-23T12:00:00.000Z'
+    });
+
+    assert.equal(rows.length, 3);
+    assert.deepEqual(rows.map((row) => row.code), ['11029834', '11029717', '21000401']);
+    assert.deepEqual(requestedUrls, [
+      'https://www.lidl.se/c/',
+      'https://www.lidl.se/c/veckans-frukt-groent/a10094676',
+      'https://www.lidl.se/c/lidl-plus-erbjudanden/a10094682',
+      'https://www.lidl.se/c/verktyg-traedgard/a10094393'
+    ]);
+  });
+
+  it('extracts bulk offer paths from Lidl HTML', () => {
+    const html = `
+      <a href="/c/veckans-frukt-groent/a10094676">Frukt</a>
+      <a href="https://www.lidl.se/c/lidl-plus-erbjudanden/a10094682">Lidl Plus</a>
+      <a href="/c/assets/non-food.css">Assets</a>
+    `;
+    const paths = extractLidlBulkOfferPaths(html);
+    assert.deepEqual(paths, ['/c/veckans-frukt-groent/a10094676', '/c/lidl-plus-erbjudanden/a10094682']);
   });
 });
 
