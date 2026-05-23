@@ -2920,7 +2920,7 @@ export const nutritionPerKrona = {
   coverage: {
     labelledProducts: nutritionPerKronaInputs.length,
     visibleProducts: products.length,
-    confidence: 'medium',
+    confidence: 'medium' as const,
     caveat: 'Only products with a visible price row and a package nutrition-label fixture are ranked; missing labels are excluded instead of estimated.'
   }
 };
