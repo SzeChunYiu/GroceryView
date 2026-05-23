@@ -1935,6 +1935,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(report);
       }
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
+      if (method === 'GET' && path === '/api/retailers') return jsonResponse(api.getRetailers());
 
       if (method === 'GET' && path === '/api/deals/flyer-offers') {
         const query = {
@@ -2993,6 +2994,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
+      '/api/retailers': { get: publicOperation('List supported retailers with logo and website metadata.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
       '/api/billing/checkout-sessions': { post: protectedOperation('Create a provider-backed subscription checkout session for the signed-in account.') },

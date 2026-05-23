@@ -94,6 +94,13 @@ export type Store = {
   confidence: 'high' | 'medium' | 'low';
 };
 
+export type Retailer = {
+  id: string;
+  name: string;
+  logo: string;
+  websiteUrl: string;
+};
+
 export type ProductDetail = SearchableProduct & {
   currentPrices: StorePrice[];
   dealScore: number;
@@ -1828,6 +1835,15 @@ const stores: Store[] = [
     openingHours: ['Mon-Fri 07:00-22:00', 'Sat-Sun 08:00-22:00'],
     confidence: 'medium'
   }
+];
+
+const retailers: Retailer[] = [
+  { id: 'city-gross', name: 'City Gross', logo: '/retailers/city-gross.svg', websiteUrl: 'https://www.citygross.se/' },
+  { id: 'coop', name: 'Coop', logo: '/retailers/coop.svg', websiteUrl: 'https://www.coop.se/' },
+  { id: 'hemkop', name: 'Hemköp', logo: '/retailers/hemkop.svg', websiteUrl: 'https://www.hemkop.se/' },
+  { id: 'ica', name: 'ICA', logo: '/retailers/ica.svg', websiteUrl: 'https://www.ica.se/' },
+  { id: 'lidl', name: 'Lidl', logo: '/retailers/lidl.svg', websiteUrl: 'https://www.lidl.se/' },
+  { id: 'willys', name: 'Willys', logo: '/retailers/willys.svg', websiteUrl: 'https://www.willys.se/' }
 ];
 
 const storeTravelProfiles: Record<string, { distanceKm: number; durationMinutes: number }> = {
@@ -4529,6 +4545,10 @@ export function createGroceryViewApi() {
 
     getStores() {
       return stores;
+    },
+
+    getRetailers() {
+      return retailers;
     },
 
     getStore(id: string) {

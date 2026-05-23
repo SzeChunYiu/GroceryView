@@ -361,6 +361,22 @@ describe('createHttpHandler', () => {
     assert.equal(stores.status, 200);
     assert.equal((await json(stores) as Array<{ id: string }>)[0].id, 'willys-odenplan');
 
+    const retailers = await handle(new Request('http://localhost/api/retailers'));
+    assert.equal(retailers.status, 200);
+    assert.deepEqual((await json(retailers) as Array<{ id: string; name: string; logo: string; websiteUrl: string }>).map((retailer) => [
+      retailer.id,
+      retailer.name,
+      retailer.logo,
+      retailer.websiteUrl
+    ]), [
+      ['city-gross', 'City Gross', '/retailers/city-gross.svg', 'https://www.citygross.se/'],
+      ['coop', 'Coop', '/retailers/coop.svg', 'https://www.coop.se/'],
+      ['hemkop', 'Hemköp', '/retailers/hemkop.svg', 'https://www.hemkop.se/'],
+      ['ica', 'ICA', '/retailers/ica.svg', 'https://www.ica.se/'],
+      ['lidl', 'Lidl', '/retailers/lidl.svg', 'https://www.lidl.se/'],
+      ['willys', 'Willys', '/retailers/willys.svg', 'https://www.willys.se/']
+    ]);
+
     const storeDetail = await handle(new Request('http://localhost/api/stores/willys-odenplan'));
     assert.equal(storeDetail.status, 200);
     const storeDetailBody = await json(storeDetail) as {

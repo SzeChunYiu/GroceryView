@@ -496,6 +496,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{productId}/price-history']);
     assert.ok(docs.body.paths['/products/{productId}/history.csv']);
     assert.ok(docs.body.paths['/users/demo/receipts/review']);
+    assert.ok(docs.body.paths['/retailers']);
     assert.ok(docs.body.paths['/stores']);
     assert.ok(docs.body.paths['/users/demo/basket/items/{productId}']);
     assert.ok(docs.body.paths['/stores/{id}/category-coverage']);
@@ -614,6 +615,21 @@ describe('GroceryView API app', () => {
     assert.equal(products.body[0].currentPrices[0].priceType, 'shelf');
     assert.equal(products.body[0].currentPrices[0].sourceType, 'demo_seed');
     assert.ok(products.body[0].currentPrices[0].provenance);
+
+    const retailers = await request(app.getHttpServer()).get('/retailers').expect(200);
+    assert.deepEqual(retailers.body.map((retailer: { id: string; name: string; logo: string; websiteUrl: string }) => [
+      retailer.id,
+      retailer.name,
+      retailer.logo,
+      retailer.websiteUrl
+    ]), [
+      ['city-gross', 'City Gross', '/retailers/city-gross.svg', 'https://www.citygross.se/'],
+      ['coop', 'Coop', '/retailers/coop.svg', 'https://www.coop.se/'],
+      ['hemkop', 'Hemköp', '/retailers/hemkop.svg', 'https://www.hemkop.se/'],
+      ['ica', 'ICA', '/retailers/ica.svg', 'https://www.ica.se/'],
+      ['lidl', 'Lidl', '/retailers/lidl.svg', 'https://www.lidl.se/'],
+      ['willys', 'Willys', '/retailers/willys.svg', 'https://www.willys.se/']
+    ]);
 
     await request(app.getHttpServer()).get('/products/coffee').expect(200);
     await request(app.getHttpServer()).get('/stores/willys-odenplan').expect(200);
