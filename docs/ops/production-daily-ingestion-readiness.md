@@ -49,7 +49,9 @@ shape (`sbp_...`) used for automation in Supabase's Management API and CLI
 documentation. A logged-in Supabase CLI/keychain session string is not enough
 for GitHub Actions recovery evidence. `db-cutover` is ready only when the current
 `DATABASE_URL` plus either `REPLACEMENT_DATABASE_URL` or `CANDIDATE_DATABASE_URL`
-are configured; the full `all` scope remains the default production-wide gate.
+are configured; an invalid Supabase recovery token does not block replacement DB
+cutover readiness, because cutover validation does not call Supabase management
+APIs. The full `all` scope remains the default production-wide gate.
 The daily workflow also records these two focused checks from injected workflow
 values in `daily-db-unblocker-preflight.json` and uploads them as the
 `groceryview-db-unblocker-preflight` artifact, so a failed DB run shows whether

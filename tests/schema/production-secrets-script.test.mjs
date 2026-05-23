@@ -271,21 +271,27 @@ process.exit(1);
     const result = spawnSync(process.execPath, [scriptPath.pathname, '--from-env', '--scope', 'db-cutover'], {
       encoding: 'utf8',
       env: {
-        DATABASE_URL: 'postgres://current'
+        DATABASE_URL: 'postgres://current',
+        SUPABASE_ACCESS_TOKEN: 'go-k_keychain_session_value'
       }
     });
     assert.equal(result.status, 1);
     const output = JSON.parse(result.stdout);
     assert.equal(output.scope, 'db-cutover');
     assert.equal(output.status, 'blocked');
+    assert.equal(output.blocker, 'db_cutover_prerequisites_missing');
     assert.deepEqual(output.missingDbCutoverSecrets, []);
     assert.deepEqual(output.missingDbCutoverCandidateSecrets, ['REPLACEMENT_DATABASE_URL', 'CANDIDATE_DATABASE_URL']);
+    assert.deepEqual(output.invalidDbRecoverySecrets, []);
+    assert.equal(output.dbRecoverySecretValidation.validated, false);
+    assert.match(output.dbRecoverySecretValidation.reason, /db-cutover scope/);
 
     const readyResult = spawnSync(process.execPath, [scriptPath.pathname, '--from-env', '--scope', 'db-cutover'], {
       encoding: 'utf8',
       env: {
         DATABASE_URL: 'postgres://current',
-        REPLACEMENT_DATABASE_URL: 'postgres://replacement'
+        REPLACEMENT_DATABASE_URL: 'postgres://replacement',
+        SUPABASE_ACCESS_TOKEN: 'go-k_keychain_session_value'
       }
     });
     const readyOutput = JSON.parse(readyResult.stdout);
@@ -294,6 +300,8 @@ process.exit(1);
     assert.equal(readyOutput.status, 'ready');
     assert.deepEqual(readyOutput.missingDbCutoverSecrets, []);
     assert.deepEqual(readyOutput.missingDbCutoverCandidateSecrets, []);
+    assert.deepEqual(readyOutput.invalidDbRecoverySecrets, []);
+    assert.equal(readyOutput.dbRecoverySecretValidation.validated, false);
   });
 
 

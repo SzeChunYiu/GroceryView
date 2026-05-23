@@ -185,7 +185,7 @@ function scopeStatus(scope, checks) {
 }
 
 function resultBlocker(scope, checks) {
-  if (checks.invalidDbRecoverySecrets.length > 0) return 'db_recovery_secret_invalid_format';
+  if (scope !== 'db-cutover' && checks.invalidDbRecoverySecrets.length > 0) return 'db_recovery_secret_invalid_format';
   if (scope === 'db-recovery' && (
     checks.missingDbRecoverySecrets.length > 0 ||
     checks.missingDbRecoveryVariables.length > 0
@@ -199,6 +199,27 @@ function resultBlocker(scope, checks) {
     if (hasMissing) return 'production_secret_audit_blocked';
   }
   return undefined;
+}
+
+function dbRecoverySecretValidationResult(fromEnvironment, scope) {
+  if (fromEnvironment && scope === 'db-cutover') {
+    return {
+      validated: false,
+      reason: 'Skipped for db-cutover scope; replacement database cutover readiness does not depend on Supabase recovery credentials.',
+      requirement: supabaseManagementTokenRequirement
+    };
+  }
+  if (fromEnvironment) {
+    return {
+      validated: true,
+      requirement: supabaseManagementTokenRequirement
+    };
+  }
+  return {
+    validated: false,
+    reason: 'GitHub secret values are not readable from gh secret list; run with --from-env inside the workflow to validate secret shape.',
+    requirement: supabaseManagementTokenRequirement
+  };
 }
 
 function readOption(name) {
@@ -238,7 +259,9 @@ function main() {
   const missingDbCutoverCandidateSecrets = hasReplacementDbCandidate ? [] : replacementDbCandidateSecrets;
   const missingDbRecoverySecrets = findMissingSecrets(requiredDbRecoverySecrets, secretNames);
   const missingDbRecoveryVariables = findMissingSecrets(requiredDbRecoveryVariables, variableNames);
-  const invalidDbRecoverySecrets = fromEnvironment ? findInvalidDbRecoverySecrets(process.env) : [];
+  const invalidDbRecoverySecrets = fromEnvironment && scope !== 'db-cutover'
+    ? findInvalidDbRecoverySecrets(process.env)
+    : [];
   const checks = {
     missingGithubActionSecrets,
     missingGithubActionVariables,
@@ -268,16 +291,7 @@ function main() {
     missingDbRecoverySecrets,
     missingDbRecoveryVariables,
     invalidDbRecoverySecrets,
-    dbRecoverySecretValidation: fromEnvironment
-      ? {
-          validated: true,
-          requirement: supabaseManagementTokenRequirement
-        }
-      : {
-          validated: false,
-          reason: 'GitHub secret values are not readable from gh secret list; run with --from-env inside the workflow to validate secret shape.',
-          requirement: supabaseManagementTokenRequirement
-        }
+    dbRecoverySecretValidation: dbRecoverySecretValidationResult(fromEnvironment, scope)
   };
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   if (result.status !== 'ready') process.exitCode = 1;
