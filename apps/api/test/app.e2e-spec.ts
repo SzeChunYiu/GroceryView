@@ -494,6 +494,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/equivalents']);
     assert.ok(docs.body.paths['/products/{id}/history']);
     assert.ok(docs.body.paths['/products/{productId}/price-history']);
+    assert.ok(docs.body.paths['/products/{productId}/history.csv']);
     assert.ok(docs.body.paths['/users/demo/receipts/review']);
     assert.ok(docs.body.paths['/stores']);
     assert.ok(docs.body.paths['/users/demo/basket/items/{productId}']);
@@ -738,6 +739,23 @@ describe('GroceryView API app', () => {
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /stores\.slug = \$4/);
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /source_run_id::text = \$5/);
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /observations\.confidence >= \$8::numeric/);
+
+    const priceHistoryCsv = await request(app.getHttpServer())
+      .get('/products/bryggkaffe-450g/history.csv?priceType=shelf&chain=willys&limit=5')
+      .expect(200);
+    assert.match(priceHistoryCsv.headers['content-type'], /^text\/csv/);
+    assert.equal(priceHistoryCsv.headers['content-disposition'], 'attachment; filename="bryggkaffe-450g-history.csv"');
+    assert.equal(
+      priceHistoryCsv.text,
+      [
+        'date,chain,price,unit',
+        '2026-05-01T09:00:00.000Z,chain-willys,59.9,133.11',
+        '2026-05-19T09:00:00.000Z,chain-willys,49.9,110.89',
+        ''
+      ].join('\n')
+    );
+    assert.deepEqual(priceHistoryExecutor.calls.at(-1)?.params, ['product-coffee', 'shelf', 'willys', null, null, null, null, null, 5]);
+    assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /from observations/i);
 
     await request(app.getHttpServer())
       .get('/products/bryggkaffe-450g/price-history?from=2026-06-01T00:00:00.000Z&to=2026-05-01T00:00:00.000Z')

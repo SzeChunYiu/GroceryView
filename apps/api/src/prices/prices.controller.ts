@@ -1,5 +1,6 @@
-import { BadRequestException, Controller, Get, NotFoundException, Param, Query } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Readable } from 'node:stream';
+import { BadRequestException, Controller, Get, NotFoundException, Param, Query, Res, StreamableFile } from '@nestjs/common';
+import { ApiOkResponse, ApiProduces, ApiTags } from '@nestjs/swagger';
 import { groceryApi } from '../demo-data.js';
 import { CheapestNowService } from './cheapest-now.service.js';
 import { LatestPricesService } from './latest-prices.service.js';
@@ -55,6 +56,31 @@ export class PricesController {
     return report;
   }
 
+  @Get('history.csv')
+  @ApiOkResponse({ description: 'Persisted product price history as CSV' })
+  @ApiProduces('text/csv')
+  async priceHistoryCsv(
+    @Param('productId') productId: string,
+    @Res({ passthrough: true }) response: { setHeader(name: string, value: string): void },
+    @Query('priceType') priceType?: string,
+    @Query('chain') chain?: string,
+    @Query('store') store?: string,
+    @Query('sourceRun') sourceRun?: string,
+    @Query('minConfidence') minConfidence?: string,
+    @Query('from') observedFrom?: string,
+    @Query('to') observedTo?: string,
+    @Query('limit') limit?: string
+  ) {
+    const filter = parsePriceHistoryFilter({ priceType, chain, store, sourceRun, minConfidence, observedFrom, observedTo, limit });
+    const report = await this.priceHistory.getProductPriceHistory(productId, filter);
+    if (!report) throw new NotFoundException('Product not found');
+
+    response.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    response.setHeader('Content-Disposition', `attachment; filename="${csvFilename(report.productSlug)}-history.csv"`);
+
+    return new StreamableFile(Readable.from([productPriceHistoryCsv(report.points)]));
+  }
+
   @Get('observations')
   @ApiOkResponse({ description: 'Price observations' })
   observations(@Param('productId') productId: string) {
@@ -71,6 +97,28 @@ export class PricesController {
       provenance: `demo://history/${productId}/${point.date}`
     }));
   }
+}
+
+function csvFilename(value: string): string {
+  const normalized = value.toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+  return normalized || 'product';
+}
+
+function csvCell(value: string | number): string {
+  const text = String(value);
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function productPriceHistoryCsv(points: Array<{ observedAt: string; chainSlug?: string; chainName?: string; chainId: string; price: number; unitPrice: number }>): string {
+  const rows = points.map((point) => [
+    point.observedAt,
+    point.chainSlug ?? point.chainName ?? point.chainId,
+    point.price,
+    point.unitPrice
+  ]);
+  return [['date', 'chain', 'price', 'unit'], ...rows]
+    .map((row) => row.map(csvCell).join(','))
+    .join('\n') + '\n';
 }
 
 function parseOptionalPriceType(value: string | undefined): ProductPriceHistoryPriceType | undefined {
