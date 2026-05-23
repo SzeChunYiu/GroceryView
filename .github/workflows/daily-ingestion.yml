@@ -212,6 +212,7 @@ jobs:
           NODE
 
       - name: Upload daily ingestion result
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: groceryview-daily-ingestion-result
