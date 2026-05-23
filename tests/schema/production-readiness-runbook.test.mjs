@@ -74,6 +74,12 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /postgres-readiness\.json/);
     assert.match(runbook, /source-run-readiness\.json/);
     assert.match(runbook, /catalog-coverage-readiness\.json/);
+    assert.match(runbook, /postgres_readiness_config_missing/);
+    assert.match(runbook, /postgres_readiness_diagnostic_missing/);
+    assert.match(runbook, /source_run_readiness_config_missing/);
+    assert.match(runbook, /source_run_readiness_diagnostic_missing/);
+    assert.match(runbook, /catalog_coverage_readiness_config_missing/);
+    assert.match(runbook, /catalog_coverage_readiness_diagnostic_missing/);
   });
 
   it('documents DB-to-site snapshot generation after daily ingestion writes latest_prices', () => {
