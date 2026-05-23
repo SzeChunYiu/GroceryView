@@ -34,6 +34,10 @@ describe('deployment manifest', () => {
     assert.match(visibleArtifactScript, /ica-nara-sergels-torg/);
     assert.match(visibleArtifactScript, /coop-swedenborgsgatan/);
     assert.match(visibleArtifactScript, /lidl-sveavagen/);
+    assert.match(visibleArtifactScript, /requiredMinimumStoreSlugs\s*=\s*6/);
+    assert.match(visibleArtifactScript, /requiredMinimumProductSlugs\s*=\s*10/);
+    assert.match(visibleArtifactScript, /data-store-slug/);
+    assert.match(visibleArtifactScript, /data-product-slug/);
     assert.match(visibleArtifactScript, /process\.exitCode = 1/);
   });
 });

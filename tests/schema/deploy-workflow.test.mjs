@@ -15,4 +15,17 @@ describe('deploy workflow', () => {
     assert.match(workflow, /ops:check-production-secrets -- --repo "\$GITHUB_REPOSITORY" --env production/);
     assert.match(workflow, /GH_TOKEN:\s*\$\{\{ secrets\.GITHUB_TOKEN \}\}/);
   });
+
+  it('deploys the verified build to the selected Vercel production project', () => {
+    assert.match(workflow, /branches:\s*\[\s*main\s*\]/);
+    assert.match(workflow, /ops:check-production-secrets -- --repo "\$GITHUB_REPOSITORY" --env production/);
+    assert.match(workflow, /GH_TOKEN:\s*\$\{\{ secrets\.GITHUB_TOKEN \}\}/);
+    assert.match(workflow, /VERCEL_TOKEN:\s*\$\{\{ secrets\.VERCEL_TOKEN \}\}/);
+    assert.match(workflow, /VERCEL_ORG_ID:\s*\$\{\{ secrets\.VERCEL_ORG_ID \}\}/);
+    assert.match(workflow, /VERCEL_PROJECT_ID:\s*\$\{\{ secrets\.VERCEL_PROJECT_ID \}\}/);
+    assert.match(workflow, /npx\s+--yes\s+vercel@latest\s+pull\s+--yes\s+--environment=production\s+--token\s+"\$VERCEL_TOKEN"/);
+    assert.match(workflow, /npx\s+--yes\s+vercel@latest\s+build\s+--prod\s+--token\s+"\$VERCEL_TOKEN"/);
+    assert.match(workflow, /npx\s+--yes\s+vercel@latest\s+deploy\s+--prebuilt\s+--prod\s+--token\s+"\$VERCEL_TOKEN"/);
+    assert.doesNotMatch(workflow, /Provider-specific deploy command intentionally not wired/);
+  });
 });

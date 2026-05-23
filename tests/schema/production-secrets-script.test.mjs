@@ -14,6 +14,9 @@ describe('production secret audit script', () => {
       'GROCERYVIEW_SERVER_URL',
       'GROCERYVIEW_API_BASE_URL',
       'EXPO_TOKEN',
+      'VERCEL_TOKEN',
+      'VERCEL_ORG_ID',
+      'VERCEL_PROJECT_ID',
       'METRICS_TOKEN',
       'AUTH_SECRET',
       'PUBLIC_WEB_URL',
@@ -28,7 +31,8 @@ describe('production secret audit script', () => {
     }
     assert.doesNotMatch(script, /['"]GROCERYVIEW_DAILY_CONNECTORS_JSON['"]/);
     assert.match(script, /process\.argv\.indexOf\('--env'\)/);
-    assert.match(script, /args\.push\('--env', environment\)/);
+    assert.match(script, /push\('--env', environment\)/);
+    assert.match(script, /new Set\(parseGhSecretList/);
     assert.equal(pkg.scripts['ops:check-production-secrets'], 'node scripts/ops/check-production-secrets.mjs');
   });
 

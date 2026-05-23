@@ -1528,6 +1528,8 @@ ${seo}`;
     assert.match(shell, /ica-nara-sergels-torg/);
     assert.match(shell, /coop-swedenborgsgatan/);
     assert.match(shell, /lidl-sveavagen/);
+    assert.match(shell, /data-store-slug=\{store\.slug\}/);
+    assert.match(shell, /data-product-slug=\{product\.slug\}/);
   });
 
   it('ships an OSM nationwide refresh script and surfaces Sweden-wide copy', async () => {
