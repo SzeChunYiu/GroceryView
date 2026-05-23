@@ -2418,6 +2418,28 @@ ${seo}`;
     assert.match(packageJson, /@groceryview\/api/);
   });
 
+  it('surfaces account-bound save-to-watchlist hearts on product cards', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const products = await read('src/app/products/page.tsx');
+
+    assert.match(verified, /buildWatchlistAlerts/);
+    assert.match(verified, /export const watchlistHeartProducts/);
+    assert.match(verified, /sourceProductSlug/);
+    assert.match(verified, /accountBound/);
+    assert.match(verified, /targetPrice/);
+    assert.match(verified, /No anonymous saves/);
+    assert.match(products, /watchlistHeartProducts/);
+    assert.match(products, /Save to watchlist/);
+    assert.match(products, /♡/);
+    assert.match(products, /Signed-in shoppers only/);
+    assert.match(products, /account-bound/i);
+    assert.match(products, /target price/i);
+    assert.match(products, /buildWatchlistAlerts/);
+    assert.match(products, /\/products\/\$\{product\.sourceProductSlug\}/);
+    assert.doesNotMatch(products, /@\/lib\/demo-data/);
+    assert.doesNotMatch(products, /@\/components\/sample-data/);
+  });
+
   it('surfaces adaptive total and unit price product cards with a compare-mode toggle', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
