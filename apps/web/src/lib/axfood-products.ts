@@ -3,6 +3,8 @@
 // Retrieved 2026-05-20/21 across ~65 common Swedish grocery queries.
 // Per-product chain prices captured in SEK; spreadPct = (max-min)/min.
 
+import { dbSiteAxfoodProducts } from './generated/db-site-products';
+
 export type ChainPrice = { price: number | null; priceText: string; priceUnit: string; savings: number | null; url: string };
 export type AxfoodProduct = {
   code: string; slug: string; name: string; brand: string; subline: string;
@@ -12,7 +14,7 @@ export type AxfoodProduct = {
   spreadPct: number; inChains: string[];
 };
 
-export const axfoodProducts: AxfoodProduct[] = [
+const staticAxfoodProducts: AxfoodProduct[] = [
   {"code": "101302991_ST", "name": "Makaroner Pasta", "brand": "Garant Eko", "subline": "GARANT EKO, 500g", "category": "skafferi", "image": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083478581_C1N1_s02", "labels": ["ecological", "eu_ecological"], "chains": {"willys": {"price": 12.2, "priceText": "12,20 kr", "priceUnit": "kr/st", "savings": null, "url": ""}, "hemkop": {"price": 17.93, "priceText": "17,93 kr", "priceUnit": "kr/st", "savings": null, "url": ""}}, "lowestChain": "willys", "lowestPrice": 12.2, "highestPrice": 17.93, "spreadPct": 47.0, "inChains": ["hemkop", "willys"], "slug": "makaroner-pasta-101302991-st"},
   {"code": "101758934_ST", "name": "Havregryn Extra Fylliga", "brand": "Axa", "subline": "AXA, 825g", "category": "skafferi", "image": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130013669_C1R1_s01", "labels": ["swedish_flag", "from_sweden", "keyhole"], "chains": {"willys": {"price": 18.83, "priceText": "18,83 kr", "priceUnit": "kr/st", "savings": 1.93, "url": ""}, "hemkop": {"price": 25.5, "priceText": "25,50 kr", "priceUnit": "kr/st", "savings": null, "url": ""}}, "lowestChain": "willys", "lowestPrice": 18.83, "highestPrice": 25.5, "spreadPct": 35.4, "inChains": ["hemkop", "willys"], "slug": "havregryn-extra-fylliga-101758934-st"},
   {"code": "101550069_ST", "name": "Svensk Honung", "brand": "Landskaphonung", "subline": "LANDSKAPHONUNG, 425g", "category": "skafferi", "image": "https://assets.axfood.se/image/upload/f_auto,t_200/07350013144011_C1C1_s01", "labels": [], "chains": {"willys": {"price": 59.52, "priceText": "59,52 kr", "priceUnit": "kr/st", "savings": null, "url": ""}, "hemkop": {"price": 80.39, "priceText": "80,39 kr", "priceUnit": "kr/st", "savings": null, "url": ""}}, "lowestChain": "willys", "lowestPrice": 59.52, "highestPrice": 80.39, "spreadPct": 35.1, "inChains": ["hemkop", "willys"], "slug": "svensk-honung-101550069-st"},
@@ -1454,3 +1456,5 @@ export const axfoodProducts: AxfoodProduct[] = [
   {"code": "101220688_ST", "name": "Kyckling Classics Kattmat Paté", "brand": "Sheba", "subline": "SHEBA, 85g", "category": "djur", "image": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429065651_C1N1_s01", "labels": [], "chains": {"hemkop": {"price": 10.95, "priceText": "10,95 kr", "priceUnit": "kr/st", "savings": null, "url": ""}}, "lowestChain": "hemkop", "lowestPrice": 10.95, "highestPrice": 10.95, "spreadPct": 0.0, "inChains": ["hemkop"], "slug": "kyckling-classics-kattmat-pat-101220688-st"},
   {"code": "100540755_ST", "name": "Kyckling Gourmet Perle Kattmat i Sås", "brand": "Gourmet", "subline": "GOURMET, 85g", "category": "djur", "image": "https://assets.axfood.se/image/upload/f_auto,t_200/07613030473381_C1N1_s02", "labels": [], "chains": {"hemkop": {"price": 10.95, "priceText": "10,95 kr", "priceUnit": "kr/st", "savings": null, "url": ""}}, "lowestChain": "hemkop", "lowestPrice": 10.95, "highestPrice": 10.95, "spreadPct": 0.0, "inChains": ["hemkop"], "slug": "kyckling-gourmet-perle-kattmat-i-s-s-100540755-st"},
 ];
+
+export const axfoodProducts: AxfoodProduct[] = dbSiteAxfoodProducts.length > 0 ? dbSiteAxfoodProducts : staticAxfoodProducts;

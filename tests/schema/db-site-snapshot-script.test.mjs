@@ -1,7 +1,14 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { buildDbSiteSnapshotArtifact } from '../../scripts/ingestion/export-db-site-snapshot.mjs';
+import {
+  buildDbSiteChainPriceObservations,
+  buildDbSiteAxfoodProducts,
+  buildDbSiteSnapshotArtifact,
+  renderDbSiteChainObservationsModule,
+  renderDbSiteIngestedOverridesModule,
+  renderDbSiteProductsModule
+} from '../../scripts/ingestion/export-db-site-snapshot.mjs';
 
 const rootPackage = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
 
@@ -39,12 +46,20 @@ describe('DB-backed site snapshot export script', () => {
         currency: 'SEK',
         observedAt: '2026-05-20T09:00:00.000Z',
         confidence: 0.88,
+        promotionText: 'Veckokampanj',
+        promotionStartsOn: '2026-05-18',
+        promotionEndsOn: '2026-05-24',
+        memberRequired: true,
+        validFrom: '2026-05-18T00:00:00.000Z',
+        validUntil: '2026-05-24T23:59:59.000Z',
+        retailerProductRef: 'willys:bryggkaffe-450g',
         provenance: { sourceType: 'retailer_page', rawSnapshotRef: 'raw://daily-ingestion/run/sha256-abcd' }
       }]
     });
 
     assert.equal(artifact.status, 'passed');
     assert.equal(artifact.generatedAt, '2026-05-22T21:20:00.000Z');
+    assert.equal(artifact.source, 'postgres.latest_prices+observations');
     assert.equal(artifact.priceRows.length, 1);
     assert.deepEqual(artifact.coverage, { products: 1, chains: 1, stores: 1, observations: 1, requiredChains: ['willys'], missingRequiredChains: [], requiredStoreExternalRefs: [], missingRequiredStoreExternalRefs: [], requiredProductSlugs: [], missingRequiredProductSlugs: [], requiredPriceTypes: [], missingRequiredStorePriceTypes: [], requiredCategorySlugs: [], missingRequiredCategorySlugs: [] });
     assert.deepEqual(artifact.priceRows[0], {
@@ -69,6 +84,13 @@ describe('DB-backed site snapshot export script', () => {
       observedAt: '2026-05-20T09:00:00.000Z',
       confidence: 0.88,
       observationId: 'observation-2',
+      promotionText: 'Veckokampanj',
+      promotionStartsOn: '2026-05-18',
+      promotionEndsOn: '2026-05-24',
+      memberRequired: true,
+      validFrom: '2026-05-18T00:00:00.000Z',
+      validUntil: '2026-05-24T23:59:59.000Z',
+      retailerProductRef: 'willys:bryggkaffe-450g',
       provenance: { sourceType: 'retailer_page', rawSnapshotRef: 'raw://daily-ingestion/run/sha256-abcd' }
     });
     assert.equal(JSON.stringify(artifact).includes('rawPayload'), false);
@@ -396,5 +418,266 @@ describe('DB-backed site snapshot export script', () => {
 
   it('fails closed when the database reader returns no latest price rows', () => {
     assert.throws(() => buildDbSiteSnapshotArtifact({ generatedAt: '2026-05-22T21:20:00.000Z', rows: [] }), /No latest price rows available/);
+  });
+
+  it('maps latest_prices rows to the AxfoodProduct shape rendered by web pages', () => {
+    const rows = [
+      {
+        productSlug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        brand: 'Rosteriet',
+        categoryPath: ['Pantry', 'Coffee'],
+        packageSize: 450,
+        packageUnit: 'g',
+        comparableUnit: 'kg',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        priceType: 'promotion',
+        price: 44.9,
+        regularPrice: 59.9,
+        unitPrice: 99.7778,
+        currency: 'SEK',
+        observedAt: '2026-05-20T09:00:00.000Z',
+        confidence: 0.88,
+        observationId: 'observation-2',
+        provenance: {}
+      },
+      {
+        productSlug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        brand: 'Rosteriet',
+        categoryPath: ['Pantry', 'Coffee'],
+        packageSize: 450,
+        packageUnit: 'g',
+        comparableUnit: 'kg',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        priceType: 'shelf',
+        price: 52.9,
+        unitPrice: 117.5556,
+        currency: 'SEK',
+        observedAt: '2026-05-20T10:00:00.000Z',
+        confidence: 0.91,
+        observationId: 'observation-2b',
+        provenance: {}
+      },
+      {
+        productSlug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        brand: 'Rosteriet',
+        categoryPath: ['Pantry', 'Coffee'],
+        packageSize: 450,
+        packageUnit: 'g',
+        comparableUnit: 'kg',
+        chainSlug: 'hemkop',
+        chainName: 'Hemköp',
+        priceType: 'shelf',
+        price: 58.9,
+        unitPrice: 130.8889,
+        currency: 'SEK',
+        observedAt: '2026-05-20T09:05:00.000Z',
+        confidence: 0.86,
+        observationId: 'observation-3',
+        provenance: {}
+      }
+    ];
+
+    assert.deepEqual(buildDbSiteAxfoodProducts(rows), [{
+      code: 'bryggkaffe-450g',
+      slug: 'bryggkaffe-450g',
+      name: 'Bryggkaffe mellanrost 450 g',
+      brand: 'Rosteriet',
+      subline: 'Rosteriet, 450g',
+      category: 'pantry',
+      image: '',
+      labels: [],
+      chains: {
+        hemkop: {
+          price: 58.9,
+          priceText: '58,90 kr',
+          priceUnit: 'kr/st',
+          savings: null,
+          url: ''
+        },
+        willys: {
+          price: 44.9,
+          priceText: '44,90 kr',
+          priceUnit: 'kr/st',
+          savings: 15,
+          url: ''
+        }
+      },
+      lowestChain: 'willys',
+      lowestPrice: 44.9,
+      highestPrice: 58.9,
+      spreadPct: 31.2,
+      inChains: ['hemkop', 'willys']
+    }]);
+  });
+
+  it('renders the generated module imported by apps/web/src/lib/axfood-products.ts', () => {
+    const moduleText = renderDbSiteProductsModule({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      rows: [{
+        productSlug: 'havregryn-1kg',
+        canonicalName: 'Havregryn 1 kg',
+        brand: 'Grynbolaget',
+        categoryPath: ['Skafferi'],
+        packageSize: 1,
+        packageUnit: 'kg',
+        comparableUnit: 'kg',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        priceType: 'shelf',
+        price: 18,
+        unitPrice: 18,
+        currency: 'SEK',
+        observedAt: '2026-05-20T09:00:00.000Z',
+        confidence: 0.9,
+        observationId: 'observation-4',
+        provenance: {}
+      }]
+    });
+
+    assert.match(moduleText, /AUTO-GENERATED from postgres\.latest_prices\/observations/);
+    assert.match(moduleText, /import type \{ AxfoodProduct \} from '\.\.\/axfood-products';/);
+    assert.match(moduleText, /export const dbSiteSnapshotGeneratedAt = "2026-05-22T21:20:00.000Z";/);
+    assert.match(moduleText, /export const dbSiteAxfoodProducts: AxfoodProduct\[] = \[/);
+    assert.match(moduleText, /"slug": "havregryn-1kg"/);
+  });
+
+  it('maps latest_prices rows to the chain-index observation shape rendered by web pages', () => {
+    const rows = [
+      {
+        productSlug: 'havregryn-1kg',
+        canonicalName: 'Havregryn 1 kg',
+        categoryPath: ['Skafferi'],
+        packageSize: 1,
+        packageUnit: 'kg',
+        comparableUnit: 'kg',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        priceType: 'shelf',
+        price: 18,
+        unitPrice: 18.123456,
+        currency: 'SEK',
+        observedAt: '2026-05-20T09:00:00.000Z',
+        confidence: 0.9,
+        observationId: 'observation-4',
+        provenance: {}
+      }
+    ];
+
+    assert.deepEqual(buildDbSiteChainPriceObservations(rows), [{
+      chainId: 'Willys',
+      category: 'skafferi · kg',
+      unitPrice: 18.1235
+    }]);
+
+    const moduleText = renderDbSiteChainObservationsModule({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      rows
+    });
+
+    assert.match(moduleText, /AUTO-GENERATED from postgres\.latest_prices\/observations/);
+    assert.match(moduleText, /import type \{ ChainPriceObservation \} from '@groceryview\/core';/);
+    assert.match(moduleText, /export const dbSiteChainObservationsGeneratedAt = "2026-05-22T21:20:00.000Z";/);
+    assert.match(moduleText, /export const dbSiteSnapshotChainPriceObservations: ChainPriceObservation\[] = \[/);
+    assert.match(moduleText, /"category": "skafferi · kg"/);
+  });
+
+  it('renders ingested fixture override modules consumed by verified-data.ts', () => {
+    const rows = [
+      {
+        productSlug: 'rod-paprika',
+        canonicalName: 'Röd paprika',
+        brand: '',
+        categoryPath: ['Frukt och grönt'],
+        packageSize: 1,
+        packageUnit: 'kg',
+        comparableUnit: 'kg',
+        chainSlug: 'lidl',
+        chainName: 'Lidl',
+        storeSlug: 'lidl-alingsas',
+        storeName: 'Lidl Alingsås',
+        city: 'Alingsås',
+        priceType: 'promotion',
+        price: 29.9,
+        regularPrice: 44.9,
+        unitPrice: 29.9,
+        currency: 'SEK',
+        observedAt: '2026-05-22T14:34:06.870Z',
+        confidence: 0.93,
+        promotionText: '-33%',
+        memberRequired: true,
+        validFrom: '2026-05-18T00:00:00.000Z',
+        validUntil: '2026-05-24T21:59:59.000Z',
+        retailerProductRef: 'lidl:11029717',
+        observationId: 'observation-lidl-1',
+        provenance: { sourceUrl: 'https://www.lidl.se/c/veckans-frukt-groent/a10094676', productUrl: 'https://www.lidl.se/p/rod-paprika/p11029717' }
+      },
+      {
+        productSlug: 'hamburgare-720g',
+        canonicalName: 'Fryst hamburgare',
+        brand: 'ICA',
+        categoryPath: ['Djupfryst'],
+        packageSize: 720,
+        packageUnit: 'g',
+        comparableUnit: 'kg',
+        chainSlug: 'ica',
+        chainName: 'ICA',
+        storeSlug: 'ica-focus',
+        storeName: 'ICA Focus',
+        priceType: 'promotion',
+        price: 70,
+        regularPrice: 78.5,
+        unitPrice: 97.2222,
+        currency: 'SEK',
+        observedAt: '2026-05-22T12:36:27.185Z',
+        confidence: 0.91,
+        memberRequired: false,
+        validUntil: '2026-05-24T00:00:00.000Z',
+        observationId: 'observation-ica-1',
+        provenance: { sourceUrl: 'https://www.ica.se/erbjudanden/ica-focus-1004247/' }
+      },
+      {
+        productSlug: 'idealmakaroner-1300g',
+        canonicalName: 'Kungsörnen Gammaldags Idealmakaroner',
+        brand: 'Kungsörnen',
+        categoryPath: ['Skafferi'],
+        packageSize: 1300,
+        packageUnit: 'g',
+        comparableUnit: 'kg',
+        chainSlug: 'mathem',
+        chainName: 'Mathem',
+        priceType: 'shelf',
+        price: 22.24,
+        unitPrice: 17.11,
+        currency: 'SEK',
+        observedAt: '2026-05-22T15:36:00.328Z',
+        confidence: 0.89,
+        memberRequired: false,
+        retailerProductRef: '6448',
+        observationId: 'observation-mathem-1',
+        provenance: { sourceUrl: 'https://www.mathem.se/se/search/products/?q=makaroner', productUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/' }
+      }
+    ];
+
+    const moduleText = renderDbSiteIngestedOverridesModule({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      rows
+    });
+
+    assert.match(moduleText, /AUTO-GENERATED from postgres\.latest_prices\/observations/);
+    assert.match(moduleText, /import type \{ LidlIngestedStoreOffer \} from '\.\.\/ingested\/lidl';/);
+    assert.match(moduleText, /export const dbSiteIngestedOverridesGeneratedAt = "2026-05-22T21:20:00.000Z";/);
+    assert.match(moduleText, /export const dbSiteMatpriskollenOffers: MatpriskollenIngestedOffer\[] = \[/);
+    assert.match(moduleText, /export const dbSiteLidlStoreOffers: LidlIngestedStoreOffer\[] = \[/);
+    assert.match(moduleText, /export const dbSiteIcaReklambladOffers: IcaReklambladIngestedOffer\[] = \[/);
+    assert.match(moduleText, /export const dbSiteMathemProducts: MathemIngestedProduct\[] = \[/);
+    assert.match(moduleText, /"storeName": "Lidl Alingsås"/);
+    assert.match(moduleText, /"storeName": "ICA Focus"/);
+    assert.match(moduleText, /"code": "6448"/);
+    assert.match(moduleText, /"rowCount": 3/);
   });
 });

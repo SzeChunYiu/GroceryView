@@ -10,6 +10,17 @@ describe('deploy workflow', () => {
     for (const command of ['npm ci', 'npm test', 'npm run build', 'npm run typecheck']) {
       assert.match(workflow, new RegExp(command.replaceAll(' ', '\\s+')));
     }
+    assert.match(workflow, /name: Export DB-backed site snapshot/);
+    assert.match(workflow, /DATABASE_URL:\s*\$\{\{\s*secrets\.DATABASE_URL\s*\}\}/);
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_PATH:\s*\/tmp\/groceryview-db-site-snapshot\.json/);
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_MODULE_PATH:\s*apps\/web\/src\/lib\/generated\/db-site-products\.ts/);
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_CHAIN_OBSERVATIONS_MODULE_PATH:\s*apps\/web\/src\/lib\/generated\/db-site-chain-observations\.ts/);
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_INGESTED_OVERRIDES_MODULE_PATH:\s*apps\/web\/src\/lib\/generated\/db-site-ingested-overrides\.ts/);
+    assert.match(workflow, /npm run --silent ingest:export-db-snapshot/);
+    assert.ok(
+      workflow.indexOf('name: Export DB-backed site snapshot') < workflow.indexOf('name: Build workspaces'),
+      'DB-backed site snapshot must be generated before the deploy build renders web pages'
+    );
     assert.match(workflow, /deploy\/groceryview\.manifest\.json/);
     assert.match(workflow, /environment:\s*production/);
     assert.match(workflow, /ops:check-production-secrets -- --from-env/);
