@@ -4448,6 +4448,23 @@ describe('daily ingestion runner', () => {
     assert.equal(attempts, 3);
   });
 
+  it('waits through transient database not-accepting-connections startup windows', async () => {
+    let attempts = 0;
+    const client = {
+      async query() {
+        attempts += 1;
+        if (attempts < 4) throw new Error('the database system is not accepting connections');
+        return { rows: [{ id: 'row-after-db-accepts-connections' }] };
+      }
+    };
+
+    const executor = createDailyIngestionQueryExecutor(client, { retryAttempts: 3, retryBaseDelayMs: 0 });
+    const rows = await executor.query<{ id: string }>('set default_transaction_read_only=off');
+
+    assert.deepEqual(rows, [{ id: 'row-after-db-accepts-connections' }]);
+    assert.equal(attempts, 4);
+  });
+
   it('fails closed when daily connector config omits any required chain', () => {
     assert.throws(() => buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',

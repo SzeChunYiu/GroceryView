@@ -3769,15 +3769,15 @@ async function waitForDailyRunnerDelay(delayMs: number): Promise<void> {
 
 function isTransientDailyDatabaseError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
-  return /connection\s+(?:to database\s+)?closed|terminating connection|connection terminated|EDBHANDLEREXITED|ECONNRESET|EPIPE|timeout|Connection terminated unexpectedly/i.test(message);
+  return /connection\s+(?:to database\s+)?closed|terminating connection|connection terminated|database system is not accepting connections|EDBHANDLEREXITED|ECONNRESET|EPIPE|timeout|Connection terminated unexpectedly/i.test(message);
 }
 
 export function createDailyIngestionQueryExecutor(
   client: PgLikeClient,
   options: { retryAttempts?: number; retryBaseDelayMs?: number } = {}
 ): QueryExecutor {
-  const retryAttempts = normalizeDailyRunnerInteger(options.retryAttempts, 2);
-  const retryBaseDelayMs = normalizeDailyRunnerInteger(options.retryBaseDelayMs, 250);
+  const retryAttempts = normalizeDailyRunnerInteger(options.retryAttempts, 8);
+  const retryBaseDelayMs = normalizeDailyRunnerInteger(options.retryBaseDelayMs, 2000);
   return {
     async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
       for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
@@ -3980,8 +3980,8 @@ export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.
     process.stderr.write(`[daily-ingestion] database pool error: ${error instanceof Error ? error.message : String(error)}\n`);
   });
   const executor = createDailyIngestionQueryExecutor(pool, {
-    retryAttempts: env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS) : 2,
-    retryBaseDelayMs: env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS) : 250
+    retryAttempts: env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS) : undefined,
+    retryBaseDelayMs: env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS) : undefined
   });
   try {
     await executor.query('set default_transaction_read_only=off');
