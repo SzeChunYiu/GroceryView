@@ -6,7 +6,17 @@ function optional(value, key) {
   return value === undefined || value === null ? {} : { [key]: value };
 }
 
-export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows }) {
+export const DEFAULT_REQUIRED_SNAPSHOT_CHAINS = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+
+export function parseRequiredSnapshotChains(value) {
+  if (!value) return DEFAULT_REQUIRED_SNAPSHOT_CHAINS;
+  return value
+    .split(',')
+    .map((chain) => chain.trim())
+    .filter(Boolean);
+}
+
+export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS }) {
   if (!Array.isArray(rows) || rows.length === 0) throw new Error('No latest price rows available for DB-to-site snapshot export.');
 
   const priceRows = rows.map((row) => ({
@@ -34,15 +44,24 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
     provenance: row.provenance ?? {}
   }));
 
+  const observedChains = new Set(priceRows.map((row) => row.chainSlug));
+  const normalizedRequiredChains = [...new Set(requiredChains.map((chain) => String(chain).trim()).filter(Boolean))].sort();
+  const missingRequiredChains = normalizedRequiredChains.filter((chain) => !observedChains.has(chain));
+  if (missingRequiredChains.length > 0) {
+    throw new Error(`db_site_snapshot_missing_required_chains:${missingRequiredChains.join(',')}`);
+  }
+
   return {
     status: 'passed',
     generatedAt,
     source: 'postgres.latest_prices',
     coverage: {
       products: new Set(priceRows.map((row) => row.productSlug)).size,
-      chains: new Set(priceRows.map((row) => row.chainSlug)).size,
+      chains: observedChains.size,
       stores: new Set(priceRows.map((row) => row.storeSlug).filter(Boolean)).size,
-      observations: priceRows.length
+      observations: priceRows.length,
+      requiredChains: normalizedRequiredChains,
+      missingRequiredChains
     },
     priceRows
   };
@@ -55,6 +74,7 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   if (!outputPath) throw new Error('GROCERYVIEW_DB_SITE_SNAPSHOT_PATH is required for DB-to-site snapshot export.');
   const minConfidence = env.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE ? Number(env.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE) : undefined;
   const limit = env.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT ? Number(env.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT) : undefined;
+  const requiredChains = parseRequiredSnapshotChains(env.GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS);
 
   const [{ createPgQueryExecutor, createPostgresSiteSnapshotReader }, pg] = await Promise.all([
     import('@groceryview/db'),
@@ -64,7 +84,7 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   try {
     const reader = createPostgresSiteSnapshotReader(createPgQueryExecutor(pool));
     const rows = await reader.listLatestPriceSnapshotRows({ minConfidence, limit });
-    const artifact = buildDbSiteSnapshotArtifact({ rows });
+    const artifact = buildDbSiteSnapshotArtifact({ rows, requiredChains });
     writeFileSync(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
     return artifact;
   } finally {

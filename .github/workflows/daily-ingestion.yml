@@ -168,6 +168,7 @@ jobs:
           GROCERYVIEW_DB_SITE_SNAPSHOT_PATH: /tmp/groceryview-db-site-snapshot.json
           GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE || '0.5' }}
           GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT || '50000' }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS || 'ica,willys,coop,hemkop,lidl,city_gross' }}
         run: |
           set -euo pipefail
           test -n "${DATABASE_URL:-}"
@@ -175,7 +176,7 @@ jobs:
             >/tmp/db-site-snapshot-result.json
           node <<'NODE'
           const body = require('/tmp/db-site-snapshot-result.json');
-          if (body.status !== 'passed' || body.coverage?.observations < 1) {
+          if (body.status !== 'passed' || body.coverage?.observations < 1 || (body.coverage?.missingRequiredChains?.length ?? 0) > 0) {
             console.error(JSON.stringify(body));
             process.exit(1);
           }
