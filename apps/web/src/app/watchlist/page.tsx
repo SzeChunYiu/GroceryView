@@ -1,20 +1,91 @@
 import Link from 'next/link';
-import { buildWatchlistAlerts, planNotifications, type NotificationPreferences } from '@groceryview/core';
+import { buildWatchlistAlerts, calculateDealScore, planNotifications, type NotificationPreferences, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
-import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, watchlistAlertInputs, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
-import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
+import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
+import { chainPriceRows, priceAlertThresholdPreferenceContract, topChainSpreads } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 type ConfidenceLevel = 'high' | 'medium' | 'low';
 type WatchlistAlert = ReturnType<typeof buildWatchlistAlerts>[number];
+type PricedChainRow = ReturnType<typeof chainPriceRows>[number] & { price: number };
+type VerifiedWatchlistProduct = WatchlistProductSnapshot & {
+  source: string;
+};
 
 const notificationNow = '2026-05-22T10:00:00.000Z';
 const notificationPreferences: NotificationPreferences = {
   channels: ['email', 'push'],
-  enabledTypes: ['target_price', 'stock_up_opportunity'],
+  enabledTypes: ['target_price'],
   quietHours: { startHour: 21, endHour: 7, timezone: 'Europe/Stockholm' }
+};
+
+const chainDisplayNames: Record<string, string> = {
+  willys: 'Willys',
+  hemkop: 'Hemköp'
+};
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function watchlistPriceTypeFor(row: PricedChainRow): WatchlistPriceType {
+  return typeof row.savings === 'number' && row.savings > 0 ? 'promotion' : 'shelf';
+}
+
+const watchlistSourceRows = topChainSpreads
+  .map((product) => {
+    const pricedRows = chainPriceRows(product)
+      .filter((row): row is PricedChainRow => typeof row.price === 'number' && Number.isFinite(row.price) && row.price > 0)
+      .sort((left, right) => left.price - right.price || String(left.chain).localeCompare(String(right.chain), 'sv'));
+    const cheapest = pricedRows[0];
+    if (!cheapest) return null;
+    const dealScore = calculateDealScore({
+      currentCityPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+      knownPromoHistoryPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+      equivalentUnitPricePercentile: product.inChains.length > 1 ? 0 : 50,
+      discountDepthPercent: product.spreadPct,
+      sourceConfidence: clamp(product.inChains.length / 2, 0, 1)
+    });
+    return { product, pricedRows, cheapest, dealScore };
+  })
+  .filter((row): row is NonNullable<typeof row> => row !== null)
+  .slice(0, 4);
+
+const watchlistItems: WatchlistItem[] = watchlistSourceRows.map(({ product, cheapest, dealScore }) => ({
+  productId: product.slug,
+  targetPrice: Math.round(cheapest.price * 1.02 * 100) / 100,
+  alertDealScoreAt: Math.max(50, Math.min(90, dealScore)),
+  favoriteStoresOnly: false,
+  allowedPriceTypes: [watchlistPriceTypeFor(cheapest)]
+}));
+
+const watchlistProducts: VerifiedWatchlistProduct[] = watchlistSourceRows.map(({ product, pricedRows, cheapest, dealScore }) => ({
+  productId: product.slug,
+  productName: product.name,
+  bestPrice: cheapest.price,
+  bestStoreId: `${cheapest.chain}-online-catalog`,
+  bestPriceType: watchlistPriceTypeFor(cheapest),
+  prices: pricedRows.map((row) => ({
+    storeId: `${row.chain}-online-catalog`,
+    storeName: `${chainDisplayNames[row.chain] ?? row.chain} online catalog`,
+    price: row.price,
+    priceType: watchlistPriceTypeFor(row)
+  })),
+  dealScore,
+  isNew52WeekLow: product.spreadPct >= 20,
+  source: `${pricedRows.length} verified Axfood chain price row${pricedRows.length === 1 ? '' : 's'} · ${product.inChains.join(' + ')}`
+}));
+
+const watchlistAlertInputs: {
+  favoriteStoreIds: string[];
+  watchlist: WatchlistItem[];
+  products: VerifiedWatchlistProduct[];
+} = {
+  favoriteStoreIds: Array.from(new Set(watchlistProducts.map((product) => product.bestStoreId))),
+  watchlist: watchlistItems,
+  products: watchlistProducts
 };
 
 export function generateMetadata() {
@@ -53,7 +124,7 @@ function confidenceForCoverage(priceRows: number, alertCount: number): Confidenc
 
 function notificationEventForAlert(alert: WatchlistAlert) {
   return {
-    type: alert.type === 'target_price' ? 'target_price' as const : 'stock_up_opportunity' as const,
+    type: 'target_price' as const,
     title: alert.productName,
     body: alert.message,
     priority: alert.severity === 'urgent' ? 'high' as const : 'normal' as const
@@ -65,7 +136,8 @@ function formatSek(value: number) {
 }
 
 export default function WatchlistPage() {
-  const watchlistAlerts = buildWatchlistAlerts(watchlistAlertInputs);
+  const watchlistAlerts = buildWatchlistAlerts(watchlistAlertInputs)
+    .filter((alert) => alert.type === 'target_price');
   const plannedNotifications = planNotifications({
     now: notificationNow,
     preferences: notificationPreferences,
@@ -80,19 +152,19 @@ export default function WatchlistPage() {
       <Eyebrow>Watchlist price alerts</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Tracked products with notification-ready alerts</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        This page calls buildWatchlistAlerts with visible price rows, then runs planNotifications so push and email rows respect user preferences and quiet-hour rules.
+        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules.
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Watched products</p>
           <p className="mt-2 text-5xl font-black text-slate-950">{watchedProducts}</p>
-          <p className="mt-3 font-semibold text-slate-700">filtered against {eligiblePriceRows} visible price rows.</p>
+          <p className="mt-3 font-semibold text-slate-700">filtered against {eligiblePriceRows} verified chain price rows.</p>
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Active alerts</p>
           <p className="mt-2 text-5xl font-black text-emerald-800">{watchlistAlerts.length}</p>
-          <p className="mt-3 font-semibold text-slate-700">target price, Deal Score, and new-low signals only when core rules pass.</p>
+          <p className="mt-3 font-semibold text-slate-700">set-target price signals only when core rules pass.</p>
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Planned notifications</p>
@@ -260,7 +332,7 @@ export default function WatchlistPage() {
 
       <Card className="mt-6">
         <h2 className="text-2xl font-black">Notification plan</h2>
-        <p className="mt-2 text-sm font-semibold text-slate-600">Alerts use visible price rows and allowed price-type filters; rows without the requested price type are excluded instead of estimated.</p>
+        <p className="mt-2 text-sm font-semibold text-slate-600">Set-target alerts use verified Axfood chain rows and allowed price-type filters; rows without the requested price type are excluded instead of estimated.</p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {plannedNotifications.map((notification, index) => (
             <div className="rounded-2xl bg-slate-50 p-4" key={`${notification.title}-${notification.channel}-${index}`}>
