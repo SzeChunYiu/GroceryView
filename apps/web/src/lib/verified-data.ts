@@ -3770,19 +3770,21 @@ export const privateFeatureCopy: Record<PrivateFeatureRoute, { verifiedSurface: 
 
 export const browserExtensionOverlayContract = {
   title: 'Retailer browser overlay',
+  manifestPath: '/extension/manifest.json',
   assetPath: '/extension/retailer-overlay.js',
   apiEndpoint: '/api/products/{productId}/cheapest-now',
   productIdAttribute: 'data-groceryview-product-id',
+  detectionSignals: ['data-groceryview-product-id', 'JSON-LD gtin/ean', 'retailer sku', 'commodity alias'],
   supportedRetailers: [
     { chain: 'ICA', hostPattern: 'handlaprivatkund.ica.se', status: 'mapping-ready' },
     { chain: 'Coop', hostPattern: 'coop.se', status: 'mapping-ready' },
     { chain: 'Willys', hostPattern: 'willys.se', status: 'mapping-ready' }
   ],
-  confidenceRule: 'High when the cheapest-now API returns at least two observed chains for the exact product id; limited when chains are missing.',
+  confidenceRule: 'High for exact GroceryView/EAN matches when the cheapest-now API returns at least two observed chains; limited for commodity aliases or missing chains.',
   guardrails: [
     'No anonymous visitor identity, basket, or retailer account data is stored by the overlay.',
-    'Retailer pages must provide a mapped data-groceryview-product-id before any cheaper alternative is shown.',
-    'Missing product mappings stay silent instead of estimating alternatives from names alone.'
+    'Retailer pages must provide a mapped GroceryView id, EAN/GTIN, SKU, or safe commodity alias before any cheaper alternative is shown.',
+    'Missing product mappings stay silent instead of estimating prices from names alone.'
   ]
 };
 

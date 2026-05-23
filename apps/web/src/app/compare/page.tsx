@@ -187,6 +187,9 @@ export default function ComparePage() {
               and the public script calls the cheapest-now API before showing a cheaper chain. No anonymous shopper profile or retailer account data is stored.
             </p>
             <div className="mt-4 flex flex-wrap gap-2 text-sm">
+              <a className="rounded-full bg-white px-4 py-2 font-black text-sky-950" href={browserExtensionOverlayContract.manifestPath}>
+                Extension manifest
+              </a>
               <a className="rounded-full bg-sky-900 px-4 py-2 font-black text-white" href={browserExtensionOverlayContract.assetPath}>
                 Open overlay script
               </a>
@@ -204,6 +207,9 @@ export default function ComparePage() {
             </div>
             <p className="mt-3 rounded-2xl bg-sky-50 p-3 text-sm font-bold text-sky-950">
               Confidence: {browserExtensionOverlayContract.confidenceRule}
+            </p>
+            <p className="mt-3 text-xs font-semibold text-slate-600">
+              Detection: {browserExtensionOverlayContract.detectionSignals.join(' · ')}
             </p>
           </div>
         </div>
