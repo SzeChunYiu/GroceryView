@@ -125,8 +125,53 @@ function productOfferBounds(product: NonNullable<ReturnType<typeof findProduct>>
   return { lowPrice: product.priceMin, highPrice: product.priceMax, offerCount: product.observationCount };
 }
 
+function storeNameFor(chain: string) {
+  if (chain === 'willys') return 'Willys';
+  if (chain === 'hemkop') return 'Hemkop';
+  return chain;
+}
+
+function storeOfferFor(input: { price: number; storeName: string; url: string }) {
+  return {
+    '@type': 'Offer',
+    price: input.price,
+    priceCurrency: 'SEK',
+    availability: 'https://schema.org/InStock',
+    url: input.url,
+    seller: { '@type': 'Organization', name: input.storeName },
+    availableAtOrFrom: { '@type': 'Store', name: input.storeName }
+  };
+}
+
+function productStoreOffersFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product) {
+    return chainPriceRows(product).map((row) => storeOfferFor({
+      price: row.price,
+      storeName: storeNameFor(row.chain),
+      url: row.url || `${siteUrl}/products/${product.slug}`
+    }));
+  }
+
+  const latest = latestObservationFor(product);
+  return [storeOfferFor({
+    price: latest?.price ?? product.priceMedian,
+    storeName: 'OpenPrices observed stores',
+    url: `${siteUrl}/products/${product.slug}`
+  })];
+}
+
 function productJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   const bounds = productOfferBounds(product);
+  const aggregateOffer = {
+    '@type': 'AggregateOffer',
+    priceCurrency: 'SEK',
+    lowPrice: bounds.lowPrice,
+    highPrice: bounds.highPrice,
+    offerCount: bounds.offerCount,
+    availability: 'https://schema.org/InStock',
+    url: `${siteUrl}/products/${product.slug}`
+  };
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -134,15 +179,7 @@ function productJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) 
     image: product.image ? [product.image] : undefined,
     brand: { '@type': 'Brand', name: productBrand(product) },
     category: labelFromSlug(product.category),
-    offers: {
-      '@type': 'AggregateOffer',
-      priceCurrency: 'SEK',
-      lowPrice: bounds.lowPrice,
-      highPrice: bounds.highPrice,
-      offerCount: bounds.offerCount,
-      availability: 'https://schema.org/InStock',
-      url: `${siteUrl}/products/${product.slug}`
-    }
+    offers: [aggregateOffer, ...productStoreOffersFor(product)]
   };
 }
 
