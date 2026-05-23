@@ -1,7 +1,7 @@
 import { calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
-import { formatPct, storeUniverse } from '@/lib/verified-data';
+import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -11,6 +11,7 @@ export function generateMetadata() {
 const chainIndexSummary = calculateChainPriceIndex(buildChainPriceObservations());
 const chainIndexByBrand = new Map(chainIndexSummary.chains.map((chain) => [chain.chainId.toLowerCase(), chain]));
 const cheapestChainNearMe = chainIndexSummary.chains[0];
+const cheapestBranchNearMe = storePricePercentileRanks[0] ?? null;
 const districtHeatOverlay = buildDistrictHeatOverlay();
 const regionalPriceStatisticsGate = buildRegionalPriceStatisticsGate();
 
@@ -140,6 +141,49 @@ export default function MapPage() {
             <p className="mt-2 text-sm font-semibold text-emerald-900">{cheapestChainNearMe ? `${cheapestChainNearMe.confidence} confidence · ${cheapestChainNearMe.categoriesCovered} categories` : 'No coverage'}</p>
           </div>
         </div>
+      </Card>
+
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-700">Cheapest branch near me</p>
+            <h2 className="mt-2 text-3xl font-black text-lime-950">
+              {cheapestBranchNearMe?.storeName ?? 'No branch-level candidate yet'}
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-lime-900">
+              This branch-level evidence uses per-branch Lidl offer observations matched to OSM store rows; it does not claim a shopper location or route time.
+              No private location is read until the shopper explicitly approves location context.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/80 p-4 text-right">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-700">Branch evidence</p>
+            <p className="mt-2 text-2xl font-black text-lime-950">
+              {cheapestBranchNearMe ? `${cheapestBranchNearMe.cheaperThanNationalLabel} cheaper than national cohort` : 'Blocked'}
+            </p>
+            <p className="mt-2 text-sm font-semibold text-lime-900">
+              {cheapestBranchNearMe ? cheapestBranchNearMe.coverageLabel : 'No per-branch Lidl offer observations matched to OSM yet'}
+            </p>
+          </div>
+        </div>
+        {cheapestBranchNearMe ? (
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-700">Kommun cohort</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{cheapestBranchNearMe.kommun}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-700">{cheapestBranchNearMe.kommunCohortSize} stores · {cheapestBranchNearMe.cheaperThanKommunLabel} cheaper than kommun cohort</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-700">National percentile</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{cheapestBranchNearMe.nationalPricePercentileLabel}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-700">{cheapestBranchNearMe.statusLabel}</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-700">Source confidence</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{cheapestBranchNearMe.confidenceLabel}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-700">{cheapestBranchNearMe.source}</p>
+            </div>
+          </div>
+        ) : null}
       </Card>
 
       <Card className="mt-6">
