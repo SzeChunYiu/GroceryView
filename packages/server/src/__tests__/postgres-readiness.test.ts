@@ -544,3 +544,79 @@ describe('scan upload CORS readiness endpoint', () => {
     assert.equal(JSON.stringify(body).includes('super-secret'), false);
   });
 });
+
+describe('scan upload write readiness endpoint', () => {
+  const readyReport = {
+    status: 'ready' as const,
+    blockers: [],
+    evidence: [
+      'scan_upload_write_ticket_created',
+      'scan_upload_write_put_succeeded',
+      'scan_upload_write_private_payload_uri'
+    ],
+    warnings: [],
+    summary: 'Scan upload write is ready.'
+  };
+
+  it('requires a metrics token before exposing scan upload write readiness evidence', async () => {
+    const handle = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      scanUploadWriteReadinessProvider: async () => readyReport
+    });
+
+    const unauthorized = await handle(new Request('http://localhost/api/readiness/scan-upload-write'));
+    assert.equal(unauthorized.status, 401);
+
+    const authorized = await handle(new Request('http://localhost/api/readiness/scan-upload-write', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(authorized.status, 200);
+    assert.deepEqual(await authorized.json(), readyReport);
+  });
+
+  it('fails closed when scan upload write readiness is blocked or not configured', async () => {
+    const blockedReport = {
+      ...readyReport,
+      status: 'blocked' as const,
+      blockers: ['scan_upload_write_put_failed'],
+      evidence: ['scan_upload_write_ticket_created'],
+      summary: 'Scan upload write readiness is blocked.'
+    };
+    const blocked = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      scanUploadWriteReadinessProvider: async () => blockedReport
+    });
+    const blockedResponse = await blocked(new Request('http://localhost/api/readiness/scan-upload-write', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(blockedResponse.status, 503);
+    assert.deepEqual(await blockedResponse.json(), blockedReport);
+
+    const missingToken = createHttpHandler(undefined, {
+      scanUploadWriteReadinessProvider: async () => readyReport
+    });
+    assert.equal((await missingToken(new Request('http://localhost/api/readiness/scan-upload-write'))).status, 503);
+
+    const missingProvider = createHttpHandler(undefined, { notificationMetricsToken: 'metrics-token' });
+    assert.equal((await missingProvider(new Request('http://localhost/api/readiness/scan-upload-write', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }))).status, 503);
+  });
+
+  it('fails closed without leaking scan upload write errors when the readiness provider throws', async () => {
+    const handle = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      async scanUploadWriteReadinessProvider() {
+        throw new Error('signed upload url secret=super-secret failed');
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/readiness/scan-upload-write', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(response.status, 503);
+    const body = await response.json() as { blockers: string[] };
+    assert.deepEqual(body.blockers, ['scan_upload_write_readiness_probe_failed']);
+    assert.equal(JSON.stringify(body).includes('super-secret'), false);
+  });
+});

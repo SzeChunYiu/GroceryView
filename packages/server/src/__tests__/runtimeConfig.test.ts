@@ -537,6 +537,65 @@ describe('runtime config', () => {
     }
   });
 
+  it('performs a runtime scan upload write before marking upload write ready', async () => {
+    const calls: Array<{ url: string; init?: RequestInit }> = [];
+    const service = createRuntimeHttpService({
+      NODE_ENV: 'development',
+      METRICS_TOKEN: 'metrics-secret',
+      S3_ENDPOINT: 'https://storage.example',
+      S3_REGION: 'eu-north-1',
+      S3_BUCKET: 'groceryview-receipts',
+      S3_ACCESS_KEY_ID: 'runtime-access-key',
+      S3_SECRET_ACCESS_KEY: 'runtime-secret-key'
+    }, {
+      now: new Date('2026-05-23T12:00:00.000Z'),
+      scanUploadWriteFetch: async (url, init) => {
+        calls.push({ url: String(url), init });
+        return new Response(null, { status: 200 });
+      }
+    });
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/scan-upload-write', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 200);
+      const body = await response.json() as { status: string; blockers: string[]; evidence: string[] };
+      assert.equal(body.status, 'ready');
+      assert.deepEqual(body.blockers, []);
+      assert.equal(body.evidence.includes('scan_upload_write_ticket_created'), true);
+      assert.equal(body.evidence.includes('scan_upload_write_put_succeeded'), true);
+      assert.equal(JSON.stringify(body).includes('runtime-secret-key'), false);
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0]?.init?.method, 'PUT');
+      assert.equal((calls[0]?.init?.headers as Headers).get('content-type'), 'image/jpeg');
+      assert.equal(calls[0]?.init?.body, 'x');
+    } finally {
+      await service.close();
+    }
+  });
+
+  it('keeps runtime scan upload write readiness blocked until storage is configured', async () => {
+    const service = createRuntimeHttpService({
+      NODE_ENV: 'development',
+      METRICS_TOKEN: 'metrics-secret'
+    });
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/scan-upload-write', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 503);
+      const body = await response.json() as { status: string; blockers: string[] };
+      assert.equal(body.status, 'blocked');
+      assert.equal(body.blockers.includes('scan_upload_storage_not_configured'), true);
+    } finally {
+      await service.close();
+    }
+  });
+
   it('loads catalog coverage targets from runtime environment JSON', () => {
     const config = loadRuntimeConfig({
       NODE_ENV: 'development',

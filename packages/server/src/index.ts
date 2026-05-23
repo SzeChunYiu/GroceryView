@@ -151,6 +151,7 @@ export type AuthOptions = {
   scanProviderReadinessProvider?: () => Promise<ScanProviderReadinessReport>;
   scanUploadStorageReadinessProvider?: () => Promise<ScanUploadStorageReadinessReport>;
   scanUploadCorsReadinessProvider?: () => Promise<ScanUploadCorsReadinessReport>;
+  scanUploadWriteReadinessProvider?: () => Promise<ScanUploadWriteReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
@@ -228,6 +229,7 @@ export type RuntimeHandlerOptions = {
   scanProviderReadinessProvider?: () => Promise<ScanProviderReadinessReport>;
   scanUploadStorageReadinessProvider?: () => Promise<ScanUploadStorageReadinessReport>;
   scanUploadCorsReadinessProvider?: () => Promise<ScanUploadCorsReadinessReport>;
+  scanUploadWriteReadinessProvider?: () => Promise<ScanUploadWriteReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
@@ -236,6 +238,7 @@ export type RuntimeHandlerOptions = {
   notificationProviderFetch?: NotificationProviderFetch;
   scanProviderFetch?: typeof fetch;
   scanUploadCorsFetch?: typeof fetch;
+  scanUploadWriteFetch?: typeof fetch;
 };
 
 export type FlyerOffersProviderQuery = {
@@ -1199,6 +1202,14 @@ export type ScanUploadCorsReadinessReport = {
   summary: string;
 };
 
+export type ScanUploadWriteReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  warnings: string[];
+  summary: string;
+};
+
 function scanUploadStorageReadinessFailureResponse(): ScanUploadStorageReadinessReport {
   return {
     status: 'blocked',
@@ -1216,6 +1227,16 @@ function scanUploadCorsReadinessFailureResponse(): ScanUploadCorsReadinessReport
     evidence: [],
     warnings: [],
     summary: 'Scan upload CORS readiness is blocked.'
+  };
+}
+
+function scanUploadWriteReadinessFailureResponse(): ScanUploadWriteReadinessReport {
+  return {
+    status: 'blocked',
+    blockers: ['scan_upload_write_readiness_probe_failed'],
+    evidence: [],
+    warnings: [],
+    summary: 'Scan upload write readiness is blocked.'
   };
 }
 
@@ -1361,6 +1382,67 @@ export async function buildScanUploadCorsReadinessReport(input: {
     evidence,
     warnings,
     summary: blockers.length === 0 ? 'Scan upload CORS is ready.' : 'Scan upload CORS readiness is blocked.'
+  };
+}
+
+export async function buildScanUploadWriteReadinessReport(input: {
+  storage?: ScanUploadStorage | undefined;
+  fetch?: typeof fetch | undefined;
+  now?: Date;
+}): Promise<ScanUploadWriteReadinessReport> {
+  const evidence: string[] = [];
+  const blockers: string[] = [];
+  const warnings: string[] = [];
+
+  if (!input.storage) {
+    blockers.push('scan_upload_storage_not_configured');
+    return {
+      status: 'blocked',
+      blockers,
+      evidence,
+      warnings,
+      summary: 'Scan upload write readiness is blocked.'
+    };
+  }
+
+  const result = await prepareScanUploadTicket({
+    request: {
+      scanId: 'readiness-scan-upload-write',
+      kind: 'receipt',
+      contentType: 'image/jpeg',
+      byteLength: 1,
+      requestedAt: (input.now ?? new Date()).toISOString()
+    },
+    storage: input.storage
+  });
+
+  if (result.status !== 'ready') {
+    blockers.push('scan_upload_storage_ticket_not_created');
+  } else {
+    evidence.push('scan_upload_write_ticket_created');
+    const response = await (input.fetch ?? fetch)(result.ticket.uploadUrl, {
+      method: 'PUT',
+      headers: new Headers(result.ticket.headers),
+      body: 'x'
+    });
+    if (response.ok) {
+      evidence.push('scan_upload_write_put_succeeded');
+    } else {
+      blockers.push('scan_upload_write_put_failed');
+    }
+    if (result.ticket.payloadUri.startsWith('s3://') || result.ticket.payloadUri.startsWith('private-upload://')) {
+      evidence.push('scan_upload_write_private_payload_uri');
+    } else {
+      blockers.push('scan_upload_write_payload_uri_not_private');
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    warnings,
+    summary: blockers.length === 0 ? 'Scan upload write is ready.' : 'Scan upload write readiness is blocked.'
   };
 }
 
@@ -1908,6 +1990,21 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
         } catch {
           return jsonResponse(scanUploadCorsReadinessFailureResponse(), { status: 503 });
+        }
+      }
+
+      if (method === 'GET' && path === '/api/readiness/scan-upload-write') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Scan upload write readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid scan upload write readiness token is required.');
+        }
+        if (!authOptions.scanUploadWriteReadinessProvider) return errorResponse(503, 'Scan upload write readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.scanUploadWriteReadinessProvider();
+          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(scanUploadWriteReadinessFailureResponse(), { status: 503 });
         }
       }
 
@@ -2824,6 +2921,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/readiness/scanning': { get: metricsOperation('Check scan provider configuration and health evidence without exposing provider secrets.') },
       '/api/readiness/scan-upload-cors': { get: metricsOperation('Check scan upload CORS preflight behavior without exposing signed upload URL secrets.') },
       '/api/readiness/scan-upload-storage': { get: metricsOperation('Check scan upload storage ticket creation without exposing object-storage secrets.') },
+      '/api/readiness/scan-upload-write': { get: metricsOperation('Check scan upload write behavior without exposing signed upload URL secrets.') },
       '/api/workers/notifications/run': { post: metricsOperation('Run the configured notification worker cycle for cron execution.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
       '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid, SES, or Expo suppression payloads.') }
@@ -3140,6 +3238,11 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
       storage: scanUploadStorage,
       origin: config.publicWebUrl,
       fetch: options.scanUploadCorsFetch,
+      now: options.now
+    })),
+    scanUploadWriteReadinessProvider: options.scanUploadWriteReadinessProvider ?? (() => buildScanUploadWriteReadinessReport({
+      storage: scanUploadStorage,
+      fetch: options.scanUploadWriteFetch,
       now: options.now
     })),
     flyerOffersProvider: options.flyerOffersProvider,
