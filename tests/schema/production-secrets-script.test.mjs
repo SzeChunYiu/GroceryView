@@ -27,6 +27,8 @@ describe('production secret audit script', () => {
       assert.match(script, new RegExp(`['"]${secret}['"]`));
     }
     assert.doesNotMatch(script, /['"]GROCERYVIEW_DAILY_CONNECTORS_JSON['"]/);
+    assert.match(script, /process\.argv\.indexOf\('--env'\)/);
+    assert.match(script, /args\.push\('--env', environment\)/);
     assert.equal(pkg.scripts['ops:check-production-secrets'], 'node scripts/ops/check-production-secrets.mjs');
   });
 

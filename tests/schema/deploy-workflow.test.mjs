@@ -12,5 +12,7 @@ describe('deploy workflow', () => {
     }
     assert.match(workflow, /deploy\/groceryview\.manifest\.json/);
     assert.match(workflow, /environment:\s*production/);
+    assert.match(workflow, /ops:check-production-secrets -- --repo "\$GITHUB_REPOSITORY" --env production/);
+    assert.match(workflow, /GH_TOKEN:\s*\$\{\{ secrets\.GITHUB_TOKEN \}\}/);
   });
 });
