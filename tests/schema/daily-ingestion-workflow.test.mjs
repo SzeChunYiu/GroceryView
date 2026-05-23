@@ -120,6 +120,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /\/tmp\/production-db-migrations\.json/);
     assert.match(workflow, /production_db_migrations_diagnostic_missing/);
     assert.match(workflow, /production_db_migrations_database_url_config_missing/);
+    assert.match(workflow, /production_db_migrations_skipped_after_prior_failure/);
     assert.match(workflow, /migration_status=\$\?/);
     assert.match(workflow, /body\.status !== 'ready'/);
     assert.match(workflow, /name:\s*groceryview-production-db-migrations/);
@@ -162,6 +163,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /daily_ingestion_connectors_diagnostic_missing/);
     assert.match(workflow, /daily_ingestion_database_url_config_missing/);
     assert.match(workflow, /daily_ingestion_result_diagnostic_missing/);
+    assert.match(workflow, /daily_ingestion_skipped_after_prior_failure/);
     assert.match(workflow, /ingestion_status=\$\?/);
     assert.match(workflow, /body\.status !== 'succeeded'/);
     assert.match(workflow, /chainSummaries/);
@@ -184,6 +186,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE:\s*\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /db_site_snapshot_result_diagnostic_missing/);
     assert.match(workflow, /db_site_snapshot_database_url_config_missing/);
+    assert.match(workflow, /db_site_snapshot_skipped_after_prior_failure/);
     assert.match(workflow, /snapshot_status=\$\?/);
     assert.match(workflow, /body\.status !== 'passed'/);
     assert.match(workflow, /body\.coverage\?\.observations < 1/);
