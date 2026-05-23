@@ -1,0 +1,61 @@
+name: Production DB cutover validation
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: production-db-cutover-validation
+  cancel-in-progress: false
+
+jobs:
+  validate-db-cutover:
+    name: Validate replacement DATABASE_URL
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify cutover validator contract
+        run: node --test tests/schema/db-cutover-validation-script.test.mjs
+
+      - name: Validate replacement DB write connectivity
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REPLACEMENT_DATABASE_URL: ${{ secrets.REPLACEMENT_DATABASE_URL }}
+          CANDIDATE_DATABASE_URL: ${{ secrets.CANDIDATE_DATABASE_URL }}
+          GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_CUTOVER_DB_CONNECTIVITY_RETRY_ATTEMPTS || '5' }}
+          GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_CUTOVER_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS || '2000' }}
+          GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS: ${{ vars.GROCERYVIEW_CUTOVER_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS || '10000' }}
+        run: |
+          set -euo pipefail
+          cutover_status=0
+          npm run --silent ops:validate-db-cutover >/tmp/db-cutover-validation.json || cutover_status=$?
+          if [ ! -s /tmp/db-cutover-validation.json ]; then
+            cat > /tmp/db-cutover-validation.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "db_cutover_validation_diagnostic_missing",
+            "exitCode": ${cutover_status}
+          }
+          EOF
+          fi
+          cat /tmp/db-cutover-validation.json
+          node -e "const body=require('/tmp/db-cutover-validation.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+          exit "${cutover_status}"
+
+      - name: Upload DB cutover validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-db-cutover-validation
+          path: /tmp/db-cutover-validation.json
+          if-no-files-found: error
+          retention-days: 14
