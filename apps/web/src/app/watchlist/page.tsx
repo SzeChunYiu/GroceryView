@@ -1,134 +1,14 @@
 import Link from 'next/link';
-import { buildWatchlistAlerts, calculateDealScore, planNotifications, type NotificationPreferences, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
-import { chainPriceRows, priceAlertThresholdPreferenceContract, topChainSpreads } from '@/lib/verified-data';
+import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
+import { confidenceForProduct, priceRowCount, priceSource, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
 import { routeMetadata } from '@/lib/seo';
-
-type ConfidenceLevel = 'high' | 'medium' | 'low';
-type WatchlistAlert = ReturnType<typeof buildWatchlistAlerts>[number];
-type PricedChainRow = ReturnType<typeof chainPriceRows>[number] & { price: number };
-type VerifiedWatchlistProduct = WatchlistProductSnapshot & {
-  source: string;
-};
-
-const notificationNow = '2026-05-22T10:00:00.000Z';
-const notificationPreferences: NotificationPreferences = {
-  channels: ['email', 'push'],
-  enabledTypes: ['target_price'],
-  quietHours: { startHour: 21, endHour: 7, timezone: 'Europe/Stockholm' }
-};
-
-const chainDisplayNames: Record<string, string> = {
-  willys: 'Willys',
-  hemkop: 'Hemköp'
-};
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
-}
-
-function watchlistPriceTypeFor(row: PricedChainRow): WatchlistPriceType {
-  return typeof row.savings === 'number' && row.savings > 0 ? 'promotion' : 'shelf';
-}
-
-const watchlistSourceRows = topChainSpreads
-  .map((product) => {
-    const pricedRows = chainPriceRows(product)
-      .filter((row): row is PricedChainRow => typeof row.price === 'number' && Number.isFinite(row.price) && row.price > 0)
-      .sort((left, right) => left.price - right.price || String(left.chain).localeCompare(String(right.chain), 'sv'));
-    const cheapest = pricedRows[0];
-    if (!cheapest) return null;
-    const dealScore = calculateDealScore({
-      currentCityPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
-      knownPromoHistoryPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
-      equivalentUnitPricePercentile: product.inChains.length > 1 ? 0 : 50,
-      discountDepthPercent: product.spreadPct,
-      sourceConfidence: clamp(product.inChains.length / 2, 0, 1)
-    });
-    return { product, pricedRows, cheapest, dealScore };
-  })
-  .filter((row): row is NonNullable<typeof row> => row !== null)
-  .slice(0, 4);
-
-const watchlistItems: WatchlistItem[] = watchlistSourceRows.map(({ product, cheapest, dealScore }) => ({
-  productId: product.slug,
-  targetPrice: Math.round(cheapest.price * 1.02 * 100) / 100,
-  alertDealScoreAt: Math.max(50, Math.min(90, dealScore)),
-  favoriteStoresOnly: false,
-  allowedPriceTypes: [watchlistPriceTypeFor(cheapest)]
-}));
-
-const watchlistProducts: VerifiedWatchlistProduct[] = watchlistSourceRows.map(({ product, pricedRows, cheapest, dealScore }) => ({
-  productId: product.slug,
-  productName: product.name,
-  bestPrice: cheapest.price,
-  bestStoreId: `${cheapest.chain}-online-catalog`,
-  bestPriceType: watchlistPriceTypeFor(cheapest),
-  prices: pricedRows.map((row) => ({
-    storeId: `${row.chain}-online-catalog`,
-    storeName: `${chainDisplayNames[row.chain] ?? row.chain} online catalog`,
-    price: row.price,
-    priceType: watchlistPriceTypeFor(row)
-  })),
-  dealScore,
-  isNew52WeekLow: product.spreadPct >= 20,
-  source: `${pricedRows.length} verified Axfood chain price row${pricedRows.length === 1 ? '' : 's'} · ${product.inChains.join(' + ')}`
-}));
-
-const watchlistAlertInputs: {
-  favoriteStoreIds: string[];
-  watchlist: WatchlistItem[];
-  products: VerifiedWatchlistProduct[];
-} = {
-  favoriteStoreIds: Array.from(new Set(watchlistProducts.map((product) => product.bestStoreId))),
-  watchlist: watchlistItems,
-  products: watchlistProducts
-};
 
 export function generateMetadata() {
   return routeMetadata('/watchlist');
-}
-
-function productForAlert(productId: string) {
-  return watchlistAlertInputs.products.find((product) => product.productId === productId);
-}
-
-function watchlistItemForAlert(productId: string) {
-  return watchlistAlertInputs.watchlist.find((item) => item.productId === productId);
-}
-
-function priceSource(productId: string) {
-  return productForAlert(productId)?.source ?? 'visible price row';
-}
-
-function priceRowCount(productId: string) {
-  return productForAlert(productId)?.prices?.length ?? 0;
-}
-
-function confidenceForProduct(productId: string): ConfidenceLevel {
-  const product = productForAlert(productId);
-  const rows = product?.prices?.length ?? 0;
-  if (!product || rows === 0) return 'low';
-  if (rows >= 2) return 'high';
-  return 'medium';
-}
-
-function confidenceForCoverage(priceRows: number, alertCount: number): ConfidenceLevel {
-  if (priceRows >= 6 && alertCount > 0) return 'high';
-  if (priceRows > 0 && alertCount > 0) return 'medium';
-  return 'low';
-}
-
-function notificationEventForAlert(alert: WatchlistAlert) {
-  return {
-    type: 'target_price' as const,
-    title: alert.productName,
-    body: alert.message,
-    priority: alert.severity === 'urgent' ? 'high' as const : 'normal' as const
-  };
 }
 
 function formatSek(value: number) {
@@ -136,16 +16,7 @@ function formatSek(value: number) {
 }
 
 export default function WatchlistPage() {
-  const watchlistAlerts = buildWatchlistAlerts(watchlistAlertInputs)
-    .filter((alert) => alert.type === 'target_price');
-  const plannedNotifications = planNotifications({
-    now: notificationNow,
-    preferences: notificationPreferences,
-    events: watchlistAlerts.map(notificationEventForAlert)
-  });
-  const watchedProducts = watchlistAlertInputs.watchlist.length;
-  const eligiblePriceRows = watchlistAlertInputs.products.reduce((sum, product) => sum + (product.prices?.length ?? 0), 0);
-  const coverageConfidence = confidenceForCoverage(eligiblePriceRows, watchlistAlerts.length);
+  const { watchlistAlerts, plannedNotifications, watchedProducts, eligiblePriceRows, coverageConfidence } = watchlistAlertBoard;
 
   return (
     <PageShell>

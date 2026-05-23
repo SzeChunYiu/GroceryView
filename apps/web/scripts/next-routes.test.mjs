@@ -829,19 +829,35 @@ describe('verified-data UI', () => {
 
   it('surfaces watchlist alerts and notification planning using verified core outputs', async () => {
     const source = await read('src/app/watchlist/page.tsx');
-    assert.match(source, /buildWatchlistAlerts/);
-    assert.match(source, /planNotifications/);
+    const watchlistData = await read('src/lib/watchlist-data.ts');
+    assert.match(watchlistData, /buildWatchlistAlerts/);
+    assert.match(watchlistData, /planNotifications/);
+    assert.match(watchlistData, /watchlistAlertInputs/);
+    assert.match(source, /watchlistAlertBoard/);
     assert.match(source, /plannedNotifications/);
     assert.match(source, /watchlistAlerts/);
-    assert.match(source, /watchlistAlertInputs/);
     assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('keeps watchlist data shaping out of the route component', async () => {
+    const route = await read('src/app/watchlist/page.tsx');
+    const watchlistData = await read('src/lib/watchlist-data.ts');
+
+    assert.match(route, /watchlistAlertBoard/);
+    assert.doesNotMatch(route, /from '@groceryview\/core'/);
+    assert.doesNotMatch(route, /topChainSpreads|chainPriceRows|calculateDealScore/);
+    assert.match(watchlistData, /topChainSpreads/);
+    assert.match(watchlistData, /chainPriceRows/);
+    assert.match(watchlistData, /calculateDealScore/);
+    assert.match(watchlistData, /export const watchlistAlertBoard/);
   });
 
   it('surfaces watchlist alert confidence and coverage as planning-ready facts', async () => {
     const route = await read('src/app/watchlist/page.tsx');
+    const watchlistData = await read('src/lib/watchlist-data.ts');
 
     assert.match(route, /coverageConfidence/);
-    assert.match(route, /confidenceForCoverage/);
+    assert.match(watchlistData, /confidenceForCoverage/);
     assert.match(route, /ConfidenceBadge/);
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
