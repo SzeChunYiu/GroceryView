@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  categoryPathForSlug,
   createPostgresCatalogReader,
   createPostgresPriceObservationWriter,
   createPostgresPriceReader,
@@ -10,9 +11,24 @@ import {
   createPostgresSourceRecordReader,
   createPostgresSourceRecordWriter,
   createPostgresWeeklyPriceDropDigestReader,
+  groceryCategoryHierarchy,
   persistOpenPricesArtifact,
   type QueryExecutor
 } from '../index.js';
+
+describe('groceryCategoryHierarchy', () => {
+  it('returns parent-to-leaf paths for public grocery category slugs', () => {
+    assert.ok(groceryCategoryHierarchy.length > 0);
+    assert.deepEqual(
+      categoryPathForSlug('coffee-tea').map((category) => category.slug),
+      ['grocery', 'packaged-grocery', 'beverages', 'coffee-tea']
+    );
+    assert.deepEqual(
+      categoryPathForSlug('produce').map((category) => category.label),
+      ['Grocery', 'Fresh food', 'Fruit & Vegetables']
+    );
+  });
+});
 
 class RecordingQueryExecutor implements QueryExecutor {
   calls: Array<{ sql: string; params: unknown[] }> = [];
