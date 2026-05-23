@@ -2,15 +2,17 @@
 
 - Source: ICA public store-scoped promotions JSON
 - Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C
-- Store locator retrieved: 2026-05-22T23:05:43.000Z
+- Store locator retrieved: 2026-05-22T23:57:52.465Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 92970
-- Stores fetched: 318
+- Real rows fetched: 93050
+- Stores fetched: 319
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
-- Live verification: 1 newly added source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-22; the wired source row count is recorded below.
+- Live verification: 1 newly added source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-23 Europe/Stockholm; the wired source row count is recorded below.
 
 ## Source URLs
+
+- Source URL (1004486 ICA Supermarket Tibro, retrieved 2026-05-22T23:57:52.465Z, rows 80): https://handlaprivatkund.ica.se/stores/1004486/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=80&maxPageSize=80
 
 - Source URL (1003939 ICA Supermarket Hedemyrs, retrieved 2026-05-22T23:22:24.612Z, rows 1): https://handlaprivatkund.ica.se/stores/1003939/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=1&maxPageSize=1
 - Source URL (1004707 ICA Supermarket Lindvallen, retrieved 2026-05-22T20:35:37.680Z, rows 1): https://handlaprivatkund.ica.se/stores/1004707/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=1&maxPageSize=1
