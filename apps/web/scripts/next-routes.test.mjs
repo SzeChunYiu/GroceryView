@@ -1097,18 +1097,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
-  it('surfaces a deal screener on deals using ranked visible deal rows', async () => {
+  it('surfaces a deal screener landing card on the deals route with dedicated /screener navigation', async () => {
     const route = await read('src/app/deals/page.tsx');
-    const demo = await read('src/lib/demo-data.ts');
-
-    assert.match(demo, /dealScreener/);
-    assert.match(demo, /rankDealOpportunities/);
-    assert.match(demo, /sourceConfidence/);
-    assert.match(route, /dealScreener/);
     assert.match(route, /Deal screener/);
-    assert.match(route, /minimumScore/);
-    assert.match(route, /categoryFilter/);
-    assert.match(route, /visible ranked deal rows/);
+    assert.match(route, /Dedicated verified screener/i);
+    assert.match(route, /Open verified deal screener/);
+    assert.match(route, /href="\/screener"/);
+    assert.doesNotMatch(route, /dealScreener/);
+  });
+
+  it('surfaces a verified deal screener on the dedicated screener route', async () => {
+    const route = await read('src/app/screener/page.tsx');
+    assert.match(route, /Sort verified deals by the signal that matters now/);
+    assert.match(route, /priceDropMoversBoard/);
+    assert.match(route, /topChainSpreads/);
+    assert.match(route, /categoryDealLeaders/);
+    assert.match(route, /Ranked deal table/);
+    assert.match(route, /What the screener will and will not claim/);
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
