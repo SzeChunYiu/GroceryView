@@ -29,6 +29,8 @@ describe('catalog coverage target export script', () => {
     assert.deepEqual(targets.targetStores, ['coop-odenplan', 'willys-odenplan']);
     assert.doesNotMatch(script, /select id from stores order by id/);
     assert.equal(targets.requireEveryProductInEveryStore, false);
+    assert.deepEqual(targets.targetPriceTypes, ['shelf']);
+    assert.equal(targets.requireEveryStorePriceType, true);
   });
 
   it('self-test exports only connector-addressable external store refs', () => {
@@ -42,5 +44,7 @@ describe('catalog coverage target export script', () => {
     const targets = JSON.parse(output);
     assert.deepEqual(targets.targetStores, ['216502']);
     assert.equal(targets.requireEveryProductInEveryStore, false);
+    assert.deepEqual(targets.targetPriceTypes, ['shelf']);
+    assert.equal(targets.requireEveryStorePriceType, true);
   });
 });

@@ -29,6 +29,8 @@ describe('production env value validation script', () => {
       assert.match(script, new RegExp(`['"]${chain}['"]`));
     }
     assert.match(script, /requireEveryProductInEveryStore must be false/);
+    assert.match(script, /targetPriceTypes/);
+    assert.match(script, /requireEveryStorePriceType/);
     assert.match(script, /stores must list every branch/);
     assert.match(script, /targetStores missing from connector stores/);
     assert.equal(pkg.scripts['ops:validate-production-env'], 'node scripts/ops/validate-production-env.mjs');
@@ -43,7 +45,8 @@ describe('production env value validation script', () => {
       connectorStoreCount: 6,
       connectorStoreCoverageCount: 6,
       coverageProductCount: 2,
-      coverageStoreCount: 6
+      coverageStoreCount: 6,
+      coveragePriceTypes: ['shelf']
     });
   });
 
@@ -56,7 +59,8 @@ describe('production env value validation script', () => {
       connectorStoreCount: 6,
       connectorStoreCoverageCount: 6,
       coverageProductCount: 1,
-      coverageStoreCount: 6
+      coverageStoreCount: 6,
+      coveragePriceTypes: ['shelf']
     });
   });
 
@@ -94,7 +98,9 @@ describe('production env value validation script', () => {
         targetCategories: ['coffee'],
         targetChains: chains,
         targetStores: chains.map((chainId) => `${chainId}-odenplan`),
-        requireEveryProductInEveryStore: false
+        targetPriceTypes: ['shelf'],
+        requireEveryProductInEveryStore: false,
+        requireEveryStorePriceType: true
       })
     }).status, 'ready');
   });
@@ -136,11 +142,56 @@ describe('production env value validation script', () => {
         targetCategories: ['coffee'],
         targetChains: chains,
         targetStores: ['willys-unknown-branch'],
-        requireEveryProductInEveryStore: false
+        targetPriceTypes: ['shelf'],
+        requireEveryProductInEveryStore: false,
+        requireEveryStorePriceType: true
       })
     };
     const result = spawnSync(process.execPath, [scriptPath.pathname], { encoding: 'utf8', env });
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, /targetStores missing from connector stores: willys-unknown-branch/);
   });
+
+  it('fails closed when catalog targets do not require shelf price coverage for every target store', () => {
+    const chains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+    const baseEnv = {
+      AUTH_SECRET: 'test-auth-secret',
+      DATABASE_URL: 'postgres://example/groceryview',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'test-notification-webhook-secret',
+      BILLING_WEBHOOK_SECRET: 'test-billing-webhook-secret',
+      METRICS_TOKEN: 'test-metrics-token',
+      SENDGRID_API_KEY: 'sg-test-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-push-token',
+      GROCERYVIEW_SERVER_URL: 'https://api.groceryview.example',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(chains.map((chainId) => ({
+        connectorId: `${chainId}-normalized-json`,
+        chainId,
+        sourceType: 'official_api',
+        endpointUrl: `https://sources.example.test/${chainId}/products.json`,
+        parserVersion: 'normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: `${chainId}-odenplan`, name: `${chainId} Odenplan`, address: 'Odenplan', city: 'Stockholm' }]
+      })))
+    };
+    const result = spawnSync(process.execPath, [scriptPath.pathname], {
+      encoding: 'utf8',
+      env: {
+        ...baseEnv,
+        CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
+          targetProducts: ['coffee'],
+          targetCategories: ['coffee'],
+          targetChains: chains,
+          targetStores: chains.map((chainId) => `${chainId}-odenplan`),
+          requireEveryProductInEveryStore: false
+        })
+      }
+    });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /targetPriceTypes/);
+  });
+
 });

@@ -210,13 +210,17 @@ class RecordingPgPool {
             product_id: 'coffee',
             category_id: 'coffee',
             observed_chain_ids: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
-            observed_store_ids: ['willys-odenplan', 'coop-odenplan']
+            observed_store_ids: ['willys-odenplan', 'coop-odenplan'],
+            observed_price_types: ['promotion', 'shelf'],
+            observed_store_price_types: ['willys-odenplan:shelf', 'coop-odenplan:promotion']
           },
           {
             product_id: 'milk',
             category_id: 'dairy',
             observed_chain_ids: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
-            observed_store_ids: ['willys-odenplan']
+            observed_store_ids: ['willys-odenplan'],
+            observed_price_types: ['shelf'],
+            observed_store_price_types: ['willys-odenplan:shelf']
           }
         ]
       };
@@ -250,7 +254,9 @@ describe('runtime config', () => {
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
         targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
-        targetStores: ['willys-odenplan']
+        targetStores: ['willys-odenplan'],
+        targetPriceTypes: ['shelf'],
+        requireEveryStorePriceType: true
       })
     });
 
@@ -276,7 +282,9 @@ describe('runtime config', () => {
         targetCategories: ['coffee'],
         targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
         targetStores: ['willys-odenplan'],
-        requireEveryProductInEveryStore: true
+        targetPriceTypes: ['shelf'],
+        requireEveryProductInEveryStore: true,
+        requireEveryStorePriceType: true
       }
     });
   });
@@ -289,7 +297,9 @@ describe('runtime config', () => {
         targetCategories: ['coffee', 'dairy'],
         targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
         targetStores: ['willys-odenplan', 'coop-odenplan'],
-        requireEveryProductInEveryStore: true
+        targetPriceTypes: ['shelf'],
+        requireEveryProductInEveryStore: true,
+        requireEveryStorePriceType: true
       })
     });
 
@@ -298,7 +308,9 @@ describe('runtime config', () => {
       targetCategories: ['coffee', 'dairy'],
       targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
       targetStores: ['willys-odenplan', 'coop-odenplan'],
-      requireEveryProductInEveryStore: true
+      targetPriceTypes: ['shelf'],
+      requireEveryProductInEveryStore: true,
+      requireEveryStorePriceType: true
     });
   });
 
@@ -309,7 +321,9 @@ describe('runtime config', () => {
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
         targetChains: ['willys', 'coop'],
-        targetStores: ['willys-odenplan']
+        targetStores: ['willys-odenplan'],
+        targetPriceTypes: ['shelf'],
+        requireEveryStorePriceType: true
       })
     }), /targetChains is missing required chains: ica, hemkop, lidl, city_gross/);
   });
@@ -1046,7 +1060,9 @@ describe('runtime config', () => {
           targetCategories: ['coffee', 'dairy'],
           targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
           targetStores: ['willys-odenplan', 'coop-odenplan'],
-          requireEveryProductInEveryStore: true
+          targetPriceTypes: ['shelf'],
+          requireEveryProductInEveryStore: true,
+          requireEveryStorePriceType: true
         })
       },
       { pgPoolFactory: () => pool }
@@ -1060,9 +1076,11 @@ describe('runtime config', () => {
       const body = await response.json() as {
         missingProductStorePairs: Array<{ productId: string; storeId: string }>;
         requiredActions: string[];
+        missingStorePriceTypes: Array<{ storeId: string; priceType: string }>;
       };
       assert.deepEqual(body.missingProductStorePairs, [{ productId: 'milk', storeId: 'coop-odenplan' }]);
-      assert.deepEqual(body.requiredActions, ['backfill_product_store_pairs:1']);
+      assert.deepEqual(body.missingStorePriceTypes, [{ storeId: 'coop-odenplan', priceType: 'shelf' }]);
+      assert.deepEqual(body.requiredActions, ['backfill_product_store_pairs:1', 'backfill_store_price_types:1']);
     } finally {
       await service.close();
     }

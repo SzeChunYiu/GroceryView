@@ -82,11 +82,18 @@ function validateCatalogTargets(env) {
   requireNonEmptyStringArray(targets.targetCategories, 'CATALOG_COVERAGE_TARGETS_JSON.targetCategories');
   const targetChains = requireNonEmptyStringArray(targets.targetChains, 'CATALOG_COVERAGE_TARGETS_JSON.targetChains');
   const targetStores = requireNonEmptyStringArray(targets.targetStores, 'CATALOG_COVERAGE_TARGETS_JSON.targetStores');
+  const targetPriceTypes = requireNonEmptyStringArray(targets.targetPriceTypes, 'CATALOG_COVERAGE_TARGETS_JSON.targetPriceTypes');
   requireRequiredChains('CATALOG_COVERAGE_TARGETS_JSON.targetChains', targetChains);
+  if (!targetPriceTypes.includes('shelf')) {
+    throw new Error('CATALOG_COVERAGE_TARGETS_JSON.targetPriceTypes must include shelf so weekly promotions cannot satisfy branch shelf-price readiness.');
+  }
   if (targets.requireEveryProductInEveryStore !== false) {
     throw new Error('CATALOG_COVERAGE_TARGETS_JSON.requireEveryProductInEveryStore must be false; branch-price readiness uses observed/queryable store coverage, not a cross-chain product-store cartesian matrix.');
   }
-  return { productCount: targetProducts.length, storeCount: targetStores.length, targetStores };
+  if (targets.requireEveryStorePriceType !== true) {
+    throw new Error('CATALOG_COVERAGE_TARGETS_JSON.requireEveryStorePriceType must be true so every target branch proves required price types.');
+  }
+  return { productCount: targetProducts.length, storeCount: targetStores.length, targetStores, targetPriceTypes };
 }
 
 function validateConnectorStoreCoverage(connectorStoreIds, targetStores) {
@@ -116,7 +123,8 @@ export function validateProductionEnv(env) {
     connectorStoreCount: connectors.connectorStoreCount,
     connectorStoreCoverageCount,
     coverageProductCount: coverage.productCount,
-    coverageStoreCount: coverage.storeCount
+    coverageStoreCount: coverage.storeCount,
+    coveragePriceTypes: coverage.targetPriceTypes
   };
 }
 
@@ -149,7 +157,9 @@ function selfTestEnv() {
       targetCategories: ['coffee', 'dairy'],
       targetChains: chains,
       targetStores: chains.map((chainId) => `${chainId}-odenplan`),
-        requireEveryProductInEveryStore: false
+      targetPriceTypes: ['shelf'],
+      requireEveryProductInEveryStore: false,
+      requireEveryStorePriceType: true
     })
   };
 }

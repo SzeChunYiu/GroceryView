@@ -2566,6 +2566,10 @@ function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCov
     return fieldValue.map((entry) => String(entry).trim());
   };
   const targetChains = readStringArray('targetChains');
+  const targetPriceTypes = readStringArray('targetPriceTypes');
+  if (!targetPriceTypes.includes('shelf')) {
+    throw new Error('CATALOG_COVERAGE_TARGETS_JSON.targetPriceTypes must include shelf.');
+  }
   const missingRequiredChains = requiredDailyChainIds.filter((chainId) => !targetChains.includes(chainId));
   if (missingRequiredChains.length > 0) {
     throw new Error(`CATALOG_COVERAGE_TARGETS_JSON.targetChains is missing required chains: ${missingRequiredChains.join(', ')}.`);
@@ -2575,7 +2579,9 @@ function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCov
     targetCategories: readStringArray('targetCategories'),
     targetChains,
     targetStores: readStringArray('targetStores'),
-    requireEveryProductInEveryStore: record.requireEveryProductInEveryStore !== false
+    targetPriceTypes,
+    requireEveryProductInEveryStore: record.requireEveryProductInEveryStore !== false,
+    requireEveryStorePriceType: record.requireEveryStorePriceType === true
   };
 }
 
