@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
 
+export * from './queries/stores.js';
+
 export type Migration = {
   version: string;
   sql: string;

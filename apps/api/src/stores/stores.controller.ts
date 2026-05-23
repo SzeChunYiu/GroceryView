@@ -65,10 +65,10 @@ export class StoresController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ description: 'Store detail' })
+  @ApiOkResponse({ description: 'Store detail with opening hours and assortment overview' })
   detail(@Param('id') id: string) {
-    const store = groceryApi.getStore(id);
-    if (!store) throw new NotFoundException('Store not found');
-    return { ...store, demo: true };
+    const detail = groceryApi.getStoreDetail(id);
+    if (!detail) throw new NotFoundException('Store not found');
+    return { ...detail, demo: true };
   }
 }

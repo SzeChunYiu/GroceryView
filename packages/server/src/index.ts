@@ -2310,8 +2310,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
 
       const storeMatch = path.match(/^\/api\/stores\/([^/]+)$/);
       if (method === 'GET' && storeMatch) {
-        const store = api.getStore(decodeURIComponent(storeMatch[1]));
-        return store ? jsonResponse(store) : errorResponse(404, 'Store not found.');
+        const storeDetail = api.getStoreDetail(decodeURIComponent(storeMatch[1]));
+        return storeDetail ? jsonResponse(storeDetail) : errorResponse(404, 'Store not found.');
       }
 
       const storeDealsMatch = path.match(/^\/api\/stores\/([^/]+)\/deals$/);
@@ -2997,7 +2997,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/billing/checkout-sessions': { post: protectedOperation('Create a provider-backed subscription checkout session for the signed-in account.') },
       '/api/billing/portal-sessions': { post: protectedOperation('Create a provider-backed billing portal session for the signed-in account.') },
       '/api/billing/subscription-events': { post: billingWebhookOperation('Accept signed billing subscription events and persist entitlement updates.') },
-      '/api/stores/{id}': { get: publicOperation('Get store profile.') },
+      '/api/stores/{id}': { get: publicOperation('Get store profile with opening hours and assortment overview.') },
       '/api/stores/{id}/category-coverage': { get: publicOperation('Get store price coverage grouped by product category.') },
       '/api/stores/{id}/deal-summary': { get: publicOperation('Get store deal summary with category leaders and score guardrails.') },
       '/api/stores/{id}/deals': { get: publicOperation('Get ranked in-store deals for one store.') },

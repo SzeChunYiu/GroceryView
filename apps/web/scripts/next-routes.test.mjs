@@ -1964,6 +1964,23 @@ ${seo}`;
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
+  it('surfaces store detail opening hours and category-sorted assortment overview', async () => {
+    const route = await read('src/app/stores/[slug]/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+
+    assert.match(verified, /storeOpeningHoursLabel/);
+    assert.match(verified, /storeAssortmentOverviewForStore/);
+    assert.match(verified, /sort\(\(left, right\) => left\.category\.localeCompare\(right\.category/);
+    assert.match(route, /Opening hours/);
+    assert.match(route, /Assortment overview/);
+    assert.match(route, /assortmentOverview\.categories\.map/);
+    assert.match(route, /assortmentOverview\.items\.slice/);
+    assert.match(route, /branch-specific assortment rows/i);
+    assert.match(route, /No branch-specific assortment rows/i);
+    assert.doesNotMatch(route, /Math\.random/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
   it('adds an ICA locator entry point from the store directory', async () => {
     const route = await read('src/app/stores/page.tsx');
     assert.match(route, /href="\/stores\/ica"/);

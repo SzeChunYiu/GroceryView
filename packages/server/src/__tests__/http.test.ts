@@ -361,6 +361,36 @@ describe('createHttpHandler', () => {
     assert.equal(stores.status, 200);
     assert.equal((await json(stores) as Array<{ id: string }>)[0].id, 'willys-odenplan');
 
+    const storeDetail = await handle(new Request('http://localhost/api/stores/willys-odenplan'));
+    assert.equal(storeDetail.status, 200);
+    const storeDetailBody = await json(storeDetail) as {
+      id: string;
+      name: string;
+      store: { id: string; address: string };
+      openingHours: string[];
+      assortment: {
+        items: Array<{ category: string; productId: string; priceLabel: string }>;
+        categories: Array<{ category: string; itemCount: number }>;
+      };
+      guardrails: string[];
+    };
+    assert.equal(storeDetailBody.id, 'willys-odenplan');
+    assert.equal(storeDetailBody.name, 'Willys Odenplan');
+    assert.equal(storeDetailBody.store.id, 'willys-odenplan');
+    assert.equal(storeDetailBody.store.address, 'Odenplan, Stockholm');
+    assert.deepEqual(storeDetailBody.openingHours, ['Mon-Fri 08:00-22:00', 'Sat-Sun 09:00-21:00']);
+    assert.deepEqual(storeDetailBody.assortment.items.map((item) => [item.category, item.productId, item.priceLabel]), [
+      ['coffee', 'coffee', 'verified_shelf'],
+      ['dairy', 'milk', 'verified_shelf'],
+      ['dairy', 'butter', 'verified_shelf'],
+      ['dairy', 'private-label-milk', 'verified_shelf']
+    ]);
+    assert.deepEqual(storeDetailBody.assortment.categories.map((category) => [category.category, category.itemCount]), [
+      ['coffee', 1],
+      ['dairy', 3]
+    ]);
+    assert.match(storeDetailBody.guardrails[0] ?? '', /verified shelf price rows/i);
+
     const storeDeals = await handle(new Request('http://localhost/api/stores/willys-odenplan/deals'));
     assert.equal(storeDeals.status, 200);
     assert.deepEqual((await json(storeDeals) as Array<{ productId: string; storeId: string }>).map((deal) => [deal.productId, deal.storeId]), [
