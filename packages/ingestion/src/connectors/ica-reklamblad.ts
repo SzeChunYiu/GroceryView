@@ -55,7 +55,38 @@ export const DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS = [
   'https://www.ica.se/erbjudanden/ica-kvantum-kungsholmen-1004599/',
   'https://www.ica.se/erbjudanden/ica-supermarket-faltoversten-1004228/',
   'https://www.ica.se/erbjudanden/ica-kvantum-sodermalm-1004222/',
-  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-bromma-1015001/'
+  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-bromma-1015001/',
+  'https://www.ica.se/erbjudanden/ica-nara-sergels-torg-1004329/',
+  'https://www.ica.se/erbjudanden/ica-nara-baner-1004414/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-esplanad-sthlm-1004164/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-kungsholmstorg-1004026/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-aptiten-1003988/',
+  'https://www.ica.se/erbjudanden/ica-nara-humlegarden-1003770/',
+  'https://www.ica.se/erbjudanden/ica-karlaplan-1003714/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-sabbatsberg-1004134/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-medborgarplatsen-1003941/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-pelikan-1003447/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-baronen-stockholm-1004155/',
+  'https://www.ica.se/erbjudanden/ica-nara-a-livs-1004177/',
+  'https://www.ica.se/erbjudanden/ica-abrahamsberg-1003617/',
+  'https://www.ica.se/erbjudanden/ica-affaren-orarna-1003909/',
+  'https://www.ica.se/erbjudanden/ica-nara-affarn-sydkoster-1003964/',
+  'https://www.ica.se/erbjudanden/ica-togo-agunnaryd-1168009/',
+  'https://www.ica.se/erbjudanden/ica-nara-ahlgrens-torg-1051006/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-ale-1003458/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-alen-1003663/',
+  'https://www.ica.se/erbjudanden/ica-nara-alexius-livs-1003644/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-alfta-1004242/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-algots-monsteras-1003645/',
+  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-alingsas-1003647/',
+  'https://www.ica.se/erbjudanden/ica-nara-allans-livs-1003942/',
+  'https://www.ica.se/erbjudanden/ica-nara-allens-1004333/',
+  'https://www.ica.se/erbjudanden/ica-krysset-almunge-1003650/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-almers-1004079/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-alno-1003652/',
+  'https://www.ica.se/erbjudanden/ica-nara-alskog-1004473/',
+  'https://www.ica.se/erbjudanden/ica-nara-alsterhallen-1003653/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-alunda-1003654/'
 ] as const;
 export const EMAGIN_PDF_API_BASE_URL = 'https://api.e-magin.se/api/pdf/';
 
@@ -71,9 +102,9 @@ export async function fetchIcaReklambladOffers(
   options: FetchIcaReklambladOffersOptions = {}
 ): Promise<IcaReklambladOffer[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const sourceUrls = options.sourceUrls ?? [options.sourceUrl ?? ICA_REKLAMBLAD_OFFER_PAGE_URL];
+  const sourceUrls = options.sourceUrls ?? (options.sourceUrl ? [options.sourceUrl] : DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS);
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
-  const maxRows = options.maxRows ?? 150;
+  const maxRows = options.maxRows ?? 2000;
   const rows: IcaReklambladOffer[] = [];
 
   for (const sourceUrl of sourceUrls) {

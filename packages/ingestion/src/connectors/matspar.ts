@@ -66,9 +66,38 @@ export const DEFAULT_MATSPAR_SEARCH_QUERIES = [
   'gronsaker',
   'godis',
   'soppa',
-  'tacos'
+  'tacos',
+  'broccoli',
+  'blomkal',
+  'morot',
+  'lok',
+  'paprika',
+  'gurka',
+  'apple',
+  'apelsin',
+  'paron',
+  'vindruvor',
+  'lax',
+  'rakor',
+  'tonfisk',
+  'bacon',
+  'skinka',
+  'gradde',
+  'creme fraiche',
+  'kvarg',
+  'keso',
+  'knackebrod',
+  'tortilla',
+  'majonnas',
+  'senap',
+  'sylt',
+  'honung',
+  'notter',
+  'mandel',
+  'tvattmedel',
+  'diskmedel'
 ] as const;
-export const DEFAULT_MATSPAR_MAX_ROWS = 1200;
+export const DEFAULT_MATSPAR_MAX_ROWS = 1800;
 
 export type FetchMatsparProductsOptions = {
   fetchImpl?: typeof fetch;
