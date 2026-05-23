@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 21:15 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 22:38 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**24** store pages, ~**35** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **209**
+- **Shipped `feat:`/`wire:` PRs to date:** **208**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,31 +42,31 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
-- #1421 feat: add product card price sparklines
-- #1414 feat(ingestion): add unit price string normalisation
-- #1419 feat(web): add category breadcrumbs
-- #1395 feat(ingest): add Coop branch flyer discounts
-- #1408 feat(web): share screener query defaults between deals and screener
-- #1402 feat(ingest): add Lidl bulk products connector
-- #1404 feat(web): add price alert subscription routes
-- #1405 feat(web): add weekly price-drop digest API
-- #1372 feat(ingest): deepen Matspar public search rows
-- #1374 wire pharmacy daily connector export
-- #1390 feat(web): rebase and sync watchlist with verified-data inputs
-- #1375 feat(ingest): deepen Mathem public search rows
-- #1333 feat(fuel): prices
-- #1309 feat(ingest): deepen real grocery source rows
-- #1370 feat(ingestion): wire pharmacy daily connector
+- #1455 feat(ingest): persist Matspar daily prices
+- #1451 feat: wire unit price alerts to API
+- #1450 feat(web): add price history CSV export
+- #1446 feat(ingest): add ICA Toria store prices
+- #1434 feat(web): add trending products carousel
+- #1439 feat(ingest): deepen Matpriskollen offer rows
+- #1449 feat(api): export product price history csv
+- #1447 feat(web): align desktop nav groups to ticket spec
+- #1444 feat(web): add ICA locator entry point from stores directory
+- #1436 feat(ingest): expand Apohem public product rows
+- #1438 feat(ingest): deepen City Gross public rows
+- #1445 feat(ingest): deepen Matspar public product rows
+- #1443 feat: add chain comparison table
+- #1440 feat(web): build sitemap from catalog records
+- #1425 feat: add Willys bulk ingestion connector
 
 ## 🔄 In progress (open PRs)
 
-- #1428 [codex] Guard account deletion flow route
-- #1427 [codex] Guard dedicated expiry deals radar page
-- #1426 Track out-of-stock observations
-- #1425 feat: add Willys bulk ingestion connector
-- #1424 [codex] Align screener sort options with constants
-- #1423 [codex] Add products pagination endpoint
-- #1422 [codex] Expose product pagination totals
+- #1457 feat: add URL-backed faceted product search
+- #1456 [codex] Add Norway coverage readiness gate
+- #1454 Add Telegram price alert notifications
+- #1453 [codex] Carry trust evidence for receipt alias candidates _(draft)_
+- #1452 [codex] Build retailer browser overlay extension
+- #1441 Add query-driven chain comparison table
+- #1433 [codex] Add confidence badge tooltip _(draft)_
 - #1416 [codex] Add DB snapshot partial cache CLI smoke
 - #1415 feat(web): add homepage brand filter _(draft)_
 - #1412 test: cover DB snapshot cache miss CLI
