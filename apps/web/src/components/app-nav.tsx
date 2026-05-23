@@ -7,13 +7,11 @@ import {
   ChevronDown,
   Database,
   Flame,
-  Fuel,
   Heart,
   ListChecks,
   Map,
   PackageSearch,
   PiggyBank,
-  Pill,
   Search,
   ShoppingBasket,
   Store,
@@ -44,7 +42,7 @@ const navGroups: NavGroup[] = [
       { href: '/', label: 'Overview', icon: BarChart3 },
       { href: '/chain-index', label: 'Chain index', icon: Database },
       { href: '/categories', label: 'Categories', icon: Tags },
-      { href: '/map', label: 'Heatmap', icon: Flame },
+      { href: '/heatmap', label: 'Heatmap', icon: Flame },
       { href: '/screener', label: 'Screener', icon: Search }
     ]
   },
@@ -53,7 +51,6 @@ const navGroups: NavGroup[] = [
     icon: PackageSearch,
     items: [
       { href: '/products', label: 'Browse', icon: PackageSearch },
-      { href: '/pharmacy', label: 'Pharmacy', icon: Pill },
       { href: '/compare', label: 'Compare', icon: ListChecks }
     ]
   },
@@ -62,8 +59,7 @@ const navGroups: NavGroup[] = [
     icon: Store,
     items: [
       { href: '/map', label: 'Map', icon: Map },
-      { href: '/stores', label: 'Stores', icon: Store },
-      { href: '/fuel', label: 'Fuel', icon: Fuel }
+      { href: '/stores', label: 'Stores', icon: Store }
     ]
   },
   {
