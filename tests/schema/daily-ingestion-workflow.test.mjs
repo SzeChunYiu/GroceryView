@@ -23,6 +23,16 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /production_config_preflight_diagnostic_missing/);
     assert.match(workflow, /name: Upload production config preflight evidence\n\s+if:\s*always\(\)/);
     assert.match(workflow, /name:\s*groceryview-production-config-preflight/);
+    assert.match(workflow, /name: Preflight DB recovery and cutover unblockers/);
+    assert.match(workflow, /ops:check-production-secrets\s+--\s+--from-env\s+--scope\s+db-recovery/);
+    assert.match(workflow, /ops:check-production-secrets\s+--\s+--from-env\s+--scope\s+db-cutover/);
+    assert.match(workflow, /\/tmp\/daily-db-unblocker-preflight\.json/);
+    assert.match(workflow, /dbRecoveryStatus/);
+    assert.match(workflow, /dbCutoverStatus/);
+    assert.match(workflow, /db_recovery_secret_audit_diagnostic_missing/);
+    assert.match(workflow, /db_cutover_secret_audit_diagnostic_missing/);
+    assert.match(workflow, /name: Upload DB unblocker preflight evidence\n\s+if:\s*always\(\)/);
+    assert.match(workflow, /name:\s*groceryview-db-unblocker-preflight/);
 
     for (const command of [
       'npm ci',
@@ -104,6 +114,10 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /SUPABASE_PROJECT_REF:\s*\$\{\{ vars\.SUPABASE_PROJECT_REF \|\| secrets\.SUPABASE_PROJECT_REF \}\}/);
     assert.match(workflow, /npm run --silent ops:db-recovery-packet >\/tmp\/production-db-recovery-packet\.json/);
     assert.match(workflow, /production_db_recovery_packet_missing_credentials/);
+    assert.match(workflow, /configure-replacement-db-cutover/);
+    assert.match(workflow, /REPLACEMENT_DATABASE_URL or CANDIDATE_DATABASE_URL/);
+    assert.match(workflow, /npm run --silent ops:check-production-secrets -- --scope db-recovery/);
+    assert.match(workflow, /npm run --silent ops:check-production-secrets -- --scope db-cutover/);
     assert.match(workflow, /production_db_recovery_packet_diagnostic_missing/);
     assert.match(workflow, /name: Upload production DB recovery packet\n\s+if:\s*failure\(\)/);
     assert.match(workflow, /name:\s*groceryview-production-db-recovery-packet/);

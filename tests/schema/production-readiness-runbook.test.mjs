@@ -61,6 +61,12 @@ describe('production daily ingestion readiness runbook', () => {
 
   it('documents production ingestion config evidence artifacts', () => {
     assert.match(runbook, /groceryview-production-ingestion-config/);
+    assert.match(runbook, /groceryview-db-unblocker-preflight/);
+    assert.match(runbook, /db-recovery/);
+    assert.match(runbook, /db-cutover/);
+    assert.match(runbook, /daily-db-unblocker-preflight\.json/);
+    assert.match(runbook, /db_recovery_secret_audit_diagnostic_missing/);
+    assert.match(runbook, /db_cutover_secret_audit_diagnostic_missing/);
     assert.match(runbook, /production-env-validation\.json/);
     assert.match(runbook, /groceryview-catalog-targets\.json/);
     assert.match(runbook, /groceryview-daily-connectors\.json/);
