@@ -4,7 +4,9 @@ import {
   apiContractOpenApiComponents,
   apiContractSchemas,
   fuelPriceObservationSchema,
+  notificationInboxResponseSchema,
   priceObservationSchema,
+  type NotificationInboxResponseDto,
   type PriceObservationDto
 } from '../index.js';
 
@@ -33,6 +35,61 @@ const validPrice: PriceObservationDto = {
   }
 };
 
+const validNotificationInbox: NotificationInboxResponseDto = {
+  userId: 'user-1',
+  generatedAt: '2026-05-23T09:30:00.000Z',
+  trackedItemCount: 1,
+  activeAlertCount: 3,
+  deliveredCount: 1,
+  heldCount: 1,
+  suppressedCount: 1,
+  summary: {
+    delivered: 1,
+    held: 1,
+    suppressed: 1,
+    total: 3
+  },
+  queue: [
+    {
+      id: 'alert-coffee-target-price-0',
+      title: 'Zoegas Coffee 450g',
+      channel: 'push',
+      status: 'delivered',
+      reason: 'Verified shelf price trigger',
+      action: 'Open price history',
+      priority: 'high',
+      productId: 'coffee',
+      sendAt: '2026-05-23T09:00:00.000Z'
+    },
+    {
+      id: 'receipt-review-quiet-hours',
+      title: 'Receipt review reminder',
+      channel: 'push',
+      status: 'held',
+      reason: 'Quiet hours 21:00-07:00',
+      action: 'Send in morning digest',
+      priority: 'normal',
+      sendAt: '2026-05-24T07:00:00.000Z'
+    },
+    {
+      id: 'butter-provider-suppression',
+      title: 'Butter target price',
+      channel: 'email',
+      status: 'suppressed',
+      reason: 'Provider token invalid',
+      action: 'Request device refresh',
+      priority: 'normal',
+      productId: 'butter',
+      sendAt: '2026-05-23T08:45:00.000Z'
+    }
+  ],
+  quietHoursWindow: '21:00-07:00',
+  guardrails: [
+    'Estimated prices never generate household alerts.',
+    'Quiet-hours holds wait for the morning digest unless the alert is critical.'
+  ]
+};
+
 describe('api contract schemas', () => {
   it('exports DTO schemas for the Phase 1 API resources', () => {
     assert.deepEqual(Object.keys(apiContractSchemas).sort(), [
@@ -43,6 +100,8 @@ describe('api contract schemas', () => {
       'fuelPriceSource',
       'fuelPricesResponse',
       'latestPrice',
+      'notificationInboxQueueItem',
+      'notificationInboxResponse',
       'priceObservation',
       'product',
       'productPricesResponse',
@@ -134,6 +193,29 @@ describe('api contract schemas', () => {
     );
   });
 
+  it('contracts notification inbox response timing fields', () => {
+    const parsed = notificationInboxResponseSchema.parse(validNotificationInbox);
+
+    assert.equal(parsed.generatedAt, '2026-05-23T09:30:00.000Z');
+    assert.deepEqual(parsed.queue.map((item) => item.sendAt), [
+      '2026-05-23T09:00:00.000Z',
+      '2026-05-24T07:00:00.000Z',
+      '2026-05-23T08:45:00.000Z'
+    ]);
+
+    const result = notificationInboxResponseSchema.safeParse({
+      ...validNotificationInbox,
+      generatedAt: undefined,
+      queue: validNotificationInbox.queue.map(({ sendAt: _sendAt, ...item }) => item)
+    });
+
+    assert.equal(result.success, false);
+    if (!result.success) {
+      const fields = result.error.issues.map((issue) => issue.path.join('.')).sort();
+      assert.deepEqual(fields, ['generatedAt', 'queue.0.sendAt', 'queue.1.sendAt', 'queue.2.sendAt']);
+    }
+  });
+
   it('publishes OpenAPI-compatible component metadata for price provenance', () => {
     const price = apiContractOpenApiComponents.PriceObservation;
     const fuel = apiContractOpenApiComponents.FuelPriceObservation;
@@ -145,6 +227,10 @@ describe('api contract schemas', () => {
     assert.ok(price.required.includes('observedAt'));
     assert.ok(price.required.includes('sourceType'));
     assert.ok(price.required.includes('provenance'));
+    assert.ok(apiContractOpenApiComponents.NotificationInboxResponse.required.includes('generatedAt'));
+    assert.ok(apiContractOpenApiComponents.NotificationInboxQueueItem.required.includes('sendAt'));
+    assert.equal(apiContractOpenApiComponents.NotificationInboxResponse.properties.generatedAt.format, 'date-time');
+    assert.equal(apiContractOpenApiComponents.NotificationInboxQueueItem.properties.sendAt.format, 'date-time');
     assert.deepEqual(price.properties.priceType.enum, ['shelf', 'member', 'promotion', 'estimated']);
     assert.deepEqual(apiContractOpenApiComponents.FuelPriceObservation.properties.fuelGrade.enum, ['95', '98', 'diesel', 'hvo100', 'e85']);
   });

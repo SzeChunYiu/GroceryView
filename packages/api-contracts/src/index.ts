@@ -139,6 +139,37 @@ export const alertSchema = z.object({
   price: priceObservationSchema.optional()
 });
 
+export const notificationInboxQueueItemSchema = z.object({
+  id: idSchema,
+  title: idSchema,
+  channel: z.enum(['push', 'email']),
+  status: z.enum(['delivered', 'held', 'suppressed']),
+  reason: idSchema,
+  action: idSchema,
+  priority: z.enum(['normal', 'high']),
+  productId: idSchema.optional(),
+  sendAt: isoDateTimeSchema
+});
+
+export const notificationInboxResponseSchema = z.object({
+  userId: idSchema,
+  generatedAt: isoDateTimeSchema,
+  trackedItemCount: z.number().int().nonnegative(),
+  activeAlertCount: z.number().int().nonnegative(),
+  deliveredCount: z.number().int().nonnegative(),
+  heldCount: z.number().int().nonnegative(),
+  suppressedCount: z.number().int().nonnegative(),
+  summary: z.object({
+    delivered: z.number().int().nonnegative(),
+    held: z.number().int().nonnegative(),
+    suppressed: z.number().int().nonnegative(),
+    total: z.number().int().nonnegative()
+  }),
+  queue: z.array(notificationInboxQueueItemSchema),
+  quietHoursWindow: idSchema,
+  guardrails: z.array(idSchema)
+});
+
 export const productPricesResponseSchema = z.object({
   product: productSchema,
   prices: z.array(latestPriceSchema)
@@ -153,6 +184,8 @@ export const apiContractSchemas = {
   fuelPriceSource: fuelPriceSourceSchema,
   fuelPricesResponse: fuelPricesResponseSchema,
   priceObservation: priceObservationSchema,
+  notificationInboxQueueItem: notificationInboxQueueItemSchema,
+  notificationInboxResponse: notificationInboxResponseSchema,
   product: productSchema,
   productPricesResponse: productPricesResponseSchema,
   provenance: provenanceSchema,
@@ -169,6 +202,8 @@ export type FuelPriceObservationDto = z.infer<typeof fuelPriceObservationSchema>
 export type FuelPriceSourceDto = z.infer<typeof fuelPriceSourceSchema>;
 export type FuelPricesResponseDto = z.infer<typeof fuelPricesResponseSchema>;
 export type LatestPriceDto = z.infer<typeof latestPriceSchema>;
+export type NotificationInboxQueueItemDto = z.infer<typeof notificationInboxQueueItemSchema>;
+export type NotificationInboxResponseDto = z.infer<typeof notificationInboxResponseSchema>;
 export type PriceDomain = z.infer<typeof priceDomainSchema>;
 export type PriceObservationDto = z.infer<typeof priceObservationSchema>;
 export type PriceType = z.infer<typeof priceTypeSchema>;
@@ -213,6 +248,62 @@ export const apiContractOpenApiComponents = {
       observedAt: { type: 'string', format: 'date-time' },
       source: { $ref: '#/components/schemas/FuelPriceSource' },
       provenance: { $ref: '#/components/schemas/Provenance' }
+    }
+  },
+  NotificationInboxQueueItem: {
+    type: 'object',
+    required: ['id', 'title', 'channel', 'status', 'reason', 'action', 'priority', 'sendAt'],
+    properties: {
+      id: { type: 'string' },
+      title: { type: 'string' },
+      channel: { type: 'string', enum: ['push', 'email'] },
+      status: { type: 'string', enum: ['delivered', 'held', 'suppressed'] },
+      reason: { type: 'string' },
+      action: { type: 'string' },
+      priority: { type: 'string', enum: ['normal', 'high'] },
+      productId: { type: 'string' },
+      sendAt: { type: 'string', format: 'date-time' }
+    }
+  },
+  NotificationInboxResponse: {
+    type: 'object',
+    required: [
+      'userId',
+      'generatedAt',
+      'trackedItemCount',
+      'activeAlertCount',
+      'deliveredCount',
+      'heldCount',
+      'suppressedCount',
+      'summary',
+      'queue',
+      'quietHoursWindow',
+      'guardrails'
+    ],
+    properties: {
+      userId: { type: 'string' },
+      generatedAt: { type: 'string', format: 'date-time' },
+      trackedItemCount: { type: 'integer', minimum: 0 },
+      activeAlertCount: { type: 'integer', minimum: 0 },
+      deliveredCount: { type: 'integer', minimum: 0 },
+      heldCount: { type: 'integer', minimum: 0 },
+      suppressedCount: { type: 'integer', minimum: 0 },
+      summary: {
+        type: 'object',
+        required: ['delivered', 'held', 'suppressed', 'total'],
+        properties: {
+          delivered: { type: 'integer', minimum: 0 },
+          held: { type: 'integer', minimum: 0 },
+          suppressed: { type: 'integer', minimum: 0 },
+          total: { type: 'integer', minimum: 0 }
+        }
+      },
+      queue: {
+        type: 'array',
+        items: { $ref: '#/components/schemas/NotificationInboxQueueItem' }
+      },
+      quietHoursWindow: { type: 'string' },
+      guardrails: { type: 'array', items: { type: 'string' } }
     }
   },
   FuelPriceSource: {
