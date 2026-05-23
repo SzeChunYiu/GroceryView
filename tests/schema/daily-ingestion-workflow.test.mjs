@@ -118,6 +118,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /missingRequiredChains/);
     assert.match(workflow, /missingRequiredStoreExternalRefs/);
     assert.match(workflow, /missingRequiredProductSlugs/);
+    assert.match(workflow, /missingRequiredStorePriceTypes/);
     assert.match(workflow, /name:\s*groceryview-db-site-snapshot/);
     assert.match(workflow, /path:\s*\/tmp\/groceryview-db-site-snapshot\.json/);
     assert.match(workflow, /missingProductStorePairs/);

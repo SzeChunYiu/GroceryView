@@ -37,7 +37,14 @@ export function parseRequiredProductSlugsFromCatalogTargets(value) {
   return targets.targetProducts.map((product) => String(product).trim()).filter(Boolean);
 }
 
-export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS, requiredStoreExternalRefs = [], requiredProductSlugs = [] }) {
+export function parseRequiredPriceTypesFromCatalogTargets(value) {
+  const targets = parseCatalogCoverageTargets(value);
+  if (!targets) return [];
+  if (!Array.isArray(targets.targetPriceTypes)) throw new Error('Catalog coverage targets must include targetPriceTypes.');
+  return targets.targetPriceTypes.map((priceType) => String(priceType).trim()).filter(Boolean);
+}
+
+export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS, requiredStoreExternalRefs = [], requiredProductSlugs = [], requiredPriceTypes = [] }) {
   if (!Array.isArray(rows) || rows.length === 0) throw new Error('No latest price rows available for DB-to-site snapshot export.');
 
   const priceRows = rows.map((row) => ({
@@ -77,6 +84,18 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
   if (missingRequiredStoreExternalRefs.length > 0) {
     throw new Error(`db_site_snapshot_missing_required_stores:${missingRequiredStoreExternalRefs.join(',')}`);
   }
+  const normalizedRequiredPriceTypes = [...new Set(requiredPriceTypes.map((priceType) => String(priceType).trim()).filter(Boolean))].sort();
+  const observedStorePriceTypes = new Set(priceRows
+    .filter((row) => row.storeExternalRef)
+    .map((row) => `${row.storeExternalRef}:${row.priceType}`));
+  const missingRequiredStorePriceTypes = normalizedRequiredStoreExternalRefs.flatMap((storeExternalRef) =>
+    normalizedRequiredPriceTypes
+      .filter((priceType) => !observedStorePriceTypes.has(`${storeExternalRef}:${priceType}`))
+      .map((priceType) => `${storeExternalRef}:${priceType}`)
+  );
+  if (missingRequiredStorePriceTypes.length > 0) {
+    throw new Error(`db_site_snapshot_missing_required_store_price_types:${missingRequiredStorePriceTypes.join(',')}`);
+  }
   const observedProductSlugs = new Set(priceRows.map((row) => row.productSlug));
   const normalizedRequiredProductSlugs = [...new Set(requiredProductSlugs.map((product) => String(product).trim()).filter(Boolean))].sort();
   const missingRequiredProductSlugs = normalizedRequiredProductSlugs.filter((product) => !observedProductSlugs.has(product));
@@ -98,7 +117,9 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
       requiredStoreExternalRefs: normalizedRequiredStoreExternalRefs,
       missingRequiredStoreExternalRefs,
       requiredProductSlugs: normalizedRequiredProductSlugs,
-      missingRequiredProductSlugs
+      missingRequiredProductSlugs,
+      requiredPriceTypes: normalizedRequiredPriceTypes,
+      missingRequiredStorePriceTypes
     },
     priceRows
   };
@@ -117,6 +138,7 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
     : env.GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON;
   const requiredStoreExternalRefs = parseRequiredStoreExternalRefsFromCatalogTargets(requiredStoreTargetsJson);
   const requiredProductSlugs = parseRequiredProductSlugsFromCatalogTargets(requiredStoreTargetsJson);
+  const requiredPriceTypes = parseRequiredPriceTypesFromCatalogTargets(requiredStoreTargetsJson);
 
   const [{ createPgQueryExecutor, createPostgresSiteSnapshotReader }, pg] = await Promise.all([
     import('@groceryview/db'),
@@ -126,7 +148,7 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   try {
     const reader = createPostgresSiteSnapshotReader(createPgQueryExecutor(pool));
     const rows = await reader.listLatestPriceSnapshotRows({ minConfidence, limit });
-    const artifact = buildDbSiteSnapshotArtifact({ rows, requiredChains, requiredStoreExternalRefs, requiredProductSlugs });
+    const artifact = buildDbSiteSnapshotArtifact({ rows, requiredChains, requiredStoreExternalRefs, requiredProductSlugs, requiredPriceTypes });
     writeFileSync(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
     return artifact;
   } finally {
