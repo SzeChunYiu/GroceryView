@@ -5,7 +5,11 @@
     "rootDir": "src",
     "noEmit": false,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {},
+    "jsx": "react-jsx"
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ]
 }

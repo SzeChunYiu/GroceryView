@@ -40,7 +40,7 @@ describe('mobile Expo Router screens', () => {
         assert.match(source, /from 'expo-router'/);
         assert.match(source, /<Stack/);
       } else {
-        assert.match(source, /GroceryViewNativeScreen/);
+        assert.match(source, file.includes('/scan/') ? /MobileScanCaptureScreen/ : /GroceryViewNativeScreen/);
         assert.match(source, new RegExp(`screenName="${screen}"`));
       }
     }
