@@ -647,6 +647,51 @@ function priceChangeEventLogFor(product: NonNullable<ReturnType<typeof findProdu
   };
 }
 
+function priceMoveNotesFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const priceChangeLog = priceChangeEventLogFor(product);
+  const sourceProvenance = 'lowestPrice' in product
+    ? 'Willys/Hemköp current chain rows without dated move tape'
+    : `${product.observationCount} OpenPrices observations · ${product.code}`;
+  const guardrail = 'No news or retailer cause is inferred from the price move.';
+
+  if (!priceChangeLog.available || 'lowestPrice' in product) {
+    return {
+      available: false,
+      title: 'Why this price moved',
+      priceMoveNotes: [],
+      observationCount: priceChangeLog.observationCount,
+      sourceProvenance,
+      guardrail,
+      detail: `${priceChangeLog.detail} GroceryView withholds the why note because there are not enough consecutive OpenPrices rows; no promotion or seasonality claim is made without source evidence.`
+    };
+  }
+
+  const confidenceLabel = product.observationCount >= 12
+    ? 'strong observed-tape confidence'
+    : product.observationCount >= 4
+      ? 'limited observed-tape confidence'
+      : 'sparse observed-tape confidence';
+
+  const priceMoveNotes = priceChangeLog.priceChangeEvents.slice(0, 4).map((event) => ({
+    eventKey: `${event.previousObservedAt}-${event.observedAt}-${event.toPriceLabel}`,
+    headline: `Why this price moved: observed ${event.direction} ${event.changePercentLabel}`,
+    sourceProvenance,
+    confidenceLabel,
+    guardrail,
+    note: `Consecutive OpenPrices rows moved from ${event.fromPriceLabel} on ${event.previousObservedAt} to ${event.toPriceLabel} on ${event.observedAt}. This explains only the observed delta; no promotion or seasonality claim is made without explicit source evidence.`
+  }));
+
+  return {
+    available: priceMoveNotes.length > 0,
+    title: 'Why this price moved',
+    priceMoveNotes,
+    observationCount: priceChangeLog.observationCount,
+    sourceProvenance,
+    guardrail,
+    detail: 'Price-move notes are derived from the factual price-change event log and consecutive OpenPrices rows only. No news or retailer cause is inferred, and there is no promotion or seasonality claim without explicit source evidence.'
+  };
+}
+
 function seasonalMonthlyAveragesFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   const emptyMonthlySeasonalityRows: {
     monthLabel: (typeof monthLabels)[number];
@@ -964,6 +1009,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
   const typicalRangeBand = priceTypicalRangeBandFor(product);
   const priceChangeLog = priceChangeEventLogFor(product);
+  const priceMoveNotes = priceMoveNotesFor(product);
   const monthlySeasonality = seasonalMonthlyAveragesFor(product);
   const crossChainHistoryOverlay = crossChainHistoryOverlayFor(product);
   const intraChainBranchSpread = intraChainBranchSpreadFor(product);
@@ -1257,6 +1303,34 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{priceChangeLog.detail}</p>
         )}
         <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{priceChangeLog.detail}</p>
+      </Card>
+      <Card className="mt-6 overflow-hidden border-rose-200 bg-rose-50/80">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-rose-800">price move notes</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Why this price moved</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Explains only what changed between consecutive OpenPrices rows. {priceMoveNotes.guardrail} There is no promotion or seasonality claim without explicit source evidence.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-rose-900">{priceMoveNotes.observationCount} dated points</p>
+        </div>
+        {priceMoveNotes.available ? (
+          <div className="mt-5 grid gap-3 lg:grid-cols-2">
+            {priceMoveNotes.priceMoveNotes.map((note) => (
+              <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={note.eventKey}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-800">{note.confidenceLabel}</p>
+                <h3 className="mt-2 text-lg font-black text-slate-950">{note.headline}</h3>
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{note.note}</p>
+                <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">sourceProvenance {note.sourceProvenance}</p>
+                <p className="mt-2 text-xs font-semibold text-slate-500">{note.guardrail}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{priceMoveNotes.detail}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{priceMoveNotes.detail} sourceProvenance {priceMoveNotes.sourceProvenance}</p>
       </Card>
       <Card className="mt-6 overflow-hidden border-amber-200 bg-amber-50/80">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">

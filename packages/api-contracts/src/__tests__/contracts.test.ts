@@ -3,12 +3,14 @@ import assert from 'node:assert/strict';
 import {
   apiContractOpenApiComponents,
   apiContractSchemas,
+  fuelPriceObservationSchema,
   priceObservationSchema,
   type PriceObservationDto
 } from '../index.js';
 
 const validPrice: PriceObservationDto = {
   id: 'obs-1',
+  domain: 'grocery',
   productId: 'coffee',
   storeId: 'willys-odenplan',
   price: { amount: 49.9, currency: 'SEK' },
@@ -37,6 +39,8 @@ describe('api contract schemas', () => {
       'alert',
       'basket',
       'basketItem',
+      'fuelPriceObservation',
+      'fuelPriceSource',
       'latestPrice',
       'priceObservation',
       'product',
@@ -63,6 +67,41 @@ describe('api contract schemas', () => {
       const fields = result.error.issues.map((issue) => issue.path.join('.')).sort();
       assert.deepEqual(fields, ['confidence', 'observedAt', 'provenance', 'sourceType']);
     }
+  });
+
+  it('models fuel price observations by grade and source kind', () => {
+    const parsed = fuelPriceObservationSchema.parse({
+      id: 'okq8-fuel-95-e10-2026-05-22',
+      domain: 'fuel',
+      productId: 'fuel-95-e10',
+      chainId: 'okq8',
+      fuelGrade: '95',
+      pricePerLitre: { amount: 18.89, currency: 'SEK' },
+      observedAt: '2026-05-22T00:00:00.000Z',
+      source: {
+        kind: 'operator_public_price_page',
+        operatorId: 'okq8',
+        operatorName: 'OKQ8',
+        sourceUrl: 'https://www.okq8.se/foretag/priser/',
+        capturedAt: '2026-05-23T08:35:34.000Z',
+        parserVersion: 'okq8-fuel-prices-v1'
+      },
+      provenance: {
+        sourceRunId: 'source-run:okq8:fuel:2026-05-23',
+        sourceUrl: 'https://www.okq8.se/foretag/priser/',
+        capturedAt: '2026-05-23T08:35:34.000Z',
+        parserVersion: 'okq8-fuel-prices-v1'
+      }
+    });
+
+    assert.equal(parsed.domain, 'fuel');
+    assert.equal(parsed.source.kind, 'operator_public_price_page');
+    assert.equal(parsed.pricePerLitre.amount, 18.89);
+
+    assert.equal(fuelPriceObservationSchema.safeParse({
+      ...parsed,
+      domain: 'grocery'
+    }).success, false);
   });
 
   it('captures watchlist price-type preferences for trusted alerts', () => {
@@ -102,5 +141,6 @@ describe('api contract schemas', () => {
     assert.ok(price.required.includes('sourceType'));
     assert.ok(price.required.includes('provenance'));
     assert.deepEqual(price.properties.priceType.enum, ['shelf', 'member', 'promotion', 'estimated']);
+    assert.deepEqual(apiContractOpenApiComponents.FuelPriceObservation.properties.fuelGrade.enum, ['95', '98', 'diesel', 'hvo100', 'e85']);
   });
 });

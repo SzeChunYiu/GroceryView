@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import {
+  apiPerformanceReadiness,
   categoryQualityMatrix,
   commodityIngestionClassifierEvidence,
+  commodityMappingReviewPlan,
   formatPct,
   multiVerticalDomainFoundation,
   publicApiDirectory,
@@ -11,7 +13,8 @@ import {
   sourceCoverage,
   sourceReadinessMatrix,
   sourceRouteMap,
-  storeBrandLedger
+  storeBrandLedger,
+  timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -41,7 +44,7 @@ export default function DataSourcesPage() {
           <div>
             <h2 className="text-2xl font-black tracking-tight">Multi-vertical domain foundation</h2>
             <p className="mt-2 text-sm leading-6 text-slate-700">
-              GroceryView now scopes chains, stores, products, and observations by domain so fuel and pharmacy can reuse the terminal model later without mixing evidence. Non-grocery prices stay at zero until domain-scoped observations exist.
+              GroceryView scopes chains, stores, products, and observations by domain so fuel and pharmacy can reuse the terminal model without mixing evidence. Fuel now renders only operator-sourced domain rows; pharmacy separates public OTC evidence from connector-backed pharmacy-chain claims.
             </p>
           </div>
           <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-indigo-900 shadow-sm">domain default 'grocery'</p>
@@ -120,6 +123,108 @@ export default function DataSourcesPage() {
         </ul>
       </Card>
 
+      <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-800">perf(web)</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">API performance readiness</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              Hot public API paths now have an injectable Redis cache contract, product search returns cursor pagination envelopes, and production readiness remains fail closed until Redis cache credentials and pgbouncer pooler routing are configured. Long-range analytics are documented as rollups only.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-cyan-900 shadow-sm">{apiPerformanceReadiness.status}</p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {apiPerformanceReadiness.requiredRuntime.map((item) => (
+            <section className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm" key={item.label}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">{item.label}</p>
+              <p className="mt-2 text-sm font-bold leading-6 text-slate-800">{item.evidence}</p>
+              <p className="mt-3 rounded-xl bg-cyan-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-cyan-950">{item.currentState}</p>
+            </section>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_1fr]">
+          <section className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">Hot endpoints</p>
+            <div className="mt-3 space-y-3">
+              {apiPerformanceReadiness.hotEndpoints.map((endpoint) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={endpoint.path}>
+                  <p className="font-mono text-sm font-black text-slate-950">{endpoint.path}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{endpoint.coverage} · Redis cache TTL {endpoint.ttlSeconds}s</p>
+                </div>
+              ))}
+            </div>
+          </section>
+          <section className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">Rollups only for long ranges</p>
+            <div className="mt-3 space-y-3">
+              {apiPerformanceReadiness.rollupTables.map((rollup) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={rollup.table}>
+                  <p className="font-mono text-sm font-black text-slate-950">{rollup.table}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{rollup.usage}</p>
+                </div>
+              ))}
+            </div>
+            <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
+              {apiPerformanceReadiness.guardrails.map((guardrail) => (
+                <li key={guardrail}>• {guardrail}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-fuchsia-800">perf(db)</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">TimescaleDB evaluation</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              {timescaleDbEvaluation.title} is {timescaleDbEvaluation.status}: {timescaleDbEvaluation.recommendation} The visible contract keeps declarative monthly partitions as the active fallback instead of claiming TimescaleDB adoption without extension, hypertable, compression, and retention evidence.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-fuchsia-900 shadow-sm">{timescaleDbEvaluation.status}</p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {timescaleDbEvaluation.evaluationSignals.map((signal) => (
+            <section className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm" key={signal.label}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">{signal.label}</p>
+              <p className="mt-2 text-sm font-bold leading-6 text-slate-800">{signal.state}</p>
+              <p className="mt-3 rounded-xl bg-fuchsia-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-fuchsia-950">{signal.evidence}</p>
+            </section>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_1fr]">
+          <section className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">Fallback tables</p>
+            <div className="mt-3 space-y-3">
+              {timescaleDbEvaluation.fallbackTables.map((item) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={item.table}>
+                  <p className="font-mono text-sm font-black text-slate-950">{item.table}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{item.role}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+          <section className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">Retention fallback</p>
+            <div className="mt-3 space-y-3">
+              {timescaleDbEvaluation.fallbackFunctions.map((item) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={item.name}>
+                  <p className="font-mono text-sm font-black text-slate-950">{item.name}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{item.role}</p>
+                </div>
+              ))}
+            </div>
+            <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
+              {timescaleDbEvaluation.guardrails.map((guardrail) => (
+                <li key={guardrail}>• {guardrail}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </Card>
+
       <Card className="mt-6 border-lime-200 bg-lime-50/60">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
@@ -152,6 +257,59 @@ export default function DataSourcesPage() {
             <p className="mt-2 text-sm font-bold leading-6 text-amber-950">{commodityIngestionClassifierEvidence.sourceConfidencePolicy}</p>
             <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
               {commodityIngestionClassifierEvidence.guardrails.map((guardrail) => (
+                <li key={guardrail}>• {guardrail}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-orange-200 bg-orange-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-orange-800">feat(commodity)</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Commodity mapping curator review · {commodityMappingReviewPlan.title}</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              Low-confidence loose-item aliases are routed through human_review_assignments before any shopper-facing commodity coverage changes. Reporter trust is checked in community_reporter_trust, and reviewWritebacks stay limited to approved commodity mapping actions.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 text-right shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">Status</p>
+            <p className="mt-2 text-2xl font-black text-orange-950">{commodityMappingReviewPlan.status}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-700">{commodityMappingReviewPlan.queue.length} queued · {commodityMappingReviewPlan.assignments.length} assigned</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {commodityMappingReviewPlan.queue.map((item) => (
+            <section className="rounded-2xl border border-orange-100 bg-white p-4 shadow-sm" key={item.id}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">{item.priority} priority</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{item.subjectType}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{item.reason}</p>
+              <p className="mt-3 rounded-xl bg-orange-50 p-2 text-xs font-bold text-orange-950">{commodityMappingReviewPlan.queueTable} · {item.subjectId}</p>
+            </section>
+          ))}
+          {commodityMappingReviewPlan.reporterControls.map((control) => (
+            <section className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm" key={control.reporterId}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{commodityMappingReviewPlan.trustTable}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{control.reporterId}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{control.action}: {control.reason}</p>
+            </section>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_1fr]">
+          <section className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">reviewWritebacks</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {commodityMappingReviewPlan.reviewWritebacks.map((writeback) => (
+                <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-black text-orange-950" key={writeback}>{writeback}</span>
+              ))}
+            </div>
+            <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{commodityMappingReviewPlan.nextRuntimeStep}</p>
+          </section>
+          <section className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">Guardrails</p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
+              {commodityMappingReviewPlan.guardrails.map((guardrail) => (
                 <li key={guardrail}>• {guardrail}</li>
               ))}
             </ul>

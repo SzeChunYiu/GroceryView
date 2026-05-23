@@ -12,12 +12,19 @@
     "test": "npm run test -w @groceryview/core && npm run test -w @groceryview/api && npm run test -w @groceryview/api-contracts && npm run test -w @groceryview/auth && npm run test -w @groceryview/notifications && npm run test -w @groceryview/server && npm run test -w @groceryview/db && npm run test -w @groceryview/scanning && npm run test -w @groceryview/monetization && npm run test -w @groceryview/ops && npm run test -w @groceryview/catalog && npm run test -w @groceryview/ingestion && npm run test -w @groceryview/mobile && npm run test -w @groceryview/web && npm run ingest:verify && node --test tests/schema/*.test.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "ingest:generate-live": "npm run build -w @groceryview/ingestion && node scripts/ingestion/generate-live-retailer-ingested.mjs",
+    "ingest:openfoodfacts-db": "npm run build -w @groceryview/ingestion && node scripts/ingestion/persist-openfoodfacts-metadata.mjs",
     "ingest:verify": "node scripts/ingestion/verify-ingested-provenance.mjs",
     "ops:catalog-coverage-targets": "node scripts/ops/print-catalog-coverage-targets.mjs",
+    "ops:apply-db-migrations": "npm run build -w @groceryview/db && node scripts/ops/apply-db-migrations.mjs",
     "ops:check-production-secrets": "node scripts/ops/check-production-secrets.mjs",
+    "ops:check-daily-db-connectivity": "node scripts/ops/check-daily-db-connectivity.mjs",
     "ops:daily-connectors": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connectors.mjs",
     "ops:daily-connector-stores": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connector-stores.mjs",
-    "ops:validate-production-env": "node scripts/ops/validate-production-env.mjs"
+    "ops:validate-production-env": "node scripts/ops/validate-production-env.mjs",
+    "ingest:export-db-snapshot": "npm run build -w @groceryview/db && node scripts/ingestion/export-db-site-snapshot.mjs",
+    "ops:check-supabase-health": "node scripts/ops/check-supabase-project-health.mjs",
+    "ops:db-recovery-packet": "node scripts/ops/print-production-db-recovery-packet.mjs",
+    "ops:validate-db-cutover": "node scripts/ops/validate-db-cutover.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",

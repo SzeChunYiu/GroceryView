@@ -41,6 +41,27 @@ const CONNECTOR_TEMPLATES = [
     parserVersion: 'coop-products-native-v1',
     robotsTxtStatus: 'not_applicable',
     legalReviewStatus: 'approved',
+    hasDataAgreement: true,
+    storeFilter: (store) => store.supportsOnlineProductPrices === true
+  },
+  {
+    connectorId: 'coop-weekly-all-stores',
+    chainId: 'coop',
+    sourceType: 'flyer_campaign',
+    endpointUrl: 'groceryview://daily/coop/weekly-offers/all-stores',
+    parserVersion: 'coop-weekly-native-v1',
+    robotsTxtStatus: 'not_applicable',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: true
+  },
+  {
+    connectorId: 'hemkop-products-all-stores',
+    chainId: 'hemkop',
+    sourceType: 'official_api',
+    endpointUrl: 'groceryview://daily/hemkop/products/all-stores',
+    parserVersion: 'hemkop-products-native-v1',
+    robotsTxtStatus: 'not_applicable',
+    legalReviewStatus: 'approved',
     hasDataAgreement: true
   },
   {
@@ -72,6 +93,19 @@ const CONNECTOR_TEMPLATES = [
     robotsTxtStatus: 'not_applicable',
     legalReviewStatus: 'approved',
     hasDataAgreement: true
+  },
+  {
+    connectorId: 'okq8-fuel-prices',
+    chainId: 'okq8',
+    domain: 'fuel',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'https://www.okq8.se/foretag/priser/',
+    parserVersion: 'okq8-fuel-prices-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
   }
 ];
 
@@ -79,8 +113,16 @@ export async function printDailyConnectors({ selfTest = false, storesResult } = 
   const storeExport = storesResult ?? await printDailyConnectorStores({ selfTest });
   return CONNECTOR_TEMPLATES.map((template) => {
     const stores = storeExport.storesByChain[template.chainId] ?? [];
-    if (stores.length === 0) throw new Error(`No daily connector stores exported for ${template.chainId}.`);
-    return { ...template, stores };
+    const connectorStores = Array.isArray(template.stores)
+      ? template.stores
+      : typeof template.storeFilter === 'function'
+        ? stores.filter(template.storeFilter)
+        : stores;
+    if (connectorStores.length === 0 && template.requireStoreScopedPrices !== false) {
+      throw new Error(`No daily connector stores exported for ${template.chainId}.`);
+    }
+    const { storeFilter: _storeFilter, ...connector } = template;
+    return { ...connector, stores: connectorStores };
   });
 }
 

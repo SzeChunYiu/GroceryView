@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { createGroceryViewApi, type BasketImportReviewItem } from '@groceryview/api';
+import { createSessionToken } from '@groceryview/auth';
 import { createHttpHandler } from '../index.js';
 
 async function json(response: Response) {
@@ -10,6 +11,11 @@ async function json(response: Response) {
 
 function signBillingWebhookBody(body: string, secret: string): string {
   return `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
+}
+
+function signStripeWebhookBody(body: string, secret: string, timestamp: number): string {
+  const signature = createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
+  return `t=${timestamp},v1=${signature}`;
 }
 
 describe('createHttpHandler', () => {
@@ -688,6 +694,59 @@ describe('createHttpHandler', () => {
     const index = await handle(new Request('http://localhost/api/indices/stockholm-grocery-index'));
     assert.equal(index.status, 200);
     assert.equal((await json(index) as { label: string }).label, 'Stockholm Grocery Index');
+  });
+
+  it('caches hot public API endpoints through an injected response cache', async () => {
+    const entries = new Map<string, string>();
+    const writes: Array<{ key: string; ttlSeconds: number }> = [];
+    const handle = createHttpHandler(undefined, {
+      apiResponseCache: {
+        get: async (key: string) => entries.get(key) ?? null,
+        set: async (key: string, value: string, options: { ttlSeconds: number }) => {
+          writes.push({ key, ttlSeconds: options.ttlSeconds });
+          entries.set(key, value);
+        }
+      }
+    } as any);
+
+    const first = await handle(new Request('http://localhost/api/market/overview'));
+    assert.equal(first.status, 200);
+    assert.equal(first.headers.get('x-groceryview-cache'), 'miss');
+    const firstBody = await json(first);
+    assert.equal(writes.length, 1);
+    assert.match(writes[0]?.key ?? '', /^hot-endpoint:v1:\/api\/market\/overview/);
+    assert.equal(writes[0]?.ttlSeconds, 60);
+
+    const second = await handle(new Request('http://localhost/api/market/overview'));
+    assert.equal(second.status, 200);
+    assert.equal(second.headers.get('x-groceryview-cache'), 'hit');
+    assert.deepEqual(await json(second), firstBody);
+  });
+
+  it('returns cursor-paginated product search envelopes for public search', async () => {
+    const handle = createHttpHandler();
+
+    const first = await handle(new Request('http://localhost/api/products/search?q=&limit=2'));
+    assert.equal(first.status, 200);
+    const firstBody = await json(first) as {
+      items: Array<{ id: string }>;
+      pagination: { limit: number; nextCursor: string | null; hasMore: boolean; source: string };
+      guardrails: string[];
+    };
+    assert.deepEqual(firstBody.items.map((product) => product.id), ['coffee', 'milk']);
+    assert.equal(firstBody.pagination.limit, 2);
+    assert.equal(firstBody.pagination.hasMore, true);
+    assert.match(firstBody.pagination.nextCursor ?? '', /^[A-Za-z0-9_-]+$/);
+    assert.match(firstBody.pagination.source, /cursor pagination/i);
+    assert.match(firstBody.guardrails.join(' '), /No offset page numbers/i);
+
+    const second = await handle(new Request(`http://localhost/api/products/search?q=&limit=2&cursor=${firstBody.pagination.nextCursor}`));
+    assert.equal(second.status, 200);
+    const secondBody = await json(second) as { items: Array<{ id: string }>; pagination: { limit: number; nextCursor: string | null; hasMore: boolean } };
+    assert.deepEqual(secondBody.items.map((product) => product.id), ['private-label-milk', 'butter']);
+    assert.equal(secondBody.pagination.limit, 2);
+    assert.equal(secondBody.pagination.hasMore, false);
+    assert.equal(secondBody.pagination.nextCursor, null);
   });
 
   it('returns product not found for unknown product child resources', async () => {
@@ -1430,6 +1489,175 @@ describe('createHttpHandler', () => {
     assert.deepEqual(missing.enforcementReasons, ['missing_subscription_entitlement']);
   });
 
+  it('creates account-bound billing checkout sessions through the configured provider', async () => {
+    const createdRequests: unknown[] = [];
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'checkout-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'checkout-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      },
+      billingCheckoutPriceIds: { premium_yearly: 'price_yearly_123' },
+      billingCheckoutProvider: {
+        async createCheckoutSession(request) {
+          createdRequests.push(request);
+          return {
+            sessionId: 'cs_test_account_bound',
+            checkoutUrl: 'https://checkout.stripe.example/session/cs_test_account_bound'
+          };
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/checkout-sessions?userId=user-1', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({ plan: 'premium_yearly' })
+    }));
+
+    assert.equal(response.status, 201);
+    assert.deepEqual(await json(response), {
+      provider: 'stripe_compatible',
+      sessionId: 'cs_test_account_bound',
+      checkoutUrl: 'https://checkout.stripe.example/session/cs_test_account_bound',
+      plan: 'premium_yearly'
+    });
+    assert.deepEqual(createdRequests, [{
+      customerReference: 'user-1',
+      priceId: 'price_yearly_123',
+      successUrl: 'https://groceryview.example/account?checkout=success&plan=premium_yearly',
+      cancelUrl: 'https://groceryview.example/account?checkout=cancel&plan=premium_yearly',
+      metadata: { plan: 'premium_yearly' }
+    }]);
+    assert.equal(JSON.stringify(createdRequests).includes('checkout-secret'), false);
+  });
+
+  it('fails billing checkout sessions closed without provider configuration', async () => {
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'checkout-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'checkout-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/checkout-sessions?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ plan: 'premium_monthly' })
+    }));
+
+    assert.equal(response.status, 503);
+    assert.deepEqual(await json(response), {
+      error: 'Subscription checkout requires configured billing provider and price id.'
+    });
+  });
+
+  it('creates account-bound billing portal sessions from persisted provider customers', async () => {
+    const createdRequests: unknown[] = [];
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'portal-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'portal-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      },
+      now: new Date('2026-05-22T00:00:00.000Z'),
+      subscriptionEntitlementRepository: {
+        async getSubscriptionEntitlement(userId) {
+          if (userId !== 'user-1') return null;
+          return {
+            userId,
+            tier: 'premium',
+            plan: 'premium_monthly',
+            status: 'active',
+            currentPeriodEndsAt: '2026-06-22T00:00:00.000Z',
+            provider: 'stripe_compatible',
+            providerCustomerId: 'cus_portal_123',
+            providerSubscriptionId: 'sub_portal_123',
+            updatedAt: '2026-05-22T00:00:00.000Z'
+          };
+        }
+      },
+      billingPortalProvider: {
+        async createPortalSession(request) {
+          createdRequests.push(request);
+          return {
+            sessionId: 'bps_test_account_bound',
+            portalUrl: 'https://billing.stripe.example/session/bps_test_account_bound'
+          };
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/portal-sessions?userId=user-1', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'content-type': 'application/json'
+      }
+    }));
+
+    assert.equal(response.status, 201);
+    assert.deepEqual(await json(response), {
+      provider: 'stripe_compatible',
+      sessionId: 'bps_test_account_bound',
+      portalUrl: 'https://billing.stripe.example/session/bps_test_account_bound'
+    });
+    assert.deepEqual(createdRequests, [{
+      customerReference: 'cus_portal_123',
+      returnUrl: 'https://groceryview.example/account?billing=return'
+    }]);
+  });
+
+  it('fails billing portal sessions closed without provider customer evidence', async () => {
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'portal-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'portal-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      },
+      subscriptionEntitlementRepository: {
+        async getSubscriptionEntitlement(userId) {
+          return {
+            userId,
+            tier: 'premium',
+            plan: 'premium_monthly',
+            status: 'active',
+            currentPeriodEndsAt: '2026-06-22T00:00:00.000Z',
+            provider: 'stripe_compatible',
+            updatedAt: '2026-05-22T00:00:00.000Z'
+          };
+        }
+      },
+      billingPortalProvider: {
+        async createPortalSession() {
+          throw new Error('should not call provider without customer evidence');
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/portal-sessions?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` }
+    }));
+
+    assert.equal(response.status, 503);
+    assert.deepEqual(await json(response), {
+      error: 'Billing portal requires an active provider customer for this account.'
+    });
+  });
+
   it('uses the runtime repository for account-bound basket import review persistence when configured', async () => {
     const api = createGroceryViewApi();
     const savedRows: Array<{ userId: string; items: Array<{ reviewItemId: string; rawName: string; status: string }> }> = [];
@@ -1596,6 +1824,98 @@ describe('createHttpHandler', () => {
         updatedAt: '2026-05-20T12:00:00.000Z'
       }
     ]);
+  });
+
+  it('accepts provider-native Stripe signatures for Stripe-compatible subscription webhooks', async () => {
+    const persisted: unknown[] = [];
+    const secret = 'whsec_provider_native';
+    const body = JSON.stringify({
+      id: 'evt_stripe_native_signature_1',
+      type: 'customer.subscription.updated',
+      created: 1779278400,
+      data: {
+        object: {
+          id: 'sub_provider_native_1',
+          customer: 'cus_provider_native_1',
+          status: 'active',
+          current_period_end: 1810771200,
+          metadata: { userId: 'user-stripe-native' },
+          items: { data: [{ price: { id: 'price_monthly_native' } }] }
+        }
+      }
+    });
+    const handle = createHttpHandler(undefined, {
+      billingWebhookSecret: secret,
+      billingPriceIdPlanMap: { price_monthly_native: 'premium_monthly' },
+      now: new Date('2026-05-20T12:00:00.000Z'),
+      billingSubscriptionSink: {
+        async upsertSubscriptionEntitlement(entitlement) {
+          persisted.push(entitlement);
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'stripe-signature': signStripeWebhookBody(body, secret, 1779278400) },
+      body
+    }));
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await json(response), {
+      accepted: true,
+      persisted: true,
+      userId: 'user-stripe-native',
+      status: 'active'
+    });
+    assert.deepEqual(persisted, [{
+      userId: 'user-stripe-native',
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'active',
+      currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      providerCustomerId: 'cus_provider_native_1',
+      providerSubscriptionId: 'sub_provider_native_1',
+      updatedAt: '2026-05-20T12:00:00.000Z'
+    }]);
+  });
+
+  it('rejects stale provider-native Stripe billing webhook signatures', async () => {
+    const persisted: unknown[] = [];
+    const secret = 'whsec_provider_native';
+    const body = JSON.stringify({
+      id: 'evt_stale_stripe_native_signature_1',
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          id: 'sub_stale_provider_native_1',
+          customer: 'cus_stale_provider_native_1',
+          status: 'active',
+          metadata: { userId: 'user-stripe-native' },
+          items: { data: [{ price: { id: 'price_monthly_native' } }] }
+        }
+      }
+    });
+    const handle = createHttpHandler(undefined, {
+      billingWebhookSecret: secret,
+      billingPriceIdPlanMap: { price_monthly_native: 'premium_monthly' },
+      now: new Date('2026-05-20T12:10:01.000Z'),
+      billingSubscriptionSink: {
+        async upsertSubscriptionEntitlement(entitlement) {
+          persisted.push(entitlement);
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'stripe-signature': signStripeWebhookBody(body, secret, 1779278400) },
+      body
+    }));
+
+    assert.equal(response.status, 401);
+    assert.deepEqual(persisted, []);
   });
 
   it('fails billing subscription events closed without configured secret, valid signature, and sink', async () => {

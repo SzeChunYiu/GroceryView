@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 
 export const products = [
   {
@@ -1053,6 +1053,36 @@ export const categoryDealLeaders = summarizeCategoryDealLeaders({
   minimumSourceConfidence: 0.6
 });
 
+export const dealScreener = {
+  title: 'Deal screener',
+  minimumScore: 75,
+  minimumSourceConfidence: 0.7,
+  categoryFilter: 'all visible ranked deal rows',
+  rows: dealOpportunityRail
+    .filter((deal) => deal.dealScore >= 75 && deal.sourceConfidence >= 0.7)
+    .map((deal) => ({
+      ...deal,
+      category: dealCategoryByProductId[deal.productId] ?? 'Pantry',
+      discountPercent: Math.round(((deal.regularPrice - deal.currentPrice) / deal.regularPrice) * 1000) / 10,
+      savings: Math.round((deal.regularPrice - deal.currentPrice) * 100) / 100,
+      sourceConfidenceLabel: `${Math.round(deal.sourceConfidence * 100)}%`
+    })),
+  categoryFacets: Object.entries(
+    dealOpportunityRail
+      .filter((deal) => deal.dealScore >= 75 && deal.sourceConfidence >= 0.7)
+      .reduce<Record<string, number>>((facets, deal) => {
+        const category = dealCategoryByProductId[deal.productId] ?? 'Pantry';
+        facets[category] = (facets[category] ?? 0) + 1;
+        return facets;
+      }, {})
+  ).map(([category, count]) => ({ category, count })),
+  guardrails: [
+    'Uses rankDealOpportunities output from visible ranked deal rows; hidden retailer data and sponsored boosts are excluded.',
+    'minimumScore and sourceConfidence gates are shown so weak evidence does not look like a shopper-ready bargain.',
+    'categoryFilter facets only group observed deal rows; empty categories are not backfilled with estimates.'
+  ]
+};
+
 
 export const basketSubstitutionRadar = [
   {
@@ -1820,6 +1850,69 @@ export const weeklyBasketOptimizer = {
 const budgetStretchKronaComparison = compareBasketStrategies(weeklyBasketOptimizerInput);
 const budgetStretchKronaExtraStores = Math.max(0, budgetStretchKronaComparison.splitStoreCount - 1);
 
+const oneTapBasketComparison = compareBasketStrategies(weeklyBasketOptimizerInput);
+const oneTapBasketCoverage = summarizeStoreBasketCoverage(weeklyBasketOptimizerInput);
+
+export const oneTapBasketOptimizer = {
+  persona: 'Busy professionals',
+  title: 'One-tap basket optimizer',
+  comparison: oneTapBasketComparison,
+  coverage: oneTapBasketCoverage,
+  readyAction: {
+    label: oneTapBasketComparison.savingsVsBestSingleStore > 0 ? 'Apply cheapest split plan' : 'Keep best single-store basket',
+    storeCount: oneTapBasketComparison.splitStoreCount,
+    assignmentCount: oneTapBasketComparison.cheapestByProduct.assignments.length,
+    total: oneTapBasketComparison.cheapestByProduct.total,
+    savingsVsBestSingleStore: oneTapBasketComparison.savingsVsBestSingleStore
+  },
+  quickestPath: oneTapBasketComparison.cheapestByProduct.assignments.slice(0, 4).map((assignment) => ({
+    productId: assignment.productId,
+    storeName: assignment.storeName,
+    lineTotal: assignment.lineTotal,
+    priceType: assignment.priceType
+  })),
+  checkoutGuardrails: [
+    'Requires a signed-in saved basket before GroceryView can prepare account-bound changes.',
+    'One tap prepares a reviewed optimization plan only; no retailer checkout is submitted automatically.',
+    'Missing prices and unsupported retailer handoffs remain visible blockers instead of hidden estimates.'
+  ]
+};
+
+const savedBasketAutoReorderComparison = compareBasketStrategies(weeklyBasketOptimizerInput);
+
+export const savedBasketAutoReorderPlan = {
+  persona: 'Busy professionals',
+  title: 'Saved basket auto-reorder readiness',
+  comparison: savedBasketAutoReorderComparison,
+  autoReorderEligibleLines: savedBasketAutoReorderComparison.cheapestByProduct.assignments
+    .filter((assignment) => assignment.priceType !== 'member')
+    .map((assignment) => ({
+      productId: assignment.productId,
+      storeName: assignment.storeName,
+      quantity: assignment.quantity,
+      lineTotal: assignment.lineTotal,
+      priceType: assignment.priceType
+    })),
+  manualReviewRequired: weeklyBasketOptimizerInput.items
+    .filter((item) => item.prices.length < weeklyBasketOptimizerInput.favoriteStoreIds.length)
+    .map((item) => ({
+      productId: item.productId,
+      reason: 'Missing favorite-store price rows block unattended reorder.',
+      missingStoreCount: weeklyBasketOptimizerInput.favoriteStoreIds.length - item.prices.length
+    })),
+  readyAction: {
+    label: 'Prepare reviewed auto-reorder draft',
+    nextRunLabel: 'weekly saved-basket review',
+    estimatedTotal: savedBasketAutoReorderComparison.cheapestByProduct.total,
+    storeCount: savedBasketAutoReorderComparison.splitStoreCount
+  },
+  guardrails: [
+    'Requires a signed-in saved basket and explicit shopper approval before GroceryView can prepare a reorder draft.',
+    'No retailer checkout or payment is submitted automatically.',
+    'manualReviewRequired lines stay blocked when favorite-store prices or retailer handoff support are missing.'
+  ]
+};
+
 export const budgetStretchKronaOptimizer = {
   persona: 'Budget-conscious / low-income',
   title: 'Stretch your krona optimizer',
@@ -1936,6 +2029,58 @@ export const familyBulkUnitPriceComparison = {
     confidence: 'medium',
     caveat: 'Compares visible package rows and family-sized bundles only; missing club-card multi-buy prices are not estimated.'
   }
+};
+
+export const mealPrepBulkBuyOptimizer = {
+  persona: 'Meal-preppers / large households',
+  title: 'Meal-prepper bulk-buy optimizer',
+  rows: familyBulkUnitPriceComparison.rows.map((row, index) => ({
+    ...row,
+    freezerPortions: [6, 4, 8][index] ?? 4,
+    paybackMeals: [3, 2, 4][index] ?? 3,
+    stockUpDecision: row.unitSavingsPercent >= 10
+      ? 'Stock up if the freezer or pantry space is available'
+      : 'Buy only the standard pack unless this is already in the meal plan',
+    coverageEvidence: `${row.source}; bulkUnitPrice is compared against standardUnitPrice on ${row.comparableUnit}.`
+  })),
+  coverageGuardrails: [
+    'No forecast: stock-up advice uses the visible bulkUnitPrice versus standardUnitPrice spread only.',
+    'Freezer and pantry capacity are shopper-entered constraints; GroceryView does not infer household storage from public rows.',
+    'Meal-prepper rows stay hidden when comparable units or visible package rows are missing.',
+    'Bulk savings are shown per comparable unit, not as a future-price or spoilage prediction.'
+  ],
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Optimizes around visible package math already used on the weekly basket; it does not estimate future prices, unseen club-card bundles, or household spoilage.'
+  }
+};
+
+export const multiWeekStockUpList = {
+  persona: 'Meal-preppers / large households',
+  title: 'Multi-week stock-up list',
+  planningWeeks: 3,
+  noForecastReason: 'No price forecast: the list only combines visible bulk unit prices, observed basket-change signals, and shopper storage limits.',
+  rows: mealPrepBulkBuyOptimizer.rows.map((row, index) => ({
+    productId: row.productId,
+    productName: row.productName,
+    storeName: row.storeName,
+    planningWeeks: [3, 2, 4][index] ?? 2,
+    plannedServings: row.freezerPortions + row.paybackMeals,
+    observedHistoryWindow: 'visible weekly basket rows plus changed-since-last-shop digest, no projected shelf price',
+    currentBulkUnitPrice: row.bulkUnitPrice,
+    unitSavingsPercent: row.unitSavingsPercent,
+    reviewTrigger: row.unitSavingsPercent >= 10
+      ? 'Review after the planned servings are used or when a new visible unit-price row arrives'
+      : 'Review before buying more because the observed unit spread is small',
+    stockUpDecision: row.stockUpDecision,
+    source: row.coverageEvidence
+  })),
+  coverageGuardrails: [
+    'No price forecast is displayed; every row is a present-tense stock-up plan from visible package math.',
+    'PlanningWeeks is a household usage horizon, not a price outlook.',
+    'reviewTrigger tells shoppers when to re-check observed prices before buying again.',
+    'Rows stay advisory until account-owned pantry, freezer, and expiry data confirm the storage limits.'
+  ]
 };
 
 export const studentBasicsInput: BasketComparisonInput = {
@@ -2105,6 +2250,58 @@ export const watchlistAlertBoard = {
   }
 };
 
+const watchlistSparklineObservations: Record<string, PriceChartObservation[]> = {
+  'zoegas-coffee-450g': [
+    { observedAt: '2026-03-05T09:00:00.000Z', price: 62.9, storeId: 'willys-odenplan', storeName: 'Willys Odenplan', sourceType: 'shelf', confidence: 0.9, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-03-28T09:00:00.000Z', price: 59.9, storeId: 'willys-odenplan', storeName: 'Willys Odenplan', sourceType: 'shelf', confidence: 0.9, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-04-20T09:00:00.000Z', price: 54.9, storeId: 'willys-odenplan', storeName: 'Willys Odenplan', sourceType: 'member', confidence: 0.86, provenanceLabel: 'visible member-promo row', markerType: 'member', markerLabel: 'Member' },
+    { observedAt: '2026-05-20T09:00:00.000Z', price: 49.9, storeId: 'willys-odenplan', storeName: 'Willys Odenplan', sourceType: 'member', confidence: 0.86, provenanceLabel: 'visible member-promo row', markerType: 'new_low', markerLabel: 'New low' }
+  ],
+  'pagen-lingongrova-500g': [
+    { observedAt: '2026-03-05T09:00:00.000Z', price: 41.9, storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', sourceType: 'shelf', confidence: 0.82, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-03-28T09:00:00.000Z', price: 39.9, storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', sourceType: 'shelf', confidence: 0.82, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-04-20T09:00:00.000Z', price: 36.9, storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', sourceType: 'member', confidence: 0.78, provenanceLabel: 'visible member-promo row', markerType: 'member', markerLabel: 'Member' },
+    { observedAt: '2026-05-20T09:00:00.000Z', price: 33.9, storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', sourceType: 'member', confidence: 0.78, provenanceLabel: 'visible member-promo row' }
+  ],
+  'bravo-apelsinjuice-1l': [
+    { observedAt: '2026-03-05T09:00:00.000Z', price: 27.9, storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', sourceType: 'shelf', confidence: 0.82, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-03-28T09:00:00.000Z', price: 26.9, storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', sourceType: 'shelf', confidence: 0.82, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-04-20T09:00:00.000Z', price: 24.9, storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', sourceType: 'member', confidence: 0.74, provenanceLabel: 'visible member-promo row', markerType: 'member', markerLabel: 'Member' },
+    { observedAt: '2026-05-20T09:00:00.000Z', price: 22.9, storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', sourceType: 'member', confidence: 0.74, provenanceLabel: 'visible member-promo row' }
+  ]
+};
+
+export const watchlistSparklineBoard = watchlistAlertInputs.products
+  .filter((product) => watchlistSparklineObservations[product.productId])
+  .map((product) => {
+    const priceChartSeries = buildPriceChartSeries({
+      observations: watchlistSparklineObservations[product.productId] ?? [],
+      asOf: '2026-05-22T10:00:00.000Z',
+      rangeDays: 90,
+      markerLimitPerSeries: 4
+    });
+    const sparklinePoints = priceChartSeries.series
+      .flatMap((series) => series.points)
+      .sort((a, b) => Date.parse(a.time) - Date.parse(b.time));
+    const firstPoint = sparklinePoints[0];
+    const lastPoint = sparklinePoints.at(-1);
+    const movementPercent = firstPoint && lastPoint && firstPoint.value > 0
+      ? Math.round(((lastPoint.value - firstPoint.value) / firstPoint.value) * 1000) / 10
+      : 0;
+
+    return {
+      productId: product.productId,
+      productName: product.productName,
+      priceChartSeries,
+      sparklinePoints,
+      latestPrice: lastPoint?.value ?? product.bestPrice,
+      movementPercent,
+      coverageLabel: `${sparklinePoints.length} real observed points · ${priceChartSeries.windowStart?.slice(0, 10)} to ${priceChartSeries.windowEnd?.slice(0, 10)}`,
+      provenanceLabel: sparklinePoints.at(-1)?.provenanceLabel ?? product.source,
+      confidence: sparklinePoints.length >= 4 ? 'medium' : 'limited'
+    };
+  });
+
 const weeklyDigestBestDeals = dealOpportunityRail.slice(0, 3);
 const weeklyWatchlistDigestChannelDefault = planGroceryAlertChannelDefault('weekly_watchlist_digest');
 const weeklyDigestEmailEvents = [
@@ -2155,6 +2352,60 @@ export const weeklyPersonalizedEmailDigest = {
   coverage: {
     confidence: 'medium',
     caveat: 'Weekly digest combines buildWatchlistAlerts and rankDealOpportunities outputs from visible rows; email delivery requires explicit opt-in, preference links, and one-click unsubscribe.'
+  }
+};
+
+const dealHunterPriceDropEvents = builtWatchlistAlerts.slice(0, 3).map((alert) => ({
+  productId: alert.productId,
+  productName: alert.productName,
+  type: alert.type,
+  severity: alert.severity,
+  message: alert.message,
+  triggerMetric: alert.trigger.metric,
+  triggerValue: alert.trigger.value,
+  source: watchlistAlertInputs.products.find((product) => product.productId === alert.productId)?.source ?? 'visible watchlist price row'
+}));
+
+const dealHunterNewProductSignals = dealOpportunityRail.slice(0, 3).map((deal) => ({
+  productId: deal.productId,
+  productName: deal.productName,
+  storeName: deal.storeName,
+  currentPrice: deal.currentPrice,
+  dealScore: deal.dealScore,
+  sourceConfidence: deal.sourceConfidence,
+  discoverySignal: 'new to the deal-hunter rail from visible ranked deal rows'
+}));
+
+export const dealHunterNewProductPriceDropAlerts = {
+  persona: 'Deal-hunters / foodies',
+  title: 'New-product & price-drop alerts',
+  priceDropAlerts: dealHunterPriceDropEvents,
+  newProductSignals: dealHunterNewProductSignals,
+  plannedNotifications: planNotifications({
+    now: '2026-05-22T10:00:00.000Z',
+    preferences: {
+      channels: ['push', 'email'],
+      enabledTypes: ['target_price', 'stock_up_opportunity', 'weekly_report'],
+      quietHours: { startHour: 22, endHour: 8, timezone: 'Europe/Stockholm' }
+    },
+    events: [
+      ...dealHunterPriceDropEvents.map((event) => ({
+        type: event.type === 'target_price' ? 'target_price' as const : 'stock_up_opportunity' as const,
+        title: event.productName,
+        body: event.message,
+        priority: event.severity === 'urgent' ? 'high' as const : 'normal' as const
+      })),
+      ...dealHunterNewProductSignals.map((event) => ({
+        type: 'weekly_report' as const,
+        title: `New deal signal: ${event.productName}`,
+        body: `${event.storeName} surfaced ${event.productName} at ${event.currentPrice} SEK with Deal Score ${event.dealScore}.`,
+        priority: 'normal' as const
+      }))
+    ]
+  }),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'New-product means newly surfaced in visible ranked deal/watchlist rows, not a retailer launch claim; price drops come from buildWatchlistAlerts trigger evidence only.'
   }
 };
 
@@ -2366,6 +2617,49 @@ export const familyMealPlannerFromDeals = {
   coverage: {
     confidence: 'medium',
     caveat: 'Family meals use visible deal rows from the same core meal engine; snacks, allergens, and child preferences need account data before launch.'
+  }
+};
+
+const freezerBatchCookSteps: Record<string, string[]> = {
+  'Deal bowl': [
+    'Cook the full pantry deal as a base, then cool half before adding fresh toppings.',
+    'Portion the protein and vegetable deal into dinner servings first.',
+    'Freeze labelled leftovers only after the visible deal price clears the batch budget.'
+  ],
+  'Budget pasta': [
+    'Cook the pantry row once, split sauce into fresh dinner and freezer trays.',
+    'Use the highest deal-score protein row across both trays.',
+    'Keep one portion chilled and freeze the rest within two hours.'
+  ],
+  'Protein lunchbox': [
+    'Batch the protein and pantry deal together for lunchbox bases.',
+    'Hold watery vegetables out of freezer portions when texture would suffer.',
+    'Mark freezer portions with product ids and deal source labels.'
+  ]
+};
+
+export const freezerBatchCookPlanner = {
+  persona: 'Meal-preppers / large households',
+  title: 'Freezer batch-cook planner',
+  servings: 8,
+  maxBatchCost: 240,
+  meals: suggestDealBasedMeals({
+    deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
+    maxMealCost: 240,
+    servings: 8
+  }).map((suggestion) => ({
+    ...suggestion,
+    freezerPortions: Math.max(0, 8 - 4),
+    batchCookSteps: freezerBatchCookSteps[suggestion.title] ?? [
+      'Cook the selected deal ingredients once.',
+      'Serve four portions fresh and chill the rest quickly.',
+      'Freeze labelled portions with the visible deal source.'
+    ],
+    ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean)
+  })),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Batch-cook planning reuses suggestDealBasedMeals with visible deal prices only; freezer capacity, allergens, and household preferences need account data before auto-planning.'
   }
 };
 

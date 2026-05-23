@@ -16,8 +16,15 @@ describe('deployment manifest', () => {
       'DATABASE_URL',
       'PUBLIC_WEB_URL',
       'NOTIFICATION_WEBHOOK_SECRET',
+      'EXPO_PUSH_ACCESS_TOKEN',
+      'SENDGRID_FROM_EMAIL',
+      'SENDGRID_API_KEY',
       'BILLING_WEBHOOK_SECRET',
+      'STRIPE_SECRET_KEY',
+      'STRIPE_PRICE_PREMIUM_MONTHLY',
+      'STRIPE_PRICE_PREMIUM_YEARLY',
       'METRICS_TOKEN',
+      'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
       'CATALOG_COVERAGE_TARGETS_JSON'
     ]);
   });
@@ -31,6 +38,10 @@ describe('deployment manifest', () => {
     assert.match(visibleArtifactScript, /ica-nara-sergels-torg/);
     assert.match(visibleArtifactScript, /coop-swedenborgsgatan/);
     assert.match(visibleArtifactScript, /lidl-sveavagen/);
+    assert.match(visibleArtifactScript, /requiredMinimumStoreSlugs\s*=\s*6/);
+    assert.match(visibleArtifactScript, /requiredMinimumProductSlugs\s*=\s*10/);
+    assert.match(visibleArtifactScript, /data-store-slug/);
+    assert.match(visibleArtifactScript, /data-product-slug/);
     assert.match(visibleArtifactScript, /process\.exitCode = 1/);
   });
 });

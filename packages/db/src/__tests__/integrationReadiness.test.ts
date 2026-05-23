@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import {
   POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS,
   POSTGRES_INTEGRATION_REQUIRED_TABLES,
+  TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS,
+  TIMESCALEDB_EVALUATION_FALLBACK_TABLES,
+  buildTimescaleDbEvaluationReport,
   buildPostgresIntegrationReadinessReport,
   buildPostgresRepositorySmokeProbes,
   checkPostgresIntegrationReadiness,
@@ -315,6 +318,9 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_table:basket_items',
       'missing_table:chains',
       'missing_table:community_reporter_trust',
+      'missing_table:fuel_grades',
+      'missing_table:fuel_price_source_observations',
+      'missing_table:fuel_price_sources',
       'missing_table:household_basket_items',
       'missing_table:household_favorite_stores',
       'missing_table:household_members',
@@ -325,7 +331,10 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_table:latest_prices',
       'missing_table:notification_suppressions',
       'missing_table:observations',
+      'missing_table:observations_v2',
       'missing_table:pantry_items',
+      'missing_table:price_daily',
+      'missing_table:price_weekly',
       'missing_table:products',
       'missing_table:raw_records',
       'missing_table:receipt_items',
@@ -345,6 +354,11 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_migration:008_household_plans',
       'missing_migration:009_retailer_source_policies',
       'missing_migration:010_basket_import_reviews',
+      'missing_migration:010_commodity_taxonomy',
+      'missing_migration:011_multi_vertical_domains',
+      'missing_migration:012_price_rollups',
+      'missing_migration:013_observations_partitioning',
+      'missing_migration:014_fuel_price_sources',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -382,6 +396,9 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'table:chains',
         'table:community_reporter_trust',
         'table:favorite_stores',
+        'table:fuel_grades',
+        'table:fuel_price_source_observations',
+        'table:fuel_price_sources',
         'table:household_basket_items',
         'table:household_favorite_stores',
         'table:household_members',
@@ -393,7 +410,10 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'table:notification_suppressions',
         'table:notification_tasks',
         'table:observations',
+        'table:observations_v2',
         'table:pantry_items',
+        'table:price_daily',
+        'table:price_weekly',
         'table:products',
         'table:raw_records',
         'table:receipt_items',
@@ -414,6 +434,11 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'migration:008_household_plans',
         'migration:009_retailer_source_policies',
         'migration:010_basket_import_reviews',
+        'migration:010_commodity_taxonomy',
+        'migration:011_multi_vertical_domains',
+        'migration:012_price_rollups',
+        'migration:013_observations_partitioning',
+        'migration:014_fuel_price_sources',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',
@@ -481,6 +506,82 @@ describe('summarizePostgresIntegrationReadinessReport', () => {
         repositoryChecks: 1
       }
     });
+  });
+});
+
+describe('buildTimescaleDbEvaluationReport', () => {
+  it('keeps the price tape ready on declarative partitions when TimescaleDB is not installed', () => {
+    const report = buildTimescaleDbEvaluationReport({
+      timescaleExtensionAvailable: false,
+      hypertables: [],
+      compressionPolicies: [],
+      retentionPolicies: [],
+      fallbackTables: [...TIMESCALEDB_EVALUATION_FALLBACK_TABLES],
+      fallbackFunctions: [...TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS]
+    });
+
+    assert.equal(report.status, 'fallback_ready');
+    assert.deepEqual(report.blockers, []);
+    assert.deepEqual(report.timescaleGaps, [
+      'timescaledb_extension_not_installed',
+      'missing_hypertable:observations_v2',
+      'missing_compression_policy:observations_v2',
+      'missing_retention_policy:observations_v2'
+    ]);
+    assert.match(report.recommendation, /Use declarative monthly partitions/);
+    assert.equal(report.evidence.includes('fallback_table:observations_v2'), true);
+    assert.equal(report.evidence.includes('fallback_table:price_daily'), true);
+    assert.equal(report.evidence.includes('fallback_function:drop_observations_partitions_before'), true);
+  });
+
+  it('marks TimescaleDB ready only when hypertable, compression, and retention evidence exists', () => {
+    const report = buildTimescaleDbEvaluationReport({
+      timescaleExtensionAvailable: true,
+      hypertables: ['observations_v2'],
+      compressionPolicies: ['observations_v2'],
+      retentionPolicies: ['observations_v2'],
+      fallbackTables: [...TIMESCALEDB_EVALUATION_FALLBACK_TABLES],
+      fallbackFunctions: [...TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS]
+    });
+
+    assert.deepEqual(report, {
+      status: 'timescale_ready',
+      blockers: [],
+      timescaleGaps: [],
+      evidence: [
+        'timescaledb_extension:available',
+        'hypertable:observations_v2',
+        'compression_policy:observations_v2',
+        'retention_policy:observations_v2',
+        'fallback_table:observations_v2',
+        'fallback_table:price_daily',
+        'fallback_table:price_weekly',
+        'fallback_function:create_observations_partitions',
+        'fallback_function:drop_observations_partitions_before'
+      ],
+      recommendation: 'TimescaleDB is ready for observations_v2 hypertable compression and retention policies.',
+      summary: 'TimescaleDB evaluation is ready.'
+    });
+  });
+
+  it('blocks the evaluation when neither TimescaleDB policies nor the partition fallback are complete', () => {
+    const report = buildTimescaleDbEvaluationReport({
+      timescaleExtensionAvailable: false,
+      hypertables: [],
+      compressionPolicies: [],
+      retentionPolicies: [],
+      fallbackTables: ['observations_v2'],
+      fallbackFunctions: []
+    });
+
+    assert.equal(report.status, 'blocked');
+    assert.deepEqual(report.blockers, [
+      'missing_fallback_table:price_daily',
+      'missing_fallback_table:price_weekly',
+      'missing_fallback_function:create_observations_partitions',
+      'missing_fallback_function:drop_observations_partitions_before'
+    ]);
+    assert.match(report.summary, /blocked/);
   });
 });
 

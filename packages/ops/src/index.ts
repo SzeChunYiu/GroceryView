@@ -336,6 +336,10 @@ export type HostedSmokeCommandPlanInput = {
   timeoutSeconds?: number;
   httpEvidenceOutputPath?: string;
   readinessEvidenceOutputPath?: string;
+  includeScannerUploadSmoke?: boolean;
+  scannerUserIdEnvVar?: string;
+  scannerBearerTokenEnvVar?: string;
+  scannerUploadEvidenceOutputPath?: string;
 };
 
 export type HostedSmokeCommandPlan = {
@@ -356,6 +360,8 @@ export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput):
   const terminalProductId = input.terminalProductId ?? 'coffee';
   const httpEvidenceOutputPath = input.httpEvidenceOutputPath ?? '/tmp/groceryview-hosted-http-smoke.json';
   const readinessEvidenceOutputPath = input.readinessEvidenceOutputPath ?? '/tmp/groceryview-hosted-readiness-smoke.json';
+  const scannerUploadEvidenceOutputPath =
+    input.scannerUploadEvidenceOutputPath ?? '/tmp/groceryview-hosted-scanner-upload-smoke.json';
   const commands = [
     [
       `GROCERYVIEW_SERVER_URL=${serverUrl}`,
@@ -373,6 +379,23 @@ export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput):
   const requiredSecrets: string[] = [];
 
   if (input.webUrl) evidence.push('hosted_web');
+
+  if (input.includeScannerUploadSmoke) {
+    const scannerUserIdEnvVar = input.scannerUserIdEnvVar ?? 'GROCERYVIEW_SCANNER_USER_ID';
+    const scannerBearerTokenEnvVar = input.scannerBearerTokenEnvVar ?? 'GROCERYVIEW_SCANNER_BEARER_TOKEN';
+    requiredSecrets.push(scannerUserIdEnvVar, scannerBearerTokenEnvVar);
+    commands.push(
+      [
+        `GROCERYVIEW_SERVER_URL=${serverUrl}`,
+        `GROCERYVIEW_SCANNER_USER_ID=$${scannerUserIdEnvVar}`,
+        `GROCERYVIEW_SCANNER_BEARER_TOKEN=$${scannerBearerTokenEnvVar}`,
+        `HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH=${scannerUploadEvidenceOutputPath}`,
+        'node infra/scripts/smoke-hosted-scanner-upload.mjs'
+      ].join(' ')
+    );
+    evidence.push('hosted_scanner_upload_ticket', 'hosted_scanner_upload_put', 'hosted_scanner_upload_artifact');
+    artifacts.push(scannerUploadEvidenceOutputPath);
+  }
 
   if (input.includePostgresReadiness) {
     const metricsTokenEnvVar = input.metricsTokenEnvVar ?? 'METRICS_TOKEN';

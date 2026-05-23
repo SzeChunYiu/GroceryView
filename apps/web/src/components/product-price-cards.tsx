@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
@@ -75,6 +76,7 @@ export function ProductPriceCards({
           <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{title}</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{intro}</p>
           <p className="mt-2 text-xs font-bold text-amber-800">No synthetic unit prices: unit rows are derived only from observed price plus reported package size.</p>
+          <p className="mt-1 text-xs font-bold text-amber-800">No synthetic product images: cards render only source image URLs from Axfood, OpenPrices, or OpenFoodFacts rows.</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2">
           <p className="px-2 pb-2 text-xs font-black uppercase tracking-[0.18em] text-slate-500">Compare by:</p>
@@ -101,6 +103,20 @@ export function ProductPriceCards({
             href={`/products/${card.slug}`}
             key={card.slug}
           >
+            {card.imageUrl && card.imageAlt ? (
+              <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-white bg-white p-3 shadow-sm">
+                <Image
+                  alt={card.imageAlt}
+                  className="max-h-full max-w-full object-contain"
+                  height={144}
+                  sizes="(min-width: 1280px) 16vw, (min-width: 768px) 33vw, 80vw"
+                  src={card.imageUrl}
+                  width={144}
+                />
+              </div>
+            ) : (
+              <p className="mb-4 rounded-2xl border border-dashed border-slate-300 bg-white p-3 text-xs font-bold text-slate-500">No synthetic product images: verified image URL missing.</p>
+            )}
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{card.productKind}</p>

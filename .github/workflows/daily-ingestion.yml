@@ -31,19 +31,130 @@ jobs:
           BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
-          CATALOG_COVERAGE_TARGETS_JSON: ${{ secrets.CATALOG_COVERAGE_TARGETS_JSON }}
+          GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: ${{ vars.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN || secrets.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN }}
         run: |
           set -euo pipefail
-          missing=0
-          if [ -z "${AUTH_SECRET:-}" ]; then echo "missing production config: AUTH_SECRET" >&2; missing=1; fi
-          if [ -z "${DATABASE_URL:-}" ]; then echo "missing production config: DATABASE_URL" >&2; missing=1; fi
-          if [ -z "${PUBLIC_WEB_URL:-}" ]; then echo "missing production config: PUBLIC_WEB_URL" >&2; missing=1; fi
-          if [ -z "${NOTIFICATION_WEBHOOK_SECRET:-}" ]; then echo "missing production config: NOTIFICATION_WEBHOOK_SECRET" >&2; missing=1; fi
-          if [ -z "${BILLING_WEBHOOK_SECRET:-}" ]; then echo "missing production config: BILLING_WEBHOOK_SECRET" >&2; missing=1; fi
-          if [ -z "${METRICS_TOKEN:-}" ]; then echo "missing production config: METRICS_TOKEN" >&2; missing=1; fi
-          if [ -z "${GROCERYVIEW_SERVER_URL:-}" ]; then echo "missing production config: GROCERYVIEW_SERVER_URL" >&2; missing=1; fi
-          if [ -z "${CATALOG_COVERAGE_TARGETS_JSON:-}" ]; then echo "missing production config: CATALOG_COVERAGE_TARGETS_JSON" >&2; missing=1; fi
-          if [ "${missing}" -ne 0 ]; then exit 1; fi
+          production_config_preflight_status=0
+          node <<'NODE' >/tmp/production-config-preflight.json || production_config_preflight_status=$?
+          const required = [
+            'AUTH_SECRET',
+            'DATABASE_URL',
+            'PUBLIC_WEB_URL',
+            'NOTIFICATION_WEBHOOK_SECRET',
+            'BILLING_WEBHOOK_SECRET',
+            'METRICS_TOKEN',
+            'GROCERYVIEW_SERVER_URL',
+            'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN'
+          ];
+          const missing = required.filter((name) => !process.env[name]);
+          const body = {
+            status: missing.length === 0 ? 'ready' : 'blocked',
+            checkedAt: new Date().toISOString(),
+            required,
+            missing,
+            blocker: missing.length > 0 ? 'production_config_preflight_missing' : undefined
+          };
+          console.log(JSON.stringify(body, null, 2));
+          NODE
+          if [ ! -s /tmp/production-config-preflight.json ]; then
+            cat > /tmp/production-config-preflight.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "production_config_preflight_diagnostic_missing",
+            "exitCode": ${production_config_preflight_status}
+          }
+          EOF
+          fi
+          cat /tmp/production-config-preflight.json
+          node -e "const body=require('/tmp/production-config-preflight.json'); if (body.status !== 'ready') { for (const name of body.missing ?? []) console.error('missing production config: ' + name); console.error(body.blocker); process.exit(1); }"
+
+      - name: Upload production config preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-production-config-preflight
+          path: /tmp/production-config-preflight.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Preflight DB recovery and cutover unblockers
+        if: always()
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REPLACEMENT_DATABASE_URL: ${{ secrets.REPLACEMENT_DATABASE_URL }}
+          CANDIDATE_DATABASE_URL: ${{ secrets.CANDIDATE_DATABASE_URL }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF || secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -euo pipefail
+          dbRecoveryStatus=0
+          npm run --silent ops:check-production-secrets -- --from-env --scope db-recovery >/tmp/db-recovery-secret-audit.json || dbRecoveryStatus=$?
+          if [ ! -s /tmp/db-recovery-secret-audit.json ]; then
+            cat > /tmp/db-recovery-secret-audit.json <<EOF
+          {
+            "status": "blocked",
+            "scope": "db-recovery",
+            "source": "environment",
+            "blocker": "db_recovery_secret_audit_diagnostic_missing",
+            "exitCode": ${dbRecoveryStatus}
+          }
+          EOF
+          fi
+          dbCutoverStatus=0
+          npm run --silent ops:check-production-secrets -- --from-env --scope db-cutover >/tmp/db-cutover-secret-audit.json || dbCutoverStatus=$?
+          if [ ! -s /tmp/db-cutover-secret-audit.json ]; then
+            cat > /tmp/db-cutover-secret-audit.json <<EOF
+          {
+            "status": "blocked",
+            "scope": "db-cutover",
+            "source": "environment",
+            "blocker": "db_cutover_secret_audit_diagnostic_missing",
+            "exitCode": ${dbCutoverStatus}
+          }
+          EOF
+          fi
+          DB_RECOVERY_STATUS="${dbRecoveryStatus}" DB_CUTOVER_STATUS="${dbCutoverStatus}" node <<'NODE' >/tmp/daily-db-unblocker-preflight.json
+          const fs = require('node:fs');
+          const recovery = JSON.parse(fs.readFileSync('/tmp/db-recovery-secret-audit.json', 'utf8'));
+          const cutover = JSON.parse(fs.readFileSync('/tmp/db-cutover-secret-audit.json', 'utf8'));
+          const dbRecoveryStatus = Number(process.env.DB_RECOVERY_STATUS ?? 0);
+          const dbCutoverStatus = Number(process.env.DB_CUTOVER_STATUS ?? 0);
+          const body = {
+            status: recovery.status === 'ready' || cutover.status === 'ready' ? 'ready' : 'blocked',
+            checkedAt: new Date().toISOString(),
+            dbRecoveryStatus,
+            dbCutoverStatus,
+            dbRecovery: {
+              status: recovery.status,
+              missingSecrets: recovery.missingDbRecoverySecrets ?? [],
+              missingVariables: recovery.missingDbRecoveryVariables ?? [],
+              blocker: recovery.blocker
+            },
+            dbCutover: {
+              status: cutover.status,
+              missingSecrets: cutover.missingDbCutoverSecrets ?? [],
+              missingCandidateSecrets: cutover.missingDbCutoverCandidateSecrets ?? [],
+              blocker: cutover.blocker
+            },
+            blocker: recovery.status === 'ready' || cutover.status === 'ready'
+              ? undefined
+              : 'daily_db_unblocker_preflight_blocked'
+          };
+          console.log(JSON.stringify(body, null, 2));
+          NODE
+          cat /tmp/daily-db-unblocker-preflight.json
+
+      - name: Upload DB unblocker preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-db-unblocker-preflight
+          path: |
+            /tmp/daily-db-unblocker-preflight.json
+            /tmp/db-recovery-secret-audit.json
+            /tmp/db-cutover-secret-audit.json
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Install
         run: npm ci
@@ -52,6 +163,46 @@ jobs:
         run: |
           npm run test -w @groceryview/db
           npm run test -w @groceryview/ingestion
+
+      - name: Export live store enumeration
+        run: |
+          set -euo pipefail
+          store_enumeration_status=0
+          npm run --silent ops:daily-connector-stores >/tmp/daily-connector-stores.json || store_enumeration_status=$?
+          if [ ! -s /tmp/daily-connector-stores.json ]; then
+            cat > /tmp/daily-connector-stores.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "store_enumeration_diagnostic_missing",
+            "exitCode": ${store_enumeration_status}
+          }
+          EOF
+          fi
+          cat /tmp/daily-connector-stores.json
+          node <<'NODE'
+          const body = require('/tmp/daily-connector-stores.json');
+          const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+          for (const chain of requiredChains) {
+            const stores = body.storesByChain?.[chain];
+            if (!Array.isArray(stores)) {
+              console.error(`store_enumeration_missing_chain:${chain}`);
+              process.exit(1);
+            }
+            if (stores.length === 0) {
+              console.error(`store_enumeration_empty_chain:${chain}`);
+              process.exit(1);
+            }
+          }
+          NODE
+
+      - name: Upload live store enumeration
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-daily-connector-stores
+          path: /tmp/daily-connector-stores.json
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Validate production ingestion configuration
         env:
@@ -62,13 +213,55 @@ jobs:
           BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
-          CATALOG_COVERAGE_TARGETS_JSON: ${{ secrets.CATALOG_COVERAGE_TARGETS_JSON }}
+          GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: ${{ vars.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN || secrets.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN }}
         run: |
           set -euo pipefail
-          npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json
+          daily_connectors_status=0
+          npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json || daily_connectors_status=$?
+          if [ ! -s /tmp/groceryview-daily-connectors.json ]; then
+            cat > /tmp/groceryview-daily-connectors.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "daily_connectors_diagnostic_missing",
+            "exitCode": ${daily_connectors_status}
+          }
+          EOF
+          fi
+          cat /tmp/groceryview-daily-connectors.json
+          if [ "${daily_connectors_status}" -ne 0 ]; then
+            exit "${daily_connectors_status}"
+          fi
+          catalog_targets_status=0
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
-            npm run --silent ops:validate-production-env \
-            >/tmp/production-env-validation.json
+            npm run --silent ops:catalog-coverage-targets -- --from-current-connectors >/tmp/groceryview-catalog-targets.json || catalog_targets_status=$?
+          if [ ! -s /tmp/groceryview-catalog-targets.json ]; then
+            cat > /tmp/groceryview-catalog-targets.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "catalog_targets_diagnostic_missing",
+            "exitCode": ${catalog_targets_status}
+          }
+          EOF
+          fi
+          cat /tmp/groceryview-catalog-targets.json
+          if [ "${catalog_targets_status}" -ne 0 ]; then
+            exit "${catalog_targets_status}"
+          fi
+          production_env_validation_status=0
+          GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
+          CATALOG_COVERAGE_TARGETS_JSON_FILE=/tmp/groceryview-catalog-targets.json \
+            npm run --silent ops:validate-production-env -- --scope daily-ingestion \
+            >/tmp/production-env-validation.json || production_env_validation_status=$?
+          if [ ! -s /tmp/production-env-validation.json ]; then
+            cat > /tmp/production-env-validation.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "production_env_validation_diagnostic_missing",
+            "exitCode": ${production_env_validation_status}
+          }
+          EOF
+          fi
+          cat /tmp/production-env-validation.json
           node <<'NODE'
           const body = require('/tmp/production-env-validation.json');
           const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
@@ -85,46 +278,492 @@ jobs:
           }
           NODE
 
-      - name: Run configured daily ingestion
+      - name: Upload production ingestion configuration
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-production-ingestion-config
+          path: |
+            /tmp/production-env-validation.json
+            /tmp/groceryview-catalog-targets.json
+            /tmp/groceryview-daily-connectors.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Check production DB write connectivity
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS || '30' }}
+          GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS || '10000' }}
+          GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS || '30000' }}
+          GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS || '1' }}
+          GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS || '1' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/daily-db-connectivity.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "daily_db_connectivity_database_url_config_missing"
+          }
+          EOF
+            cat /tmp/daily-db-connectivity.json
+            exit 1
+          fi
+          connectivity_status=0
+          npm run --silent ops:check-daily-db-connectivity >/tmp/daily-db-connectivity.json || connectivity_status=$?
+          if [ ! -s /tmp/daily-db-connectivity.json ]; then
+            cat > /tmp/daily-db-connectivity.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "daily_db_connectivity_diagnostic_missing",
+            "exitCode": ${connectivity_status}
+          }
+          EOF
+          fi
+          cat /tmp/daily-db-connectivity.json
+          node -e "const body=require('/tmp/daily-db-connectivity.json'); for (const candidate of body.alternateConnections ?? []) { if (candidate.name === 'supabase_direct_host' || candidate.name === 'supabase_transaction_pooler') console.error(JSON.stringify({ alternateConnection: candidate.name, status: candidate.status, action: candidate.action })); } if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+          exit "${connectivity_status}"
+
+      - name: Upload daily DB connectivity diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-daily-db-connectivity
+          path: /tmp/daily-db-connectivity.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Generate production DB recovery packet
+        if: failure()
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF || secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_ACCESS_TOKEN:-}" ] || [ -z "${SUPABASE_PROJECT_REF:-}" ]; then
+            node <<'NODE' >/tmp/production-db-recovery-packet.json
+          const missing = [];
+          if (!process.env.SUPABASE_ACCESS_TOKEN) missing.push('SUPABASE_ACCESS_TOKEN');
+          if (!process.env.SUPABASE_PROJECT_REF) missing.push('SUPABASE_PROJECT_REF');
+          console.log(JSON.stringify({
+            status: 'blocked',
+            blocker: 'production_db_recovery_packet_missing_credentials',
+            missing,
+            recommendedActions: [
+              {
+                id: 'configure-supabase-management-access',
+                owner: 'operator',
+                action: 'Set SUPABASE_ACCESS_TOKEN and SUPABASE_PROJECT_REF so failed daily DB readiness runs can upload a redacted Supabase recovery packet; verify with npm run --silent ops:check-production-secrets -- --scope db-recovery.'
+              },
+              {
+                id: 'configure-replacement-db-cutover',
+                owner: 'operator_after_approval',
+                action: 'If the existing Supabase project cannot be recovered promptly, set REPLACEMENT_DATABASE_URL or CANDIDATE_DATABASE_URL and verify with npm run --silent ops:check-production-secrets -- --scope db-cutover before running the Production DB cutover validation workflow.'
+              }
+            ]
+          }, null, 2));
+          NODE
+            cat /tmp/production-db-recovery-packet.json
+            exit 1
+          fi
+          recovery_packet_status=0
+          npm run --silent ops:db-recovery-packet >/tmp/production-db-recovery-packet.json || recovery_packet_status=$?
+          if [ ! -s /tmp/production-db-recovery-packet.json ]; then
+            cat > /tmp/production-db-recovery-packet.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "production_db_recovery_packet_diagnostic_missing",
+            "exitCode": ${recovery_packet_status}
+          }
+          EOF
+          fi
+          cat /tmp/production-db-recovery-packet.json
+          exit "${recovery_packet_status}"
+
+      - name: Upload production DB recovery packet
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-production-db-recovery-packet
+          path: /tmp/production-db-recovery-packet.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Apply production DB migrations
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           set -euo pipefail
-          test -n "${DATABASE_URL:-}"
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/production-db-migrations.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "production_db_migrations_database_url_config_missing"
+          }
+          EOF
+            cat /tmp/production-db-migrations.json
+            exit 1
+          fi
+          migration_status=0
+          npm run --silent ops:apply-db-migrations >/tmp/production-db-migrations.json || migration_status=$?
+          if [ ! -s /tmp/production-db-migrations.json ]; then
+            cat > /tmp/production-db-migrations.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "production_db_migrations_diagnostic_missing",
+            "exitCode": ${migration_status}
+          }
+          EOF
+          fi
+          cat /tmp/production-db-migrations.json
+          node -e "const body=require('/tmp/production-db-migrations.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+          exit "${migration_status}"
+
+      - name: Preserve skipped production DB migrations result
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/production-db-migrations.json ]; then
+            cat > /tmp/production-db-migrations.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "production_db_migrations_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          cat /tmp/production-db-migrations.json
+
+      - name: Upload production DB migrations result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-production-db-migrations
+          path: /tmp/production-db-migrations.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Run configured daily ingestion
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_DAILY_MAX_CONCURRENCY: ${{ vars.GROCERYVIEW_DAILY_MAX_CONCURRENCY || '2' }}
+          GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS || '250' }}
+          GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS || '1' }}
+          GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS || '500' }}
+          GROCERYVIEW_DAILY_BLOCKER_LOG_PATH: codex-tasks/ingestion-blockers.txt
+        run: |
+          set -euo pipefail
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/daily-ingestion-result.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "daily_ingestion_database_url_config_missing"
+          }
+          EOF
+            mkdir -p codex-tasks
+            {
+              echo "# Daily ingestion blockers"
+              echo
+              echo "status: failed"
+              echo "blockers:"
+              echo "- daily_ingestion_database_url_config_missing"
+            } > codex-tasks/ingestion-blockers.txt
+            cat /tmp/daily-ingestion-result.json
+            exit 1
+          fi
           npm run build -w @groceryview/db
           npm run build -w @groceryview/ingestion
-          npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json
+          daily_ingestion_connectors_status=0
+          npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json || daily_ingestion_connectors_status=$?
+          if [ "${daily_ingestion_connectors_status}" -ne 0 ] || [ ! -s /tmp/groceryview-daily-connectors.json ]; then
+            cat > /tmp/daily-ingestion-result.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "daily_ingestion_connectors_diagnostic_missing",
+            "exitCode": ${daily_ingestion_connectors_status}
+          }
+          EOF
+            mkdir -p codex-tasks
+            {
+              echo "# Daily ingestion blockers"
+              echo
+              echo "status: failed"
+              echo "blockers:"
+              echo "- daily_ingestion_connectors_diagnostic_missing"
+            } > codex-tasks/ingestion-blockers.txt
+            cat /tmp/daily-ingestion-result.json
+            if [ "${daily_ingestion_connectors_status}" -ne 0 ]; then
+              exit "${daily_ingestion_connectors_status}"
+            fi
+            exit 1
+          fi
+          ingestion_status=0
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
             node packages/ingestion/dist/index.js \
-            >/tmp/daily-ingestion-result.json
-          node -e "const body=require('/tmp/daily-ingestion-result.json'); if (body.status !== 'succeeded') { console.error(JSON.stringify(body)); process.exit(1); }"
+            >/tmp/daily-ingestion-result.json || ingestion_status=$?
+          if [ ! -s /tmp/daily-ingestion-result.json ]; then
+            cat > /tmp/daily-ingestion-result.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "daily_ingestion_result_diagnostic_missing",
+            "exitCode": ${ingestion_status}
+          }
+          EOF
+          fi
+          if [ ! -s codex-tasks/ingestion-blockers.txt ]; then
+            mkdir -p codex-tasks
+            {
+              echo "# Daily ingestion blockers"
+              echo
+              echo "status: failed"
+              echo "blockers:"
+              echo "- daily_ingestion_blocker_log_missing"
+            } > codex-tasks/ingestion-blockers.txt
+          fi
+          cat /tmp/daily-ingestion-result.json
+          node <<'NODE'
+          const body = require('/tmp/daily-ingestion-result.json');
+          const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+          const summaries = Array.isArray(body.chainSummaries) ? body.chainSummaries : [];
+          if (body.status !== 'succeeded') {
+            console.error(JSON.stringify(body));
+            process.exit(1);
+          }
+          for (const chain of requiredChains) {
+            const chainSummaries = summaries.filter((summary) => summary.chainId === chain);
+            if (chainSummaries.length === 0) {
+              console.error(`daily_ingestion_missing_chain_summary:${chain}`);
+              process.exit(1);
+            }
+            if (chainSummaries.some((summary) => summary.status !== 'succeeded')) {
+              console.error(`daily_ingestion_chain_not_succeeded:${chain}`);
+              process.exit(1);
+            }
+            if (chainSummaries.every((summary) => (summary.observationIds?.length ?? 0) === 0)) {
+              console.error(`daily_ingestion_chain_without_observations:${chain}`);
+              process.exit(1);
+            }
+          }
+          NODE
+
+      - name: Preserve skipped daily ingestion result
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/daily-ingestion-result.json ]; then
+            cat > /tmp/daily-ingestion-result.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "daily_ingestion_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          if [ ! -s codex-tasks/ingestion-blockers.txt ]; then
+            mkdir -p codex-tasks
+            {
+              echo "# Daily ingestion blockers"
+              echo
+              echo "status: skipped"
+              echo "blockers:"
+              echo "- daily_ingestion_skipped_after_prior_failure"
+            } > codex-tasks/ingestion-blockers.txt
+          fi
+          cat /tmp/daily-ingestion-result.json
+
+      - name: Upload daily ingestion result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-daily-ingestion-result
+          path: |
+            /tmp/daily-ingestion-result.json
+            codex-tasks/ingestion-blockers.txt
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Export DB-backed site snapshot
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_PATH: /tmp/groceryview-db-site-snapshot.json
+          GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE || '0.5' }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT || '50000' }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS || '36' }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS || 'ica,willys,coop,hemkop,lidl,city_gross' }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE: /tmp/groceryview-catalog-targets.json
+        run: |
+          set -euo pipefail
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/groceryview-db-site-snapshot.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "db_site_snapshot_database_url_config_missing"
+          }
+          EOF
+            cat > /tmp/db-site-snapshot-result.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "db_site_snapshot_database_url_config_missing"
+          }
+          EOF
+            cat /tmp/db-site-snapshot-result.json
+            exit 1
+          fi
+          snapshot_status=0
+          npm run --silent ingest:export-db-snapshot \
+            >/tmp/db-site-snapshot-result.json || snapshot_status=$?
+          if [ ! -s /tmp/db-site-snapshot-result.json ]; then
+            cat > /tmp/db-site-snapshot-result.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "db_site_snapshot_result_diagnostic_missing",
+            "exitCode": ${snapshot_status}
+          }
+          EOF
+          fi
+          cat /tmp/db-site-snapshot-result.json
+          node <<'NODE'
+          const body = require('/tmp/db-site-snapshot-result.json');
+          if (body.status !== 'passed' || body.coverage?.observations < 1 || (body.coverage?.missingRequiredChains?.length ?? 0) > 0 || (body.coverage?.missingRequiredStoreExternalRefs?.length ?? 0) > 0 || (body.coverage?.missingRequiredProductSlugs?.length ?? 0) > 0 || (body.coverage?.missingRequiredStorePriceTypes?.length ?? 0) > 0 || (body.coverage?.missingRequiredCategorySlugs?.length ?? 0) > 0 || (body.coverage?.staleObservationCount ?? 0) > 0) {
+            console.error(JSON.stringify(body));
+            process.exit(1);
+          }
+          NODE
+
+      - name: Preserve skipped DB-backed site snapshot
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/groceryview-db-site-snapshot.json ]; then
+            cat > /tmp/groceryview-db-site-snapshot.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "db_site_snapshot_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          if [ ! -s /tmp/db-site-snapshot-result.json ]; then
+            cat > /tmp/db-site-snapshot-result.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "db_site_snapshot_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          cat /tmp/db-site-snapshot-result.json
+
+      - name: Upload DB-backed site snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-db-site-snapshot
+          path: |
+            /tmp/groceryview-db-site-snapshot.json
+            /tmp/db-site-snapshot-result.json
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Check deployed PostgreSQL readiness
+        if: always()
         env:
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
         run: |
           set -euo pipefail
-          test -n "${GROCERYVIEW_SERVER_URL:-}"
-          test -n "${METRICS_TOKEN:-}"
-          curl -fsS \
-            -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
-            "${GROCERYVIEW_SERVER_URL%/}/api/readiness/postgres" \
-            >/tmp/postgres-readiness.json
-          node -e "const body=require('/tmp/postgres-readiness.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+          postgres_readiness_status=0
+          if [ -z "${GROCERYVIEW_SERVER_URL:-}" ] || [ -z "${METRICS_TOKEN:-}" ]; then
+            node <<'NODE' >/tmp/postgres-readiness.json
+          const required = ['GROCERYVIEW_SERVER_URL', 'METRICS_TOKEN'];
+          const missing = required.filter((name) => !process.env[name]);
+          console.log(JSON.stringify({
+            status: 'blocked',
+            blocker: 'postgres_readiness_config_missing',
+            missing
+          }, null, 2));
+          NODE
+          else
+            curl -fsS \
+              -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
+              "${GROCERYVIEW_SERVER_URL%/}/api/readiness/postgres" \
+              >/tmp/postgres-readiness.json || postgres_readiness_status=$?
+          fi
+          if [ ! -s /tmp/postgres-readiness.json ]; then
+            cat > /tmp/postgres-readiness.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "postgres_readiness_diagnostic_missing",
+            "exitCode": ${postgres_readiness_status}
+          }
+          EOF
+          fi
+          cat /tmp/postgres-readiness.json
+          node <<'NODE'
+          const { existsSync } = require('node:fs');
+          const readiness = require('/tmp/postgres-readiness.json');
+          if (!existsSync('/tmp/daily-db-connectivity.json')) {
+            console.error(JSON.stringify({
+              blocker: 'postgres_readiness_missing_ingestion_connectivity_diagnostic',
+              deployedTarget: readiness.target
+            }));
+            process.exit(1);
+          }
+          const connectivity = require('/tmp/daily-db-connectivity.json');
+          if (readiness.status !== 'ready') {
+            console.error(JSON.stringify(readiness));
+            process.exit(1);
+          }
+          if (
+            readiness.target?.host !== connectivity.host ||
+            readiness.target?.database !== connectivity.database ||
+            readiness.target?.username !== connectivity.username
+          ) {
+            console.error(JSON.stringify({
+              blocker: 'postgres_readiness_target_mismatch',
+              deployedTarget: readiness.target,
+              ingestionTarget: {
+                host: connectivity.host,
+                database: connectivity.database,
+                username: connectivity.username,
+                poolerMode: connectivity.poolerMode
+              }
+            }));
+            process.exit(1);
+          }
+          NODE
 
       - name: Check deployed daily source-run freshness
+        if: always()
         env:
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
         run: |
           set -euo pipefail
-          test -n "${GROCERYVIEW_SERVER_URL:-}"
-          test -n "${METRICS_TOKEN:-}"
-          curl -fsS \
-            -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
-            "${GROCERYVIEW_SERVER_URL%/}/api/readiness/source-runs" \
-            >/tmp/source-run-readiness.json
+          source_run_readiness_status=0
+          if [ -z "${GROCERYVIEW_SERVER_URL:-}" ] || [ -z "${METRICS_TOKEN:-}" ]; then
+            node <<'NODE' >/tmp/source-run-readiness.json
+          const required = ['GROCERYVIEW_SERVER_URL', 'METRICS_TOKEN'];
+          const missing = required.filter((name) => !process.env[name]);
+          console.log(JSON.stringify({
+            status: 'blocked',
+            blocker: 'source_run_readiness_config_missing',
+            missing
+          }, null, 2));
+          NODE
+          else
+            curl -fsS \
+              -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
+              "${GROCERYVIEW_SERVER_URL%/}/api/readiness/source-runs" \
+              >/tmp/source-run-readiness.json || source_run_readiness_status=$?
+          fi
+          if [ ! -s /tmp/source-run-readiness.json ]; then
+            cat > /tmp/source-run-readiness.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "source_run_readiness_diagnostic_missing",
+            "exitCode": ${source_run_readiness_status}
+          }
+          EOF
+          fi
+          cat /tmp/source-run-readiness.json
           node <<'NODE'
           const body = require('/tmp/source-run-readiness.json');
           const requiredMissingChainBlockers = [
@@ -135,31 +774,92 @@ jobs:
             'source_run_missing_fresh_chain:lidl',
             'source_run_missing_fresh_chain:city_gross'
           ];
-          if (body.report?.status !== 'healthy') {
+          const sourceRunSummary = {
+            blockerCount: body.summary?.blockers?.total ?? body.report?.blockers?.length ?? 0,
+            missingFreshChains: body.summary?.blockers?.missingFreshChains ?? 0,
+            insufficientAcceptedRows: body.summary?.blockers?.insufficientAcceptedRows ?? 0,
+            succeededEvidence: body.summary?.evidence?.succeeded ?? 0,
+            latestSuccessfulFinishedAt: body.summary?.latestSuccessfulFinishedAt
+          };
+          if (
+            body.report?.status !== 'healthy' ||
+            sourceRunSummary.blockerCount !== 0 ||
+            sourceRunSummary.missingFreshChains !== 0 ||
+            sourceRunSummary.insufficientAcceptedRows !== 0 ||
+            sourceRunSummary.succeededEvidence < requiredMissingChainBlockers.length ||
+            !sourceRunSummary.latestSuccessfulFinishedAt
+          ) {
             for (const blocker of requiredMissingChainBlockers) {
               if (body.report?.blockers?.includes(blocker)) console.error(blocker);
             }
-            console.error(JSON.stringify(body));
+            console.error(JSON.stringify({ ...body, sourceRunSummary }));
             process.exit(1);
           }
           NODE
 
       - name: Check deployed catalog product-store coverage
+        if: always()
         env:
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
         run: |
           set -euo pipefail
-          test -n "${GROCERYVIEW_SERVER_URL:-}"
-          test -n "${METRICS_TOKEN:-}"
-          curl -fsS \
-            -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
-            "${GROCERYVIEW_SERVER_URL%/}/api/readiness/catalog-coverage" \
-            >/tmp/catalog-coverage-readiness.json
+          catalog_coverage_readiness_status=0
+          if [ -z "${GROCERYVIEW_SERVER_URL:-}" ] || [ -z "${METRICS_TOKEN:-}" ]; then
+            node <<'NODE' >/tmp/catalog-coverage-readiness.json
+          const required = ['GROCERYVIEW_SERVER_URL', 'METRICS_TOKEN'];
+          const missing = required.filter((name) => !process.env[name]);
+          console.log(JSON.stringify({
+            status: 'blocked',
+            blocker: 'catalog_coverage_readiness_config_missing',
+            missing
+          }, null, 2));
+          NODE
+          else
+            curl -fsS \
+              -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
+              "${GROCERYVIEW_SERVER_URL%/}/api/readiness/catalog-coverage" \
+              >/tmp/catalog-coverage-readiness.json || catalog_coverage_readiness_status=$?
+          fi
+          if [ ! -s /tmp/catalog-coverage-readiness.json ]; then
+            cat > /tmp/catalog-coverage-readiness.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "catalog_coverage_readiness_diagnostic_missing",
+            "exitCode": ${catalog_coverage_readiness_status}
+          }
+          EOF
+          fi
+          cat /tmp/catalog-coverage-readiness.json
           node <<'NODE'
           const body = require('/tmp/catalog-coverage-readiness.json');
-          if (body.status !== 'complete' || (body.missingProductStorePairs?.length ?? 0) > 0 || (body.requiredActions?.length ?? 0) > 0) {
-            console.error(JSON.stringify(body));
+          const missingDimensions = {
+            chains: body.coverage?.chains?.missing ?? [],
+            stores: body.coverage?.stores?.missing ?? [],
+            products: body.coverage?.products?.missing ?? [],
+            categories: body.coverage?.categories?.missing ?? [],
+            priceTypes: body.coverage?.priceTypes?.missing ?? []
+          };
+          if (
+            body.status !== 'complete' ||
+            Object.values(missingDimensions).some((missing) => missing.length > 0) ||
+            (body.missingProductStorePairs?.length ?? 0) > 0 ||
+            (body.missingStorePriceTypes?.length ?? 0) > 0 ||
+            (body.requiredActions?.length ?? 0) > 0
+          ) {
+            console.error(JSON.stringify({ ...body, missingDimensions }));
             process.exit(1);
           }
           NODE
+
+      - name: Upload deployed readiness evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-deployed-readiness
+          path: |
+            /tmp/postgres-readiness.json
+            /tmp/source-run-readiness.json
+            /tmp/catalog-coverage-readiness.json
+          if-no-files-found: error
+          retention-days: 14

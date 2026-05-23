@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { healthMacroOptimizer, highProteinDealFinder, nutritionPerKrona } from '@/lib/demo-data';
+import { healthVerifiedLabelFilters } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -60,6 +61,46 @@ export default function NutritionValuePage() {
                 <p className={`rounded-2xl p-3 font-semibold ${row.saltWarning ? 'bg-amber-50 text-amber-950' : 'bg-emerald-50 text-emerald-950'}`}>{row.saltWarning ? 'Salt warning' : 'No salt warning'}</p>
               </div>
             </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-teal-200 bg-teal-50/70">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-teal-800">Health & fitness filters</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Organic, Keyhole & vegan filters</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              These filters are built from verified Axfood label fields and explicit package text before a product is shown. They are not a medical claim, and the result is not inferred from browsing, profiles, or unstated ingredient guesses.
+            </p>
+          </div>
+          <p className="rounded-2xl bg-white px-4 py-3 text-right text-sm font-black text-teal-950 shadow-sm">
+            {healthVerifiedLabelFilters.reduce((sum, filter) => sum + filter.verifiedProductCount, 0).toLocaleString('sv-SE')} verifiedProductCount rows
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {healthVerifiedLabelFilters.map((filter) => (
+            <div className="rounded-2xl border border-teal-100 bg-white p-4 shadow-sm" key={filter.id}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-800">{filter.swedishQuery}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{filter.label}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{filter.healthUse}</p>
+              <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
+                <p className="rounded-2xl bg-teal-50 p-3 font-black text-teal-950">verifiedProductCount {filter.verifiedProductCount}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-black text-slate-950">{filter.chainCount} chains</p>
+              </div>
+              <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-slate-500">evidenceLabels</p>
+              <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">{filter.evidenceLabels.join(', ') || 'explicit product text'}</p>
+              <div className="mt-3 space-y-2">
+                {filter.products.map((product) => (
+                  <Link className="block rounded-2xl bg-teal-50 p-3 text-sm hover:bg-teal-100" href={`/products/${product.slug}`} key={product.slug}>
+                    <span className="block font-black text-slate-950">{product.productName}</span>
+                    <span className="mt-1 block font-semibold text-slate-700">{product.lowestChain} · {formatSek(product.lowestPrice)} · spread {product.spreadPct.toFixed(1)}%</span>
+                  </Link>
+                ))}
+              </div>
+              <p className="mt-3 text-sm font-semibold leading-6 text-teal-950">{filter.guardrail}</p>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{filter.caveat}</p>
+            </div>
           ))}
         </div>
       </Card>

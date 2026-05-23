@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
   defaultLocale,
@@ -72,21 +73,20 @@ export function LanguagePreferenceSwitcher() {
           const option = localeOptionFor(language.locale);
           const enabled = language.status === 'native_reviewed';
           return (
-            <button
+            <Link
               aria-pressed={language.locale === selectedLocale}
               className={`rounded-full border px-3 py-1 text-xs font-black ${language.locale === selectedLocale ? 'border-emerald-800 bg-emerald-800 text-white' : 'border-slate-200 bg-white text-slate-700'} ${enabled ? '' : 'cursor-not-allowed opacity-50'}`}
               data-currency={option.currency}
               data-dir={option.dir === 'rtl' ? rtlContract.dir : 'ltr'}
-              disabled={!enabled}
+              href={`/${language.locale}`}
               key={language.locale}
               onClick={() => {
                 if (enabled) chooseLocale(language.locale as SupportedLocale);
               }}
               title={enabled ? 'Persist language preference' : 'Native-quality translation review required before launch'}
-              type="button"
             >
               {option.label} · {option.nativeLabel}
-            </button>
+            </Link>
           );
         })}
       </div>

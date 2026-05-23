@@ -26,6 +26,8 @@ describe('buildOpenApiDocument', () => {
       '/api/basket/stores/{storeId}/quote',
       '/api/basket/transfer/{retailerId}',
       '/api/basket/trip-cost',
+      '/api/billing/checkout-sessions',
+      '/api/billing/portal-sessions',
       '/api/billing/subscription-events',
       '/api/budget',
       '/api/budget/categories',
@@ -68,6 +70,10 @@ describe('buildOpenApiDocument', () => {
       '/api/products/{id}/terminal',
       '/api/readiness/catalog-coverage',
       '/api/readiness/postgres',
+      '/api/readiness/scan-upload-cors',
+      '/api/readiness/scan-upload-storage',
+      '/api/readiness/scan-upload-write',
+      '/api/readiness/scanning',
       '/api/readiness/source-runs',
       '/api/receipts/review',
       '/api/scans/process',
@@ -92,11 +98,14 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.components.securitySchemes.metricsToken, { type: 'apiKey', in: 'header', name: 'x-groceryview-metrics-token' });
     assert.deepEqual(doc.components.securitySchemes.webhookSignature, { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' });
     assert.deepEqual(doc.components.securitySchemes.billingWebhookSignature, { type: 'apiKey', in: 'header', name: 'x-groceryview-billing-signature' });
+    assert.deepEqual(doc.components.securitySchemes.stripeWebhookSignature, { type: 'apiKey', in: 'header', name: 'stripe-signature' });
     assert.deepEqual(doc.paths['/api/account/subscription-access'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/ads/disclosure'].get?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/ads/disclosure'].get?.summary ?? '', /ad disclosure/i);
     assert.equal(doc.paths['/api/auth/session'].post?.security, undefined);
-    assert.deepEqual(doc.paths['/api/billing/subscription-events'].post?.security, [{ billingWebhookSignature: [] }]);
+    assert.deepEqual(doc.paths['/api/billing/checkout-sessions'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/billing/portal-sessions'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/billing/subscription-events'].post?.security, [{ billingWebhookSignature: [] }, { stripeWebhookSignature: [] }]);
     assert.deepEqual(doc.paths['/api/basket/comparison-report'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/fulfillment-slots/{retailerId}/{storeId}'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/handoff/{retailerId}'].get?.security, [{ bearerAuth: [] }]);
@@ -139,6 +148,14 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/readiness/postgres'].get?.security, [{ metricsToken: [] }]);
     assert.deepEqual(doc.paths['/api/readiness/source-runs'].get?.security, [{ metricsToken: [] }]);
     assert.match(doc.paths['/api/readiness/source-runs'].get?.summary ?? '', /source run/i);
+    assert.deepEqual(doc.paths['/api/readiness/scanning'].get?.security, [{ metricsToken: [] }]);
+    assert.match(doc.paths['/api/readiness/scanning'].get?.summary ?? '', /scan provider/i);
+    assert.deepEqual(doc.paths['/api/readiness/scan-upload-storage'].get?.security, [{ metricsToken: [] }]);
+    assert.match(doc.paths['/api/readiness/scan-upload-storage'].get?.summary ?? '', /scan upload storage/i);
+    assert.deepEqual(doc.paths['/api/readiness/scan-upload-cors'].get?.security, [{ metricsToken: [] }]);
+    assert.match(doc.paths['/api/readiness/scan-upload-cors'].get?.summary ?? '', /scan upload CORS/i);
+    assert.deepEqual(doc.paths['/api/readiness/scan-upload-write'].get?.security, [{ metricsToken: [] }]);
+    assert.match(doc.paths['/api/readiness/scan-upload-write'].get?.summary ?? '', /scan upload write/i);
     assert.deepEqual(doc.paths['/api/workers/notifications/run'].post?.security, [{ metricsToken: [] }]);
     assert.match(doc.paths['/api/workers/notifications/run'].post?.summary ?? '', /notification worker/i);
     assert.deepEqual(doc.paths['/api/notifications/suppression-events'].post?.security, [{ webhookSignature: [] }]);

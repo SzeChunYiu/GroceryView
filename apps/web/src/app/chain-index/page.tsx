@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
-import { buildBrandTierPriceObservations, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
-import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, matchedChainProducts } from '@/lib/verified-data';
-import { routeMetadata, siteUrl } from '@/lib/seo';
+import { buildBrandTierPriceObservations, buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
+import { buildGroceryIndexTickerWidget } from '@/lib/grocery-index-widget';
+import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, marketHeatmapTiles, matchedChainProducts } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
   return routeMetadata('/chain-index');
@@ -15,6 +16,7 @@ const matchedBasketRefinedIndex = calculateChainPriceIndex([
   ...buildChainPriceObservations(),
   ...matchedBasketObservations
 ]);
+const chainIndexTrendSeries = buildChainIndexTrendSeries();
 
 const widgetSourceConfidence = matchedBasketRefinedIndex.chains.reduce(
   (summary, chain) => ({
@@ -24,17 +26,18 @@ const widgetSourceConfidence = matchedBasketRefinedIndex.chains.reduce(
   { high: 0, medium: 0, low: 0 } as Record<'high' | 'medium' | 'low', number>
 );
 
-export const groceryIndexTickerWidget = {
-  route: '/widgets/grocery-index-ticker',
-  title: 'Embeddable Grocery Index ticker',
-  sourceConfidence: widgetSourceConfidence,
-  embedCode: `<iframe src="${siteUrl}/widgets/grocery-index-ticker" title="Grocery Index ticker" loading="lazy" width="100%" height="320"></iframe>`
-};
+const groceryIndexTickerWidget = buildGroceryIndexTickerWidget(widgetSourceConfidence);
 
 function tierTone(value: number) {
   if (value < 95) return 'text-emerald-800 bg-emerald-50';
   if (value > 105) return 'text-rose-800 bg-rose-50';
   return 'text-slate-800 bg-slate-50';
+}
+
+function heatTileTone(value: number) {
+  if (value >= 80) return 'border-rose-200 bg-rose-50 text-rose-950';
+  if (value >= 55) return 'border-amber-200 bg-amber-50 text-amber-950';
+  return 'border-emerald-200 bg-emerald-50 text-emerald-950';
 }
 
 export default function ChainIndexPage() {
@@ -51,6 +54,77 @@ export default function ChainIndexPage() {
         <Card><p className="text-sm font-black text-slate-600">Average spread</p><p className="mt-2 text-4xl font-black text-emerald-800">{formatPct(averageSpread)}</p></Card>
         <Card><p className="text-sm font-black text-slate-600">Lowest-price wins</p><p className="mt-2 text-xl font-black text-slate-950">Willys {willysWins} · Hemköp {hemkopWins}</p></Card>
       </div>
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50">
+        <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <Eyebrow>{chainIndexTrendSeries.sourceLabel}</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-indigo-950">Chain Price Index trend chart</h2>
+            <p className="mt-3 text-sm leading-6 text-indigo-950">
+              This chart replays dated campaign tape through calculateChainPriceIndex so Willys and Hemköp can be compared over time on the same 100-centred scale. No forecast is rendered and missing full-shelf history stays labelled as campaign coverage.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <p className="rounded-2xl bg-white/80 p-4 text-sm font-black text-indigo-950">{chainIndexTrendSeries.chartWindowLabel}</p>
+              <p className="rounded-2xl bg-white/80 p-4 text-sm font-black text-indigo-950">{chainIndexTrendSeries.coverageLabel}</p>
+            </div>
+          </div>
+          <div className="grid gap-3">
+            {chainIndexTrendSeries.series.map((series) => (
+              <div className="rounded-2xl bg-white/85 p-4 shadow-sm" data-chain-index-trend={series.chainId} key={series.chainId}>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-[0.18em] text-indigo-700">{series.chainId}</p>
+                    <p className="mt-1 text-xs font-bold text-indigo-900">{series.coverageLabel} · latest {series.latestDate}</p>
+                  </div>
+                  <p className="text-3xl font-black text-indigo-950">{series.latestIndex.toFixed(1)}</p>
+                </div>
+                <p className="mt-2 text-sm font-black text-indigo-950">Movement from first campaign date: {series.movementFromFirst >= 0 ? '+' : ''}{series.movementFromFirst.toFixed(1)} index points</p>
+                <div className="mt-4 space-y-2">
+                  {series.points.map((point) => (
+                    <div className="grid gap-2 text-xs font-bold text-indigo-950 sm:grid-cols-[7rem_1fr_7rem]" key={`${series.chainId}-${point.date}`}>
+                      <span>{point.date}</span>
+                      <span className="h-3 overflow-hidden rounded-full bg-indigo-100">
+                        <span className="block h-full rounded-full bg-indigo-600" style={{ width: `${Math.max(8, Math.min(100, point.value))}%` }} />
+                      </span>
+                      <span>{point.value.toFixed(1)} · {point.confidence}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <ul className="mt-5 grid gap-3 text-sm font-bold leading-6 text-indigo-950 lg:grid-cols-3">
+          {chainIndexTrendSeries.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white/80 p-3" key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
+      </Card>
+
+      <Card className="mt-6 border-slate-200 bg-white">
+        <div className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <Eyebrow>Market heatmap</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Terminal heat across deals, spreads, liquidity, and movers</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              These heat tiles are derived from categoryDealLeaders, chainCategoryCoverage, openPriceObservationDepth, and priceDropMoversBoard. No forecast is rendered: the score is a normalized view of visible observed data and matched cross-chain rows.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {marketHeatmapTiles.slice(0, 6).map((tile) => (
+              <Link className={`rounded-2xl border p-4 hover:border-slate-500 ${heatTileTone(tile.heatScore)}`} href={tile.route} key={tile.id}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] opacity-70">{tile.sourceSignal}</p>
+                <div className="mt-2 flex items-start justify-between gap-3">
+                  <p className="font-black">{tile.label}</p>
+                  <p className="text-2xl font-black">{tile.heatScore.toFixed(0)}</p>
+                </div>
+                <p className="mt-2 text-sm font-black">{tile.metricLabel}</p>
+                <p className="mt-2 text-xs font-semibold leading-5 opacity-80">{tile.confidenceLabel}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-blue-200 bg-blue-50">
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">

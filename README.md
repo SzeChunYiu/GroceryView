@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 20:18 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 12:34 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **286**
+- **Shipped `feat:`/`wire:` PRs to date:** **216**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,25 +42,35 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
-- #1080 feat(commodity): surface mapping review queue
-- #1078 feat(ingest): refresh OpenFoodFacts barcode nutrition
-- #1074 feat(ingest): add ICA Sälen promotions
-- #1076 feat(web): rank matched store price percentiles
-- #1075 feat(ingest): add Coop branch flyer discounts
-- #1073 feat(web): add notification inbox actions
-- #1072 feat(scanner): surface receipt alias growth
-- #1071 feat(web): surface member-offer aggregation
-- #1068 feat(ops): gate deploys on visible production artifact
-- #1066 feat(web): surface fresh food chain index
-- #1062 feat(ingest): add ICA Säffle promotions
-- #1063 feat(web): add scanner camera preview
-- #1064 feat(web): add seasonal produce calendar
-- #1059 feat(ingest): add Coop Karlskoga flyer discounts
-- #1061 feat(api): preserve unpriced basket products
+- #1308 feat(ingest): add ICA Kvantum Kista promotions
+- #1303 feat(ingest): expand Axfood weekly branch flyers
+- #1297 feat(fuel): prices
+- #1291 feat: wire pantry planner replenishment
+- #1289 feat(fuel): prices
+- #1280 feat(fuel): prices
+- #1276 feat(web): surface pharmacy OTC evidence
+- #1271 feat(fuel): prices
+- #1258 feat(fuel): prices
+- #1265 feat(web): surface commodity mapping curator review
+- #1257 feat(web): add basket cost heatmap by area
+- #1250 feat(web): add chain index trend chart
+- #1239 feat(web): add grocery market heatmap
+- #1232 feat(readiness): configure source run row thresholds
+- #1231 feat(web): sync map and list selection
 
 ## 🔄 In progress (open PRs)
 
-- #1081 feat(account): add signed-in ad disclosure controls
+- #1310 feat(ingest): add Coop branch weekly discounts _(draft)_
+- #1309 feat(ingest): deepen real grocery source rows
+- #1306 feat(ingest): expand Coop weekly branch discounts
+- #1305 feat(ingest): deepen live grocery source coverage
+- #1304 feat(ingest): add ICA Tierp promotions
+- #1299 docs(readme): refresh live status board
+- #1298 feat(ingest): deepen Matspar Matpriskollen Lidl ICA rows
+- #1283 feat(web): add verified deal screener
+- #1262 feat(web): product cross chain table (WIP from LUNARC fleet)
+- #1261 feat(web): nav groups (WIP from LUNARC fleet)
+- #1260 feat(web): dark mode (WIP from LUNARC fleet)
 
 ## 📋 To-do (from GOAL.md backlog)
 

@@ -260,6 +260,36 @@ describe('deployment ops foundation', () => {
     });
   });
 
+
+
+  it('builds hosted scanner upload smoke command plans without embedding account token values', () => {
+    const plan = buildHostedSmokeCommandPlan({
+      serverUrl: 'https://api.groceryview.example/',
+      includePostgresReadiness: false,
+      includeScannerUploadSmoke: true,
+      scannerUserIdEnvVar: 'PROD_SCANNER_USER_ID',
+      scannerBearerTokenEnvVar: 'PROD_SCANNER_BEARER_TOKEN',
+      scannerUploadEvidenceOutputPath: '/var/tmp/scanner-upload-smoke.json'
+    });
+
+    assert.deepEqual(plan, {
+      commands: [
+        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example GROCERYVIEW_TERMINAL_PRODUCT_ID=coffee HTTP_SMOKE_TIMEOUT_SECONDS=15 HOSTED_HTTP_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-http-smoke.json infra/scripts/smoke-hosted-http.sh',
+        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example GROCERYVIEW_SCANNER_USER_ID=$PROD_SCANNER_USER_ID GROCERYVIEW_SCANNER_BEARER_TOKEN=$PROD_SCANNER_BEARER_TOKEN HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH=/var/tmp/scanner-upload-smoke.json node infra/scripts/smoke-hosted-scanner-upload.mjs'
+      ],
+      requiredSecrets: ['PROD_SCANNER_USER_ID', 'PROD_SCANNER_BEARER_TOKEN'],
+      evidence: [
+        'hosted_api_health',
+        'hosted_product_terminal',
+        'hosted_http_smoke_artifact',
+        'hosted_scanner_upload_ticket',
+        'hosted_scanner_upload_put',
+        'hosted_scanner_upload_artifact'
+      ],
+      artifacts: ['/tmp/groceryview-hosted-http-smoke.json', '/var/tmp/scanner-upload-smoke.json']
+    });
+  });
+
   it('blocks deployment when required secrets are missing, stale, or lack rotation ownership', () => {
     const report = buildSecretRotationReadinessReport({
       checkedAt: '2026-05-20T08:00:00.000Z',

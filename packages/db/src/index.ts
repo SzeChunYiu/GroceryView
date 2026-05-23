@@ -38,7 +38,10 @@ export function migrationVersionFromPath(path: string): string {
 
 export function createMigrationPlan(files: SqlMigrationFile[]): Migration[] {
   const migrations = files
-    .filter((file) => file.path.endsWith('.sql'))
+    .filter((file) => {
+      const filename = file.path.split(/[\\/]/).filter(Boolean).at(-1) ?? '';
+      return filename.endsWith('.sql') && !filename.startsWith('._');
+    })
     .sort((a, b) => a.path.localeCompare(b.path))
     .map((file) => ({
       version: migrationVersionFromPath(file.path),
@@ -396,6 +399,8 @@ export type CatalogProductCoverageRecord = {
   categoryId: string;
   observedChainIds: string[];
   observedStoreIds: string[];
+  observedPriceTypes: string[];
+  observedStorePriceTypes: string[];
 };
 
 export type ProductAliasSourceType = 'retailer' | 'receipt' | 'community' | 'import' | 'manual';
@@ -446,6 +451,7 @@ export type PriceObservationRecord = {
   productId: string;
   chainId: string;
   storeId?: string;
+  domain?: 'grocery' | 'fuel' | 'pharmacy';
   sourceRunId?: string;
   rawRecordId?: string;
   retailerProductRef?: string;
@@ -469,6 +475,7 @@ export type PriceObservationRecord = {
 
 export type PriceObservationWriteResult = {
   observationId: string;
+  status?: 'unchanged';
 };
 
 export type PriceObservationBatchWriteResult = {
@@ -514,6 +521,31 @@ export type LatestPriceRecord = {
 export type PostgresPriceReader = {
   listLatestPricesForProduct(productId: string): Promise<LatestPriceRecord[]>;
   listPriceObservationHistory(filter: PriceObservationHistoryFilter): Promise<PriceObservationHistoryRecord[]>;
+};
+
+export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
+  productSlug: string;
+  canonicalName: string;
+  brand?: string;
+  categoryPath: string[];
+  packageSize?: number;
+  packageUnit?: string;
+  comparableUnit: string;
+  chainSlug: string;
+  chainName: string;
+  storeSlug?: string;
+  storeExternalRef?: string;
+  storeName?: string;
+  city?: string;
+};
+
+export type SiteLatestPriceSnapshotFilter = {
+  minConfidence?: number;
+  limit?: number;
+};
+
+export type PostgresSiteSnapshotReader = {
+  listLatestPriceSnapshotRows(filter?: SiteLatestPriceSnapshotFilter): Promise<SiteLatestPriceSnapshotRow[]>;
 };
 
 export type SourceRunRecord = {
@@ -1449,6 +1481,23 @@ type LatestPriceRow = {
   confidence: string | number;
   provenance: Record<string, unknown> | string | null;
 };
+
+
+type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
+  product_slug: string;
+  canonical_name: string;
+  brand: string | null;
+  category_path: string[] | string | null;
+  package_size: string | number | null;
+  package_unit: string | null;
+  comparable_unit: string;
+  chain_slug: string;
+  chain_name: string;
+  store_slug: string | null;
+  store_external_ref: string | null;
+  store_name: string | null;
+  city: string | null;
+};
 type PriceObservationHistoryRow = {
   id: string;
   product_id: string;
@@ -1540,6 +1589,8 @@ type CatalogProductCoverageRow = {
   category_id: string | null;
   observed_chain_ids: string[] | null;
   observed_store_ids: string[] | null;
+  observed_price_types: string[] | null;
+  observed_store_price_types: string[] | null;
 };
 type ProductAliasRow = {
   id: string;
@@ -1590,6 +1641,60 @@ function mapLatestPrice(row: LatestPriceRow): LatestPriceRecord {
     observedAt: asIso(row.observed_at),
     confidence: Number(row.confidence),
     provenance: asRecord(row.provenance)
+  };
+}
+
+function samePriceValue(left: string | number | null, right: number | null | undefined): boolean {
+  if (left === null || right === null || right === undefined) return left === null && (right === null || right === undefined);
+  return Math.abs(Number(left) - Number(right)) < 0.000001;
+}
+
+function sameLatestPriceKey(row: LatestPriceRow, observation: PriceObservationRecord): boolean {
+  return row.product_id === observation.productId &&
+    row.chain_id === observation.chainId &&
+    (row.store_id ?? null) === (observation.storeId ?? null) &&
+    row.price_type === observation.priceType;
+}
+
+function latestPriceIsUnchanged(row: LatestPriceRow, observation: PriceObservationRecord): boolean {
+  if (!sameLatestPriceKey(row, observation)) return false;
+  if (Date.parse(asIso(row.observed_at)) > Date.parse(observation.observedAt)) return false;
+  return samePriceValue(row.price, observation.price) &&
+    samePriceValue(row.regular_price, observation.regularPrice ?? null) &&
+    samePriceValue(row.unit_price, observation.unitPrice) &&
+    row.currency === (observation.currency ?? 'SEK');
+}
+
+
+function asStringArray(value: string[] | string | null): string[] {
+  if (Array.isArray(value)) return value;
+  if (!value) return [];
+  const parsed = JSON.parse(value) as unknown;
+  return Array.isArray(parsed) ? parsed.map(String) : [];
+}
+
+function optionalNumberFromDb(value: string | number | null): number | undefined {
+  if (value === null) return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): SiteLatestPriceSnapshotRow {
+  return {
+    ...mapLatestPrice(row),
+    productSlug: row.product_slug,
+    canonicalName: row.canonical_name,
+    ...(row.brand ? { brand: row.brand } : {}),
+    categoryPath: asStringArray(row.category_path),
+    ...(optionalNumberFromDb(row.package_size) === undefined ? {} : { packageSize: optionalNumberFromDb(row.package_size) }),
+    ...(row.package_unit ? { packageUnit: row.package_unit } : {}),
+    comparableUnit: row.comparable_unit,
+    chainSlug: row.chain_slug,
+    chainName: row.chain_name,
+    ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
+    ...(row.store_external_ref ? { storeExternalRef: row.store_external_ref } : {}),
+    ...(row.store_name ? { storeName: row.store_name } : {}),
+    ...(row.city ? { city: row.city } : {})
   };
 }
 
@@ -1703,7 +1808,9 @@ function mapCatalogProductCoverage(row: CatalogProductCoverageRow): CatalogProdu
     id: row.product_id,
     categoryId: row.category_id ?? 'uncategorized',
     observedChainIds: [...(row.observed_chain_ids ?? [])].sort(),
-    observedStoreIds: [...(row.observed_store_ids ?? [])].sort()
+    observedStoreIds: [...(row.observed_store_ids ?? [])].sort(),
+    observedPriceTypes: [...(row.observed_price_types ?? [])].sort(),
+    observedStorePriceTypes: [...(row.observed_store_price_types ?? [])].sort()
   };
 }
 
@@ -2960,14 +3067,25 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
       const rows = await executor.query<CatalogProductCoverageRow>(
         `select products.id as product_id,
                 coalesce(products.category_path[1], 'uncategorized') as category_id,
-                coalesce(array_agg(distinct latest_prices.chain_id) filter (where latest_prices.chain_id is not null), '{}') as observed_chain_ids,
+                coalesce(array_agg(distinct replace(chains.slug, '-', '_')) filter (where chains.slug is not null), '{}') as observed_chain_ids,
                 coalesce(
                   array_agg(distinct coalesce(stores.external_ref, stores.slug, latest_prices.store_id::text))
                     filter (where latest_prices.store_id is not null),
                   '{}'
-                ) as observed_store_ids
+                ) as observed_store_ids,
+                coalesce(
+                  array_agg(distinct latest_prices.price_type)
+                    filter (where latest_prices.price_type is not null),
+                  '{}'
+                ) as observed_price_types,
+                coalesce(
+                  array_agg(distinct coalesce(stores.external_ref, stores.slug, latest_prices.store_id::text) || ':' || latest_prices.price_type)
+                    filter (where latest_prices.store_id is not null and latest_prices.price_type is not null),
+                  '{}'
+                ) as observed_store_price_types
          from products
          left join latest_prices on latest_prices.product_id = products.id
+         left join chains on chains.id = latest_prices.chain_id
          left join stores on stores.id = latest_prices.store_id
          group by products.id, products.category_path
          order by products.id
@@ -3057,6 +3175,33 @@ export type PostgresIntegrationProbe = {
   }>;
 };
 
+export type TimescaleDbEvaluationProbe = {
+  timescaleExtensionAvailable: boolean;
+  hypertables: string[];
+  compressionPolicies: string[];
+  retentionPolicies: string[];
+  fallbackTables: string[];
+  fallbackFunctions: string[];
+};
+
+export type TimescaleDbEvaluationReport = {
+  status: 'timescale_ready' | 'fallback_ready' | 'blocked';
+  blockers: string[];
+  timescaleGaps: string[];
+  evidence: string[];
+  recommendation: string;
+  summary: string;
+};
+
+export const TIMESCALEDB_EVALUATION_HYPERTABLES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_RETENTION_POLICIES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_FALLBACK_TABLES = ['observations_v2', 'price_daily', 'price_weekly'] as const;
+export const TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS = [
+  'create_observations_partitions',
+  'drop_observations_partitions_before'
+] as const;
+
 export type PostgresRepositoryProbe = {
   name: string;
   run(executor: QueryExecutor): Promise<void>;
@@ -3085,11 +3230,17 @@ export type CheckPostgresRepositoryIntegrationReadinessInput = Omit<CollectPostg
 export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'chains',
   'products',
+  'fuel_grades',
   'source_runs',
   'raw_records',
   'retailer_source_policies',
+  'fuel_price_sources',
+  'fuel_price_source_observations',
   'observations',
+  'observations_v2',
   'latest_prices',
+  'price_daily',
+  'price_weekly',
   'app_users',
   'favorite_stores',
   'user_preferences',
@@ -3124,7 +3275,12 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '007_receipt_uploads',
   '008_household_plans',
   '009_retailer_source_policies',
-  '010_basket_import_reviews'
+  '010_basket_import_reviews',
+  '010_commodity_taxonomy',
+  '011_multi_vertical_domains',
+  '012_price_rollups',
+  '013_observations_partitioning',
+  '014_fuel_price_sources'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -3599,11 +3755,44 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
   return {
     async recordPriceObservation(observation) {
       const provenanceJson = JSON.stringify(observation.provenance);
+      const latestRows = await executor.query<LatestPriceRow>(
+        `select product_id,
+                chain_id,
+                store_id,
+                price_type,
+                observation_id,
+                price,
+                regular_price,
+                unit_price,
+                currency,
+                observed_at,
+                confidence,
+                provenance
+         from latest_prices
+         where product_id = $1
+           and chain_id = $2
+           and store_id is not distinct from $3::uuid
+           and price_type = $4
+         order by observed_at desc
+         limit 1`,
+        [
+          observation.productId,
+          observation.chainId,
+          observation.storeId ?? null,
+          observation.priceType
+        ]
+      );
+      const latestRow = latestRows.find((row) => sameLatestPriceKey(row, observation)) ?? latestRows[0];
+      if (latestRow && latestPriceIsUnchanged(latestRow, observation)) {
+        return { observationId: latestRow.observation_id, status: 'unchanged' };
+      }
+
       const rows = await executor.query<ObservationIdRow>(
         `insert into observations(
            product_id,
            chain_id,
            store_id,
+           domain,
            source_run_id,
            raw_record_id,
            retailer_product_ref,
@@ -3625,13 +3814,14 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            provenance
          ) values (
            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22::jsonb
+           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23::jsonb
          )
          returning id`,
         [
           observation.productId,
           observation.chainId,
           observation.storeId ?? null,
+          observation.domain ?? 'grocery',
           observation.sourceRunId ?? null,
           observation.rawRecordId ?? null,
           observation.retailerProductRef ?? null,
@@ -3647,7 +3837,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.promotionEndsOn ?? null,
           observation.memberRequired ?? false,
           observation.observedAt,
-          observation.validFrom ?? null,
+          observation.validFrom ?? observation.observedAt,
           observation.validUntil ?? null,
           observation.confidence,
           provenanceJson
@@ -3661,6 +3851,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            product_id,
            chain_id,
            store_id,
+           domain,
            price_type,
            observation_id,
            price,
@@ -3670,7 +3861,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            observed_at,
            confidence,
            provenance
-         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::jsonb)
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::jsonb)
          on conflict (product_id, chain_id, store_id, price_type) do update set
            observation_id = excluded.observation_id,
            price = excluded.price,
@@ -3679,6 +3870,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            currency = excluded.currency,
            observed_at = excluded.observed_at,
            confidence = excluded.confidence,
+           domain = excluded.domain,
            provenance = excluded.provenance,
            updated_at = now()
          where latest_prices.observed_at <= excluded.observed_at`,
@@ -3686,6 +3878,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.productId,
           observation.chainId,
           observation.storeId ?? null,
+          observation.domain ?? 'grocery',
           observation.priceType,
           observationId,
           observation.price,
@@ -3711,6 +3904,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              product_id uuid,
              chain_id uuid,
              store_id uuid,
+             domain text,
              source_run_id uuid,
              raw_record_id uuid,
              retailer_product_ref text,
@@ -3735,7 +3929,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
          ranked_input as (
            select input.*,
                   row_number() over (
-                    partition by product_id, chain_id, store_id, price_type, observed_at, retailer_product_ref, price, unit_price, currency, confidence, provenance
+                    partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, confidence, provenance
                     order by ordinal
                   ) as input_rank
            from input
@@ -3747,6 +3941,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                   observations.product_id,
                   observations.chain_id,
                   observations.store_id,
+                  observations.domain,
                   observations.price_type,
                   observations.price,
                   observations.regular_price,
@@ -3759,6 +3954,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            join observations on observations.product_id = ranked_input.product_id
              and observations.chain_id = ranked_input.chain_id
              and observations.store_id is not distinct from ranked_input.store_id
+             and observations.domain = ranked_input.domain
              and observations.price_type = ranked_input.price_type
              and observations.observed_at = ranked_input.observed_at
              and observations.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
@@ -3774,6 +3970,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              product_id,
              chain_id,
              store_id,
+             domain,
              source_run_id,
              raw_record_id,
              retailer_product_ref,
@@ -3798,6 +3995,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              product_id,
              chain_id,
              store_id,
+             domain,
              source_run_id,
              raw_record_id,
              retailer_product_ref,
@@ -3824,7 +4022,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                from existing
                where existing.ordinal = ranked_input.ordinal
              )
-           returning id, product_id, chain_id, store_id, retailer_product_ref, price_type, price, regular_price, unit_price, currency, observed_at, confidence, provenance
+           returning id, product_id, chain_id, store_id, domain, retailer_product_ref, price_type, price, regular_price, unit_price, currency, observed_at, confidence, provenance
          ),
          written as (
            select ranked_input.ordinal,
@@ -3832,6 +4030,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                   coalesce(inserted.product_id, existing.product_id) as product_id,
                   coalesce(inserted.chain_id, existing.chain_id) as chain_id,
                   coalesce(inserted.store_id, existing.store_id) as store_id,
+                  coalesce(inserted.domain, existing.domain) as domain,
                   coalesce(inserted.price_type, existing.price_type) as price_type,
                   coalesce(inserted.price, existing.price) as price,
                   coalesce(inserted.regular_price, existing.regular_price) as regular_price,
@@ -3845,6 +4044,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            left join inserted on inserted.product_id = ranked_input.product_id
              and inserted.chain_id = ranked_input.chain_id
              and inserted.store_id is not distinct from ranked_input.store_id
+             and inserted.domain = ranked_input.domain
              and inserted.price_type = ranked_input.price_type
              and inserted.observed_at = ranked_input.observed_at
              and inserted.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
@@ -3860,6 +4060,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              product_id,
              chain_id,
              store_id,
+             domain,
              price_type,
              observation_id,
              price,
@@ -3874,6 +4075,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              product_id,
              chain_id,
              store_id,
+             domain,
              price_type,
              id,
              price,
@@ -3888,6 +4090,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                product_id,
                chain_id,
                store_id,
+               domain,
                price_type,
                id,
                price,
@@ -3908,6 +4111,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              currency = excluded.currency,
              observed_at = excluded.observed_at,
              confidence = excluded.confidence,
+             domain = excluded.domain,
              provenance = excluded.provenance,
              updated_at = now()
            where latest_prices.observed_at <= excluded.observed_at
@@ -3921,6 +4125,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           product_id: observation.productId,
           chain_id: observation.chainId,
           store_id: observation.storeId ?? null,
+          domain: observation.domain ?? 'grocery',
           source_run_id: observation.sourceRunId ?? null,
           raw_record_id: observation.rawRecordId ?? null,
           retailer_product_ref: observation.retailerProductRef ?? null,
@@ -3952,6 +4157,51 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           return id;
         })
       };
+    }
+  };
+}
+
+export function createPostgresSiteSnapshotReader(executor: QueryExecutor): PostgresSiteSnapshotReader {
+  return {
+    async listLatestPriceSnapshotRows(filter = {}) {
+      const minConfidence = Math.min(Math.max(filter.minConfidence ?? 0, 0), 1);
+      const limit = Math.min(Math.max(filter.limit ?? 1000, 1), 10000);
+      const rows = await executor.query<SiteLatestPriceSnapshotRowSql>(
+        `select latest_prices.product_id,
+                products.slug as product_slug,
+                products.canonical_name,
+                products.brand,
+                products.category_path,
+                products.package_size,
+                products.package_unit,
+                products.comparable_unit,
+                latest_prices.chain_id,
+                chains.slug as chain_slug,
+                chains.name as chain_name,
+                latest_prices.store_id,
+                stores.slug as store_slug,
+                stores.external_ref as store_external_ref,
+                stores.name as store_name,
+                stores.city,
+                latest_prices.price_type,
+                latest_prices.observation_id,
+                latest_prices.price,
+                latest_prices.regular_price,
+                latest_prices.unit_price,
+                latest_prices.currency,
+                latest_prices.observed_at,
+                latest_prices.confidence,
+                latest_prices.provenance
+         from latest_prices
+         join products on products.id = latest_prices.product_id
+         join chains on chains.id = latest_prices.chain_id
+         left join stores on stores.id = latest_prices.store_id
+         where latest_prices.confidence >= $1
+         order by latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
+         limit $2`,
+        [minConfidence, limit]
+      );
+      return rows.map(mapSiteLatestPriceSnapshotRow);
     }
   };
 }
@@ -4110,6 +4360,137 @@ export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrati
     evidence,
     summary: blockers.length === 0 ? 'PostgreSQL integration contract is ready.' : 'PostgreSQL integration contract is blocked.'
   };
+}
+
+export function buildTimescaleDbEvaluationReport(input: TimescaleDbEvaluationProbe): TimescaleDbEvaluationReport {
+  const hypertables = new Set(input.hypertables);
+  const compressionPolicies = new Set(input.compressionPolicies);
+  const retentionPolicies = new Set(input.retentionPolicies);
+  const fallbackTables = new Set(input.fallbackTables);
+  const fallbackFunctions = new Set(input.fallbackFunctions);
+  const timescaleGaps: string[] = [];
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+
+  if (input.timescaleExtensionAvailable) {
+    evidence.push('timescaledb_extension:available');
+  } else {
+    timescaleGaps.push('timescaledb_extension_not_installed');
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_HYPERTABLES) {
+    if (hypertables.has(table)) evidence.push(`hypertable:${table}`);
+    else timescaleGaps.push(`missing_hypertable:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES) {
+    if (compressionPolicies.has(table)) evidence.push(`compression_policy:${table}`);
+    else timescaleGaps.push(`missing_compression_policy:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_RETENTION_POLICIES) {
+    if (retentionPolicies.has(table)) evidence.push(`retention_policy:${table}`);
+    else timescaleGaps.push(`missing_retention_policy:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_FALLBACK_TABLES) {
+    if (fallbackTables.has(table)) evidence.push(`fallback_table:${table}`);
+    else blockers.push(`missing_fallback_table:${table}`);
+  }
+
+  for (const routine of TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS) {
+    if (fallbackFunctions.has(routine)) evidence.push(`fallback_function:${routine}`);
+    else blockers.push(`missing_fallback_function:${routine}`);
+  }
+
+  if (timescaleGaps.length === 0) {
+    return {
+      status: 'timescale_ready',
+      blockers,
+      timescaleGaps: [],
+      evidence,
+      recommendation: 'TimescaleDB is ready for observations_v2 hypertable compression and retention policies.',
+      summary: blockers.length === 0 ? 'TimescaleDB evaluation is ready.' : 'TimescaleDB evaluation is blocked by missing fallback evidence.'
+    };
+  }
+
+  if (blockers.length === 0) {
+    return {
+      status: 'fallback_ready',
+      blockers: [],
+      timescaleGaps,
+      evidence,
+      recommendation: 'Use declarative monthly partitions, BRIN pruning, price_daily/price_weekly rollups, and partition-drop retention until TimescaleDB is installed.',
+      summary: 'TimescaleDB is not fully configured; the declarative partition fallback is ready.'
+    };
+  }
+
+  return {
+    status: 'blocked',
+    blockers,
+    timescaleGaps,
+    evidence,
+    recommendation: 'Block price-tape scale claims until either TimescaleDB policies or the declarative partition fallback are fully present.',
+    summary: 'TimescaleDB evaluation is blocked.'
+  };
+}
+
+export async function collectTimescaleDbEvaluationProbe(executor: QueryExecutor): Promise<TimescaleDbEvaluationProbe> {
+  const extensionRows = await executor.query<{ installed_version: string | null }>(
+    "select installed_version from pg_available_extensions where name = 'timescaledb'"
+  );
+  const timescaleExtensionAvailable = Boolean(extensionRows[0]?.installed_version);
+  const fallbackTableRows = await executor.query<{ table_name: string }>(
+    'select table_name from information_schema.tables where table_schema = current_schema() and table_name = any($1)',
+    [[...TIMESCALEDB_EVALUATION_FALLBACK_TABLES]]
+  );
+  const fallbackFunctionRows = await executor.query<{ routine_name: string }>(
+    'select routine_name from information_schema.routines where routine_schema = current_schema() and routine_name = any($1)',
+    [[...TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS]]
+  );
+
+  const probe: TimescaleDbEvaluationProbe = {
+    timescaleExtensionAvailable,
+    hypertables: [],
+    compressionPolicies: [],
+    retentionPolicies: [],
+    fallbackTables: fallbackTableRows.map((row) => row.table_name),
+    fallbackFunctions: fallbackFunctionRows.map((row) => row.routine_name)
+  };
+
+  if (!timescaleExtensionAvailable) return probe;
+
+  try {
+    const hypertableRows = await executor.query<{ hypertable_name: string }>(
+      'select hypertable_name from timescaledb_information.hypertables where hypertable_name = any($1)',
+      [[...TIMESCALEDB_EVALUATION_HYPERTABLES]]
+    );
+    probe.hypertables = hypertableRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.hypertables = [];
+  }
+
+  try {
+    const compressionRows = await executor.query<{ hypertable_name: string }>(
+      "select hypertable_name from timescaledb_information.jobs where proc_name = 'policy_compression' and hypertable_name = any($1)",
+      [[...TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES]]
+    );
+    probe.compressionPolicies = compressionRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.compressionPolicies = [];
+  }
+
+  try {
+    const retentionRows = await executor.query<{ hypertable_name: string }>(
+      "select hypertable_name from timescaledb_information.jobs where proc_name = 'policy_retention' and hypertable_name = any($1)",
+      [[...TIMESCALEDB_EVALUATION_RETENTION_POLICIES]]
+    );
+    probe.retentionPolicies = retentionRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.retentionPolicies = [];
+  }
+
+  return probe;
 }
 
 export function summarizePostgresIntegrationReadinessReport(

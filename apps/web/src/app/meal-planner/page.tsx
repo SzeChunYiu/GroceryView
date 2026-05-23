@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { dealBasedMeals, familyMealPlannerFromDeals, studentDealRecipes } from '@/lib/demo-data';
+import { dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, studentDealRecipes } from '@/lib/demo-data';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -138,6 +138,43 @@ export default function MealPlannerPage() {
           ))}
         </div>
         <p className="mt-4 text-sm font-semibold text-slate-700">{familyMealPlannerFromDeals.coverage.caveat}</p>
+      </Card>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">{freezerBatchCookPlanner.persona}</p>
+        <h2 className="mt-2 text-2xl font-black">Freezer batch-cook planner</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          This large-household lens calls suggestDealBasedMeals with an eight-serving batch budget, then exposes freezerPortions and batchCookSteps only from visible deal prices.
+        </p>
+        <div className="mt-4 space-y-4">
+          {freezerBatchCookPlanner.meals.map((meal) => (
+            <div className="rounded-3xl border border-cyan-200 bg-white p-5" key={meal.title}>
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-2xl font-black text-slate-950">{meal.title}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{meal.reason}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-3xl font-black text-cyan-800">{formatSek(meal.estimatedCost)}</p>
+                  <p className="text-sm font-semibold text-slate-600">freezerPortions: {meal.freezerPortions}</p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {meal.ingredients.map((ingredient) => ingredient ? (
+                  <Link className="rounded-2xl bg-cyan-50 p-4 hover:bg-cyan-100" href={`/products/${ingredient.productId}`} key={ingredient.productId}>
+                    <p className="font-black">{ingredient.name}</p>
+                    <p className="mt-1 text-sm text-slate-600">{ingredient.category} · deal score {ingredient.dealScore}</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-700">{formatSek(ingredient.price)} · {ingredient.source}</p>
+                  </Link>
+                ) : null)}
+              </div>
+              <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm font-semibold text-slate-700">
+                {meal.batchCookSteps.map((step) => <li key={step}>{step}</li>)}
+              </ol>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-sm font-semibold text-slate-700">{freezerBatchCookPlanner.coverage.caveat}</p>
       </Card>
 
       <Card className="mt-6 border-violet-200 bg-violet-50">
