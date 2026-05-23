@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -15,6 +16,109 @@ import {
 } from '../../scripts/ingestion/export-db-site-snapshot.mjs';
 
 const rootPackage = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+const cliScriptPath = new URL('../../scripts/ingestion/export-db-site-snapshot.mjs', import.meta.url);
+
+function writeFixturePostgresLoader(loaderPath) {
+  writeFileSync(loaderPath, `
+const dbModuleUrl = 'data:text/javascript;charset=utf-8,' + encodeURIComponent(\`
+export function createPgQueryExecutor(pool) {
+  return {
+    query: (...args) => pool.query(...args)
+  };
+}
+
+export function createPostgresSiteSnapshotReader(executor) {
+  return {
+    async listLatestPriceSnapshotRows() {
+      await executor.query({ text: 'select fixture_latest_prices' });
+    }
+  };
+}
+\`);
+
+const pgModuleUrl = 'data:text/javascript;charset=utf-8,' + encodeURIComponent(\`
+export class Pool {
+  constructor(config) {
+    this.config = config;
+  }
+
+  async query() {
+    throw new Error('fixture_unusable_database_url:' + this.config.connectionString);
+  }
+
+  async end() {}
+}
+\`);
+
+export async function resolve(specifier, context, nextResolve) {
+  if (specifier === '@groceryview/db') return { url: dbModuleUrl, shortCircuit: true };
+  if (specifier === 'pg') return { url: pgModuleUrl, shortCircuit: true };
+  return nextResolve(specifier, context);
+}
+`);
+}
+
+function buildStaleDbSiteSnapshotFixture() {
+  return buildDbSiteSnapshotArtifact({
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    requiredChains: ['willys'],
+    rows: [{
+      productId: 'product-1',
+      productSlug: 'bryggkaffe-450g',
+      canonicalName: 'Bryggkaffe mellanrost 450 g',
+      categoryPath: ['Pantry', 'Coffee'],
+      comparableUnit: 'kg',
+      chainId: 'chain-1',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      priceType: 'online',
+      observationId: 'observation-stale-cache',
+      price: 44.9,
+      unitPrice: 99.7778,
+      currency: 'SEK',
+      observedAt: '2026-01-01T00:00:00.000Z',
+      confidence: 0.88
+    }]
+  });
+}
+
+function runDbSiteSnapshotCliCacheMissFixture({ writeModulePath }) {
+  const dir = mkdtempSync(join(tmpdir(), 'db-site-snapshot-cli-cache-miss-'));
+  const outputPath = join(dir, 'snapshot.json');
+  const modulePath = join(dir, 'db-site-products.ts');
+  const loaderPath = join(dir, 'fixture-postgres-loader.mjs');
+  const staleArtifactText = `${JSON.stringify(buildStaleDbSiteSnapshotFixture(), null, 2)}\n`;
+  const staleModuleText = '// stale generated module that must not be rewritten\nexport const staleGeneratedFixture = true;\n';
+
+  writeFixturePostgresLoader(loaderPath);
+  writeFileSync(outputPath, staleArtifactText);
+  if (writeModulePath) writeFileSync(modulePath, staleModuleText);
+
+  const result = spawnSync(process.execPath, [
+    '--experimental-loader',
+    loaderPath,
+    cliScriptPath.pathname
+  ], {
+    encoding: 'utf8',
+    env: {
+      PATH: process.env.PATH,
+      DATABASE_URL: 'postgres://fixture.invalid/not-a-real-db',
+      GROCERYVIEW_DB_SITE_SNAPSHOT_PATH: outputPath,
+      GROCERYVIEW_DB_SITE_SNAPSHOT_MODULE_PATH: modulePath,
+      GROCERYVIEW_DB_SITE_SNAPSHOT_CACHE_TTL_SECONDS: '60',
+      GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS: 'willys'
+    }
+  });
+
+  return {
+    dir,
+    outputPath,
+    modulePath,
+    staleArtifactText,
+    staleModuleText,
+    result
+  };
+}
 
 describe('DB-backed site snapshot export script', () => {
   it('publishes a root operator command for DB-to-site snapshot generation', () => {
@@ -512,6 +616,30 @@ describe('DB-backed site snapshot export script', () => {
       }), artifact);
     } finally {
       rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('falls through to the Postgres reader on an expired CLI cache without rewriting stale outputs', () => {
+    const fixture = runDbSiteSnapshotCliCacheMissFixture({ writeModulePath: true });
+    try {
+      assert.notEqual(fixture.result.status, 0);
+      assert.match(fixture.result.stderr, /fixture_unusable_database_url:postgres:\/\/fixture\.invalid\/not-a-real-db/);
+      assert.equal(readFileSync(fixture.outputPath, 'utf8'), fixture.staleArtifactText);
+      assert.equal(readFileSync(fixture.modulePath, 'utf8'), fixture.staleModuleText);
+    } finally {
+      rmSync(fixture.dir, { recursive: true, force: true });
+    }
+  });
+
+  it('falls through to the Postgres reader on an incomplete CLI cache without rewriting stale outputs', () => {
+    const fixture = runDbSiteSnapshotCliCacheMissFixture({ writeModulePath: false });
+    try {
+      assert.notEqual(fixture.result.status, 0);
+      assert.match(fixture.result.stderr, /fixture_unusable_database_url:postgres:\/\/fixture\.invalid\/not-a-real-db/);
+      assert.equal(readFileSync(fixture.outputPath, 'utf8'), fixture.staleArtifactText);
+      assert.equal(existsSync(fixture.modulePath), false);
+    } finally {
+      rmSync(fixture.dir, { recursive: true, force: true });
     }
   });
 
