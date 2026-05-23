@@ -1,0 +1,47 @@
+name: Notification worker
+
+on:
+  schedule:
+    - cron: '23 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-notification-worker:
+    name: Run due notification worker
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - name: Preflight required production configuration
+        run: |
+          missing=0
+          if [ -z "${{ secrets.GROCERYVIEW_API_BASE_URL }}" ]; then
+            echo "missing production config: GROCERYVIEW_API_BASE_URL" >&2
+            missing=1
+          fi
+          if [ -z "${{ secrets.METRICS_TOKEN }}" ]; then
+            echo "missing production config: METRICS_TOKEN" >&2
+            missing=1
+          fi
+          exit "$missing"
+
+      - name: Run protected notification worker endpoint
+        run: |
+          response_file=$(mktemp)
+          status=$(curl --silent --show-error --output "$response_file" --write-out '%{http_code}' \
+            --request POST \
+            --header "authorization: Bearer ${{ secrets.METRICS_TOKEN }}" \
+            --header "accept: application/json" \
+            "${{ secrets.GROCERYVIEW_API_BASE_URL }}/api/workers/notifications/run")
+          cat "$response_file"
+          node --input-type=module "$status" "$response_file" <<'NODE'
+          import { readFileSync } from 'node:fs';
+          const status = Number(process.argv[2]);
+          const body = JSON.parse(readFileSync(process.argv[3], 'utf8'));
+          if (status < 200 || status >= 300 || body.report?.status !== 'healthy') {
+            throw new Error(`notification worker unhealthy: status=${status} report=${body.report?.status ?? 'missing'}`);
+          }
+          if ((body.summary?.deadLettered ?? 0) > 0 || (body.summary?.retryScheduled ?? 0) > 0) {
+            throw new Error(`notification worker has unresolved delivery failures: deadLettered=${body.summary?.deadLettered ?? 0} retryScheduled=${body.summary?.retryScheduled ?? 0}`);
+          }
+          NODE
