@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
-import { adaptiveProductCards, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, topChainSpreads, freshestOpenPrices } from '@/lib/verified-data';
+import { adaptiveProductCards, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
@@ -82,6 +82,50 @@ export default function ProductsPage() {
                 <p>{product.cheapestPriceLabel} · {product.unitPriceLabel}</p>
                 <p>{product.chainLabel}</p>
                 <p className="text-violet-800">sourceTables: {product.sourceTables.join(' · ')}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </Card>
+      <Card className="mt-8 border-rose-200 bg-rose-50/70">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-rose-800">Save to watchlist</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">♡ Account-bound product hearts</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Signed-in shoppers only can save a verified product heart to their account-bound watchlist.
+              Each card keeps the sourceProductSlug, target price, Deal Score, and alert summary wired to buildWatchlistAlerts output rather than anonymous local storage or demo rows.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-rose-900 shadow-sm">{watchlistHeartProducts.length} verified save candidates</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {watchlistHeartProducts.map((product) => (
+            <Link className="group rounded-2xl border border-rose-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-rose-700" href={`/products/${product.sourceProductSlug}`} key={product.sourceProductSlug}>
+              <div className="flex items-start gap-3">
+                {product.imageUrl ? (
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-rose-100">
+                    <Image alt={`${product.productName} watchlist product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={64} sizes="64px" src={product.imageUrl} width={64} />
+                  </div>
+                ) : null}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-700">{product.brand}</p>
+                    <span aria-label={`Save ${product.productName} to watchlist`} className="rounded-full bg-rose-100 px-2 py-1 text-lg font-black text-rose-800">♡</span>
+                  </div>
+                  <h3 className="mt-1 line-clamp-2 text-lg font-black text-slate-950">{product.productName}</h3>
+                  <p className="mt-1 text-xs font-semibold text-slate-500">{product.categoryLabel}</p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-2 text-xs font-black text-slate-700">
+                <p>{product.currentPriceLabel} now · {product.unitPriceLabel}</p>
+                <p>target price {product.targetPriceLabel} · Deal Score {product.dealScore}</p>
+                <p>{product.bestStoreLabel} · {product.priceTypeLabel}</p>
+                <p className="rounded-2xl bg-rose-50 p-3 text-rose-900">{product.saveLabel}: {product.authRequirement}</p>
+                <p className="rounded-2xl bg-white p-3 text-slate-700 ring-1 ring-rose-100">buildWatchlistAlerts: {product.alertCount} alert signals · {product.alertSummary}</p>
+                <p>{product.firstAlertMessage}</p>
+                <p>{product.sourceLabel}</p>
+                <p className="text-rose-800">sourceProductSlug: {product.sourceProductSlug} · account-bound {product.accountBound ? 'yes' : 'no'}</p>
               </div>
             </Link>
           ))}

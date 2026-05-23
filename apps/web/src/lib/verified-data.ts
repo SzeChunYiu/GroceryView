@@ -1,6 +1,6 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { buildPriceChartSeries, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput } from '@groceryview/core';
+import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
@@ -300,6 +300,99 @@ export const facetedProductSearch = {
     };
   })
 };
+
+type PricedChainRow = ReturnType<typeof chainPriceRows>[number] & { price: number };
+
+function watchlistPriceTypeFor(row: PricedChainRow): WatchlistPriceType {
+  return typeof row.savings === 'number' && row.savings > 0 ? 'promotion' : 'shelf';
+}
+
+const watchlistHeartSourceRows = topChainSpreads
+  .map((product) => {
+    const pricedRows = chainPriceRows(product)
+      .filter((row): row is PricedChainRow => typeof row.price === 'number' && Number.isFinite(row.price) && row.price > 0)
+      .sort((left, right) => left.price - right.price || String(left.chain).localeCompare(String(right.chain), 'sv'));
+    const cheapest = pricedRows[0];
+    if (!cheapest) return null;
+    const dealScore = calculateDealScore({
+      currentCityPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+      knownPromoHistoryPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+      equivalentUnitPricePercentile: product.inChains.length > 1 ? 0 : 50,
+      discountDepthPercent: product.spreadPct,
+      sourceConfidence: clamp(product.inChains.length / 2, 0, 1)
+    });
+    return { product, pricedRows, cheapest, dealScore };
+  })
+  .filter((row): row is NonNullable<typeof row> => row !== null)
+  .slice(0, 4);
+
+const watchlistHeartItems: WatchlistItem[] = watchlistHeartSourceRows.map(({ product, cheapest, dealScore }) => ({
+  productId: product.slug,
+  targetPrice: roundSek(cheapest.price * 1.02),
+  alertDealScoreAt: Math.max(50, Math.min(90, dealScore)),
+  favoriteStoresOnly: false,
+  allowedPriceTypes: [watchlistPriceTypeFor(cheapest)]
+}));
+
+const watchlistHeartSnapshots: WatchlistProductSnapshot[] = watchlistHeartSourceRows.map(({ product, pricedRows, cheapest, dealScore }) => ({
+  productId: product.slug,
+  productName: product.name,
+  bestPrice: cheapest.price,
+  bestStoreId: `${cheapest.chain}-online-catalog`,
+  bestPriceType: watchlistPriceTypeFor(cheapest),
+  prices: pricedRows.map((row) => ({
+    storeId: `${row.chain}-online-catalog`,
+    storeName: `${chainDisplayNames[row.chain] ?? row.chain} online catalog`,
+    price: row.price,
+    priceType: watchlistPriceTypeFor(row)
+  })),
+  dealScore,
+  isNew52WeekLow: product.spreadPct >= 20
+}));
+
+const watchlistHeartAlerts = buildWatchlistAlerts({
+  watchlist: watchlistHeartItems,
+  products: watchlistHeartSnapshots,
+  favoriteStoreIds: []
+});
+
+export const watchlistHeartProducts = watchlistHeartSourceRows.map(({ product, cheapest, pricedRows, dealScore }) => {
+  const item = watchlistHeartItems.find((watchlistItem) => watchlistItem.productId === product.slug)!;
+  const alerts = watchlistHeartAlerts.filter((alert) => alert.productId === product.slug);
+  const normalizedUnit = normalizeComparableUnitPrice(cheapest.price, product.subline);
+  return {
+    productId: product.slug,
+    sourceProductSlug: product.slug,
+    productName: product.name,
+    brand: product.brand || 'Brand not reported',
+    imageUrl: product.image || null,
+    categoryLabel: labelFromSlug(product.category),
+    currentPrice: cheapest.price,
+    currentPriceLabel: formatSek(cheapest.price),
+    unitPriceLabel: normalizedUnit ? formatLocalizedUnitPrice(normalizedUnit.unitPrice, {
+      locale: defaultLocale,
+      currency: observedSnapshotCurrency,
+      unit: normalizedUnit.unitLabel.replace('kr/', '')
+    }) : 'Unit price not reported',
+    targetPrice: item.targetPrice ?? cheapest.price,
+    targetPriceLabel: formatSek(item.targetPrice ?? cheapest.price),
+    dealScore,
+    bestStoreLabel: `${chainDisplayNames[cheapest.chain] ?? cheapest.chain} online catalog`,
+    priceTypeLabel: watchlistPriceTypeFor(cheapest),
+    sourceLabel: `${pricedRows.length} verified chain price rows · ${product.inChains.join(' + ')}`,
+    accountBound: true,
+    saveLabel: 'Save to watchlist',
+    authRequirement: 'Signed-in shoppers only; the heart is account-bound to the shopper watchlist and never stored anonymously.',
+    alertSummary: alerts.length > 0 ? alerts.map((alert) => alert.type.replaceAll('_', ' ')).join(' · ') : 'No alert until target price, Deal Score, or new-low rules match.',
+    firstAlertMessage: alerts[0]?.message ?? 'buildWatchlistAlerts evaluated this product but no notification is due yet.',
+    alertCount: alerts.length,
+    guardrails: [
+      'No anonymous saves: heart clicks require a signed-in account before the watched product is persisted.',
+      'Saved products use the verified sourceProductSlug and current chain price rows instead of demo-data or sample-data.',
+      'Target price, Deal Score, and new-low copy comes from buildWatchlistAlerts outputs only.'
+    ]
+  };
+});
 
 const groceryObservationCount = pricedProducts.reduce((sum, product) => sum + product.observationCount, 0);
 
