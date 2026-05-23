@@ -7,92 +7,107 @@ const DATASETS = [
     file: 'citygross.ts',
     rows: 'cityGrossProducts',
     source: 'cityGrossSource',
-    key: ['sourceUrl', 'code', 'storeId', 'price']
+    key: ['sourceUrl', 'code', 'storeId', 'price'],
+    required: ['code', 'name', 'storeId', 'price', 'productUrl']
   },
   {
     file: 'coop.ts',
     rows: 'coopProducts',
     source: 'coopSource',
-    key: ['sourceUrl', 'code', 'price']
+    key: ['sourceUrl', 'code', 'price'],
+    required: ['code', 'name', 'price']
   },
   {
     file: 'coop.ts',
     rows: 'coopWeeklyDiscounts',
     source: 'coopWeeklyDiscountSource',
-    key: ['sourceUrl', 'code', 'storeId', 'offerPrice']
+    key: ['sourceUrl', 'code', 'storeId', 'offerPrice'],
+    required: ['code', 'name', 'storeId', 'offerPrice', 'validFrom', 'validTo']
   },
   {
     file: 'hemkop.ts',
     rows: 'hemkopProducts',
     source: 'hemkopSource',
-    key: ['sourceUrl', 'code', 'price']
+    key: ['sourceUrl', 'code', 'price'],
+    required: ['code', 'name', 'price']
   },
   {
     file: 'hemkop.ts',
     rows: 'hemkopWeeklyDiscounts',
     source: 'hemkopWeeklyDiscountSource',
-    key: ['sourceUrl', 'code', 'storeId', 'price']
+    key: ['sourceUrl', 'code', 'storeId', 'price'],
+    required: ['code', 'name', 'storeId', 'price', 'startDate', 'endDate']
   },
   {
     file: 'ica-reklamblad.ts',
     rows: 'icaReklambladOffers',
     source: 'icaReklambladSource',
-    key: ['sourceUrl', 'code', 'storeId', 'priceText']
+    key: ['sourceUrl', 'code', 'storeId', 'priceText'],
+    required: ['code', 'name', 'priceText', 'validTo']
   },
   {
     file: 'ica.ts',
     rows: 'icaProducts',
     source: 'icaSources',
     sourceRowCount: 'sum',
-    key: ['sourceUrl', 'productId', 'storeAccountId', 'price']
+    key: ['sourceUrl', 'productId', 'storeAccountId', 'price'],
+    required: ['productId', 'name', 'storeAccountId']
   },
   {
     file: 'lidl.ts',
     rows: 'lidlStoreOffers',
     source: 'lidlSource',
-    key: ['sourceUrl', 'code', 'storeId', 'price']
+    key: ['sourceUrl', 'code', 'storeId', 'price'],
+    required: ['code', 'name', 'storeId', 'price', 'validFrom', 'validTo']
   },
   {
     file: 'mathem.ts',
     rows: 'mathemProducts',
     source: 'mathemSource',
-    key: ['sourceUrl', 'code', 'price']
+    key: ['sourceUrl', 'code', 'price'],
+    required: ['code', 'name', 'price', 'productUrl']
   },
   {
     file: 'matpriskollen.ts',
     rows: 'matpriskollenOffers',
     source: 'matpriskollenSource',
-    key: ['sourceUrl', 'code', 'storeKey', 'price']
+    key: ['sourceUrl', 'code', 'storeKey', 'priceText'],
+    required: ['code', 'name', 'storeKey', 'priceText', 'validFrom', 'validTo']
   },
   {
     file: 'matspar.ts',
     rows: 'matsparProducts',
     source: 'matsparSource',
-    key: ['sourceUrl', 'code', 'price']
+    key: ['sourceUrl', 'code', 'price'],
+    required: ['code', 'name', 'price', 'productUrl']
   },
   {
     file: 'openfoodfacts.ts',
     rows: 'openFoodFactsProducts',
     source: 'openFoodFactsSource',
-    key: ['sourceUrl', 'barcode']
+    key: ['sourceUrl', 'barcode'],
+    required: ['barcode', 'name', 'productUrl']
   },
   {
     file: 'overpass.ts',
     rows: 'overpassStores',
     source: 'overpassSource',
-    key: ['sourceUrl', 'osmType', 'osmId']
+    key: ['sourceUrl', 'osmType', 'osmId'],
+    required: ['osmType', 'osmId', 'name', 'shop']
   },
   {
     file: 'willys.ts',
     rows: 'willysProducts',
     source: 'willysSource',
-    key: ['sourceUrl', 'code', 'price']
+    key: ['sourceUrl', 'code', 'price'],
+    required: ['code', 'name', 'price']
   },
   {
     file: 'willys.ts',
     rows: 'willysWeeklyDiscounts',
     source: 'willysWeeklyDiscountSource',
-    key: ['sourceUrl', 'code', 'storeId', 'price']
+    key: ['sourceUrl', 'code', 'storeId', 'price'],
+    required: ['code', 'name', 'storeId', 'price', 'startDate', 'endDate']
   }
 ];
 
@@ -108,7 +123,9 @@ for (const dataset of DATASETS) {
   const duplicateKeys = countDuplicates(rows.map((row) => rowKey(row, dataset.key)));
   const missingSourceUrl = rows.filter((row) => !hasText(row.sourceUrl)).length;
   const missingRetrievedAt = rows.filter((row) => !hasText(row.retrievedAt)).length;
+  const missingRequiredRows = rows.filter((row) => !hasRequiredFields(row, dataset.required ?? [])).length;
   const missingSourceMetadata = sourceUrls(source).length === 0;
+  const missingSourceRetrievedAt = sourceRetrievedAtValues(source).length === 0;
 
   if (sourceRowCount !== rows.length) {
     failures.push(`${label} rowCount mismatch: source metadata=${sourceRowCount}, rows=${rows.length}`);
@@ -119,11 +136,17 @@ for (const dataset of DATASETS) {
   if (missingRetrievedAt > 0) {
     failures.push(`${label} has ${missingRetrievedAt} rows without retrievedAt`);
   }
+  if (missingRequiredRows > 0) {
+    failures.push(`${label} has ${missingRequiredRows} skeletal rows missing required factual fields`);
+  }
   if (duplicateKeys > 0) {
     failures.push(`${label} has ${duplicateKeys} duplicate provenance/content keys`);
   }
   if (missingSourceMetadata) {
     failures.push(`${label} source metadata does not cite a source URL`);
+  }
+  if (missingSourceRetrievedAt) {
+    failures.push(`${label} source metadata does not cite retrievedAt`);
   }
 
   summaries.push({
@@ -132,8 +155,10 @@ for (const dataset of DATASETS) {
     sourceRowCount,
     missingSourceUrl,
     missingRetrievedAt,
+    missingRequiredRows,
     duplicateKeys,
-    sourceMetadataUrlCount: sourceUrls(source).length
+    sourceMetadataUrlCount: sourceUrls(source).length,
+    sourceMetadataRetrievedAtCount: sourceRetrievedAtValues(source).length
   });
 }
 
@@ -223,6 +248,19 @@ function sourceUrls(source) {
     ...(Array.isArray(item.flyerPdfUrls) ? item.flyerPdfUrls : []),
     ...(Array.isArray(item.stores) ? sourceUrls(item.stores) : [])
   ]).filter(hasText);
+}
+
+function sourceRetrievedAtValues(source) {
+  const values = Array.isArray(source) ? source : [source];
+  return values.map((item) => item.retrievedAt).filter(hasText);
+}
+
+function hasRequiredFields(row, fields) {
+  return fields.every((field) => {
+    const value = row[field];
+    if (typeof value === 'number') return Number.isFinite(value);
+    return hasText(value);
+  });
 }
 
 function hasText(value) {

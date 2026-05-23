@@ -2470,7 +2470,7 @@ describe('fetchMatpriskollenOffers', () => {
     }]);
   });
 
-  it('deduplicates offers across Matpriskollen stores', async () => {
+  it('keeps Matpriskollen offers distinct by store when offer keys repeat', async () => {
     const offer = {
       key: 'same-offer-key',
       price: '10,00/st',
@@ -2492,7 +2492,8 @@ describe('fetchMatpriskollenOffers', () => {
       retrievedAt: '2026-05-21T01:20:00.000Z'
     });
 
-    assert.equal(rows.length, 1);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows.map((row) => row.storeKey), ['store-a', 'store-b']);
   });
 });
 
