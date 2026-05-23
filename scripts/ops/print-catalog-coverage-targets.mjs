@@ -38,6 +38,34 @@ function connectorStoreIdsFromEnv() {
   ));
 }
 
+
+function transientCatalogDbError(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  return /connection\s+(?:to database\s+)?closed|terminating connection|connection terminated|EDBHANDLEREXITED|ECONNRESET|EPIPE|timeout|Connection terminated unexpectedly/i.test(message);
+}
+
+async function waitForCatalogRetry(delayMs) {
+  if (!delayMs || delayMs <= 0) return;
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+}
+
+async function readCatalogRowsOnce(databaseUrl) {
+  const client = new Client({ connectionString: databaseUrl });
+  await client.connect();
+  try {
+    const products = await client.query(`select id, coalesce(category_path[1], 'uncategorized') as category_id from products order by id`);
+    const stores = await client.query(`
+      select distinct stores.slug, stores.external_ref, stores.id
+      from stores
+      order by stores.slug
+    `);
+    const chains = await client.query('select slug as id from chains order by slug');
+    return { products: products.rows, stores: stores.rows, chains: chains.rows };
+  } finally {
+    await client.end().catch(() => undefined);
+  }
+}
+
 export function buildCatalogCoverageTargets(rows, options = {}) {
   const targetProducts = uniqueSorted(rows.products.map((row) => row.id));
   const targetCategories = uniqueSorted(rows.products.map((row) => row.category_id ?? 'uncategorized'));
@@ -63,21 +91,19 @@ export function buildCatalogCoverageTargets(rows, options = {}) {
   };
 }
 
-async function readCatalogRows(databaseUrl) {
-  const client = new Client({ connectionString: databaseUrl });
-  await client.connect();
-  try {
-    const products = await client.query(`select id, coalesce(category_path[1], 'uncategorized') as category_id from products order by id`);
-    const stores = await client.query(`
-      select distinct stores.slug, stores.external_ref, stores.id
-      from stores
-      order by stores.slug
-    `);
-    const chains = await client.query('select slug as id from chains order by slug');
-    return { products: products.rows, stores: stores.rows, chains: chains.rows };
-  } finally {
-    await client.end();
+async function readCatalogRows(databaseUrl, { retryAttempts = 2, retryBaseDelayMs = 250 } = {}) {
+  let lastError;
+  for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
+    try {
+      return await readCatalogRowsOnce(databaseUrl);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= retryAttempts || !transientCatalogDbError(error)) break;
+      process.stderr.write(`[catalog-coverage-targets] retrying catalog target DB read attempt=${attempt + 2}/${retryAttempts + 1}: ${error instanceof Error ? error.message : String(error)}\n`);
+      await waitForCatalogRetry(retryBaseDelayMs * (attempt + 1));
+    }
   }
+  throw lastError;
 }
 
 async function main() {

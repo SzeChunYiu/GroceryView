@@ -14,6 +14,8 @@ describe('catalog coverage target export script', () => {
     assert.match(script, /from stores/);
     assert.doesNotMatch(script, /join latest_prices on latest_prices.store_id = stores.id/);
     assert.match(script, /from chains order by slug/);
+    assert.match(script, /retrying catalog target DB read/);
+    assert.match(script, /terminating connection/);
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
       assert.match(script, new RegExp(`['"]${chain}['"]`));
     }
