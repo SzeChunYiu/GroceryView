@@ -19,7 +19,7 @@ export type IcaStorePromotionSourceSummary = {
 export const icaStorePromotionSourceSummary: IcaStorePromotionSourceSummary = {
   sourceLabel: 'ICA handlaprivatkund store-scoped promotions endpoints',
   generatedFrom: 'apps/web/src/lib/ingested/ica.ts',
-  totalRowCount: 93083,
+  totalRowCount: 93084,
   storeEndpointCount: 323,
   latestStores: [
     {
@@ -31,12 +31,12 @@ export const icaStorePromotionSourceSummary: IcaStorePromotionSourceSummary = {
       sourceUrl: 'https://handlaprivatkund.ica.se/stores/1004070/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=10&maxPageSize=10'
     },
     {
-      retrievedAt: '2026-05-23T12:44:17.000Z',
-      rowCount: 10,
+      retrievedAt: '2026-05-23T13:59:01.000Z',
+      rowCount: 11,
       storeAccountId: '1003693',
       storeName: 'ICA Supermarket Tierp',
       regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d',
-      sourceUrl: 'https://handlaprivatkund.ica.se/stores/1003693/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=10&maxPageSize=10'
+      sourceUrl: 'https://handlaprivatkund.ica.se/stores/1003693/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=11&maxPageSize=11'
     },
     {
       retrievedAt: '2026-05-23T12:01:00.690Z',
