@@ -44,7 +44,22 @@ export function parseRequiredPriceTypesFromCatalogTargets(value) {
   return targets.targetPriceTypes.map((priceType) => String(priceType).trim()).filter(Boolean);
 }
 
-export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS, requiredStoreExternalRefs = [], requiredProductSlugs = [], requiredPriceTypes = [] }) {
+export function parseRequiredCategorySlugsFromCatalogTargets(value) {
+  const targets = parseCatalogCoverageTargets(value);
+  if (!targets) return [];
+  if (!Array.isArray(targets.targetCategories)) throw new Error('Catalog coverage targets must include targetCategories.');
+  return targets.targetCategories.map((category) => String(category).trim()).filter(Boolean);
+}
+
+function normalizeCoverageSlug(value) {
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS, requiredStoreExternalRefs = [], requiredProductSlugs = [], requiredPriceTypes = [], requiredCategorySlugs = [] }) {
   if (!Array.isArray(rows) || rows.length === 0) throw new Error('No latest price rows available for DB-to-site snapshot export.');
 
   const priceRows = rows.map((row) => ({
@@ -96,6 +111,12 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
   if (missingRequiredStorePriceTypes.length > 0) {
     throw new Error(`db_site_snapshot_missing_required_store_price_types:${missingRequiredStorePriceTypes.join(',')}`);
   }
+  const observedCategorySlugs = new Set(priceRows.flatMap((row) => (row.categoryPath ?? []).map(normalizeCoverageSlug).filter(Boolean)));
+  const normalizedRequiredCategorySlugs = [...new Set(requiredCategorySlugs.map(normalizeCoverageSlug).filter(Boolean))].sort();
+  const missingRequiredCategorySlugs = normalizedRequiredCategorySlugs.filter((category) => !observedCategorySlugs.has(category));
+  if (missingRequiredCategorySlugs.length > 0) {
+    throw new Error(`db_site_snapshot_missing_required_categories:${missingRequiredCategorySlugs.join(',')}`);
+  }
   const observedProductSlugs = new Set(priceRows.map((row) => row.productSlug));
   const normalizedRequiredProductSlugs = [...new Set(requiredProductSlugs.map((product) => String(product).trim()).filter(Boolean))].sort();
   const missingRequiredProductSlugs = normalizedRequiredProductSlugs.filter((product) => !observedProductSlugs.has(product));
@@ -119,7 +140,9 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
       requiredProductSlugs: normalizedRequiredProductSlugs,
       missingRequiredProductSlugs,
       requiredPriceTypes: normalizedRequiredPriceTypes,
-      missingRequiredStorePriceTypes
+      missingRequiredStorePriceTypes,
+      requiredCategorySlugs: normalizedRequiredCategorySlugs,
+      missingRequiredCategorySlugs
     },
     priceRows
   };
@@ -139,6 +162,7 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   const requiredStoreExternalRefs = parseRequiredStoreExternalRefsFromCatalogTargets(requiredStoreTargetsJson);
   const requiredProductSlugs = parseRequiredProductSlugsFromCatalogTargets(requiredStoreTargetsJson);
   const requiredPriceTypes = parseRequiredPriceTypesFromCatalogTargets(requiredStoreTargetsJson);
+  const requiredCategorySlugs = parseRequiredCategorySlugsFromCatalogTargets(requiredStoreTargetsJson);
 
   const [{ createPgQueryExecutor, createPostgresSiteSnapshotReader }, pg] = await Promise.all([
     import('@groceryview/db'),
@@ -148,7 +172,7 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   try {
     const reader = createPostgresSiteSnapshotReader(createPgQueryExecutor(pool));
     const rows = await reader.listLatestPriceSnapshotRows({ minConfidence, limit });
-    const artifact = buildDbSiteSnapshotArtifact({ rows, requiredChains, requiredStoreExternalRefs, requiredProductSlugs, requiredPriceTypes });
+    const artifact = buildDbSiteSnapshotArtifact({ rows, requiredChains, requiredStoreExternalRefs, requiredProductSlugs, requiredPriceTypes, requiredCategorySlugs });
     writeFileSync(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
     return artifact;
   } finally {

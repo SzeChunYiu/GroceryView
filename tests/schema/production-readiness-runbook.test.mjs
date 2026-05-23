@@ -65,10 +65,12 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /db_site_snapshot_missing_required_stores/);
     assert.match(runbook, /db_site_snapshot_missing_required_products/);
     assert.match(runbook, /db_site_snapshot_missing_required_store_price_types/);
+    assert.match(runbook, /db_site_snapshot_missing_required_categories/);
     assert.match(runbook, /missingRequiredChains/);
     assert.match(runbook, /missingRequiredStoreExternalRefs/);
     assert.match(runbook, /missingRequiredProductSlugs/);
     assert.match(runbook, /missingRequiredStorePriceTypes/);
+    assert.match(runbook, /missingRequiredCategorySlugs/);
   });
 
 });
