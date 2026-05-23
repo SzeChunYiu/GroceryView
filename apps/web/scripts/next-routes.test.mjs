@@ -529,6 +529,25 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(fuelRoute, /currentPrice|price SEK/);
   });
 
+  it('surfaces fuel target price alerts through the real watchlist engine without station-price claims', async () => {
+    const fuelRoute = await read('src/app/fuel/page.tsx');
+    const fuelPrices = await read('src/lib/fuel-prices.ts');
+    const core = await read('../../packages/core/src/index.ts');
+
+    assert.match(core, /export function buildWatchlistAlerts/);
+    assert.match(fuelPrices, /buildWatchlistAlerts/);
+    assert.match(fuelPrices, /export const fuelPriceTargetAlerts/);
+    assert.match(fuelPrices, /okq8-operator-price-page/);
+    assert.match(fuelPrices, /95 E10 alert/);
+    assert.match(fuelRoute, /fuelPriceTargetAlerts/);
+    assert.match(fuelRoute, /Fuel target price alerts/);
+    assert.match(fuelPrices, /target 19 kr\/l/i);
+    assert.match(fuelRoute, /target\.targetLabel/);
+    assert.match(fuelPrices, /No station-level fuel alert/);
+    assert.match(fuelRoute, /fuelPriceTargetAlerts\.guardrails\.map/);
+    assert.doesNotMatch(fuelRoute, /near me pump price|synthetic station/i);
+  });
+
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/basket-ideas/page.tsx');
