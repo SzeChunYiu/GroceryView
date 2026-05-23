@@ -11,11 +11,15 @@ describe('hosted smoke workflow', () => {
     assert.match(workflow, /environment:\s*production/);
     assert.match(workflow, /GROCERYVIEW_API_BASE_URL/);
     assert.match(workflow, /METRICS_TOKEN/);
+    assert.match(workflow, /GROCERYVIEW_SCANNER_USER_ID/);
+    assert.match(workflow, /GROCERYVIEW_SCANNER_BEARER_TOKEN/);
     assert.match(workflow, /infra\/scripts\/smoke-hosted-http\.sh/);
     assert.match(workflow, /infra\/scripts\/smoke-hosted-readiness\.sh/);
+    assert.match(workflow, /infra\/scripts\/smoke-hosted-scanner-upload\.mjs/);
     assert.match(readFileSync(new URL('../../infra/scripts/smoke-hosted-readiness.sh', import.meta.url), 'utf8'), /api\/readiness\/scanning/);
     assert.match(workflow, /HOSTED_HTTP_SMOKE_OUTPUT_PATH:\s*artifacts\/hosted-http-smoke\.json/);
     assert.match(workflow, /HOSTED_READINESS_SMOKE_OUTPUT_PATH:\s*artifacts\/hosted-readiness-smoke\.json/);
+    assert.match(workflow, /HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH:\s*artifacts\/hosted-scanner-upload-smoke\.json/);
     assert.match(workflow, /actions\/upload-artifact@v4/);
   });
 });

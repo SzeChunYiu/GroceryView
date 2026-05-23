@@ -128,6 +128,27 @@ HOSTED_READINESS_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-readiness-smoke.json 
   infra/scripts/smoke-hosted-readiness.sh
 ```
 
+To prove an account-bound scanner upload path against the hosted API, provide a real signed-in scanner user id plus a short-lived bearer token and run the scanner upload smoke:
+
+```bash
+GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
+GROCERYVIEW_SCANNER_USER_ID=replace-with-user-id \
+GROCERYVIEW_SCANNER_BEARER_TOKEN=replace-with-session-token \
+  node infra/scripts/smoke-hosted-scanner-upload.mjs
+```
+
+The scanner upload smoke calls `/api/scans/upload-url?userId=${GROCERYVIEW_SCANNER_USER_ID}`, requires a ready private upload ticket, and performs the returned signed `PUT` with the ticket headers. It intentionally writes only safe evidence (`scan_upload_ticket_ready`, `scan_upload_put_succeeded`, and `scan_upload_private_payload_uri`) and never records the bearer token or signed upload URL. This proves hosted account-bound upload-ticket plus object-storage write behavior; it does not replace browser camera/device-capture evidence.
+
+Set `HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH` to save passed scanner upload evidence as JSON for release records:
+
+```bash
+GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
+GROCERYVIEW_SCANNER_USER_ID=replace-with-user-id \
+GROCERYVIEW_SCANNER_BEARER_TOKEN=replace-with-session-token \
+HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-scanner-upload-smoke.json \
+  node infra/scripts/smoke-hosted-scanner-upload.mjs
+```
+
 ## Smoke environment overrides
 
 Use these variables when running the smoke script against a non-default compose file, renamed services, or slower local Docker runtime.

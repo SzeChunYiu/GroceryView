@@ -23,6 +23,8 @@ jobs:
         env:
           GROCERYVIEW_API_BASE_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+          GROCERYVIEW_SCANNER_USER_ID: ${{ vars.GROCERYVIEW_SCANNER_USER_ID }}
+          GROCERYVIEW_SCANNER_BEARER_TOKEN: ${{ secrets.GROCERYVIEW_SCANNER_BEARER_TOKEN }}
         run: |
           if [ -z "$GROCERYVIEW_API_BASE_URL" ]; then
             echo "missing production config: GROCERYVIEW_API_BASE_URL" >&2
@@ -30,6 +32,14 @@ jobs:
           fi
           if [ -z "$METRICS_TOKEN" ]; then
             echo "missing production config: METRICS_TOKEN" >&2
+            exit 1
+          fi
+          if [ -z "$GROCERYVIEW_SCANNER_USER_ID" ]; then
+            echo "missing production config: GROCERYVIEW_SCANNER_USER_ID" >&2
+            exit 1
+          fi
+          if [ -z "$GROCERYVIEW_SCANNER_BEARER_TOKEN" ]; then
+            echo "missing production config: GROCERYVIEW_SCANNER_BEARER_TOKEN" >&2
             exit 1
           fi
 
@@ -49,6 +59,14 @@ jobs:
           READINESS_TIMEOUT_SECONDS: '20'
           HOSTED_READINESS_SMOKE_OUTPUT_PATH: artifacts/hosted-readiness-smoke.json
         run: infra/scripts/smoke-hosted-readiness.sh
+
+      - name: Run hosted scanner upload smoke
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          GROCERYVIEW_SCANNER_USER_ID: ${{ vars.GROCERYVIEW_SCANNER_USER_ID }}
+          GROCERYVIEW_SCANNER_BEARER_TOKEN: ${{ secrets.GROCERYVIEW_SCANNER_BEARER_TOKEN }}
+          HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH: artifacts/hosted-scanner-upload-smoke.json
+        run: node infra/scripts/smoke-hosted-scanner-upload.mjs
 
       - name: Upload hosted smoke evidence
         if: always()

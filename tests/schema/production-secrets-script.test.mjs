@@ -18,6 +18,7 @@ describe('production secret audit script', () => {
       'VERCEL_ORG_ID',
       'VERCEL_PROJECT_ID',
       'METRICS_TOKEN',
+      'GROCERYVIEW_SCANNER_BEARER_TOKEN',
       'AUTH_SECRET',
       'PUBLIC_WEB_URL',
       'NOTIFICATION_WEBHOOK_SECRET',
@@ -69,7 +70,8 @@ describe('production secret audit script', () => {
       'EXPO_TOKEN',
       'VERCEL_TOKEN',
       'VERCEL_ORG_ID',
-      'VERCEL_PROJECT_ID'
+      'VERCEL_PROJECT_ID',
+      'GROCERYVIEW_SCANNER_BEARER_TOKEN'
     ]);
     assert.ok(output.missingRuntimeSecrets.includes('STRIPE_SECRET_KEY'));
   });
