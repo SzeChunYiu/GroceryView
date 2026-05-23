@@ -7,6 +7,7 @@ const { Pool: PgPool } = pg;
 const DEFAULT_RETRY_ATTEMPTS = 30;
 const DEFAULT_RETRY_BASE_DELAY_MS = 10_000;
 const DEFAULT_RETRY_MAX_DELAY_MS = 30_000;
+const DEFAULT_DIRECT_PROBE_ATTEMPTS = 1;
 
 export function redactDatabaseUrl(rawUrl) {
   const url = new URL(rawUrl);
@@ -46,6 +47,18 @@ export function classifyDatabaseUrl(rawUrl) {
     transformedForDailyWrites,
     redactedUrl: redactDatabaseUrl(rawUrl)
   };
+}
+
+export function buildSupabaseDirectConnectionString(rawUrl) {
+  const classification = classifyDatabaseUrl(rawUrl);
+  if (!classification.isSupabasePooler) return null;
+  const projectRefMatch = classification.username.match(/^postgres\.([a-z0-9]{20})$/i);
+  if (!projectRefMatch) return null;
+  const url = new URL(rawUrl);
+  url.hostname = `db.${projectRefMatch[1]}.supabase.co`;
+  url.username = 'postgres';
+  url.port = '5432';
+  return url.toString();
 }
 
 function buildDailyWriteConnectionString(rawUrl) {
@@ -97,21 +110,11 @@ function sanitizeError(error) {
     .replace(/password=[^\s]+/gi, 'password=[redacted]');
 }
 
-export async function checkDailyDatabaseConnectivity(env = process.env, options = {}) {
-  const databaseUrl = env.DATABASE_URL;
-  if (!databaseUrl?.trim()) throw new Error('DATABASE_URL is required.');
-
-  const classification = classifyDatabaseUrl(databaseUrl);
-  const retryAttempts = parsePositiveInteger(env.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS, DEFAULT_RETRY_ATTEMPTS);
-  const retryBaseDelayMs = parseNonNegativeInteger(env.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS, DEFAULT_RETRY_BASE_DELAY_MS);
-  const retryMaxDelayMs = parseNonNegativeInteger(env.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS, DEFAULT_RETRY_MAX_DELAY_MS);
-  const Pool = options.Pool ?? PgPool;
-  const wait = options.sleep ?? sleep;
-
+async function probeConnection({ connectionString, retryAttempts, retryBaseDelayMs, retryMaxDelayMs, Pool, wait }) {
   let lastError;
   for (let attempt = 1; attempt <= retryAttempts; attempt += 1) {
     const pool = new Pool({
-      connectionString: buildDailyWriteConnectionString(databaseUrl),
+      connectionString,
       max: 1,
       idleTimeoutMillis: 1_000,
       connectionTimeoutMillis: 15_000
@@ -120,14 +123,7 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
       await pool.query('set default_transaction_read_only=off');
       await pool.query('select 1 as ok');
       await pool.end();
-      return {
-        status: 'ready',
-        attempts: attempt,
-        retryAttempts,
-        retryBaseDelayMs,
-        retryMaxDelayMs,
-        ...classification
-      };
+      return { status: 'ready', attempts: attempt };
     } catch (error) {
       lastError = error;
       try {
@@ -140,16 +136,85 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
       await wait(Math.min(retryBaseDelayMs * attempt, retryMaxDelayMs));
     }
   }
-
   return {
     status: 'blocked',
     attempts: retryAttempts,
+    blockers: [blockerForError(lastError)],
+    error: sanitizeError(lastError)
+  };
+}
+
+export async function checkDailyDatabaseConnectivity(env = process.env, options = {}) {
+  const databaseUrl = env.DATABASE_URL;
+  if (!databaseUrl?.trim()) throw new Error('DATABASE_URL is required.');
+
+  const classification = classifyDatabaseUrl(databaseUrl);
+  const retryAttempts = parsePositiveInteger(env.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS, DEFAULT_RETRY_ATTEMPTS);
+  const retryBaseDelayMs = parseNonNegativeInteger(env.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS, DEFAULT_RETRY_BASE_DELAY_MS);
+  const retryMaxDelayMs = parseNonNegativeInteger(env.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS, DEFAULT_RETRY_MAX_DELAY_MS);
+  const Pool = options.Pool ?? PgPool;
+  const wait = options.sleep ?? sleep;
+
+  const primary = await probeConnection({
+    connectionString: buildDailyWriteConnectionString(databaseUrl),
+    retryAttempts,
+    retryBaseDelayMs,
+    retryMaxDelayMs,
+    Pool,
+    wait
+  });
+
+  if (primary.status === 'ready') {
+    return {
+      status: 'ready',
+      attempts: primary.attempts,
+      retryAttempts,
+      retryBaseDelayMs,
+      retryMaxDelayMs,
+      ...classification
+    };
+  }
+
+  const alternateConnections = [];
+  const directConnectionString = buildSupabaseDirectConnectionString(databaseUrl);
+  if (directConnectionString) {
+    const directProbeAttempts = parsePositiveInteger(env.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS, DEFAULT_DIRECT_PROBE_ATTEMPTS);
+    const directClassification = classifyDatabaseUrl(directConnectionString);
+    const directProbe = await probeConnection({
+      connectionString: directConnectionString,
+      retryAttempts: directProbeAttempts,
+      retryBaseDelayMs,
+      retryMaxDelayMs,
+      Pool,
+      wait
+    });
+    alternateConnections.push({
+      name: 'supabase_direct_host',
+      status: directProbe.status,
+      attempts: directProbe.attempts,
+      host: directClassification.host,
+      port: directClassification.port,
+      database: directClassification.database,
+      username: directClassification.username,
+      redactedUrl: directClassification.redactedUrl,
+      blockers: directProbe.blockers,
+      error: directProbe.error,
+      action: directProbe.status === 'ready'
+        ? 'Direct Supabase host accepts writes; update DATABASE_URL to the direct host or use a replacement DB before rerunning Daily ingestion readiness.'
+        : 'Direct Supabase host also failed; continue provider recovery or replacement DB cutover.'
+    });
+  }
+
+  return {
+    status: 'blocked',
+    attempts: primary.attempts,
     retryAttempts,
     retryBaseDelayMs,
     retryMaxDelayMs,
     ...classification,
-    blockers: [blockerForError(lastError)],
-    error: sanitizeError(lastError)
+    blockers: primary.blockers,
+    error: primary.error,
+    alternateConnections
   };
 }
 

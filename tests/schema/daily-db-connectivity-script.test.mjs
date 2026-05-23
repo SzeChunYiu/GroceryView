@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import {
+  buildSupabaseDirectConnectionString,
   checkDailyDatabaseConnectivity,
   classifyDatabaseUrl,
   isTransientDailyDatabaseError,
@@ -70,10 +71,51 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.equal(result.transformedForDailyWrites, true);
     assert.deepEqual(result.blockers, ['database_not_accepting_connections']);
     assert.equal(JSON.stringify(result).includes('super-secret'), false);
-    assert.equal(calls.filter((call) => call.type === 'constructor').length, 2);
-    assert.equal(calls.filter((call) => call.type === 'query' && call.sql === 'set default_transaction_read_only=off').length, 2);
-    assert.equal(calls.filter((call) => call.type === 'end').length, 2);
+    assert.equal(calls.filter((call) => call.type === 'constructor').length, 3);
+    assert.equal(calls.filter((call) => call.type === 'query' && call.sql === 'set default_transaction_read_only=off').length, 3);
+    assert.equal(calls.filter((call) => call.type === 'end').length, 3);
     assert.equal(calls[0].config.connectionString.includes(':5432/'), true);
+    assert.equal(result.alternateConnections[0].status, 'blocked');
+  });
+
+
+  it('derives a redacted direct Supabase host probe from pooler credentials', async () => {
+    const poolerUrl = 'postgres://postgres.dgsoqwanrkqgdichtgzl:super-secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres?sslmode=no-verify';
+    const directUrl = buildSupabaseDirectConnectionString(poolerUrl);
+    assert.equal(directUrl, 'postgres://postgres:super-secret@db.dgsoqwanrkqgdichtgzl.supabase.co:5432/postgres?sslmode=no-verify');
+
+    const connections = [];
+    class PoolerFailingDirectReadyPool {
+      constructor(config) {
+        this.connectionString = config.connectionString;
+        connections.push(config.connectionString);
+      }
+      async query() {
+        if (this.connectionString.includes('.pooler.supabase.com')) {
+          throw new Error('the database system is not accepting connections');
+        }
+        return { rows: [{ ok: 1 }] };
+      }
+      async end() {}
+    }
+
+    const result = await checkDailyDatabaseConnectivity(
+      {
+        DATABASE_URL: poolerUrl,
+        GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: '1'
+      },
+      { Pool: PoolerFailingDirectReadyPool, sleep: async () => {} }
+    );
+
+    assert.equal(result.status, 'blocked');
+    assert.deepEqual(result.blockers, ['database_not_accepting_connections']);
+    assert.equal(result.alternateConnections.length, 1);
+    assert.equal(result.alternateConnections[0].name, 'supabase_direct_host');
+    assert.equal(result.alternateConnections[0].status, 'ready');
+    assert.equal(result.alternateConnections[0].host, 'db.dgsoqwanrkqgdichtgzl.supabase.co');
+    assert.match(result.alternateConnections[0].action, /Direct Supabase host accepts writes/);
+    assert.equal(JSON.stringify(result).includes('super-secret'), false);
+    assert.equal(connections.some((connection) => connection.includes('db.dgsoqwanrkqgdichtgzl.supabase.co:5432')), true);
   });
 
   it('reports ready after proving write-mode and select connectivity', async () => {
