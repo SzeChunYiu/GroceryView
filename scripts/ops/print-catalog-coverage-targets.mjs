@@ -49,11 +49,11 @@ async function waitForCatalogRetry(delayMs) {
   await new Promise((resolve) => setTimeout(resolve, delayMs));
 }
 
-async function readCatalogRowsOnce(databaseUrl) {
+async function readCatalogRowsOnce(databaseUrl, { productLimit = 1000 } = {}) {
   const client = new Client({ connectionString: databaseUrl });
   await client.connect();
   try {
-    const products = await client.query(`select id, coalesce(category_path[1], 'uncategorized') as category_id from products order by id`);
+    const products = await client.query(`select id, coalesce(category_path[1], 'uncategorized') as category_id from products limit $1`, [productLimit]);
     const stores = await client.query(`
       select distinct stores.slug, stores.external_ref, stores.id
       from stores
@@ -91,11 +91,11 @@ export function buildCatalogCoverageTargets(rows, options = {}) {
   };
 }
 
-async function readCatalogRows(databaseUrl, { retryAttempts = 2, retryBaseDelayMs = 250 } = {}) {
+async function readCatalogRows(databaseUrl, { retryAttempts = 2, retryBaseDelayMs = 250, productLimit = 1000 } = {}) {
   let lastError;
   for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
     try {
-      return await readCatalogRowsOnce(databaseUrl);
+      return await readCatalogRowsOnce(databaseUrl, { productLimit });
     } catch (error) {
       lastError = error;
       if (attempt >= retryAttempts || !transientCatalogDbError(error)) break;
@@ -141,7 +141,9 @@ async function main() {
 
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error('DATABASE_URL is required.');
-  const targets = buildCatalogCoverageTargets(await readCatalogRows(databaseUrl), {
+  const productLimit = process.env.CATALOG_COVERAGE_TARGET_PRODUCT_LIMIT?.trim() ? Number(process.env.CATALOG_COVERAGE_TARGET_PRODUCT_LIMIT) : 1000;
+  if (!Number.isInteger(productLimit) || productLimit <= 0) throw new Error('CATALOG_COVERAGE_TARGET_PRODUCT_LIMIT must be a positive integer when provided.');
+  const targets = buildCatalogCoverageTargets(await readCatalogRows(databaseUrl, { productLimit }), {
     connectorStoreIds: connectorStoreIdsFromEnv()
   });
   process.stdout.write(`${JSON.stringify(targets)}\n`);
