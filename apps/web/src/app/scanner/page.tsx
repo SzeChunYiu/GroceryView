@@ -36,6 +36,7 @@ export default function ScannerPage() {
             <div className="rounded-2xl bg-white/80 p-4">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-700">Review action</p>
               <p className="mt-2 break-all text-lg font-black text-indigo-950">{receiptFedAliasGrowthPlan.reviewAction}</p>
+              <p className="mt-2 text-sm font-semibold text-indigo-900">{receiptFedAliasGrowthPlan.reviewQueue} · {receiptFedAliasGrowthPlan.trustTable}</p>
             </div>
           </div>
         </div>
@@ -45,7 +46,13 @@ export default function ScannerPage() {
               <p className="text-sm font-black text-slate-950">{candidate.normalizedAlias}</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">{candidate.chainLabel} · {candidate.itemTotal} kr · {candidate.quantity} {candidate.comparableUnit}</p>
               <p className="mt-2 text-2xl font-black text-indigo-950">{candidate.unitPrice} kr/{candidate.comparableUnit}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-700">Priority {candidate.priority}; evidence {candidate.evidence.join(' · ')}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">
+                Priority {candidate.priority}; confidence {Math.round(candidate.confidence * 100)}%; reporter trust {Math.round(candidate.sourceTrust * 100)}%
+                {candidate.reporterId ? `; reporter ${candidate.reporterId}` : ''}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">
+                Evidence text: {candidate.evidenceText}. Private image evidence is {candidate.evidenceImageUri ? 'attached to the review item' : 'not available'} and not rendered publicly.
+              </p>
             </div>
           ))}
         </div>

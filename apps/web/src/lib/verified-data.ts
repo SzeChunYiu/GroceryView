@@ -3156,8 +3156,11 @@ const receiptAliasGrowth = planReceiptAliasGrowth({
       scanId: 'receipt-alias-growth-example',
       chainLabel: 'Willys Odenplan',
       observedAt: '2026-05-22T10:00:00.000Z',
+      reporterId: 'reporter-produce-1',
+      sourceTrust: 0.82,
+      evidenceImageUri: 'private-upload://receipt-alias-growth-example',
       rows: [
-        { rawName: 'Banan 0,82 kg', itemTotal: 19.35, confidence: 0.86 },
+        { rawName: 'Banan 0,82 kg', itemTotal: 19.35, confidence: 0.86, evidenceText: 'Banan 0,82 kg 19,35' },
         { rawName: 'Gurka 1 st', itemTotal: 12.9, confidence: 0.74 },
         { rawName: 'SMUDGED ROW', itemTotal: 8, confidence: 0.42 }
       ]
@@ -3170,6 +3173,8 @@ export const receiptFedAliasGrowthPlan = {
   status: receiptAliasGrowth.status,
   sourceLabel: 'packages/scanning planReceiptAliasGrowth',
   evidenceRequirement: 'chain label + kr + weight',
+  trustTable: 'community_reporter_trust',
+  reviewQueue: 'community_review_queue',
   reviewAction: 'create_commodity_alias_candidate',
   candidates: receiptAliasGrowth.candidates,
   rejectedRows: receiptAliasGrowth.rejectedRows,
