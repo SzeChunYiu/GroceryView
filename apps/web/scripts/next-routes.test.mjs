@@ -2397,6 +2397,27 @@ ${seo}`;
     assert.match(sitemap, /\/\$\{city\.slug\}\/billigaste\/\$\{product\.slug\}/);
   });
 
+  it('surfaces instant faceted product search from real catalogue price rows', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const products = await read('src/app/products/page.tsx');
+    const packageJson = await read('package.json');
+
+    assert.match(verified, /buildFacetedProductSearch/);
+    assert.match(verified, /export const facetedProductSearch/);
+    assert.match(verified, /facetedSearchRows/);
+    assert.match(verified, /sourceTables/);
+    assert.match(products, /Instant faceted search/);
+    assert.match(products, /facetedProductSearch/);
+    assert.match(products, /categoryFacets/);
+    assert.match(products, /labelFacets/);
+    assert.match(products, /chainFacets/);
+    assert.match(products, /priceRange/);
+    assert.match(products, /inStockOnly/);
+    assert.match(products, /kr\/kg|kr\/l|per-unit/i);
+    assert.match(products, /latest_prices/);
+    assert.match(packageJson, /@groceryview\/api/);
+  });
+
   it('surfaces adaptive total and unit price product cards with a compare-mode toggle', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
