@@ -5252,6 +5252,61 @@ describe('daily ingestion runner', () => {
     assert.equal(executor.calls.length, 0);
   });
 
+  it('marks the source run failed when daily observation persistence aborts after run creation', async () => {
+    class FailingObservationExecutor extends DailyIngestionExecutor {
+      async query<T>(sql: string, params: unknown[] = []) {
+        if (sql.includes('jsonb_to_recordset') && sql.includes('insert into observations')) {
+          this.calls.push({ sql, params });
+          throw new Error('observation write failed');
+        }
+        return super.query<T>(sql, params);
+      }
+    }
+
+    const executor = new FailingObservationExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [{
+        connectorId: 'willys-normalized-json',
+        chainId: 'willys',
+        sourceType: 'official_api',
+        endpointUrl: 'https://sources.example.test/willys/products.json',
+        parserVersion: 'normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' }]
+      }],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [{
+          storeId: 'willys-odenplan',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Zoégas Skånerost 450g',
+          canonicalName: 'Zoégas Coffee 450g',
+          productId: 'zoegas-coffee-450g',
+          categoryId: 'coffee',
+          brand: 'Zoégas',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'blocked');
+    assert.deepEqual(result.blockers, ['willys:persistence_failed:observation write failed']);
+    const sourceRunUpdate = executor.calls.find((call) => call.sql.includes('update source_runs'));
+    assert.ok(sourceRunUpdate, 'source run must be marked terminal after persistence failure');
+    assert.equal(sourceRunUpdate.params[2], 'failed');
+    assert.match(String(sourceRunUpdate.params[3]), /observation write failed/);
+    assert.ok(
+      executor.calls.findIndex((call) => call.sql.includes('insert into observations')) <
+      executor.calls.findIndex((call) => call.sql.includes('update source_runs')),
+      'source run failure update should happen after the aborted observation write'
+    );
+  });
+
   it('fails closed before persistence when a required daily connector is blocked', async () => {
     const executor = new DailyIngestionExecutor();
     const result = await runDailyIngestion({

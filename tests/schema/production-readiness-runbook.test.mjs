@@ -50,6 +50,9 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /daily_ingestion_chain_not_succeeded/);
     assert.match(runbook, /daily_ingestion_chain_without_observations/);
     assert.match(runbook, /missing_configured_store_observations/);
+    assert.match(runbook, /persistence_failed/);
+    assert.match(runbook, /source run/);
+    assert.match(runbook, /failed/);
   });
 
   it('documents DB-to-site snapshot generation after daily ingestion writes latest_prices', () => {
