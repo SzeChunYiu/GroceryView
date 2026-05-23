@@ -467,3 +467,80 @@ describe('scan upload storage readiness endpoint', () => {
     assert.equal(JSON.stringify(body).includes('super-secret'), false);
   });
 });
+
+describe('scan upload CORS readiness endpoint', () => {
+  const readyReport = {
+    status: 'ready' as const,
+    blockers: [],
+    evidence: [
+      'scan_upload_cors_origin_configured',
+      'scan_upload_cors_preflight_passed',
+      'scan_upload_cors_allows_put',
+      'scan_upload_cors_allows_content_type'
+    ],
+    warnings: [],
+    summary: 'Scan upload CORS is ready.'
+  };
+
+  it('requires a metrics token before exposing scan upload CORS readiness evidence', async () => {
+    const handle = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      scanUploadCorsReadinessProvider: async () => readyReport
+    });
+
+    const unauthorized = await handle(new Request('http://localhost/api/readiness/scan-upload-cors'));
+    assert.equal(unauthorized.status, 401);
+
+    const authorized = await handle(new Request('http://localhost/api/readiness/scan-upload-cors', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(authorized.status, 200);
+    assert.deepEqual(await authorized.json(), readyReport);
+  });
+
+  it('fails closed when scan upload CORS readiness is blocked or not configured', async () => {
+    const blockedReport = {
+      ...readyReport,
+      status: 'blocked' as const,
+      blockers: ['scan_upload_cors_preflight_failed'],
+      evidence: ['scan_upload_cors_origin_configured'],
+      summary: 'Scan upload CORS readiness is blocked.'
+    };
+    const blocked = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      scanUploadCorsReadinessProvider: async () => blockedReport
+    });
+    const blockedResponse = await blocked(new Request('http://localhost/api/readiness/scan-upload-cors', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(blockedResponse.status, 503);
+    assert.deepEqual(await blockedResponse.json(), blockedReport);
+
+    const missingToken = createHttpHandler(undefined, {
+      scanUploadCorsReadinessProvider: async () => readyReport
+    });
+    assert.equal((await missingToken(new Request('http://localhost/api/readiness/scan-upload-cors'))).status, 503);
+
+    const missingProvider = createHttpHandler(undefined, { notificationMetricsToken: 'metrics-token' });
+    assert.equal((await missingProvider(new Request('http://localhost/api/readiness/scan-upload-cors', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }))).status, 503);
+  });
+
+  it('fails closed without leaking scan upload CORS errors when the readiness provider throws', async () => {
+    const handle = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      async scanUploadCorsReadinessProvider() {
+        throw new Error('signed upload url secret=super-secret failed');
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/readiness/scan-upload-cors', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(response.status, 503);
+    const body = await response.json() as { blockers: string[] };
+    assert.deepEqual(body.blockers, ['scan_upload_cors_readiness_probe_failed']);
+    assert.equal(JSON.stringify(body).includes('super-secret'), false);
+  });
+});

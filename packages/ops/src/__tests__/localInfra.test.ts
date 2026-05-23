@@ -116,6 +116,7 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /\/api\/products\/\$\{GROCERYVIEW_TERMINAL_PRODUCT_ID:-coffee\}\/terminal/);
     assert.match(infraReadme, /\/api\/readiness\/postgres/);
     assert.match(infraReadme, /\/api\/readiness\/scanning/);
+    assert.match(infraReadme, /\/api\/readiness\/scan-upload-cors/);
     assert.match(infraReadme, /\/api\/readiness\/scan-upload-storage/);
   });
 
@@ -126,6 +127,7 @@ describe('local infrastructure compose', () => {
     assert.match(hostedReadinessSmokeScript, /HOSTED_READINESS_SMOKE_OUTPUT_PATH/);
     assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/postgres/);
     assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scanning/);
+    assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scan-upload-cors/);
     assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scan-upload-storage/);
     assert.match(hostedReadinessSmokeScript, /x-groceryview-metrics-token: \$METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /curl -fsS/);

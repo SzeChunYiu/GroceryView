@@ -465,6 +465,78 @@ describe('runtime config', () => {
     }
   });
 
+  it('runs a runtime scan upload CORS preflight before marking upload CORS ready', async () => {
+    const calls: Array<{ url: string; init?: RequestInit }> = [];
+    const service = createRuntimeHttpService({
+      NODE_ENV: 'development',
+      METRICS_TOKEN: 'metrics-secret',
+      PUBLIC_WEB_URL: 'https://app.groceryview.example',
+      S3_ENDPOINT: 'https://storage.example',
+      S3_REGION: 'eu-north-1',
+      S3_BUCKET: 'groceryview-receipts',
+      S3_ACCESS_KEY_ID: 'runtime-access-key',
+      S3_SECRET_ACCESS_KEY: 'runtime-secret-key'
+    }, {
+      now: new Date('2026-05-23T12:00:00.000Z'),
+      scanUploadCorsFetch: async (url, init) => {
+        calls.push({ url: String(url), init });
+        return new Response(null, {
+          status: 204,
+          headers: {
+            'access-control-allow-origin': 'https://app.groceryview.example',
+            'access-control-allow-methods': 'GET, PUT, OPTIONS',
+            'access-control-allow-headers': 'content-type, x-amz-meta-scan-id'
+          }
+        });
+      }
+    });
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/scan-upload-cors', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 200);
+      const body = await response.json() as { status: string; blockers: string[]; evidence: string[] };
+      assert.equal(body.status, 'ready');
+      assert.deepEqual(body.blockers, []);
+      assert.equal(body.evidence.includes('scan_upload_cors_preflight_passed'), true);
+      assert.equal(body.evidence.includes('scan_upload_cors_allows_put'), true);
+      assert.equal(JSON.stringify(body).includes('runtime-secret-key'), false);
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0]?.init?.method, 'OPTIONS');
+      assert.equal((calls[0]?.init?.headers as Headers).get('origin'), 'https://app.groceryview.example');
+      assert.equal((calls[0]?.init?.headers as Headers).get('access-control-request-method'), 'PUT');
+    } finally {
+      await service.close();
+    }
+  });
+
+  it('keeps runtime scan upload CORS readiness blocked until origin and storage are configured', async () => {
+    const service = createRuntimeHttpService({
+      NODE_ENV: 'development',
+      METRICS_TOKEN: 'metrics-secret',
+      S3_ENDPOINT: 'https://storage.example',
+      S3_REGION: 'eu-north-1',
+      S3_BUCKET: 'groceryview-receipts',
+      S3_ACCESS_KEY_ID: 'runtime-access-key',
+      S3_SECRET_ACCESS_KEY: 'runtime-secret-key'
+    });
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/scan-upload-cors', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 503);
+      const body = await response.json() as { status: string; blockers: string[] };
+      assert.equal(body.status, 'blocked');
+      assert.equal(body.blockers.includes('scan_upload_cors_origin_not_configured'), true);
+    } finally {
+      await service.close();
+    }
+  });
+
   it('loads catalog coverage targets from runtime environment JSON', () => {
     const config = loadRuntimeConfig({
       NODE_ENV: 'development',
