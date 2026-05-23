@@ -288,6 +288,7 @@ export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.fla
       canonicalName: product.name,
       brand: product.brand,
       categoryPath: [labelFromSlug(product.category)],
+      labels: product.labels,
       ...(packageAmount ? { packageSize: packageAmount.amount, packageUnit: packageAmount.unit } : {}),
       comparableUnit,
       ...(product.image ? { imageUrl: product.image } : {}),
@@ -310,28 +311,49 @@ export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.fla
 });
 
 const rawFacetedProductSearch = buildFacetedProductSearch({ rows: facetedSearchRows });
-const facetedProductIds = new Set(rawFacetedProductSearch.products.map((product) => product.productId));
-const labelCounts = axfoodProducts.reduce<Map<string, number>>((counts, product) => {
-  if (!facetedProductIds.has(product.code)) return counts;
-  for (const label of product.labels) counts.set(label, (counts.get(label) ?? 0) + 1);
-  return counts;
-}, new Map());
 
-export const facetedProductSearch = {
-  ...rawFacetedProductSearch,
-  title: 'Instant faceted search',
-  categoryFacets: rawFacetedProductSearch.facets.categories.slice(0, 6),
-  chainFacets: rawFacetedProductSearch.facets.chains,
-  labelFacets: sortedCountFacets(labelCounts).slice(0, 8),
-  priceRange: rawFacetedProductSearch.facets.priceRange,
-  inStockOnly: {
-    label: 'In-stock / priced rows only',
-    productCount: rawFacetedProductSearch.evidence.pricedProductCount,
-    latestPriceCount: rawFacetedProductSearch.evidence.latestPriceCount,
-    availableLatestPriceCount: rawFacetedProductSearch.evidence.availableLatestPriceCount,
-    outOfStockLatestPriceCount: rawFacetedProductSearch.evidence.outOfStockLatestPriceCount
-  },
-  resultCards: rawFacetedProductSearch.products.map((product) => {
+type SearchParamValue = string | string[] | undefined;
+
+export type ProductSearchUrlParams = {
+  q?: SearchParamValue;
+  category?: SearchParamValue;
+  label?: SearchParamValue;
+  chain?: SearchParamValue;
+  minPrice?: SearchParamValue;
+  maxPrice?: SearchParamValue;
+  inStockOnly?: SearchParamValue;
+  minConfidence?: SearchParamValue;
+};
+
+function firstSearchValue(value: SearchParamValue): string {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return raw?.trim() ?? '';
+}
+
+function listSearchValues(value: SearchParamValue): string[] {
+  const rawValues = Array.isArray(value) ? value : value ? [value] : [];
+  return [...new Set(rawValues.flatMap((item) => item.split(',')).map((item) => item.trim()).filter(Boolean))];
+}
+
+function numericSearchValue(value: SearchParamValue): number | undefined {
+  const raw = firstSearchValue(value);
+  if (!raw) return undefined;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
+}
+
+function confidenceSearchValue(value: SearchParamValue): number | undefined {
+  const parsed = numericSearchValue(value);
+  if (parsed === undefined) return undefined;
+  return parsed > 1 ? Math.min(parsed / 100, 1) : Math.min(parsed, 1);
+}
+
+function booleanSearchValue(value: SearchParamValue): boolean {
+  return ['1', 'true', 'yes', 'on'].includes(firstSearchValue(value).toLocaleLowerCase('sv-SE'));
+}
+
+function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) {
+  return searchResult.products.map((product) => {
     const cheapest = product.currentPrices[0] ?? null;
     return {
       slug: product.slug,
@@ -339,6 +361,7 @@ export const facetedProductSearch = {
       brand: product.brand ?? 'Brand not reported',
       imageUrl: product.imageUrl,
       categoryLabel: product.categoryPath[0] ?? 'Category not reported',
+      labels: product.labels.map(readableLabel),
       cheapestPriceLabel: formatSek(product.cheapestPrice),
       unitPriceLabel: cheapest ? formatLocalizedUnitPrice(cheapest.unitPrice, {
         locale: defaultLocale,
@@ -347,10 +370,54 @@ export const facetedProductSearch = {
       }) : 'No current price row',
       isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
-      sourceTables: rawFacetedProductSearch.evidence.sourceTables
+      sourceTables: searchResult.evidence.sourceTables
     };
-  })
-};
+  });
+}
+
+export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}) {
+  const query = firstSearchValue(searchParams.q);
+  const categories = listSearchValues(searchParams.category);
+  const labels = listSearchValues(searchParams.label);
+  const chains = listSearchValues(searchParams.chain);
+  const minPrice = numericSearchValue(searchParams.minPrice);
+  const maxPrice = numericSearchValue(searchParams.maxPrice);
+  const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
+  const minConfidence = confidenceSearchValue(searchParams.minConfidence);
+  const filters = { query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
+  const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
+
+  const activeFilters = [
+    query ? `q=${query}` : null,
+    ...categories.map((category) => `category=${category}`),
+    ...labels.map((label) => `label=${readableLabel(label)}`),
+    ...chains.map((chain) => `chain=${chainDisplayNames[chain] ?? chain}`),
+    minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
+    maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
+    inStockOnly ? 'priced/in-stock only' : null,
+    minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null
+  ].filter((item): item is string => item !== null);
+
+  return {
+    ...searchResult,
+    title: 'Instant faceted search',
+    categoryFacets: searchResult.facets.categories.slice(0, 6),
+    chainFacets: searchResult.facets.chains,
+    labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
+    priceRange: searchResult.facets.priceRange,
+    inStockOnly: {
+      label: 'In-stock / priced rows only',
+      productCount: searchResult.evidence.pricedProductCount,
+      latestPriceCount: searchResult.evidence.latestPriceCount,
+      availableLatestPriceCount: searchResult.evidence.availableLatestPriceCount,
+      outOfStockLatestPriceCount: searchResult.evidence.outOfStockLatestPriceCount
+    },
+    activeFilters,
+    resultCards: productSearchResultCards(searchResult)
+  };
+}
+
+export const facetedProductSearch = buildProductSearchView();
 
 type PricedChainRow = ReturnType<typeof chainPriceRows>[number] & { price: number };
 

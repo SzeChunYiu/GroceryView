@@ -1260,6 +1260,7 @@ export type RealCatalogSearchPriceRow = {
   canonicalName: string;
   brand?: string;
   categoryPath: string[];
+  labels?: string[];
   packageSize?: number;
   packageUnit?: string;
   comparableUnit: string;
@@ -1283,12 +1284,15 @@ export type RealCatalogSearchPriceRow = {
 export type FacetedProductSearchFilters = {
   query?: string;
   categories?: string[];
+  labels?: string[];
   brands?: string[];
   chains?: string[];
   stores?: string[];
   priceTypes?: RealCatalogPriceType[];
   minPrice?: number;
   maxPrice?: number;
+  inStockOnly?: boolean;
+  minConfidence?: number;
   limit?: number;
 };
 
@@ -1297,14 +1301,16 @@ export const facetedProductSearchEndpoint = {
   controllerPath: 'products',
   actionPath: 'search/faceted',
   path: '/products/search/faceted',
-  queryParams: ['q', 'category', 'brand', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'limit']
+  queryParams: ['q', 'category', 'brand', 'label', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit']
 } as const;
 
 export type FacetedProductSearchResult = {
   query: string;
-  filters: Required<Pick<FacetedProductSearchFilters, 'categories' | 'brands' | 'chains' | 'stores' | 'priceTypes'>> & {
+  filters: Required<Pick<FacetedProductSearchFilters, 'categories' | 'labels' | 'brands' | 'chains' | 'stores' | 'priceTypes'>> & {
     minPrice: number | null;
     maxPrice: number | null;
+    inStockOnly: boolean;
+    minConfidence: number | null;
     limit: number;
   };
   count: number;
@@ -1314,6 +1320,7 @@ export type FacetedProductSearchResult = {
     canonicalName: string;
     brand: string | null;
     categoryPath: string[];
+    labels: string[];
     packageSize: number | null;
     packageUnit: string | null;
     comparableUnit: string;
@@ -1340,6 +1347,7 @@ export type FacetedProductSearchResult = {
   }>;
   facets: {
     categories: Array<{ value: string; count: number }>;
+    labels: Array<{ value: string; count: number }>;
     brands: Array<{ value: string; count: number }>;
     chains: Array<{ value: string; label: string; count: number }>;
     stores: Array<{ value: string; label: string; count: number }>;
@@ -1426,6 +1434,10 @@ function normalizedList(values: readonly string[] | undefined): string[] {
   return [...new Set((values ?? []).map((value) => value.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
 
+function normalizedFilterSet(values: readonly string[] | undefined): Set<string> {
+  return new Set(normalizedList(values).map((value) => value.toLocaleLowerCase('sv-SE')));
+}
+
 function increment(map: Map<string, number>, key: string): void {
   map.set(key, (map.get(key) ?? 0) + 1);
 }
@@ -1440,25 +1452,63 @@ function money(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
+function rowSearchHaystack(row: RealCatalogSearchPriceRow): string {
+  return [
+    row.productId,
+    row.slug,
+    row.canonicalName,
+    row.brand ?? '',
+    ...row.categoryPath,
+    ...(row.labels ?? [])
+  ].join(' ').toLocaleLowerCase('sv-SE');
+}
+
 export function buildFacetedProductSearch(input: {
   rows: RealCatalogSearchPriceRow[];
   filters?: FacetedProductSearchFilters;
 }): FacetedProductSearchResult {
   const filters = input.filters ?? {};
   const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
+  const query = filters.query?.trim().toLocaleLowerCase('sv-SE') ?? '';
+  const categoryFilters = normalizedFilterSet(filters.categories);
+  const labelFilters = normalizedFilterSet(filters.labels);
+  const brandFilters = normalizedFilterSet(filters.brands);
+  const chainFilters = normalizedFilterSet(filters.chains);
+  const storeFilters = normalizedFilterSet(filters.stores);
+  const priceTypeFilters = new Set(filters.priceTypes ?? []);
+  const minPriceFilter = filters.minPrice;
+  const maxPriceFilter = filters.maxPrice;
+  const inStockOnly = filters.inStockOnly ?? false;
+  const minConfidence = filters.minConfidence;
   const productMap = new Map<string, FacetedProductSearchResult['products'][number]>();
   const categoryFacet = new Map<string, number>();
+  const labelFacet = new Map<string, number>();
   const brandFacet = new Map<string, number>();
   const chainFacet = new Map<string, { label: string; count: number }>();
   const storeFacet = new Map<string, { label: string; count: number }>();
   const priceTypeFacet = new Map<RealCatalogPriceType, number>();
-  let minPrice: number | null = null;
-  let maxPrice: number | null = null;
+  let minObservedUnitPrice: number | null = null;
+  let maxObservedUnitPrice: number | null = null;
   let latestPriceCount = 0;
   let availableLatestPriceCount = 0;
   let outOfStockLatestPriceCount = 0;
 
   for (const row of input.rows) {
+    const rowCategories = row.categoryPath.map((category) => category.toLocaleLowerCase('sv-SE'));
+    const rowLabels = (row.labels ?? []).map((label) => label.toLocaleLowerCase('sv-SE'));
+    if (query && !rowSearchHaystack(row).includes(query)) continue;
+    if (categoryFilters.size > 0 && !rowCategories.some((category) => categoryFilters.has(category))) continue;
+    if (labelFilters.size > 0 && ![...labelFilters].every((label) => rowLabels.includes(label))) continue;
+    if (brandFilters.size > 0 && (!row.brand || !brandFilters.has(row.brand.toLocaleLowerCase('sv-SE')))) continue;
+    if (chainFilters.size > 0 && (!row.chainSlug || !chainFilters.has(row.chainSlug.toLocaleLowerCase('sv-SE')))) continue;
+    if (storeFilters.size > 0 && (!row.storeSlug || !storeFilters.has(row.storeSlug.toLocaleLowerCase('sv-SE')))) continue;
+    if (priceTypeFilters.size > 0 && (!row.priceType || !priceTypeFilters.has(row.priceType))) continue;
+    if ((minPriceFilter !== undefined || maxPriceFilter !== undefined) && typeof row.unitPrice !== 'number') continue;
+    if (minPriceFilter !== undefined && (typeof row.unitPrice !== 'number' || row.unitPrice < minPriceFilter)) continue;
+    if (maxPriceFilter !== undefined && (typeof row.unitPrice !== 'number' || row.unitPrice > maxPriceFilter)) continue;
+    if (inStockOnly && (!row.observationId || typeof row.price !== 'number' || row.isAvailable === false)) continue;
+    if (minConfidence !== undefined && (typeof row.confidence !== 'number' || row.confidence < minConfidence)) continue;
+
     let product = productMap.get(row.productId);
     if (!product) {
       product = {
@@ -1467,6 +1517,7 @@ export function buildFacetedProductSearch(input: {
         canonicalName: row.canonicalName,
         brand: row.brand ?? null,
         categoryPath: [...row.categoryPath],
+        labels: normalizedList(row.labels),
         packageSize: row.packageSize ?? null,
         packageUnit: row.packageUnit ?? null,
         comparableUnit: row.comparableUnit,
@@ -1478,6 +1529,7 @@ export function buildFacetedProductSearch(input: {
       };
       productMap.set(row.productId, product);
       for (const category of row.categoryPath) increment(categoryFacet, category);
+      for (const label of row.labels ?? []) increment(labelFacet, label);
       if (row.brand) increment(brandFacet, row.brand);
     }
 
@@ -1497,8 +1549,8 @@ export function buildFacetedProductSearch(input: {
       if (isAvailable) availableLatestPriceCount += 1;
       else outOfStockLatestPriceCount += 1;
       product.cheapestPrice = product.cheapestPrice === null ? row.price : Math.min(product.cheapestPrice, row.price);
-      minPrice = minPrice === null ? row.price : Math.min(minPrice, row.price);
-      maxPrice = maxPrice === null ? row.price : Math.max(maxPrice, row.price);
+      minObservedUnitPrice = minObservedUnitPrice === null ? row.unitPrice : Math.min(minObservedUnitPrice, row.unitPrice);
+      maxObservedUnitPrice = maxObservedUnitPrice === null ? row.unitPrice : Math.max(maxObservedUnitPrice, row.unitPrice);
       product.currentPrices.push({
         observationId: row.observationId,
         price: row.price,
@@ -1545,18 +1597,22 @@ export function buildFacetedProductSearch(input: {
     query: filters.query?.trim() ?? '',
     filters: {
       categories: normalizedList(filters.categories),
+      labels: normalizedList(filters.labels),
       brands: normalizedList(filters.brands),
       chains: normalizedList(filters.chains),
       stores: normalizedList(filters.stores),
       priceTypes: [...(filters.priceTypes ?? [])].sort((a, b) => a.localeCompare(b)),
       minPrice: filters.minPrice ?? null,
       maxPrice: filters.maxPrice ?? null,
+      inStockOnly,
+      minConfidence: filters.minConfidence ?? null,
       limit
     },
     count: products.length,
     products,
     facets: {
       categories: sortedFacet(categoryFacet),
+      labels: sortedFacet(labelFacet),
       brands: sortedFacet(brandFacet),
       chains: [...chainFacet.entries()]
         .map(([value, facet]) => ({ value, label: facet.label, count: facet.count }))
@@ -1567,7 +1623,7 @@ export function buildFacetedProductSearch(input: {
       priceTypes: [...priceTypeFacet.entries()]
         .map(([value, count]) => ({ value, count }))
         .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value)),
-      priceRange: { min: minPrice, max: maxPrice }
+      priceRange: { min: minObservedUnitPrice, max: maxObservedUnitPrice }
     },
     evidence: {
       pricedProductCount: products.filter((product) => product.currentPrices.length > 0).length,

@@ -194,7 +194,7 @@ describe('createGroceryViewApi', () => {
       controllerPath: 'products',
       actionPath: 'search/faceted',
       path: '/products/search/faceted',
-      queryParams: ['q', 'category', 'brand', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'limit']
+      queryParams: ['q', 'category', 'brand', 'label', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit']
     });
 
     const result = buildFacetedProductSearch({
@@ -202,15 +202,110 @@ describe('createGroceryViewApi', () => {
       filters: { query: 'mjolk', categories: ['Dairy'], chains: ['willys'], limit: 10 }
     });
 
-    assert.equal(result.count, 2);
+    assert.equal(result.count, 1);
     assert.equal(result.products[0]?.productId, 'product-milk');
     assert.equal(result.products[0]?.cheapestPrice, 14.9);
     assert.equal(result.products[0]?.currentPrices[0]?.observationId, 'obs-milk-willys');
     assert.equal(result.products[0]?.currentPrices[0]?.isAvailable, true);
-    assert.deepEqual(result.facets.categories.find((facet) => facet.value === 'Dairy'), { value: 'Dairy', count: 2 });
-    assert.deepEqual(result.facets.chains.find((facet) => facet.value === 'willys'), { value: 'willys', label: 'Willys', count: 2 });
-    assert.deepEqual(result.facets.priceRange, { min: 14.9, max: 54.9 });
+    assert.deepEqual(result.filters.labels, []);
+    assert.equal(result.products[0]?.currentPrices.some((price) => price.chainSlug === 'coop'), false);
+    assert.deepEqual(result.facets.categories.find((facet) => facet.value === 'Dairy'), { value: 'Dairy', count: 1 });
+    assert.deepEqual(result.facets.chains.find((facet) => facet.value === 'willys'), { value: 'willys', label: 'Willys', count: 1 });
+    assert.deepEqual(result.facets.priceRange, { min: 14.9, max: 14.9 });
     assert.deepEqual(result.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores']);
+  });
+
+  it('applies label, unit-price, in-stock, and confidence filters for faceted search', () => {
+    const result = buildFacetedProductSearch({
+      rows: [
+        {
+          productId: 'product-yogurt',
+          slug: 'naturell-yoghurt-1kg',
+          canonicalName: 'Naturell yoghurt 1 kg',
+          brand: 'Arla',
+          categoryPath: ['Dairy', 'Yogurt'],
+          labels: ['keyhole', 'lactose_free'],
+          packageSize: 1,
+          packageUnit: 'kg',
+          comparableUnit: 'kg',
+          observationId: 'obs-yogurt-willys',
+          price: 32,
+          unitPrice: 32,
+          currency: 'SEK',
+          priceType: 'online',
+          confidence: 0.96,
+          observedAt: '2026-05-21T09:00:00.000Z',
+          isAvailable: true,
+          chainId: 'chain-willys',
+          chainSlug: 'willys',
+          chainName: 'Willys'
+        },
+        {
+          productId: 'product-yogurt',
+          slug: 'naturell-yoghurt-1kg',
+          canonicalName: 'Naturell yoghurt 1 kg',
+          brand: 'Arla',
+          categoryPath: ['Dairy', 'Yogurt'],
+          labels: ['keyhole', 'lactose_free'],
+          packageSize: 1,
+          packageUnit: 'kg',
+          comparableUnit: 'kg',
+          observationId: 'obs-yogurt-coop-low-confidence',
+          price: 31,
+          unitPrice: 31,
+          currency: 'SEK',
+          priceType: 'online',
+          confidence: 0.6,
+          observedAt: '2026-05-21T09:00:00.000Z',
+          isAvailable: true,
+          chainId: 'chain-coop',
+          chainSlug: 'coop',
+          chainName: 'Coop'
+        },
+        {
+          productId: 'product-cereal',
+          slug: 'flingor-500g',
+          canonicalName: 'Flingor 500 g',
+          brand: 'Garant',
+          categoryPath: ['Pantry', 'Breakfast'],
+          labels: ['vegan'],
+          packageSize: 500,
+          packageUnit: 'g',
+          comparableUnit: 'kg',
+          observationId: 'obs-cereal-willys',
+          price: 28,
+          unitPrice: 56,
+          currency: 'SEK',
+          priceType: 'online',
+          confidence: 0.97,
+          observedAt: '2026-05-21T09:00:00.000Z',
+          isAvailable: false,
+          chainId: 'chain-willys',
+          chainSlug: 'willys',
+          chainName: 'Willys'
+        }
+      ],
+      filters: {
+        query: 'yoghurt',
+        labels: ['keyhole'],
+        minPrice: 30,
+        maxPrice: 35,
+        inStockOnly: true,
+        minConfidence: 0.9,
+        limit: 10
+      }
+    });
+
+    assert.deepEqual(result.filters.labels, ['keyhole']);
+    assert.equal(result.filters.inStockOnly, true);
+    assert.equal(result.filters.minConfidence, 0.9);
+    assert.equal(result.count, 1);
+    assert.equal(result.products[0]?.productId, 'product-yogurt');
+    assert.deepEqual(result.products[0]?.labels, ['keyhole', 'lactose_free']);
+    assert.deepEqual(result.products[0]?.currentPrices.map((price) => price.observationId), ['obs-yogurt-willys']);
+    assert.deepEqual(result.facets.labels.find((facet) => facet.value === 'keyhole'), { value: 'keyhole', count: 1 });
+    assert.deepEqual(result.facets.priceRange, { min: 32, max: 32 });
+    assert.equal(result.evidence.latestPriceCount, 1);
   });
 
   it('carries latest_prices availability into faceted product cards for out-of-stock badges', () => {
@@ -267,7 +362,7 @@ describe('createGroceryViewApi', () => {
     const oats = result.products.find((product) => product.productId === 'product-oats');
     assert.equal(oats?.cheapestPrice, null);
     assert.deepEqual(oats?.currentPrices, []);
-    assert.equal(result.evidence.latestPriceCount, realRows.length);
+    assert.equal(result.evidence.latestPriceCount, 0);
   });
 
   it('builds basket comparisons from latest price rows without estimated fallback prices', () => {
