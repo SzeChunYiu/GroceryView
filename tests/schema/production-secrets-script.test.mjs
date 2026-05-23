@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
 const scriptPath = new URL('../../scripts/ops/check-production-secrets.mjs', import.meta.url);
@@ -31,9 +31,35 @@ describe('production secret audit script', () => {
     }
     assert.doesNotMatch(script, /['"]GROCERYVIEW_DAILY_CONNECTORS_JSON['"]/);
     assert.match(script, /process\.argv\.indexOf\('--env'\)/);
+    assert.match(script, /process\.argv\.includes\('--from-env'\)/);
+    assert.match(script, /process\.env\[name\]/);
     assert.match(script, /push\('--env', environment\)/);
     assert.match(script, /new Set\(parseGhSecretList/);
     assert.equal(pkg.scripts['ops:check-production-secrets'], 'node scripts/ops/check-production-secrets.mjs');
+  });
+
+  it('can audit injected workflow secret environment values without listing repository secrets', () => {
+    const result = spawnSync(process.execPath, [scriptPath.pathname, '--from-env'], {
+      encoding: 'utf8',
+      env: {
+        DATABASE_URL: 'postgres://example',
+        METRICS_TOKEN: 'metrics-token'
+      }
+    });
+    assert.equal(result.status, 1);
+    assert.equal(result.stderr, '');
+    const output = JSON.parse(result.stdout);
+    assert.equal(output.source, 'environment');
+    assert.deepEqual(output.checkedSecretNames, ['DATABASE_URL', 'METRICS_TOKEN']);
+    assert.deepEqual(output.missingGithubActionSecrets, [
+      'GROCERYVIEW_SERVER_URL',
+      'GROCERYVIEW_API_BASE_URL',
+      'EXPO_TOKEN',
+      'VERCEL_TOKEN',
+      'VERCEL_ORG_ID',
+      'VERCEL_PROJECT_ID'
+    ]);
+    assert.ok(output.missingRuntimeSecrets.includes('STRIPE_SECRET_KEY'));
   });
 
   it('self-test reports missing required secrets', () => {

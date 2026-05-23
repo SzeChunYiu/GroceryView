@@ -12,14 +12,32 @@ describe('deploy workflow', () => {
     }
     assert.match(workflow, /deploy\/groceryview\.manifest\.json/);
     assert.match(workflow, /environment:\s*production/);
-    assert.match(workflow, /ops:check-production-secrets -- --repo "\$GITHUB_REPOSITORY" --env production/);
-    assert.match(workflow, /GH_TOKEN:\s*\$\{\{ secrets\.GITHUB_TOKEN \}\}/);
+    assert.match(workflow, /ops:check-production-secrets -- --from-env/);
+    assert.doesNotMatch(workflow, /gh secret list/);
   });
 
   it('deploys the verified build to the selected Vercel production project', () => {
     assert.match(workflow, /branches:\s*\[\s*main\s*\]/);
-    assert.match(workflow, /ops:check-production-secrets -- --repo "\$GITHUB_REPOSITORY" --env production/);
-    assert.match(workflow, /GH_TOKEN:\s*\$\{\{ secrets\.GITHUB_TOKEN \}\}/);
+    for (const secret of [
+      'DATABASE_URL',
+      'GROCERYVIEW_SERVER_URL',
+      'GROCERYVIEW_API_BASE_URL',
+      'EXPO_TOKEN',
+      'VERCEL_TOKEN',
+      'VERCEL_ORG_ID',
+      'VERCEL_PROJECT_ID',
+      'METRICS_TOKEN',
+      'AUTH_SECRET',
+      'PUBLIC_WEB_URL',
+      'NOTIFICATION_WEBHOOK_SECRET',
+      'BILLING_WEBHOOK_SECRET',
+      'STRIPE_SECRET_KEY',
+      'STRIPE_PRICE_PREMIUM_MONTHLY',
+      'STRIPE_PRICE_PREMIUM_YEARLY',
+      'CATALOG_COVERAGE_TARGETS_JSON'
+    ]) {
+      assert.match(workflow, new RegExp(`${secret}:\\s*\\$\\{\\{ secrets\\.${secret} \\}\\}`));
+    }
     assert.match(workflow, /VERCEL_TOKEN:\s*\$\{\{ secrets\.VERCEL_TOKEN \}\}/);
     assert.match(workflow, /VERCEL_ORG_ID:\s*\$\{\{ secrets\.VERCEL_ORG_ID \}\}/);
     assert.match(workflow, /VERCEL_PROJECT_ID:\s*\$\{\{ secrets\.VERCEL_PROJECT_ID \}\}/);

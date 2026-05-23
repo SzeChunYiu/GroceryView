@@ -22,8 +22,23 @@ jobs:
         run: npm ci
       - name: Audit production secrets
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run ops:check-production-secrets -- --repo "$GITHUB_REPOSITORY" --env production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
+          GROCERYVIEW_API_BASE_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          PUBLIC_WEB_URL: ${{ secrets.PUBLIC_WEB_URL }}
+          NOTIFICATION_WEBHOOK_SECRET: ${{ secrets.NOTIFICATION_WEBHOOK_SECRET }}
+          BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_PRICE_PREMIUM_MONTHLY: ${{ secrets.STRIPE_PRICE_PREMIUM_MONTHLY }}
+          STRIPE_PRICE_PREMIUM_YEARLY: ${{ secrets.STRIPE_PRICE_PREMIUM_YEARLY }}
+          CATALOG_COVERAGE_TARGETS_JSON: ${{ secrets.CATALOG_COVERAGE_TARGETS_JSON }}
+        run: npm run ops:check-production-secrets -- --from-env
       - name: Run tests
         run: npm test
       - name: Build workspaces
