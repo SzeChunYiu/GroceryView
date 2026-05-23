@@ -17,6 +17,7 @@ import {
   freshestOpenPrices,
   homepageAdaptiveProductCards,
   localeFormattingShowcase,
+  marketHeatmapTiles,
   memberOfferAggregationBoard,
   openPriceObservationDepth,
   priceDropMoversBoard,
@@ -40,6 +41,7 @@ const homepageRouteMap = sourceRouteMap.slice(0, 3);
 const homepageFreshOpenPrices = freshestOpenPrices.slice(3, 9);
 const homepageMapChainIndex = mapChainIndexScores.slice(0, 3);
 const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
+const homepageMarketHeatmap = marketHeatmapTiles.slice(0, 6);
 const homepageMarketTerminal = {
   title: 'Grocery Index market terminal',
   indexLabel: mapChainIndexScores[0]?.chainId ?? 'chain-index unavailable',
@@ -86,6 +88,12 @@ const launchFixtureStores = [
   { slug: 'hemkop-stockholm', name: 'Hemköp Stockholm', district: 'Norrmalm', fixture: 'Hemkop Stockholm locator result' },
   { slug: 'city-gross-stockholm', name: 'City Gross Stockholm', district: 'Stockholm County', fixture: 'City Gross Stockholm county locator result' }
 ];
+
+function heatmapTileClass(heatScore: number) {
+  if (heatScore >= 80) return 'border-rose-300 bg-rose-50 text-rose-950';
+  if (heatScore >= 55) return 'border-amber-300 bg-amber-50 text-amber-950';
+  return 'border-emerald-300 bg-emerald-50 text-emerald-950';
+}
 
 export function MarketShell() {
   return (
@@ -162,6 +170,42 @@ export function MarketShell() {
         <div className="mt-4 grid gap-2 md:grid-cols-3">
           {homepageMarketTerminal.guardrails.map((guardrail) => (
             <p className="rounded-2xl border border-white/10 bg-white/10 p-3 text-xs font-bold leading-5 text-slate-200" key={guardrail}>{guardrail}</p>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-slate-200 bg-white">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <Eyebrow>Grocery market heatmap</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Hot categories, spreads, liquidity, and movers</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              The homepage market heatmap compresses verified deal-score leaders, cross-chain spread pressure, OpenPrices observation liquidity, and dated price-drop movers into clickable tiles. No forecast or synthetic row is used.
+            </p>
+          </div>
+          <Link className="rounded-full bg-slate-950 px-5 py-3 text-center text-sm font-black text-white" href="/chain-index">
+            Open heatmap details
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {homepageMarketHeatmap.map((tile) => (
+            <Link
+              className={`rounded-2xl border p-4 transition hover:-translate-y-0.5 hover:shadow-lg ${heatmapTileClass(tile.heatScore)}`}
+              data-heatmap-tile={tile.id}
+              href={tile.route}
+              key={tile.id}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] opacity-70">{tile.sourceSignal}</p>
+                  <p className="mt-2 text-lg font-black">{tile.label}</p>
+                </div>
+                <p className="rounded-full bg-white/80 px-3 py-2 text-xl font-black">{tile.heatScore.toFixed(0)}</p>
+              </div>
+              <p className="mt-3 text-sm font-black">{tile.metricLabel}</p>
+              <p className="mt-2 text-xs font-semibold leading-5 opacity-80">{tile.detail}</p>
+              <p className="mt-3 rounded-xl bg-white/70 p-2 text-xs font-bold leading-5 opacity-80">{tile.confidenceLabel}</p>
+            </Link>
           ))}
         </div>
       </Card>

@@ -2312,6 +2312,96 @@ export const categoryDealLeaders = summarizeCategoryDealLeaders({
   evidenceLabel: `${leader.storeName} lowest · ${formatPct(leader.sourceConfidence * 100)} sourceConfidence · cross-chain spread derived`
 }));
 
+export const marketHeatmapSourceSignals = [
+  {
+    id: 'deal-score',
+    label: 'Deal score heat',
+    source: 'categoryDealLeaders',
+    evidence: 'summarizeCategoryDealLeaders over verified cross-chain prices'
+  },
+  {
+    id: 'spread',
+    label: 'Cross-chain spread heat',
+    source: 'chainCategoryCoverage',
+    evidence: 'matched Willys/Hemköp category spreads'
+  },
+  {
+    id: 'liquidity',
+    label: 'Observation liquidity heat',
+    source: 'openPriceObservationDepth',
+    evidence: 'OpenPrices observation totals by category'
+  },
+  {
+    id: 'movers',
+    label: 'Price-drop mover heat',
+    source: 'priceDropMoversBoard',
+    evidence: 'dated observed price drops only'
+  }
+] as const;
+
+function marketHeatBand(heatScore: number) {
+  if (heatScore >= 80) return 'hot';
+  if (heatScore >= 55) return 'warm';
+  return 'cool';
+}
+
+const maxOpenPriceObservationTotal = Math.max(...openPriceObservationDepth.map((row) => row.observationTotal), 1);
+
+export const marketHeatmapTiles = [
+  ...categoryDealLeaders.map((leader) => ({
+    id: `deal-${leader.categorySlug}-${leader.productSlug}`,
+    label: leader.categoryLabel,
+    route: `/categories/${leader.categorySlug}`,
+    sourceSignal: marketHeatmapSourceSignals[0].label,
+    heatScore: clamp(leader.dealScore, 0, 100),
+    metricLabel: leader.signal,
+    detail: `${leader.productName} · ${leader.evidenceLabel}`,
+    confidenceLabel: `${formatPct(leader.sourceConfidence * 100)} source confidence · deal score from calculateDealScore`,
+    band: marketHeatBand(clamp(leader.dealScore, 0, 100))
+  })),
+  ...chainCategoryCoverage.map((category) => ({
+    id: `spread-${category.slug}`,
+    label: category.label,
+    route: `/categories/${category.slug}`,
+    sourceSignal: marketHeatmapSourceSignals[1].label,
+    heatScore: clamp(category.topSpread, 0, 100),
+    metricLabel: `${formatPct(category.topSpread)} top spread`,
+    detail: `${category.matchedProducts} matched products · ${category.leadingLowestChain} leads lowest-price wins`,
+    confidenceLabel: 'Matched chain catalogue rows only; no unmatched SKU is mixed into the heat tile.',
+    band: marketHeatBand(clamp(category.topSpread, 0, 100))
+  })),
+  ...openPriceObservationDepth.map((category) => {
+    const heatScore = clamp((category.observationTotal / maxOpenPriceObservationTotal) * 100, 0, 100);
+    return {
+      id: `liquidity-${category.slug}`,
+      label: category.label,
+      route: `/categories/${category.slug}`,
+      sourceSignal: marketHeatmapSourceSignals[2].label,
+      heatScore,
+      metricLabel: `${category.observationTotal.toLocaleString('sv-SE')} observations`,
+      detail: `${category.products} products · latest ${category.latestObservation || 'not reported'}`,
+      confidenceLabel: `${category.topProductName} has ${category.topProductObservations.toLocaleString('sv-SE')} source observations.`,
+      band: marketHeatBand(heatScore)
+    };
+  }),
+  ...priceDropMoversBoard.map((mover) => {
+    const heatScore = clamp(Math.abs(mover.changePercent), 0, 100);
+    return {
+      id: `mover-${mover.productSlug}`,
+      label: mover.categoryLabel,
+      route: `/products/${mover.productSlug}`,
+      sourceSignal: marketHeatmapSourceSignals[3].label,
+      heatScore,
+      metricLabel: `${formatPct(mover.changePercent)} latest move`,
+      detail: `${mover.productName} · latest ${formatSek(mover.latestPrice)} from ${mover.observedCount} dated points`,
+      confidenceLabel: `${mover.rawObservationCount.toLocaleString('sv-SE')} raw observations · ${mover.legalCopy}`,
+      band: marketHeatBand(heatScore)
+    };
+  })
+]
+  .sort((a, b) => b.heatScore - a.heatScore || a.label.localeCompare(b.label, 'sv'))
+  .slice(0, 12);
+
 export const sourceCoverage = [
   {
     name: 'Axfood chain price snapshot',

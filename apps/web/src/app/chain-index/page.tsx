@@ -3,7 +3,7 @@ import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryvie
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { buildBrandTierPriceObservations, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
 import { buildGroceryIndexTickerWidget } from '@/lib/grocery-index-widget';
-import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, matchedChainProducts } from '@/lib/verified-data';
+import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, marketHeatmapTiles, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -33,6 +33,12 @@ function tierTone(value: number) {
   return 'text-slate-800 bg-slate-50';
 }
 
+function heatTileTone(value: number) {
+  if (value >= 80) return 'border-rose-200 bg-rose-50 text-rose-950';
+  if (value >= 55) return 'border-amber-200 bg-amber-50 text-amber-950';
+  return 'border-emerald-200 bg-emerald-50 text-emerald-950';
+}
+
 export default function ChainIndexPage() {
   const willysWins = matchedChainProducts.filter((product) => product.lowestChain === 'willys').length;
   const hemkopWins = matchedChainProducts.filter((product) => product.lowestChain === 'hemkop').length;
@@ -47,6 +53,31 @@ export default function ChainIndexPage() {
         <Card><p className="text-sm font-black text-slate-600">Average spread</p><p className="mt-2 text-4xl font-black text-emerald-800">{formatPct(averageSpread)}</p></Card>
         <Card><p className="text-sm font-black text-slate-600">Lowest-price wins</p><p className="mt-2 text-xl font-black text-slate-950">Willys {willysWins} · Hemköp {hemkopWins}</p></Card>
       </div>
+
+      <Card className="mt-6 border-slate-200 bg-white">
+        <div className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <Eyebrow>Market heatmap</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Terminal heat across deals, spreads, liquidity, and movers</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              These heat tiles are derived from categoryDealLeaders, chainCategoryCoverage, openPriceObservationDepth, and priceDropMoversBoard. No forecast is rendered: the score is a normalized view of visible observed data and matched cross-chain rows.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {marketHeatmapTiles.slice(0, 6).map((tile) => (
+              <Link className={`rounded-2xl border p-4 hover:border-slate-500 ${heatTileTone(tile.heatScore)}`} href={tile.route} key={tile.id}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] opacity-70">{tile.sourceSignal}</p>
+                <div className="mt-2 flex items-start justify-between gap-3">
+                  <p className="font-black">{tile.label}</p>
+                  <p className="text-2xl font-black">{tile.heatScore.toFixed(0)}</p>
+                </div>
+                <p className="mt-2 text-sm font-black">{tile.metricLabel}</p>
+                <p className="mt-2 text-xs font-semibold leading-5 opacity-80">{tile.confidenceLabel}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-blue-200 bg-blue-50">
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
