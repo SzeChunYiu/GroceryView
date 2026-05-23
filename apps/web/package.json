@@ -5,11 +5,18 @@
   "scripts": {
     "build": "NODE_OPTIONS=--max-old-space-size=6144 next build --webpack",
     "dev": "next dev",
+    "perf:bundle-budget": "next build --profile --webpack && bundlesize",
     "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
     "perf:lighthouse:preview": "lhci autorun --config=./lighthouserc.preview.cjs",
     "start": "next start",
     "test": "node --test scripts/*.test.mjs"
   },
+  "bundlesize": [
+    {
+      "path": ".next/static/chunks/main-*.js",
+      "maxSize": "250 KB"
+    }
+  ],
   "dependencies": {
     "@groceryview/api": "0.1.0",
     "@groceryview/catalog": "0.1.0",
@@ -36,6 +43,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.23",
+    "bundlesize": "^0.18.2",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.19"
   }

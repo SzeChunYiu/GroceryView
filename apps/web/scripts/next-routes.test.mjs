@@ -1550,6 +1550,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(shell, /NoVerifiedData/);
   });
 
+  it('ships a profiled gzipped main-chunk bundle budget in CI', async () => {
+    const pkg = await read('package.json');
+    const workflow = await read('../../.github/workflows/ci.yml');
+
+    assert.match(pkg, /"perf:bundle-budget": "next build --profile --webpack && bundlesize"/);
+    assert.match(pkg, /"bundlesize": \[/);
+    assert.match(pkg, /"path": "\.next\/static\/chunks\/main-\*\.js"/);
+    assert.match(pkg, /"maxSize": "250 KB"/);
+    assert.match(pkg, /"bundlesize": "\^0\./);
+    assert.match(workflow, /Bundle size performance budget/);
+    assert.match(workflow, /npm run perf:bundle-budget -w @groceryview\/web/);
+  });
+
 
   it('ships a persisted language preference switcher with RTL and browser-language detection', async () => {
     const nav = await read('src/components/app-nav.tsx');
