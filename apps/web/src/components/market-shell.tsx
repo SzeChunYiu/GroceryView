@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import { ProductPriceCards } from './product-price-cards';
+import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedShellCopy } from '@/lib/i18n';
+import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
   chainSavingsLedger,
@@ -16,6 +18,8 @@ import {
   formatSek,
   freshestOpenPrices,
   homepageAdaptiveProductCards,
+  localeFormattingShowcase,
+  marketHeatmapTiles,
   memberOfferAggregationBoard,
   openPriceObservationDepth,
   priceDropMoversBoard,
@@ -39,6 +43,9 @@ const homepageRouteMap = sourceRouteMap.slice(0, 3);
 const homepageFreshOpenPrices = freshestOpenPrices.slice(3, 9);
 const homepageMapChainIndex = mapChainIndexScores.slice(0, 3);
 const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
+const homepageMarketHeatmap = marketHeatmapTiles.slice(0, 6);
+const homepageChainIndexTrend = buildChainIndexTrendSeries().series.slice(0, 2);
+const homepageBasketCostHeatmap = basketCostHeatmap.rows.slice(0, 3);
 const homepageMarketTerminal = {
   title: 'Grocery Index market terminal',
   indexLabel: mapChainIndexScores[0]?.chainId ?? 'chain-index unavailable',
@@ -86,6 +93,12 @@ const launchFixtureStores = [
   { slug: 'city-gross-stockholm', name: 'City Gross Stockholm', district: 'Stockholm County', fixture: 'City Gross Stockholm county locator result' }
 ];
 
+function heatmapTileClass(heatScore: number) {
+  if (heatScore >= 80) return 'border-rose-300 bg-rose-50 text-rose-950';
+  if (heatScore >= 55) return 'border-amber-300 bg-amber-50 text-amber-950';
+  return 'border-emerald-300 bg-emerald-50 text-emerald-950';
+}
+
 export function MarketShell() {
   return (
     <PageShell>
@@ -111,7 +124,7 @@ export function MarketShell() {
           </div>
           <div className="mt-6 grid gap-3">
             {freshestOpenPrices.slice(0, 3).map((product) => (
-              <Link className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-600" href={`/products/${product.slug}`} key={product.slug}>
+              <Link className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-600" data-product-slug={product.slug} href={`/products/${product.slug}`} key={product.slug}>
                 <p className="font-black text-slate-950">{product.name}</p>
                 <p className="text-sm text-slate-600">{product.brands || 'Brand not reported'} · observed {product.lastObservedAt}</p>
                 <p className="mt-1 font-black text-emerald-800">Median {formatSek(product.priceMedian)}</p>
@@ -142,7 +155,7 @@ export function MarketShell() {
             <p className="mt-2 text-2xl font-black">{homepageMarketTerminal.indexLabel}</p>
             <p className="mt-1 text-sm font-semibold text-slate-300">{homepageMarketTerminal.indexValue?.toFixed(1) ?? 'Not reported'} vs market 100</p>
           </div>
-          <Link className="rounded-2xl border border-white/10 bg-white/10 p-4 hover:border-emerald-300" href={homepageMarketTerminal.mover ? `/products/${homepageMarketTerminal.mover.productSlug}` : '/products'}>
+          <Link className="rounded-2xl border border-white/10 bg-white/10 p-4 hover:border-emerald-300" data-product-slug={homepageMarketTerminal.mover?.productSlug} href={homepageMarketTerminal.mover ? `/products/${homepageMarketTerminal.mover.productSlug}` : '/products'}>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-200">Price-drop mover</p>
             <p className="mt-2 text-lg font-black">{homepageMarketTerminal.mover?.productName ?? 'No mover available'}</p>
             <p className="mt-1 text-sm font-semibold text-slate-300">{homepageMarketTerminal.mover ? formatPct(homepageMarketTerminal.mover.changePercent) : 'Not reported'} latest move</p>
@@ -161,6 +174,119 @@ export function MarketShell() {
         <div className="mt-4 grid gap-2 md:grid-cols-3">
           {homepageMarketTerminal.guardrails.map((guardrail) => (
             <p className="rounded-2xl border border-white/10 bg-white/10 p-3 text-xs font-bold leading-5 text-slate-200" key={guardrail}>{guardrail}</p>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <Eyebrow>Chain index trend tape</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Dated campaign index movement</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-indigo-950">
+              The homepage previews the Willys/Hemköp weekly campaign tape as a Chain Price Index trend before shoppers open the full chart. No forecast or synthetic shelf history is displayed; the preview is only dated campaign evidence.
+            </p>
+          </div>
+          <Link className="rounded-full bg-indigo-700 px-5 py-3 text-center text-sm font-black text-white" href="/chain-index">
+            Open trend chart
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {homepageChainIndexTrend.map((series) => (
+            <Link className="rounded-2xl border border-indigo-200 bg-white p-4 shadow-sm hover:border-indigo-700" data-chain-index-trend={series.chainId} href="/chain-index" key={series.chainId}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-700">{series.chainId}</p>
+                  <p className="mt-1 text-sm font-bold text-indigo-950">{series.coverageLabel}</p>
+                </div>
+                <p className="text-3xl font-black text-indigo-950">{series.latestIndex.toFixed(1)}</p>
+              </div>
+              <p className="mt-3 text-sm font-black text-indigo-950">Latest {series.latestDate} · movement {series.movementFromFirst >= 0 ? '+' : ''}{series.movementFromFirst.toFixed(1)} points</p>
+              <div className="mt-4 flex items-end gap-2">
+                {series.points.map((point) => (
+                  <span className="flex flex-1 flex-col gap-1 text-center text-[0.65rem] font-black text-indigo-950" key={`${series.chainId}-${point.date}`}>
+                    <span className="rounded-t-xl bg-indigo-600" style={{ height: `${Math.max(1.5, Math.min(4.5, point.value / 24))}rem` }} />
+                    <span>{point.date.slice(5)}</span>
+                  </span>
+                ))}
+              </div>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-slate-200 bg-white">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <Eyebrow>Grocery market heatmap</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Hot categories, spreads, liquidity, and movers</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              The homepage market heatmap compresses verified deal-score leaders, cross-chain spread pressure, OpenPrices observation liquidity, and dated price-drop movers into clickable tiles. No forecast or synthetic row is used.
+            </p>
+          </div>
+          <Link className="rounded-full bg-slate-950 px-5 py-3 text-center text-sm font-black text-white" href="/chain-index">
+            Open heatmap details
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {homepageMarketHeatmap.map((tile) => (
+            <Link
+              className={`rounded-2xl border p-4 transition hover:-translate-y-0.5 hover:shadow-lg ${heatmapTileClass(tile.heatScore)}`}
+              data-heatmap-tile={tile.id}
+              href={tile.route}
+              key={tile.id}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] opacity-70">{tile.sourceSignal}</p>
+                  <p className="mt-2 text-lg font-black">{tile.label}</p>
+                </div>
+                <p className="rounded-full bg-white/80 px-3 py-2 text-xl font-black">{tile.heatScore.toFixed(0)}</p>
+              </div>
+              <p className="mt-3 text-sm font-black">{tile.metricLabel}</p>
+              <p className="mt-2 text-xs font-semibold leading-5 opacity-80">{tile.detail}</p>
+              <p className="mt-3 rounded-xl bg-white/70 p-2 text-xs font-bold leading-5 opacity-80">{tile.confidenceLabel}</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <Eyebrow>Basket-cost heatmap</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Basket-cost heatmap by area</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-fuchsia-950">
+              The homepage previews the map's area basket view using compareBasketStrategies totals from visible weekly basket rows. It is a coverage-gated guide, not a branch checkout quote; missing favorite-store prices remain visible.
+            </p>
+          </div>
+          <Link className="rounded-full bg-fuchsia-700 px-5 py-3 text-center text-sm font-black text-white" href="/map">
+            Open area heatmap
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {homepageBasketCostHeatmap.map((row) => (
+            <Link
+              className="rounded-2xl border border-fuchsia-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-fuchsia-700 hover:shadow-lg"
+              data-basket-cost-heatmap={row.area}
+              href="/map"
+              key={row.storeId}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-700">{row.area}</p>
+                  <p className="mt-2 text-lg font-black text-slate-950">{row.storeName}</p>
+                </div>
+                <p className="rounded-full bg-fuchsia-100 px-3 py-2 text-xl font-black text-fuchsia-950">{row.relativeBasketIndex.toFixed(1)}</p>
+              </div>
+              <p className="mt-3 text-sm font-black text-fuchsia-950">{formatSek(row.knownBasketTotal)} known basket total</p>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{formatPct(row.coveragePercent)} coverage · {row.missingProductCount} missing products</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          {basketCostHeatmap.guardrails.map((guardrail) => (
+            <p className="rounded-2xl bg-white/80 p-3 text-xs font-bold leading-5 text-fuchsia-950" key={guardrail}>{guardrail}</p>
           ))}
         </div>
       </Card>
@@ -226,7 +352,7 @@ export function MarketShell() {
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-3">
           {seasonalProduceCalendar.topBestBuys.slice(0, 3).map((row) => (
-            <Link className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm hover:border-emerald-700" href={`/products/${row.slug}`} key={row.slug}>
+            <Link className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm hover:border-emerald-700" data-product-slug={row.slug} href={`/products/${row.slug}`} key={row.slug}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Best time to buy · {row.bestBuyMonth}</p>
               <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
               <p className="mt-2 text-sm font-semibold text-slate-700">{row.historicalMonthlyAverageLabel} historicalMonthlyAverage · {row.savingsVsTypicalLabel}</p>
@@ -271,6 +397,29 @@ export function MarketShell() {
               </p>
             </div>
           ))}
+        </div>
+        <div className="mt-4 rounded-3xl border border-amber-200 bg-white p-4">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Locale-aware price formatting</p>
+              <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">Multi-currency display follows observation currency</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                SEK · NOK · DKK · EUR · ISK are formatter-ready, but only currencies present on observed price rows render money; the rest stay blocked instead of converting or inventing values.
+                No currency conversion or fake price is displayed for currencies missing from observations.currency.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-2 md:grid-cols-5">
+            {localeFormattingShowcase.map((row) => (
+              <div className="rounded-2xl border border-amber-100 bg-amber-50 p-3" key={row.currency}>
+                <p className="text-lg font-black text-slate-950">{row.currency}</p>
+                <p className="mt-1 text-sm font-bold text-amber-950">{row.moneyLabel}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-600">{row.unitPriceLabel}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-500">{row.dateLabel}</p>
+                <p className="mt-2 text-[0.65rem] font-black uppercase tracking-[0.12em] text-amber-800">{row.guardrail}</p>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {immigrantMultilingualUi.guardrails.map((guardrail) => (
@@ -325,7 +474,7 @@ export function MarketShell() {
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {privateLabelDupeFinder.topDupes.slice(0, 4).map((dupe) => (
-            <Link className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm hover:border-fuchsia-700" href={`/products/${dupe.dupeSlug}`} key={`${dupe.sourceSlug}-${dupe.dupeSlug}`}>
+            <Link className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm hover:border-fuchsia-700" data-product-slug={dupe.dupeSlug} href={`/products/${dupe.dupeSlug}`} key={`${dupe.sourceSlug}-${dupe.dupeSlug}`}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">Save {formatPct(dupe.savingsPercent)} per unit</p>
               <h3 className="mt-2 text-lg font-black text-slate-950">{dupe.privateLabelBrand} for {dupe.nationalBrand}</h3>
               <p className="mt-1 text-sm font-semibold text-slate-600">{dupe.dupeName} · {dupe.dupePackage} · {dupe.cheapestChain}</p>
@@ -425,6 +574,7 @@ export function MarketShell() {
           {priceDropMoversBoard.map((mover) => (
             <Link
               className="grid gap-3 py-4 transition hover:bg-emerald-50/70 md:grid-cols-[1fr_auto_auto]"
+              data-product-slug={mover.productSlug}
               href={`/products/${mover.productSlug}`}
               key={mover.productSlug}
             >
@@ -518,6 +668,7 @@ export function MarketShell() {
           {homepageFreshOpenPrices.map((product) => (
             <Link
               className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              data-product-slug={product.slug}
               href={`/products/${product.slug}`}
               key={product.slug}
             >
@@ -572,6 +723,7 @@ export function MarketShell() {
           {homepageChainSavings.map((chain) => (
             <Link
               className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              data-product-slug={chain.topProductSlug}
               href={`/products/${chain.topProductSlug}`}
               key={chain.chain}
             >
@@ -870,7 +1022,7 @@ export function MarketShell() {
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {launchFixtureStores.map((store) => (
-              <Link className="block rounded-2xl border border-emerald-200 bg-emerald-50 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}>
+              <Link className="block rounded-2xl border border-emerald-200 bg-emerald-50 p-4 hover:border-emerald-700" data-store-slug={store.slug} href={`/stores/${store.slug}`} key={store.slug}>
                 <p className="font-black text-slate-950">{store.name}</p>
                 <p className="text-sm text-slate-600">{store.district} · fixture {store.fixture}</p>
                 <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{store.slug}</p>
@@ -884,7 +1036,7 @@ export function MarketShell() {
           <h2 className="mt-2 text-2xl font-black tracking-tight">Sweden stores from OSM</h2>
           <div className="mt-5 space-y-3">
             {featuredStores.slice(0, 7).map((store) => (
-              <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}>
+              <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" data-store-slug={store.slug} href={`/stores/${store.slug}`} key={store.slug}>
                 <p className="font-black text-slate-950">{store.name}</p>
                 <p className="text-sm text-slate-600">{store.brand} · {store.address || 'Address not reported by OSM'}</p>
               </Link>

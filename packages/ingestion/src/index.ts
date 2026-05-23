@@ -8,6 +8,7 @@ import {
   createPostgresSourceRecordWriter,
   type PriceType as DbPriceType,
   type QueryExecutor,
+  type PgLikeClient,
   type SourceRunRecord
 } from '@groceryview/db';
 import { COMMODITIES, findCommodity, type Commodity } from '@groceryview/catalog';
@@ -22,7 +23,9 @@ import {
   type CoopWeeklyDiscount
 } from './connectors/coop.js';
 import {
+  fetchHemkopProductsForAllStores,
   fetchHemkopWeeklyDiscountsForAllStores,
+  type HemkopStoreProduct,
   type HemkopWeeklyDiscount
 } from './connectors/hemkop.js';
 import {
@@ -1666,6 +1669,28 @@ function willysStoreProductToDailyItem(row: WillysStoreProduct): RetailerConnect
   };
 }
 
+
+function hemkopStoreProductToDailyItem(row: HemkopStoreProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromAxfoodImageUrl(row.imageUrl));
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('hemkop', row.code, barcode),
+    categoryId: stableKeyPart(row.category || 'hemkop-products'),
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
   const regularPrice = nativePriceFromText(row.regularPriceText);
@@ -1733,6 +1758,8 @@ function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnect
     regularPrice: row.ordinaryPrice > row.offerPrice ? row.ordinaryPrice : undefined,
     promoText: row.offerMechanicText || row.offerPriceText || undefined,
     memberOnly: row.medMeraRequired,
+    validFrom: row.validFrom,
+    validUntil: row.validTo,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl
   };
@@ -1872,6 +1899,21 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysStoreProductToDailyItem) });
   }
 
+
+  if (sourceUrl === GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchHemkopProductsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(hemkopStoreProductToDailyItem) });
+  }
+
   if (sourceUrl === GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
@@ -1893,7 +1935,9 @@ export async function fetchDailyConnectorSnapshot(
       maxStores: dailyNativeNumberParam(url, 'maxStores'),
       maxRows: dailyNativeNumberParam(url, 'maxRows'),
       productQueries: dailyNativeStringListParam(url, 'productQueries'),
-      includeStoreDetails: url.searchParams.get('includeStoreDetails') === 'true',
+      includeStoreDetails: url.searchParams.has('includeStoreDetails')
+        ? url.searchParams.get('includeStoreDetails') === 'true'
+        : undefined,
       subscriptionKey: url.searchParams.get('subscriptionKey') ?? undefined,
       storeApiSubscriptionKey: url.searchParams.get('storeApiSubscriptionKey') ?? undefined,
       retrievedAt
@@ -2078,6 +2122,8 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
       regularPrice: optionalNumber(record, 'regularPrice', path),
       promoText: optionalString(record, 'promoText', path),
       memberOnly: optionalBoolean(record, 'memberOnly', path),
+      validFrom: optionalString(record, 'validFrom', path),
+      validUntil: optionalString(record, 'validUntil', path),
       observedAt: optionalString(record, 'observedAt', path),
       sourceUrl: optionalString(record, 'sourceUrl', path)
     };
@@ -2258,6 +2304,8 @@ export type RetailerProductInput = {
   regularPrice?: number;
   promoText?: string;
   memberOnly?: boolean;
+  validFrom?: string;
+  validUntil?: string;
   sourceUrl?: string;
 };
 
@@ -2318,6 +2366,8 @@ export type IngestedPriceObservation = {
   memberPrice?: number;
   promoType?: string;
   priceType: PriceType;
+  validFrom?: string;
+  validUntil?: string;
   sourceType: SourceType;
   sourceUrl?: string;
   parserVersion: string;
@@ -2338,6 +2388,8 @@ export type IngestedPromotionObservation = {
   promoText: string;
   memberOnly: boolean;
   priceType: PriceType;
+  validFrom?: string;
+  validUntil?: string;
   sourceType: SourceType;
   provenance: PriceProvenance;
   confidenceScore: number;
@@ -2359,6 +2411,8 @@ function validateInput(input: RetailerProductInput): void {
   if (!input.parserVersion.trim()) throw new Error('parserVersion is required.');
   if (!input.rawSnapshotRef.trim()) throw new Error('rawSnapshotRef is required.');
   if (Number.isNaN(Date.parse(input.observedAt))) throw new Error('observedAt must be an ISO date.');
+  if (input.validFrom !== undefined && Number.isNaN(Date.parse(input.validFrom))) throw new Error('validFrom must be an ISO date.');
+  if (input.validUntil !== undefined && Number.isNaN(Date.parse(input.validUntil))) throw new Error('validUntil must be an ISO date.');
   if (input.originCountry !== undefined && !/^[a-z]{2}$/i.test(input.originCountry)) throw new Error('originCountry must be an ISO-3166 alpha-2 code.');
 }
 
@@ -2481,6 +2535,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       promoPrice: hasPromotion ? input.price : undefined,
       promoType: hasPromotion ? 'discount' : undefined,
       priceType,
+      validFrom: input.validFrom,
+      validUntil: input.validUntil,
       sourceType: input.sourceType,
       sourceUrl: input.sourceUrl,
       parserVersion: input.parserVersion,
@@ -2501,6 +2557,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
           promoText: input.promoText ?? 'Promotion observed',
           memberOnly: input.memberOnly ?? false,
           priceType,
+          validFrom: input.validFrom,
+          validUntil: input.validUntil,
           sourceType: input.sourceType,
           provenance,
           confidenceScore: confidence
@@ -2558,7 +2616,14 @@ export type DailyIngestionEnv = Partial<Record<
   | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'
   | 'GROCERYVIEW_DAILY_BLOCKER_LOG_PATH'
   | 'GROCERYVIEW_DATABASE_URL'
-  | 'GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES',
+  | 'GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES'
+  | 'GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS'
+  | 'GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS'
+  | 'GROCERYVIEW_DAILY_MAX_CONNECTORS'
+  | 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS',
   string
 >>;
 
@@ -2566,6 +2631,13 @@ export type DailyIngestionEnvConfig = {
   databaseUrl: string;
   connectors: DailyIngestionConnectorConfig[];
   runtimeOptions: DailyIngestionRuntimeOptions;
+  runner: {
+    maxConnectors?: number;
+    maxConcurrency?: number;
+    connectorStartDelayMs?: number;
+    connectorRetryAttempts?: number;
+    connectorRetryBaseDelayMs?: number;
+  };
 };
 
 export type DailyIngestionRunInput = {
@@ -2585,6 +2657,19 @@ export type DailyIngestionRunInput = {
   blockerLogPath?: string;
 };
 
+export type DailyIngestionConnectorSummary = {
+  connectorId: string;
+  chainId: string;
+  status: 'succeeded' | 'partial' | 'blocked';
+  blockers: string[];
+  persistedRuns: number;
+  acceptedCount: number;
+  rejectedCount: number;
+  sourceRunIds: string[];
+  rawRecordIds: string[];
+  observationIds: string[];
+};
+
 export type DailyIngestionRunResult = {
   status: 'succeeded' | 'partial' | 'blocked';
   blockers: string[];
@@ -2594,6 +2679,7 @@ export type DailyIngestionRunResult = {
   sourceRunIds: string[];
   rawRecordIds: string[];
   observationIds: string[];
+  chainSummaries: DailyIngestionConnectorSummary[];
 };
 
 type IdRow = { id: string };
@@ -2629,6 +2715,7 @@ export const requiredDailyIngestionChainIds = [
 
 export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/willys/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/willys/products/all-stores';
+export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/hemkop/products/all-stores';
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/ica/store-promotions/default-stores';
 export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lidl/public-offers/all-stores';
@@ -2711,21 +2798,39 @@ function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[
   return connectors;
 }
 
+function dailyRunnerIntegerFromEnv(value: string | undefined, fallback?: number): number | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return fallback;
+  const parsed = Number(trimmed);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(0, Math.floor(parsed));
+}
+
 export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): DailyIngestionEnvConfig {
   const databaseUrl = env.DATABASE_URL?.trim();
   if (!databaseUrl) throw new Error('DATABASE_URL is required for daily ingestion.');
   const connectorsJson = env.GROCERYVIEW_DAILY_CONNECTORS_JSON?.trim()
     ?? (env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE?.trim() ? readFileSync(env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE.trim(), 'utf8') : undefined);
   if (!connectorsJson) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE is required for daily ingestion.');
+  const parsedConnectors = parseDailyConnectorsJson(connectorsJson);
+  const maxConnectors = dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_MAX_CONNECTORS);
+  const runtimeOptions = {
+    maxConcurrency: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY, 1, 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'),
+    connectorStartDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'),
+    connectorRetryAttempts: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'),
+    connectorRetryBaseDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS, 250, 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'),
+    blockerLogPath: env.GROCERYVIEW_DAILY_BLOCKER_LOG_PATH?.trim() || DEFAULT_DAILY_INGESTION_BLOCKER_LOG_PATH
+  };
   return {
     databaseUrl,
-    connectors: parseDailyConnectorsJson(connectorsJson),
-    runtimeOptions: {
-      maxConcurrency: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY, 1, 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'),
-      connectorStartDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'),
-      connectorRetryAttempts: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'),
-      connectorRetryBaseDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS, 250, 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'),
-      blockerLogPath: env.GROCERYVIEW_DAILY_BLOCKER_LOG_PATH?.trim() || DEFAULT_DAILY_INGESTION_BLOCKER_LOG_PATH
+    connectors: maxConnectors && maxConnectors > 0 ? parsedConnectors.slice(0, maxConnectors) : parsedConnectors,
+    runtimeOptions,
+    runner: {
+      maxConnectors,
+      maxConcurrency: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY),
+      connectorStartDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS),
+      connectorRetryAttempts: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS),
+      connectorRetryBaseDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS)
     }
   };
 }
@@ -2738,8 +2843,12 @@ function parseDailyEnvInteger(value: string | undefined, fallback: number, name:
 }
 
 export function buildDailyIngestionPostgresPoolConfig(databaseUrl: string): { connectionString: string; max: number } {
+  const parsed = new URL(databaseUrl);
+  if (parsed.hostname.endsWith('.pooler.supabase.com') && parsed.port === '6543') {
+    parsed.port = '5432';
+  }
   return {
-    connectionString: databaseUrl,
+    connectionString: parsed.toString(),
     max: 1
   };
 }
@@ -2852,6 +2961,22 @@ function validateStoreScopedConnectorOutput(config: DailyIngestionConnectorConfi
   if (missingStoreProducts.length > 0) blockers.push(`${config.chainId}:missing_store_scoped_prices:${missingStoreProducts.slice(0, 10).join(',')}`);
   if (unknownStores.size > 0) blockers.push(`${config.chainId}:unknown_store_ids:${[...unknownStores].sort().slice(0, 10).join(',')}`);
   return blockers;
+}
+
+function validateConfiguredStoreObservationCoverage(config: DailyIngestionConnectorConfig, result: RetailerConnectorRunResult): string[] {
+  if (config.requireStoreScopedPrices === false || config.sourceType !== 'official_api') return [];
+  const configuredStores = (config.stores ?? []).map((store) => normalizeDailySlug(store.storeId));
+  if (configuredStores.length === 0) return [];
+  const observedStores = new Set(
+    result.ingestion.accepted
+      .map((accepted) => accepted.priceObservation.storeId?.trim())
+      .filter((storeId): storeId is string => Boolean(storeId))
+      .map((storeId) => normalizeDailySlug(storeId))
+  );
+  const missingStores = configuredStores.filter((storeId) => !observedStores.has(storeId));
+  return missingStores.length > 0
+    ? [`${config.chainId}:missing_configured_store_observations:${missingStores.slice(0, 10).join(',')}`]
+    : [];
 }
 
 async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProduct, domain?: DailyIngestionDomain): Promise<string> {
@@ -3219,7 +3344,7 @@ export async function runOpenFoodFactsProductMetadataEnrichmentFromEnv(env: Dail
     throw new Error('GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES must be a positive number when provided.');
   }
 
-  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void> } };
+  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void>; on?(event: 'error', listener: (error: unknown) => void): void } };
   if (!pg.Pool) throw new Error('pg Pool export is not available.');
   const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
   try {
@@ -3289,6 +3414,7 @@ async function persistDailyConnectorOutput(input: {
 }): Promise<Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'>> {
   const { executor, config, result } = input;
   const domain = normalizeDailyDomain(config.domain);
+  await executor.query('set default_transaction_read_only=off');
   const sourceWriter = createPostgresSourceRecordWriter(executor);
   const storesBySlug = new Map((config.stores ?? []).map((store) => [normalizeDailySlug(store.storeId), store]));
   const sourceRun = await sourceWriter.createSourceRun({
@@ -3611,20 +3737,21 @@ async function persistDailyConnectorOutput(input: {
     return ids;
   }
 
-  const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product), domain);
-  const aliasesToUpsert: Parameters<typeof upsertDailyAliasBatch>[1] = [];
-  for (const accepted of result.ingestion.accepted) {
-    const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
-    if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
-    aliasesToUpsert.push({
-      productId,
-      alias: accepted.alias.rawName,
-      normalizedAlias: accepted.alias.rawName.trim().toLowerCase().replace(/\s+/g, ' '),
-      sourceRef: result.plan.runKey,
-      matchConfidence: accepted.alias.matchConfidence
-    });
-  }
-  await upsertDailyAliasBatch(executor, aliasesToUpsert);
+  try {
+    const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product), domain);
+    const aliasesToUpsert: Parameters<typeof upsertDailyAliasBatch>[1] = [];
+    for (const accepted of result.ingestion.accepted) {
+      const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
+      if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
+      aliasesToUpsert.push({
+        productId,
+        alias: accepted.alias.rawName,
+        normalizedAlias: accepted.alias.rawName.trim().toLowerCase().replace(/\s+/g, ' '),
+        sourceRef: result.plan.runKey,
+        matchConfidence: accepted.alias.matchConfidence
+      });
+    }
+    await upsertDailyAliasBatch(executor, aliasesToUpsert);
 
   const rawRecordsToUpsert: Parameters<typeof upsertRawRecordBatch>[0] = [];
   const observationsToInsert: Parameters<typeof insertObservationBatch>[0] = [];
@@ -3637,13 +3764,17 @@ async function persistDailyConnectorOutput(input: {
     if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
 
     const payload = {
-      product: accepted.product,
-      alias: accepted.alias,
-      priceObservation: accepted.priceObservation,
-      promotionObservation: accepted.promotionObservation
+      chainId: config.chainId,
+      productId: accepted.product.id,
+      storeId: accepted.priceObservation.storeId,
+      priceType: accepted.priceObservation.priceType,
+      price: accepted.priceObservation.price,
+      observedAt: accepted.priceObservation.observedAt
     };
     const rawProvenance = {
-      ...accepted.priceObservation.provenance,
+      sourceType: accepted.priceObservation.provenance.sourceType,
+      parserVersion: accepted.priceObservation.provenance.parserVersion,
+      rawSnapshotRef: accepted.priceObservation.provenance.rawSnapshotRef,
       chainId: config.chainId,
       cadence: 'daily',
       connectorId: config.connectorId,
@@ -3680,8 +3811,12 @@ async function persistDailyConnectorOutput(input: {
       quantity: accepted.product.packageSize,
       quantityUnit: accepted.product.packageUnit,
       promotionText: accepted.promotionObservation?.promoText,
+      promotionStartsOn: accepted.promotionObservation?.validFrom?.slice(0, 10),
+      promotionEndsOn: accepted.promotionObservation?.validUntil?.slice(0, 10),
       memberRequired: accepted.promotionObservation?.memberOnly ?? false,
       observedAt: accepted.priceObservation.observedAt,
+      validFrom: accepted.priceObservation.validFrom,
+      validUntil: accepted.priceObservation.validUntil,
       confidence: accepted.priceObservation.confidenceScore,
       domain,
       provenance: rawProvenance
@@ -3703,13 +3838,23 @@ async function persistDailyConnectorOutput(input: {
     status: result.rejectedCount > 0 ? 'partial' : 'succeeded'
   });
 
-  return {
-    sourceRunIds: [sourceRun.sourceRunId],
-    rawRecordIds,
-    observationIds,
-    acceptedCount: result.acceptedCount,
-    rejectedCount: result.rejectedCount
-  };
+    return {
+      sourceRunIds: [sourceRun.sourceRunId],
+      rawRecordIds,
+      observationIds,
+      acceptedCount: result.acceptedCount,
+      rejectedCount: result.rejectedCount
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await sourceWriter.finishSourceRun({
+      sourceRunId: sourceRun.sourceRunId,
+      finishedAt: config.requestedAt,
+      status: 'failed',
+      errorMessage: message
+    });
+    throw error;
+  }
 }
 
 type DailyConnectorRunPersistenceResult = Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'> & {
@@ -3752,6 +3897,35 @@ function normalizeDailyRunnerInteger(value: number | undefined, fallback: number
 async function waitForDailyRunnerDelay(delayMs: number): Promise<void> {
   if (delayMs <= 0) return;
   await new Promise((resolve) => setTimeout(resolve, delayMs));
+}
+
+function isTransientDailyDatabaseError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /connection\s+(?:to database\s+)?closed|terminating connection|connection terminated|database system is not accepting connections|EDBHANDLEREXITED|ECONNRESET|ECONNREFUSED|econnrefused|EPIPE|timeout|Connection terminated unexpectedly/i.test(message);
+}
+
+export function createDailyIngestionQueryExecutor(
+  client: PgLikeClient,
+  options: { retryAttempts?: number; retryBaseDelayMs?: number } = {}
+): QueryExecutor {
+  const retryAttempts = normalizeDailyRunnerInteger(options.retryAttempts, 8);
+  const retryBaseDelayMs = normalizeDailyRunnerInteger(options.retryBaseDelayMs, 2000);
+  return {
+    async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
+      for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
+        try {
+          const result = await client.query(sql, params);
+          return result.rows as T[];
+        } catch (error) {
+          if (attempt >= retryAttempts || !isTransientDailyDatabaseError(error)) throw error;
+          process.stderr.write(`[daily-ingestion] retrying database query attempt=${attempt + 2}/${retryAttempts + 1}: ${error instanceof Error ? error.message : String(error)}
+`);
+          await waitForDailyRunnerDelay(retryBaseDelayMs * (attempt + 1));
+        }
+      }
+      throw new Error('Daily ingestion database query retry loop exhausted.');
+    }
+  };
 }
 
 async function runDailyIngestionConnector(input: {
@@ -3823,9 +3997,13 @@ async function runDailyIngestionConnector(input: {
     }
 
     const storeScopeBlockers = validateStoreScopedConnectorOutput(runConfig, result);
-    if (storeScopeBlockers.length > 0) {
+    const storeCoverageBlockers = storeScopeBlockers.length === 0
+      ? validateConfiguredStoreObservationCoverage(runConfig, result)
+      : [];
+    const storeBlockers = [...storeScopeBlockers, ...storeCoverageBlockers];
+    if (storeBlockers.length > 0) {
       return {
-        blockers: storeScopeBlockers,
+        blockers: storeBlockers,
         persistedRuns: 0,
         acceptedCount: 0,
         rejectedCount: 0,
@@ -3914,12 +4092,15 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
   const sourceRunIds: string[] = [];
   const rawRecordIds: string[] = [];
   const observationIds: string[] = [];
+  const chainSummaries: DailyIngestionConnectorSummary[] = [];
   let persistedRuns = 0;
   let acceptedCount = 0;
   let rejectedCount = 0;
 
-  for (const result of results) {
+  for (const [index, result] of results.entries()) {
     if (!result) continue;
+    const config = input.connectors[index];
+    if (!config) continue;
     blockers.push(...result.blockers);
     persistedRuns += result.persistedRuns;
     acceptedCount += result.acceptedCount;
@@ -3927,6 +4108,18 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
     sourceRunIds.push(...result.sourceRunIds);
     rawRecordIds.push(...result.rawRecordIds);
     observationIds.push(...result.observationIds);
+    chainSummaries.push({
+      connectorId: config.connectorId,
+      chainId: config.chainId,
+      status: result.blockers.length === 0 ? 'succeeded' : result.persistedRuns > 0 ? 'partial' : 'blocked',
+      blockers: [...result.blockers],
+      persistedRuns: result.persistedRuns,
+      acceptedCount: result.acceptedCount,
+      rejectedCount: result.rejectedCount,
+      sourceRunIds: [...result.sourceRunIds],
+      rawRecordIds: [...result.rawRecordIds],
+      observationIds: [...result.observationIds]
+    });
   }
 
   const runResult: DailyIngestionRunResult = {
@@ -3937,7 +4130,8 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
     rejectedCount,
     sourceRunIds,
     rawRecordIds,
-    observationIds
+    observationIds,
+    chainSummaries
   };
 
   if (input.blockerLogPath?.trim()) {
@@ -3949,13 +4143,20 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
 
 export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.env): Promise<DailyIngestionRunResult> {
   const { databaseUrl, connectors, runtimeOptions } = buildDailyConnectorConfigsFromEnv(env);
-  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void> } };
+  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void>; on?(event: 'error', listener: (error: unknown) => void): void } };
   if (!pg.Pool) throw new Error('pg Pool export is not available.');
   const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
+  pool.on?.('error', (error: unknown) => {
+    process.stderr.write(`[daily-ingestion] database pool error: ${error instanceof Error ? error.message : String(error)}\n`);
+  });
+  const executor = createDailyIngestionQueryExecutor(pool, {
+    retryAttempts: env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS) : undefined,
+    retryBaseDelayMs: env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS) : undefined
+  });
   try {
-    await pool.query('set default_transaction_read_only=off');
+    await executor.query('set default_transaction_read_only=off');
     return await runDailyIngestion({
-      executor: createPgQueryExecutor(pool),
+      executor,
       requestedAt: new Date().toISOString(),
       connectors,
       ...runtimeOptions

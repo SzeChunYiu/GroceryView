@@ -1,5 +1,6 @@
+import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
+import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
@@ -10,6 +11,14 @@ import { matpriskollenOffers } from './ingested/matpriskollen';
 import { verifiedFuelPriceObservations, verifiedFuelPriceSource } from './fuel-prices';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { osmStores } from './osm-stores';
+import {
+  currencyFromObservation,
+  defaultLocale,
+  formatLocalizedDate,
+  formatLocalizedMoney,
+  formatLocalizedUnitPrice,
+  supportedCurrencies
+} from './i18n';
 
 export const snapshot = {
   retrievedLabel: '20-21 May 2026',
@@ -19,11 +28,11 @@ export const snapshot = {
   osmSource: 'OpenStreetMap Overpass Sweden extract'
 };
 
-const sek = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 });
+const observedSnapshotCurrency = currencyFromObservation({ currency: 'SEK' });
 const pct = new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 });
 
 export function formatSek(value: number | null | undefined) {
-  return typeof value === 'number' && Number.isFinite(value) ? sek.format(value) : 'Not reported';
+  return formatLocalizedMoney(value, { locale: defaultLocale, currency: observedSnapshotCurrency });
 }
 
 export function formatPct(value: number | null | undefined) {
@@ -112,10 +121,279 @@ function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
   }));
 }
 
+const compareOverlayProducts = [...pricedProducts]
+  .filter((product) => product.observations.length >= 4)
+  .sort((left, right) => {
+    const observationDelta = right.observationCount - left.observationCount;
+    if (observationDelta !== 0) return observationDelta;
+    return right.lastObservedAt.localeCompare(left.lastObservedAt);
+  })
+  .slice(0, 2);
+
+function compareOverlayObservationsFor(product: (typeof pricedProducts)[number]): PriceChartObservation[] {
+  return product.observations
+    .filter((observation) => observation.date && Number.isFinite(observation.price))
+    .map((observation) => ({
+      observedAt: `${observation.date}T00:00:00.000Z`,
+      price: observation.price,
+      storeId: `openprices-${product.slug}`,
+      storeName: product.name,
+      sourceType: 'online',
+      confidence: product.observationCount >= 8 ? 0.78 : 0.62,
+      provenanceLabel: `${snapshot.openPricesSource} · barcode ${product.code}`,
+      markerType: 'source_warning',
+      markerLabel: product.brands || product.name
+    }));
+}
+
+const compareOverlayChartSeries = buildPriceChartSeries({
+  observations: compareOverlayProducts.flatMap(compareOverlayObservationsFor),
+  asOf: '2026-05-22T00:00:00.000Z',
+  rangeDays: 365,
+  markerLimitPerSeries: 3
+});
+
+export const compareOverlayChart = {
+  title: 'Compare-overlay chart',
+  subtitle: 'Two product tickers overlaid from the OpenPrices dated observation tape.',
+  windowStart: compareOverlayChartSeries.windowStart,
+  windowEnd: compareOverlayChartSeries.windowEnd,
+  overlayProducts: compareOverlayProducts.map((product) => ({
+    slug: product.slug,
+    name: product.name,
+    brand: product.brands || 'Brand not reported',
+    observationCount: product.observationCount,
+    lastObservedAt: product.lastObservedAt,
+    source: snapshot.openPricesSource
+  })),
+  overlaySeries: compareOverlayChartSeries.series.map((series) => {
+    const points = [...series.points].sort((left, right) => Date.parse(left.time) - Date.parse(right.time));
+    const firstPoint = points[0];
+    const latestPoint = points.at(-1);
+    const prices = points.map((point) => point.value);
+    const lowPrice = prices.length ? Math.min(...prices) : null;
+    const highPrice = prices.length ? Math.max(...prices) : null;
+    const movementPercent = firstPoint && latestPoint && firstPoint.value > 0
+      ? ((latestPoint.value - firstPoint.value) / firstPoint.value) * 100
+      : 0;
+
+    return {
+      id: series.id,
+      productSlug: series.storeId.replace(/^openprices-/, ''),
+      productName: series.storeName,
+      sourceType: series.sourceType,
+      lineStyle: series.lineStyle,
+      pointCount: points.length,
+      latestPrice: latestPoint?.value ?? null,
+      movementPercent,
+      lowPrice,
+      highPrice,
+      provenanceLabel: latestPoint?.provenanceLabel ?? snapshot.openPricesSource,
+      markerCount: series.markers.length,
+      sparklinePoints: points.slice(-8)
+    };
+  }),
+  coverageLabel: `${compareOverlayChartSeries.series.length} price tapes · ${compareOverlayProducts.reduce((sum, product) => sum + product.observationCount, 0)} source observations considered`,
+  confidenceLabel: 'OpenPrices online observations only; shelf, flyer, and member-price sources are not mixed into this overlay.',
+  guardrail: 'No forecast: the overlay only plots dated observed SEK prices and withholds missing source classes rather than filling gaps.'
+};
+
 export const matchedChainProducts = axfoodProducts.filter((product) => product.inChains.length > 1 && product.lowestPrice > 0);
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
+
+const chainDisplayNames: Record<string, string> = {
+  willys: 'Willys',
+  hemkop: 'Hemköp'
+};
+
+function readableLabel(label: string) {
+  const known: Record<string, string> = {
+    ecological: 'Ekologisk',
+    eu_ecological: 'EU-ekologisk',
+    fairtrade: 'Fairtrade',
+    fairtrade_facet: 'Fairtrade',
+    from_sweden: 'Från Sverige',
+    keyhole: 'Nyckelhålet',
+    krav: 'KRAV',
+    laktosfree: 'Laktosfri',
+    swedish_flag: 'Svenskt ursprung'
+  };
+  return known[label] ?? label.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function sortedCountFacets(counts: Map<string, number>) {
+  return [...counts.entries()]
+    .map(([value, count]) => ({ value, label: readableLabel(value), count }))
+    .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, 'sv'));
+}
+
+export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.flatMap((product) => {
+  const packageAmount = unitAmountFromPackage(product.subline);
+  return chainPriceRows(product).flatMap((priceRow) => {
+    const price = priceRow.price;
+    if (typeof price !== 'number') return [];
+    const normalizedUnit = normalizeComparableUnitPrice(price, product.subline);
+    const comparableUnit = packageAmount?.unit ?? (priceRow.priceUnit.replace(/^kr\//, '') || 'st');
+    return {
+      productId: product.code,
+      slug: product.slug,
+      canonicalName: product.name,
+      brand: product.brand,
+      categoryPath: [labelFromSlug(product.category)],
+      ...(packageAmount ? { packageSize: packageAmount.amount, packageUnit: packageAmount.unit } : {}),
+      comparableUnit,
+      ...(product.image ? { imageUrl: product.image } : {}),
+      observationId: `axfood-${product.code}-${priceRow.chain}`,
+      price,
+      unitPrice: normalizedUnit?.unitPrice ?? price,
+      currency: observedSnapshotCurrency,
+      priceType: priceRow.savings ? 'promotion' : 'online',
+      confidence: 0.95,
+      observedAt: '2026-05-21T00:00:00.000Z',
+      chainId: priceRow.chain,
+      chainSlug: priceRow.chain,
+      chainName: chainDisplayNames[priceRow.chain] ?? priceRow.chain,
+      storeId: `${priceRow.chain}-online-catalog`,
+      storeSlug: `${priceRow.chain}-online-catalog`,
+      storeName: `${chainDisplayNames[priceRow.chain] ?? priceRow.chain} online catalog`
+    } satisfies RealCatalogSearchPriceRow;
+  });
+});
+
+const rawFacetedProductSearch = buildFacetedProductSearch({ rows: facetedSearchRows, filters: { limit: 8 } });
+const facetedProductIds = new Set(rawFacetedProductSearch.products.map((product) => product.productId));
+const labelCounts = axfoodProducts.reduce<Map<string, number>>((counts, product) => {
+  if (!facetedProductIds.has(product.code)) return counts;
+  for (const label of product.labels) counts.set(label, (counts.get(label) ?? 0) + 1);
+  return counts;
+}, new Map());
+
+export const facetedProductSearch = {
+  ...rawFacetedProductSearch,
+  title: 'Instant faceted search',
+  categoryFacets: rawFacetedProductSearch.facets.categories.slice(0, 6),
+  chainFacets: rawFacetedProductSearch.facets.chains,
+  labelFacets: sortedCountFacets(labelCounts).slice(0, 8),
+  priceRange: rawFacetedProductSearch.facets.priceRange,
+  inStockOnly: {
+    label: 'In-stock / priced rows only',
+    productCount: rawFacetedProductSearch.evidence.pricedProductCount,
+    latestPriceCount: rawFacetedProductSearch.evidence.latestPriceCount
+  },
+  resultCards: rawFacetedProductSearch.products.slice(0, 6).map((product) => {
+    const cheapest = product.currentPrices[0] ?? null;
+    return {
+      slug: product.slug,
+      name: product.canonicalName,
+      brand: product.brand ?? 'Brand not reported',
+      imageUrl: product.imageUrl,
+      categoryLabel: product.categoryPath[0] ?? 'Category not reported',
+      cheapestPriceLabel: formatSek(product.cheapestPrice),
+      unitPriceLabel: cheapest ? formatLocalizedUnitPrice(cheapest.unitPrice, {
+        locale: defaultLocale,
+        currency: cheapest.currency,
+        unit: product.comparableUnit
+      }) : 'No current price row',
+      chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
+      sourceTables: rawFacetedProductSearch.evidence.sourceTables
+    };
+  })
+};
+
+type PricedChainRow = ReturnType<typeof chainPriceRows>[number] & { price: number };
+
+function watchlistPriceTypeFor(row: PricedChainRow): WatchlistPriceType {
+  return typeof row.savings === 'number' && row.savings > 0 ? 'promotion' : 'shelf';
+}
+
+const watchlistHeartSourceRows = topChainSpreads
+  .map((product) => {
+    const pricedRows = chainPriceRows(product)
+      .filter((row): row is PricedChainRow => typeof row.price === 'number' && Number.isFinite(row.price) && row.price > 0)
+      .sort((left, right) => left.price - right.price || String(left.chain).localeCompare(String(right.chain), 'sv'));
+    const cheapest = pricedRows[0];
+    if (!cheapest) return null;
+    const dealScore = calculateDealScore({
+      currentCityPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+      knownPromoHistoryPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+      equivalentUnitPricePercentile: product.inChains.length > 1 ? 0 : 50,
+      discountDepthPercent: product.spreadPct,
+      sourceConfidence: clamp(product.inChains.length / 2, 0, 1)
+    });
+    return { product, pricedRows, cheapest, dealScore };
+  })
+  .filter((row): row is NonNullable<typeof row> => row !== null)
+  .slice(0, 4);
+
+const watchlistHeartItems: WatchlistItem[] = watchlistHeartSourceRows.map(({ product, cheapest, dealScore }) => ({
+  productId: product.slug,
+  targetPrice: roundSek(cheapest.price * 1.02),
+  alertDealScoreAt: Math.max(50, Math.min(90, dealScore)),
+  favoriteStoresOnly: false,
+  allowedPriceTypes: [watchlistPriceTypeFor(cheapest)]
+}));
+
+const watchlistHeartSnapshots: WatchlistProductSnapshot[] = watchlistHeartSourceRows.map(({ product, pricedRows, cheapest, dealScore }) => ({
+  productId: product.slug,
+  productName: product.name,
+  bestPrice: cheapest.price,
+  bestStoreId: `${cheapest.chain}-online-catalog`,
+  bestPriceType: watchlistPriceTypeFor(cheapest),
+  prices: pricedRows.map((row) => ({
+    storeId: `${row.chain}-online-catalog`,
+    storeName: `${chainDisplayNames[row.chain] ?? row.chain} online catalog`,
+    price: row.price,
+    priceType: watchlistPriceTypeFor(row)
+  })),
+  dealScore,
+  isNew52WeekLow: product.spreadPct >= 20
+}));
+
+const watchlistHeartAlerts = buildWatchlistAlerts({
+  watchlist: watchlistHeartItems,
+  products: watchlistHeartSnapshots,
+  favoriteStoreIds: []
+});
+
+export const watchlistHeartProducts = watchlistHeartSourceRows.map(({ product, cheapest, pricedRows, dealScore }) => {
+  const item = watchlistHeartItems.find((watchlistItem) => watchlistItem.productId === product.slug)!;
+  const alerts = watchlistHeartAlerts.filter((alert) => alert.productId === product.slug);
+  const normalizedUnit = normalizeComparableUnitPrice(cheapest.price, product.subline);
+  return {
+    productId: product.slug,
+    sourceProductSlug: product.slug,
+    productName: product.name,
+    brand: product.brand || 'Brand not reported',
+    imageUrl: product.image || null,
+    categoryLabel: labelFromSlug(product.category),
+    currentPrice: cheapest.price,
+    currentPriceLabel: formatSek(cheapest.price),
+    unitPriceLabel: normalizedUnit ? formatLocalizedUnitPrice(normalizedUnit.unitPrice, {
+      locale: defaultLocale,
+      currency: observedSnapshotCurrency,
+      unit: normalizedUnit.unitLabel.replace('kr/', '')
+    }) : 'Unit price not reported',
+    targetPrice: item.targetPrice ?? cheapest.price,
+    targetPriceLabel: formatSek(item.targetPrice ?? cheapest.price),
+    dealScore,
+    bestStoreLabel: `${chainDisplayNames[cheapest.chain] ?? cheapest.chain} online catalog`,
+    priceTypeLabel: watchlistPriceTypeFor(cheapest),
+    sourceLabel: `${pricedRows.length} verified chain price rows · ${product.inChains.join(' + ')}`,
+    accountBound: true,
+    saveLabel: 'Save to watchlist',
+    authRequirement: 'Signed-in shoppers only; the heart is account-bound to the shopper watchlist and never stored anonymously.',
+    alertSummary: alerts.length > 0 ? alerts.map((alert) => alert.type.replaceAll('_', ' ')).join(' · ') : 'No alert until target price, Deal Score, or new-low rules match.',
+    firstAlertMessage: alerts[0]?.message ?? 'buildWatchlistAlerts evaluated this product but no notification is due yet.',
+    alertCount: alerts.length,
+    guardrails: [
+      'No anonymous saves: heart clicks require a signed-in account before the watched product is persisted.',
+      'Saved products use the verified sourceProductSlug and current chain price rows instead of demo-data or sample-data.',
+      'Target price, Deal Score, and new-low copy comes from buildWatchlistAlerts outputs only.'
+    ]
+  };
+});
 
 const groceryObservationCount = pricedProducts.reduce((sum, product) => sum + product.observationCount, 0);
 
@@ -154,6 +432,24 @@ export const multiVerticalDomainFoundation = SUPPORTED_PRICE_DOMAINS.map((domain
     'Non-grocery matching remains domain-scoped: fuel grades are not compared to grocery EANs, and pharmacy OTC rows exclude prescription claims.'
   ]
 }));
+
+
+export const fuelStationSourceCoverage = {
+  title: 'OSM fuel station source',
+  source: 'OpenStreetMap Overpass Sweden extract',
+  connector: 'fetchOverpassFuelStations',
+  overpassFilter: 'amenity=fuel',
+  stationScope: 'Sweden and per-county refresh queries',
+  status: 'station locations wired; fuel prices withheld',
+  priceObservationCount: 0,
+  fields: ['osmType', 'osmId', 'name', 'brand', 'operator', 'latitude', 'longitude', 'openingHours', 'availableFuelGrades'],
+  fuelGradeTags: ['fuel:octane_95', 'fuel:octane_98', 'fuel:diesel', 'fuel:hvo100', 'fuel:e85', 'fuel:adblue'],
+  guardrails: [
+    'The connector reads OSM station location and grade availability tags only.',
+    'Fuel pages must not render pump prices until connector or trusted crowd rows write domain=fuel observations.',
+    'Fuel grade matching stays separate from grocery EAN and commodity matching.'
+  ]
+};
 
 type DeliveryVsInStoreBasketPair = {
   matchedToken: string;
@@ -352,6 +648,62 @@ export const seasonalProduceCalendar = {
     'No forecast or synthetic seasonal prediction: every month row is calculated only from historical monthly averages.',
     'Packaged produce and loose produce can both appear, but they are labelled as OpenPrices observations until commodity unit prices are present.',
     'Rows with fewer than two observed months or fewer than three dated observations are withheld.'
+  ]
+};
+
+const swedishOriginEvidenceLabels = ['swedish_flag', 'from_sweden', 'meat_from_sweden'];
+
+function swedishOriginEvidenceFor(product: (typeof axfoodProducts)[number]) {
+  return product.labels
+    .filter((label) => swedishOriginEvidenceLabels.includes(label))
+    .map((label) => `${label} · Swedish origin label`);
+}
+
+const localOriginRows = axfoodProducts
+  .map((product) => ({ product, originEvidence: swedishOriginEvidenceFor(product) }))
+  .filter((row) => row.originEvidence.length > 0)
+  .filter((row) => ['frukt-och-gront', 'mejeri-ost-och-agg', 'kott-fagel-och-chark', 'fisk-och-skaldjur'].includes(row.product.category))
+  .sort((left, right) =>
+    right.product.inChains.length - left.product.inChains.length ||
+    right.product.spreadPct - left.product.spreadPct ||
+    left.product.name.localeCompare(right.product.name, 'sv')
+  )
+  .slice(0, 6)
+  .map(({ product, originEvidence }) => ({
+    slug: product.slug,
+    productName: product.name,
+    brand: product.brand,
+    categoryLabel: labelFromSlug(product.category),
+    lowestChain: product.lowestChain,
+    lowestPrice: product.lowestPrice,
+    lowestPriceLabel: formatSek(product.lowestPrice),
+    spreadPct: product.spreadPct,
+    originEvidence,
+    labelEvidence: product.labels,
+    claimBoundary: 'Local pick requires an explicit Swedish-origin label; GroceryView does not infer origin from store, month, or brand name.'
+  }));
+
+export const localSeasonalPicks = {
+  title: 'Local & seasonal picks',
+  persona: 'Eco-conscious',
+  status: 'explicit_origin_plus_historical_seasonality',
+  sourceLabels: [snapshot.axfoodSource, snapshot.openPricesSource],
+  localOriginRows,
+  seasonalEvidenceRows: seasonalProduceCalendar.topBestBuys.slice(0, 6).map((row) => ({
+    slug: row.slug,
+    productName: row.productName,
+    bestBuyMonth: row.bestBuyMonth,
+    historicalMonthlyAverage: row.historicalMonthlyAverage,
+    historicalMonthlyAverageLabel: row.historicalMonthlyAverageLabel,
+    seasonalEvidence: row.evidenceLabel,
+    confidenceLabel: row.confidenceLabel,
+    claimBoundary: 'Seasonal pick means lowest observed historicalMonthlyAverage, not a harvest, origin, or future price claim.'
+  })),
+  guardrails: [
+    'No carbon or harvest claim is made from month, brand, category, or Swedish-origin labels.',
+    'A local pick requires an explicit Swedish-origin label such as from_sweden, swedish_flag, or meat_from_sweden.',
+    'A seasonal pick requires dated OpenPrices monthly history and remains separate from originEvidence unless both evidence types are present.',
+    'Missing origin or seasonal evidence stays absent instead of being inferred from store proximity.'
   ]
 };
 
@@ -588,6 +940,50 @@ export const ecoBasketScorecard = {
   ]
 };
 
+
+export const sustainableBrandFilter = {
+  persona: 'Eco-conscious',
+  title: 'Sustainable-brand filter',
+  sourceSummary: {
+    axfoodRows: axfoodProducts.length,
+    openFoodFactsRows: openFoodFactsCatalog.length,
+    carbonKgCo2e: null as number | null
+  },
+  rows: axfoodProducts
+    .map((product) => {
+      const { catalogProduct, evidence, explicitEvidenceCount } = ecoEvidenceForProduct(product);
+      const evidenceLabels = [
+        ...product.labels,
+        ...(catalogProduct?.labels ?? []),
+        ...(catalogProduct?.categories ?? [])
+      ]
+        .filter((label) => explicitEcoLabelNeedles.some((needle) => normalizedEcoEvidence(label).includes(needle)))
+        .slice(0, 6);
+      if (evidence.length === 0 || evidenceLabels.length === 0) return null;
+      return {
+        slug: product.slug,
+        productName: product.name,
+        brand: product.brand,
+        categorySlug: product.category,
+        lowestChain: product.lowestChain,
+        lowestPrice: product.lowestPrice,
+        spreadPct: product.spreadPct,
+        evidenceLabels: [...new Set(evidenceLabels)],
+        evidenceSummary: evidence,
+        confidence: catalogProduct ? 'medium_openfoodfacts_and_retailer_label' : 'medium_retailer_label',
+        filterScore: clamp(50 + (evidence.length * 10) + Math.min(20, explicitEvidenceCount * 2) + Math.min(10, product.inChains.length * 2), 0, 100),
+        guardrail: 'Verified label evidence only; this is not a carbon claim and does not infer lifecycle impact.'
+      };
+    })
+    .filter((row): row is NonNullable<typeof row> => row !== null)
+    .sort((a, b) => b.filterScore - a.filterScore || b.spreadPct - a.spreadPct)
+    .slice(0, 8),
+  guardrails: [
+    'Sustainable-brand filter rows require explicit retailer or OpenFoodFacts label/category evidence.',
+    'The filter displays lowest visible chain price and spread, but does not turn labels into carbon-impact estimates.',
+    'Rows without verified label evidence are withheld instead of being inferred from brand names or category browsing.'
+  ]
+};
 
 export const crowdPriceSubmissionContract = {
   title: 'Crowd price submissions',
@@ -1034,10 +1430,57 @@ export const weeklyBasketChangeDigest = planRecurringBasketDigest({
   ]
 });
 
+export const savedBasketAutoReorderPlanner = {
+  persona: 'Busy professionals',
+  title: 'Saved basket auto-reorder',
+  corePlanner: 'planRecurringBasketDigest',
+  endpoint: '/api/basket/recurring-digest',
+  templateId: weeklyBasketChangeDigest.templateId,
+  templateName: weeklyBasketChangeDigest.templateName,
+  cadence: weeklyBasketChangeDigest.cadence,
+  asOf: weeklyBasketChangeDigest.asOf,
+  autoReorderDecision: {
+    status: weeklyBasketChangeDigest.changeSummary.missingCurrentPrice > 0 ? 'review_required' : 'ready_for_signed_in_confirmation',
+    label: weeklyBasketChangeDigest.changeSummary.missingCurrentPrice > 0
+      ? 'Review missing-price blockers before reordering'
+      : 'Ready for signed-in shopper confirmation',
+    comparableCurrentTotal: weeklyBasketChangeDigest.comparableCurrentTotal,
+    comparablePreviousTotal: weeklyBasketChangeDigest.comparablePreviousTotal,
+    comparableDelta: weeklyBasketChangeDigest.comparableDelta,
+    priceDownLines: weeklyBasketChangeDigest.changeSummary.priceDown,
+    priceUpLines: weeklyBasketChangeDigest.changeSummary.priceUp,
+    missingPriceBlockerCount: weeklyBasketChangeDigest.changeSummary.missingCurrentPrice
+  },
+  reviewLines: weeklyBasketChangeDigest.lines.slice(0, 4).map((line) => ({
+    productId: line.productId,
+    productName: line.productName,
+    changeType: line.changeType,
+    recommendedAction: line.recommendedAction,
+    currentUnitPrice: line.currentUnitPrice,
+    previousUnitPrice: line.previousUnitPrice,
+    confidence: line.confidence
+  })),
+  missingPriceBlockers: weeklyBasketChangeDigest.lines
+    .filter((line) => line.changeType === 'missing_current_price' || line.currentUnitPrice === null)
+    .map((line) => ({
+      productId: line.productId,
+      productName: line.productName,
+      blocker: 'Missing current verified price; do not prepare retailer handoff until this line has evidence.'
+    })),
+  guardrails: [
+    'Requires a signed-in shopper confirmation before any recurring basket plan is saved.',
+    'The plan is not automatic purchase, payment, or retailer order placement.',
+    'Suggested substitutes stay review-only and never rewrite a saved recurring basket automatically.',
+    'Missing-price blockers remain visible and stop any handoff preparation until verified prices return.'
+  ]
+};
+
 export type AdaptiveProductCard = {
   slug: string;
   name: string;
   brand: string;
+  imageUrl: string | null;
+  imageAlt: string | null;
   productKind: 'branded' | 'commodity';
   totalPriceLabel: string;
   unitPriceLabel: string;
@@ -1065,9 +1508,15 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     slug: product.slug,
     name: product.name,
     brand: isChainProduct ? product.brand : product.brands || 'Brand not reported',
+    imageUrl: product.image || null,
+    imageAlt: product.image ? `${product.name} product image from ${isChainProduct ? 'Axfood' : 'OpenPrices/OpenFoodFacts'} source data` : null,
     productKind,
     totalPriceLabel: formatSek(totalPrice),
-    unitPriceLabel: normalizedUnit ? `${formatSek(normalizedUnit.unitPrice)} / ${normalizedUnit.unitLabel.replace('kr/', '')}` : 'Unit price not reported',
+    unitPriceLabel: normalizedUnit ? formatLocalizedUnitPrice(normalizedUnit.unitPrice, {
+      locale: defaultLocale,
+      currency: observedSnapshotCurrency,
+      unit: normalizedUnit.unitLabel.replace('kr/', '')
+    }) : 'Unit price not reported',
     packageLabel: normalizedUnit?.packageLabel || packageText || 'Package size not reported',
     sourceLabel: isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
     confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
@@ -1078,6 +1527,27 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
   };
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);
+
+const localeFormattingSampleCard = adaptiveProductCards.find((card) => card.unitSortPrice !== null) ?? adaptiveProductCards[0];
+const localeFormattingSampleDate = freshestOpenPrices[0]?.lastObservedAt ?? null;
+
+export const localeFormattingShowcase = supportedCurrencies.map((currency) => {
+  const hasObservedRows = currency === observedSnapshotCurrency;
+  return {
+    currency,
+    status: hasObservedRows ? 'observed from OpenPrices currency=SEK' : 'awaiting observations.currency rows',
+    moneyLabel: hasObservedRows
+      ? formatLocalizedMoney(localeFormattingSampleCard?.totalSortPrice, { locale: defaultLocale, currency })
+      : 'No observed prices in this currency',
+    unitPriceLabel: hasObservedRows
+      ? localeFormattingSampleCard?.unitPriceLabel ?? 'Unit price not reported'
+      : 'No unit price until observation lands',
+    dateLabel: hasObservedRows
+      ? formatLocalizedDate(localeFormattingSampleDate, { locale: defaultLocale })
+      : 'No observed date',
+    guardrail: hasObservedRows ? 'Uses observed SEK price rows only' : 'No currency conversion or fake price'
+  };
+});
 
 const digitalCatalogueSampleOffers = icaReklambladOffers
   .filter((offer) => offer.priceText && offer.sourceUrl && offer.flyerUrl && offer.flyerPdfUrl)
@@ -1604,6 +2074,85 @@ export const dietaryScenarioFilters = dietaryScenarioDefinitions
   })
   .filter((scenario) => scenario.verifiedProductCount > 0);
 
+type HealthLabelFilterDefinition = {
+  id: string;
+  label: string;
+  swedishQuery: string;
+  labelNeedles: string[];
+  textNeedles: string[];
+  healthUse: string;
+  guardrail: string;
+};
+
+const healthLabelFilterDefinitions: HealthLabelFilterDefinition[] = [
+  {
+    id: 'keyhole',
+    label: 'Keyhole-labelled staples',
+    swedishQuery: 'nyckelhål keyhole',
+    labelNeedles: ['keyhole'],
+    textNeedles: ['nyckelhål', 'keyhole'],
+    healthUse: 'Quickly find products with verified Keyhole label evidence before comparing protein, fiber, and price.',
+    guardrail: 'Keyhole is rendered only when the source label or explicit package text is present; it is not a medical claim.'
+  },
+  {
+    id: 'organic',
+    label: 'Organic / ekologisk picks',
+    swedishQuery: 'ekologisk organic KRAV',
+    labelNeedles: ['ecological', 'eu_ecological', 'krav'],
+    textNeedles: ['ekologisk', 'ekologiska', 'organic', 'krav', 'eko'],
+    healthUse: 'Filter organic-labelled products while preserving the same price and nutrition-per-krona comparison context.',
+    guardrail: 'Organic filters use ecological/KRAV evidence only and do not infer nutrition superiority or sustainability impact.'
+  },
+  {
+    id: 'vegan',
+    label: 'Vegan verified rows',
+    swedishQuery: 'vegan vegansk',
+    labelNeedles: ['vegan'],
+    textNeedles: ['vegan', 'vegansk', 'veganska'],
+    healthUse: 'Find explicit vegan rows for plant-based shoppers before opening the product page for current price evidence.',
+    guardrail: 'Vegan status requires explicit label or product-text evidence; ingredients are not guessed and not inferred from browsing.'
+  }
+];
+
+function matchesHealthLabelFilter(product: (typeof axfoodProducts)[number], filter: HealthLabelFilterDefinition) {
+  const labels = product.labels.map((label) => label.toLowerCase());
+  const text = `${product.name} ${product.brand} ${product.subline}`.toLowerCase();
+  return filter.labelNeedles.some((needle) => labels.includes(needle)) || filter.textNeedles.some((needle) => text.includes(needle));
+}
+
+export const healthVerifiedLabelFilters = healthLabelFilterDefinitions
+  .map((filter) => {
+    const matches = axfoodProducts
+      .filter((product) => matchesHealthLabelFilter(product, filter))
+      .sort((a, b) => b.inChains.length - a.inChains.length || b.spreadPct - a.spreadPct || a.name.localeCompare(b.name, 'sv'));
+    const sample = matches[0] ?? null;
+    return {
+      id: filter.id,
+      label: filter.label,
+      swedishQuery: filter.swedishQuery,
+      healthUse: filter.healthUse,
+      verifiedProductCount: matches.length,
+      chainCount: new Set(matches.flatMap((product) => product.inChains)).size,
+      evidenceLabels: [...new Set(matches.flatMap((product) => product.labels))].filter(Boolean).slice(0, 6),
+      sampleProductName: sample?.name ?? 'No verified product yet',
+      sampleProductSlug: sample?.slug ?? null,
+      sampleChain: sample?.lowestChain ?? 'No verified chain yet',
+      samplePrice: sample?.lowestPrice ?? null,
+      products: matches.slice(0, 3).map((product) => ({
+        slug: product.slug,
+        productName: product.name,
+        brand: product.brand,
+        lowestChain: product.lowestChain,
+        lowestPrice: product.lowestPrice,
+        spreadPct: product.spreadPct,
+        evidenceLabels: product.labels.filter((label) => filter.labelNeedles.includes(label.toLowerCase()) || filter.textNeedles.includes(label.toLowerCase()))
+      })),
+      guardrail: filter.guardrail,
+      caveat: 'Health filters use verified label or package-text evidence only; they are not a medical claim and are not inferred from browsing behavior.'
+    };
+  })
+  .filter((filter) => filter.verifiedProductCount > 0);
+
 export const categoryQualityMatrix = categorySummaries
   .map((category) => {
     const openRows = pricedProducts.filter((product) => product.category === category.slug);
@@ -1774,6 +2323,96 @@ export const categoryDealLeaders = summarizeCategoryDealLeaders({
   productSlug: leader.productId,
   evidenceLabel: `${leader.storeName} lowest · ${formatPct(leader.sourceConfidence * 100)} sourceConfidence · cross-chain spread derived`
 }));
+
+export const marketHeatmapSourceSignals = [
+  {
+    id: 'deal-score',
+    label: 'Deal score heat',
+    source: 'categoryDealLeaders',
+    evidence: 'summarizeCategoryDealLeaders over verified cross-chain prices'
+  },
+  {
+    id: 'spread',
+    label: 'Cross-chain spread heat',
+    source: 'chainCategoryCoverage',
+    evidence: 'matched Willys/Hemköp category spreads'
+  },
+  {
+    id: 'liquidity',
+    label: 'Observation liquidity heat',
+    source: 'openPriceObservationDepth',
+    evidence: 'OpenPrices observation totals by category'
+  },
+  {
+    id: 'movers',
+    label: 'Price-drop mover heat',
+    source: 'priceDropMoversBoard',
+    evidence: 'dated observed price drops only'
+  }
+] as const;
+
+function marketHeatBand(heatScore: number) {
+  if (heatScore >= 80) return 'hot';
+  if (heatScore >= 55) return 'warm';
+  return 'cool';
+}
+
+const maxOpenPriceObservationTotal = Math.max(...openPriceObservationDepth.map((row) => row.observationTotal), 1);
+
+export const marketHeatmapTiles = [
+  ...categoryDealLeaders.map((leader) => ({
+    id: `deal-${leader.categorySlug}-${leader.productSlug}`,
+    label: leader.categoryLabel,
+    route: `/categories/${leader.categorySlug}`,
+    sourceSignal: marketHeatmapSourceSignals[0].label,
+    heatScore: clamp(leader.dealScore, 0, 100),
+    metricLabel: leader.signal,
+    detail: `${leader.productName} · ${leader.evidenceLabel}`,
+    confidenceLabel: `${formatPct(leader.sourceConfidence * 100)} source confidence · deal score from calculateDealScore`,
+    band: marketHeatBand(clamp(leader.dealScore, 0, 100))
+  })),
+  ...chainCategoryCoverage.map((category) => ({
+    id: `spread-${category.slug}`,
+    label: category.label,
+    route: `/categories/${category.slug}`,
+    sourceSignal: marketHeatmapSourceSignals[1].label,
+    heatScore: clamp(category.topSpread, 0, 100),
+    metricLabel: `${formatPct(category.topSpread)} top spread`,
+    detail: `${category.matchedProducts} matched products · ${category.leadingLowestChain} leads lowest-price wins`,
+    confidenceLabel: 'Matched chain catalogue rows only; no unmatched SKU is mixed into the heat tile.',
+    band: marketHeatBand(clamp(category.topSpread, 0, 100))
+  })),
+  ...openPriceObservationDepth.map((category) => {
+    const heatScore = clamp((category.observationTotal / maxOpenPriceObservationTotal) * 100, 0, 100);
+    return {
+      id: `liquidity-${category.slug}`,
+      label: category.label,
+      route: `/categories/${category.slug}`,
+      sourceSignal: marketHeatmapSourceSignals[2].label,
+      heatScore,
+      metricLabel: `${category.observationTotal.toLocaleString('sv-SE')} observations`,
+      detail: `${category.products} products · latest ${category.latestObservation || 'not reported'}`,
+      confidenceLabel: `${category.topProductName} has ${category.topProductObservations.toLocaleString('sv-SE')} source observations.`,
+      band: marketHeatBand(heatScore)
+    };
+  }),
+  ...priceDropMoversBoard.map((mover) => {
+    const heatScore = clamp(Math.abs(mover.changePercent), 0, 100);
+    return {
+      id: `mover-${mover.productSlug}`,
+      label: mover.categoryLabel,
+      route: `/products/${mover.productSlug}`,
+      sourceSignal: marketHeatmapSourceSignals[3].label,
+      heatScore,
+      metricLabel: `${formatPct(mover.changePercent)} latest move`,
+      detail: `${mover.productName} · latest ${formatSek(mover.latestPrice)} from ${mover.observedCount} dated points`,
+      confidenceLabel: `${mover.rawObservationCount.toLocaleString('sv-SE')} raw observations · ${mover.legalCopy}`,
+      band: marketHeatBand(heatScore)
+    };
+  })
+]
+  .sort((a, b) => b.heatScore - a.heatScore || a.label.localeCompare(b.label, 'sv'))
+  .slice(0, 12);
 
 export const sourceCoverage = [
   {

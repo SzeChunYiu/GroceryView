@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
+import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -43,6 +43,59 @@ export default function ComparePage() {
             </Link>
           ))}
         </div>
+      </Card>
+      <Card className="mt-6 overflow-hidden border-indigo-200 bg-indigo-50/80">
+        <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-indigo-800">TradingView-style compare</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Compare-overlay chart</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Calls buildPriceChartSeries over two real OpenPrices product tapes, then overlays the dated SEK observations so shoppers can compare product tickers without filling missing days.
+              {` ${compareOverlayChart.guardrail}`}
+            </p>
+          </div>
+          <div className="rounded-[2rem] bg-slate-950 p-5 text-right text-white shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-300">{compareOverlayChart.title}</p>
+            <p className="mt-2 text-3xl font-black">{compareOverlayChart.overlaySeries.length} overlaySeries</p>
+            <p className="mt-1 text-xs font-semibold text-slate-300">{compareOverlayChart.coverageLabel}</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {compareOverlayChart.overlaySeries.map((series) => {
+            const values = series.sparklinePoints.map((point) => point.value);
+            const low = values.length ? Math.min(...values) : 0;
+            const high = values.length ? Math.max(...values) : 0;
+            return (
+              <Link className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-700" href={`/products/${series.productSlug}`} key={series.id}>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-800">{series.sourceType} · lineStyle {series.lineStyle}</p>
+                <h3 className="mt-2 text-lg font-black text-slate-950">{series.productName}</h3>
+                <div className="mt-4 flex h-20 items-end gap-1 rounded-2xl bg-indigo-50 p-3" aria-label={`${series.productName} compare overlay sparkline`}>
+                  {series.sparklinePoints.map((point) => {
+                    const height = high > low ? 18 + ((point.value - low) / (high - low)) * 56 : 42;
+                    return (
+                      <span
+                        className="flex-1 rounded-t-full bg-indigo-700"
+                        key={`${series.id}-${point.time}-${point.value}`}
+                        style={{ height: `${height}px` }}
+                        title={`${point.time.slice(0, 10)} · ${formatSek(point.value)}`}
+                      />
+                    );
+                  })}
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                  <p className="rounded-xl bg-indigo-50 p-3 font-black text-indigo-950">Latest {formatSek(series.latestPrice)}</p>
+                  <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">Move {formatPct(series.movementPercent)}</p>
+                  <p className="rounded-xl bg-emerald-50 p-3 font-black text-emerald-950">Low {formatSek(series.lowPrice)}</p>
+                  <p className="rounded-xl bg-rose-50 p-3 font-black text-rose-950">High {formatSek(series.highPrice)}</p>
+                </div>
+                <p className="mt-3 text-xs font-semibold text-slate-500">
+                  {series.pointCount} dated points · {series.markerCount} source markers · {series.provenanceLabel}
+                </p>
+              </Link>
+            );
+          })}
+        </div>
+        <p className="mt-4 rounded-2xl bg-white/85 p-4 text-xs font-semibold leading-5 text-slate-600">{compareOverlayChart.confidenceLabel} No forecast or interpolated price is rendered.</p>
       </Card>
       <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">

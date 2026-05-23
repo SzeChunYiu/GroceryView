@@ -4,6 +4,16 @@ import { FormEvent, useRef, useState } from 'react';
 
 type ScannerStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
+type ScanUploadTicket = {
+  scanId: string;
+  uploadUrl: string;
+  payloadUri: string;
+  headers: Record<string, string>;
+};
+
+type ScanUploadTicketResponse =
+  | { result: { status: 'ready'; ticket: ScanUploadTicket } }
+  | { result: { status: 'failed_no_storage'; reason: string } };
 
 function readSession(): BrowserSession {
   const accessToken = sessionStorage.getItem('groceryview:accessToken') || '';
@@ -58,6 +68,77 @@ export function ScannerUploadActions() {
       body: JSON.stringify({ scanId, kind: 'receipt', contentType, byteLength: Number(byteLength) })
     });
     await handleResponse(response, `Private upload ticket requested for ${scanId}.`);
+  }
+
+  function captureReceiptFrame(contentTypeHint: string): Promise<Blob | null> {
+    const video = videoRef.current;
+    if (!video || video.videoWidth <= 0 || video.videoHeight <= 0) return Promise.resolve(null);
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const context = canvas.getContext('2d');
+    if (!context) return Promise.resolve(null);
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => resolve(blob), contentTypeHint, 0.92);
+    });
+  }
+
+  async function submitReceiptImage() {
+    const session = requireSession();
+    if (!session) return;
+    if (!cameraReady) {
+      setStatus('error');
+      setMessage('Start the receipt camera before submitting a receipt image. No upload was sent.');
+      return;
+    }
+
+    const captureContentType = contentType.startsWith('image/') ? contentType : 'image/jpeg';
+    const blob = await captureReceiptFrame(captureContentType);
+    if (!blob) {
+      setStatus('error');
+      setMessage('Receipt frame could not be captured. No upload ticket was requested.');
+      return;
+    }
+
+    const { accessToken, userId } = session;
+    const scanId = newScanId('receipt');
+    const ticketResponse = await fetch(`/api/scans/upload-url?userId=${encodeURIComponent(userId)}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ scanId, kind: 'receipt', contentType: blob.type || captureContentType, byteLength: blob.size })
+    });
+    if (!ticketResponse.ok) {
+      setStatus('error');
+      setMessage('Receipt upload ticket was rejected by the production API.');
+      return;
+    }
+
+    const ticketBody = (await ticketResponse.json()) as ScanUploadTicketResponse;
+    if (ticketBody.result.status !== 'ready') {
+      setStatus('error');
+      setMessage(`Receipt upload is blocked: ${ticketBody.result.reason}`);
+      return;
+    }
+
+    const ticket = ticketBody.result.ticket;
+    const uploadResponse = await fetch(ticket.uploadUrl, {
+      method: 'PUT',
+      headers: ticket.headers,
+      body: blob
+    });
+    if (!uploadResponse.ok) {
+      setStatus('error');
+      setMessage('Receipt image upload failed. Scan processing was not started.');
+      return;
+    }
+
+    const processResponse = await fetch(`/api/scans/process?userId=${encodeURIComponent(userId)}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ scanId, kind: 'receipt', payload: ticket.payloadUri, uploadedAt: new Date().toISOString() })
+    });
+    await handleResponse(processResponse, `Receipt image submitted for ${scanId}; review work items are returned when OCR needs human review.`);
   }
 
   async function startReceiptCamera() {
@@ -151,6 +232,7 @@ export function ScannerUploadActions() {
           />
           <div className="mt-3 flex flex-wrap gap-2">
             <button className="rounded-full bg-indigo-800 px-4 py-2 text-sm font-black text-white" onClick={startReceiptCamera} type="button">Start receipt camera</button>
+            <button className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-black text-white" disabled={!cameraReady} onClick={submitReceiptImage} type="button">Submit receipt image</button>
             <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-950" disabled={!cameraReady} onClick={stopReceiptCamera} type="button">Stop receipt camera</button>
           </div>
         </div>

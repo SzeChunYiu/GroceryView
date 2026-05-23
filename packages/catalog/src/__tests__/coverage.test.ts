@@ -59,6 +59,36 @@ describe('buildCatalogCoverageReport', () => {
     assert.deepEqual(report.missingProductStorePairs, [{ productId: 'milk', storeId: 'coop-odenplan' }]);
     assert.deepEqual(report.requiredActions, ['backfill_product_store_pairs:1']);
   });
+
+  it('fails closed when target stores only have promotion coverage but branch product prices are required', () => {
+    const report = buildCatalogCoverageReport({
+      targetCategories: ['coffee'],
+      targetChains: ['coop'],
+      targetStores: ['216502', '196183'],
+      targetPriceTypes: ['online'],
+      requireEveryStorePriceType: true,
+      products: [{
+        id: 'coffee',
+        categoryId: 'coffee',
+        observedChainIds: ['coop'],
+        observedStoreIds: ['216502', '196183'],
+        observedPriceTypes: ['promotion'],
+        observedStorePriceTypes: ['216502:promotion', '196183:promotion']
+      }]
+    });
+
+    assert.equal(report.status, 'incomplete');
+    assert.deepEqual(report.coverage.priceTypes, { covered: 0, target: 1, percent: 0, missing: ['online'] });
+    assert.deepEqual(report.missingStorePriceTypes, [
+      { storeId: '196183', priceType: 'online' },
+      { storeId: '216502', priceType: 'online' }
+    ]);
+    assert.deepEqual(report.requiredActions, [
+      'backfill_price_types:online',
+      'backfill_store_price_types:2'
+    ]);
+  });
+
 });
 
 describe('buildMyStoresCoverageReport', () => {

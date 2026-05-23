@@ -148,6 +148,14 @@ describe('verified-data UI', () => {
     assert.match(actions, /review work items/);
     assert.match(actions, /navigator\.mediaDevices\.getUserMedia/);
     assert.match(actions, /facingMode: \{ ideal: 'environment' \}/);
+    assert.match(actions, /document\.createElement\('canvas'\)/);
+    assert.match(actions, /canvas\.toBlob/);
+    assert.match(actions, /fetch\(ticket\.uploadUrl/);
+    assert.match(actions, /method: 'PUT'/);
+    assert.match(actions, /headers: ticket\.headers/);
+    assert.match(actions, /body: blob/);
+    assert.match(actions, /payload: ticket\.payloadUri/);
+    assert.match(actions, /Submit receipt image/);
     assert.match(actions, /Stop receipt camera/);
     assert.match(actions, /Camera access stays local/);
     assert.match(actions, /Sign in first/);
@@ -283,6 +291,55 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
   });
 
+  it('ships account billing controls for signed-in checkout and subscription management', async () => {
+    const account = await read('src/app/account/page.tsx');
+    const billingActions = await read('src/components/account-billing-actions.tsx');
+
+    assert.match(account, /AccountBillingActions/);
+    assert.match(billingActions, /'use client'/);
+    assert.match(billingActions, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(billingActions, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(billingActions, /Authorization: `Bearer \$\{accessToken\}`/);
+    assert.match(billingActions, /\/api\/account\/subscription-access\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(billingActions, /\/api\/billing\/checkout-sessions\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(billingActions, /\/api\/billing\/portal-sessions\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(billingActions, /premium_monthly/);
+    assert.match(billingActions, /premium_yearly/);
+    assert.match(billingActions, /checkoutUrl/);
+    assert.match(billingActions, /portalUrl/);
+    assert.match(billingActions, /window\.location\.assign/);
+    assert.match(billingActions, /Sign in first/);
+    assert.match(billingActions, /No anonymous billing sessions/);
+    assert.doesNotMatch(billingActions, /STRIPE_SECRET_KEY|sk_test|clientSecret/);
+    assert.doesNotMatch(billingActions, /localStorage\.setItem\('groceryview:userId'/);
+  });
+
+  it('surfaces busy-professional saved basket auto-reorder planning without anonymous checkout', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const account = await read('src/app/account/page.tsx');
+    const actions = await read('src/components/account-mutation-actions.tsx');
+
+    assert.match(verified, /export const savedBasketAutoReorderPlanner = /);
+    assert.match(verified, /planRecurringBasketDigest/);
+    assert.match(verified, /autoReorderDecision/);
+    assert.match(verified, /missingCurrentPrice|missing-price blockers/);
+    assert.match(account, /savedBasketAutoReorderPlanner/);
+    assert.match(account, /Saved basket auto-reorder/);
+    assert.match(account, /signed-in shopper confirmation/i);
+    assert.match(account, /not automatic purchase/i);
+    assert.match(account, /missing-price blockers/i);
+    assert.match(actions, /Plan auto-reorder/);
+    assert.match(actions, /\/api\/basket\/recurring-digest\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /templateId/);
+    assert.match(actions, /templateName/);
+    assert.match(actions, /cadence=weekly/);
+    assert.match(actions, /method: 'GET'/);
+    assert.match(actions, /Auto-reorder plan prepared for the signed-in account/);
+    assert.match(actions, /No anonymous auto-reorder/);
+    assert.doesNotMatch(actions, /checkout|purchaseNow|retailerSessionToken/);
+    assert.doesNotMatch(account, /@\/lib\/demo-data/);
+  });
+
 
   it('ships signed-in ad disclosure controls without anonymous sponsored-ranking state', async () => {
     const account = await read('src/app/account/page.tsx');
@@ -389,6 +446,9 @@ describe('verified-data UI', () => {
     assert.match(actions, /method: 'POST'/);
     assert.match(actions, /accept_community_report/);
     assert.match(actions, /dismiss_community_report/);
+    assert.match(actions, /needs_more_info/);
+    assert.match(actions, /Request more info/);
+    assert.match(actions, /status.*in_progress/);
     assert.match(actions, /reviewedByHuman: true/);
     assert.match(actions, /Sign in first/);
     assert.match(actions, /No anonymous price-report moderation/);
@@ -440,6 +500,27 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(priceReports, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+
+
+  it('surfaces the fuel OSM station connector alongside operator fuel prices', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const fuelRoute = await read('src/app/fuel/page.tsx');
+    const overpass = await read('../../packages/ingestion/src/connectors/overpass.ts');
+
+    assert.match(overpass, /fetchOverpassFuelStations/);
+    assert.match(overpass, /amenity"="fuel/);
+    assert.match(verified, /export const fuelStationSourceCoverage/);
+    assert.match(verified, /fetchOverpassFuelStations/);
+    assert.match(verified, /amenity=fuel/);
+    assert.match(fuelRoute, /fuelStationSourceCoverage/);
+    assert.match(fuelRoute, /OSM fuel station source/);
+    assert.match(fuelRoute, /amenity=fuel/);
+    assert.match(fuelRoute, /verifiedFuelPriceObservations/);
+    assert.match(fuelRoute, /Fuel prices by grade/);
+    assert.match(fuelRoute, /price per litre/);
+    assert.match(fuelRoute, /operator domain=fuel observations/);
+    assert.doesNotMatch(fuelRoute, /currentPrice|price SEK/);
+  });
 
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
@@ -586,6 +667,38 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a meal-prepper bulk-buy unit-price optimizer without price forecasts', async () => {
+    const demo = await read('src/lib/demo-data.ts');
+    const source = await read('src/app/weekly-basket/page.tsx');
+
+    assert.match(demo, /export const mealPrepBulkBuyOptimizer = /);
+    assert.match(demo, /stockUpDecision/);
+    assert.match(demo, /paybackMeals/);
+    assert.match(demo, /No forecast/);
+    assert.match(source, /mealPrepBulkBuyOptimizer/);
+    assert.match(source, /Meal-prepper bulk-buy optimizer/);
+    assert.match(source, /bulkUnitPrice/);
+    assert.match(source, /freezerPortions/);
+    assert.match(source, /coverageGuardrails/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('surfaces a multi-week stock-up list with forecast claims blocked', async () => {
+    const demo = await read('src/lib/demo-data.ts');
+    const source = await read('src/app/weekly-basket/page.tsx');
+
+    assert.match(demo, /export const multiWeekStockUpList = /);
+    assert.match(demo, /observedHistoryWindow/);
+    assert.match(demo, /noForecastReason/);
+    assert.match(demo, /reviewTrigger/);
+    assert.match(source, /multiWeekStockUpList/);
+    assert.match(source, /Multi-week stock-up list/);
+    assert.match(source, /planningWeeks/);
+    assert.match(source, /No price forecast/);
+    assert.match(source, /observedHistoryWindow/);
+    assert.doesNotMatch(source, /future price prediction|forecasted price/i);
+  });
+
   it('surfaces a budget stretch-krona basket optimizer using real basket strategy output', async () => {
     const source = await read('src/app/weekly-basket/page.tsx');
     const demo = await read('src/lib/demo-data.ts');
@@ -612,6 +725,24 @@ describe('verified-data UI', () => {
     assert.match(source, /readyAction/);
     assert.match(source, /checkoutGuardrails/);
     assert.match(source, /signed-in/i);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('surfaces signed-in saved-basket auto-reorder readiness without automatic checkout', async () => {
+    const source = await read('src/app/weekly-basket/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+
+    assert.match(demo, /savedBasketAutoReorderPlan/);
+    assert.match(demo, /compareBasketStrategies/);
+    assert.match(demo, /autoReorderEligibleLines/);
+    assert.match(demo, /manualReviewRequired/);
+    assert.match(demo, /No retailer checkout or payment is submitted automatically/);
+    assert.match(source, /savedBasketAutoReorderPlan/);
+    assert.match(source, /Saved basket auto-reorder readiness/);
+    assert.match(source, /autoReorderEligibleLines/);
+    assert.match(source, /manualReviewRequired/);
+    assert.match(source, /No retailer checkout or payment is submitted automatically/);
+    assert.match(source, /signed-in saved basket/i);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
@@ -664,6 +795,22 @@ describe('verified-data UI', () => {
     assert.match(source, /planNotifications/);
     assert.match(source, /plannedNotifications/);
     assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('surfaces watchlist sparklines from real price chart series output', async () => {
+    const route = await read('src/app/watchlist/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+
+    assert.match(demo, /watchlistSparklineBoard/);
+    assert.match(demo, /buildPriceChartSeries/);
+    assert.match(demo, /rangeDays: 90/);
+    assert.match(demo, /provenanceLabel/);
+    assert.match(route, /watchlistSparklineBoard/);
+    assert.match(route, /Watchlist sparklines/);
+    assert.match(route, /sparklinePoints/);
+    assert.match(route, /priceChartSeries/);
+    assert.match(route, /coverageLabel/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
 
@@ -720,6 +867,21 @@ describe('verified-data UI', () => {
     assert.match(route, /newProductSignals/);
     assert.match(route, /priceDropAlerts/);
     assert.match(route, /not a retailer launch claim/i);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
+  it('surfaces deal-hunter specialty and premium tier tracking from the real brand-tier index', async () => {
+    const route = await read('src/app/deals/page.tsx');
+
+    assert.match(route, /calculateBrandTierIndices/);
+    assert.match(route, /buildBrandTierPriceObservations/);
+    assert.match(route, /premiumTierTracking/);
+    assert.match(route, /Specialty & premium tier tracking/);
+    assert.match(route, /premiumGapPercent/);
+    assert.match(route, /premium tier/i);
+    assert.match(route, /specialty basket/i);
+    assert.match(route, /not a forecast/i);
+    assert.match(route, /observed brand-tier basket/i);
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
@@ -894,6 +1056,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a deal screener on deals using ranked visible deal rows', async () => {
+    const route = await read('src/app/deals/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+
+    assert.match(demo, /dealScreener/);
+    assert.match(demo, /rankDealOpportunities/);
+    assert.match(demo, /sourceConfidence/);
+    assert.match(route, /dealScreener/);
+    assert.match(route, /Deal screener/);
+    assert.match(route, /minimumScore/);
+    assert.match(route, /categoryFilter/);
+    assert.match(route, /visible ranked deal rows/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
   it('surfaces offer expiry reminders from real Matpriskollen validity windows', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/deals/page.tsx');
@@ -997,6 +1174,23 @@ describe('verified-data UI', () => {
     assert.match(source, /proteinPer10Sek/);
     assert.match(source, /dealScore/);
     assert.match(source, /visible deal rows and package nutrition labels/i);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('surfaces organic Keyhole and vegan health filters from verified labels', async () => {
+    const source = await read('src/app/nutrition-value/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+
+    assert.match(verified, /export const healthVerifiedLabelFilters = /);
+    assert.match(verified, /keyhole/);
+    assert.match(verified, /organic|ecological|eu_ecological/);
+    assert.match(verified, /vegan/);
+    assert.match(source, /healthVerifiedLabelFilters/);
+    assert.match(source, /Organic, Keyhole & vegan filters/);
+    assert.match(source, /verifiedProductCount/);
+    assert.match(source, /evidenceLabels/);
+    assert.match(source, /not a medical claim/i);
+    assert.match(source, /not inferred from browsing/i);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
@@ -1161,6 +1355,39 @@ describe('verified-data UI', () => {
     assert.match(sitemap, /entry\('\/seasonal-calendar'/);
   });
 
+  it('surfaces eco-conscious local and seasonal picks without origin or carbon invention', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/seasonal-calendar/page.tsx');
+
+    assert.match(verified, /export const localSeasonalPicks = /);
+    assert.match(verified, /Swedish origin label/);
+    assert.match(verified, /historicalMonthlyAverage/);
+    assert.match(verified, /from_sweden|swedish_flag/);
+    assert.match(route, /localSeasonalPicks/);
+    assert.match(route, /Local & seasonal picks/);
+    assert.match(route, /originEvidence/);
+    assert.match(route, /seasonalEvidence/);
+    assert.match(route, /No carbon or harvest claim/);
+    assert.match(route, /explicit Swedish-origin label/i);
+    assert.doesNotMatch(route, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
+  it('surfaces an eco-conscious sustainable-brand filter from verified label evidence', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/categories/page.tsx');
+
+    assert.match(verified, /export const sustainableBrandFilter/);
+    assert.match(verified, /openFoodFactsCatalog/);
+    assert.match(verified, /ecoEvidenceForProduct/);
+    assert.match(verified, /evidenceLabels/);
+    assert.match(route, /sustainableBrandFilter/);
+    assert.match(route, /Sustainable-brand filter/);
+    assert.match(route, /verified label evidence/i);
+    assert.match(route, /not a carbon claim/i);
+    assert.match(route, /evidenceLabels/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
   it('surfaces a cheaper and greener basket scorecard without fabricated carbon data', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const source = await read('src/app/savings-dashboard/page.tsx');
@@ -1207,6 +1434,50 @@ describe('verified-data UI', () => {
     assert.match(shell, /No forecast, sponsored boost, or synthetic placeholder row/);
     assert.match(shell, /Open Grocery Index/);
     assert.doesNotMatch(shell, /NoVerifiedData|@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
+  it('surfaces a grocery market heatmap on homepage and chain-index from verified market tiles', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const route = await read('src/app/chain-index/page.tsx');
+
+    assert.match(verified, /export const marketHeatmapTiles/);
+    assert.match(verified, /marketHeatmapSourceSignals/);
+    assert.match(verified, /categoryDealLeaders/);
+    assert.match(verified, /openPriceObservationDepth/);
+    assert.match(verified, /chainCategoryCoverage/);
+    assert.match(shell, /homepageMarketHeatmap/);
+    assert.match(shell, /marketHeatmapTiles\.slice\(0, 6\)/);
+    assert.match(shell, /Grocery market heatmap/);
+    assert.match(shell, /data-heatmap-tile/);
+    assert.match(shell, /tile\.heatScore/);
+    assert.match(route, /marketHeatmapTiles/);
+    assert.match(route, /Market heatmap/);
+    assert.match(route, /heatScore\.toFixed/);
+    assert.match(route, /No forecast/);
+    assert.doesNotMatch(verified, /Math\.random/);
+  });
+
+  it('surfaces a chain price index trend chart from dated campaign tape on homepage and chain-index', async () => {
+    const chainData = await read('src/lib/chain-index-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const route = await read('src/app/chain-index/page.tsx');
+
+    assert.match(chainData, /willysWeeklyDiscounts/);
+    assert.match(chainData, /hemkopWeeklyDiscounts/);
+    assert.match(chainData, /export function buildChainIndexTrendSeries/);
+    assert.match(chainData, /parseCampaignDate/);
+    assert.match(chainData, /campaignTrendObservations/);
+    assert.match(chainData, /calculateChainPriceIndex/);
+    assert.match(shell, /homepageChainIndexTrend/);
+    assert.match(shell, /Chain index trend tape/);
+    assert.match(shell, /data-chain-index-trend/);
+    assert.match(route, /chainIndexTrendSeries/);
+    assert.match(route, /Chain Price Index trend chart/);
+    assert.match(route, /campaign tape/);
+    assert.match(route, /No forecast/);
+    assert.match(route, /data-chain-index-trend/);
+    assert.doesNotMatch(chainData, /Math\.random|Date\.now/);
   });
 
   it('uses a readable global shell and provenance surfaces across the app', async () => {
@@ -1278,6 +1549,25 @@ ${seo}`;
     assert.match(route, /Cheapest chain near me/);
   });
 
+  it('surfaces synced map and list selection on the map route', async () => {
+    const route = await read('src/app/map/page.tsx');
+    const map = await read('src/components/store-map.tsx');
+
+    assert.match(route, /StoreMap/);
+    assert.match(route, /Synced map \+ list/);
+    assert.match(route, /map ↔ list sync/);
+    assert.match(map, /syncedMapListStores/);
+    assert.match(map, /selectedStoreSlug/);
+    assert.match(map, /setSelectedStoreSlug/);
+    assert.match(map, /data-store-slug/);
+    assert.match(map, /aria-pressed/);
+    assert.match(map, /mapRef/);
+    assert.match(map, /easeTo|flyTo/);
+    assert.match(map, /chainIndexScore/);
+    assert.match(map, /osmStores/);
+    assert.doesNotMatch(map, /Math\.random/);
+  });
+
   it('surfaces a price-by-district heat overlay on the map without branch-price claims', async () => {
     const route = await read('src/app/map/page.tsx');
     assert.match(route, /districtHeatOverlay/);
@@ -1286,6 +1576,42 @@ ${seo}`;
     assert.match(route, /district\.averageIndex\.toFixed/);
     assert.match(route, /district\.coveredStores/);
     assert.match(route, /chain-index proxy/);
+  });
+
+  it('surfaces a basket-cost heatmap by area from the weekly basket optimizer without branch-price invention', async () => {
+    const heatmap = await read('src/lib/map-basket-cost-heatmap.ts');
+    const route = await read('src/app/map/page.tsx');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(heatmap, /basketCostHeatmap/);
+    assert.match(heatmap, /compareBasketStrategies/);
+    assert.match(heatmap, /summarizeStoreBasketCoverage/);
+    assert.match(heatmap, /weeklyBasketOptimizerInput/);
+    assert.match(heatmap, /storeUniverse/);
+    assert.match(heatmap, /branch-level basket prices are not invented/);
+    assert.match(route, /basketCostHeatmap/);
+    assert.match(route, /Basket-cost heatmap by area/);
+    assert.match(route, /data-basket-cost-heatmap/);
+    assert.match(route, /No branch-level basket quote/);
+    assert.match(shell, /homepageBasketCostHeatmap/);
+    assert.match(shell, /Basket-cost heatmap/);
+    assert.match(shell, /data-basket-cost-heatmap/);
+    assert.match(shell, /Basket-cost heatmap by area/);
+    assert.doesNotMatch(`${heatmap}\n${route}\n${shell}`, /Math\.random|Date\.now/);
+  });
+
+  it('surfaces a cheapest-branch-near-me highlight from branch-level evidence', async () => {
+    const route = await read('src/app/map/page.tsx');
+
+    assert.match(route, /storePricePercentileRanks/);
+    assert.match(route, /cheapestBranchNearMe/);
+    assert.match(route, /Cheapest branch near me/);
+    assert.match(route, /branch-level evidence/);
+    assert.match(route, /per-branch Lidl offer observations/);
+    assert.match(route, /cheaperThanNationalLabel/);
+    assert.match(route, /coverageLabel/);
+    assert.match(route, /No private location/);
+    assert.doesNotMatch(route, /Math\.random/);
   });
 
   it('surfaces a fail-closed regional price statistics gate on the map', async () => {
@@ -1362,6 +1688,8 @@ ${seo}`;
     assert.match(shell, /ica-nara-sergels-torg/);
     assert.match(shell, /coop-swedenborgsgatan/);
     assert.match(shell, /lidl-sveavagen/);
+    assert.match(shell, /data-store-slug=\{store\.slug\}/);
+    assert.match(shell, /data-product-slug=\{product\.slug\}/);
   });
 
   it('ships an OSM nationwide refresh script and surfaces Sweden-wide copy', async () => {
@@ -1546,6 +1874,21 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces price-move explanation notes from observed event logs without invented causes', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /priceMoveNotesFor/);
+    assert.match(source, /priceChangeEventLogFor/);
+    assert.match(source, /Why this price moved/);
+    assert.match(source, /sourceProvenance/);
+    assert.match(source, /consecutive OpenPrices rows/);
+    assert.match(source, /No news or retailer cause is inferred/);
+    assert.match(source, /no promotion or seasonality claim/i);
+    assert.doesNotMatch(source, /invented cause|retailer news claim|synthetic explanation/i);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces a seasonal-by-month view from historical monthly averages without forecasting', async () => {
     const source = await read('src/app/products/[slug]/page.tsx');
 
@@ -1637,6 +1980,22 @@ ${seo}`;
     assert.match(route, /chain\.topProductSlug/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+  it('surfaces a compare-overlay chart from real price chart series output', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/compare/page.tsx');
+
+    assert.match(verified, /compareOverlayChart/);
+    assert.match(verified, /buildPriceChartSeries/);
+    assert.match(verified, /rangeDays: 365/);
+    assert.match(verified, /provenanceLabel/);
+    assert.match(route, /compareOverlayChart/);
+    assert.match(route, /Compare-overlay chart/);
+    assert.match(route, /overlaySeries/);
+    assert.match(route, /lineStyle/);
+    assert.match(route, /No forecast/);
+    assert.doesNotMatch(route, /Math\.random|placeholder|synthetic/i);
   });
 
   it('surfaces a retailer browser overlay contract backed by the cheapest-now API', async () => {
@@ -1999,6 +2358,28 @@ ${seo}`;
     assert.match(store, /findStore/);
   });
 
+  it('ships metadataBase and hreflang alternates for the supported locale pair', async () => {
+    const seo = await read('src/lib/seo.ts');
+    const localeHome = await read('src/components/locale-home-page.tsx');
+    const routing = await read('src/lib/i18n-routing.ts');
+    const layout = await read('src/app/layout.tsx');
+
+    assert.match(routing, /supportedLocales = \['sv', 'en'\]/);
+    assert.match(layout, /metadataBase: new URL\(siteUrl\)/);
+    assert.match(seo, /metadataBase: new URL\(siteUrl\)/);
+    assert.match(seo, /languageAlternateUrls/);
+    assert.match(seo, /'sv-SE'/);
+    assert.match(seo, /'en-SE'/);
+    assert.match(seo, /'x-default'/);
+    assert.match(seo, /alternates: \{[\s\S]*canonical:[\s\S]*languages: languageAlternateUrls\(config\.path\)/);
+    assert.match(seo, /locale-negotiated current route/i);
+    assert.match(localeHome, /metadataBase: new URL\(siteUrl\)/);
+    assert.match(localeHome, /languageHomeAlternates/);
+    assert.match(localeHome, /\/sv/);
+    assert.match(localeHome, /\/en/);
+    assert.doesNotMatch(seo, /NoVerifiedData/);
+  });
+
   it('ships an installable PWA-first web manifest for mobile grocery checks', async () => {
     const manifestPath = 'src/app/manifest.ts';
     assert.equal(await fileExists(manifestPath), true, 'App Router should expose /manifest.webmanifest');
@@ -2104,6 +2485,49 @@ ${seo}`;
     assert.match(sitemap, /\/\$\{city\.slug\}\/billigaste\/\$\{product\.slug\}/);
   });
 
+  it('surfaces instant faceted product search from real catalogue price rows', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const products = await read('src/app/products/page.tsx');
+    const packageJson = await read('package.json');
+
+    assert.match(verified, /buildFacetedProductSearch/);
+    assert.match(verified, /export const facetedProductSearch/);
+    assert.match(verified, /facetedSearchRows/);
+    assert.match(verified, /sourceTables/);
+    assert.match(products, /Instant faceted search/);
+    assert.match(products, /facetedProductSearch/);
+    assert.match(products, /categoryFacets/);
+    assert.match(products, /labelFacets/);
+    assert.match(products, /chainFacets/);
+    assert.match(products, /priceRange/);
+    assert.match(products, /inStockOnly/);
+    assert.match(products, /kr\/kg|kr\/l|per-unit/i);
+    assert.match(products, /latest_prices/);
+    assert.match(packageJson, /@groceryview\/api/);
+  });
+
+  it('surfaces account-bound save-to-watchlist hearts on product cards', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const products = await read('src/app/products/page.tsx');
+
+    assert.match(verified, /buildWatchlistAlerts/);
+    assert.match(verified, /export const watchlistHeartProducts/);
+    assert.match(verified, /sourceProductSlug/);
+    assert.match(verified, /accountBound/);
+    assert.match(verified, /targetPrice/);
+    assert.match(verified, /No anonymous saves/);
+    assert.match(products, /watchlistHeartProducts/);
+    assert.match(products, /Save to watchlist/);
+    assert.match(products, /♡/);
+    assert.match(products, /Signed-in shoppers only/);
+    assert.match(products, /account-bound/i);
+    assert.match(products, /target price/i);
+    assert.match(products, /buildWatchlistAlerts/);
+    assert.match(products, /\/products\/\$\{product\.sourceProductSlug\}/);
+    assert.doesNotMatch(products, /@\/lib\/demo-data/);
+    assert.doesNotMatch(products, /@\/components\/sample-data/);
+  });
+
   it('surfaces adaptive total and unit price product cards with a compare-mode toggle', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
@@ -2113,15 +2537,20 @@ ${seo}`;
     assert.match(verified, /export const adaptiveProductCards/);
     assert.match(verified, /normalizeComparableUnitPrice/);
     assert.match(verified, /cheapestUnitBadge/);
+    assert.match(verified, /imageUrl/);
+    assert.match(verified, /imageAlt/);
     assert.match(products, /ProductPriceCards/);
     assert.match(products, /adaptiveProductCards/);
     assert.match(shell, /ProductPriceCards/);
     assert.match(shell, /homepageAdaptiveProductCards/);
+    assert.match(cards, /next\/image/);
+    assert.match(cards, /<Image/);
     assert.match(cards, /Compare by:/);
     assert.match(cards, /localStorage/);
     assert.match(cards, /unitSortPrice/);
     assert.match(cards, /totalSortPrice/);
     assert.match(cards, /cheapest-per-unit/);
+    assert.match(cards, /No synthetic product images/);
     assert.match(cards, /No synthetic unit prices/);
   });
 
@@ -2270,12 +2699,15 @@ ${seo}`;
   it('surfaces an embeddable Grocery Index ticker widget on chain-index', async () => {
     const route = await read('src/app/chain-index/page.tsx');
     const widgetRoute = await read('src/app/widgets/grocery-index-ticker/page.tsx');
+    const widgetContract = await read('src/lib/grocery-index-widget.ts');
     const seo = await read('src/lib/seo.ts');
 
     assert.match(route, /groceryIndexTickerWidget/);
-    assert.match(route, /Embeddable Grocery Index ticker/);
-    assert.match(route, /widgets\/grocery-index-ticker/);
-    assert.match(route, /iframe/);
+    assert.doesNotMatch(route, /export const groceryIndexTickerWidget/);
+    assert.match(widgetContract, /export const groceryIndexTickerWidget/);
+    assert.match(widgetContract, /Embeddable Grocery Index ticker/);
+    assert.match(widgetContract, /widgets\/grocery-index-ticker/);
+    assert.match(widgetContract, /iframe/);
     assert.match(widgetRoute, /calculateChainPriceIndex/);
     assert.match(widgetRoute, /buildChainPriceObservations/);
     assert.match(widgetRoute, /Grocery Index ticker/);
@@ -2401,5 +2833,29 @@ ${seo}`;
     assert.match(enRoute, /locale=\"en\"/);
     assert.match(arRoute, /BlockedLocalePage/);
     assert.match(soRoute, /BlockedLocalePage/);
+  });
+
+  it('ships locale-aware money date and unit formatters for observation currencies', async () => {
+    const i18n = await read('src/lib/i18n.ts');
+    const verified = await read('src/lib/verified-data.ts');
+    const marketShell = await read('src/components/market-shell.tsx');
+
+    assert.match(i18n, /supportedCurrencies = \['SEK', 'NOK', 'DKK', 'EUR', 'ISK'\]/);
+    assert.match(i18n, /export type SupportedCurrency/);
+    assert.match(i18n, /normalizeCurrency/);
+    assert.match(i18n, /currencyFromObservation/);
+    assert.match(i18n, /formatLocalizedMoney/);
+    assert.match(i18n, /formatLocalizedDate/);
+    assert.match(i18n, /formatLocalizedUnitPrice/);
+    assert.match(i18n, /Intl\.NumberFormat\(localeOption\.htmlLang/);
+    assert.match(verified, /formatLocalizedMoney/);
+    assert.match(verified, /formatLocalizedDate/);
+    assert.match(verified, /formatLocalizedUnitPrice/);
+    assert.match(verified, /localeFormattingShowcase/);
+    assert.match(verified, /currencyFromObservation\(\{ currency: 'SEK' \}\)/);
+    assert.match(marketShell, /localeFormattingShowcase/);
+    assert.match(marketShell, /Multi-currency display follows observation currency/);
+    assert.match(marketShell, /SEK · NOK · DKK · EUR · ISK/);
+    assert.match(marketShell, /No currency conversion or fake price/);
   });
 });

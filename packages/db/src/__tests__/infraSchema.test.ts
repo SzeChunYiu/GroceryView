@@ -17,7 +17,7 @@ const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/mi
 const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/010_basket_import_reviews.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
-  .filter((entry) => entry.endsWith('.sql'))
+  .filter((entry) => entry.endsWith('.sql') && !entry.startsWith('._'))
   .sort()
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
@@ -114,6 +114,39 @@ describe('infra/db PostgreSQL schema contract', () => {
     const latestPrices = tableDefinition('latest_prices');
     assert.match(latestPrices, /observation_id uuid not null references observations\(id\)/);
     assert.match(latestPrices, /unique nulls not distinct \(product_id, chain_id, store_id, price_type\)/);
+  });
+
+  it('materializes daily and weekly price rollups for chart and 52-week-low reads', () => {
+    for (const table of ['price_daily', 'price_weekly']) {
+      assert.match(allMigrations, new RegExp(`create table if not exists ${table}\\b`), `${table} table missing`);
+      assert.match(schemaDoc, new RegExp(`### \`${table}\``), `${table} missing from SCHEMA.md`);
+      assert.match(migrationVerifier, new RegExp(`\\b${table}\\b`), `${table} missing from migration verifier`);
+    }
+
+    assert.match(allMigrations, /date_trunc\('week', observed_at\)::date/);
+    assert.match(allMigrations, /min_price numeric\(12, 2\) not null/);
+    assert.match(allMigrations, /max_price numeric\(12, 2\) not null/);
+    assert.match(allMigrations, /avg_price numeric\(12, 4\) not null/);
+    assert.match(allMigrations, /last_price numeric\(12, 2\) not null/);
+    assert.match(allMigrations, /observation_count integer not null check \(observation_count > 0\)/);
+    assert.match(allMigrations, /price_daily_product_chain_day_idx/);
+    assert.match(allMigrations, /price_weekly_product_chain_week_idx/);
+    assert.match(schemaDoc, /charts and 52-week-low reads must hit `price_daily` or `price_weekly`/);
+  });
+
+  it('builds the observations time-series partition lane with monthly partitions and BRIN pruning', () => {
+    assert.match(allMigrations, /create table if not exists observations_v2\b[\s\S]*partition by range \(observed_at\)/);
+    assert.match(allMigrations, /create table if not exists observations_default partition of observations_v2 default/);
+    assert.match(allMigrations, /create or replace function ensure_observations_monthly_partition\(partition_month date\)/);
+    assert.match(allMigrations, /to_char\(partition_month, 'yyyy_mm'\)/);
+    assert.match(allMigrations, /for values from \(%l\) to \(%l\)/);
+    assert.match(allMigrations, /using brin \(observed_at\)/);
+    assert.match(allMigrations, /create_observations_partitions\(window_start date, months_ahead integer\)/);
+    assert.match(allMigrations, /drop_observations_partitions_before\(cutoff_month date\)/);
+    assert.match(migrationVerifier, /\bobservations_v2\b/);
+    assert.match(schemaDoc, /monthly range partitions/);
+    assert.match(schemaDoc, /BRIN/i);
+    assert.match(schemaDoc, /retention.*partition drop/);
   });
 
   it('preserves provenance on source-derived tables', () => {
@@ -248,5 +281,7 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(migrationVerifier, /required migration extensions ok/);
     assert.match(migrationVerifier, /postgres_ready_timeout_seconds/);
     assert.match(migrationVerifier, /seq 1 "\$postgres_ready_timeout_seconds"/);
+    assert.match(migrationVerifier, /migrations=\(\)/);
+    assert.doesNotMatch(migrationVerifier, /mapfile/);
   });
 });

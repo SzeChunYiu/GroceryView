@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, oneTapBasketOptimizer, weeklyBasketOptimizer } from '@/lib/demo-data';
+import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizer } from '@/lib/demo-data';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -80,6 +80,58 @@ export default function WeeklyBasketPage() {
               ))}
             </ul>
             <p className="mt-3 text-sm font-black text-sky-950">Signed-in saved baskets are required before GroceryView can prepare the one-tap mutation.</p>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">{savedBasketAutoReorderPlan.persona}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Saved basket auto-reorder readiness</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Busy professionals can prepare the next {savedBasketAutoReorderPlan.readyAction.nextRunLabel} from a signed-in saved basket, but GroceryView only drafts the reviewed plan from compareBasketStrategies. No retailer checkout or payment is submitted automatically.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">autoReorderEligibleLines</span>
+                <span className="mt-1 block text-2xl font-black text-cyan-900">{savedBasketAutoReorderPlan.autoReorderEligibleLines.length}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">manualReviewRequired</span>
+                <span className="mt-1 block text-2xl font-black text-cyan-900">{savedBasketAutoReorderPlan.manualReviewRequired.length}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Draft total</span>
+                <span className="mt-1 block text-2xl font-black text-slate-950">{formatSek(savedBasketAutoReorderPlan.readyAction.estimatedTotal)}</span>
+              </p>
+            </div>
+            <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 sm:grid-cols-2">
+              {savedBasketAutoReorderPlan.autoReorderEligibleLines.map((line) => (
+                <Link className="rounded-2xl bg-white p-3 hover:bg-cyan-100" href={`/products/${line.productId}`} key={`${line.productId}-${line.storeName}`}>
+                  <span className="block font-black text-slate-950">{line.productId}</span>
+                  <span className="mt-1 block">{line.quantity}× at {line.storeName} · {formatSek(line.lineTotal)} · {line.priceType}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-[1.5rem] border border-cyan-100 bg-white p-4 shadow-sm">
+            <h3 className="text-lg font-black text-slate-950">{savedBasketAutoReorderPlan.readyAction.label}</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Account-bound reorder readiness is fail-closed: signed-in saved basket state is required before a shopper can approve any draft.
+            </p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              {savedBasketAutoReorderPlan.guardrails.map((guardrail) => (
+                <li className="rounded-2xl bg-cyan-50 p-3" key={guardrail}>{guardrail}</li>
+              ))}
+            </ul>
+            <div className="mt-4 space-y-2">
+              {savedBasketAutoReorderPlan.manualReviewRequired.map((blocker) => (
+                <Link className="block rounded-2xl bg-slate-50 p-3 text-sm font-black text-slate-950 hover:bg-cyan-50" href={`/products/${blocker.productId}`} key={blocker.productId}>
+                  {blocker.productId}: {blocker.reason} {blocker.missingStoreCount} missing stores.
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </Card>
@@ -255,6 +307,80 @@ export default function WeeklyBasketPage() {
           ))}
         </div>
         <p className="mt-4 text-sm font-semibold text-slate-700">{familyBulkUnitPriceComparison.coverage.caveat}</p>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-fuchsia-800">{mealPrepBulkBuyOptimizer.persona}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Meal-prepper bulk-buy optimizer</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Large-household shoppers can compare bulkUnitPrice against the standard package row, then decide whether freezerPortions and pantry space justify stocking up. The stockUpDecision is not a forecast; it is a visible unit-price and storage guardrail.
+            </p>
+            <div className="mt-4 grid gap-3 lg:grid-cols-3">
+              {mealPrepBulkBuyOptimizer.rows.map((row) => (
+                <Link className="rounded-2xl border border-fuchsia-200 bg-white p-4 hover:border-fuchsia-700" href={`/products/${row.productId}`} key={row.productId}>
+                  <p className="text-lg font-black text-slate-950">{row.productName}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{row.familyPack} · {row.storeName}</p>
+                  <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                    <p className="rounded-2xl bg-fuchsia-50 p-3 font-semibold">bulkUnitPrice {formatSek(row.bulkUnitPrice)} / {row.comparableUnit.replace('SEK/', '')}</p>
+                    <p className="rounded-2xl bg-white p-3 font-semibold">freezerPortions {row.freezerPortions} · paybackMeals {row.paybackMeals}</p>
+                    <p className="rounded-2xl bg-emerald-50 p-3 font-black text-emerald-900">{row.unitSavingsPercent}% unit savings</p>
+                  </div>
+                  <p className="mt-3 text-sm font-black text-fuchsia-950">stockUpDecision: {row.stockUpDecision}</p>
+                  <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{row.coverageEvidence}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-[1.5rem] border border-fuchsia-100 bg-white p-4 shadow-sm">
+            <h3 className="text-lg font-black text-slate-950">coverageGuardrails</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-600">{mealPrepBulkBuyOptimizer.coverage.caveat}</p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              {mealPrepBulkBuyOptimizer.coverageGuardrails.map((guardrail) => (
+                <li className="rounded-2xl bg-fuchsia-50 p-3" key={guardrail}>{guardrail}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-orange-200 bg-orange-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">{multiWeekStockUpList.persona}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Multi-week stock-up list</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              This planningWeeks view blocks price outlook claims. No price forecast is shown; each observedHistoryWindow comes from visible package math and changed basket rows that shoppers should review before restocking.
+            </p>
+          </div>
+          <p className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-orange-950 shadow-sm">
+            planningWeeks {multiWeekStockUpList.planningWeeks}
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {multiWeekStockUpList.rows.map((row) => (
+            <Link className="rounded-2xl border border-orange-200 bg-white p-4 hover:border-orange-700" href={`/products/${row.productId}`} key={row.productId}>
+              <p className="text-lg font-black text-slate-950">{row.productName}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{row.storeName} · {row.planningWeeks} week plan</p>
+              <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                <p className="rounded-2xl bg-orange-50 p-3 font-semibold">observedHistoryWindow: {row.observedHistoryWindow}</p>
+                <p className="rounded-2xl bg-white p-3 font-semibold">planned servings {row.plannedServings} · unit savings {row.unitSavingsPercent}%</p>
+                <p className="rounded-2xl bg-emerald-50 p-3 font-black text-emerald-900">{formatSek(row.currentBulkUnitPrice)} current bulk unit</p>
+              </div>
+              <p className="mt-3 text-sm font-black text-orange-950">reviewTrigger: {row.reviewTrigger}</p>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{row.stockUpDecision}</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-[0.8fr_1fr]">
+          <p className="rounded-2xl bg-white p-4 text-sm font-black text-orange-950">{multiWeekStockUpList.noForecastReason}</p>
+          <ul className="grid gap-2 text-sm font-semibold text-slate-700 md:grid-cols-2">
+            {multiWeekStockUpList.coverageGuardrails.map((guardrail) => (
+              <li className="rounded-2xl bg-white p-3" key={guardrail}>{guardrail}</li>
+            ))}
+          </ul>
+        </div>
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">

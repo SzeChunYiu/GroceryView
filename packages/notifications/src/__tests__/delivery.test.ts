@@ -4,6 +4,8 @@ import {
   applyNotificationSuppressions,
   buildNotificationOperationsReport,
   buildNotificationProviderReadinessReport,
+  createExpoPushProvider,
+  createSendgridEmailProvider,
   deliverDueNotifications,
   planNotificationOperationsAlerts,
   formatNotificationOperationsMetrics,
@@ -29,6 +31,71 @@ const persistedTask = (overrides: Partial<Parameters<typeof planDeadLetterNotifi
   maxAttempts: 3,
   status: 'dead_lettered' as const,
   ...overrides
+});
+
+describe('notification provider adapters', () => {
+  it('sends email through SendGrid with bearer auth and returns the provider message id', async () => {
+    const calls: Array<{ url: string; init: RequestInit }> = [];
+    const provider = createSendgridEmailProvider({
+      apiKey: 'sg-live-key',
+      fromEmail: 'alerts@groceryview.se',
+      fetch: async (url: string | URL | Request, init?: RequestInit) => {
+        calls.push({ url: String(url), init: init ?? {} });
+        return new Response('', { status: 202, headers: { 'x-message-id': 'sg-message-1' } });
+      }
+    });
+
+    const messageId = await provider.send({
+      recipient: 'shopper@example.com',
+      title: 'Coffee deal',
+      body: 'Zoegas below 50 SEK',
+      metadata: { type: 'target_price', priority: 'high', sendAt: '2026-05-22T09:00:00.000Z' }
+    });
+
+    assert.equal(messageId, 'sg-message-1');
+    assert.equal(calls[0]?.url, 'https://api.sendgrid.com/v3/mail/send');
+    assert.equal(calls[0]?.init.method, 'POST');
+    assert.equal((calls[0]?.init.headers as Record<string, string>).authorization, 'Bearer sg-live-key');
+    assert.equal((calls[0]?.init.headers as Record<string, string>)['content-type'], 'application/json');
+    assert.deepEqual(JSON.parse(String(calls[0]?.init.body)), {
+      personalizations: [{ to: [{ email: 'shopper@example.com' }], custom_args: { type: 'target_price', priority: 'high', sendAt: '2026-05-22T09:00:00.000Z' } }],
+      from: { email: 'alerts@groceryview.se' },
+      subject: 'Coffee deal',
+      content: [{ type: 'text/plain', value: 'Zoegas below 50 SEK' }]
+    });
+  });
+
+  it('sends push notifications through Expo and fails closed on rejected tickets', async () => {
+    const calls: Array<{ url: string; init: RequestInit }> = [];
+    const provider = createExpoPushProvider({
+      accessToken: 'expo-access-token',
+      fetch: async (url: string | URL | Request, init?: RequestInit) => {
+        calls.push({ url: String(url), init: init ?? {} });
+        return Response.json({ data: [{ status: 'error', message: 'DeviceNotRegistered', details: { error: 'DeviceNotRegistered' } }] });
+      }
+    });
+
+    await assert.rejects(
+      provider.send({
+        recipient: 'ExponentPushToken[device]',
+        title: 'Budget alert',
+        body: 'Basket over budget',
+        metadata: { type: 'budget_alert', priority: 'high', sendAt: '2026-05-22T09:00:00.000Z' }
+      }),
+      /Expo push rejected: DeviceNotRegistered/
+    );
+
+    assert.equal(calls[0]?.url, 'https://exp.host/--/api/v2/push/send');
+    assert.equal(calls[0]?.init.method, 'POST');
+    assert.equal((calls[0]?.init.headers as Record<string, string>).authorization, 'Bearer expo-access-token');
+    assert.deepEqual(JSON.parse(String(calls[0]?.init.body)), {
+      to: 'ExponentPushToken[device]',
+      title: 'Budget alert',
+      body: 'Basket over budget',
+      priority: 'high',
+      data: { type: 'budget_alert', sendAt: '2026-05-22T09:00:00.000Z' }
+    });
+  });
 });
 
 describe('buildNotificationProviderReadinessReport', () => {

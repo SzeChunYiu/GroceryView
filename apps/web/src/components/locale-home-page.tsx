@@ -4,9 +4,9 @@ import { MarketShell } from './market-shell';
 import { localeOptionFor, localizedShellCopy, type BlockedLocaleRoute, type SupportedLocale } from '@/lib/i18n';
 import { siteUrl } from '@/lib/seo';
 
-const languageAlternates = {
-  sv: '/sv',
-  en: '/en',
+const languageHomeAlternates = {
+  'sv-SE': '/sv',
+  'en-SE': '/en',
   'x-default': '/'
 };
 
@@ -21,11 +21,12 @@ export function localeHomeMetadata(locale: SupportedLocale): Metadata {
   const description = copy.hero.body;
 
   return {
+    metadataBase: new URL(siteUrl),
     title,
     description,
     alternates: {
       canonical: absoluteUrl(`/${locale}`),
-      languages: languageAlternates
+      languages: languageHomeAlternates
     },
     openGraph: {
       title,
@@ -44,11 +45,12 @@ export function blockedLocaleMetadata(locale: BlockedLocaleRoute): Metadata {
   const description = 'Native-quality translation review required before this language route can show GroceryView copy. No machine-translated prices or source labels are shipped.';
 
   return {
+    metadataBase: new URL(siteUrl),
     title,
     description,
     alternates: {
       canonical: absoluteUrl(`/${locale}`),
-      languages: languageAlternates
+      languages: languageHomeAlternates
     },
     robots: { index: false, follow: true }
   };

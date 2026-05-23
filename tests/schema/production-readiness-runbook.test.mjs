@@ -19,11 +19,86 @@ describe('production daily ingestion readiness runbook', () => {
     assert.doesNotMatch(runbook, /GROCERYVIEW_DAILY_CONNECTORS_JSON=\$\(npm run --silent ops:daily-connectors\)/);
     assert.doesNotMatch(runbook, /Use the emitted JSON as the `GROCERYVIEW_DAILY_CONNECTORS_JSON` secret\/value/);
   });
+  it('documents bounded bulk daily ingestion runner controls', () => {
+    for (const name of [
+      'GROCERYVIEW_DAILY_MAX_CONNECTORS',
+      'GROCERYVIEW_DAILY_MAX_CONCURRENCY',
+      'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS',
+      'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS',
+      'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'
+    ]) {
+      assert.match(runbook, new RegExp(name));
+    }
+    assert.match(runbook, /bounded bulk/);
+    assert.match(runbook, /all six required chains/);
+  });
+
+  it('documents source-run accepted-row thresholds for every required chain', () => {
+    assert.match(runbook, /GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN/);
+    assert.match(runbook, /source-run row thresholds/);
+    assert.match(runbook, /positive integer threshold for all six required chains/);
+    assert.match(runbook, /source_run_insufficient_accepted_rows/);
+  });
+
+
+  it('documents daily store enumeration evidence before connector validation', () => {
+    assert.match(runbook, /npm run --silent ops:daily-connector-stores/);
+    assert.match(runbook, /groceryview-daily-connector-stores/);
+    assert.match(runbook, /store_enumeration_missing_chain/);
+    assert.match(runbook, /store_enumeration_empty_chain/);
+    assert.match(runbook, /before connector and target validation/);
+  });
+
+  it('documents production ingestion config evidence artifacts', () => {
+    assert.match(runbook, /groceryview-production-ingestion-config/);
+    assert.match(runbook, /production-env-validation\.json/);
+    assert.match(runbook, /groceryview-catalog-targets\.json/);
+    assert.match(runbook, /groceryview-daily-connectors\.json/);
+  });
+
+
+  it('documents daily ingestion chain summary evidence', () => {
+    assert.match(runbook, /chainSummaries/);
+    assert.match(runbook, /groceryview-daily-ingestion-result/);
+    assert.match(runbook, /daily_ingestion_missing_chain_summary/);
+    assert.match(runbook, /daily_ingestion_chain_not_succeeded/);
+    assert.match(runbook, /daily_ingestion_chain_without_observations/);
+    assert.match(runbook, /missing_configured_store_observations/);
+    assert.match(runbook, /persistence_failed/);
+    assert.match(runbook, /source run/);
+    assert.match(runbook, /failed/);
+  });
+
+  it('documents deployed readiness evidence artifacts after daily ingestion', () => {
+    assert.match(runbook, /groceryview-deployed-readiness/);
+    assert.match(runbook, /postgres-readiness\.json/);
+    assert.match(runbook, /source-run-readiness\.json/);
+    assert.match(runbook, /catalog-coverage-readiness\.json/);
+  });
+
   it('documents DB-to-site snapshot generation after daily ingestion writes latest_prices', () => {
     assert.match(runbook, /npm run --silent ingest:export-db-snapshot/);
     assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_PATH=/);
     assert.match(runbook, /postgres\.latest_prices/);
     assert.match(runbook, /No latest price rows available/);
+    assert.match(runbook, /daily ingestion workflow exports this snapshot/);
+    assert.match(runbook, /groceryview-db-site-snapshot/);
+    assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE/);
+    assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT/);
+    assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS/);
+    assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS/);
+    assert.match(runbook, /db_site_snapshot_missing_required_chains/);
+    assert.match(runbook, /db_site_snapshot_missing_required_stores/);
+    assert.match(runbook, /db_site_snapshot_missing_required_products/);
+    assert.match(runbook, /db_site_snapshot_missing_required_store_price_types/);
+    assert.match(runbook, /db_site_snapshot_missing_required_categories/);
+    assert.match(runbook, /db_site_snapshot_stale_observations/);
+    assert.match(runbook, /missingRequiredChains/);
+    assert.match(runbook, /missingRequiredStoreExternalRefs/);
+    assert.match(runbook, /missingRequiredProductSlugs/);
+    assert.match(runbook, /missingRequiredStorePriceTypes/);
+    assert.match(runbook, /missingRequiredCategorySlugs/);
+    assert.match(runbook, /staleObservationCount/);
   });
 
 });

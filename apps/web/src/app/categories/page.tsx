@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { categorySummaries, dietaryScenarioFilters, formatPct, formatSek, immigrantAisleFinder } from '@/lib/verified-data';
+import { categorySummaries, dietaryScenarioFilters, formatPct, formatSek, immigrantAisleFinder, sustainableBrandFilter } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -48,6 +48,31 @@ export default function CategoriesIndexPage() {
             </Link>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-800">{sustainableBrandFilter.persona}</p>
+        <h2 className="mt-2 text-2xl font-black">Sustainable-brand filter</h2>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+          This filter uses verified label evidence from Axfood rows plus OpenFoodFacts metadata. It is not a carbon claim: products without explicit evidenceLabels are withheld, and no lifecycle impact is inferred from brand names.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {sustainableBrandFilter.rows.map((row) => (
+            <Link className="rounded-2xl border border-lime-200 bg-white p-4 hover:border-lime-700" href={`/products/${row.slug}`} key={row.slug}>
+              <p className="font-black text-slate-950">{row.productName}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{row.brand} · {row.lowestChain} · {formatSek(row.lowestPrice)}</p>
+              <p className="mt-2 text-sm font-bold text-lime-900">filterScore {row.filterScore} · spread {formatPct(row.spreadPct)}</p>
+              <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-slate-500">evidenceLabels</p>
+              <p className="mt-1 text-sm leading-6 text-slate-700">{row.evidenceLabels.join(', ')}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">{row.guardrail}</p>
+            </Link>
+          ))}
+        </div>
+        <ul className="mt-4 space-y-2 text-sm font-semibold text-slate-700">
+          {sustainableBrandFilter.guardrails.map((guardrail) => (
+            <li key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
       </Card>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">

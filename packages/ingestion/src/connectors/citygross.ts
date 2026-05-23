@@ -71,7 +71,7 @@ export const CITY_GROSS_BASE_URL = 'https://www.citygross.se';
 export const CITY_GROSS_API_BASE_URL = 'https://www.citygross.se/api/v1';
 export const CITY_GROSS_STORES_PATH = 'PageData/stores';
 export const CITY_GROSS_PRODUCTS_PATH = 'Loop54/products';
-export const DEFAULT_CITY_GROSS_ROWS_PER_STORE = 48;
+export const DEFAULT_CITY_GROSS_PRODUCT_PAGE_SIZE = 100;
 
 export const DEFAULT_CITY_GROSS_PRODUCT_QUERIES = [
   'kaffe',
@@ -156,8 +156,8 @@ export async function fetchCityGrossStores(options: FetchCityGrossStoresOptions 
 
 export async function fetchCityGrossProducts(options: FetchCityGrossProductsOptions): Promise<CityGrossProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const maxRows = options.maxRows ?? 100;
-  const pageSize = options.pageSize ?? maxRows;
+  const maxRows = options.maxRows ?? Number.POSITIVE_INFINITY;
+  const pageSize = options.pageSize ?? DEFAULT_CITY_GROSS_PRODUCT_PAGE_SIZE;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: CityGrossProduct[] = [];
   const seen = new Set<string>();
@@ -186,8 +186,10 @@ export async function fetchCityGrossProducts(options: FetchCityGrossProductsOpti
       rows.push(row);
       if (rows.length >= maxRows) return rows;
     }
+    const totalCount = numberOrNull(payload.totalCount);
     if (items.length === 0 || items.length < pageSize) break;
     skip += items.length;
+    if (totalCount !== null && skip >= totalCount) break;
   }
   return rows;
 }
@@ -203,14 +205,14 @@ export async function fetchCityGrossProductsForAllStores(
   });
   const rows: CityGrossProduct[] = [];
   const seen = new Set<string>();
-  const queries = options.queries ?? DEFAULT_CITY_GROSS_PRODUCT_QUERIES;
+  const queries: readonly (string | undefined)[] = options.queries ?? [undefined];
   for (const store of stores) {
     for (const query of queries) {
       const products = await fetchCityGrossProducts({
         fetchImpl: options.fetchImpl,
         siteId: store.storeId,
         query,
-        maxRows: options.maxRowsPerStore ?? DEFAULT_CITY_GROSS_ROWS_PER_STORE,
+        maxRows: options.maxRowsPerStore,
         pageSize: options.pageSize,
         retrievedAt: options.retrievedAt,
         apiBaseUrl: options.apiBaseUrl

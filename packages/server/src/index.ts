@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
@@ -37,12 +37,14 @@ import {
   type SourceRunHealthReport
 } from '@groceryview/db';
 import {
+  buildSubscriptionCheckoutPlan,
   buildSubscriptionAccessPolicy,
   parseStripeCompatibleSubscriptionEvent,
   processBillingSubscriptionEvent,
   type BillingSubscriptionEntitlementMutation,
   type BillingSubscriptionEvent,
   type BillingSubscriptionEventType,
+  type SubscriptionCheckoutPlan,
   type SubscriptionEntitlementSnapshot,
   type SubscriptionPlan
 } from '@groceryview/monetization';
@@ -69,20 +71,31 @@ import {
   type WatchlistPriceType
 } from '@groceryview/core';
 import {
+  createExpoPushProvider,
+  createSendgridEmailProvider,
   formatNotificationOperationsMetrics,
   parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
+  runRepositoryNotificationWorkerCycle,
   type DeliveryChannel,
   type NotificationOperationsReport,
   type RepositoryNotificationWorkerCycleResult,
   type NotificationSuppressionWebhookProvider,
+  type NotificationProviderFetch,
+  type NotificationProviders,
+  type NotificationSuppression,
   type NotificationSuppressionEventType,
-  type NotificationSuppressionMutation
+  type NotificationSuppressionMutation,
+  type PersistedNotificationTask
 } from '@groceryview/notifications';
 import {
+  buildScanProviderReadinessReport,
+  createOcrSpaceReceiptProvider,
+  createOpenFoodFactsBarcodeProvider,
   planScanReviewWorkItems,
   prepareScanUploadTicket,
   processScanUpload,
+  type ScanProviderReadinessReport,
   type ScanProviders,
   type ScanUpload,
   type ScanUploadStorage
@@ -126,12 +139,19 @@ export type AuthOptions = {
   billingSubscriptionSink?: {
     upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   };
+  billingCheckoutPriceIds?: Partial<Record<SubscriptionPlan, string>>;
+  billingCheckoutProvider?: BillingCheckoutProvider;
+  billingPortalProvider?: BillingPortalProvider;
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
   notificationWorkerRunner?: () => Promise<RepositoryNotificationWorkerCycleResult>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
+  scanProviderReadinessProvider?: () => Promise<ScanProviderReadinessReport>;
+  scanUploadStorageReadinessProvider?: () => Promise<ScanUploadStorageReadinessReport>;
+  scanUploadCorsReadinessProvider?: () => Promise<ScanUploadCorsReadinessReport>;
+  scanUploadWriteReadinessProvider?: () => Promise<ScanUploadWriteReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
@@ -181,6 +201,9 @@ export type RuntimePersistenceRepository = {
     quantity?: number;
   }): Promise<BasketImportReviewItem>;
   upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
+  listDueNotificationTasks?(now: string): Promise<PersistedNotificationTask[]>;
+  listActiveNotificationSuppressions?(): Promise<NotificationSuppression[]>;
+  upsertNotificationTask?(task: PersistedNotificationTask): Promise<void>;
 };
 
 type RuntimeWatchlistRepository = {
@@ -203,11 +226,19 @@ export type RuntimeHandlerOptions = {
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
+  scanProviderReadinessProvider?: () => Promise<ScanProviderReadinessReport>;
+  scanUploadStorageReadinessProvider?: () => Promise<ScanUploadStorageReadinessReport>;
+  scanUploadCorsReadinessProvider?: () => Promise<ScanUploadCorsReadinessReport>;
+  scanUploadWriteReadinessProvider?: () => Promise<ScanUploadWriteReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
   watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
   pgPoolFactory?: RuntimePgPoolFactory;
+  notificationProviderFetch?: NotificationProviderFetch;
+  scanProviderFetch?: typeof fetch;
+  scanUploadCorsFetch?: typeof fetch;
+  scanUploadWriteFetch?: typeof fetch;
 };
 
 export type FlyerOffersProviderQuery = {
@@ -227,6 +258,90 @@ type JsonRecord = Record<string, unknown>;
 const require = createRequire(import.meta.url);
 const jsonHeaders = { 'content-type': 'application/json; charset=utf-8' };
 const requiredDailyChainIds = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'] as const;
+
+export type BillingCheckoutSession = {
+  sessionId: string;
+  checkoutUrl: string;
+};
+
+export type BillingCheckoutProvider = {
+  createCheckoutSession(request: Extract<SubscriptionCheckoutPlan, { status: 'ready' }>['checkoutRequest']): Promise<BillingCheckoutSession>;
+};
+
+export type BillingPortalRequest = {
+  customerReference: string;
+  returnUrl: string;
+};
+
+export type BillingPortalSession = {
+  sessionId: string;
+  portalUrl: string;
+};
+
+export type BillingPortalProvider = {
+  createPortalSession(request: BillingPortalRequest): Promise<BillingPortalSession>;
+};
+
+function createStripeCompatibleCheckoutProvider(secretKey: string): BillingCheckoutProvider {
+  return {
+    async createCheckoutSession(request) {
+      const body = new URLSearchParams();
+      body.set('mode', 'subscription');
+      body.set('client_reference_id', request.customerReference);
+      body.set('line_items[0][price]', request.priceId);
+      body.set('line_items[0][quantity]', '1');
+      body.set('success_url', request.successUrl);
+      body.set('cancel_url', request.cancelUrl);
+      body.set('metadata[plan]', request.metadata.plan);
+
+      const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: new Headers({
+          authorization: `Basic ${Buffer.from(`${secretKey}:`).toString('base64')}`,
+          'content-type': 'application/x-www-form-urlencoded'
+        }),
+        body
+      });
+      const payload = await response.json() as unknown;
+      if (!response.ok || payload === null || typeof payload !== 'object' || Array.isArray(payload)) {
+        throw new Error('Billing checkout provider rejected the session request.');
+      }
+      const record = payload as Record<string, unknown>;
+      return {
+        sessionId: requiredString(record.id, 'stripeCheckoutSession.id'),
+        checkoutUrl: requiredString(record.url, 'stripeCheckoutSession.url')
+      };
+    }
+  };
+}
+
+function createStripeCompatiblePortalProvider(secretKey: string): BillingPortalProvider {
+  return {
+    async createPortalSession(request) {
+      const body = new URLSearchParams();
+      body.set('customer', request.customerReference);
+      body.set('return_url', request.returnUrl);
+
+      const response = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
+        method: 'POST',
+        headers: new Headers({
+          authorization: `Basic ${Buffer.from(`${secretKey}:`).toString('base64')}`,
+          'content-type': 'application/x-www-form-urlencoded'
+        }),
+        body
+      });
+      const payload = await response.json() as unknown;
+      if (!response.ok || payload === null || typeof payload !== 'object' || Array.isArray(payload)) {
+        throw new Error('Billing portal provider rejected the session request.');
+      }
+      const record = payload as Record<string, unknown>;
+      return {
+        sessionId: requiredString(record.id, 'stripeBillingPortalSession.id'),
+        portalUrl: requiredString(record.url, 'stripeBillingPortalSession.url')
+      };
+    }
+  };
+}
 
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(body), {
@@ -259,6 +374,11 @@ function parseJsonObject(text: string): JsonRecord {
 function requiredString(value: unknown, field: string): string {
   if (typeof value !== 'string' || value.trim() === '') throw new Error(`${field} is required.`);
   return value;
+}
+
+function requiredSubscriptionPlan(value: unknown): SubscriptionPlan {
+  if (value === 'premium_monthly' || value === 'premium_yearly') return value;
+  throw new Error('plan must be premium_monthly or premium_yearly.');
 }
 
 function requiredScanKind(value: unknown): ScanUpload['kind'] {
@@ -926,14 +1046,37 @@ function signBillingWebhookBody(body: string, secret: string): string {
   return `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
 }
 
-function hasValidBillingWebhookSignature(request: Request, body: string, secret: string): boolean {
-  const provided = request.headers.get('x-groceryview-billing-signature');
-  if (!provided) return false;
+const STRIPE_WEBHOOK_SIGNATURE_TOLERANCE_SECONDS = 300;
 
-  const expected = signBillingWebhookBody(body, secret);
+function hasConstantTimeEqualSignature(provided: string, expected: string): boolean {
   const providedBuffer = Buffer.from(provided);
   const expectedBuffer = Buffer.from(expected);
   return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
+}
+
+function hasValidStripeBillingWebhookSignature(request: Request, body: string, secret: string, now: Date): boolean {
+  const header = request.headers.get('stripe-signature');
+  if (!header) return false;
+  const parts = header.split(',').map((part) => part.trim()).filter(Boolean);
+  const timestamp = parts.find((part) => part.startsWith('t='))?.slice(2);
+  const signatures = parts.filter((part) => part.startsWith('v1=')).map((part) => part.slice(3));
+  if (!timestamp || signatures.length === 0) return false;
+  const timestampSeconds = Number(timestamp);
+  if (!Number.isInteger(timestampSeconds)) return false;
+  const ageSeconds = Math.abs(Math.floor(now.getTime() / 1000) - timestampSeconds);
+  if (ageSeconds > STRIPE_WEBHOOK_SIGNATURE_TOLERANCE_SECONDS) return false;
+
+  const expected = createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
+  return signatures.some((signature) => hasConstantTimeEqualSignature(signature, expected));
+}
+
+function hasValidBillingWebhookSignature(request: Request, body: string, secret: string, now: Date): boolean {
+  const provided = request.headers.get('x-groceryview-billing-signature');
+  if (provided) {
+    return hasConstantTimeEqualSignature(provided, signBillingWebhookBody(body, secret));
+  }
+
+  return hasValidStripeBillingWebhookSignature(request, body, secret, now);
 }
 
 function hasValidMetricsToken(request: Request, token: string): boolean {
@@ -961,6 +1104,15 @@ export type PostgresReadinessDiagnostics = {
 
 export type HttpPostgresReadinessReport = PostgresIntegrationReadinessReport & {
   diagnostics: PostgresReadinessDiagnostics;
+  target?: PostgresReadinessTarget;
+};
+
+export type PostgresReadinessTarget = {
+  host: string;
+  database: string;
+  username: string;
+  isSupabasePooler: boolean;
+  poolerMode: 'direct' | 'session' | 'transaction';
 };
 
 export function summarizePostgresReadinessForHttp(report: PostgresIntegrationReadinessReport): PostgresReadinessDiagnostics {
@@ -988,9 +1140,27 @@ export function summarizePostgresReadinessForHttp(report: PostgresIntegrationRea
   };
 }
 
-function postgresReadinessResponse(report: PostgresIntegrationReadinessReport): HttpPostgresReadinessReport {
+export function postgresReadinessTargetFromDatabaseUrl(databaseUrl: string | undefined): PostgresReadinessTarget | undefined {
+  if (!databaseUrl?.trim()) return undefined;
+  const url = new URL(databaseUrl);
+  const port = url.port ? Number.parseInt(url.port, 10) : 5432;
+  const isSupabasePooler = url.hostname.endsWith('.pooler.supabase.com');
+  return {
+    host: url.hostname,
+    database: url.pathname.replace(/^\//, '') || 'postgres',
+    username: decodeURIComponent(url.username),
+    isSupabasePooler,
+    poolerMode: isSupabasePooler ? (port === 5432 ? 'session' : 'transaction') : 'direct'
+  };
+}
+
+function postgresReadinessResponse(
+  report: PostgresIntegrationReadinessReport,
+  target?: PostgresReadinessTarget
+): HttpPostgresReadinessReport {
   return {
     ...report,
+    ...(target ? { target } : {}),
     diagnostics: summarizePostgresReadinessForHttp(report)
   };
 }
@@ -1030,6 +1200,322 @@ function sourceRunHealthFailureResponse(): SourceRunHealthCheckResult {
     runCount: 0,
     filter: { limit: 0 }
   };
+}
+
+
+function scanProviderReadinessFailureResponse(): ScanProviderReadinessReport {
+  return {
+    status: 'blocked',
+    blockers: ['scan_provider_readiness_probe_failed'],
+    evidence: [],
+    warnings: [],
+    summary: 'Scan provider readiness is blocked.'
+  };
+}
+
+export type ScanUploadStorageReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  warnings: string[];
+  summary: string;
+};
+
+export type ScanUploadCorsReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  warnings: string[];
+  summary: string;
+};
+
+export type ScanUploadWriteReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  warnings: string[];
+  summary: string;
+};
+
+function scanUploadStorageReadinessFailureResponse(): ScanUploadStorageReadinessReport {
+  return {
+    status: 'blocked',
+    blockers: ['scan_upload_storage_readiness_probe_failed'],
+    evidence: [],
+    warnings: [],
+    summary: 'Scan upload storage readiness is blocked.'
+  };
+}
+
+function scanUploadCorsReadinessFailureResponse(): ScanUploadCorsReadinessReport {
+  return {
+    status: 'blocked',
+    blockers: ['scan_upload_cors_readiness_probe_failed'],
+    evidence: [],
+    warnings: [],
+    summary: 'Scan upload CORS readiness is blocked.'
+  };
+}
+
+function scanUploadWriteReadinessFailureResponse(): ScanUploadWriteReadinessReport {
+  return {
+    status: 'blocked',
+    blockers: ['scan_upload_write_readiness_probe_failed'],
+    evidence: [],
+    warnings: [],
+    summary: 'Scan upload write readiness is blocked.'
+  };
+}
+
+export async function buildScanUploadStorageReadinessReport(input: {
+  storage?: ScanUploadStorage | undefined;
+  now?: Date;
+}): Promise<ScanUploadStorageReadinessReport> {
+  const evidence: string[] = [];
+  const blockers: string[] = [];
+  const warnings: string[] = [];
+
+  if (!input.storage) {
+    blockers.push('scan_upload_storage_not_configured');
+    return {
+      status: 'blocked',
+      blockers,
+      evidence,
+      warnings,
+      summary: 'Scan upload storage readiness is blocked.'
+    };
+  }
+  evidence.push('scan_upload_storage_configured');
+
+  const result = await prepareScanUploadTicket({
+    request: {
+      scanId: 'readiness-scan-upload-storage',
+      kind: 'receipt',
+      contentType: 'image/jpeg',
+      byteLength: 1,
+      requestedAt: (input.now ?? new Date()).toISOString()
+    },
+    storage: input.storage
+  });
+
+  if (result.status !== 'ready') {
+    blockers.push('scan_upload_storage_ticket_not_created');
+  } else {
+    evidence.push('scan_upload_storage_ticket_created');
+    if (result.ticket.payloadUri.startsWith('s3://') || result.ticket.payloadUri.startsWith('private-upload://')) {
+      evidence.push('scan_upload_storage_private_payload_uri');
+    } else {
+      blockers.push('scan_upload_storage_payload_uri_not_private');
+    }
+    if (Object.keys(result.ticket.headers).length > 0) {
+      evidence.push('scan_upload_storage_headers_present');
+    } else {
+      blockers.push('scan_upload_storage_headers_missing');
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    warnings,
+    summary: blockers.length === 0 ? 'Scan upload storage is ready.' : 'Scan upload storage readiness is blocked.'
+  };
+}
+
+function headerListIncludes(value: string | null, expected: string): boolean {
+  if (!value) return false;
+  return value
+    .split(',')
+    .map((entry) => entry.trim().toLowerCase())
+    .includes(expected.toLowerCase());
+}
+
+function corsOriginAllowed(value: string | null, expectedOrigin: string): boolean {
+  if (!value) return false;
+  return value === '*' || value.split(',').map((entry) => entry.trim()).includes(expectedOrigin);
+}
+
+export async function buildScanUploadCorsReadinessReport(input: {
+  storage?: ScanUploadStorage | undefined;
+  origin?: string | undefined;
+  fetch?: typeof fetch | undefined;
+  now?: Date;
+}): Promise<ScanUploadCorsReadinessReport> {
+  const evidence: string[] = [];
+  const blockers: string[] = [];
+  const warnings: string[] = [];
+
+  if (!input.storage) blockers.push('scan_upload_storage_not_configured');
+  if (!input.origin?.trim()) {
+    blockers.push('scan_upload_cors_origin_not_configured');
+  } else {
+    evidence.push('scan_upload_cors_origin_configured');
+  }
+  if (blockers.length > 0) {
+    return {
+      status: 'blocked',
+      blockers,
+      evidence,
+      warnings,
+      summary: 'Scan upload CORS readiness is blocked.'
+    };
+  }
+
+  const result = await prepareScanUploadTicket({
+    request: {
+      scanId: 'readiness-scan-upload-cors',
+      kind: 'receipt',
+      contentType: 'image/jpeg',
+      byteLength: 1,
+      requestedAt: (input.now ?? new Date()).toISOString()
+    },
+    storage: input.storage
+  });
+  if (result.status !== 'ready') {
+    blockers.push('scan_upload_storage_ticket_not_created');
+  } else {
+    const response = await (input.fetch ?? fetch)(result.ticket.uploadUrl, {
+      method: 'OPTIONS',
+      headers: new Headers({
+        origin: input.origin!,
+        'access-control-request-method': 'PUT',
+        'access-control-request-headers': 'content-type'
+      })
+    });
+    if (!response.ok) blockers.push('scan_upload_cors_preflight_failed');
+    else evidence.push('scan_upload_cors_preflight_passed');
+
+    if (corsOriginAllowed(response.headers.get('access-control-allow-origin'), input.origin!)) {
+      evidence.push('scan_upload_cors_allows_origin');
+    } else {
+      blockers.push('scan_upload_cors_origin_not_allowed');
+    }
+    if (headerListIncludes(response.headers.get('access-control-allow-methods'), 'PUT')) {
+      evidence.push('scan_upload_cors_allows_put');
+    } else {
+      blockers.push('scan_upload_cors_put_not_allowed');
+    }
+    if (headerListIncludes(response.headers.get('access-control-allow-headers'), 'content-type')) {
+      evidence.push('scan_upload_cors_allows_content_type');
+    } else {
+      blockers.push('scan_upload_cors_content_type_header_not_allowed');
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    warnings,
+    summary: blockers.length === 0 ? 'Scan upload CORS is ready.' : 'Scan upload CORS readiness is blocked.'
+  };
+}
+
+export async function buildScanUploadWriteReadinessReport(input: {
+  storage?: ScanUploadStorage | undefined;
+  fetch?: typeof fetch | undefined;
+  now?: Date;
+}): Promise<ScanUploadWriteReadinessReport> {
+  const evidence: string[] = [];
+  const blockers: string[] = [];
+  const warnings: string[] = [];
+
+  if (!input.storage) {
+    blockers.push('scan_upload_storage_not_configured');
+    return {
+      status: 'blocked',
+      blockers,
+      evidence,
+      warnings,
+      summary: 'Scan upload write readiness is blocked.'
+    };
+  }
+
+  const result = await prepareScanUploadTicket({
+    request: {
+      scanId: 'readiness-scan-upload-write',
+      kind: 'receipt',
+      contentType: 'image/jpeg',
+      byteLength: 1,
+      requestedAt: (input.now ?? new Date()).toISOString()
+    },
+    storage: input.storage
+  });
+
+  if (result.status !== 'ready') {
+    blockers.push('scan_upload_storage_ticket_not_created');
+  } else {
+    evidence.push('scan_upload_write_ticket_created');
+    const response = await (input.fetch ?? fetch)(result.ticket.uploadUrl, {
+      method: 'PUT',
+      headers: new Headers(result.ticket.headers),
+      body: 'x'
+    });
+    if (response.ok) {
+      evidence.push('scan_upload_write_put_succeeded');
+    } else {
+      blockers.push('scan_upload_write_put_failed');
+    }
+    if (result.ticket.payloadUri.startsWith('s3://') || result.ticket.payloadUri.startsWith('private-upload://')) {
+      evidence.push('scan_upload_write_private_payload_uri');
+    } else {
+      blockers.push('scan_upload_write_payload_uri_not_private');
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    warnings,
+    summary: blockers.length === 0 ? 'Scan upload write is ready.' : 'Scan upload write readiness is blocked.'
+  };
+}
+
+async function providerHealthStatus(check: (() => Promise<unknown>) | undefined): Promise<'pass' | 'fail' | 'not_run'> {
+  if (!check) return 'not_run';
+  try {
+    await check();
+    return 'pass';
+  } catch {
+    return 'fail';
+  }
+}
+
+async function buildRuntimeScanProviderReadinessReport(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): Promise<ScanProviderReadinessReport> {
+  const fetchOption = options.scanProviderFetch ? { fetch: options.scanProviderFetch } : {};
+  const barcodeProvider = config.openFoodFactsUserAgent
+    ? createOpenFoodFactsBarcodeProvider({ userAgent: config.openFoodFactsUserAgent, ...fetchOption })
+    : undefined;
+  const receiptProvider = config.ocrSpaceApiKey
+    ? createOcrSpaceReceiptProvider({ apiKey: config.ocrSpaceApiKey, ...fetchOption })
+    : undefined;
+
+  const [barcodeHealth, receiptHealth] = await Promise.all([
+    providerHealthStatus(barcodeProvider && config.openFoodFactsHealthcheckBarcode ? () => barcodeProvider.lookup(config.openFoodFactsHealthcheckBarcode!) : undefined),
+    providerHealthStatus(receiptProvider && config.ocrSpaceHealthcheckImageUrl ? () => receiptProvider.parse(config.ocrSpaceHealthcheckImageUrl!) : undefined)
+  ]);
+
+  return buildScanProviderReadinessReport({
+    requiredProviders: ['barcode', 'receiptOcr'],
+    providers: [
+      {
+        kind: 'barcode',
+        providerName: 'openfoodfacts',
+        configured: Boolean(config.openFoodFactsUserAgent),
+        credentialsPresent: Boolean(config.openFoodFactsUserAgent),
+        healthStatus: barcodeHealth
+      },
+      {
+        kind: 'receiptOcr',
+        providerName: 'ocrspace',
+        configured: Boolean(config.ocrSpaceApiKey),
+        credentialsPresent: Boolean(config.ocrSpaceApiKey),
+        healthStatus: receiptHealth
+      }
+    ]
+  });
 }
 
 function catalogCoverageFailureResponse(): CatalogCoverageReport {
@@ -1363,6 +1849,66 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(api.getSubscriptionAccess(user, (authOptions.now ?? new Date()).toISOString()));
       }
 
+      if (method === 'POST' && path === '/api/billing/checkout-sessions') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const body = await readJson(request);
+        const plan = requiredSubscriptionPlan(body.plan);
+        const publicWebUrl = authOptions.runtimeConfig?.publicWebUrl ?? process.env.PUBLIC_WEB_URL;
+        const checkoutPlan = buildSubscriptionCheckoutPlan({
+          userId: user,
+          plan,
+          billingProviderConfigured: Boolean(authOptions.billingCheckoutProvider),
+          providerPriceId: authOptions.billingCheckoutPriceIds?.[plan],
+          successUrl: publicWebUrl ? `${publicWebUrl}/account?checkout=success&plan=${encodeURIComponent(plan)}` : undefined,
+          cancelUrl: publicWebUrl ? `${publicWebUrl}/account?checkout=cancel&plan=${encodeURIComponent(plan)}` : undefined
+        });
+        if (checkoutPlan.status !== 'ready') return errorResponse(503, checkoutPlan.reason);
+        if (!authOptions.billingCheckoutProvider) return errorResponse(503, 'Billing checkout provider is not configured.');
+        const session = await authOptions.billingCheckoutProvider.createCheckoutSession(checkoutPlan.checkoutRequest);
+        return jsonResponse({
+          provider: checkoutPlan.provider,
+          sessionId: session.sessionId,
+          checkoutUrl: session.checkoutUrl,
+          plan
+        }, { status: 201 });
+      }
+
+      if (method === 'POST' && path === '/api/billing/portal-sessions') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const entitlement = authOptions.subscriptionEntitlementRepository
+          ? await authOptions.subscriptionEntitlementRepository.getSubscriptionEntitlement(user)
+          : api.getSubscriptionEntitlement(user);
+        const providerCustomerId = entitlement && 'providerCustomerId' in entitlement && typeof entitlement.providerCustomerId === 'string'
+          ? entitlement.providerCustomerId
+          : undefined;
+        if (
+          !entitlement ||
+          entitlement.provider !== 'stripe_compatible' ||
+          !providerCustomerId ||
+          !['active', 'past_due'].includes(entitlement.status)
+        ) {
+          return errorResponse(503, 'Billing portal requires an active provider customer for this account.');
+        }
+        const publicWebUrl = authOptions.runtimeConfig?.publicWebUrl ?? process.env.PUBLIC_WEB_URL;
+        if (!publicWebUrl) return errorResponse(503, 'Billing portal return URL is not configured.');
+        if (!authOptions.billingPortalProvider) return errorResponse(503, 'Billing portal provider is not configured.');
+        const session = await authOptions.billingPortalProvider.createPortalSession({
+          customerReference: providerCustomerId,
+          returnUrl: `${publicWebUrl}/account?billing=return`
+        });
+        return jsonResponse({
+          provider: 'stripe_compatible',
+          sessionId: session.sessionId,
+          portalUrl: session.portalUrl
+        }, { status: 201 });
+      }
+
       if (method === 'GET' && path === '/api/metrics/notifications') {
         if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Notification metrics token is not configured.');
         if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
@@ -1385,7 +1931,10 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
 
         try {
           const report = await authOptions.postgresReadinessProvider();
-          return jsonResponse(postgresReadinessResponse(report), { status: report.status === 'ready' ? 200 : 503 });
+          return jsonResponse(
+            postgresReadinessResponse(report, postgresReadinessTargetFromDatabaseUrl(authOptions.runtimeConfig?.databaseUrl ?? process.env.DATABASE_URL)),
+            { status: report.status === 'ready' ? 200 : 503 }
+          );
         } catch {
           return jsonResponse(
             postgresReadinessResponse({
@@ -1426,6 +1975,66 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           return jsonResponse(report, { status: report.status === 'complete' ? 200 : 503 });
         } catch {
           return jsonResponse(catalogCoverageFailureResponse(), { status: 503 });
+        }
+      }
+
+      if (method === 'GET' && path === '/api/readiness/scanning') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Scan provider readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid scan provider readiness token is required.');
+        }
+        if (!authOptions.scanProviderReadinessProvider) return errorResponse(503, 'Scan provider readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.scanProviderReadinessProvider();
+          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(scanProviderReadinessFailureResponse(), { status: 503 });
+        }
+      }
+
+      if (method === 'GET' && path === '/api/readiness/scan-upload-storage') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Scan upload storage readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid scan upload storage readiness token is required.');
+        }
+        if (!authOptions.scanUploadStorageReadinessProvider) return errorResponse(503, 'Scan upload storage readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.scanUploadStorageReadinessProvider();
+          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(scanUploadStorageReadinessFailureResponse(), { status: 503 });
+        }
+      }
+
+      if (method === 'GET' && path === '/api/readiness/scan-upload-cors') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Scan upload CORS readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid scan upload CORS readiness token is required.');
+        }
+        if (!authOptions.scanUploadCorsReadinessProvider) return errorResponse(503, 'Scan upload CORS readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.scanUploadCorsReadinessProvider();
+          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(scanUploadCorsReadinessFailureResponse(), { status: 503 });
+        }
+      }
+
+      if (method === 'GET' && path === '/api/readiness/scan-upload-write') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Scan upload write readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid scan upload write readiness token is required.');
+        }
+        if (!authOptions.scanUploadWriteReadinessProvider) return errorResponse(503, 'Scan upload write readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.scanUploadWriteReadinessProvider();
+          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(scanUploadWriteReadinessFailureResponse(), { status: 503 });
         }
       }
 
@@ -1558,7 +2167,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (!authOptions.billingWebhookSecret) return errorResponse(503, 'Billing webhook secret is not configured.');
 
         const rawBody = request.body ? await request.text() : '';
-        if (!hasValidBillingWebhookSignature(request, rawBody, authOptions.billingWebhookSecret)) {
+        if (!hasValidBillingWebhookSignature(request, rawBody, authOptions.billingWebhookSecret, authOptions.now ?? new Date())) {
           return errorResponse(401, 'A valid billing webhook signature is required.');
         }
 
@@ -2196,6 +2805,7 @@ export type OpenApiSecurityRequirement = {
   metricsToken?: never[];
   webhookSignature?: never[];
   billingWebhookSignature?: never[];
+  stripeWebhookSignature?: never[];
 };
 
 export type OpenApiPathItem = Partial<Record<'get' | 'post' | 'put' | 'patch' | 'delete', OpenApiOperation>>;
@@ -2210,6 +2820,7 @@ export type OpenApiDocument = {
       metricsToken: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-metrics-token' };
       webhookSignature: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-signature' };
       billingWebhookSignature: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-billing-signature' };
+      stripeWebhookSignature: { type: 'apiKey'; in: 'header'; name: 'stripe-signature' };
     };
   };
 };
@@ -2218,7 +2829,7 @@ const protectedOperation = (summary: string): OpenApiOperation => ({ summary, se
 const publicOperation = (summary: string): OpenApiOperation => ({ summary });
 const metricsOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ metricsToken: [] }] });
 const webhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ webhookSignature: [] }] });
-const billingWebhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ billingWebhookSignature: [] }] });
+const billingWebhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ billingWebhookSignature: [] }, { stripeWebhookSignature: [] }] });
 
 export function buildOpenApiDocument(): OpenApiDocument {
   return {
@@ -2229,7 +2840,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
         bearerAuth: { type: 'http', scheme: 'bearer' },
         metricsToken: { type: 'apiKey', in: 'header', name: 'x-groceryview-metrics-token' },
         webhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' },
-        billingWebhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-billing-signature' }
+        billingWebhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-billing-signature' },
+        stripeWebhookSignature: { type: 'apiKey', in: 'header', name: 'stripe-signature' }
       }
     },
     paths: {
@@ -2253,6 +2865,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
+      '/api/billing/checkout-sessions': { post: protectedOperation('Create a provider-backed subscription checkout session for the signed-in account.') },
+      '/api/billing/portal-sessions': { post: protectedOperation('Create a provider-backed billing portal session for the signed-in account.') },
       '/api/billing/subscription-events': { post: billingWebhookOperation('Accept signed billing subscription events and persist entitlement updates.') },
       '/api/stores/{id}': { get: publicOperation('Get store profile.') },
       '/api/stores/{id}/category-coverage': { get: publicOperation('Get store price coverage grouped by product category.') },
@@ -2316,7 +2930,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/import-export': { post: protectedOperation('Import consented bookmarklet or extension basket rows and return unmatched review items.') },
       '/api/basket/import-review': { get: protectedOperation('Get account-bound retailer basket import review rows.') },
       '/api/basket/import-review/{reviewItemId}/decisions': { post: protectedOperation('Resolve an account-bound retailer basket import review row.') },
-      '/api/basket/trip-cost': { get: protectedOperation('Get basket totals ranked by shelf price plus explicit travel, time, delivery, and split-shop costs.') },
+      '/api/basket/trip-cost': { get: protectedOperation('Get basket totals ranked by branch product price plus explicit travel, time, delivery, and split-shop costs.') },
       '/api/basket/transfer/{retailerId}': { get: protectedOperation('Preflight secure retailer basket transfer and block unless capability is verified.') },
       '/api/basket/recurring-digest': { get: protectedOperation('Get recurring basket changes, missing-price blockers, and suggested review actions.') },
       '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },
@@ -2334,6 +2948,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
       '/api/readiness/source-runs': { get: metricsOperation('Check source run freshness and terminal status without exposing source secrets.') },
       '/api/readiness/catalog-coverage': { get: metricsOperation('Check product, chain, store, and product-store catalog coverage without exposing database secrets.') },
+      '/api/readiness/scanning': { get: metricsOperation('Check scan provider configuration and health evidence without exposing provider secrets.') },
+      '/api/readiness/scan-upload-cors': { get: metricsOperation('Check scan upload CORS preflight behavior without exposing signed upload URL secrets.') },
+      '/api/readiness/scan-upload-storage': { get: metricsOperation('Check scan upload storage ticket creation without exposing object-storage secrets.') },
+      '/api/readiness/scan-upload-write': { get: metricsOperation('Check scan upload write behavior without exposing signed upload URL secrets.') },
       '/api/workers/notifications/run': { post: metricsOperation('Run the configured notification worker cycle for cron execution.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
       '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid, SES, or Expo suppression payloads.') }
@@ -2349,9 +2967,59 @@ export type RuntimeConfig = {
   publicWebUrl?: string;
   notificationWebhookSecret?: string;
   billingWebhookSecret?: string;
+  stripeSecretKey?: string;
+  stripePriceIds?: Partial<Record<SubscriptionPlan, string>>;
+  sendgridApiKey?: string;
+  sendgridFromEmail?: string;
+  expoPushAccessToken?: string;
   metricsToken?: string;
+  ocrSpaceApiKey?: string;
+  ocrSpaceHealthcheckImageUrl?: string;
+  openFoodFactsUserAgent?: string;
+  openFoodFactsHealthcheckBarcode?: string;
+  s3Endpoint?: string;
+  s3Region?: string;
+  s3Bucket?: string;
+  s3AccessKeyId?: string;
+  s3SecretAccessKey?: string;
+  scanUploadMaxBytes?: number;
   catalogCoverageTargets?: Omit<CatalogCoverageInput, 'products'>;
+  sourceRunMinAcceptedRowsByChain?: Readonly<Record<string, number>>;
 };
+
+const defaultSourceRunMinAcceptedRowsByChain: Readonly<Record<(typeof requiredDailyChainIds)[number], number>> = {
+  ica: 1,
+  willys: 1,
+  coop: 1,
+  hemkop: 1,
+  lidl: 1,
+  city_gross: 1
+};
+
+function parseSourceRunMinAcceptedRowsByChain(value: string | undefined): Readonly<Record<string, number>> | undefined {
+  if (!value?.trim()) return undefined;
+  const parsed = JSON.parse(value) as unknown;
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN must be a JSON object.');
+  }
+  const entries = Object.entries(parsed as Record<string, unknown>);
+  if (entries.length === 0) {
+    throw new Error('GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN must include at least one chain threshold.');
+  }
+  const knownChains = new Set<string>(requiredDailyChainIds);
+  const thresholds: Record<string, number> = {};
+  for (const [rawChainId, rawMinimum] of entries) {
+    const chainId = rawChainId.trim();
+    if (!knownChains.has(chainId)) {
+      throw new Error(`GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN.${rawChainId} must be one of: ${requiredDailyChainIds.join(', ')}.`);
+    }
+    if (typeof rawMinimum !== 'number' || !Number.isInteger(rawMinimum) || rawMinimum < 1) {
+      throw new Error(`GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN.${rawChainId} must be a positive integer.`);
+    }
+    thresholds[chainId] = rawMinimum;
+  }
+  return thresholds;
+}
 
 function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCoverageInput, 'products'> | undefined {
   if (!value?.trim()) return undefined;
@@ -2368,6 +3036,10 @@ function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCov
     return fieldValue.map((entry) => String(entry).trim());
   };
   const targetChains = readStringArray('targetChains');
+  const targetPriceTypes = readStringArray('targetPriceTypes');
+  if (!targetPriceTypes.includes('online')) {
+    throw new Error('CATALOG_COVERAGE_TARGETS_JSON.targetPriceTypes must include online.');
+  }
   const missingRequiredChains = requiredDailyChainIds.filter((chainId) => !targetChains.includes(chainId));
   if (missingRequiredChains.length > 0) {
     throw new Error(`CATALOG_COVERAGE_TARGETS_JSON.targetChains is missing required chains: ${missingRequiredChains.join(', ')}.`);
@@ -2377,7 +3049,9 @@ function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCov
     targetCategories: readStringArray('targetCategories'),
     targetChains,
     targetStores: readStringArray('targetStores'),
-    requireEveryProductInEveryStore: record.requireEveryProductInEveryStore !== false
+    targetPriceTypes,
+    requireEveryProductInEveryStore: record.requireEveryProductInEveryStore !== false,
+    requireEveryStorePriceType: record.requireEveryStorePriceType === true
   };
 }
 
@@ -2404,12 +3078,32 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.DATABASE_URL) throw new Error('DATABASE_URL is required in production.');
     if (!env.PUBLIC_WEB_URL) throw new Error('PUBLIC_WEB_URL is required in production.');
     if (!env.NOTIFICATION_WEBHOOK_SECRET) throw new Error('NOTIFICATION_WEBHOOK_SECRET is required in production.');
+    if (!env.SENDGRID_API_KEY) throw new Error('SENDGRID_API_KEY is required in production.');
+    if (!env.SENDGRID_FROM_EMAIL) throw new Error('SENDGRID_FROM_EMAIL is required in production.');
+    if (!env.EXPO_PUSH_ACCESS_TOKEN) throw new Error('EXPO_PUSH_ACCESS_TOKEN is required in production.');
     if (!env.BILLING_WEBHOOK_SECRET) throw new Error('BILLING_WEBHOOK_SECRET is required in production.');
     if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
+    if (!env.OCR_SPACE_API_KEY) throw new Error('OCR_SPACE_API_KEY is required in production.');
+    if (!env.OCR_SPACE_HEALTHCHECK_IMAGE_URL) throw new Error('OCR_SPACE_HEALTHCHECK_IMAGE_URL is required in production.');
+    if (!env.OPENFOODFACTS_USER_AGENT) throw new Error('OPENFOODFACTS_USER_AGENT is required in production.');
+    if (!env.OPENFOODFACTS_HEALTHCHECK_BARCODE) throw new Error('OPENFOODFACTS_HEALTHCHECK_BARCODE is required in production.');
+    if (!env.S3_ENDPOINT) throw new Error('S3_ENDPOINT is required in production.');
+    if (!env.S3_REGION) throw new Error('S3_REGION is required in production.');
+    if (!env.S3_BUCKET) throw new Error('S3_BUCKET is required in production.');
+    if (!env.S3_ACCESS_KEY_ID) throw new Error('S3_ACCESS_KEY_ID is required in production.');
+    if (!env.S3_SECRET_ACCESS_KEY) throw new Error('S3_SECRET_ACCESS_KEY is required in production.');
     if (!env.CATALOG_COVERAGE_TARGETS_JSON) throw new Error('CATALOG_COVERAGE_TARGETS_JSON is required in production.');
+    if (!env.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN) throw new Error('GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN is required in production.');
   }
   validatePublicWebUrl(env.PUBLIC_WEB_URL);
+  const scanUploadMaxBytes = Number(env.SCAN_UPLOAD_MAX_BYTES ?? '5000000');
+  if (!Number.isInteger(scanUploadMaxBytes) || scanUploadMaxBytes <= 0) throw new Error('SCAN_UPLOAD_MAX_BYTES must be a positive integer.');
   const catalogCoverageTargets = parseCatalogCoverageTargets(env.CATALOG_COVERAGE_TARGETS_JSON);
+  const sourceRunMinAcceptedRowsByChain = parseSourceRunMinAcceptedRowsByChain(env.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN);
+  const stripePriceIds: Partial<Record<SubscriptionPlan, string>> = {
+    ...(env.STRIPE_PRICE_PREMIUM_MONTHLY ? { premium_monthly: env.STRIPE_PRICE_PREMIUM_MONTHLY } : {}),
+    ...(env.STRIPE_PRICE_PREMIUM_YEARLY ? { premium_yearly: env.STRIPE_PRICE_PREMIUM_YEARLY } : {})
+  };
   return {
     nodeEnv,
     port,
@@ -2417,29 +3111,214 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     databaseUrl: env.DATABASE_URL,
     publicWebUrl: env.PUBLIC_WEB_URL,
     notificationWebhookSecret: env.NOTIFICATION_WEBHOOK_SECRET,
+    ...(env.SENDGRID_API_KEY ? { sendgridApiKey: env.SENDGRID_API_KEY } : {}),
+    ...(env.SENDGRID_FROM_EMAIL ? { sendgridFromEmail: env.SENDGRID_FROM_EMAIL } : {}),
+    ...(env.EXPO_PUSH_ACCESS_TOKEN ? { expoPushAccessToken: env.EXPO_PUSH_ACCESS_TOKEN } : {}),
     billingWebhookSecret: env.BILLING_WEBHOOK_SECRET,
+    ...(env.STRIPE_SECRET_KEY ? { stripeSecretKey: env.STRIPE_SECRET_KEY } : {}),
+    ...(Object.keys(stripePriceIds).length > 0 ? { stripePriceIds } : {}),
     metricsToken: env.METRICS_TOKEN,
-    ...(catalogCoverageTargets ? { catalogCoverageTargets } : {})
+    ...(env.OCR_SPACE_API_KEY ? { ocrSpaceApiKey: env.OCR_SPACE_API_KEY } : {}),
+    ...(env.OCR_SPACE_HEALTHCHECK_IMAGE_URL ? { ocrSpaceHealthcheckImageUrl: env.OCR_SPACE_HEALTHCHECK_IMAGE_URL } : {}),
+    ...(env.OPENFOODFACTS_USER_AGENT ? { openFoodFactsUserAgent: env.OPENFOODFACTS_USER_AGENT } : {}),
+    ...(env.OPENFOODFACTS_HEALTHCHECK_BARCODE ? { openFoodFactsHealthcheckBarcode: env.OPENFOODFACTS_HEALTHCHECK_BARCODE } : {}),
+    ...(env.S3_ENDPOINT ? { s3Endpoint: env.S3_ENDPOINT } : {}),
+    ...(env.S3_REGION ? { s3Region: env.S3_REGION } : {}),
+    ...(env.S3_BUCKET ? { s3Bucket: env.S3_BUCKET } : {}),
+    ...(env.S3_ACCESS_KEY_ID ? { s3AccessKeyId: env.S3_ACCESS_KEY_ID } : {}),
+    ...(env.S3_SECRET_ACCESS_KEY ? { s3SecretAccessKey: env.S3_SECRET_ACCESS_KEY } : {}),
+    scanUploadMaxBytes,
+    ...(catalogCoverageTargets ? { catalogCoverageTargets } : {}),
+    ...(sourceRunMinAcceptedRowsByChain ? { sourceRunMinAcceptedRowsByChain } : {})
+  };
+}
+
+
+function buildRuntimeNotificationProviders(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): NotificationProviders {
+  return {
+    ...(config.sendgridApiKey && config.sendgridFromEmail
+      ? {
+          email: createSendgridEmailProvider({
+            apiKey: config.sendgridApiKey,
+            fromEmail: config.sendgridFromEmail,
+            ...(options.notificationProviderFetch ? { fetch: options.notificationProviderFetch } : {})
+          })
+        }
+      : {}),
+    ...(config.expoPushAccessToken
+      ? {
+          push: createExpoPushProvider({
+            accessToken: config.expoPushAccessToken,
+            ...(options.notificationProviderFetch ? { fetch: options.notificationProviderFetch } : {})
+          })
+        }
+      : {})
+  };
+}
+
+function buildRuntimeNotificationWorkerRunner(
+  config: RuntimeConfig,
+  repository: RuntimePersistenceRepository | undefined,
+  options: RuntimeHandlerOptions = {}
+): (() => Promise<RepositoryNotificationWorkerCycleResult>) | undefined {
+  if (!repository?.listDueNotificationTasks || !repository.listActiveNotificationSuppressions || !repository.upsertNotificationTask) return undefined;
+  const providers = buildRuntimeNotificationProviders(config, options);
+  if (!providers.email && !providers.push) return undefined;
+  return () => runRepositoryNotificationWorkerCycle({
+    now: (options.now ?? new Date()).toISOString(),
+    retryDelayMinutes: 15,
+    staleAfterMinutes: 60,
+    repository: {
+      listDueNotificationTasks: (now) => repository.listDueNotificationTasks!(now),
+      listActiveNotificationSuppressions: () => repository.listActiveNotificationSuppressions!(),
+      upsertNotificationTask: (task) => repository.upsertNotificationTask!(task)
+    },
+    providers,
+    alertRecipients: []
+  });
+}
+
+function hashHex(value: string): string {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function hmacBuffer(key: Buffer | string, value: string): Buffer {
+  return createHmac('sha256', key).update(value).digest();
+}
+
+function hmacHex(key: Buffer | string, value: string): string {
+  return createHmac('sha256', key).update(value).digest('hex');
+}
+
+function awsDateParts(date: Date): { amzDate: string; dateStamp: string } {
+  const iso = date.toISOString().replace(/[:-]|\.\d{3}/g, '');
+  return { amzDate: iso, dateStamp: iso.slice(0, 8) };
+}
+
+function encodeS3KeySegment(segment: string): string {
+  return encodeURIComponent(segment).replace(/[!'()*]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`);
+}
+
+function buildRuntimeScanUploadStorage(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): ScanUploadStorage | undefined {
+  if (!config.s3Endpoint || !config.s3Region || !config.s3Bucket || !config.s3AccessKeyId || !config.s3SecretAccessKey) return undefined;
+  const endpoint = new URL(config.s3Endpoint);
+  const bucket = config.s3Bucket;
+  const region = config.s3Region;
+  const accessKeyId = config.s3AccessKeyId;
+  const secretAccessKey = config.s3SecretAccessKey;
+
+  return {
+    async createUploadTicket(request) {
+      const issuedAt = options.now ?? new Date(request.requestedAt);
+      const expiresInSeconds = 600;
+      const expiresAt = new Date(issuedAt.getTime() + expiresInSeconds * 1000).toISOString();
+      const objectKey = ['scans', request.kind, request.scanId].map(encodeS3KeySegment).join('/');
+      const path = `/${encodeS3KeySegment(bucket)}/${objectKey}`;
+      const { amzDate, dateStamp } = awsDateParts(issuedAt);
+      const credentialScope = `${dateStamp}/${region}/s3/aws4_request`;
+      const signedHeaders = 'host';
+      const params = new URLSearchParams({
+        'X-Amz-Algorithm': 'AWS4-HMAC-SHA256',
+        'X-Amz-Credential': `${accessKeyId}/${credentialScope}`,
+        'X-Amz-Date': amzDate,
+        'X-Amz-Expires': String(expiresInSeconds),
+        'X-Amz-SignedHeaders': signedHeaders
+      });
+      const canonicalQuery = Array.from(params.entries())
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+        .join('&');
+      const canonicalRequest = [
+        'PUT',
+        path,
+        canonicalQuery,
+        `host:${endpoint.host}\n`,
+        signedHeaders,
+        'UNSIGNED-PAYLOAD'
+      ].join('\n');
+      const stringToSign = [
+        'AWS4-HMAC-SHA256',
+        amzDate,
+        credentialScope,
+        hashHex(canonicalRequest)
+      ].join('\n');
+      const signingKey = hmacBuffer(hmacBuffer(hmacBuffer(hmacBuffer(`AWS4${secretAccessKey}`, dateStamp), region), 's3'), 'aws4_request');
+      params.set('X-Amz-Signature', hmacHex(signingKey, stringToSign));
+      const uploadUrl = new URL(path, endpoint);
+      uploadUrl.search = params.toString();
+      return {
+        scanId: request.scanId,
+        uploadUrl: uploadUrl.toString(),
+        payloadUri: `s3://${bucket}/${objectKey}`,
+        expiresAt,
+        maxBytes: config.scanUploadMaxBytes ?? 5_000_000,
+        headers: { 'content-type': request.contentType }
+      };
+    }
   };
 }
 
 export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): AuthOptions {
+  const scanProviders: ScanProviders = {
+    ...(config.openFoodFactsUserAgent
+      ? {
+          barcode: createOpenFoodFactsBarcodeProvider({
+            userAgent: config.openFoodFactsUserAgent,
+            ...(options.scanProviderFetch ? { fetch: options.scanProviderFetch } : {})
+          })
+        }
+      : {}),
+    ...(config.ocrSpaceApiKey
+      ? {
+          receiptOcr: createOcrSpaceReceiptProvider({
+            apiKey: config.ocrSpaceApiKey,
+            ...(options.scanProviderFetch ? { fetch: options.scanProviderFetch } : {})
+          })
+        }
+      : {})
+  };
+  const scanUploadStorage = buildRuntimeScanUploadStorage(config, options);
   return {
     runtimeConfig: config,
     authSecret: config.authSecret,
     now: options.now,
     notificationWebhookSecret: config.notificationWebhookSecret,
     billingWebhookSecret: config.billingWebhookSecret,
+    billingCheckoutPriceIds: config.stripePriceIds,
+    ...(config.stripeSecretKey
+      ? {
+          billingCheckoutProvider: createStripeCompatibleCheckoutProvider(config.stripeSecretKey),
+          billingPortalProvider: createStripeCompatiblePortalProvider(config.stripeSecretKey)
+        }
+      : {}),
     notificationMetricsToken: config.metricsToken,
     notificationMetricsProvider: options.notificationMetricsProvider,
     notificationWorkerRunner: options.notificationWorkerRunner,
     postgresReadinessProvider: options.postgresReadinessProvider,
     sourceRunHealthProvider: options.sourceRunHealthProvider,
     catalogCoverageProvider: options.catalogCoverageProvider,
+    scanProviderReadinessProvider: options.scanProviderReadinessProvider ?? (() => buildRuntimeScanProviderReadinessReport(config, options)),
+    scanUploadStorageReadinessProvider: options.scanUploadStorageReadinessProvider ?? (() => buildScanUploadStorageReadinessReport({
+      storage: scanUploadStorage,
+      now: options.now
+    })),
+    scanUploadCorsReadinessProvider: options.scanUploadCorsReadinessProvider ?? (() => buildScanUploadCorsReadinessReport({
+      storage: scanUploadStorage,
+      origin: config.publicWebUrl,
+      fetch: options.scanUploadCorsFetch,
+      now: options.now
+    })),
+    scanUploadWriteReadinessProvider: options.scanUploadWriteReadinessProvider ?? (() => buildScanUploadWriteReadinessReport({
+      storage: scanUploadStorage,
+      fetch: options.scanUploadWriteFetch,
+      now: options.now
+    })),
     flyerOffersProvider: options.flyerOffersProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider,
-    watchlistPriceAlertWriter: options.watchlistPriceAlertWriter
+    watchlistPriceAlertWriter: options.watchlistPriceAlertWriter,
+    ...(Object.keys(scanProviders).length > 0 ? { scanProviders } : {}),
+    ...(scanUploadStorage ? { scanUploadStorage } : {})
   };
 }
 
@@ -2522,7 +3401,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
         maxRunningMinutes: 120,
         staleAfterMinutes: 24 * 60,
         requiredFreshChainIds: requiredDailyChainIds,
-        requiredAcceptedCountByChain: { ica: 1, willys: 1, coop: 1, hemkop: 1, lidl: 1, city_gross: 1 },
+        requiredAcceptedCountByChain: config.sourceRunMinAcceptedRowsByChain ?? defaultSourceRunMinAcceptedRowsByChain,
         filter: { limit: 100 }
       }),
     ...(config.catalogCoverageTargets
@@ -2551,7 +3430,9 @@ function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: Runt
     ...(resource.repository ? { repository: resource.repository } : {}),
     postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider,
     sourceRunHealthProvider: options.sourceRunHealthProvider ?? resource.sourceRunHealthProvider,
+    notificationWorkerRunner: options.notificationWorkerRunner ?? buildRuntimeNotificationWorkerRunner(config, options.repository ?? resource.repository, options),
     catalogCoverageProvider: options.catalogCoverageProvider ?? resource.catalogCoverageProvider,
+    scanProviderReadinessProvider: options.scanProviderReadinessProvider,
     flyerOffersProvider: options.flyerOffersProvider ?? resource.flyerOffersProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider ?? resource.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider ?? resource.watchlistPriceAlertsProvider,

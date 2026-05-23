@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
-import { adaptiveProductCards, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, topChainSpreads, freshestOpenPrices } from '@/lib/verified-data';
+import { adaptiveProductCards, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
@@ -11,11 +11,126 @@ export function generateMetadata() {
 }
 
 export default function ProductsPage() {
+  const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = facetedProductSearch;
+
   return (
     <PageShell>
       <Eyebrow>Products</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Verified product catalogue</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Products are shown only when present in the Axfood chain snapshot or OpenPrices SEK observations. No synthetic prices or filler products are rendered.</p>
+      <Card className="mt-8 border-violet-200 bg-violet-50/70">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-violet-800">Product search</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Instant faceted search</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              This preview calls buildFacetedProductSearch over facetedSearchRows generated from real product, latest_prices, chains, and stores-shaped Axfood rows.
+              Shoppers can narrow by category, label/dietary evidence, kr/kg or kr/l range, chain, and the inStockOnly priced-row gate without synthetic product or price filler.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-violet-950 shadow-sm">
+            {inStockOnly.productCount.toLocaleString('sv-SE')} priced products · {inStockOnly.latestPriceCount.toLocaleString('sv-SE')} latest_prices rows
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-4">
+          <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Category facets</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {categoryFacets.map((facet) => (
+                <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-900" key={facet.value}>{facet.value} · {facet.count}</span>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Label / dietary facets</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {labelFacets.map((facet) => (
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900" key={facet.value}>{facet.label} · {facet.count}</span>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Chain facets</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {chainFacets.map((facet) => (
+                <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" key={facet.value}>{facet.label} · {facet.count}</span>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Price range + stock</p>
+            <p className="mt-3 text-2xl font-black text-slate-950">{formatSek(priceRange.min)} – {formatSek(priceRange.max)}</p>
+            <p className="mt-2 text-xs font-bold text-slate-600">Comparable unit filters cover kr/kg, kr/l, and per-unit rows. {inStockOnly.label} keeps unpriced catalog rows out of instant results.</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {resultCards.map((product) => (
+            <Link className="group rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700" href={`/products/${product.slug}`} key={product.slug}>
+              <div className="flex gap-3">
+                {product.imageUrl ? (
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100">
+                    <Image alt={`${product.name} product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} sizes="80px" src={product.imageUrl} width={80} />
+                  </div>
+                ) : null}
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">{product.brand}</p>
+                  <h3 className="mt-1 text-lg font-black text-slate-950">{product.name}</h3>
+                  <p className="mt-1 text-xs font-semibold text-slate-500">{product.categoryLabel}</p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-2 text-xs font-black text-slate-700">
+                <p>{product.cheapestPriceLabel} · {product.unitPriceLabel}</p>
+                <p>{product.chainLabel}</p>
+                <p className="text-violet-800">sourceTables: {product.sourceTables.join(' · ')}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </Card>
+      <Card className="mt-8 border-rose-200 bg-rose-50/70">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-rose-800">Save to watchlist</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">♡ Account-bound product hearts</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Signed-in shoppers only can save a verified product heart to their account-bound watchlist.
+              Each card keeps the sourceProductSlug, target price, Deal Score, and alert summary wired to buildWatchlistAlerts output rather than anonymous local storage or demo rows.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-rose-900 shadow-sm">{watchlistHeartProducts.length} verified save candidates</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {watchlistHeartProducts.map((product) => (
+            <Link className="group rounded-2xl border border-rose-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-rose-700" href={`/products/${product.sourceProductSlug}`} key={product.sourceProductSlug}>
+              <div className="flex items-start gap-3">
+                {product.imageUrl ? (
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-rose-100">
+                    <Image alt={`${product.productName} watchlist product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={64} sizes="64px" src={product.imageUrl} width={64} />
+                  </div>
+                ) : null}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-700">{product.brand}</p>
+                    <span aria-label={`Save ${product.productName} to watchlist`} className="rounded-full bg-rose-100 px-2 py-1 text-lg font-black text-rose-800">♡</span>
+                  </div>
+                  <h3 className="mt-1 line-clamp-2 text-lg font-black text-slate-950">{product.productName}</h3>
+                  <p className="mt-1 text-xs font-semibold text-slate-500">{product.categoryLabel}</p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-2 text-xs font-black text-slate-700">
+                <p>{product.currentPriceLabel} now · {product.unitPriceLabel}</p>
+                <p>target price {product.targetPriceLabel} · Deal Score {product.dealScore}</p>
+                <p>{product.bestStoreLabel} · {product.priceTypeLabel}</p>
+                <p className="rounded-2xl bg-rose-50 p-3 text-rose-900">{product.saveLabel}: {product.authRequirement}</p>
+                <p className="rounded-2xl bg-white p-3 text-slate-700 ring-1 ring-rose-100">buildWatchlistAlerts: {product.alertCount} alert signals · {product.alertSummary}</p>
+                <p>{product.firstAlertMessage}</p>
+                <p>{product.sourceLabel}</p>
+                <p className="text-rose-800">sourceProductSlug: {product.sourceProductSlug} · account-bound {product.accountBound ? 'yes' : 'no'}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </Card>
       <Card className="mt-8 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>

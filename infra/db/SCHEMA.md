@@ -24,15 +24,16 @@ Every price-bearing row carries `price_type`, `confidence`, `observed_at`, and `
 
 ## Partitioning Plan
 
-`observations` is intentionally kept as a single table for the first migration so early API and worker lanes can integrate without partition-management code. When write volume requires partitioning, add a follow-up migration that:
+Migration 013 builds the first time-series partition lane without breaking existing `latest_prices` foreign keys:
 
-1. creates `observations_v2 partition by range (observed_at)`,
-2. creates monthly partitions named `observations_YYYY_MM`,
-3. recreates the product/time, store/time, price type/time, and provenance indexes on each partition,
-4. backfills from `observations`,
-5. swaps read/write code to `observations_v2`.
+1. `observations` remains the canonical immutable write table for current adapters.
+2. `observations_v2` is a mirror table partitioned by range on `observed_at`.
+3. Monthly range partitions are named `observations_YYYY_MM` and can be pre-created with `create_observations_partitions(window_start, months_ahead)`.
+4. `ensure_observations_monthly_partition(partition_month)` auto-creates the matching month before trigger-synced writes land.
+5. Each monthly partition carries product/time, store/time, price type/time, domain/time, provenance GIN, and BRIN indexes. BRIN keeps append-only time pruning cheap at large row counts.
+6. `drop_observations_partitions_before(cutoff_month)` is the retention tiering hook: operators can archive a month, then perform retention by partition drop instead of row deletes.
 
-The same pattern can be reused for long-term raw payload retention in `raw_records` if retailer capture volume grows faster than normalized observations.
+The same monthly range partition and retention by partition drop pattern can be reused for long-term raw payload retention in `raw_records` if retailer capture volume grows faster than normalized observations.
 
 ## Deal Score Boundary
 
@@ -112,17 +113,45 @@ Immutable normalized price facts. This is the canonical table for historical cha
 
 Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `observed_at`, validity window fields, `confidence`, `provenance`.
 
+Write policy: daily ingestion uses change-only writes. Before inserting a new immutable observation, the PostgreSQL writer compares the incoming `(product_id, chain_id, store_id, price_type)` price tuple with `latest_prices`; unchanged current snapshots reuse the existing `observation_id` instead of creating another daily duplicate. Changed rows keep temporal state by writing `valid_from` from source evidence or defaulting it to `observed_at`.
+
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
 Indexes: product/time, store/time, price type/time, and provenance GIN.
 
+### `observations_v2`
+
+Range-partitioned monthly mirror of immutable `observations` for high-volume history reads. It is populated by `observations_partition_lane_sync`, which calls `ensure_observations_monthly_partition()` before copying inserts and updates from the canonical table.
+
+Key columns: same price, source, provenance, validity, domain, and observed-time fields as `observations`. The partitioned primary key is `(id, observed_at)` because PostgreSQL range-partitioned unique keys must include the partition key.
+
+Partitions: monthly range partitions named `observations_YYYY_MM`, plus `observations_default` for rows outside the pre-created window. Operators should drain the default partition by creating the matching monthly partition before long-term retention.
+
+Indexes: parent and per-partition product/time, store/time, price type/time, domain/time, provenance GIN, and `observed_at` BRIN. Retention uses `drop_observations_partitions_before(cutoff_month)` after archive/downsample handoff.
+
 ### `latest_prices`
 
-Materialized latest price lookup for API and UI reads. Each row references the observation that won the rollup.
+Materialized latest price lookup for API and UI reads, and the write-side change detector for daily ingestion. Each row references the observation that won the rollup.
 
 Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `observation_id`, `price`, `regular_price`, `unit_price`, `currency`, `observed_at`, `confidence`, `provenance`, `updated_at`.
 
 Primary key: `(product_id, chain_id, store_id, price_type)`.
+
+### `price_daily`
+
+Derived daily rollup over immutable `observations` for product charts, 52-week-low checks, and historic range reads. Raw observations remain authoritative; charts and 52-week-low reads must hit `price_daily` or `price_weekly` instead of scanning raw observations for long ranges.
+
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `currency`, `bucket_day`, `min_price`, `max_price`, `avg_price`, `last_price`, unit-price equivalents, `first_observed_at`, `last_observed_at`, `observation_count`, `source_observation_ids`, `provenance`.
+
+Indexes: `price_daily_product_chain_day_idx`, `price_daily_store_day_idx`, and `price_daily_domain_day_idx`.
+
+### `price_weekly`
+
+Derived weekly rollup over immutable `observations` for long-range market charts and price-history summaries. It uses ISO-style `date_trunc('week', observed_at)::date` buckets and keeps source observation ids so every aggregate remains traceable to raw facts.
+
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `currency`, `week_start`, `min_price`, `max_price`, `avg_price`, `last_price`, unit-price equivalents, `first_observed_at`, `last_observed_at`, `observation_count`, `source_observation_ids`, `provenance`.
+
+Indexes: `price_weekly_product_chain_week_idx`, `price_weekly_store_week_idx`, and `price_weekly_domain_week_idx`.
 
 ### `users`
 

@@ -38,7 +38,10 @@ export function migrationVersionFromPath(path: string): string {
 
 export function createMigrationPlan(files: SqlMigrationFile[]): Migration[] {
   const migrations = files
-    .filter((file) => file.path.endsWith('.sql'))
+    .filter((file) => {
+      const filename = file.path.split(/[\\/]/).filter(Boolean).at(-1) ?? '';
+      return filename.endsWith('.sql') && !filename.startsWith('._');
+    })
     .sort((a, b) => a.path.localeCompare(b.path))
     .map((file) => ({
       version: migrationVersionFromPath(file.path),
@@ -396,6 +399,8 @@ export type CatalogProductCoverageRecord = {
   categoryId: string;
   observedChainIds: string[];
   observedStoreIds: string[];
+  observedPriceTypes: string[];
+  observedStorePriceTypes: string[];
 };
 
 export type ProductAliasSourceType = 'retailer' | 'receipt' | 'community' | 'import' | 'manual';
@@ -470,6 +475,7 @@ export type PriceObservationRecord = {
 
 export type PriceObservationWriteResult = {
   observationId: string;
+  status?: 'unchanged';
 };
 
 export type PostgresPriceObservationWriter = {
@@ -1578,6 +1584,8 @@ type CatalogProductCoverageRow = {
   category_id: string | null;
   observed_chain_ids: string[] | null;
   observed_store_ids: string[] | null;
+  observed_price_types: string[] | null;
+  observed_store_price_types: string[] | null;
 };
 type ProductAliasRow = {
   id: string;
@@ -1629,6 +1637,27 @@ function mapLatestPrice(row: LatestPriceRow): LatestPriceRecord {
     confidence: Number(row.confidence),
     provenance: asRecord(row.provenance)
   };
+}
+
+function samePriceValue(left: string | number | null, right: number | null | undefined): boolean {
+  if (left === null || right === null || right === undefined) return left === null && (right === null || right === undefined);
+  return Math.abs(Number(left) - Number(right)) < 0.000001;
+}
+
+function sameLatestPriceKey(row: LatestPriceRow, observation: PriceObservationRecord): boolean {
+  return row.product_id === observation.productId &&
+    row.chain_id === observation.chainId &&
+    (row.store_id ?? null) === (observation.storeId ?? null) &&
+    row.price_type === observation.priceType;
+}
+
+function latestPriceIsUnchanged(row: LatestPriceRow, observation: PriceObservationRecord): boolean {
+  if (!sameLatestPriceKey(row, observation)) return false;
+  if (Date.parse(asIso(row.observed_at)) > Date.parse(observation.observedAt)) return false;
+  return samePriceValue(row.price, observation.price) &&
+    samePriceValue(row.regular_price, observation.regularPrice ?? null) &&
+    samePriceValue(row.unit_price, observation.unitPrice) &&
+    row.currency === (observation.currency ?? 'SEK');
 }
 
 
@@ -1774,7 +1803,9 @@ function mapCatalogProductCoverage(row: CatalogProductCoverageRow): CatalogProdu
     id: row.product_id,
     categoryId: row.category_id ?? 'uncategorized',
     observedChainIds: [...(row.observed_chain_ids ?? [])].sort(),
-    observedStoreIds: [...(row.observed_store_ids ?? [])].sort()
+    observedStoreIds: [...(row.observed_store_ids ?? [])].sort(),
+    observedPriceTypes: [...(row.observed_price_types ?? [])].sort(),
+    observedStorePriceTypes: [...(row.observed_store_price_types ?? [])].sort()
   };
 }
 
@@ -3031,14 +3062,25 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
       const rows = await executor.query<CatalogProductCoverageRow>(
         `select products.id as product_id,
                 coalesce(products.category_path[1], 'uncategorized') as category_id,
-                coalesce(array_agg(distinct latest_prices.chain_id) filter (where latest_prices.chain_id is not null), '{}') as observed_chain_ids,
+                coalesce(array_agg(distinct replace(chains.slug, '-', '_')) filter (where chains.slug is not null), '{}') as observed_chain_ids,
                 coalesce(
                   array_agg(distinct coalesce(stores.external_ref, stores.slug, latest_prices.store_id::text))
                     filter (where latest_prices.store_id is not null),
                   '{}'
-                ) as observed_store_ids
+                ) as observed_store_ids,
+                coalesce(
+                  array_agg(distinct latest_prices.price_type)
+                    filter (where latest_prices.price_type is not null),
+                  '{}'
+                ) as observed_price_types,
+                coalesce(
+                  array_agg(distinct coalesce(stores.external_ref, stores.slug, latest_prices.store_id::text) || ':' || latest_prices.price_type)
+                    filter (where latest_prices.store_id is not null and latest_prices.price_type is not null),
+                  '{}'
+                ) as observed_store_price_types
          from products
          left join latest_prices on latest_prices.product_id = products.id
+         left join chains on chains.id = latest_prices.chain_id
          left join stores on stores.id = latest_prices.store_id
          group by products.id, products.category_path
          order by products.id
@@ -3160,7 +3202,10 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'raw_records',
   'retailer_source_policies',
   'observations',
+  'observations_v2',
   'latest_prices',
+  'price_daily',
+  'price_weekly',
   'app_users',
   'favorite_stores',
   'user_preferences',
@@ -3195,7 +3240,11 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '007_receipt_uploads',
   '008_household_plans',
   '009_retailer_source_policies',
-  '010_basket_import_reviews'
+  '010_basket_import_reviews',
+  '010_commodity_taxonomy',
+  '011_multi_vertical_domains',
+  '012_price_rollups',
+  '013_observations_partitioning'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -3669,6 +3718,38 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
   return {
     async recordPriceObservation(observation) {
       const provenanceJson = JSON.stringify(observation.provenance);
+      const latestRows = await executor.query<LatestPriceRow>(
+        `select product_id,
+                chain_id,
+                store_id,
+                price_type,
+                observation_id,
+                price,
+                regular_price,
+                unit_price,
+                currency,
+                observed_at,
+                confidence,
+                provenance
+         from latest_prices
+         where product_id = $1
+           and chain_id = $2
+           and store_id is not distinct from $3::uuid
+           and price_type = $4
+         order by observed_at desc
+         limit 1`,
+        [
+          observation.productId,
+          observation.chainId,
+          observation.storeId ?? null,
+          observation.priceType
+        ]
+      );
+      const latestRow = latestRows.find((row) => sameLatestPriceKey(row, observation)) ?? latestRows[0];
+      if (latestRow && latestPriceIsUnchanged(latestRow, observation)) {
+        return { observationId: latestRow.observation_id, status: 'unchanged' };
+      }
+
       const rows = await executor.query<ObservationIdRow>(
         `insert into observations(
            product_id,
@@ -3719,7 +3800,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.promotionEndsOn ?? null,
           observation.memberRequired ?? false,
           observation.observedAt,
-          observation.validFrom ?? null,
+          observation.validFrom ?? observation.observedAt,
           observation.validUntil ?? null,
           observation.confidence,
           provenanceJson

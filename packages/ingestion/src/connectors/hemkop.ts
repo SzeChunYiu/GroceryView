@@ -58,6 +58,12 @@ export type HemkopStore = {
   retrievedAt: string;
 };
 
+export type HemkopStoreProduct = HemkopProduct & {
+  storeId: string;
+  storeName: string;
+  city: string;
+};
+
 type HemkopSearchProduct = {
   code?: unknown;
   name?: unknown;
@@ -81,6 +87,12 @@ type HemkopSearchResponse = {
     numberOfPages?: unknown;
     currentPage?: unknown;
   };
+};
+
+type AxfoodCategoryTreeNode = {
+  url?: unknown;
+  valid?: unknown;
+  children?: AxfoodCategoryTreeNode[];
 };
 
 type AxfoodCampaignPromotion = {
@@ -146,6 +158,8 @@ type HemkopStoreApiRow = {
 export const HEMKOP_SEARCH_BASE_URL = 'https://www.hemkop.se/search';
 export const HEMKOP_WEEKLY_DISCOUNTS_BASE_URL = 'https://www.hemkop.se/search/campaigns/offline';
 export const HEMKOP_STORE_API_URL = 'https://www.hemkop.se/axfood/rest/store';
+export const HEMKOP_CATEGORY_TREE_URL = 'https://www.hemkop.se/leftMenu/categorytree';
+export const HEMKOP_CATEGORY_BASE_URL = 'https://www.hemkop.se/c';
 export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_ID = '4003';
 export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS = [
   '4003',
@@ -221,6 +235,8 @@ export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS = [
   '4204'
 ] as const;
 
+export const DEFAULT_HEMKOP_CATEGORY_PAGE_SIZE = 100;
+
 export const DEFAULT_HEMKOP_SEARCH_QUERIES = [
   'makaroner',
   'mjolk',
@@ -242,9 +258,18 @@ export const DEFAULT_HEMKOP_SEARCH_QUERIES = [
 export type FetchHemkopProductsOptions = {
   fetchImpl?: typeof fetch;
   queries?: readonly string[];
+  categoryPaths?: readonly string[];
+  categoryTreeUrl?: string;
+  storeId?: string;
   maxRows?: number;
   pageSize?: number;
   retrievedAt?: string;
+};
+
+export type FetchHemkopProductsForAllStoresOptions = Omit<FetchHemkopProductsOptions, 'storeId' | 'maxRows'> & {
+  storeApiUrl?: string;
+  maxStores?: number;
+  maxRowsPerStore?: number;
 };
 
 export type FetchHemkopWeeklyDiscountsOptions = {
@@ -269,14 +294,43 @@ export type FetchHemkopStoresOptions = {
   storeApiUrl?: string;
 };
 
-export function buildHemkopSearchUrl(query: string, size?: number, page = 0): string {
+export function buildHemkopSearchUrl(query: string, size?: number, page = 0, storeId?: string): string {
   const url = new URL(HEMKOP_SEARCH_BASE_URL);
   url.searchParams.set('q', query);
+  if (storeId) url.searchParams.set('store', storeId);
   if (size !== undefined) {
     url.searchParams.set('page', String(page));
     url.searchParams.set('size', String(size));
   }
   return url.toString();
+}
+
+export function buildHemkopCategoryUrl(categoryPath: string, size = DEFAULT_HEMKOP_CATEGORY_PAGE_SIZE, page = 0, storeId?: string): string {
+  const safePath = categoryPath.split('/').filter(Boolean).map(encodeURIComponent).join('/');
+  const url = new URL(`${HEMKOP_CATEGORY_BASE_URL}/${safePath}`);
+  url.searchParams.set('page', String(page));
+  url.searchParams.set('size', String(size));
+  if (storeId) url.searchParams.set('store', storeId);
+  return url.toString();
+}
+
+export async function fetchHemkopCategoryPaths(options: { fetchImpl?: typeof fetch; categoryTreeUrl?: string } = {}): Promise<string[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const sourceUrl = options.categoryTreeUrl ?? HEMKOP_CATEGORY_TREE_URL;
+  const response = await fetchImpl(sourceUrl, {
+    headers: {
+      accept: 'application/json',
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+  if (!response.ok) throw new Error(`Hemkop category tree request failed: ${response.status}`);
+  const root = await response.json() as AxfoodCategoryTreeNode;
+  const paths = (root.children ?? [])
+    .filter((node) => node.valid !== false)
+    .map((node) => text(node.url))
+    .filter((url): url is string => Boolean(url));
+  if (paths.length === 0) throw new Error('Hemkop category tree had no usable category paths.');
+  return paths;
 }
 
 export function buildHemkopWeeklyDiscountsUrl(
@@ -328,19 +382,60 @@ export async function fetchHemkopStores(options: FetchHemkopStoresOptions = {}):
 
 export async function fetchHemkopProducts(options: FetchHemkopProductsOptions = {}): Promise<HemkopProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const queries = options.queries ?? DEFAULT_HEMKOP_SEARCH_QUERIES;
   const maxRows = options.maxRows ?? Number.POSITIVE_INFINITY;
-  const pageSize = options.pageSize ?? 100;
+  const pageSize = options.pageSize ?? DEFAULT_HEMKOP_CATEGORY_PAGE_SIZE;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: HemkopProduct[] = [];
   const seenCodes = new Set<string>();
 
-  for (const query of queries) {
+  if (options.queries) {
+    for (const query of options.queries) {
+      let page = 0;
+      let pageCount: number | null = null;
+
+      while (rows.length < maxRows && (pageCount === null || page < pageCount)) {
+        const sourceUrl = buildHemkopSearchUrl(query, pageSize, page, options.storeId);
+        const response = await fetchImpl(sourceUrl, {
+          headers: {
+            accept: 'application/json',
+            'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Hemkop search request failed for ${query}: ${response.status}`);
+        }
+
+        const payload = await response.json() as HemkopSearchResponse;
+        const results = payload.results ?? [];
+        const responsePageCount = numberOrNull(payload.pagination?.numberOfPages);
+        pageCount = responsePageCount && responsePageCount > 0 ? responsePageCount : page + 1;
+
+        for (const product of results) {
+          const row = normalizeHemkopProduct(product, sourceUrl, retrievedAt);
+          if (!row || seenCodes.has(row.code)) continue;
+          seenCodes.add(row.code);
+          rows.push(row);
+          if (rows.length >= maxRows) return rows;
+        }
+
+        if (results.length === 0) break;
+        page += 1;
+      }
+    }
+    return rows;
+  }
+
+  const categoryPaths = options.categoryPaths ?? await fetchHemkopCategoryPaths({
+    fetchImpl,
+    categoryTreeUrl: options.categoryTreeUrl
+  });
+  for (const categoryPath of categoryPaths) {
     let page = 0;
     let pageCount: number | null = null;
 
     while (rows.length < maxRows && (pageCount === null || page < pageCount)) {
-      const sourceUrl = buildHemkopSearchUrl(query, pageSize, page);
+      const sourceUrl = buildHemkopCategoryUrl(categoryPath, pageSize, page, options.storeId);
       const response = await fetchImpl(sourceUrl, {
         headers: {
           accept: 'application/json',
@@ -349,7 +444,7 @@ export async function fetchHemkopProducts(options: FetchHemkopProductsOptions = 
       });
 
       if (!response.ok) {
-        throw new Error(`Hemkop search request failed for ${query}: ${response.status}`);
+        throw new Error(`Hemkop category request failed for ${categoryPath}: ${response.status}`);
       }
 
       const payload = await response.json() as HemkopSearchResponse;
@@ -359,23 +454,65 @@ export async function fetchHemkopProducts(options: FetchHemkopProductsOptions = 
 
       for (const product of results) {
         const row = normalizeHemkopProduct(product, sourceUrl, retrievedAt);
-        if (!row || seenCodes.has(row.code)) {
-          continue;
-        }
+        if (!row || seenCodes.has(row.code)) continue;
         seenCodes.add(row.code);
         rows.push(row);
-        if (rows.length >= maxRows) {
-          return rows;
-        }
+        if (rows.length >= maxRows) return rows;
       }
 
-      if (results.length === 0) {
-        break;
-      }
+      if (results.length === 0) break;
       page += 1;
     }
   }
 
+  return rows;
+}
+
+
+
+export async function fetchHemkopProductsForAllStores(
+  options: FetchHemkopProductsForAllStoresOptions = {}
+): Promise<HemkopStoreProduct[]> {
+  const stores = await fetchHemkopStores({
+    fetchImpl: options.fetchImpl,
+    online: true,
+    maxRows: options.maxStores,
+    retrievedAt: options.retrievedAt,
+    storeApiUrl: options.storeApiUrl
+  });
+  const rows: HemkopStoreProduct[] = [];
+  const failures: string[] = [];
+  const concurrency = 8;
+  for (let index = 0; index < stores.length; index += concurrency) {
+    const batch = stores.slice(index, index + concurrency);
+    const settled = await Promise.allSettled(batch.map(async (store) => {
+      const products = await fetchHemkopProducts({
+        fetchImpl: options.fetchImpl,
+        queries: options.queries,
+        categoryPaths: options.categoryPaths,
+        categoryTreeUrl: options.categoryTreeUrl,
+        storeId: store.storeId,
+        maxRows: options.maxRowsPerStore,
+        pageSize: options.queries ? options.maxRowsPerStore ?? options.pageSize : options.pageSize,
+        retrievedAt: options.retrievedAt
+      });
+      return products.map((product) => ({
+        ...product,
+        storeId: store.storeId,
+        storeName: store.name,
+        city: store.city
+      }));
+    }));
+    for (let offset = 0; offset < settled.length; offset += 1) {
+      const result = settled[offset]!;
+      if (result.status === 'fulfilled') {
+        rows.push(...result.value);
+      } else {
+        failures.push(`${batch[offset]?.storeId ?? 'unknown'}:${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
+      }
+    }
+  }
+  if (rows.length === 0 && failures.length > 0) throw new Error(`Hemkop all-store product requests returned no usable branch products: ${failures[0]}`);
   return rows;
 }
 

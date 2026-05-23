@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "build": "next build --webpack",
     "dev": "next dev",
     "test": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
+    "@groceryview/api": "0.1.0",
     "@groceryview/catalog": "0.1.0",
     "@groceryview/core": "0.1.0",
     "@tanstack/react-query": "^5.90.11",

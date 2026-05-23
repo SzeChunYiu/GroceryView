@@ -9,6 +9,7 @@ const infraReadme = readFileSync(new URL('../../../../infra/README.md', import.m
 const smokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-local-services.sh', import.meta.url), 'utf8');
 const hostedReadinessSmokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-hosted-readiness.sh', import.meta.url), 'utf8');
 const hostedHttpSmokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-hosted-http.sh', import.meta.url), 'utf8');
+const hostedScannerUploadSmokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-hosted-scanner-upload.mjs', import.meta.url), 'utf8');
 const smokeRetailerConnectorScript = readFileSync(new URL('../../../../infra/scripts/smoke-retailer-connector.sh', import.meta.url), 'utf8');
 const smokeOpenPricesScript = readFileSync(new URL('../../../../infra/scripts/smoke-open-prices.sh', import.meta.url), 'utf8');
 const importOpenPricesArtifactScript = readFileSync(new URL('../../../../infra/scripts/import-open-prices-artifact.sh', import.meta.url), 'utf8');
@@ -102,32 +103,59 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /acceptedObservations/);
   });
 
-  it('documents hosted deployment smoke commands for API, product terminal, web, and PostgreSQL readiness evidence', () => {
+  it('documents hosted deployment smoke commands for API, product terminal, web, PostgreSQL, and scan readiness evidence', () => {
     assert.match(infraReadme, /## Hosted deployment smoke/);
     assert.match(infraReadme, /infra\/scripts\/smoke-hosted-http\.sh/);
     assert.match(infraReadme, /infra\/scripts\/smoke-hosted-readiness\.sh/);
+    assert.match(infraReadme, /infra\/scripts\/smoke-hosted-scanner-upload\.mjs/);
     assert.match(infraReadme, /GROCERYVIEW_SERVER_URL/);
     assert.match(infraReadme, /GROCERYVIEW_WEB_URL/);
     assert.match(infraReadme, /GROCERYVIEW_TERMINAL_PRODUCT_ID/);
     assert.match(infraReadme, /HOSTED_HTTP_SMOKE_OUTPUT_PATH/);
     assert.match(infraReadme, /HOSTED_READINESS_SMOKE_OUTPUT_PATH/);
+    assert.match(infraReadme, /HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH/);
     assert.match(infraReadme, /METRICS_TOKEN/);
+    assert.match(infraReadme, /GROCERYVIEW_SCANNER_USER_ID/);
+    assert.match(infraReadme, /GROCERYVIEW_SCANNER_BEARER_TOKEN/);
     assert.match(infraReadme, /\/api\/health/);
     assert.match(infraReadme, /\/api\/products\/\$\{GROCERYVIEW_TERMINAL_PRODUCT_ID:-coffee\}\/terminal/);
     assert.match(infraReadme, /\/api\/readiness\/postgres/);
+    assert.match(infraReadme, /\/api\/readiness\/scanning/);
+    assert.match(infraReadme, /\/api\/readiness\/scan-upload-cors/);
+    assert.match(infraReadme, /\/api\/readiness\/scan-upload-storage/);
+    assert.match(infraReadme, /\/api\/readiness\/scan-upload-write/);
+    assert.match(infraReadme, /\/api\/scans\/upload-url\?userId=/);
   });
 
-  it('ships a hosted PostgreSQL readiness smoke script for deployment evidence', () => {
+  it('ships a hosted scanner upload smoke script for account-bound signed PUT evidence', () => {
+    assert.match(hostedScannerUploadSmokeScript, /GROCERYVIEW_SERVER_URL/);
+    assert.match(hostedScannerUploadSmokeScript, /GROCERYVIEW_SCANNER_USER_ID/);
+    assert.match(hostedScannerUploadSmokeScript, /GROCERYVIEW_SCANNER_BEARER_TOKEN/);
+    assert.match(hostedScannerUploadSmokeScript, /HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH/);
+    assert.match(hostedScannerUploadSmokeScript, /\/api\/scans\/upload-url\?userId=/);
+    assert.match(hostedScannerUploadSmokeScript, /method:\s*'POST'/);
+    assert.match(hostedScannerUploadSmokeScript, /method:\s*'PUT'/);
+    assert.match(hostedScannerUploadSmokeScript, /ticket\.headers/);
+    assert.match(hostedScannerUploadSmokeScript, /ticket\.payloadUri/);
+    assert.match(hostedScannerUploadSmokeScript, /scan_upload_ticket_ready/);
+    assert.match(hostedScannerUploadSmokeScript, /scan_upload_put_succeeded/);
+  });
+
+  it('ships a hosted readiness smoke script for deployment evidence', () => {
     assert.match(hostedReadinessSmokeScript, /GROCERYVIEW_SERVER_URL/);
     assert.match(hostedReadinessSmokeScript, /METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /READINESS_TIMEOUT_SECONDS/);
     assert.match(hostedReadinessSmokeScript, /HOSTED_READINESS_SMOKE_OUTPUT_PATH/);
     assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/postgres/);
+    assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scanning/);
+    assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scan-upload-cors/);
+    assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scan-upload-storage/);
+    assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scan-upload-write/);
     assert.match(hostedReadinessSmokeScript, /x-groceryview-metrics-token: \$METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /curl -fsS/);
-    assert.match(hostedReadinessSmokeScript, /"status"\[\[:space:\]\]\*:\[\[:space:\]\]\*"ready"/);
+    assert.match(hostedReadinessSmokeScript, /"status"\[\[:space:\]\]\*:\[\[:space:\]\]\*"\(ready\|complete\)"/);
     assert.match(hostedReadinessSmokeScript, /endpoint/);
-    assert.match(hostedReadinessSmokeScript, /Hosted PostgreSQL readiness smoke evidence written/);
+    assert.match(hostedReadinessSmokeScript, /Hosted readiness smoke evidence written/);
   });
 
   it('ships a retailer connector smoke script gated by source access approvals', () => {
