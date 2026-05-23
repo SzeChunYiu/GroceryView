@@ -10,9 +10,11 @@ import {
   createPostgresSiteSnapshotReader,
   createPostgresSourceRecordReader,
   createPostgresSourceRecordWriter,
+  createPostgresTrendingPriceChangeReader,
   createPostgresWeeklyPriceDropDigestReader,
   groceryCategoryHierarchy,
   persistOpenPricesArtifact,
+  summarizeTrendingProductPriceChanges,
   type QueryExecutor
 } from '../index.js';
 
@@ -367,6 +369,28 @@ class RecordingQueryExecutor implements QueryExecutor {
       confidence: '0.8800'
     }
   ];
+  trendingPriceChangeRows: unknown[] = [
+    {
+      rank: '1',
+      product_id: 'product-1',
+      product_slug: 'bryggkaffe-450g',
+      product_name: 'Bryggkaffe mellanrost 450 g',
+      brand: 'Rosteriet',
+      category_label: 'Coffee',
+      change_count: '3',
+      observation_count: '5',
+      latest_price: '44.90',
+      previous_price: '49.90',
+      change_amount: '-5.00',
+      change_percent: '-10.02',
+      currency: 'SEK',
+      latest_observed_at: '2026-05-22T09:00:00.000Z',
+      chain_slug: 'willys',
+      chain_name: 'Willys',
+      store_slug: 'willys-hemma-stockholm-torsplan',
+      store_name: 'Willys Hemma Stockholm Torsplan'
+    }
+  ];
   siteSnapshotRows: unknown[] = [
     {
       product_id: 'product-1',
@@ -435,6 +459,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
     if (sql.includes('left join latest_prices')) return this.catalogCoverageRows as T[];
     if (sql.includes('weekly_price_drop_digest')) return this.weeklyPriceDropDigestRows as T[];
+    if (sql.includes('trending_price_changes')) return this.trendingPriceChangeRows as T[];
     if (sql.includes('join products on products.id = latest_prices.product_id')) return this.siteSnapshotRows as T[];
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
     if (sql.includes('retailer_product_ref is not distinct from')) return this.existingObservationRows as T[];
@@ -2080,6 +2105,158 @@ describe('createPostgresWeeklyPriceDropDigestReader', () => {
     assert.match(executor.calls[0]!.sql, /latest_prices\.observed_at >= \$1::timestamptz/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.observed_at < \$2::timestamptz/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.regular_price > latest_prices\.price/);
+    assert.match(executor.calls[0]!.sql, /limit \$3/);
+    assert.deepEqual(executor.calls[0]!.params, ['2026-05-16T00:00:00.000Z', '2026-05-23T00:00:00.000Z', 10]);
+  });
+});
+
+describe('summarizeTrendingProductPriceChanges', () => {
+  it('ranks products by real price changes inside the seven-day time-series window', () => {
+    const result = summarizeTrendingProductPriceChanges({
+      asOf: '2026-05-23T00:00:00.000Z',
+      limit: 10,
+      points: [
+        {
+          productId: 'coffee',
+          productSlug: 'coffee',
+          productName: 'Coffee',
+          brand: 'Rosteriet',
+          categoryLabel: 'Coffee',
+          price: 59.9,
+          currency: 'SEK',
+          observedAt: '2026-05-15T00:00:00.000Z'
+        },
+        {
+          productId: 'coffee',
+          productSlug: 'coffee',
+          productName: 'Coffee',
+          brand: 'Rosteriet',
+          categoryLabel: 'Coffee',
+          price: 54.9,
+          currency: 'SEK',
+          observedAt: '2026-05-17T00:00:00.000Z'
+        },
+        {
+          productId: 'coffee',
+          productSlug: 'coffee',
+          productName: 'Coffee',
+          brand: 'Rosteriet',
+          categoryLabel: 'Coffee',
+          price: 49.9,
+          currency: 'SEK',
+          observedAt: '2026-05-19T00:00:00.000Z'
+        },
+        {
+          productId: 'tea',
+          productSlug: 'tea',
+          productName: 'Tea',
+          price: 25,
+          currency: 'SEK',
+          observedAt: '2026-05-17T00:00:00.000Z'
+        },
+        {
+          productId: 'tea',
+          productSlug: 'tea',
+          productName: 'Tea',
+          price: 25,
+          currency: 'SEK',
+          observedAt: '2026-05-18T00:00:00.000Z'
+        },
+        {
+          productId: 'pasta',
+          productSlug: 'pasta',
+          productName: 'Pasta',
+          price: 18,
+          currency: 'SEK',
+          observedAt: '2026-05-18T00:00:00.000Z'
+        },
+        {
+          productId: 'pasta',
+          productSlug: 'pasta',
+          productName: 'Pasta',
+          price: 20,
+          currency: 'SEK',
+          observedAt: '2026-05-20T00:00:00.000Z'
+        }
+      ]
+    });
+
+    assert.deepEqual(result, [
+      {
+        rank: 1,
+        productId: 'coffee',
+        productSlug: 'coffee',
+        productName: 'Coffee',
+        brand: 'Rosteriet',
+        categoryLabel: 'Coffee',
+        changeCount: 2,
+        observationCount: 2,
+        latestPrice: 49.9,
+        previousPrice: 54.9,
+        changeAmount: -5,
+        changePercent: -9.107468123861567,
+        currency: 'SEK',
+        latestObservedAt: '2026-05-19T00:00:00.000Z'
+      },
+      {
+        rank: 2,
+        productId: 'pasta',
+        productSlug: 'pasta',
+        productName: 'Pasta',
+        changeCount: 1,
+        observationCount: 2,
+        latestPrice: 20,
+        previousPrice: 18,
+        changeAmount: 2,
+        changePercent: 11.11111111111111,
+        currency: 'SEK',
+        latestObservedAt: '2026-05-20T00:00:00.000Z'
+      }
+    ]);
+  });
+});
+
+describe('createPostgresTrendingPriceChangeReader', () => {
+  it('lists top products with the most observed price changes in the window', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresTrendingPriceChangeReader(executor);
+
+    assert.deepEqual(
+      await reader.listTrendingPriceChanges({
+        since: '2026-05-16T00:00:00.000Z',
+        until: '2026-05-23T00:00:00.000Z',
+        limit: 10
+      }),
+      [
+        {
+          rank: 1,
+          productId: 'product-1',
+          productSlug: 'bryggkaffe-450g',
+          productName: 'Bryggkaffe mellanrost 450 g',
+          brand: 'Rosteriet',
+          categoryLabel: 'Coffee',
+          changeCount: 3,
+          observationCount: 5,
+          latestPrice: 44.9,
+          previousPrice: 49.9,
+          changeAmount: -5,
+          changePercent: -10.02,
+          currency: 'SEK',
+          latestObservedAt: '2026-05-22T09:00:00.000Z',
+          chainSlug: 'willys',
+          chainName: 'Willys',
+          storeSlug: 'willys-hemma-stockholm-torsplan',
+          storeName: 'Willys Hemma Stockholm Torsplan'
+        }
+      ]
+    );
+
+    assert.match(executor.calls[0]!.sql, /trending_price_changes/);
+    assert.match(executor.calls[0]!.sql, /from observations/);
+    assert.match(executor.calls[0]!.sql, /lag\(observations\.price\) over/);
+    assert.match(executor.calls[0]!.sql, /observations\.domain = 'grocery'/);
+    assert.match(executor.calls[0]!.sql, /observations\.observed_at >= \(\$1::timestamptz - interval '31 days'\)/);
+    assert.match(executor.calls[0]!.sql, /observed_at >= \$1::timestamptz/);
     assert.match(executor.calls[0]!.sql, /limit \$3/);
     assert.deepEqual(executor.calls[0]!.params, ['2026-05-16T00:00:00.000Z', '2026-05-23T00:00:00.000Z', 10]);
   });

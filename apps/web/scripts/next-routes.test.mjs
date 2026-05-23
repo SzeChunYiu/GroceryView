@@ -2285,6 +2285,26 @@ ${seo}`;
     assert.doesNotMatch(shell, /@\/components\/sample-data/);
   });
 
+  it('surfaces a trending products carousel from DB time-series price changes on the homepage', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const carousel = await read('src/components/TrendingCarousel.tsx');
+
+    assert.match(verified, /summarizeTrendingProductPriceChanges/);
+    assert.match(verified, /type TrendingPriceChangePoint/);
+    assert.match(verified, /export const homepageTrendingPriceChanges = /);
+    assert.match(verified, /windowDays: 7/);
+    assert.match(verified, /limit: 10/);
+    assert.match(shell, /TrendingCarousel/);
+    assert.match(shell, /homepageTrendingPriceChanges/);
+    assert.match(carousel, /Most price changes in the last 7 days/);
+    assert.match(carousel, /data-trending-carousel/);
+    assert.match(carousel, /item\.changeCount/);
+    assert.match(carousel, /\/products\/\$\{item\.productSlug\}/);
+    assert.doesNotMatch(carousel, /@\/lib\/demo-data/);
+    assert.doesNotMatch(carousel, /@\/components\/sample-data/);
+  });
+
   it('surfaces category deal leaders on the homepage and category routes using the real core summarizer', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
