@@ -168,7 +168,7 @@ The workflow must pass these gates in order:
 5. DB-backed site snapshot export and `groceryview-db-site-snapshot` artifact upload
 6. `/api/readiness/postgres`
 7. `/api/readiness/source-runs`
-8. `/api/readiness/catalog-coverage`
+8. `/api/readiness/catalog-coverage`, including zero missing chain, store, product, category, price-type, product-store pair, and store-price-type gaps
 9. upload `groceryview-deployed-readiness` with `postgres-readiness.json`, `source-run-readiness.json`, and `catalog-coverage-readiness.json`
 
 ## Expected blocker meanings
@@ -198,4 +198,4 @@ Do not treat the system as production-ready until all are true:
 - `npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView` reports `ready`.
 - `npm run ops:validate-production-env` reports `ready` in the deployment environment.
 - the latest `daily-ingestion.yml` run passes and includes the `groceryview-production-ingestion-config` and `groceryview-deployed-readiness` artifacts.
-- `/api/readiness/postgres`, `/api/readiness/source-runs`, and `/api/readiness/catalog-coverage` all return healthy/complete responses with HTTP 200.
+- `/api/readiness/postgres`, `/api/readiness/source-runs`, and `/api/readiness/catalog-coverage` all return healthy/complete responses with HTTP 200, and catalog coverage has no missing dimension, product-store-pair, or store-price-type gaps.

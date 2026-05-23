@@ -332,8 +332,21 @@ jobs:
             >/tmp/catalog-coverage-readiness.json
           node <<'NODE'
           const body = require('/tmp/catalog-coverage-readiness.json');
-          if (body.status !== 'complete' || (body.missingProductStorePairs?.length ?? 0) > 0 || (body.requiredActions?.length ?? 0) > 0) {
-            console.error(JSON.stringify(body));
+          const missingDimensions = {
+            chains: body.coverage?.chains?.missing ?? [],
+            stores: body.coverage?.stores?.missing ?? [],
+            products: body.coverage?.products?.missing ?? [],
+            categories: body.coverage?.categories?.missing ?? [],
+            priceTypes: body.coverage?.priceTypes?.missing ?? []
+          };
+          if (
+            body.status !== 'complete' ||
+            Object.values(missingDimensions).some((missing) => missing.length > 0) ||
+            (body.missingProductStorePairs?.length ?? 0) > 0 ||
+            (body.missingStorePriceTypes?.length ?? 0) > 0 ||
+            (body.requiredActions?.length ?? 0) > 0
+          ) {
+            console.error(JSON.stringify({ ...body, missingDimensions }));
             process.exit(1);
           }
           NODE
