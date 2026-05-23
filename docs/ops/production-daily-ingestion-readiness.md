@@ -166,9 +166,9 @@ The workflow must pass these gates in order:
 3. production ingestion configuration validator and always-attempted `groceryview-production-ingestion-config` artifact upload with `production-env-validation.json`, `groceryview-catalog-targets.json`, and `groceryview-daily-connectors.json` for success or failure diagnostics
 4. configured daily ingestion runner; its `chainSummaries` must include every required chain, every summary must be `succeeded`, every official product connector must emit at least one observation for every configured branch in `stores[]`, every required chain must emit at least one observation id, and the workflow always attempts to upload `groceryview-daily-ingestion-result` for success or failure diagnostics
 5. DB-backed site snapshot export and always-attempted `groceryview-db-site-snapshot` artifact upload with `groceryview-db-site-snapshot.json` and `db-site-snapshot-result.json` for success or failure diagnostics
-6. `/api/readiness/postgres`
-7. `/api/readiness/source-runs`, including zero blockers, zero missing fresh chains, zero insufficient accepted-row blockers, at least six succeeded daily source-run evidence entries, and a latest successful finish timestamp
-8. `/api/readiness/catalog-coverage`, including zero missing chain, store, product, category, price-type, product-store pair, and store-price-type gaps
+6. always-attempted `/api/readiness/postgres`, including a target match against the daily DB connectivity diagnostic; if that diagnostic was not produced, the workflow fails with `postgres_readiness_missing_ingestion_connectivity_diagnostic`
+7. always-attempted `/api/readiness/source-runs`, including zero blockers, zero missing fresh chains, zero insufficient accepted-row blockers, at least six succeeded daily source-run evidence entries, and a latest successful finish timestamp
+8. always-attempted `/api/readiness/catalog-coverage`, including zero missing chain, store, product, category, price-type, product-store pair, and store-price-type gaps
 9. upload `groceryview-deployed-readiness` with `postgres-readiness.json`, `source-run-readiness.json`, and `catalog-coverage-readiness.json`
 
 ## Expected blocker meanings
@@ -182,6 +182,7 @@ The workflow must pass these gates in order:
 - `<chain>:persistence_failed:<message>`: connector output could not be written to `source_runs`, `raw_records`, `observations`, or `latest_prices`; if the source run was already created, ingestion marks that source run `failed` with the sanitized error message instead of leaving it stuck as `running`.
 - `source_run_missing_fresh_chain:<chain>`: no fresh successful daily source run for that chain.
 - `source_run_insufficient_accepted_rows:<chain>:<count>/<min>`: source run completed but accepted too few rows.
+- `postgres_readiness_missing_ingestion_connectivity_diagnostic`: deployed PostgreSQL readiness was probed, but the daily DB connectivity diagnostic was not available for target matching.
 - `missing_store_scoped_prices:<products>`: connector output had accepted products without a branch/store id.
 - `unknown_store_ids:<stores>`: connector output referenced branch ids not declared in connector `stores[]`.
 - `CATALOG_COVERAGE_TARGETS_JSON.targetStores missing from connector stores: <stores>`: production env has target branches that no daily connector declares.
