@@ -144,5 +144,51 @@ describe('daily DB connectivity diagnostic script', () => {
       assert.match(scriptSource, new RegExp(signature.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     }
     assert.equal(isTransientDailyDatabaseError(new Error('Failed to connect to database: {"error":"econnrefused"}')), true);
+    assert.equal(isTransientDailyDatabaseError(new Error('Failed to connect to database: {:error, :db_connection_closed_in_auth} 08006')), true);
+    assert.equal(isTransientDailyDatabaseError(new Error('57P03: the database system is not accepting connections DETAIL: Hot standby mode is disabled.')), true);
+  });
+
+  it('classifies Supabase pooler auth-closed and hot-standby failures as actionable blockers', async () => {
+    class AuthClosedPool {
+      async query() {
+        const error = new Error('Failed to connect to database: {:error, :db_connection_closed_in_auth} 08006');
+        error.code = '08006';
+        throw error;
+      }
+
+      async end() {}
+    }
+
+    const authClosed = await checkDailyDatabaseConnectivity(
+      {
+        DATABASE_URL: 'postgres://postgres.dgsoqwanrkqgdichtgzl:super-secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres',
+        GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: '1'
+      },
+      { Pool: AuthClosedPool, sleep: async () => {} }
+    );
+
+    assert.equal(authClosed.status, 'blocked');
+    assert.deepEqual(authClosed.blockers, ['supabase_pooler_auth_closed']);
+    assert.equal(JSON.stringify(authClosed).includes('super-secret'), false);
+
+    class HotStandbyPool {
+      async query() {
+        throw new Error('FATAL: 57P03: the database system is not accepting connections DETAIL: Hot standby mode is disabled.');
+      }
+
+      async end() {}
+    }
+
+    const hotStandby = await checkDailyDatabaseConnectivity(
+      {
+        DATABASE_URL: 'postgres://postgres.dgsoqwanrkqgdichtgzl:super-secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres',
+        GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: '1'
+      },
+      { Pool: HotStandbyPool, sleep: async () => {} }
+    );
+
+    assert.equal(hotStandby.status, 'blocked');
+    assert.deepEqual(hotStandby.blockers, ['database_not_accepting_connections']);
+    assert.match(hotStandby.error, /Hot standby mode is disabled/);
   });
 });

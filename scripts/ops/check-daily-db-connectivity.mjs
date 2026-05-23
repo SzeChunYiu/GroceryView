@@ -71,6 +71,8 @@ export function isTransientDailyDatabaseError(error) {
     'connection terminated unexpectedly',
     'terminating connection',
     'connection to database closed',
+    'db_connection_closed_in_auth',
+    'hot standby mode is disabled',
     'edbhandlerexited',
     'timeout',
     'epipe'
@@ -80,6 +82,8 @@ export function isTransientDailyDatabaseError(error) {
 function blockerForError(error) {
   const text = errorText(error).toLowerCase();
   if (text.includes('database system is not accepting connections')) return 'database_not_accepting_connections';
+  if (text.includes('db_connection_closed_in_auth')) return 'supabase_pooler_auth_closed';
+  if (text.includes('hot standby mode is disabled')) return 'supabase_database_hot_standby_disabled';
   if (text.includes('econnrefused')) return 'database_connection_refused';
   if (text.includes('timeout')) return 'database_connection_timeout';
   if (text.includes('connection terminated unexpectedly') || text.includes('terminating connection')) return 'database_connection_terminated';
