@@ -98,6 +98,7 @@ const DATASETS = [
 
 const summaries = [];
 const failures = [];
+const icaSourceSummary = await readIcaSourceSummary();
 
 for (const dataset of DATASETS) {
   const text = await readFile(new URL(dataset.file, INGESTED_DIR), 'utf8');
@@ -135,6 +136,10 @@ for (const dataset of DATASETS) {
     duplicateKeys,
     sourceMetadataUrlCount: sourceUrls(source).length
   });
+
+  if (dataset.file === 'ica.ts' && dataset.source === 'icaSources') {
+    verifyIcaSourceSummary({ source, sourceRowCount, summary: icaSourceSummary });
+  }
 }
 
 if (failures.length > 0) {
@@ -244,4 +249,60 @@ function countDuplicates(keys) {
     }
   }
   return duplicates;
+}
+
+async function readIcaSourceSummary() {
+  const text = await readFile(new URL('ica-source-summary.ts', INGESTED_DIR), 'utf8');
+  return {
+    totalRowCount: Number(requiredMatch(text, /totalRowCount:\s*(\d+)/, 'ICA source summary totalRowCount')),
+    storeEndpointCount: Number(requiredMatch(text, /storeEndpointCount:\s*(\d+)/, 'ICA source summary storeEndpointCount')),
+    latestStores: [...text.matchAll(/\{\s*retrievedAt:\s*'([^']+)',\s*rowCount:\s*(\d+),[\s\S]*?sourceUrl:\s*'([^']+)'\s*\}/g)].map((match) => ({
+      retrievedAt: match[1],
+      rowCount: Number(match[2]),
+      sourceUrl: match[3]
+    }))
+  };
+}
+
+function verifyIcaSourceSummary({ source, sourceRowCount, summary }) {
+  const label = 'ica-source-summary.ts:icaStorePromotionSourceSummary';
+
+  if (summary.totalRowCount !== sourceRowCount) {
+    failures.push(`${label} totalRowCount mismatch: summary=${summary.totalRowCount}, icaSources=${sourceRowCount}`);
+  }
+  if (summary.storeEndpointCount !== source.length) {
+    failures.push(`${label} storeEndpointCount mismatch: summary=${summary.storeEndpointCount}, icaSources=${source.length}`);
+  }
+  if (summary.latestStores.length === 0) {
+    failures.push(`${label} latestStores is empty`);
+  }
+
+  const latestSources = source.slice(0, summary.latestStores.length);
+  for (const [index, latestStore] of summary.latestStores.entries()) {
+    const expected = latestSources[index];
+    if (!expected) {
+      failures.push(`${label} latestStores[${index}] has no matching icaSources entry`);
+      continue;
+    }
+    for (const field of ['retrievedAt', 'rowCount', 'sourceUrl']) {
+      if (latestStore[field] !== expected[field]) {
+        failures.push(`${label} latestStores[${index}].${field} mismatch: summary=${latestStore[field]}, icaSources=${expected[field]}`);
+      }
+    }
+  }
+
+  summaries.push({
+    dataset: label,
+    totalRowCount: summary.totalRowCount,
+    storeEndpointCount: summary.storeEndpointCount,
+    latestStoreCount: summary.latestStores.length
+  });
+}
+
+function requiredMatch(text, pattern, label) {
+  const match = text.match(pattern);
+  if (!match) {
+    throw new Error(`Missing ${label}`);
+  }
+  return match[1];
 }
