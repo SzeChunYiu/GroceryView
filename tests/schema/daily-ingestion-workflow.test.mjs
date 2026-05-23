@@ -72,12 +72,16 @@ describe('daily ingestion workflow', () => {
       'DB write connectivity diagnostics must fail before retailer fetches and DB persistence work'
     );
     assert.match(workflow, /\/tmp\/daily-db-connectivity\.json/);
+    assert.match(workflow, /daily_db_connectivity_diagnostic_missing/);
+    assert.match(workflow, /connectivity_status=\$\?/);
     assert.match(workflow, /body\.status !== 'ready'/);
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS \|\| '30' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS \|\| '10000' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS \|\| '30000' \}\}/);
     assert.match(workflow, /name:\s*groceryview-daily-db-connectivity/);
     assert.match(workflow, /path:\s*\/tmp\/daily-db-connectivity\.json/);
+    assert.match(workflow, /name: Upload daily DB connectivity diagnostic\n\s+if:\s*always\(\)/);
+    assert.match(workflow, /name:\s*groceryview-daily-db-connectivity[\s\S]*if-no-files-found:\s*error/);
     assert.match(workflow, /name: Apply production DB migrations/);
     assert.ok(
       workflow.indexOf('name: Check production DB write connectivity') < workflow.indexOf('name: Apply production DB migrations'),
