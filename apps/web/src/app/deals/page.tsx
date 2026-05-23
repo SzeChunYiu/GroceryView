@@ -56,7 +56,7 @@ export default function DealsPage() {
           </div>
           <Link
             className="h-fit rounded-xl border border-emerald-900 bg-emerald-900 px-4 py-3 text-sm font-black text-white hover:brightness-110"
-            href="/screener"
+            href="/screener?sort=biggest-drop&category=all"
           >
             Open verified deal screener →
           </Link>

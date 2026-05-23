@@ -1102,7 +1102,7 @@ describe('verified-data UI', () => {
     assert.match(route, /Deal screener/);
     assert.match(route, /Dedicated verified screener/i);
     assert.match(route, /Open verified deal screener/);
-    assert.match(route, /href="\/screener"/);
+    assert.match(route, /href="\/screener\?sort=biggest-drop&category=all"/);
     assert.doesNotMatch(route, /dealScreener/);
   });
 
@@ -1115,6 +1115,21 @@ describe('verified-data UI', () => {
     assert.match(route, /Ranked deal table/);
     assert.match(route, /What the screener will and will not claim/);
     assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
+  it('keeps a stable screener query contract when /deals links to the dedicated screener', async () => {
+    const deals = await read('src/app/deals/page.tsx');
+    const route = await read('src/app/screener/page.tsx');
+
+    assert.match(deals, /href="\/screener\?sort=biggest-drop&category=all"/);
+    assert.match(route, /new URLSearchParams/);
+    assert.match(route, /type SortMode = 'biggest-drop' \| 'cheapest-per-kg' \| 'widest-spread'/);
+    assert.match(route, /paramValue\(params\.sort\)/);
+    assert.match(route, /selectedMode\(paramValue\(params\.sort\)\)/);
+    assert.match(route, /sortOptions\.some\(\(option\) => option\.mode === value\)/);
+    assert.match(route, /\? value as SortMode : 'biggest-drop'/);
+    assert.match(route, /const requestedCategory = paramValue\(params\.category\) \?\? 'all'/);
+    assert.match(route, /requestedCategory === 'all' \|\| categoryOptions\.some\(\(option\) => option\.slug === requestedCategory\)/);
   });
 
   it('surfaces offer expiry reminders from real Matpriskollen validity windows', async () => {
