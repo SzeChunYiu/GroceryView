@@ -47,6 +47,13 @@ describe('verified-data UI', () => {
     assert.match(verified, /sourceCoverage/);
   });
 
+
+  it('renders the consent banner visible in the first HTML pass to avoid homepage CLS', async () => {
+    const consentManager = await read('src/components/consent-manager.tsx');
+    assert.match(consentManager, /useState\(true\)/);
+    assert.match(consentManager, /Cookie consent banner/);
+  });
+
   it('removes rendered dependencies on old demo and sample drivers', async () => {
     const renderedSources = await Promise.all(appFiles.map(read));
     const joined = renderedSources.join('\n');

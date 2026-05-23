@@ -87,7 +87,7 @@ function loadStoredConsent(): ConsentState | null {
 export function ConsentManager() {
   const denied = useMemo<ConsentState>(() => ({ necessary: true, analytics: false, ads: false, personalisation: false }), []);
   const granted = useMemo<ConsentState>(() => ({ necessary: true, analytics: true, ads: true, personalisation: true }), []);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [manageOpen, setManageOpen] = useState(false);
   const [draft, setDraft] = useState<ConsentState>(denied);
 
