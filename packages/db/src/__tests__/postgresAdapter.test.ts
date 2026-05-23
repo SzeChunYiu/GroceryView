@@ -1529,6 +1529,49 @@ describe('createPostgresSourceRecordReader', () => {
 });
 
 describe('createPostgresPriceObservationWriter', () => {
+  it('skips unchanged daily snapshots and reuses the existing latest observation id', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.latestPriceRows = [
+      {
+        product_id: 'product-1',
+        chain_id: 'chain-1',
+        store_id: 'store-1',
+        price_type: 'promotion',
+        observation_id: 'existing-observation',
+        price: '49.90',
+        regular_price: '69.90',
+        unit_price: '110.8889',
+        currency: 'SEK',
+        observed_at: '2026-05-20T08:00:00.000Z',
+        confidence: '0.9100',
+        provenance: '{"sourceType":"retailer_api","sourceName":"Willys"}'
+      }
+    ];
+    const writer = createPostgresPriceObservationWriter(executor);
+
+    assert.deepEqual(
+      await writer.recordPriceObservation({
+        productId: 'product-1',
+        chainId: 'chain-1',
+        storeId: 'store-1',
+        priceType: 'promotion',
+        price: 49.9,
+        regularPrice: 69.9,
+        unitPrice: 110.8889,
+        currency: 'SEK',
+        observedAt: '2026-05-21T08:00:00.000Z',
+        confidence: 0.93,
+        provenance: { sourceType: 'retailer_api', sourceName: 'Willys', snapshot: 'daily-unchanged' }
+      }),
+      { observationId: 'existing-observation', status: 'unchanged' }
+    );
+
+    assert.match(executor.calls[0]!.sql, /from latest_prices/);
+    assert.match(executor.calls[0]!.sql, /store_id is not distinct from/);
+    assert.equal(executor.calls.some((call) => /insert into observations/.test(call.sql)), false);
+    assert.equal(executor.calls.some((call) => /insert into latest_prices/.test(call.sql)), false);
+  });
+
   it('persists immutable observations before rolling up latest prices', async () => {
     const executor = new RecordingQueryExecutor();
     const writer = createPostgresPriceObservationWriter(executor);
@@ -1561,9 +1604,12 @@ describe('createPostgresPriceObservationWriter', () => {
       { observationId: 'observation-1' }
     );
 
-    assert.match(executor.calls[0]!.sql, /insert into observations/);
-    assert.match(executor.calls[0]!.sql, /returning id/);
-    assert.deepEqual(executor.calls[0]!.params.slice(0, 11), [
+    assert.match(executor.calls[0]!.sql, /from latest_prices/);
+    assert.match(executor.calls[0]!.sql, /store_id is not distinct from/);
+
+    assert.match(executor.calls[1]!.sql, /insert into observations/);
+    assert.match(executor.calls[1]!.sql, /returning id/);
+    assert.deepEqual(executor.calls[1]!.params.slice(0, 11), [
       'product-1',
       'chain-1',
       'store-1',
@@ -1576,12 +1622,12 @@ describe('createPostgresPriceObservationWriter', () => {
       110.8889,
       'SEK'
     ]);
-    assert.equal(executor.calls[0]!.params[21], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
+    assert.equal(executor.calls[1]!.params[21], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
 
-    assert.match(executor.calls[1]!.sql, /insert into latest_prices/);
-    assert.match(executor.calls[1]!.sql, /on conflict \(product_id, chain_id, store_id, price_type\) do update/);
-    assert.match(executor.calls[1]!.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
-    assert.deepEqual(executor.calls[1]!.params, [
+    assert.match(executor.calls[2]!.sql, /insert into latest_prices/);
+    assert.match(executor.calls[2]!.sql, /on conflict \(product_id, chain_id, store_id, price_type\) do update/);
+    assert.match(executor.calls[2]!.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
+    assert.deepEqual(executor.calls[2]!.params, [
       'product-1',
       'chain-1',
       'store-1',
