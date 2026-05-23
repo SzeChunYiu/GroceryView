@@ -63,9 +63,24 @@ export const requiredRuntimeSecrets = [
   'CATALOG_COVERAGE_TARGETS_JSON'
 ];
 
+export const runtimeSecretsSatisfiableByVariables = [
+  'PUBLIC_WEB_URL',
+  'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN'
+];
+
 export function findMissingSecrets(requiredNames, listedNames) {
   const listed = new Set(listedNames);
   return requiredNames.filter((name) => !listed.has(name));
+}
+
+export function findMissingRuntimeSecrets(requiredNames, listedSecretNames, listedVariableNames) {
+  const listedSecrets = new Set(listedSecretNames);
+  const listedVariables = new Set(listedVariableNames);
+  const variableBackedRuntimeNames = new Set(runtimeSecretsSatisfiableByVariables);
+  return requiredNames.filter((name) => {
+    if (listedSecrets.has(name)) return false;
+    return !(variableBackedRuntimeNames.has(name) && listedVariables.has(name));
+  });
 }
 
 function uniqueSecretNames() {
@@ -79,7 +94,11 @@ function uniqueSecretNames() {
 }
 
 function uniqueVariableNames() {
-  return Array.from(new Set([...requiredGithubActionVariables, ...requiredDbRecoveryVariables]));
+  return Array.from(new Set([
+    ...requiredGithubActionVariables,
+    ...requiredDbRecoveryVariables,
+    ...runtimeSecretsSatisfiableByVariables
+  ]));
 }
 
 function hasAnySecret(candidateNames, listedNames) {
@@ -176,7 +195,7 @@ function main() {
     : readGithubVariableNames(repo, environment);
   const missingGithubActionSecrets = findMissingSecrets(requiredGithubActionSecrets, secretNames);
   const missingGithubActionVariables = findMissingSecrets(requiredGithubActionVariables, variableNames);
-  const missingRuntimeSecrets = findMissingSecrets(requiredRuntimeSecrets, secretNames);
+  const missingRuntimeSecrets = findMissingRuntimeSecrets(requiredRuntimeSecrets, secretNames, variableNames);
   const missingDbCutoverSecrets = findMissingSecrets(requiredDbCutoverSecrets, secretNames);
   const hasReplacementDbCandidate = hasAnySecret(replacementDbCandidateSecrets, secretNames);
   const missingDbCutoverCandidateSecrets = hasReplacementDbCandidate ? [] : replacementDbCandidateSecrets;

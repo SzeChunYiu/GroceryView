@@ -1,7 +1,14 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import {
+  findMissingRuntimeSecrets,
+  requiredRuntimeSecrets,
+  runtimeSecretsSatisfiableByVariables
+} from '../../scripts/ops/check-production-secrets.mjs';
 
 const scriptPath = new URL('../../scripts/ops/check-production-secrets.mjs', import.meta.url);
 const script = readFileSync(scriptPath, 'utf8');
@@ -99,6 +106,82 @@ describe('production secret audit script', () => {
     assert.deepEqual(output.missingDbCutoverCandidateSecrets, ['REPLACEMENT_DATABASE_URL', 'CANDIDATE_DATABASE_URL']);
     assert.deepEqual(output.missingDbRecoverySecrets, ['SUPABASE_ACCESS_TOKEN']);
     assert.deepEqual(output.missingDbRecoveryVariables, ['SUPABASE_PROJECT_REF']);
+  });
+
+  it('treats only selected runtime secrets as satisfiable by GitHub variables', () => {
+    const listedSecrets = requiredRuntimeSecrets.filter((name) => !runtimeSecretsSatisfiableByVariables.includes(name));
+    const missingWithVariables = findMissingRuntimeSecrets(
+      requiredRuntimeSecrets,
+      listedSecrets,
+      runtimeSecretsSatisfiableByVariables
+    );
+    assert.deepEqual(missingWithVariables, []);
+
+    const [variableBackedName] = runtimeSecretsSatisfiableByVariables;
+    const missingWithoutVariable = findMissingRuntimeSecrets(
+      requiredRuntimeSecrets,
+      listedSecrets,
+      runtimeSecretsSatisfiableByVariables.filter((name) => name !== variableBackedName)
+    );
+    assert.deepEqual(missingWithoutVariable, [variableBackedName]);
+  });
+
+  it('accepts runtime readiness values supplied as GitHub variables when the workflow supports vars or secrets', async () => {
+    const productionSecrets = await import(scriptPath.href);
+    const variableBackedRuntimeNames = runtimeSecretsSatisfiableByVariables;
+    assert.ok(variableBackedRuntimeNames.includes('PUBLIC_WEB_URL'));
+    assert.ok(variableBackedRuntimeNames.includes('GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN'));
+    const fakeSecretNames = new Set([
+      ...productionSecrets.requiredGithubActionSecrets,
+      ...productionSecrets.requiredRuntimeSecrets,
+      ...productionSecrets.requiredDbCutoverSecrets,
+      ...productionSecrets.requiredDbRecoverySecrets,
+      productionSecrets.replacementDbCandidateSecrets[0]
+    ]);
+    for (const name of variableBackedRuntimeNames) fakeSecretNames.delete(name);
+    const fakeVariableNames = new Set([
+      ...productionSecrets.requiredGithubActionVariables,
+      ...productionSecrets.requiredDbRecoveryVariables,
+      ...variableBackedRuntimeNames
+    ]);
+    const tempDir = mkdtempSync(join(tmpdir(), 'groceryview-fake-gh-'));
+    try {
+      const fakeGhPath = join(tempDir, 'gh');
+      writeFileSync(fakeGhPath, `#!/usr/bin/env node
+const args = process.argv.slice(2);
+if (args[0] === 'secret' && args[1] === 'list') {
+  process.stdout.write(process.env.FAKE_GH_SECRETS.split(',').filter(Boolean).map((name) => name + '\\t2026-05-23T00:00:00Z').join('\\n'));
+  process.exit(0);
+}
+if (args[0] === 'variable' && args[1] === 'list') {
+  process.stdout.write(process.env.FAKE_GH_VARIABLES.split(',').filter(Boolean).map((name) => name + '\\t2026-05-23T00:00:00Z').join('\\n'));
+  process.exit(0);
+}
+process.stderr.write('unexpected gh args: ' + args.join(' ') + '\\n');
+process.exit(1);
+`);
+      chmodSync(fakeGhPath, 0o755);
+      const result = spawnSync(process.execPath, [scriptPath.pathname], {
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          PATH: `${tempDir}:${process.env.PATH}`,
+          FAKE_GH_SECRETS: Array.from(fakeSecretNames).join(','),
+          FAKE_GH_VARIABLES: Array.from(fakeVariableNames).join(',')
+        }
+      });
+      assert.equal(result.stderr, '');
+      const output = JSON.parse(result.stdout);
+      assert.equal(result.status, 0);
+      assert.equal(output.status, 'ready');
+      for (const name of variableBackedRuntimeNames) {
+        assert.equal(output.checkedSecretNames.includes(name), false);
+        assert.equal(output.checkedVariableNames.includes(name), true);
+        assert.equal(output.missingRuntimeSecrets.includes(name), false);
+      }
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
 

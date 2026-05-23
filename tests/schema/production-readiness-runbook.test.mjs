@@ -36,6 +36,7 @@ describe('production daily ingestion readiness runbook', () => {
 
   it('documents source-run accepted-row thresholds for every required chain', () => {
     assert.match(runbook, /GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN/);
+    assert.match(runbook, /GitHub variable or secret/);
     assert.match(runbook, /source-run row thresholds/);
     assert.match(runbook, /positive integer threshold for all six required chains/);
     assert.match(runbook, /source_run_insufficient_accepted_rows/);
