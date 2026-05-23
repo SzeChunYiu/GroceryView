@@ -114,6 +114,10 @@ export const routeMetadataCatalog = {
     title: 'Sweden grocery store map and price heat overlay | GroceryView',
     description: 'Map verified OSM grocery stores with chain-index marker colors, district heat signals, and cheapest-chain context.'
   },
+  '/stores/ica': {
+    title: 'ICA store locator map | GroceryView',
+    description: 'Browse real Swedish ICA branch locations from OpenStreetMap Overpass rows with latitude, longitude, and source provenance.'
+  },
   '/meal-planner': {
     title: 'Deal-based grocery meal planner | GroceryView',
     description: 'Build student and family meal ideas from verified deal rows, serving costs, leftovers, and source confidence.'

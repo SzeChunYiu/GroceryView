@@ -32,6 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/widgets/grocery-index-ticker', 0.7, 'daily'),
     entry('/categories', 0.8, 'daily'),
     entry('/stores', 0.75, 'weekly'),
+    entry('/stores/ica', 0.72, 'weekly'),
     entry('/map', 0.75, 'daily'),
     entry('/cookies', 0.68, 'weekly'),
     entry('/data-sources', 0.65, 'weekly'),

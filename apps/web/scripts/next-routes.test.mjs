@@ -7,6 +7,7 @@ const appFiles = [
   'src/app/products/page.tsx',
   'src/app/products/[slug]/page.tsx',
   'src/app/stores/page.tsx',
+  'src/app/stores/ica/page.tsx',
   'src/app/stores/[slug]/page.tsx',
   'src/app/categories/page.tsx',
   'src/app/categories/[slug]/page.tsx',
@@ -1740,6 +1741,27 @@ ${seo}`;
     assert.match(map, /chainIndexScore/);
     assert.match(map, /osmStores/);
     assert.doesNotMatch(map, /Math\.random/);
+  });
+
+  it('renders a dedicated ICA store locator from Overpass coordinates', async () => {
+    const route = await read('src/app/stores/ica/page.tsx');
+    const map = await read('src/components/ica-store-map.tsx');
+    const data = await read('src/lib/ingested/ica-stores.ts');
+
+    assert.match(route, /IcaStoreMap/);
+    assert.match(route, /icaStoreCount/);
+    assert.match(route, /routeMetadata\('\/stores\/ica'\)/);
+    assert.match(map, /maplibregl/);
+    assert.match(map, /icaStores/);
+    assert.match(map, /ica-store-points/);
+    assert.match(map, /data-ica-store-slug/);
+    assert.match(map, /selectedStoreSlug/);
+    assert.match(map, /easeTo/);
+    assert.match(data, /overpassStores/);
+    assert.match(data, /Number\.isFinite\(store\.latitude\)/);
+    assert.match(data, /Number\.isFinite\(store\.longitude\)/);
+    assert.match(data, /brand\.includes\('ica'\)/);
+    assert.match(data, /export const icaStoreCount = icaStores\.length/);
   });
 
   it('surfaces a price-by-district heat overlay on the map without branch-price claims', async () => {
