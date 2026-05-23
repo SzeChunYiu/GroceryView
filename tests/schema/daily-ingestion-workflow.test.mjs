@@ -51,6 +51,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /body\.storesByChain\?\.\[chain\]/);
     assert.match(workflow, /store_enumeration_missing_chain/);
     assert.match(workflow, /store_enumeration_empty_chain/);
+    assert.match(workflow, /name: Upload live store enumeration\n\s+if:\s*always\(\)/);
     assert.match(workflow, /name:\s*groceryview-daily-connector-stores/);
     assert.match(workflow, /path:\s*\/tmp\/daily-connector-stores\.json/);
     assert.match(workflow, /npm run --silent ops:daily-connectors >\/tmp\/groceryview-daily-connectors\.json/);
