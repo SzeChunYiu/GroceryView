@@ -4,9 +4,11 @@ import { createRequire } from 'node:module';
 import { dirname } from 'node:path';
 import {
   createPgQueryExecutor,
+  createPostgresPriceObservationWriter,
   createPostgresProductAliasRepository,
   createPostgresSourceRecordWriter,
   type PriceType as DbPriceType,
+  type PriceObservationRecord,
   type QueryExecutor,
   type PgLikeClient,
   type SourceRunRecord
@@ -2948,7 +2950,6 @@ function dailyPayloadHash(payload: unknown): string {
 }
 
 type BatchRawRecordIdRow = { ordinal: number; id: string };
-type BatchObservationIdRow = { id: string };
 type FuelPriceSourceIdRow = { id: string };
 type BatchProductIdRow = { slug: string; id: string };
 
@@ -3496,6 +3497,7 @@ async function persistDailyConnectorOutput(input: {
   const domain = normalizeDailyDomain(config.domain);
   await executor.query('set default_transaction_read_only=off');
   const sourceWriter = createPostgresSourceRecordWriter(executor);
+  const priceWriter = createPostgresPriceObservationWriter(executor);
   const storesBySlug = new Map((config.stores ?? []).map((store) => [normalizeDailySlug(store.storeId), store]));
   const sourceRun = await sourceWriter.createSourceRun({
     sourceType: dbSourceTypeForConnector(config.sourceType),
@@ -3614,209 +3616,6 @@ async function persistDailyConnectorOutput(input: {
     return ids;
   }
 
-  async function insertObservationBatch(observations: Array<{
-    productId: string;
-    chainId: string;
-    storeId?: string;
-    rawRecordId: string;
-    retailerProductRef?: string;
-    priceType: DbPriceType;
-    price: number;
-    regularPrice?: number;
-    unitPrice: number;
-    currency?: string;
-    quantity?: number;
-    quantityUnit?: string;
-    promotionText?: string;
-    promotionStartsOn?: string;
-    promotionEndsOn?: string;
-    memberRequired?: boolean;
-    observedAt: string;
-    validFrom?: string;
-    validUntil?: string;
-    confidence: number;
-    domain: DailyIngestionDomain;
-    provenance: Record<string, unknown>;
-  }>): Promise<string[]> {
-    if (observations.length === 0) return [];
-    const ids: string[] = [];
-    for (const chunk of chunkDailyRows(observations)) {
-      const rows = await executor.query<BatchObservationIdRow>(
-      `with input as (
-         select *
-         from jsonb_to_recordset($1::jsonb) as x(
-           product_id uuid,
-           chain_id uuid,
-           store_id uuid,
-           source_run_id uuid,
-           raw_record_id uuid,
-           retailer_product_ref text,
-           price_type text,
-           price numeric,
-           regular_price numeric,
-           unit_price numeric,
-           currency char(3),
-           quantity numeric,
-           quantity_unit text,
-           promotion_text text,
-           promotion_starts_on date,
-           promotion_ends_on date,
-           member_required boolean,
-           observed_at timestamptz,
-           valid_from timestamptz,
-           valid_until timestamptz,
-           confidence numeric,
-           domain text,
-           provenance jsonb
-         )
-       ),
-       inserted as (
-         insert into observations(
-           product_id,
-           chain_id,
-           store_id,
-           source_run_id,
-           raw_record_id,
-           retailer_product_ref,
-           price_type,
-           price,
-           regular_price,
-           unit_price,
-           currency,
-           quantity,
-           quantity_unit,
-           promotion_text,
-           promotion_starts_on,
-           promotion_ends_on,
-           member_required,
-           observed_at,
-           valid_from,
-           valid_until,
-           confidence,
-           domain,
-           provenance
-         )
-         select
-           product_id,
-           chain_id,
-           store_id,
-           source_run_id,
-           raw_record_id,
-           retailer_product_ref,
-           price_type,
-           price,
-           regular_price,
-           unit_price,
-           currency,
-           quantity,
-           quantity_unit,
-           promotion_text,
-           promotion_starts_on,
-           promotion_ends_on,
-           member_required,
-           observed_at,
-           valid_from,
-           valid_until,
-           confidence,
-           domain,
-           provenance
-         from input
-         returning id, product_id, chain_id, store_id, price_type, price, regular_price, unit_price, currency, observed_at, confidence, domain, provenance
-       ),
-       latest_upsert as (
-         insert into latest_prices(
-           product_id,
-           chain_id,
-           store_id,
-           price_type,
-           observation_id,
-           price,
-           regular_price,
-           unit_price,
-           currency,
-           observed_at,
-           confidence,
-           domain,
-           provenance
-         )
-         select
-           product_id,
-           chain_id,
-           store_id,
-           price_type,
-           id,
-           price,
-           regular_price,
-           unit_price,
-           currency,
-           observed_at,
-           confidence,
-           domain,
-           provenance
-         from (
-           select distinct on (product_id, chain_id, store_id, price_type)
-             product_id,
-             chain_id,
-             store_id,
-             price_type,
-             id,
-             price,
-             regular_price,
-             unit_price,
-             currency,
-             observed_at,
-             confidence,
-             domain,
-             provenance
-           from inserted
-           order by product_id, chain_id, store_id, price_type, observed_at desc, id desc
-         ) latest_input
-         on conflict (product_id, chain_id, store_id, price_type) do update set
-           observation_id = excluded.observation_id,
-           price = excluded.price,
-           regular_price = excluded.regular_price,
-           unit_price = excluded.unit_price,
-           currency = excluded.currency,
-           observed_at = excluded.observed_at,
-           confidence = excluded.confidence,
-           domain = excluded.domain,
-           provenance = excluded.provenance,
-           updated_at = now()
-         where latest_prices.observed_at <= excluded.observed_at
-         returning 1
-       )
-       select id from inserted`,
-      [JSON.stringify(chunk.map((observation) => ({
-        product_id: observation.productId,
-        chain_id: observation.chainId,
-        store_id: observation.storeId ?? null,
-        source_run_id: sourceRun.sourceRunId,
-        raw_record_id: observation.rawRecordId,
-        retailer_product_ref: observation.retailerProductRef ?? null,
-        price_type: observation.priceType,
-        price: observation.price,
-        regular_price: observation.regularPrice ?? null,
-        unit_price: observation.unitPrice,
-        currency: observation.currency ?? 'SEK',
-        quantity: observation.quantity ?? null,
-        quantity_unit: observation.quantityUnit ?? null,
-        promotion_text: observation.promotionText ?? null,
-        promotion_starts_on: observation.promotionStartsOn ?? null,
-        promotion_ends_on: observation.promotionEndsOn ?? null,
-        member_required: observation.memberRequired ?? false,
-        observed_at: observation.observedAt,
-        valid_from: observation.validFrom ?? null,
-        valid_until: observation.validUntil ?? null,
-        confidence: observation.confidence,
-        domain: observation.domain,
-        provenance: observation.provenance
-      })))]
-      );
-      ids.push(...rows.map((row) => row.id));
-    }
-    return ids;
-  }
-
   async function insertFuelPriceSourceObservationLinks(links: Array<{
     observationId: string;
     fuelGradeId: FuelGradeId;
@@ -3909,105 +3708,105 @@ async function persistDailyConnectorOutput(input: {
     }
     await upsertDailyAliasBatch(executor, aliasesToUpsert);
 
-  const rawRecordsToUpsert: Parameters<typeof upsertRawRecordBatch>[0] = [];
-  const observationsToInsert: Parameters<typeof insertObservationBatch>[0] = [];
+    const rawRecordsToUpsert: Parameters<typeof upsertRawRecordBatch>[0] = [];
+    const observationsToInsert: PriceObservationRecord[] = [];
 
-  for (const [ordinal, accepted] of result.ingestion.accepted.entries()) {
-    const chainId = await getDailyChainId(accepted.priceObservation.chainId);
-    const storeConfig = accepted.priceObservation.storeId ? storesBySlug.get(normalizeDailySlug(accepted.priceObservation.storeId)) : undefined;
-    const storeId = storeConfig ? await getDailyStoreId(chainId, storeConfig) : undefined;
-    const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
-    if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
+    for (const [ordinal, accepted] of result.ingestion.accepted.entries()) {
+      const chainId = await getDailyChainId(accepted.priceObservation.chainId);
+      const storeConfig = accepted.priceObservation.storeId ? storesBySlug.get(normalizeDailySlug(accepted.priceObservation.storeId)) : undefined;
+      const storeId = storeConfig ? await getDailyStoreId(chainId, storeConfig) : undefined;
+      const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
+      if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
 
-    const payload = {
-      chainId: config.chainId,
-      productId: accepted.product.id,
-      storeId: accepted.priceObservation.storeId,
-      priceType: accepted.priceObservation.priceType,
-      price: accepted.priceObservation.price,
-      observedAt: accepted.priceObservation.observedAt
-    };
-    const rawProvenance = {
-      sourceType: accepted.priceObservation.provenance.sourceType,
-      parserVersion: accepted.priceObservation.provenance.parserVersion,
-      rawSnapshotRef: accepted.priceObservation.provenance.rawSnapshotRef,
-      chainId: config.chainId,
-      cadence: 'daily',
-      connectorId: config.connectorId,
-      runKey: result.plan.runKey,
-      domain
-    };
-    rawRecordsToUpsert.push({
-      ordinal,
-      recordType: 'price',
-      externalRef: accepted.priceObservation.retailerProductId ?? accepted.product.id,
-      observedAt: accepted.priceObservation.observedAt,
-      payload,
-      payloadHash: dailyPayloadHash({
-        runKey: result.plan.runKey,
+      const payload = {
+        chainId: config.chainId,
         productId: accepted.product.id,
-        retailerProductId: accepted.priceObservation.retailerProductId ?? null,
-        storeId: accepted.priceObservation.storeId ?? null,
+        storeId: accepted.priceObservation.storeId,
+        priceType: accepted.priceObservation.priceType,
+        price: accepted.priceObservation.price,
+        observedAt: accepted.priceObservation.observedAt
+      };
+      const rawProvenance = {
+        sourceType: accepted.priceObservation.provenance.sourceType,
+        parserVersion: accepted.priceObservation.provenance.parserVersion,
+        rawSnapshotRef: accepted.priceObservation.provenance.rawSnapshotRef,
+        chainId: config.chainId,
+        cadence: 'daily',
+        connectorId: config.connectorId,
+        runKey: result.plan.runKey,
+        domain
+      };
+      rawRecordsToUpsert.push({
+        ordinal,
+        recordType: 'price',
+        externalRef: accepted.priceObservation.retailerProductId ?? accepted.product.id,
         observedAt: accepted.priceObservation.observedAt,
-        price: accepted.priceObservation.price
-      }),
-      provenance: rawProvenance
+        payload,
+        payloadHash: dailyPayloadHash({
+          runKey: result.plan.runKey,
+          productId: accepted.product.id,
+          retailerProductId: accepted.priceObservation.retailerProductId ?? null,
+          storeId: accepted.priceObservation.storeId ?? null,
+          observedAt: accepted.priceObservation.observedAt,
+          price: accepted.priceObservation.price
+        }),
+        provenance: rawProvenance
+      });
+      observationsToInsert.push({
+        productId,
+        chainId,
+        storeId,
+        sourceRunId: sourceRun.sourceRunId,
+        retailerProductRef: accepted.priceObservation.retailerProductId,
+        priceType: dbPriceTypeForIngested(accepted.priceObservation.priceType),
+        price: accepted.priceObservation.price,
+        regularPrice: accepted.priceObservation.regularPrice,
+        unitPrice: accepted.priceObservation.unitPrice,
+        currency: accepted.priceObservation.currency,
+        quantity: accepted.product.packageSize,
+        quantityUnit: accepted.product.packageUnit,
+        promotionText: accepted.promotionObservation?.promoText,
+        promotionStartsOn: accepted.promotionObservation?.validFrom?.slice(0, 10),
+        promotionEndsOn: accepted.promotionObservation?.validUntil?.slice(0, 10),
+        memberRequired: accepted.promotionObservation?.memberOnly ?? false,
+        observedAt: accepted.priceObservation.observedAt,
+        validFrom: accepted.priceObservation.validFrom,
+        validUntil: accepted.priceObservation.validUntil,
+        confidence: accepted.priceObservation.confidenceScore,
+        domain,
+        provenance: rawProvenance
+      });
+    }
+
+    const rawRecordIdsByOrdinal = await upsertRawRecordBatch(rawRecordsToUpsert);
+    for (let index = 0; index < observationsToInsert.length; index += 1) {
+      const rawRecordId = rawRecordIdsByOrdinal.get(index);
+      if (!rawRecordId) throw new Error(`Daily ingestion raw record batch did not return an id for accepted record ${index}`);
+      rawRecordIds.push(rawRecordId);
+      observationsToInsert[index]!.rawRecordId = rawRecordId;
+    }
+    const insertedObservationIds = (await priceWriter.upsertConnectorPriceObservations(observationsToInsert)).observationIds;
+    observationIds.push(...insertedObservationIds);
+
+    if (domain === 'fuel') {
+      await insertFuelPriceSourceObservationLinks(result.ingestion.accepted.flatMap((accepted, index) => {
+        const source = accepted.priceObservation.fuelSource;
+        const observationId = insertedObservationIds[index];
+        if (!source || !observationId) return [];
+        return [{
+          observationId,
+          fuelGradeId: source.fuelGradeId,
+          originalPriceText: source.originalPriceText,
+          originalEffectiveDate: source.originalEffectiveDate
+        }];
+      }));
+    }
+
+    await sourceWriter.finishSourceRun({
+      sourceRunId: sourceRun.sourceRunId,
+      finishedAt: config.requestedAt,
+      status: result.rejectedCount > 0 ? 'partial' : 'succeeded'
     });
-    observationsToInsert.push({
-      productId,
-      chainId,
-      storeId,
-      rawRecordId: '',
-      retailerProductRef: accepted.priceObservation.retailerProductId,
-      priceType: dbPriceTypeForIngested(accepted.priceObservation.priceType),
-      price: accepted.priceObservation.price,
-      regularPrice: accepted.priceObservation.regularPrice,
-      unitPrice: accepted.priceObservation.unitPrice,
-      currency: accepted.priceObservation.currency,
-      quantity: accepted.product.packageSize,
-      quantityUnit: accepted.product.packageUnit,
-      promotionText: accepted.promotionObservation?.promoText,
-      promotionStartsOn: accepted.promotionObservation?.validFrom?.slice(0, 10),
-      promotionEndsOn: accepted.promotionObservation?.validUntil?.slice(0, 10),
-      memberRequired: accepted.promotionObservation?.memberOnly ?? false,
-      observedAt: accepted.priceObservation.observedAt,
-      validFrom: accepted.priceObservation.validFrom,
-      validUntil: accepted.priceObservation.validUntil,
-      confidence: accepted.priceObservation.confidenceScore,
-      domain,
-      provenance: rawProvenance
-    });
-  }
-
-  const rawRecordIdsByOrdinal = await upsertRawRecordBatch(rawRecordsToUpsert);
-  for (let index = 0; index < observationsToInsert.length; index += 1) {
-    const rawRecordId = rawRecordIdsByOrdinal.get(index);
-    if (!rawRecordId) throw new Error(`Daily ingestion raw record batch did not return an id for accepted record ${index}`);
-    rawRecordIds.push(rawRecordId);
-    observationsToInsert[index]!.rawRecordId = rawRecordId;
-  }
-  const insertedObservationIds = await insertObservationBatch(observationsToInsert);
-  observationIds.push(...insertedObservationIds);
-
-  if (domain === 'fuel') {
-    await insertFuelPriceSourceObservationLinks(result.ingestion.accepted.flatMap((accepted, index) => {
-      const source = accepted.priceObservation.fuelSource;
-      const observationId = insertedObservationIds[index];
-      if (!source || !observationId) return [];
-      return [{
-        observationId,
-        fuelGradeId: source.fuelGradeId,
-        originalPriceText: source.originalPriceText,
-        originalEffectiveDate: source.originalEffectiveDate
-      }];
-    }));
-  }
-
-  await sourceWriter.finishSourceRun({
-    sourceRunId: sourceRun.sourceRunId,
-    finishedAt: config.requestedAt,
-    status: result.rejectedCount > 0 ? 'partial' : 'succeeded'
-  });
 
     return {
       sourceRunIds: [sourceRun.sourceRunId],

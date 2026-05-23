@@ -1055,6 +1055,8 @@ describe('verified-data UI', () => {
     const demo = await read('src/lib/demo-data.ts');
     assert.match(demo, /calculateMealCostBreakdown/);
     assert.match(demo, /mealCostBreakdown/);
+    assert.match(source, /calculateMealCostBreakdown/);
+    assert.match(source, /ConfidenceBadge/);
     assert.match(source, /mealCostBreakdown/);
     assert.match(source, /Ingredient-level meal costing/);
     assert.match(source, /costPerServing/);
