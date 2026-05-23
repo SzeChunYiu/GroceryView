@@ -107,6 +107,11 @@ can be derived. Operators can tune
 (default `1`) to retry those proofs before deciding whether to switch
 `DATABASE_URL` to the direct host, keep waiting on pooler recovery, or continue
 replacement DB cutover.
+If the Supabase pooler returns `(EAUTHQUERY) authentication query failed:
+connection to database not available`, the diagnostic reports
+`supabase_pooler_database_unavailable` so the artifact points at a provider
+database/pooler availability incident instead of a generic credential or network
+failure.
 
 When connectivity still fails, the daily workflow tries to generate a redacted
 `groceryview-production-db-recovery-packet` artifact with
@@ -347,6 +352,7 @@ The workflow must pass these gates in order:
 - `daily_db_connectivity_diagnostic_missing`: the production DB connectivity command failed before writing a diagnostic JSON payload; inspect the `groceryview-daily-db-connectivity` artifact for the command exit code.
 - `supabase_transaction_pooler`: an alternate `alternateConnections[]` entry proving whether the original Supabase transaction-pooler endpoint accepts writes when the session-pooler rewrite fails; tune `GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS` if provider startup is flapping.
 - `supabase_direct_host`: an alternate `alternateConnections[]` entry proving whether the direct Supabase DB host accepts writes when the pooler path fails; tune `GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS` if provider startup is flapping.
+- `supabase_pooler_database_unavailable`: Supabase pooler authentication reached the project but reported `connection to database not available` (for example `EAUTHQUERY`); wait for provider recovery, use the recovery packet to inspect Supabase project health, or validate a replacement DB cutover before retrying daily ingestion.
 - `production_db_recovery_packet_missing_credentials`: DB connectivity failed, but the workflow could not call Supabase management APIs because `SUPABASE_ACCESS_TOKEN` or `SUPABASE_PROJECT_REF` was absent; inspect `groceryview-production-db-recovery-packet` and configure the missing value before the next failure.
 - `production_db_recovery_packet_diagnostic_missing`: the recovery-packet command failed before writing JSON; inspect `groceryview-production-db-recovery-packet` for the command exit code.
 - `production_db_migrations_diagnostic_missing`: the production DB migration command failed before writing a diagnostic JSON payload; inspect the `groceryview-production-db-migrations` artifact for the command exit code.

@@ -96,6 +96,8 @@ export function isTransientDailyDatabaseError(error) {
     'db_connection_closed_in_auth',
     'hot standby mode is disabled',
     'edbhandlerexited',
+    'eauthquery',
+    'connection to database not available',
     'timeout',
     'epipe'
   ].some((signature) => text.includes(signature));
@@ -103,6 +105,7 @@ export function isTransientDailyDatabaseError(error) {
 
 function blockerForError(error) {
   const text = errorText(error).toLowerCase();
+  if (text.includes('eauthquery') && text.includes('connection to database not available')) return 'supabase_pooler_database_unavailable';
   if (text.includes('database system is not accepting connections')) return 'database_not_accepting_connections';
   if (text.includes('db_connection_closed_in_auth')) return 'supabase_pooler_auth_closed';
   if (text.includes('hot standby mode is disabled')) return 'supabase_database_hot_standby_disabled';
@@ -121,7 +124,9 @@ function sanitizeError(error) {
 
 async function probeConnection({ connectionString, retryAttempts, retryBaseDelayMs, retryMaxDelayMs, Pool, wait }) {
   let lastError;
+  let attempts = 0;
   for (let attempt = 1; attempt <= retryAttempts; attempt += 1) {
+    attempts = attempt;
     const pool = new Pool({
       connectionString,
       max: 1,
@@ -147,7 +152,7 @@ async function probeConnection({ connectionString, retryAttempts, retryBaseDelay
   }
   return {
     status: 'blocked',
-    attempts: retryAttempts,
+    attempts,
     blockers: [blockerForError(lastError)],
     error: sanitizeError(lastError)
   };
