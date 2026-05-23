@@ -67,7 +67,7 @@ Branch ids are fetched from public/native store catalogs where available:
 Generate connector-ready `stores[]` snippets:
 
 ```bash
-npm run ops:daily-connector-stores > /tmp/daily-connector-stores.json
+npm run --silent ops:daily-connector-stores > /tmp/daily-connector-stores.json
 ```
 
 The daily ingestion workflow generates `GROCERYVIEW_DAILY_CONNECTORS_JSON` directly from the native connector exporter, so it is not a GitHub secret. To inspect the same generated config locally, run:
@@ -77,6 +77,8 @@ npm run --silent ops:daily-connectors > /tmp/groceryview-daily-connectors.json
 ```
 
 Use this emitted JSON only for local `ops:validate-production-env` checks or one-off operator debugging when the workflow is not available.
+The daily workflow also exports this store enumeration before connector and target validation, fails closed with `store_enumeration_missing_chain:<chain>` or `store_enumeration_empty_chain:<chain>` if any required chain is absent or empty, and uploads the JSON as the `groceryview-daily-connector-stores` artifact for operator evidence.
+
 
 ## Bounded bulk ingestion controls
 
@@ -140,15 +142,18 @@ gh run list --workflow daily-ingestion.yml --repo SzeChunYiu/GroceryView --limit
 The workflow must pass these gates in order:
 
 1. DB and ingestion package tests
-2. production ingestion configuration validator
-3. configured daily ingestion runner
-4. DB-backed site snapshot export and `groceryview-db-site-snapshot` artifact upload
-5. `/api/readiness/postgres`
-6. `/api/readiness/source-runs`
-7. `/api/readiness/catalog-coverage`
+2. live store enumeration and `groceryview-daily-connector-stores` artifact upload
+3. production ingestion configuration validator
+4. configured daily ingestion runner
+5. DB-backed site snapshot export and `groceryview-db-site-snapshot` artifact upload
+6. `/api/readiness/postgres`
+7. `/api/readiness/source-runs`
+8. `/api/readiness/catalog-coverage`
 
 ## Expected blocker meanings
 
+- `store_enumeration_missing_chain:<chain>`: store enumeration did not emit a `storesByChain` array for a required chain.
+- `store_enumeration_empty_chain:<chain>`: store enumeration emitted no branches for a required chain, so connector and target validation cannot prove all-branch coverage.
 - `source_run_missing_fresh_chain:<chain>`: no fresh successful daily source run for that chain.
 - `source_run_insufficient_accepted_rows:<chain>:<count>/<min>`: source run completed but accepted too few rows.
 - `missing_store_scoped_prices:<products>`: connector output had accepted products without a branch/store id.

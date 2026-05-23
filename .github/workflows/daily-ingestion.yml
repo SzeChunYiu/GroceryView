@@ -51,6 +51,34 @@ jobs:
           npm run test -w @groceryview/db
           npm run test -w @groceryview/ingestion
 
+      - name: Export live store enumeration
+        run: |
+          set -euo pipefail
+          npm run --silent ops:daily-connector-stores >/tmp/daily-connector-stores.json
+          node <<'NODE'
+          const body = require('/tmp/daily-connector-stores.json');
+          const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+          for (const chain of requiredChains) {
+            const stores = body.storesByChain?.[chain];
+            if (!Array.isArray(stores)) {
+              console.error(`store_enumeration_missing_chain:${chain}`);
+              process.exit(1);
+            }
+            if (stores.length === 0) {
+              console.error(`store_enumeration_empty_chain:${chain}`);
+              process.exit(1);
+            }
+          }
+          NODE
+
+      - name: Upload live store enumeration
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-daily-connector-stores
+          path: /tmp/daily-connector-stores.json
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Validate production ingestion configuration
         env:
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
