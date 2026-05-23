@@ -9,11 +9,11 @@
 //     thing across chains,
 //   - the category key carries its base unit, so medians are always like-for-like.
 import { coopProducts } from './ingested/coop';
-import { willysProducts } from './ingested/willys';
-import { hemkopProducts } from './ingested/hemkop';
+import { willysProducts, willysWeeklyDiscounts, type WillysIngestedWeeklyDiscount } from './ingested/willys';
+import { hemkopProducts, hemkopWeeklyDiscounts, type HemkopIngestedWeeklyDiscount } from './ingested/hemkop';
 import { matpriskollenOffers } from './ingested/matpriskollen';
 import { axfoodProducts } from './axfood-products';
-import type { BrandTierPriceObservation, ChainPriceObservation } from '@groceryview/core';
+import { calculateChainPriceIndex, type BrandTierPriceObservation, type ChainPriceObservation } from '@groceryview/core';
 
 // ── unit canonicalisation ────────────────────────────────────────────────────
 type Canon = { factor: number; base: 'kg' | 'l' | 'st' };
@@ -132,6 +132,210 @@ export function buildMatchedBasketChainPriceObservations(): ChainPriceObservatio
     }
   }
   return out;
+}
+
+type WeeklyCampaignDiscount = WillysIngestedWeeklyDiscount | HemkopIngestedWeeklyDiscount;
+
+export type ChainIndexTrendPoint = {
+  date: string;
+  value: number;
+  categoriesCovered: number;
+  observations: number;
+  confidence: 'high' | 'medium' | 'low';
+};
+
+export type ChainIndexTrendSeries = {
+  chainId: string;
+  points: ChainIndexTrendPoint[];
+  latestIndex: number;
+  latestDate: string;
+  movementFromFirst: number;
+  coverageLabel: string;
+};
+
+export type ChainIndexTrendReport = {
+  title: string;
+  sourceLabel: string;
+  dateCount: number;
+  observationCount: number;
+  chartWindowLabel: string;
+  coverageLabel: string;
+  guardrails: string[];
+  series: ChainIndexTrendSeries[];
+};
+
+type DatedChainObservation = {
+  date: string;
+  observation: ChainPriceObservation;
+};
+
+export function parseCampaignDate(value: string): string | null {
+  const match = value.trim().match(/^(\d{1,2})\/(\d{1,2})-(\d{4})$/);
+  if (!match) return null;
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+  if (!Number.isInteger(day) || !Number.isInteger(month) || !Number.isInteger(year)) return null;
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+
+  const monthLengths = [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (day > monthLengths[month - 1]) return null;
+
+  return `${year.toString().padStart(4, '0')}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+}
+
+function isLeapYear(year: number): boolean {
+  return year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0);
+}
+
+function campaignTrendObservations(chainId: string, discounts: readonly WeeklyCampaignDiscount[]): DatedChainObservation[] {
+  const out: DatedChainObservation[] = [];
+
+  for (const discount of discounts) {
+    const date = parseCampaignDate(discount.startDate);
+    if (!date) continue;
+
+    const value = parseSek(discount.comparePriceText);
+    const unit = discount.comparePriceText.split('/')[1]?.trim() ?? '';
+    const canon = value == null ? null : canonUnitPrice(value, unit);
+    if (!canon) continue;
+
+    out.push({
+      date,
+      observation: {
+        chainId,
+        category: `${normaliseCategory(discount.category, discount.name, discount.brand)} · ${canon.base}`,
+        unitPrice: canon.price
+      }
+    });
+  }
+
+  return out;
+}
+
+function sharedCategoryObservations(rows: ChainPriceObservation[]): ChainPriceObservation[] {
+  const chainsByCategory = new Map<string, Set<string>>();
+  for (const row of rows) {
+    const chains = chainsByCategory.get(row.category) ?? new Set<string>();
+    chains.add(row.chainId);
+    chainsByCategory.set(row.category, chains);
+  }
+
+  return rows.filter((row) => (chainsByCategory.get(row.category)?.size ?? 0) >= 2);
+}
+
+function isoDayOrdinal(date: string): number {
+  const [year, month, day] = date.split('-').map(Number);
+  if (!year || !month || !day) return Number.NaN;
+  return Math.floor(Date.UTC(year, month - 1, day) / 86_400_000);
+}
+
+function latestCampaignDateOnOrBefore(dates: readonly string[], date: string): string | null {
+  let latest: string | null = null;
+  for (const candidate of dates) {
+    if (candidate <= date) latest = candidate;
+    if (candidate > date) break;
+  }
+  return latest;
+}
+
+let chainIndexTrendCache: ChainIndexTrendReport | null = null;
+
+export function buildChainIndexTrendSeries(): ChainIndexTrendReport {
+  if (chainIndexTrendCache) return chainIndexTrendCache;
+
+  const campaignRows = [
+    ...campaignTrendObservations('Willys', willysWeeklyDiscounts),
+    ...campaignTrendObservations('Hemköp', hemkopWeeklyDiscounts)
+  ].sort((a, b) => a.date.localeCompare(b.date));
+
+  const byChainAndDate = new Map<string, Map<string, ChainPriceObservation[]>>();
+  for (const row of campaignRows) {
+    const byDate = byChainAndDate.get(row.observation.chainId) ?? new Map<string, ChainPriceObservation[]>();
+    const rows = byDate.get(row.date) ?? [];
+    rows.push(row.observation);
+    byDate.set(row.date, rows);
+    byChainAndDate.set(row.observation.chainId, byDate);
+  }
+  const datesByChain = new Map(
+    [...byChainAndDate.entries()].map(([chainId, byDate]) => [chainId, [...byDate.keys()].sort((a, b) => a.localeCompare(b))])
+  );
+  const candidateDates = [...new Set(campaignRows.map((row) => row.date))].sort((a, b) => a.localeCompare(b));
+
+  const pointsByChain = new Map<string, ChainIndexTrendPoint[]>();
+  let observationCount = 0;
+
+  for (const date of candidateDates) {
+    const snapshotRows: ChainPriceObservation[] = [];
+    const dateOrdinal = isoDayOrdinal(date);
+    for (const [chainId, byDate] of byChainAndDate) {
+      const latestDate = latestCampaignDateOnOrBefore(datesByChain.get(chainId) ?? [], date);
+      if (!latestDate) continue;
+      const ageDays = dateOrdinal - isoDayOrdinal(latestDate);
+      if (!Number.isFinite(ageDays) || ageDays < 0 || ageDays > 7) continue;
+      snapshotRows.push(...(byDate.get(latestDate) ?? []));
+    }
+
+    const sharedRows = sharedCategoryObservations(snapshotRows);
+    const report = calculateChainPriceIndex(sharedRows);
+    if (report.chains.length < 2) continue;
+
+    observationCount += report.generatedFrom;
+    for (const chain of report.chains) {
+      const points = pointsByChain.get(chain.chainId) ?? [];
+      points.push({
+        date,
+        value: chain.overallIndex,
+        categoriesCovered: chain.categoriesCovered,
+        observations: chain.observations,
+        confidence: chain.confidence
+      });
+      pointsByChain.set(chain.chainId, points);
+    }
+  }
+
+  const series = [...pointsByChain.entries()]
+    .map(([chainId, points]) => {
+      const sortedPoints = points.sort((a, b) => a.date.localeCompare(b.date));
+      const first = sortedPoints[0];
+      const latest = sortedPoints[sortedPoints.length - 1];
+      const coverageCategories = new Set(sortedPoints.map((point) => point.categoriesCovered));
+      return {
+        chainId,
+        points: sortedPoints,
+        latestIndex: latest.value,
+        latestDate: latest.date,
+        movementFromFirst: Math.round((latest.value - first.value) * 10) / 10,
+        coverageLabel: `${sortedPoints.length} dates · ${coverageCategories.size} coverage levels`
+      };
+    })
+    .sort((a, b) => a.latestIndex - b.latestIndex);
+
+  const dates = new Set(series.flatMap((entry) => entry.points.map((point) => point.date)));
+  const sortedDates = [...dates].sort((a, b) => a.localeCompare(b));
+  const chartWindowLabel =
+    sortedDates.length > 1
+      ? `${sortedDates[0]} → ${sortedDates[sortedDates.length - 1]}`
+      : sortedDates[0] ?? 'No dated campaign rows';
+
+  chainIndexTrendCache = {
+    title: 'Chain Price Index trend chart',
+    sourceLabel: 'Willys/Hemköp weekly campaign tape',
+    dateCount: sortedDates.length,
+    observationCount,
+    chartWindowLabel,
+    coverageLabel: `${sortedDates.length} campaign snapshots · ${observationCount.toLocaleString('sv-SE')} shared-category observations`,
+    guardrails: [
+      'Uses dated weekly campaign rows from willysWeeklyDiscounts and hemkopWeeklyDiscounts.',
+      'Snapshot points carry forward only observed campaign rows within a 7-day campaign window.',
+      'calculateChainPriceIndex runs per campaign snapshot date; no forecast or synthetic shelf history is rendered.',
+      'This is campaign tape coverage, not a full-store shelf basket time series.'
+    ],
+    series
+  };
+
+  return chainIndexTrendCache;
 }
 
 

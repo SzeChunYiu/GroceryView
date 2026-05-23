@@ -1455,6 +1455,28 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(verified, /Math\.random/);
   });
 
+  it('surfaces a chain price index trend chart from dated campaign tape on homepage and chain-index', async () => {
+    const chainData = await read('src/lib/chain-index-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const route = await read('src/app/chain-index/page.tsx');
+
+    assert.match(chainData, /willysWeeklyDiscounts/);
+    assert.match(chainData, /hemkopWeeklyDiscounts/);
+    assert.match(chainData, /export function buildChainIndexTrendSeries/);
+    assert.match(chainData, /parseCampaignDate/);
+    assert.match(chainData, /campaignTrendObservations/);
+    assert.match(chainData, /calculateChainPriceIndex/);
+    assert.match(shell, /homepageChainIndexTrend/);
+    assert.match(shell, /Chain index trend tape/);
+    assert.match(shell, /data-chain-index-trend/);
+    assert.match(route, /chainIndexTrendSeries/);
+    assert.match(route, /Chain Price Index trend chart/);
+    assert.match(route, /campaign tape/);
+    assert.match(route, /No forecast/);
+    assert.match(route, /data-chain-index-trend/);
+    assert.doesNotMatch(chainData, /Math\.random|Date\.now/);
+  });
+
   it('uses a readable global shell and provenance surfaces across the app', async () => {
     const globals = await read('src/app/globals.css');
     const nav = await read('src/components/app-nav.tsx');
