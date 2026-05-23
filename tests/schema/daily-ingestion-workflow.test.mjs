@@ -104,6 +104,10 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /SUPABASE_PROJECT_REF:\s*\$\{\{ vars\.SUPABASE_PROJECT_REF \|\| secrets\.SUPABASE_PROJECT_REF \}\}/);
     assert.match(workflow, /npm run --silent ops:db-recovery-packet >\/tmp\/production-db-recovery-packet\.json/);
     assert.match(workflow, /production_db_recovery_packet_missing_credentials/);
+    assert.match(workflow, /configure-replacement-db-cutover/);
+    assert.match(workflow, /REPLACEMENT_DATABASE_URL or CANDIDATE_DATABASE_URL/);
+    assert.match(workflow, /npm run --silent ops:check-production-secrets -- --scope db-recovery/);
+    assert.match(workflow, /npm run --silent ops:check-production-secrets -- --scope db-cutover/);
     assert.match(workflow, /production_db_recovery_packet_diagnostic_missing/);
     assert.match(workflow, /name: Upload production DB recovery packet\n\s+if:\s*failure\(\)/);
     assert.match(workflow, /name:\s*groceryview-production-db-recovery-packet/);
