@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
-import { buildBrandTierPriceObservations, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
+import { buildBrandTierPriceObservations, buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
 import { buildGroceryIndexTickerWidget } from '@/lib/grocery-index-widget';
 import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, marketHeatmapTiles, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -16,6 +16,7 @@ const matchedBasketRefinedIndex = calculateChainPriceIndex([
   ...buildChainPriceObservations(),
   ...matchedBasketObservations
 ]);
+const chainIndexTrendSeries = buildChainIndexTrendSeries();
 
 const widgetSourceConfidence = matchedBasketRefinedIndex.chains.reduce(
   (summary, chain) => ({
@@ -53,6 +54,52 @@ export default function ChainIndexPage() {
         <Card><p className="text-sm font-black text-slate-600">Average spread</p><p className="mt-2 text-4xl font-black text-emerald-800">{formatPct(averageSpread)}</p></Card>
         <Card><p className="text-sm font-black text-slate-600">Lowest-price wins</p><p className="mt-2 text-xl font-black text-slate-950">Willys {willysWins} · Hemköp {hemkopWins}</p></Card>
       </div>
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50">
+        <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <Eyebrow>{chainIndexTrendSeries.sourceLabel}</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-indigo-950">Chain Price Index trend chart</h2>
+            <p className="mt-3 text-sm leading-6 text-indigo-950">
+              This chart replays dated campaign tape through calculateChainPriceIndex so Willys and Hemköp can be compared over time on the same 100-centred scale. No forecast is rendered and missing full-shelf history stays labelled as campaign coverage.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <p className="rounded-2xl bg-white/80 p-4 text-sm font-black text-indigo-950">{chainIndexTrendSeries.chartWindowLabel}</p>
+              <p className="rounded-2xl bg-white/80 p-4 text-sm font-black text-indigo-950">{chainIndexTrendSeries.coverageLabel}</p>
+            </div>
+          </div>
+          <div className="grid gap-3">
+            {chainIndexTrendSeries.series.map((series) => (
+              <div className="rounded-2xl bg-white/85 p-4 shadow-sm" data-chain-index-trend={series.chainId} key={series.chainId}>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-[0.18em] text-indigo-700">{series.chainId}</p>
+                    <p className="mt-1 text-xs font-bold text-indigo-900">{series.coverageLabel} · latest {series.latestDate}</p>
+                  </div>
+                  <p className="text-3xl font-black text-indigo-950">{series.latestIndex.toFixed(1)}</p>
+                </div>
+                <p className="mt-2 text-sm font-black text-indigo-950">Movement from first campaign date: {series.movementFromFirst >= 0 ? '+' : ''}{series.movementFromFirst.toFixed(1)} index points</p>
+                <div className="mt-4 space-y-2">
+                  {series.points.map((point) => (
+                    <div className="grid gap-2 text-xs font-bold text-indigo-950 sm:grid-cols-[7rem_1fr_7rem]" key={`${series.chainId}-${point.date}`}>
+                      <span>{point.date}</span>
+                      <span className="h-3 overflow-hidden rounded-full bg-indigo-100">
+                        <span className="block h-full rounded-full bg-indigo-600" style={{ width: `${Math.max(8, Math.min(100, point.value))}%` }} />
+                      </span>
+                      <span>{point.value.toFixed(1)} · {point.confidence}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <ul className="mt-5 grid gap-3 text-sm font-bold leading-6 text-indigo-950 lg:grid-cols-3">
+          {chainIndexTrendSeries.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white/80 p-3" key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
+      </Card>
 
       <Card className="mt-6 border-slate-200 bg-white">
         <div className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
