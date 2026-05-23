@@ -1502,6 +1502,25 @@ ${seo}`;
     assert.match(route, /Cheapest chain near me/);
   });
 
+  it('surfaces synced map and list selection on the map route', async () => {
+    const route = await read('src/app/map/page.tsx');
+    const map = await read('src/components/store-map.tsx');
+
+    assert.match(route, /StoreMap/);
+    assert.match(route, /Synced map \+ list/);
+    assert.match(route, /map ↔ list sync/);
+    assert.match(map, /syncedMapListStores/);
+    assert.match(map, /selectedStoreSlug/);
+    assert.match(map, /setSelectedStoreSlug/);
+    assert.match(map, /data-store-slug/);
+    assert.match(map, /aria-pressed/);
+    assert.match(map, /mapRef/);
+    assert.match(map, /easeTo|flyTo/);
+    assert.match(map, /chainIndexScore/);
+    assert.match(map, /osmStores/);
+    assert.doesNotMatch(map, /Math\.random/);
+  });
+
   it('surfaces a price-by-district heat overlay on the map without branch-price claims', async () => {
     const route = await read('src/app/map/page.tsx');
     assert.match(route, /districtHeatOverlay/);

@@ -1,5 +1,6 @@
 import { calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { StoreMap } from '@/components/store-map';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -125,6 +126,26 @@ export default function MapPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         The website has verified latitude and longitude for OSM stores. Markers are colored by the chain-level price index only; branch-level prices, route times, and store quality scores are not invented.
       </p>
+
+      <Card className="mt-6 overflow-hidden border-slate-200 bg-slate-950 p-0 text-white">
+        <div className="grid gap-4 p-6 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-300">Synced map + list</p>
+            <h2 className="mt-2 text-3xl font-black">Interactive store map with linked list selection</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-200">
+              The map ↔ list sync uses verified OSM coordinates and chain-index proxy colors. Selecting a list row moves the map; selecting a marker updates the linked row without inventing branch-level basket prices.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/10 p-4 text-right">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-200">Selection model</p>
+            <p className="mt-2 text-2xl font-black text-white">Account-safe map UX</p>
+            <p className="mt-2 text-sm font-semibold text-slate-200">No private shopper location is read by default.</p>
+          </div>
+        </div>
+        <div className="h-[620px] overflow-hidden border-t border-white/10 bg-slate-900">
+          <StoreMap />
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto]">

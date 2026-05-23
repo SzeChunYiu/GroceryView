@@ -47,6 +47,22 @@ function chainIndexColor(score: number | null, fallback: string): string {
   return '#D94F3D';
 }
 
+const syncedMapListStores = osmStores
+  .filter((store) => Number.isFinite(store.lat) && Number.isFinite(store.lng))
+  .slice(0, 8);
+
+function storeLocationLabel(store: OsmStore): string {
+  return [store.district || store.city, store.address].filter(Boolean).join(' · ') || 'Stockholm area';
+}
+
+function chainIndexLabel(store: OsmStore): string {
+  const score = chainIndexScore(store.brand || '');
+  if (score == null) return 'No chain-index coverage';
+  if (score < 96) return `Index ${score.toFixed(1)} · cheaper chain signal`;
+  if (score > 103) return `Index ${score.toFixed(1)} · higher-price chain signal`;
+  return `Index ${score.toFixed(1)} · market band`;
+}
+
 function districtHeatColor(score: number): string {
   if (score < 96) return '#1D8649';
   if (score <= 103) return '#F59E0B';
@@ -70,6 +86,7 @@ function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
         type: 'Feature',
         geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
         properties: {
+          slug: s.slug,
           name: s.name,
           brand: s.brand || 'Other',
           chainIndex: chainIndexScore(s.brand || ''),
@@ -123,7 +140,18 @@ function districtHeatCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
 
 export function StoreMap() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
   const [storeCount, setStoreCount] = useState(0);
+  const [selectedStoreSlug, setSelectedStoreSlug] = useState(syncedMapListStores[0]?.slug ?? '');
+
+  function focusStore(store: OsmStore) {
+    setSelectedStoreSlug(store.slug);
+    mapRef.current?.easeTo({
+      center: [store.lng, store.lat],
+      zoom: 14,
+      duration: 700,
+    });
+  }
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -138,6 +166,7 @@ export function StoreMap() {
       zoom: 9.5,
       attributionControl: false,
     });
+    mapRef.current = map;
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
     map.addControl(
@@ -238,6 +267,7 @@ export function StoreMap() {
         const f = e.features?.[0];
         if (!f) return;
         const p = f.properties as Record<string, string>;
+        setSelectedStoreSlug(String(p.slug ?? ''));
         const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
         const directions = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
         const where = [escapeHtml(p.address || ''), escapeHtml(p.district || '')]
@@ -268,7 +298,10 @@ export function StoreMap() {
       }
     });
 
-    return () => map.remove();
+    return () => {
+      mapRef.current = null;
+      map.remove();
+    };
   }, []);
 
   return (
@@ -296,6 +329,52 @@ export function StoreMap() {
           <div className="font-bold uppercase tracking-wide text-market-ink/55">Cheapest chain near me</div>
           <div>{cheapestMapChain ? `${cheapestMapChain.chainId} · index ${cheapestMapChain.overallIndex.toFixed(1)}` : 'Awaiting index coverage'}</div>
           <div className="mt-1">Green &lt; 96 · amber 96-103 · red &gt; 103</div>
+        </div>
+      </div>
+
+      <div className="absolute bottom-3 right-3 top-3 flex w-[min(22rem,calc(100%-1.5rem))] flex-col rounded-2xl border border-white/70 bg-white/95 p-3 text-slate-950 shadow-2xl backdrop-blur">
+        <div className="rounded-xl bg-slate-950 px-4 py-3 text-white">
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-200">Synced map + list</p>
+          <h3 className="mt-1 text-lg font-black">Linked store selection</h3>
+          <p className="mt-1 text-xs font-semibold leading-5 text-slate-200">
+            Click a list row to fly the map; click a marker to update the selected row.
+          </p>
+        </div>
+        <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+          {syncedMapListStores.map((store) => {
+            const selected = selectedStoreSlug === store.slug;
+            const score = chainIndexScore(store.brand || '');
+            return (
+              <button
+                aria-pressed={selected}
+                className={`w-full rounded-2xl border p-3 text-left transition ${
+                  selected
+                    ? 'border-emerald-400 bg-emerald-50 shadow-sm ring-2 ring-emerald-200'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                }`}
+                data-store-slug={store.slug}
+                key={store.slug}
+                onClick={() => focusStore(store)}
+                type="button"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-black leading-5 text-slate-950">{store.name}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">{storeLocationLabel(store)}</p>
+                  </div>
+                  <span
+                    aria-hidden="true"
+                    className="mt-1 inline-block h-3 w-3 shrink-0 rounded-full"
+                    style={{ background: chainIndexColor(score, chainColor(store.brand || '')) }}
+                  />
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-[0.12em]">
+                  <span className="rounded-full bg-slate-100 px-2 py-1 text-slate-600">{store.brand || 'Other'}</span>
+                  <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">{chainIndexLabel(store)}</span>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
