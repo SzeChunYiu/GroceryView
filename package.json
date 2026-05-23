@@ -15,6 +15,7 @@
     "ingest:openfoodfacts-db": "npm run build -w @groceryview/ingestion && node scripts/ingestion/persist-openfoodfacts-metadata.mjs",
     "ingest:verify": "node scripts/ingestion/verify-ingested-provenance.mjs",
     "ops:catalog-coverage-targets": "node scripts/ops/print-catalog-coverage-targets.mjs",
+    "ops:apply-db-migrations": "npm run build -w @groceryview/db && node scripts/ops/apply-db-migrations.mjs",
     "ops:check-production-secrets": "node scripts/ops/check-production-secrets.mjs",
     "ops:check-daily-db-connectivity": "node scripts/ops/check-daily-db-connectivity.mjs",
     "ops:daily-connectors": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connectors.mjs",
