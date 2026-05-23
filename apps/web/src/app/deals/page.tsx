@@ -5,6 +5,7 @@ import { buildBrandTierPriceObservations } from '@/lib/chain-index-data';
 import { expiryDealRadar, expiryDealRadarReports, kidsSnackLunchboxDeals, singlePortionDealFinder } from '@/lib/demo-data';
 import { digitalCatalogueOfferBoard, flyerValidityCalendar, offerExpiryReminderBoard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { screenerDefaultHref } from '@/lib/screener-query';
 
 const premiumTierSummary = calculateBrandTierIndices(buildBrandTierPriceObservations());
 const premiumTierTracking = {
@@ -56,7 +57,7 @@ export default function DealsPage() {
           </div>
           <Link
             className="h-fit rounded-xl border border-emerald-900 bg-emerald-900 px-4 py-3 text-sm font-black text-white hover:brightness-110"
-            href="/screener"
+            href={screenerDefaultHref()}
           >
             Open verified deal screener →
           </Link>

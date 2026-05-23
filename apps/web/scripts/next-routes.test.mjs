@@ -1096,7 +1096,7 @@ describe('verified-data UI', () => {
     assert.match(route, /Deal screener/);
     assert.match(route, /Dedicated verified screener/i);
     assert.match(route, /Open verified deal screener/);
-    assert.match(route, /href="\/screener"/);
+    assert.match(route, /screenerDefaultHref\(\)/);
     assert.doesNotMatch(route, /dealScreener/);
   });
 
@@ -1114,8 +1114,8 @@ describe('verified-data UI', () => {
   it('covers invalid sort query values on the screener route with explicit default selection', async () => {
     const route = await read('src/app/screener/page.tsx');
 
-    assert.match(route, /function selectedMode\(value: string \| undefined\)/);
-    assert.match(route, /\bsortOptions\.some\(\(option\) => option\.mode === value\)\s*\? value as SortMode : 'biggest-drop'/s);
+    assert.match(route, /function selectedMode\(value: string \| undefined\): SortMode {/);
+    assert.match(route, /return normalizeScreenerSort\(value\);/);
     assert.match(route, /const mode = selectedMode\(paramValue\(params\.sort\)\);/);
   });
 
@@ -1123,12 +1123,12 @@ describe('verified-data UI', () => {
     const route = await read('src/app/screener/page.tsx');
 
     assert.match(route, /const category =/);
-    assert.match(route, /requestedCategory === 'all'/);
-    assert.match(route, /categoryOptions\.some\(\(option\) => option\.slug === requestedCategory\)/);
+    assert.match(route, /SCREENER_DEFAULT_CATEGORY/);
+    assert.match(route, /normalizeScreenerCategory\(requestedCategory, categoryOptions\.map\(\(option\) => option\.slug\)\)/);
     assert.match(route, /categoryOptions/);
-    assert.match(route, /const requestedCategory = paramValue\(params\.category\) \?\? 'all';/);
+    assert.match(route, /const requestedCategory = paramValue\(params\.category\) \?\? SCREENER_DEFAULT_CATEGORY;/);
     assert.match(route, /href={modeHref\(option\.mode, category\)}/);
-    assert.match(route, /href={categoryHref\('all', mode\)}/);
+    assert.match(route, /href={categoryHref\(SCREENER_DEFAULT_CATEGORY, mode\)}/);
   });
 
   it('surfaces offer expiry reminders from real Matpriskollen validity windows', async () => {

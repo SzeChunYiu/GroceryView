@@ -11,9 +11,10 @@ import {
   snapshot,
   topChainSpreads
 } from '@/lib/verified-data';
+import { SCREENER_DEFAULT_CATEGORY, normalizeScreenerCategory, normalizeScreenerSort, type ScreenerSortMode, screenerCategoryHref, screenerSortHref } from '@/lib/screener-query';
 import { routeMetadata } from '@/lib/seo';
 
-type SortMode = 'biggest-drop' | 'cheapest-per-kg' | 'widest-spread';
+type SortMode = ScreenerSortMode;
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -63,19 +64,15 @@ function paramValue(value: string | string[] | undefined) {
 }
 
 function selectedMode(value: string | undefined): SortMode {
-  return sortOptions.some((option) => option.mode === value) ? value as SortMode : 'biggest-drop';
+  return normalizeScreenerSort(value);
 }
 
 function modeHref(mode: SortMode, category: string) {
-  const params = new URLSearchParams({ sort: mode });
-  if (category !== 'all') params.set('category', category);
-  return `/screener?${params.toString()}`;
+  return screenerSortHref(mode, category);
 }
 
 function categoryHref(category: string, mode: SortMode) {
-  const params = new URLSearchParams({ sort: mode });
-  if (category !== 'all') params.set('category', category);
-  return `/screener?${params.toString()}`;
+  return screenerCategoryHref(category, mode);
 }
 
 function formatUnitPrice(value: number, unitLabel: string) {
@@ -184,7 +181,7 @@ const categoryOptions = [
 const leaderByCategory = new Map(categoryDealLeaders.map((leader) => [leader.categorySlug, leader]));
 
 function sortedRows(mode: SortMode, category: string) {
-  const filtered = rowsByMode[mode].filter((row) => category === 'all' || row.categorySlug === category);
+  const filtered = rowsByMode[mode].filter((row) => category === SCREENER_DEFAULT_CATEGORY || row.categorySlug === category);
   return [...filtered].sort((left, right) => {
     if (mode === 'cheapest-per-kg') {
       return left.sortValues[mode] - right.sortValues[mode] || left.productName.localeCompare(right.productName, 'sv');
@@ -196,12 +193,10 @@ function sortedRows(mode: SortMode, category: string) {
 export default async function ScreenerPage({ searchParams }: Readonly<{ searchParams?: Promise<SearchParams> }>) {
   const params = (await searchParams) ?? {};
   const mode = selectedMode(paramValue(params.sort));
-  const requestedCategory = paramValue(params.category) ?? 'all';
-  const category = requestedCategory === 'all' || categoryOptions.some((option) => option.slug === requestedCategory)
-    ? requestedCategory
-    : 'all';
+  const requestedCategory = paramValue(params.category) ?? SCREENER_DEFAULT_CATEGORY;
+  const category = normalizeScreenerCategory(requestedCategory, categoryOptions.map((option) => option.slug));
   const visibleRows = sortedRows(mode, category);
-  const selectedLeader = category !== 'all' ? leaderByCategory.get(category) : null;
+  const selectedLeader = category !== SCREENER_DEFAULT_CATEGORY ? leaderByCategory.get(category) : null;
 
   return (
     <PageShell>
@@ -244,8 +239,8 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
             <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Category filter</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Link
-                className={`rounded-lg border px-3 py-2 text-xs font-black ${category === 'all' ? 'border-emerald-900 bg-emerald-900 text-white' : 'border-slate-200 bg-slate-50 text-slate-800 hover:border-emerald-700'}`}
-                href={categoryHref('all', mode)}
+                className={`rounded-lg border px-3 py-2 text-xs font-black ${category === SCREENER_DEFAULT_CATEGORY ? 'border-emerald-900 bg-emerald-900 text-white' : 'border-slate-200 bg-slate-50 text-slate-800 hover:border-emerald-700'}`}
+                href={categoryHref(SCREENER_DEFAULT_CATEGORY, mode)}
               >
                 All
               </Link>
