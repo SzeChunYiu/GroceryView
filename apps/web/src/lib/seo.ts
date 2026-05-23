@@ -187,6 +187,10 @@ export const routeMetadataCatalog = {
     title: 'Unit-price spread alerts | GroceryView',
     description: 'Spot wide unit-price spreads and cheapest-per-unit opportunities across matched chain products.'
   },
+  '/alerts': {
+    title: 'Manage grocery price alerts | GroceryView',
+    description: 'List active target-price alerts, compare targets with verified current chain prices, and delete alerts that no longer matter.'
+  },
   '/watchlist': {
     title: 'Grocery watchlist price alerts | GroceryView',
     description: 'Track watchlist alerts, weekly personalised email digests, diaper price drops, budget essentials, and planned notifications from verified price rows.'
