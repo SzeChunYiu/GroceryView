@@ -91,11 +91,7 @@ export const routeMetadataCatalog = {
   },
   '/deals': {
     title: 'Verified grocery deal radar | GroceryView',
-    description: 'Legacy deal radar URL that redirects to the verified deal screener.'
-  },
-  '/screener': {
-    title: 'Verified grocery deal screener | GroceryView',
-    description: 'Sort verified grocery deal rows by biggest observed drop, cheapest price per kg, and widest Willys/Hemkop spread with source confidence.'
+    description: 'Find expiry deals, single-portion deals, lunchbox deals, and trusted deal opportunities from visible source-backed rows.'
   },
   '/fuel': {
     title: 'Fuel prices by grade | GroceryView',
