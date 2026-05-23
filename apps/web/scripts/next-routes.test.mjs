@@ -1452,11 +1452,14 @@ describe('verified-data UI', () => {
   it('ships a Lighthouse CI performance budget gate for web terminal routes', async () => {
     const pkg = await read('package.json');
     const lhci = await read('lighthouserc.cjs');
+    const previewLhci = await read('lighthouserc.preview.cjs');
     const workflow = await read('../../.github/workflows/ci.yml');
+    const previewWorkflow = await read('../../.github/workflows/lighthouse.yml');
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
 
     assert.match(pkg, /"perf:lighthouse:ci"/);
+    assert.match(pkg, /"perf:lighthouse:preview"/);
     assert.match(pkg, /@lhci\/cli/);
     assert.match(lhci, /http:\/\/127\.0\.0\.1:3000\//);
     assert.match(lhci, /numberOfRuns:\s*3/);
@@ -1468,6 +1471,13 @@ describe('verified-data UI', () => {
     assert.match(lhci, /filesystem/);
     assert.match(workflow, /Lighthouse performance budget/);
     assert.match(workflow, /npm run perf:lighthouse:ci -w @groceryview\/web/);
+    assert.match(previewLhci, /LHCI_PREVIEW_URL/);
+    assert.match(previewLhci, /categories:performance': \['error', \{ minScore: 0\.85 \}\]/);
+    assert.match(previewLhci, /largest-contentful-paint': \['error', \{ maxNumericValue: 2500 \}\]/);
+    assert.match(previewWorkflow, /pull_request:/);
+    assert.match(previewWorkflow, /environment: 'Preview'/);
+    assert.match(previewWorkflow, /core\.exportVariable\('LHCI_PREVIEW_URL'/);
+    assert.match(previewWorkflow, /npm run perf:lighthouse:preview -w @groceryview\/web/);
     assert.match(verified, /export const webPerformanceBudgetGate/);
     assert.match(verified, /Core Web Vitals budget/);
     assert.match(verified, /≤ 0\.15 layout shift/);
