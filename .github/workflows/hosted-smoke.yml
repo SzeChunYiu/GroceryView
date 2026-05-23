@@ -1,0 +1,59 @@
+name: Hosted smoke
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * *'
+
+concurrency:
+  group: hosted-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Verify hosted production endpoints
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Preflight hosted smoke config
+        env:
+          GROCERYVIEW_API_BASE_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: |
+          if [ -z "$GROCERYVIEW_API_BASE_URL" ]; then
+            echo "missing production config: GROCERYVIEW_API_BASE_URL" >&2
+            exit 1
+          fi
+          if [ -z "$METRICS_TOKEN" ]; then
+            echo "missing production config: METRICS_TOKEN" >&2
+            exit 1
+          fi
+
+      - name: Run hosted HTTP smoke
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          GROCERYVIEW_WEB_URL: ${{ vars.GROCERYVIEW_PRODUCTION_URL }}
+          GROCERYVIEW_TERMINAL_PRODUCT_ID: ${{ vars.GROCERYVIEW_TERMINAL_PRODUCT_ID }}
+          HTTP_SMOKE_TIMEOUT_SECONDS: '20'
+          HOSTED_HTTP_SMOKE_OUTPUT_PATH: artifacts/hosted-http-smoke.json
+        run: infra/scripts/smoke-hosted-http.sh
+
+      - name: Run hosted PostgreSQL readiness smoke
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+          READINESS_TIMEOUT_SECONDS: '20'
+          HOSTED_READINESS_SMOKE_OUTPUT_PATH: artifacts/hosted-readiness-smoke.json
+        run: infra/scripts/smoke-hosted-readiness.sh
+
+      - name: Upload hosted smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hosted-smoke-evidence
+          path: artifacts/*.json
+          if-no-files-found: ignore
