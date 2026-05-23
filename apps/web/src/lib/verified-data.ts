@@ -3,6 +3,7 @@ import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, ty
 import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
+import { icaStorePromotionSourceSummary } from './ingested/ica-source-summary';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
 import { mathemProducts, mathemSource } from './ingested/mathem';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
@@ -23,6 +24,7 @@ import {
 export const snapshot = {
   retrievedLabel: '20-21 May 2026',
   axfoodSource: 'Willys and Hemköp public search endpoints',
+  icaStorePromotionsSource: 'ICA handlaprivatkund store-scoped promotions endpoints',
   openPricesSource: 'OpenPrices / Open Food Facts SEK observations',
   openFoodFactsCatalogSource: 'OpenFoodFacts Sweden metadata catalog',
   osmSource: 'OpenStreetMap Overpass Sweden extract'
@@ -1651,6 +1653,23 @@ const digitalCatalogueSampleOffers = icaReklambladOffers
     evidenceLabel: `${offer.storeName} · ${offer.availableOnline ? 'online + in-store' : offer.availableInStore ? 'in-store' : 'availability not reported'}`
   }));
 
+export const icaStorePromotionEvidence = {
+  title: 'ICA store-scoped promotions',
+  latestStore: icaStorePromotionSourceSummary.latestStores[0] ?? null,
+  latestStores: icaStorePromotionSourceSummary.latestStores,
+  storeEndpointCount: icaStorePromotionSourceSummary.storeEndpointCount,
+  storeScopedRows: icaStorePromotionSourceSummary.totalRowCount,
+  productRowCount: icaStorePromotionSourceSummary.totalRowCount,
+  sourceLabel: icaStorePromotionSourceSummary.sourceLabel,
+  generatedFrom: icaStorePromotionSourceSummary.generatedFrom,
+  coverageLabel: `${icaStorePromotionSourceSummary.storeEndpointCount.toLocaleString('sv-SE')} store endpoints · ${icaStorePromotionSourceSummary.totalRowCount.toLocaleString('sv-SE')} fetched promotion rows`,
+  guardrails: [
+    'Rows come from ICA public store-scoped promotion listing JSON and retain storeAccountId, regionId, retrievedAt, and sourceUrl evidence.',
+    'No branch shelf-price claim: these are promotion listing rows, not guaranteed in-store shelf prices, stock levels, or checkout totals.',
+    'The latest-store card is a provenance surface only; it does not rank ICA branches or compare availability across stores.'
+  ]
+};
+
 export const digitalCatalogueOfferBoard = {
   title: 'ICA e-magin weekly catalogue ingestion',
   sourceLabel: icaReklambladSource.source,
@@ -2502,6 +2521,14 @@ export const sourceCoverage = [
     caveat: 'Chain-wide online catalogue prices; not per-branch shelf prices.'
   },
   {
+    name: 'ICA store-scoped promotions',
+    source: snapshot.icaStorePromotionsSource,
+    rows: icaStorePromotionEvidence.storeScopedRows,
+    coverage: `${icaStorePromotionEvidence.storeEndpointCount.toLocaleString('sv-SE')} store endpoints including ${icaStorePromotionEvidence.latestStore?.storeName ?? 'latest store not reported'}`,
+    freshness: icaStorePromotionEvidence.latestStore?.retrievedAt ?? 'Not reported',
+    caveat: 'Store-scoped promotion listing rows; no branch shelf-price, inventory, or checkout-total claim.'
+  },
+  {
     name: 'OpenPrices SEK observations',
     source: snapshot.openPricesSource,
     rows: pricedProducts.length,
@@ -2537,6 +2564,7 @@ export const sourceCoverage = [
 
 function sourceKindFor(name: string) {
   if (name === 'Axfood chain price snapshot') return 'axfood';
+  if (name === 'ICA store-scoped promotions') return 'ica-promotions';
   if (name === 'OpenPrices SEK observations') return 'openprices';
   if (name === 'OpenFoodFacts metadata catalog') return 'openfoodfacts';
   if (name === 'OKQ8 fuel operator prices') return 'fuel';
@@ -2546,12 +2574,14 @@ function sourceKindFor(name: string) {
 function sourceRouteFor(name: string) {
   if (name === 'Sweden store directory') return '/stores';
   if (name === 'OKQ8 fuel operator prices') return '/fuel';
+  if (name === 'ICA store-scoped promotions') return '/data-sources';
   if (name === 'OpenPrices SEK observations' || name === 'OpenFoodFacts metadata catalog') return '/products';
   return '/compare';
 }
 
 function confidenceBadgeFor(name: string) {
   if (name === 'Axfood chain price snapshot') return 'chain-wide catalogue confidence';
+  if (name === 'ICA store-scoped promotions') return 'store-scoped promotion provenance';
   if (name === 'OKQ8 fuel operator prices') return 'operator-page confidence';
   if (name === 'OpenPrices SEK observations') return 'community-observed confidence';
   if (name === 'OpenFoodFacts metadata catalog') return 'metadata-only confidence';
@@ -2577,6 +2607,8 @@ export const sourceReadinessMatrix = sourceCoverage.map((source) => {
       ? '/stores'
       : source.name === 'OKQ8 fuel operator prices'
         ? '/fuel'
+      : source.name === 'ICA store-scoped promotions'
+        ? '/data-sources'
       : source.name === 'OpenPrices SEK observations' || source.name === 'OpenFoodFacts metadata catalog'
         ? '/products'
         : '/compare';
@@ -2596,6 +2628,8 @@ export const sourceRouteMap = sourceReadinessMatrix.map((source) => {
   const supportingRoutes =
     source.name === 'Sweden store directory'
       ? ['/stores', '/map', '/data-sources']
+      : source.name === 'ICA store-scoped promotions'
+        ? ['/', '/data-sources', '/deals']
       : source.name === 'OpenPrices SEK observations'
         ? ['/products', '/categories', '/data-sources']
         : source.name === 'OpenFoodFacts metadata catalog'
@@ -2615,12 +2649,16 @@ export const sourceClaimLedger = sourceCoverage.map((source) => {
   const route =
     source.name === 'Sweden store directory'
       ? '/stores'
+      : source.name === 'ICA store-scoped promotions'
+        ? '/data-sources'
       : source.name === 'OpenPrices SEK observations' || source.name === 'OpenFoodFacts metadata catalog'
         ? '/products'
         : '/compare';
   const allowedClaim =
     source.name === 'Sweden store directory'
       ? 'Verified Sweden store locations, brands, formats, districts, and address coverage.'
+      : source.name === 'ICA store-scoped promotions'
+        ? 'ICA public store-scoped promotion listing rows with storeAccountId, regionId, retrievedAt, row counts, and source URLs.'
       : source.name === 'OpenPrices SEK observations'
         ? 'Observed community price medians, observation counts, product codes, and latest sighting dates.'
         : source.name === 'OpenFoodFacts metadata catalog'
@@ -2629,6 +2667,8 @@ export const sourceClaimLedger = sourceCoverage.map((source) => {
   const blockedClaim =
     source.name === 'Sweden store directory'
       ? 'Branch-level prices, inventory, opening hours, or promotion availability.'
+      : source.name === 'ICA store-scoped promotions'
+        ? 'Branch shelf-price guarantee, stock status, authenticated ICA loyalty pricing, or checkout-total availability.'
       : source.name === 'OpenPrices SEK observations'
         ? 'Guaranteed current shelf price, store-specific availability, or member-only offer state.'
         : source.name === 'OpenFoodFacts metadata catalog'

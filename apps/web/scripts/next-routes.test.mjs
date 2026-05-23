@@ -1132,6 +1132,41 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(shell, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('wires the latest ICA store-scoped promotion import to visible source surfaces', async () => {
+    const generated = await read('src/lib/ingested/ica.ts');
+    const summary = await read('src/lib/ingested/ica-source-summary.ts');
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const dataSources = await read('src/app/data-sources/page.tsx');
+
+    assert.match(generated, /ICA Kvantum Tomelilla/);
+    assert.match(generated, /"storeAccountId":"1004070"/);
+    assert.match(generated, /retrieved 2026-05-23T13:26:35\.000Z/);
+    assert.match(generated, /ICA Supermarket Tierp/);
+    assert.match(summary, /AUTO-GENERATED summary from public ICA store-scoped promotions JSON/);
+    assert.match(summary, /generatedFrom: 'apps\/web\/src\/lib\/ingested\/ica\.ts'/);
+    assert.match(summary, /totalRowCount: 93083/);
+    assert.match(summary, /storeEndpointCount: 323/);
+    assert.match(summary, /ICA Kvantum Tomelilla/);
+    assert.match(summary, /storeAccountId: '1004070'/);
+    assert.match(summary, /ICA Supermarket Tierp/);
+    assert.match(verified, /import \{ icaStorePromotionSourceSummary \} from '\.\/ingested\/ica-source-summary'/);
+    assert.match(verified, /export const icaStorePromotionEvidence/);
+    assert.match(verified, /latestStore/);
+    assert.match(verified, /storeScopedRows/);
+    assert.match(verified, /ICA store-scoped promotions/);
+    assert.match(verified, /No branch shelf-price claim/);
+    assert.match(shell, /icaStorePromotionEvidence/);
+    assert.match(shell, /Latest ICA store-scoped promotions/);
+    assert.match(shell, /data-ica-store-promotion-import/);
+    assert.match(shell, /href="\/data-sources"/);
+    assert.match(dataSources, /icaStorePromotionEvidence/);
+    assert.match(dataSources, /ICA store-scoped promotions/);
+    assert.match(dataSources, /latestStores\.map/);
+    assert.match(dataSources, /sourceUrl/);
+    assert.doesNotMatch(`${shell}\n${dataSources}`, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
 
 
   it('surfaces a retailer flyer validity calendar without unsupported tomorrow claims', async () => {
