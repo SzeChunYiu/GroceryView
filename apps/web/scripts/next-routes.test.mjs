@@ -1112,6 +1112,26 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
+  it('covers invalid sort query values on the screener route with explicit default selection', async () => {
+    const route = await read('src/app/screener/page.tsx');
+
+    assert.match(route, /function selectedMode\(value: string \| undefined\)/);
+    assert.match(route, /\bsortOptions\.some\(\(option\) => option\.mode === value\)\s*\? value as SortMode : 'biggest-drop'/s);
+    assert.match(route, /const mode = selectedMode\(paramValue\(params\.sort\)\);/);
+  });
+
+  it('defaults unknown screener category filters back to all', async () => {
+    const route = await read('src/app/screener/page.tsx');
+
+    assert.match(route, /const category =/);
+    assert.match(route, /requestedCategory === 'all'/);
+    assert.match(route, /categoryOptions\.some\(\(option\) => option\.slug === requestedCategory\)/);
+    assert.match(route, /categoryOptions/);
+    assert.match(route, /const requestedCategory = paramValue\(params\.category\) \?\? 'all';/);
+    assert.match(route, /href={modeHref\(option\.mode, category\)}/);
+    assert.match(route, /href={categoryHref\('all', mode\)}/);
+  });
+
   it('surfaces offer expiry reminders from real Matpriskollen validity windows', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/deals/page.tsx');
