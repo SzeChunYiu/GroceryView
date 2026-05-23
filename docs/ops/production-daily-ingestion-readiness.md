@@ -180,14 +180,18 @@ gates before a production cutover is allowed:
 2. `ops:apply-db-migrations` applies the canonical schema to the replacement DB
    and uploads `groceryview-replacement-db-migrations`.
 3. the generated all-chain daily connector config is run against the replacement
-   DB; `chainSummaries` must include `ica`, `willys`, `coop`, `hemkop`, `lidl`,
-   and `city_gross`, every summary must be `succeeded`, and every required chain
-   must have at least one persisted observation.
+   DB; if connector generation fails before JSON, the workflow writes
+   `replacement_daily_connectors_diagnostic_missing`, if catalog target generation
+   fails before JSON, it writes `replacement_catalog_targets_diagnostic_missing`,
+   otherwise `chainSummaries` must include `ica`, `willys`, `coop`, `hemkop`,
+   `lidl`, and `city_gross`, every summary must be `succeeded`, and every
+   required chain must have at least one persisted observation.
 4. `ingest:export-db-snapshot` exports a replacement DB-backed site snapshot with
    all required chains, stores, products, categories, and price types covered.
 5. artifacts `groceryview-db-cutover-validation`,
    `groceryview-replacement-db-migrations`, `groceryview-replacement-db-ingestion`,
-   and `groceryview-replacement-db-site-snapshot` are available for review.
+   and `groceryview-replacement-db-site-snapshot` are available for review, and
+   each upload fails if its expected evidence file is missing.
 
 Expected replacement DB blockers:
 
@@ -201,6 +205,10 @@ Expected replacement DB blockers:
   write-mode connectivity.
 - `replacement_db_migrations_diagnostic_missing`: migration application failed
   before producing its normal JSON evidence.
+- `replacement_daily_connectors_diagnostic_missing`: replacement all-store
+  ingestion validation could not generate daily connector JSON before starting.
+- `replacement_catalog_targets_diagnostic_missing`: replacement all-store
+  ingestion validation could not generate catalog target JSON before starting.
 - `replacement_daily_ingestion_missing_chain_summary:<chain>`: the all-store
   replacement ingestion run did not report a required chain.
 - `replacement_daily_ingestion_chain_not_succeeded:<chain>:<status>`: a required

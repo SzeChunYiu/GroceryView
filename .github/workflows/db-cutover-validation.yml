@@ -87,7 +87,7 @@ jobs:
         with:
           name: groceryview-replacement-db-migrations
           path: /tmp/replacement-db-migrations.json
-          if-no-files-found: ignore
+          if-no-files-found: error
           retention-days: 14
 
       - name: Run replacement DB all-store ingestion validation
@@ -100,10 +100,60 @@ jobs:
         run: |
           set -euo pipefail
           test -n "${DATABASE_URL:-}"
-          npm run --silent ops:daily-connectors >/tmp/replacement-daily-connectors.json
+          replacement_daily_connectors_status=0
+          npm run --silent ops:daily-connectors >/tmp/replacement-daily-connectors.json || replacement_daily_connectors_status=$?
+          if [ "${replacement_daily_connectors_status}" -ne 0 ] || [ ! -s /tmp/replacement-daily-connectors.json ]; then
+            cat > /tmp/replacement-daily-connectors.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_daily_connectors_diagnostic_missing",
+            "exitCode": ${replacement_daily_connectors_status}
+          }
+          EOF
+            cat > /tmp/replacement-catalog-targets.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_catalog_targets_skipped_due_to_connectors"
+          }
+          EOF
+            cat > /tmp/replacement-daily-ingestion-result.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_daily_connectors_diagnostic_missing",
+            "exitCode": ${replacement_daily_connectors_status}
+          }
+          EOF
+            cat /tmp/replacement-daily-ingestion-result.json
+            if [ "${replacement_daily_connectors_status}" -ne 0 ]; then
+              exit "${replacement_daily_connectors_status}"
+            fi
+            exit 1
+          fi
+          replacement_catalog_targets_status=0
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/replacement-daily-connectors.json \
             npm run --silent ops:catalog-coverage-targets -- --from-current-connectors \
-            >/tmp/replacement-catalog-targets.json
+            >/tmp/replacement-catalog-targets.json || replacement_catalog_targets_status=$?
+          if [ "${replacement_catalog_targets_status}" -ne 0 ] || [ ! -s /tmp/replacement-catalog-targets.json ]; then
+            cat > /tmp/replacement-catalog-targets.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_catalog_targets_diagnostic_missing",
+            "exitCode": ${replacement_catalog_targets_status}
+          }
+          EOF
+            cat > /tmp/replacement-daily-ingestion-result.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_catalog_targets_diagnostic_missing",
+            "exitCode": ${replacement_catalog_targets_status}
+          }
+          EOF
+            cat /tmp/replacement-daily-ingestion-result.json
+            if [ "${replacement_catalog_targets_status}" -ne 0 ]; then
+              exit "${replacement_catalog_targets_status}"
+            fi
+            exit 1
+          fi
           ingestion_status=0
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/replacement-daily-connectors.json \
             node packages/ingestion/dist/index.js \
@@ -154,7 +204,7 @@ jobs:
             /tmp/replacement-daily-connectors.json
             /tmp/replacement-catalog-targets.json
             /tmp/replacement-daily-ingestion-result.json
-          if-no-files-found: ignore
+          if-no-files-found: error
           retention-days: 14
 
       - name: Export replacement DB-backed site snapshot
@@ -215,5 +265,5 @@ jobs:
           path: |
             /tmp/replacement-db-site-snapshot.json
             /tmp/replacement-db-site-snapshot-result.json
-          if-no-files-found: ignore
+          if-no-files-found: error
           retention-days: 14
