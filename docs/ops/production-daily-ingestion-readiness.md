@@ -138,9 +138,16 @@ npm run --silent ops:db-io-hotspots \
 
 Run the same command after the mitigation lands, writing
 `/tmp/groceryview-db-io-hotspots-after.json`, then compare the `queryid` rows and
-block counters. If the command fails with `relation "pg_stat_statements" does
-not exist`, enable the Supabase `pg_stat_statements` extension or collect the
-same query in the SQL editor before treating IO evidence as complete.
+block counters. The daily ingestion workflow also captures this automatically
+after production DB connectivity and again after the ingestion result is
+preserved, writing `/tmp/daily-db-io-hotspots-before.json` and
+`/tmp/daily-db-io-hotspots-after.json` into the
+`groceryview-daily-db-io-hotspots` artifact. Empty `hotspots[]` rows are valid
+evidence that no block IO rows were present in `pg_stat_statements`; a workflow
+failure should mean the diagnostic file was missing or the query itself failed.
+If the command fails with `relation "pg_stat_statements" does not exist`, enable
+the Supabase `pg_stat_statements` extension or collect the same query in the SQL
+editor before treating IO evidence as complete.
 
 When connectivity still fails, the daily workflow tries to generate a redacted
 `groceryview-production-db-recovery-packet` artifact with

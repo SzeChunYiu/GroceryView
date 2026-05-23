@@ -334,6 +334,36 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Capture daily DB IO hotspots before ingestion
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT: ${{ vars.GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT || '20' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/daily-db-io-hotspots-before.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "daily_db_io_hotspots_before_database_url_config_missing"
+          }
+          EOF
+            cat /tmp/daily-db-io-hotspots-before.json
+            exit 1
+          fi
+          db_io_hotspots_before_status=0
+          npm run --silent ops:db-io-hotspots >/tmp/daily-db-io-hotspots-before.json || db_io_hotspots_before_status=$?
+          if [ ! -s /tmp/daily-db-io-hotspots-before.json ]; then
+            cat > /tmp/daily-db-io-hotspots-before.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "daily_db_io_hotspots_before_diagnostic_missing",
+            "exitCode": ${db_io_hotspots_before_status}
+          }
+          EOF
+          fi
+          cat /tmp/daily-db-io-hotspots-before.json
+          exit "${db_io_hotspots_before_status}"
+
       - name: Generate production DB recovery packet
         if: failure()
         env:
@@ -582,6 +612,48 @@ jobs:
           path: |
             /tmp/daily-ingestion-result.json
             codex-tasks/ingestion-blockers.txt
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Capture daily DB IO hotspots after ingestion
+        if: always()
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT: ${{ vars.GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT || '20' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/daily-db-io-hotspots-after.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "daily_db_io_hotspots_after_database_url_config_missing"
+          }
+          EOF
+            cat /tmp/daily-db-io-hotspots-after.json
+            exit 1
+          fi
+          db_io_hotspots_after_status=0
+          npm run --silent ops:db-io-hotspots >/tmp/daily-db-io-hotspots-after.json || db_io_hotspots_after_status=$?
+          if [ ! -s /tmp/daily-db-io-hotspots-after.json ]; then
+            cat > /tmp/daily-db-io-hotspots-after.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "daily_db_io_hotspots_after_diagnostic_missing",
+            "exitCode": ${db_io_hotspots_after_status}
+          }
+          EOF
+          fi
+          cat /tmp/daily-db-io-hotspots-after.json
+          exit "${db_io_hotspots_after_status}"
+
+      - name: Upload daily DB IO hotspots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-daily-db-io-hotspots
+          path: |
+            /tmp/daily-db-io-hotspots-before.json
+            /tmp/daily-db-io-hotspots-after.json
           if-no-files-found: error
           retention-days: 14
 
