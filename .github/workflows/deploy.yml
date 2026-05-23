@@ -41,6 +41,28 @@ jobs:
           npx --yes vercel@latest pull --yes --environment=production --token "$VERCEL_TOKEN"
           npx --yes vercel@latest build --prod --token "$VERCEL_TOKEN"
           npx --yes vercel@latest deploy --prebuilt --prod --token "$VERCEL_TOKEN"
+      - name: Run post-deploy hosted HTTP smoke
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          GROCERYVIEW_WEB_URL: ${{ vars.GROCERYVIEW_PRODUCTION_URL }}
+          GROCERYVIEW_TERMINAL_PRODUCT_ID: ${{ vars.GROCERYVIEW_TERMINAL_PRODUCT_ID }}
+          HTTP_SMOKE_TIMEOUT_SECONDS: '20'
+          HOSTED_HTTP_SMOKE_OUTPUT_PATH: artifacts/deploy-hosted-http-smoke.json
+        run: infra/scripts/smoke-hosted-http.sh
+      - name: Run post-deploy PostgreSQL readiness smoke
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+          READINESS_TIMEOUT_SECONDS: '20'
+          HOSTED_READINESS_SMOKE_OUTPUT_PATH: artifacts/deploy-hosted-readiness-smoke.json
+        run: infra/scripts/smoke-hosted-readiness.sh
+      - name: Upload deploy smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-hosted-smoke-evidence
+          path: artifacts/*.json
+          if-no-files-found: ignore
       - name: Verify production visible artifact
         env:
           GROCERYVIEW_PRODUCTION_URL: ${{ vars.GROCERYVIEW_PRODUCTION_URL }}
