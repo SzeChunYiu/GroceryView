@@ -113,6 +113,29 @@ jobs:
           }
           NODE
 
+      - name: Check production DB write connectivity
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS || '3' }}
+          GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS || '2000' }}
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}"
+          connectivity_status=0
+          npm run --silent ops:check-daily-db-connectivity >/tmp/daily-db-connectivity.json || connectivity_status=$?
+          cat /tmp/daily-db-connectivity.json
+          node -e "const body=require('/tmp/daily-db-connectivity.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+          exit "${connectivity_status}"
+
+      - name: Upload daily DB connectivity diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-daily-db-connectivity
+          path: /tmp/daily-db-connectivity.json
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Run configured daily ingestion
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
