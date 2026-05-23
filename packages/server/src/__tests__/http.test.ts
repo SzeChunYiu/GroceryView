@@ -1405,6 +1405,61 @@ describe('createHttpHandler', () => {
     assert.match(JSON.stringify(await json(invalid)), /Unknown productId: missing-product/);
   });
 
+  it('lets invited household members join and check shared grocery list lines with attribution', async () => {
+    const handle = createHttpHandler();
+    const payload = {
+      householdId: 'house-join-1',
+      name: 'Shared flat',
+      weeklyBudget: 500,
+      approvalLimit: 70,
+      reviewer: 'user-1',
+      members: [{ userId: 'user-1', displayName: 'Alex', role: 'owner' }],
+      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'user-1' }],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
+      sharedFavoriteStoreIds: ['willys-odenplan']
+    };
+
+    await handle(new Request('http://localhost/api/households/current?userId=user-1', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    }));
+
+    const joined = await handle(new Request('http://localhost/api/households/join?userId=user-2', {
+      method: 'POST',
+      body: JSON.stringify({
+        householdId: 'house-join-1',
+        inviteToken: 'house-join-1:join',
+        displayName: 'Mina',
+        role: 'editor'
+      })
+    }));
+    assert.equal(joined.status, 200);
+    const joinedBody = await json(joined) as { household: { members: Array<{ userId: string; role: string }> } };
+    assert.deepEqual(joinedBody.household.members.map((member) => `${member.userId}:${member.role}`), ['user-1:owner', 'user-2:editor']);
+
+    const checked = await handle(new Request('http://localhost/api/households/current/basket/check?userId=user-2', {
+      method: 'POST',
+      body: JSON.stringify({
+        productId: 'milk',
+        checked: true,
+        checkedAt: '2026-05-23T11:00:00.000Z'
+      })
+    }));
+    assert.equal(checked.status, 200);
+    const checkedBody = await json(checked) as {
+      household: { basketItems: Array<{ productId: string; checked: boolean; checkedBy?: string }> };
+      summary: { checkedItemCount: number; openItemCount: number };
+    };
+    assert.deepEqual(checkedBody.household.basketItems.map((item) => [item.productId, item.checked, item.checkedBy]), [
+      ['milk', true, 'user-2']
+    ]);
+    assert.equal(checkedBody.summary.checkedItemCount, 1);
+    assert.equal(checkedBody.summary.openItemCount, 0);
+
+    const partnerRead = await json(await handle(new Request('http://localhost/api/households/current?userId=user-2'))) as { household: { id: string } };
+    assert.equal(partnerRead.household.id, 'house-join-1');
+  });
+
   it('creates private scan upload tickets before scan processing', async () => {
     const handle = createHttpHandler(undefined, {
       now: new Date('2026-05-20T08:00:00.000Z'),

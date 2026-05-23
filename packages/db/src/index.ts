@@ -311,12 +311,16 @@ export type ReceiptUploadRecord = {
 export type HouseholdMemberRecord = {
   userId: string;
   displayName: string;
+  role?: 'owner' | 'editor' | 'viewer';
 };
 
 export type HouseholdBasketItemRecord = {
   productId: string;
   quantity: number;
   addedBy: string;
+  checked?: boolean;
+  checkedBy?: string;
+  checkedAt?: string;
 };
 
 export type HouseholdWatchlistItemRecord = {
@@ -1539,13 +1543,16 @@ type HouseholdPlanRow = {
   created_at: string | Date;
   updated_at: string | Date;
 };
-type HouseholdMemberRow = { household_id: string; user_id: string; display_name: string };
+type HouseholdMemberRow = { household_id: string; user_id: string; display_name: string; role?: HouseholdMemberRecord['role'] | null };
 type HouseholdBasketItemRow = {
   household_id: string;
   line_position: string | number;
   product_id: string;
   quantity: string | number;
   added_by: string;
+  checked?: boolean | null;
+  checked_by?: string | null;
+  checked_at?: string | Date | null;
 };
 type HouseholdWatchlistItemRow = {
   household_id: string;
@@ -2698,15 +2705,24 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
 
       for (const member of plan.members) {
         await executor.query(
-          'insert into household_members(household_id, user_id, display_name) values ($1, $2, $3)',
-          [plan.householdId, member.userId, member.displayName]
+          'insert into household_members(household_id, user_id, display_name, role) values ($1, $2, $3, $4)',
+          [plan.householdId, member.userId, member.displayName, member.role ?? 'editor']
         );
       }
       for (const [linePosition, item] of plan.basketItems.entries()) {
         await executor.query(
-          `insert into household_basket_items(household_id, line_position, product_id, quantity, added_by)
-           values ($1, $2, $3, $4, $5)`,
-          [plan.householdId, linePosition, item.productId, item.quantity, item.addedBy]
+          `insert into household_basket_items(household_id, line_position, product_id, quantity, added_by, checked, checked_by, checked_at)
+           values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [
+            plan.householdId,
+            linePosition,
+            item.productId,
+            item.quantity,
+            item.addedBy,
+            item.checked ?? false,
+            item.checkedBy ?? null,
+            item.checkedAt ?? null
+          ]
         );
       }
       for (const [linePosition, item] of plan.watchlistItems.entries()) {
@@ -2736,14 +2752,14 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       const householdId = plan.id;
       const [memberRows, basketRows, watchlistRows, favoriteStoreRows] = await Promise.all([
         executor.query<HouseholdMemberRow>(
-          `select household_id, user_id, display_name
+          `select household_id, user_id, display_name, role
            from household_members
            where household_id = $1
            order by user_id`,
           [householdId]
         ),
         executor.query<HouseholdBasketItemRow>(
-          `select household_id, line_position, product_id, quantity, added_by
+          `select household_id, line_position, product_id, quantity, added_by, checked, checked_by, checked_at
            from household_basket_items
            where household_id = $1
            order by line_position`,
@@ -2767,8 +2783,15 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
 
       return mapHouseholdPlan(
         plan,
-        memberRows.map((row) => ({ userId: row.user_id, displayName: row.display_name })),
-        basketRows.map((row) => ({ productId: row.product_id, quantity: Number(row.quantity), addedBy: row.added_by })),
+        memberRows.map((row) => ({ userId: row.user_id, displayName: row.display_name, ...(row.role ? { role: row.role } : {}) })),
+        basketRows.map((row) => ({
+          productId: row.product_id,
+          quantity: Number(row.quantity),
+          addedBy: row.added_by,
+          checked: row.checked ?? false,
+          ...(row.checked_by ? { checkedBy: row.checked_by } : {}),
+          ...(row.checked_at ? { checkedAt: asIso(row.checked_at) } : {})
+        })),
         watchlistRows.map((row) => ({
           productId: row.product_id,
           addedBy: row.added_by,
@@ -3639,7 +3662,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '013_observations_partitioning',
   '014_fuel_price_sources',
   '016_observation_connector_idempotency',
-  '017_observation_availability'
+  '017_observation_availability',
+  '018_household_collaboration_rls'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
