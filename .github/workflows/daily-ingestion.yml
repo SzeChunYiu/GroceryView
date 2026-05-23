@@ -323,3 +323,15 @@ jobs:
             process.exit(1);
           }
           NODE
+
+      - name: Upload deployed readiness evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-deployed-readiness
+          path: |
+            /tmp/postgres-readiness.json
+            /tmp/source-run-readiness.json
+            /tmp/catalog-coverage-readiness.json
+          if-no-files-found: ignore
+          retention-days: 14
