@@ -2510,12 +2510,13 @@ ${seo}`;
 
     assert.match(sitemap, /MetadataRoute\.Sitemap/);
     assert.match(sitemap, /https:\/\/grocery-web-mu\.vercel\.app/);
-    assert.match(sitemap, /productUniverse/);
+    assert.match(sitemap, /axfoodProducts/);
+    assert.match(sitemap, /pricedProducts/);
     assert.match(sitemap, /osmStores/);
-    assert.match(sitemap, /categoryLabels/);
+    assert.match(sitemap, /groceryCategoryHierarchy/);
     assert.match(sitemap, /\/products\/\$\{product\.slug\}/);
     assert.match(sitemap, /\/stores\/\$\{store\.slug\}/);
-    assert.match(sitemap, /\/categories\/\$\{slug\}/);
+    assert.match(sitemap, /\/categories\/\$\{category\.slug\}/);
     assert.match(sitemap, /entry\('\/screener'/);
     assert.match(sitemap, /changeFrequency/);
     assert.match(sitemap, /lastModified/);
@@ -2528,6 +2529,28 @@ ${seo}`;
     assert.match(robots, /disallow: \[/);
     assert.match(robots, /\/account/);
     assert.match(robots, /\/login/);
+  });
+
+  it('drives dynamic product, category, and store sitemap URLs from DB catalog-shaped records', async () => {
+    const sitemap = await read('src/app/sitemap.ts');
+
+    assert.match(sitemap, /@groceryview\/db/);
+    assert.match(sitemap, /ProductCatalogRecord/);
+    assert.match(sitemap, /StoreCatalogRecord/);
+    assert.match(sitemap, /buildCatalogSitemapEntries/);
+    assert.match(sitemap, /const productSitemapRecords: ProductSitemapRecord\[\] = \[/);
+    assert.match(sitemap, /\.\.\.axfoodProducts\.map\(\(product\) =>/);
+    assert.match(sitemap, /\.\.\.pricedProducts\.map\(\(product\) =>/);
+    assert.match(sitemap, /groceryCategoryHierarchy\.filter\(\(category\) => category\.routable\)/);
+    assert.match(sitemap, /uniqueRecordsBySlug\(productSitemapRecords\)/);
+    assert.match(sitemap, /uniqueRecordsBySlug\(storeSitemapRecords\)/);
+    assert.match(sitemap, /lastModifiedFrom\(product\.updatedAt\)/);
+    assert.match(sitemap, /lastModifiedFrom\(store\.updatedAt\)/);
+    assert.match(sitemap, /\/products\/\$\{product\.slug\}/);
+    assert.match(sitemap, /\/categories\/\$\{category\.slug\}/);
+    assert.match(sitemap, /\/stores\/\$\{store\.slug\}/);
+    assert.doesNotMatch(sitemap, /productUniverse/);
+    assert.doesNotMatch(sitemap, /osmStores\.slice\(0,\s*80\)/);
   });
 
   it('ships canonical generateMetadata coverage for every app route', async () => {
