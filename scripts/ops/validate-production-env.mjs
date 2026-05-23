@@ -19,6 +19,11 @@ export const requiredEnvNames = [
   'OCR_SPACE_HEALTHCHECK_IMAGE_URL',
   'OPENFOODFACTS_USER_AGENT',
   'OPENFOODFACTS_HEALTHCHECK_BARCODE',
+  'S3_ENDPOINT',
+  'S3_REGION',
+  'S3_BUCKET',
+  'S3_ACCESS_KEY_ID',
+  'S3_SECRET_ACCESS_KEY',
   'CATALOG_COVERAGE_TARGETS_JSON'
 ];
 
@@ -163,6 +168,11 @@ function selfTestEnv() {
     OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
     OPENFOODFACTS_USER_AGENT: 'GroceryView/0.1 self-test@groceryview.se',
     OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
+    S3_ENDPOINT: 'https://storage.example',
+    S3_REGION: 'eu-north-1',
+    S3_BUCKET: 'groceryview-receipts',
+    S3_ACCESS_KEY_ID: 'self-test-s3-access-key',
+    S3_SECRET_ACCESS_KEY: 'self-test-s3-secret-key',
     GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(chains.map((chainId) => ({
       connectorId: `${chainId}-normalized-json`,
       chainId,

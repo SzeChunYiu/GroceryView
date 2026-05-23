@@ -255,6 +255,12 @@ describe('runtime config', () => {
       OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se',
       OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
+      S3_ENDPOINT: 'https://storage.example',
+      S3_REGION: 'eu-north-1',
+      S3_BUCKET: 'groceryview-receipts',
+      S3_ACCESS_KEY_ID: 'runtime-access-key',
+      S3_SECRET_ACCESS_KEY: 'runtime-secret-key',
+      SCAN_UPLOAD_MAX_BYTES: '7654321',
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -286,6 +292,12 @@ describe('runtime config', () => {
       ocrSpaceHealthcheckImageUrl: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       openFoodFactsUserAgent: 'GroceryView/1.0 contact@groceryview.se',
       openFoodFactsHealthcheckBarcode: '0735000123456',
+      s3Endpoint: 'https://storage.example',
+      s3Region: 'eu-north-1',
+      s3Bucket: 'groceryview-receipts',
+      s3AccessKeyId: 'runtime-access-key',
+      s3SecretAccessKey: 'runtime-secret-key',
+      scanUploadMaxBytes: 7654321,
       catalogCoverageTargets: {
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -399,6 +411,55 @@ describe('runtime config', () => {
       assert.equal(body.status, 'blocked');
       assert.equal(body.blockers.includes('scan_provider_health_not_run:barcode'), true);
       assert.equal(body.blockers.includes('scan_provider_health_not_run:receiptOcr'), true);
+    } finally {
+      await service.close();
+    }
+  });
+
+  it('creates a runtime S3-compatible scan upload ticket before marking storage readiness ready', async () => {
+    const service = createRuntimeHttpService({
+      NODE_ENV: 'development',
+      METRICS_TOKEN: 'metrics-secret',
+      S3_ENDPOINT: 'https://storage.example',
+      S3_REGION: 'eu-north-1',
+      S3_BUCKET: 'groceryview-receipts',
+      S3_ACCESS_KEY_ID: 'runtime-access-key',
+      S3_SECRET_ACCESS_KEY: 'runtime-secret-key',
+      SCAN_UPLOAD_MAX_BYTES: '7654321'
+    }, { now: new Date('2026-05-23T12:00:00.000Z') });
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/scan-upload-storage', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 200);
+      const body = await response.json() as { status: string; blockers: string[]; evidence: string[] };
+      assert.equal(body.status, 'ready');
+      assert.deepEqual(body.blockers, []);
+      assert.equal(body.evidence.includes('scan_upload_storage_ticket_created'), true);
+      assert.equal(body.evidence.includes('scan_upload_storage_private_payload_uri'), true);
+      assert.equal(JSON.stringify(body).includes('runtime-secret-key'), false);
+    } finally {
+      await service.close();
+    }
+  });
+
+  it('keeps runtime scan upload storage readiness blocked until S3 credentials are configured', async () => {
+    const service = createRuntimeHttpService({
+      NODE_ENV: 'development',
+      METRICS_TOKEN: 'metrics-secret'
+    });
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/scan-upload-storage', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 503);
+      const body = await response.json() as { status: string; blockers: string[] };
+      assert.equal(body.status, 'blocked');
+      assert.equal(body.blockers.includes('scan_upload_storage_not_configured'), true);
     } finally {
       await service.close();
     }
@@ -575,7 +636,12 @@ describe('runtime config', () => {
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
       OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se',
-      OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456'
+      OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
+      S3_ENDPOINT: 'https://storage.example',
+      S3_REGION: 'eu-north-1',
+      S3_BUCKET: 'groceryview-receipts',
+      S3_ACCESS_KEY_ID: 'runtime-access-key',
+      S3_SECRET_ACCESS_KEY: 'runtime-secret-key'
     }), /CATALOG_COVERAGE_TARGETS_JSON is required/);
   });
 
@@ -601,6 +667,11 @@ describe('runtime config', () => {
       OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se',
       OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
+      S3_ENDPOINT: 'https://storage.example',
+      S3_REGION: 'eu-north-1',
+      S3_BUCKET: 'groceryview-receipts',
+      S3_ACCESS_KEY_ID: 'runtime-access-key',
+      S3_SECRET_ACCESS_KEY: 'runtime-secret-key',
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],

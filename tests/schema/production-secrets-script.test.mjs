@@ -32,6 +32,11 @@ describe('production secret audit script', () => {
       'OCR_SPACE_HEALTHCHECK_IMAGE_URL',
       'OPENFOODFACTS_USER_AGENT',
       'OPENFOODFACTS_HEALTHCHECK_BARCODE',
+      'S3_ENDPOINT',
+      'S3_REGION',
+      'S3_BUCKET',
+      'S3_ACCESS_KEY_ID',
+      'S3_SECRET_ACCESS_KEY',
       'CATALOG_COVERAGE_TARGETS_JSON'
     ]) {
       assert.match(script, new RegExp(`['"]${secret}['"]`));

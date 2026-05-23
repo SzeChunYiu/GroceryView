@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
@@ -149,6 +149,7 @@ export type AuthOptions = {
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
   scanProviderReadinessProvider?: () => Promise<ScanProviderReadinessReport>;
+  scanUploadStorageReadinessProvider?: () => Promise<ScanUploadStorageReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
@@ -224,6 +225,7 @@ export type RuntimeHandlerOptions = {
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
   scanProviderReadinessProvider?: () => Promise<ScanProviderReadinessReport>;
+  scanUploadStorageReadinessProvider?: () => Promise<ScanUploadStorageReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
@@ -1178,6 +1180,80 @@ function scanProviderReadinessFailureResponse(): ScanProviderReadinessReport {
   };
 }
 
+export type ScanUploadStorageReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  warnings: string[];
+  summary: string;
+};
+
+function scanUploadStorageReadinessFailureResponse(): ScanUploadStorageReadinessReport {
+  return {
+    status: 'blocked',
+    blockers: ['scan_upload_storage_readiness_probe_failed'],
+    evidence: [],
+    warnings: [],
+    summary: 'Scan upload storage readiness is blocked.'
+  };
+}
+
+export async function buildScanUploadStorageReadinessReport(input: {
+  storage?: ScanUploadStorage | undefined;
+  now?: Date;
+}): Promise<ScanUploadStorageReadinessReport> {
+  const evidence: string[] = [];
+  const blockers: string[] = [];
+  const warnings: string[] = [];
+
+  if (!input.storage) {
+    blockers.push('scan_upload_storage_not_configured');
+    return {
+      status: 'blocked',
+      blockers,
+      evidence,
+      warnings,
+      summary: 'Scan upload storage readiness is blocked.'
+    };
+  }
+  evidence.push('scan_upload_storage_configured');
+
+  const result = await prepareScanUploadTicket({
+    request: {
+      scanId: 'readiness-scan-upload-storage',
+      kind: 'receipt',
+      contentType: 'image/jpeg',
+      byteLength: 1,
+      requestedAt: (input.now ?? new Date()).toISOString()
+    },
+    storage: input.storage
+  });
+
+  if (result.status !== 'ready') {
+    blockers.push('scan_upload_storage_ticket_not_created');
+  } else {
+    evidence.push('scan_upload_storage_ticket_created');
+    if (result.ticket.payloadUri.startsWith('s3://') || result.ticket.payloadUri.startsWith('private-upload://')) {
+      evidence.push('scan_upload_storage_private_payload_uri');
+    } else {
+      blockers.push('scan_upload_storage_payload_uri_not_private');
+    }
+    if (Object.keys(result.ticket.headers).length > 0) {
+      evidence.push('scan_upload_storage_headers_present');
+    } else {
+      blockers.push('scan_upload_storage_headers_missing');
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    warnings,
+    summary: blockers.length === 0 ? 'Scan upload storage is ready.' : 'Scan upload storage readiness is blocked.'
+  };
+}
+
 async function providerHealthStatus(check: (() => Promise<unknown>) | undefined): Promise<'pass' | 'fail' | 'not_run'> {
   if (!check) return 'not_run';
   try {
@@ -1692,6 +1768,21 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
         } catch {
           return jsonResponse(scanProviderReadinessFailureResponse(), { status: 503 });
+        }
+      }
+
+      if (method === 'GET' && path === '/api/readiness/scan-upload-storage') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Scan upload storage readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid scan upload storage readiness token is required.');
+        }
+        if (!authOptions.scanUploadStorageReadinessProvider) return errorResponse(503, 'Scan upload storage readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.scanUploadStorageReadinessProvider();
+          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(scanUploadStorageReadinessFailureResponse(), { status: 503 });
         }
       }
 
@@ -2606,6 +2697,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/readiness/source-runs': { get: metricsOperation('Check source run freshness and terminal status without exposing source secrets.') },
       '/api/readiness/catalog-coverage': { get: metricsOperation('Check product, chain, store, and product-store catalog coverage without exposing database secrets.') },
       '/api/readiness/scanning': { get: metricsOperation('Check scan provider configuration and health evidence without exposing provider secrets.') },
+      '/api/readiness/scan-upload-storage': { get: metricsOperation('Check scan upload storage ticket creation without exposing object-storage secrets.') },
       '/api/workers/notifications/run': { post: metricsOperation('Run the configured notification worker cycle for cron execution.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
       '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid, SES, or Expo suppression payloads.') }
@@ -2631,6 +2723,12 @@ export type RuntimeConfig = {
   ocrSpaceHealthcheckImageUrl?: string;
   openFoodFactsUserAgent?: string;
   openFoodFactsHealthcheckBarcode?: string;
+  s3Endpoint?: string;
+  s3Region?: string;
+  s3Bucket?: string;
+  s3AccessKeyId?: string;
+  s3SecretAccessKey?: string;
+  scanUploadMaxBytes?: number;
   catalogCoverageTargets?: Omit<CatalogCoverageInput, 'products'>;
 };
 
@@ -2700,9 +2798,16 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.OCR_SPACE_HEALTHCHECK_IMAGE_URL) throw new Error('OCR_SPACE_HEALTHCHECK_IMAGE_URL is required in production.');
     if (!env.OPENFOODFACTS_USER_AGENT) throw new Error('OPENFOODFACTS_USER_AGENT is required in production.');
     if (!env.OPENFOODFACTS_HEALTHCHECK_BARCODE) throw new Error('OPENFOODFACTS_HEALTHCHECK_BARCODE is required in production.');
+    if (!env.S3_ENDPOINT) throw new Error('S3_ENDPOINT is required in production.');
+    if (!env.S3_REGION) throw new Error('S3_REGION is required in production.');
+    if (!env.S3_BUCKET) throw new Error('S3_BUCKET is required in production.');
+    if (!env.S3_ACCESS_KEY_ID) throw new Error('S3_ACCESS_KEY_ID is required in production.');
+    if (!env.S3_SECRET_ACCESS_KEY) throw new Error('S3_SECRET_ACCESS_KEY is required in production.');
     if (!env.CATALOG_COVERAGE_TARGETS_JSON) throw new Error('CATALOG_COVERAGE_TARGETS_JSON is required in production.');
   }
   validatePublicWebUrl(env.PUBLIC_WEB_URL);
+  const scanUploadMaxBytes = Number(env.SCAN_UPLOAD_MAX_BYTES ?? '5000000');
+  if (!Number.isInteger(scanUploadMaxBytes) || scanUploadMaxBytes <= 0) throw new Error('SCAN_UPLOAD_MAX_BYTES must be a positive integer.');
   const catalogCoverageTargets = parseCatalogCoverageTargets(env.CATALOG_COVERAGE_TARGETS_JSON);
   const stripePriceIds: Partial<Record<SubscriptionPlan, string>> = {
     ...(env.STRIPE_PRICE_PREMIUM_MONTHLY ? { premium_monthly: env.STRIPE_PRICE_PREMIUM_MONTHLY } : {}),
@@ -2726,6 +2831,12 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     ...(env.OCR_SPACE_HEALTHCHECK_IMAGE_URL ? { ocrSpaceHealthcheckImageUrl: env.OCR_SPACE_HEALTHCHECK_IMAGE_URL } : {}),
     ...(env.OPENFOODFACTS_USER_AGENT ? { openFoodFactsUserAgent: env.OPENFOODFACTS_USER_AGENT } : {}),
     ...(env.OPENFOODFACTS_HEALTHCHECK_BARCODE ? { openFoodFactsHealthcheckBarcode: env.OPENFOODFACTS_HEALTHCHECK_BARCODE } : {}),
+    ...(env.S3_ENDPOINT ? { s3Endpoint: env.S3_ENDPOINT } : {}),
+    ...(env.S3_REGION ? { s3Region: env.S3_REGION } : {}),
+    ...(env.S3_BUCKET ? { s3Bucket: env.S3_BUCKET } : {}),
+    ...(env.S3_ACCESS_KEY_ID ? { s3AccessKeyId: env.S3_ACCESS_KEY_ID } : {}),
+    ...(env.S3_SECRET_ACCESS_KEY ? { s3SecretAccessKey: env.S3_SECRET_ACCESS_KEY } : {}),
+    scanUploadMaxBytes,
     ...(catalogCoverageTargets ? { catalogCoverageTargets } : {})
   };
 }
@@ -2775,6 +2886,86 @@ function buildRuntimeNotificationWorkerRunner(
   });
 }
 
+function hashHex(value: string): string {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function hmacBuffer(key: Buffer | string, value: string): Buffer {
+  return createHmac('sha256', key).update(value).digest();
+}
+
+function hmacHex(key: Buffer | string, value: string): string {
+  return createHmac('sha256', key).update(value).digest('hex');
+}
+
+function awsDateParts(date: Date): { amzDate: string; dateStamp: string } {
+  const iso = date.toISOString().replace(/[:-]|\.\d{3}/g, '');
+  return { amzDate: iso, dateStamp: iso.slice(0, 8) };
+}
+
+function encodeS3KeySegment(segment: string): string {
+  return encodeURIComponent(segment).replace(/[!'()*]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`);
+}
+
+function buildRuntimeScanUploadStorage(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): ScanUploadStorage | undefined {
+  if (!config.s3Endpoint || !config.s3Region || !config.s3Bucket || !config.s3AccessKeyId || !config.s3SecretAccessKey) return undefined;
+  const endpoint = new URL(config.s3Endpoint);
+  const bucket = config.s3Bucket;
+  const region = config.s3Region;
+  const accessKeyId = config.s3AccessKeyId;
+  const secretAccessKey = config.s3SecretAccessKey;
+
+  return {
+    async createUploadTicket(request) {
+      const issuedAt = options.now ?? new Date(request.requestedAt);
+      const expiresInSeconds = 600;
+      const expiresAt = new Date(issuedAt.getTime() + expiresInSeconds * 1000).toISOString();
+      const objectKey = ['scans', request.kind, request.scanId].map(encodeS3KeySegment).join('/');
+      const path = `/${encodeS3KeySegment(bucket)}/${objectKey}`;
+      const { amzDate, dateStamp } = awsDateParts(issuedAt);
+      const credentialScope = `${dateStamp}/${region}/s3/aws4_request`;
+      const signedHeaders = 'host';
+      const params = new URLSearchParams({
+        'X-Amz-Algorithm': 'AWS4-HMAC-SHA256',
+        'X-Amz-Credential': `${accessKeyId}/${credentialScope}`,
+        'X-Amz-Date': amzDate,
+        'X-Amz-Expires': String(expiresInSeconds),
+        'X-Amz-SignedHeaders': signedHeaders
+      });
+      const canonicalQuery = Array.from(params.entries())
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+        .join('&');
+      const canonicalRequest = [
+        'PUT',
+        path,
+        canonicalQuery,
+        `host:${endpoint.host}\n`,
+        signedHeaders,
+        'UNSIGNED-PAYLOAD'
+      ].join('\n');
+      const stringToSign = [
+        'AWS4-HMAC-SHA256',
+        amzDate,
+        credentialScope,
+        hashHex(canonicalRequest)
+      ].join('\n');
+      const signingKey = hmacBuffer(hmacBuffer(hmacBuffer(hmacBuffer(`AWS4${secretAccessKey}`, dateStamp), region), 's3'), 'aws4_request');
+      params.set('X-Amz-Signature', hmacHex(signingKey, stringToSign));
+      const uploadUrl = new URL(path, endpoint);
+      uploadUrl.search = params.toString();
+      return {
+        scanId: request.scanId,
+        uploadUrl: uploadUrl.toString(),
+        payloadUri: `s3://${bucket}/${objectKey}`,
+        expiresAt,
+        maxBytes: config.scanUploadMaxBytes ?? 5_000_000,
+        headers: { 'content-type': request.contentType }
+      };
+    }
+  };
+}
+
 export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): AuthOptions {
   const scanProviders: ScanProviders = {
     ...(config.openFoodFactsUserAgent
@@ -2794,6 +2985,7 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
         }
       : {})
   };
+  const scanUploadStorage = buildRuntimeScanUploadStorage(config, options);
   return {
     runtimeConfig: config,
     authSecret: config.authSecret,
@@ -2814,11 +3006,16 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     sourceRunHealthProvider: options.sourceRunHealthProvider,
     catalogCoverageProvider: options.catalogCoverageProvider,
     scanProviderReadinessProvider: options.scanProviderReadinessProvider ?? (() => buildRuntimeScanProviderReadinessReport(config, options)),
+    scanUploadStorageReadinessProvider: options.scanUploadStorageReadinessProvider ?? (() => buildScanUploadStorageReadinessReport({
+      storage: scanUploadStorage,
+      now: options.now
+    })),
     flyerOffersProvider: options.flyerOffersProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider,
     watchlistPriceAlertWriter: options.watchlistPriceAlertWriter,
-    ...(Object.keys(scanProviders).length > 0 ? { scanProviders } : {})
+    ...(Object.keys(scanProviders).length > 0 ? { scanProviders } : {}),
+    ...(scanUploadStorage ? { scanUploadStorage } : {})
   };
 }
 
