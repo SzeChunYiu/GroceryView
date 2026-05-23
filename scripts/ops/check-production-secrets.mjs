@@ -31,6 +31,10 @@ export function findMissingSecrets(requiredNames, listedNames) {
   return requiredNames.filter((name) => !listed.has(name));
 }
 
+function uniqueSecretNames() {
+  return Array.from(new Set([...requiredGithubActionSecrets, ...requiredRuntimeSecrets]));
+}
+
 function parseGhSecretList(output) {
   return output
     .split('\n')
@@ -52,6 +56,13 @@ function readGithubSecretNames(repo, environment) {
   return Array.from(names);
 }
 
+function readEnvironmentSecretNames(requiredNames) {
+  return requiredNames.filter((name) => {
+    const value = process.env[name];
+    return typeof value === 'string' && value.trim().length > 0;
+  });
+}
+
 function main() {
   if (process.argv.includes('--self-test')) {
     const missing = findMissingSecrets(['DATABASE_URL', 'METRICS_TOKEN'], ['DATABASE_URL']);
@@ -59,17 +70,19 @@ function main() {
     return;
   }
 
+  const fromEnvironment = process.argv.includes('--from-env');
   const repoIndex = process.argv.indexOf('--repo');
   const repo = repoIndex >= 0 ? process.argv[repoIndex + 1] : undefined;
   const envIndex = process.argv.indexOf('--env');
   const environment = envIndex >= 0 ? process.argv[envIndex + 1] : undefined;
-  const secretNames = readGithubSecretNames(repo, environment);
+  const secretNames = fromEnvironment ? readEnvironmentSecretNames(uniqueSecretNames()) : readGithubSecretNames(repo, environment);
   const missingGithubActionSecrets = findMissingSecrets(requiredGithubActionSecrets, secretNames);
   const missingRuntimeSecrets = findMissingSecrets(requiredRuntimeSecrets, secretNames);
   const result = {
     status: missingGithubActionSecrets.length === 0 && missingRuntimeSecrets.length === 0 ? 'ready' : 'blocked',
     checkedSecretNames: secretNames.sort(),
     environment: environment ?? null,
+    source: fromEnvironment ? 'environment' : 'github',
     missingGithubActionSecrets,
     missingRuntimeSecrets
   };
