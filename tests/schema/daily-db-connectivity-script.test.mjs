@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 
 import {
   buildSupabaseDirectConnectionString,
+  buildSupabaseTransactionPoolerConnectionString,
   checkDailyDatabaseConnectivity,
   classifyDatabaseUrl,
   isTransientDailyDatabaseError,
@@ -71,13 +72,21 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.equal(result.transformedForDailyWrites, true);
     assert.deepEqual(result.blockers, ['database_not_accepting_connections']);
     assert.equal(JSON.stringify(result).includes('super-secret'), false);
-    assert.equal(calls.filter((call) => call.type === 'constructor').length, 3);
-    assert.equal(calls.filter((call) => call.type === 'query' && call.sql === 'set default_transaction_read_only=off').length, 3);
-    assert.equal(calls.filter((call) => call.type === 'end').length, 3);
+    assert.equal(calls.filter((call) => call.type === 'constructor').length, 4);
+    assert.equal(calls.filter((call) => call.type === 'query' && call.sql === 'set default_transaction_read_only=off').length, 4);
+    assert.equal(calls.filter((call) => call.type === 'end').length, 4);
     assert.equal(calls[0].config.connectionString.includes(':5432/'), true);
+    assert.equal(result.alternateConnections[0].name, 'supabase_transaction_pooler');
     assert.equal(result.alternateConnections[0].status, 'blocked');
   });
 
+
+
+  it('builds the original transaction-pooler URL for alternate Supabase pooler diagnostics', () => {
+    const poolerUrl = 'postgres://postgres.dgsoqwanrkqgdichtgzl:super-secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres?sslmode=no-verify';
+    assert.equal(buildSupabaseTransactionPoolerConnectionString(poolerUrl), poolerUrl);
+    assert.equal(buildSupabaseTransactionPoolerConnectionString('postgres://user:secret@db.example.test:5432/postgres'), null);
+  });
 
   it('derives a redacted direct Supabase host probe from pooler credentials', async () => {
     const poolerUrl = 'postgres://postgres.dgsoqwanrkqgdichtgzl:super-secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres?sslmode=no-verify';
@@ -109,12 +118,16 @@ describe('daily DB connectivity diagnostic script', () => {
 
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['database_not_accepting_connections']);
-    assert.equal(result.alternateConnections.length, 1);
-    assert.equal(result.alternateConnections[0].name, 'supabase_direct_host');
-    assert.equal(result.alternateConnections[0].status, 'ready');
-    assert.equal(result.alternateConnections[0].host, 'db.dgsoqwanrkqgdichtgzl.supabase.co');
-    assert.match(result.alternateConnections[0].action, /Direct Supabase host accepts writes/);
+    assert.equal(result.alternateConnections.length, 2);
+    assert.equal(result.alternateConnections[0].name, 'supabase_transaction_pooler');
+    assert.equal(result.alternateConnections[0].status, 'blocked');
+    assert.equal(result.alternateConnections[0].port, 6543);
+    assert.equal(result.alternateConnections[1].name, 'supabase_direct_host');
+    assert.equal(result.alternateConnections[1].status, 'ready');
+    assert.equal(result.alternateConnections[1].host, 'db.dgsoqwanrkqgdichtgzl.supabase.co');
+    assert.match(result.alternateConnections[1].action, /Direct Supabase host accepts writes/);
     assert.equal(JSON.stringify(result).includes('super-secret'), false);
+    assert.equal(connections.some((connection) => connection.includes('aws-1-eu-north-1.pooler.supabase.com:6543')), true);
     assert.equal(connections.some((connection) => connection.includes('db.dgsoqwanrkqgdichtgzl.supabase.co:5432')), true);
   });
 
