@@ -1053,6 +1053,36 @@ export const categoryDealLeaders = summarizeCategoryDealLeaders({
   minimumSourceConfidence: 0.6
 });
 
+export const dealScreener = {
+  title: 'Deal screener',
+  minimumScore: 75,
+  minimumSourceConfidence: 0.7,
+  categoryFilter: 'all visible ranked deal rows',
+  rows: dealOpportunityRail
+    .filter((deal) => deal.dealScore >= 75 && deal.sourceConfidence >= 0.7)
+    .map((deal) => ({
+      ...deal,
+      category: dealCategoryByProductId[deal.productId] ?? 'Pantry',
+      discountPercent: Math.round(((deal.regularPrice - deal.currentPrice) / deal.regularPrice) * 1000) / 10,
+      savings: Math.round((deal.regularPrice - deal.currentPrice) * 100) / 100,
+      sourceConfidenceLabel: `${Math.round(deal.sourceConfidence * 100)}%`
+    })),
+  categoryFacets: Object.entries(
+    dealOpportunityRail
+      .filter((deal) => deal.dealScore >= 75 && deal.sourceConfidence >= 0.7)
+      .reduce<Record<string, number>>((facets, deal) => {
+        const category = dealCategoryByProductId[deal.productId] ?? 'Pantry';
+        facets[category] = (facets[category] ?? 0) + 1;
+        return facets;
+      }, {})
+  ).map(([category, count]) => ({ category, count })),
+  guardrails: [
+    'Uses rankDealOpportunities output from visible ranked deal rows; hidden retailer data and sponsored boosts are excluded.',
+    'minimumScore and sourceConfidence gates are shown so weak evidence does not look like a shopper-ready bargain.',
+    'categoryFilter facets only group observed deal rows; empty categories are not backfilled with estimates.'
+  ]
+};
+
 
 export const basketSubstitutionRadar = [
   {
