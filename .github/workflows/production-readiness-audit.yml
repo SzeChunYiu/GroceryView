@@ -1,0 +1,48 @@
+name: Production readiness audit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '42 6 * * *'
+
+permissions:
+  contents: read
+
+env:
+  AUDIT_OUTPUT_PATH: artifacts/production-readiness-secret-audit.json
+
+jobs:
+  audit:
+    name: Audit production GitHub configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit production secrets and variables
+        run: |
+          mkdir -p "$(dirname "$AUDIT_OUTPUT_PATH")"
+          set +e
+          npm run ops:check-production-secrets -- --repo ${{ github.repository }} --env production > "$AUDIT_OUTPUT_PATH"
+          audit_status="$?"
+          cat "$AUDIT_OUTPUT_PATH"
+          exit "$audit_status"
+
+      - name: Upload production readiness audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-readiness-audit-evidence
+          path: artifacts/*.json
+          if-no-files-found: error
