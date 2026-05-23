@@ -5,6 +5,8 @@ import process from 'node:process';
 export const requiredGithubActionSecrets = [
   'DATABASE_URL',
   'GROCERYVIEW_SERVER_URL',
+  'GROCERYVIEW_API_BASE_URL',
+  'EXPO_TOKEN',
   'METRICS_TOKEN'
 ];
 
