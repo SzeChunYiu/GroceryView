@@ -21,6 +21,9 @@ const requiredTables = [
   'receipt_items',
   'community_price_reports',
   'community_reporter_trust',
+  'fuel_grades',
+  'fuel_price_sources',
+  'fuel_price_source_observations',
   'subscription_entitlements',
   'notification_tasks',
   'notification_suppressions',
@@ -59,7 +62,11 @@ const requiredColumns = [
   'max_attempts',
   'reason',
   'base_date',
-  'weight'
+  'weight',
+  'domain',
+  'fuel_grade_id',
+  'source_kind',
+  'original_price_text'
 ];
 
 describe('db/schema.sql', () => {
@@ -88,5 +95,17 @@ describe('db/schema.sql', () => {
     assert.match(schema, /tier text not null check \(tier in \('free', 'premium'\)\)/);
     assert.match(schema, /provider text check \(provider in \('stripe_compatible'\)\)/);
     assert.doesNotMatch(schema, /\b(card_number|cvc|client_secret|payment_method_secret)\b/);
+  });
+
+  it('models fuel prices as source-backed per-grade observations', () => {
+    assert.match(schema, /domain in \('grocery', 'fuel', 'pharmacy'\)/);
+    assert.match(schema, /fuel-95-e10/);
+    assert.match(schema, /fuel-98/);
+    assert.match(schema, /fuel-diesel/);
+    assert.match(schema, /fuel-hvo100/);
+    assert.match(schema, /fuel-e85/);
+    assert.match(schema, /source_kind in \('operator_public_price_page', 'crowd_station_report'\)/);
+    assert.match(schema, /reporter_id text references community_reporter_trust/);
+    assert.match(schema, /price_observation_id bigint not null references price_observations/);
   });
 });

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { formatFuelPrice, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
+import { formatFuelPrice, fuelPriceSourceSchema, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
 import { fuelStationSourceCoverage, multiVerticalDomainFoundation } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -87,13 +87,16 @@ export default function FuelPage() {
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
             <p className="font-black text-slate-950">Operator source</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">Public operator price page, parser version {verifiedFuelPriceSource.parserVersion}, captured at {verifiedFuelPriceSource.capturedAt}.</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{fuelPriceSourceSchema.operatorSourceKind} in {fuelPriceSourceSchema.sourceTable}, parser version {verifiedFuelPriceSource.parserVersion}, captured at {verifiedFuelPriceSource.capturedAt}.</p>
           </div>
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
             <p className="font-black text-slate-950">Crowd source</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">Schema supports trusted station reports, but no crowd fuel prices are rendered on this page yet.</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{fuelPriceSourceSchema.crowdSourceKind} rows require a trusted reporter and station evidence; no crowd fuel prices are rendered on this page yet.</p>
           </div>
         </div>
+        <p className="mt-4 rounded-lg bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-700">
+          {fuelPriceSourceSchema.gradeTable} + {fuelPriceSourceSchema.sourceObservationTable}: {fuelPriceSourceSchema.observationContract}.
+        </p>
       </Card>
 
       <Card className="mt-6">

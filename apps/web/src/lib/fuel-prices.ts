@@ -26,6 +26,16 @@ export const verifiedFuelPriceSource = {
   caveat: 'Operator company station prices from OKQ8; not a crowd report and not proof of every station pump price.'
 } as const;
 
+export const fuelPriceSourceSchema = {
+  gradeTable: 'fuel_grades',
+  sourceTable: 'fuel_price_sources',
+  sourceObservationTable: 'fuel_price_source_observations',
+  operatorSourceKind: 'operator_public_price_page',
+  crowdSourceKind: 'crowd_station_report',
+  requiredGrades: ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85'],
+  observationContract: 'domain=fuel, price per litre, fuel grade id, original source price text'
+} as const;
+
 export const verifiedFuelPriceObservations: VerifiedFuelPriceObservation[] = [
   {
     id: 'okq8-fuel-95-e10-2026-05-22',
