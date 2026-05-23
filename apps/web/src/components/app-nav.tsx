@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Database,
   Flame,
+  Fuel,
   Heart,
   ListChecks,
   Map,
@@ -59,7 +60,8 @@ const navGroups: NavGroup[] = [
     icon: Store,
     items: [
       { href: '/map', label: 'Map', icon: Map },
-      { href: '/stores', label: 'Stores', icon: Store }
+      { href: '/stores', label: 'Stores', icon: Store },
+      { href: '/fuel', label: 'Fuel', icon: Fuel }
     ]
   },
   {

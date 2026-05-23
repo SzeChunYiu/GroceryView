@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { formatFuelPrice, fuelPriceSourceSchema, fuelPriceTargetAlerts, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
+import { fuelStations, fuelStationSource, type FuelStationChain } from '@/lib/ingested/fuel-stations';
 import { fuelStationSourceCoverage, multiVerticalDomainFoundation } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -12,6 +13,38 @@ function freshnessLabel(value: string) {
   return value.slice(0, 10);
 }
 
+const fuelMapBounds = {
+  minLat: 55.2,
+  maxLat: 69.2,
+  minLon: 10.6,
+  maxLon: 24.3
+};
+
+const fuelChainColors: Record<FuelStationChain, string> = {
+  'Circle K': '#d71920',
+  OKQ8: '#0b65c6',
+  Preem: '#118849',
+  St1: '#f3c300',
+  Ingo: '#f06a00',
+  Tanka: '#22a6b3',
+  Qstar: '#6f42c1',
+  Shell: '#ffd100'
+};
+
+function fuelStationPosition(latitude: number, longitude: number) {
+  const x = ((longitude - fuelMapBounds.minLon) / (fuelMapBounds.maxLon - fuelMapBounds.minLon)) * 100;
+  const y = (1 - (latitude - fuelMapBounds.minLat) / (fuelMapBounds.maxLat - fuelMapBounds.minLat)) * 100;
+
+  return {
+    left: `${Math.min(98, Math.max(2, x))}%`,
+    top: `${Math.min(98, Math.max(2, y))}%`
+  };
+}
+
+function stationAddress(station: (typeof fuelStations)[number]) {
+  return [station.street, station.houseNumber, station.postcode, station.city].filter(Boolean).join(', ');
+}
+
 export default function FuelPage() {
   const domain = multiVerticalDomainFoundation.find((candidate) => candidate.slug === 'fuel')!;
   const lowest = [...verifiedFuelPriceObservations].sort((a, b) => a.pricePerLitre - b.pricePerLitre)[0]!;
@@ -19,6 +52,9 @@ export default function FuelPage() {
     .map((row) => row.effectiveFrom)
     .sort()
     .at(-1)!;
+  const fuelChainRows = Object.entries(fuelStationSource.chainCounts) as [FuelStationChain, number][];
+  const northernMostStation = fuelStations.reduce((top, station) => (station.latitude > top.latitude ? station : top), fuelStations[0]);
+  const southernMostStation = fuelStations.reduce((bottom, station) => (station.latitude < bottom.latitude ? station : bottom), fuelStations[0]);
 
   return (
     <PageShell>
@@ -183,6 +219,88 @@ export default function FuelPage() {
         <ul className="mt-4 list-disc space-y-2 pl-5 text-sm font-semibold leading-6 text-indigo-950">
           {fuelStationSourceCoverage.guardrails.map((guardrail) => <li key={guardrail}>{guardrail}</li>)}
         </ul>
+      </Card>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>Overpass fuel locations</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+              {fuelStationSource.rowCount.toLocaleString('sv-SE')} Swedish fuel stations with coordinates
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Real amenity=fuel rows fetched with curl from Overpass for Circle K, OKQ8, Preem, St1, Ingo, Tanka, Qstar, and Shell. These rows locate stations only; they do not create station-level pump price claims.
+            </p>
+          </div>
+          <div className="rounded-lg bg-white p-4 text-right shadow-sm">
+            <p className="text-3xl font-black text-sky-900">{fuelChainRows.length}</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">chains</p>
+            <p className="mt-2 text-xs font-semibold text-slate-600">
+              {northernMostStation.city || northernMostStation.name} north · {southernMostStation.city || southernMostStation.name} south
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="relative min-h-[560px] overflow-hidden rounded-lg border border-sky-100 bg-[#edf7f8]">
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.06)_1px,transparent_1px),linear-gradient(0deg,rgba(15,23,42,0.06)_1px,transparent_1px)] bg-[size:48px_48px]" />
+            <div className="absolute inset-x-[24%] bottom-[8%] top-[4%] rounded-[46%_48%_44%_42%] border border-sky-100 bg-white/65 shadow-inner" />
+            {fuelStations.map((station) => (
+              <span
+                aria-label={`${station.name}, ${station.chain}`}
+                className="absolute z-10 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white shadow-sm"
+                key={`${station.osmType}-${station.osmId}`}
+                style={{
+                  ...fuelStationPosition(station.latitude, station.longitude),
+                  backgroundColor: fuelChainColors[station.chain]
+                }}
+                title={`${station.name} · ${station.latitude.toFixed(5)}, ${station.longitude.toFixed(5)}`}
+              />
+            ))}
+          </div>
+
+          <div className="rounded-lg bg-white shadow-sm">
+            <div className="border-b border-slate-100 px-4 py-3">
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Chain coverage</p>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {fuelChainRows.map(([chain, count]) => (
+                <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm" key={chain}>
+                  <span className="flex min-w-0 items-center gap-2 font-black text-slate-900">
+                    <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: fuelChainColors[chain] }} />
+                    {chain}
+                  </span>
+                  <span className="font-black tabular-nums text-slate-600">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 overflow-hidden rounded-lg border border-sky-100 bg-white">
+          <div className="hidden grid-cols-[1fr_0.6fr_1fr_0.7fr_0.7fr] gap-3 border-b border-slate-100 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500 md:grid">
+            <span>Station</span>
+            <span>Chain</span>
+            <span>Address</span>
+            <span>Latitude</span>
+            <span className="text-right">Longitude</span>
+          </div>
+          {fuelStations.slice(0, 120).map((station) => (
+            <div
+              className="grid gap-2 border-b border-slate-100 px-4 py-3 text-sm last:border-b-0 md:grid-cols-[1fr_0.6fr_1fr_0.7fr_0.7fr]"
+              key={`${station.osmType}-${station.osmId}-row`}
+            >
+              <span className="min-w-0">
+                <span className="block truncate font-black text-slate-950">{station.name}</span>
+                <span className="mt-1 block text-xs font-semibold text-slate-500">OSM {station.osmType}/{station.osmId}</span>
+              </span>
+              <span className="font-semibold text-slate-700">{station.chain}</span>
+              <span className="truncate text-slate-600">{stationAddress(station) || 'Address not tagged'}</span>
+              <span className="tabular-nums text-slate-700">{station.latitude.toFixed(5)}</span>
+              <span className="tabular-nums text-slate-700 md:text-right">{station.longitude.toFixed(5)}</span>
+            </div>
+          ))}
+        </div>
       </Card>
 
       <Card className="mt-6 border-amber-200 bg-amber-50">

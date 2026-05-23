@@ -35,6 +35,8 @@ import {
   buildOpenPricesConnectorUrl,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
+  BRANDED_FUEL_STATIONS_OVERPASS_URL,
+  BRANDED_SWEDISH_FUEL_STATION_CHAINS,
   confidenceForSource,
   buildSwedishCountyFuelOverpassQuery,
   buildSwedishCountyGroceryOverpassQuery,
@@ -50,6 +52,7 @@ import {
   fetchOpenFoodFactsSwedenCatalog,
   fetchOkq8FuelPrices,
   fetchOpenFoodFactsRetailerEnrichments,
+  fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
@@ -104,6 +107,7 @@ import {
   offerSelectorFixturesCanEmitOfferFacts,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
+  parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
@@ -118,6 +122,7 @@ import {
   STOCKHOLM_FUEL_OVERPASS_QUERY,
   STOCKHOLM_GROCERY_OVERPASS_QUERY,
   STORE_ENUMERATOR_OVERPASS_URL,
+  SWEDEN_BRANDED_FUEL_STATIONS_OVERPASS_QUERY,
   SWEDEN_FUEL_OVERPASS_QUERY,
   SWEDEN_GROCERY_OVERPASS_QUERY,
   SWEDISH_COUNTY_ISO3166_2_CODES,
@@ -1736,6 +1741,79 @@ describe('fetchOverpassFuelStations', () => {
 
     assert.equal(rows.length, 1);
     assert.equal(rows[0].name, 'Valid station');
+  });
+});
+
+describe('fetchBrandedSwedishFuelStations', () => {
+  it('posts a Sweden amenity=fuel Overpass query for the requested fuel chains', async () => {
+    const requestedBodies: string[] = [];
+    const fetchImpl: typeof fetch = async (url, init) => {
+      assert.equal(String(url), BRANDED_FUEL_STATIONS_OVERPASS_URL);
+      assert.equal(init?.method, 'POST');
+      requestedBodies.push(String(init?.body));
+      return new Response(JSON.stringify({
+        elements: [{
+          type: 'node',
+          id: 29592701,
+          lat: 59.5174583,
+          lon: 18.0722494,
+          tags: {
+            amenity: 'fuel',
+            brand: 'Circle K',
+            name: 'Circle K',
+            website: 'https://www.circlek.se/station/circle-k-vallentuna'
+          }
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchBrandedSwedishFuelStations({
+      fetchImpl,
+      retrievedAt: '2026-05-23T12:00:00.000Z'
+    });
+
+    const postedQuery = new URLSearchParams(requestedBodies[0]).get('data') ?? '';
+    assert.match(postedQuery, /ISO3166-1/);
+    assert.match(postedQuery, /amenity"="fuel/);
+    for (const chain of BRANDED_SWEDISH_FUEL_STATION_CHAINS) {
+      assert.match(postedQuery, new RegExp(chain));
+    }
+    assert.equal(SWEDEN_BRANDED_FUEL_STATIONS_OVERPASS_QUERY.includes('Circle K'), true);
+    assert.deepEqual(rows, [{
+      osmType: 'node',
+      osmId: 29592701,
+      name: 'Circle K',
+      chain: 'Circle K',
+      brand: 'Circle K',
+      operator: '',
+      amenity: 'fuel',
+      latitude: 59.5174583,
+      longitude: 18.0722494,
+      street: '',
+      houseNumber: '',
+      postcode: '',
+      city: '',
+      openingHours: '',
+      website: 'https://www.circlek.se/station/circle-k-vallentuna',
+      phone: '',
+      sourceUrl: BRANDED_FUEL_STATIONS_OVERPASS_URL,
+      retrievedAt: '2026-05-23T12:00:00.000Z'
+    }]);
+  });
+
+  it('keeps only requested fuel chains with coordinates', () => {
+    const rows = parseBrandedSwedishFuelStations({
+      elements: [
+        { type: 'node', id: 1, lat: 59, lon: 18, tags: { amenity: 'fuel', brand: 'OKQ8', name: 'OKQ8 Test' } },
+        { type: 'node', id: 2, lat: 59, lon: 18, tags: { amenity: 'fuel', brand: 'Other Fuel' } },
+        { type: 'node', id: 3, tags: { amenity: 'fuel', brand: 'Preem', name: 'Missing coordinates' } },
+        { type: 'node', id: 4, lat: 59, lon: 18, tags: { amenity: 'charging_station', brand: 'Circle K' } }
+      ]
+    }, '2026-05-23T12:00:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].chain, 'OKQ8');
+    assert.equal(rows[0].amenity, 'fuel');
   });
 });
 
