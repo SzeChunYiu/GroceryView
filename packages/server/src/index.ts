@@ -1834,6 +1834,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       if (method === 'GET' && path === '/api/market/overview') {
         return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => api.getMarketOverview());
       }
+      if (method === 'GET' && (path === '/api/fuel' || path === '/fuel')) return jsonResponse(api.getFuelPrices());
       if (method === 'GET' && path === '/api/nutrition/value') return jsonResponse(api.getNutritionValueReport(optionalNutritionMetric(url.searchParams.get('metric'))));
       if (path === '/api/meal-plans/suggestions') {
         const user = userIdFrom(url);
@@ -2960,6 +2961,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
       '/api/openapi.json': { get: publicOperation('Get the public OpenAPI document for developer price and nutrition API integrations.') },
       '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
+      '/api/fuel': { get: publicOperation('Get per-grade fuel price observations with operator and crowd-source provenance.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/nutrition/value': { get: publicOperation('Get nutrition per krona rankings with sugar and salt warning guardrails.') },
       '/api/meal-plans/suggestions': { get: protectedOperation('Get deal-based meal suggestions with cost, serving, and household guardrails.') },

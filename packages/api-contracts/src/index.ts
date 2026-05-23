@@ -100,6 +100,14 @@ export const latestPriceSchema = priceObservationSchema.extend({
   supersedesObservationIds: z.array(idSchema).default([])
 });
 
+export const fuelPricesResponseSchema = z.object({
+  domain: z.literal('fuel'),
+  litreBasis: z.literal(1),
+  grades: z.array(fuelGradeSchema),
+  observations: z.array(fuelPriceObservationSchema),
+  sources: z.array(fuelPriceSourceSchema)
+});
+
 export const watchlistSchema = z.object({
   id: idSchema,
   userId: idSchema,
@@ -143,6 +151,7 @@ export const apiContractSchemas = {
   latestPrice: latestPriceSchema,
   fuelPriceObservation: fuelPriceObservationSchema,
   fuelPriceSource: fuelPriceSourceSchema,
+  fuelPricesResponse: fuelPricesResponseSchema,
   priceObservation: priceObservationSchema,
   product: productSchema,
   productPricesResponse: productPricesResponseSchema,
@@ -158,6 +167,7 @@ export type Confidence = z.infer<typeof confidenceSchema>;
 export type FuelGrade = z.infer<typeof fuelGradeSchema>;
 export type FuelPriceObservationDto = z.infer<typeof fuelPriceObservationSchema>;
 export type FuelPriceSourceDto = z.infer<typeof fuelPriceSourceSchema>;
+export type FuelPricesResponseDto = z.infer<typeof fuelPricesResponseSchema>;
 export type LatestPriceDto = z.infer<typeof latestPriceSchema>;
 export type PriceDomain = z.infer<typeof priceDomainSchema>;
 export type PriceObservationDto = z.infer<typeof priceObservationSchema>;

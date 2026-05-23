@@ -138,6 +138,31 @@ describe('createHttpHandler', () => {
     assert.equal(marketBody.movers[0]?.stockholmMedianGap, -10);
     assert.equal(marketBody.movers[0]?.verifiedHistoryPoints, 3);
 
+    const fuel = await handle(new Request('http://localhost/api/fuel'));
+    assert.equal(fuel.status, 200);
+    const fuelBody = await json(fuel) as {
+      domain: string;
+      grades: string[];
+      observations: Array<{ grade: string; pricePerLitre: { amount: number; currency: string }; domain: string; source: { kind: string; operatorName: string } }>;
+      sources: Array<{ kind: string; sourceUrl: string }>;
+    };
+    assert.equal(fuelBody.domain, 'fuel');
+    assert.deepEqual(fuelBody.grades, ['98', '95', 'E85', 'diesel', 'HVO100']);
+    assert.deepEqual(fuelBody.observations.map((row) => [row.grade, row.pricePerLitre.amount, row.pricePerLitre.currency, row.domain]), [
+      ['98', 20.19, 'SEK', 'fuel'],
+      ['95', 18.89, 'SEK', 'fuel'],
+      ['E85', 15.84, 'SEK', 'fuel'],
+      ['diesel', 21.34, 'SEK', 'fuel'],
+      ['HVO100', 29.74, 'SEK', 'fuel']
+    ]);
+    assert.equal(fuelBody.observations[0]?.source.kind, 'operator');
+    assert.equal(fuelBody.observations[0]?.source.operatorName, 'St1 Sverige AB');
+    assert.equal(fuelBody.sources[0]?.sourceUrl, 'https://st1.se/foretag/listpris');
+
+    const fuelAlias = await handle(new Request('http://localhost/fuel'));
+    assert.equal(fuelAlias.status, 200);
+    assert.equal((await json(fuelAlias) as { domain: string }).domain, 'fuel');
+
     const nutrition = await handle(new Request('http://localhost/api/nutrition/value?metric=protein'));
     assert.equal(nutrition.status, 200);
     const nutritionBody = await json(nutrition) as { metric: string; rows: Array<{ productId: string; valuePer10Sek: number }>; leader: { productId: string } };

@@ -38,6 +38,7 @@ const requiredColumns = [
   'unit_price',
   'member_price',
   'source_type',
+  'domain',
   'confidence_score',
   'barcode',
   'canonical_name',

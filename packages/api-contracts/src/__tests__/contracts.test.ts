@@ -41,6 +41,7 @@ describe('api contract schemas', () => {
       'basketItem',
       'fuelPriceObservation',
       'fuelPriceSource',
+      'fuelPricesResponse',
       'latestPrice',
       'priceObservation',
       'product',
@@ -135,6 +136,10 @@ describe('api contract schemas', () => {
 
   it('publishes OpenAPI-compatible component metadata for price provenance', () => {
     const price = apiContractOpenApiComponents.PriceObservation;
+    const fuel = apiContractOpenApiComponents.FuelPriceObservation;
+    assert.ok(fuel.required.includes('domain'));
+    assert.ok(fuel.required.includes('fuelGrade'));
+    assert.ok(fuel.required.includes('pricePerLitre'));
     assert.ok(price.required.includes('priceType'));
     assert.ok(price.required.includes('confidence'));
     assert.ok(price.required.includes('observedAt'));
