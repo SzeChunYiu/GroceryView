@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 04:26 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 05:27 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **255**
+- **Shipped `feat:`/`wire:` PRs to date:** **250**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,6 +42,9 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1213 feat(ingestion): expose daily chain summaries
+- #1211 feat(products): explain price move notes
+- #1205 feat(ingestion): bound bulk daily runner
 - #1204 feat(compare): add price overlay chart
 - #1197 feat(scanning): add hosted upload smoke
 - #1196 feat(watchlist): add price sparklines
@@ -54,14 +57,10 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1181 feat(scanning): add OpenFoodFacts barcode provider
 - #1179 feat(map): highlight cheapest branch evidence
 - #1178 feat(scanning): add OCR.space receipt provider
-- #1177 feat(ingestion): add Hemkop all-store product prices
-- #1175 feat(mobile): add camera capture screens
-- #1173 feat(scanner): upload captured receipt images
 
 ## 🔄 In progress (open PRs)
 
-- #1206 fix(ingestion): use session pooler for daily writes
-- #1205 feat(ingestion): bound bulk daily runner
+- #1219 feat(products): add faceted search surface
 
 ## 📋 To-do (from GOAL.md backlog)
 
