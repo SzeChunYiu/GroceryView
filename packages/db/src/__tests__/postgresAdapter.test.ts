@@ -1585,6 +1585,110 @@ describe('createPostgresPriceObservationWriter', () => {
     );
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into latest_prices')), false);
   });
+
+  it('upserts connector observation batches idempotently while keeping observations append-only', async () => {
+    class BatchRecordingExecutor implements QueryExecutor {
+      calls: Array<{ sql: string; params: unknown[] }> = [];
+
+      async query<T>(sql: string, params: unknown[] = []) {
+        this.calls.push({ sql, params });
+        const rows = JSON.parse(String(params[0])) as Array<{ ordinal: number }>;
+        return rows.map((row) => ({ ordinal: row.ordinal, id: `observation-${row.ordinal + 1}` })) as T[];
+      }
+    }
+
+    const executor = new BatchRecordingExecutor();
+    const writer = createPostgresPriceObservationWriter(executor);
+
+    assert.deepEqual(
+      await writer.upsertConnectorPriceObservations([
+        {
+          productId: '00000000-0000-0000-0000-000000000001',
+          chainId: '00000000-0000-0000-0000-000000000002',
+          storeId: '00000000-0000-0000-0000-000000000003',
+          sourceRunId: '00000000-0000-0000-0000-000000000004',
+          rawRecordId: '00000000-0000-0000-0000-000000000005',
+          retailerProductRef: 'wil-zoegas-450',
+          priceType: 'online',
+          price: 49.9,
+          regularPrice: 69.9,
+          unitPrice: 110.8889,
+          currency: 'SEK',
+          quantity: 450,
+          quantityUnit: 'g',
+          promotionText: 'Veckans erbjudande',
+          memberRequired: false,
+          observedAt: '2026-05-21T03:17:00.000Z',
+          confidence: 0.95,
+          provenance: { connectorId: 'willys-normalized-json', runKey: 'willys:2026-05-21' }
+        },
+        {
+          productId: '00000000-0000-0000-0000-000000000001',
+          chainId: '00000000-0000-0000-0000-000000000002',
+          storeId: '00000000-0000-0000-0000-000000000003',
+          sourceRunId: '00000000-0000-0000-0000-000000000006',
+          rawRecordId: '00000000-0000-0000-0000-000000000007',
+          retailerProductRef: 'wil-zoegas-450',
+          priceType: 'online',
+          price: 47.9,
+          regularPrice: 69.9,
+          unitPrice: 106.4444,
+          currency: 'SEK',
+          quantity: 450,
+          quantityUnit: 'g',
+          observedAt: '2026-05-22T03:17:00.000Z',
+          confidence: 0.95,
+          provenance: { connectorId: 'willys-normalized-json', runKey: 'willys:2026-05-22' }
+        }
+      ]),
+      { observationIds: ['observation-1', 'observation-2'] }
+    );
+
+    assert.equal(executor.calls.length, 1);
+    assert.match(executor.calls[0]!.sql, /from jsonb_to_recordset\(\$1::jsonb\)/);
+    assert.match(executor.calls[0]!.sql, /partition by product_id, chain_id, store_id, price_type, observed_at, retailer_product_ref/);
+    assert.match(executor.calls[0]!.sql, /join observations on observations\.product_id = ranked_input\.product_id/);
+    assert.match(executor.calls[0]!.sql, /and observations\.retailer_product_ref is not distinct from ranked_input\.retailer_product_ref/);
+    assert.match(executor.calls[0]!.sql, /where input_rank = 1/);
+    assert.match(executor.calls[0]!.sql, /and not exists/);
+    const observationsInsertSql = executor.calls[0]!.sql.slice(
+      executor.calls[0]!.sql.indexOf('insert into observations'),
+      executor.calls[0]!.sql.indexOf('),\n         written as')
+    );
+    assert.doesNotMatch(observationsInsertSql, /on conflict/);
+    assert.match(executor.calls[0]!.sql, /insert into latest_prices/);
+    assert.match(executor.calls[0]!.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
+
+    const payload = JSON.parse(String(executor.calls[0]!.params[0])) as Array<Record<string, unknown>>;
+    assert.deepEqual(payload.map((row) => row.ordinal), [0, 1]);
+    assert.deepEqual(payload[0], {
+      ordinal: 0,
+      product_id: '00000000-0000-0000-0000-000000000001',
+      chain_id: '00000000-0000-0000-0000-000000000002',
+      store_id: '00000000-0000-0000-0000-000000000003',
+      source_run_id: '00000000-0000-0000-0000-000000000004',
+      raw_record_id: '00000000-0000-0000-0000-000000000005',
+      retailer_product_ref: 'wil-zoegas-450',
+      price_type: 'online',
+      price: 49.9,
+      regular_price: 69.9,
+      unit_price: 110.8889,
+      currency: 'SEK',
+      quantity: 450,
+      quantity_unit: 'g',
+      promotion_text: 'Veckans erbjudande',
+      promotion_starts_on: null,
+      promotion_ends_on: null,
+      member_required: false,
+      observed_at: '2026-05-21T03:17:00.000Z',
+      valid_from: null,
+      valid_until: null,
+      confidence: 0.95,
+      provenance: { connectorId: 'willys-normalized-json', runKey: 'willys:2026-05-21' }
+    });
+    assert.equal(payload[1]!.observed_at, '2026-05-22T03:17:00.000Z');
+    assert.equal(payload[1]!.price, 47.9);
+  });
 });
 
 describe('createPostgresPriceReader', () => {

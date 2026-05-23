@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { calculateMealCostBreakdown } from '@groceryview/core';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { mealCostBreakdown } from '@/lib/demo-data';
 import { routeMetadata } from '@/lib/seo';
@@ -15,8 +17,16 @@ function formatPct(value: number) {
   return `${Math.round(value * 100)}%`;
 }
 
+function confidenceLevel(value: number): 'high' | 'medium' | 'low' {
+  if (value >= 0.75) return 'high';
+  if (value >= 0.6) return 'medium';
+  return 'low';
+}
+
 export default function MealCostPage() {
-  const { summary } = mealCostBreakdown;
+  const summary = calculateMealCostBreakdown(mealCostBreakdown.input);
+  const summaryConfidence = summary.cheapestChain?.averageConfidence ?? summary.coverage.minimumConfidence;
+
   return (
     <PageShell>
       <Eyebrow>{mealCostBreakdown.persona}</Eyebrow>
@@ -24,6 +34,13 @@ export default function MealCostPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         GroceryView calls calculateMealCostBreakdown with real ingredient offer rows, package sizes, and serving counts to show exact cost per meal and per serving. Missing chains are excluded instead of estimated.
       </p>
+      <div className="mt-4">
+        <ConfidenceBadge
+          level={confidenceLevel(summaryConfidence)}
+          label={summary.confidenceLabel}
+          sampleSize={summary.coverage.offerCount}
+        />
+      </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <Card className="border-emerald-200 bg-emerald-50">
@@ -62,7 +79,9 @@ export default function MealCostPage() {
                 <p className="text-sm text-slate-600">{row.quantityNeeded} {row.unit} from {row.packageQuantity} {row.packageUnit} package · {row.source}</p>
               </div>
               <p className="font-black text-emerald-800">ingredientCost {formatSek(row.ingredientCost)}</p>
-              <p className="text-sm font-semibold text-slate-600">confidence {formatPct(row.confidence)}</p>
+              <div className="flex items-center md:justify-end">
+                <ConfidenceBadge level={confidenceLevel(row.confidence)} label={`confidence ${formatPct(row.confidence)}`} />
+              </div>
             </Link>
           ))}
         </div>
@@ -78,6 +97,9 @@ export default function MealCostPage() {
               <p className="mt-1 text-sm font-semibold text-slate-700">{chain.coveredIngredients}/{chain.ingredientCount} ingredients · {formatPct(chain.coverageShare)} coverage</p>
               <p className="mt-2 text-2xl font-black text-blue-800">{chain.eligible ? formatSek(chain.totalCost) : 'blocked'}</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">{chain.storeNames.join(', ') || 'No complete store evidence'}</p>
+              <div className="mt-3">
+                <ConfidenceBadge level={confidenceLevel(chain.averageConfidence)} label={`average confidence ${formatPct(chain.averageConfidence)}`} />
+              </div>
             </div>
           ))}
         </div>

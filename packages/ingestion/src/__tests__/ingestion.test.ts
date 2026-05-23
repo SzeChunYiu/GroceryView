@@ -3722,8 +3722,8 @@ class DailyIngestionExecutor implements QueryExecutor {
       return records.map((record) => ({ ordinal: record.ordinal, id: `raw-db-${++this.sequence}` })) as T[];
     }
     if (sql.includes('jsonb_to_recordset') && sql.includes('insert into observations')) {
-      const observations = JSON.parse(String(params[0])) as unknown[];
-      return observations.map(() => ({ id: `observation-db-${++this.sequence}` })) as T[];
+      const observations = JSON.parse(String(params[0])) as Array<{ ordinal: number }>;
+      return observations.map((observation) => ({ ordinal: observation.ordinal, id: `observation-db-${++this.sequence}` })) as T[];
     }
     if (sql.includes('insert into raw_records')) return [{ id: `raw-db-${++this.sequence}` }] as T[];
     if (sql.includes('insert into observations')) return [{ id: `observation-db-${++this.sequence}` }] as T[];

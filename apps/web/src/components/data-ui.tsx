@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { AppNav } from './app-nav';
+import { BottomNav } from './bottom-nav';
 import {
   formatPct,
   formatSek,
@@ -16,7 +17,8 @@ export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
       <AppNav />
-      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 pb-20 sm:px-6 lg:px-8 lg:pb-6">{children}</main>
+      <BottomNav />
     </div>
   );
 }

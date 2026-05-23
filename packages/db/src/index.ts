@@ -471,8 +471,13 @@ export type PriceObservationWriteResult = {
   observationId: string;
 };
 
+export type PriceObservationBatchWriteResult = {
+  observationIds: string[];
+};
+
 export type PostgresPriceObservationWriter = {
   recordPriceObservation(observation: PriceObservationRecord): Promise<PriceObservationWriteResult>;
+  upsertConnectorPriceObservations(observations: PriceObservationRecord[]): Promise<PriceObservationBatchWriteResult>;
 };
 
 export type PriceObservationHistoryRecord = PriceObservationRecord & {
@@ -3460,6 +3465,7 @@ type MigrationVersionRow = { version: string };
 type ProbeIdRow = { id: string };
 type LatestPriceProbeRow = { observation_id: string };
 type ObservationIdRow = { id: string };
+type BatchObservationIdRow = { ordinal: string | number; id: string };
 type SourceRunIdRow = { id: string };
 type RawRecordIdRow = { id: string };
 
@@ -3693,6 +3699,249 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
       );
 
       return { observationId };
+    },
+
+    async upsertConnectorPriceObservations(observations) {
+      if (observations.length === 0) return { observationIds: [] };
+      const rows = await executor.query<BatchObservationIdRow>(
+        `with input as (
+           select *
+           from jsonb_to_recordset($1::jsonb) as x(
+             ordinal int,
+             product_id uuid,
+             chain_id uuid,
+             store_id uuid,
+             source_run_id uuid,
+             raw_record_id uuid,
+             retailer_product_ref text,
+             price_type text,
+             price numeric,
+             regular_price numeric,
+             unit_price numeric,
+             currency char(3),
+             quantity numeric,
+             quantity_unit text,
+             promotion_text text,
+             promotion_starts_on date,
+             promotion_ends_on date,
+             member_required boolean,
+             observed_at timestamptz,
+             valid_from timestamptz,
+             valid_until timestamptz,
+             confidence numeric,
+             provenance jsonb
+           )
+         ),
+         ranked_input as (
+           select input.*,
+                  row_number() over (
+                    partition by product_id, chain_id, store_id, price_type, observed_at, retailer_product_ref
+                    order by ordinal
+                  ) as input_rank
+           from input
+         ),
+         existing as (
+           select distinct on (ranked_input.ordinal)
+                  ranked_input.ordinal,
+                  observations.id,
+                  observations.product_id,
+                  observations.chain_id,
+                  observations.store_id,
+                  observations.price_type,
+                  observations.price,
+                  observations.regular_price,
+                  observations.unit_price,
+                  observations.currency,
+                  observations.observed_at,
+                  observations.confidence,
+                  observations.provenance
+           from ranked_input
+           join observations on observations.product_id = ranked_input.product_id
+             and observations.chain_id = ranked_input.chain_id
+             and observations.store_id is not distinct from ranked_input.store_id
+             and observations.price_type = ranked_input.price_type
+             and observations.observed_at = ranked_input.observed_at
+             and observations.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
+           order by ranked_input.ordinal, observations.created_at, observations.id
+         ),
+         inserted as (
+           insert into observations(
+             product_id,
+             chain_id,
+             store_id,
+             source_run_id,
+             raw_record_id,
+             retailer_product_ref,
+             price_type,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             quantity,
+             quantity_unit,
+             promotion_text,
+             promotion_starts_on,
+             promotion_ends_on,
+             member_required,
+             observed_at,
+             valid_from,
+             valid_until,
+             confidence,
+             provenance
+           )
+           select
+             product_id,
+             chain_id,
+             store_id,
+             source_run_id,
+             raw_record_id,
+             retailer_product_ref,
+             price_type,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             quantity,
+             quantity_unit,
+             promotion_text,
+             promotion_starts_on,
+             promotion_ends_on,
+             member_required,
+             observed_at,
+             valid_from,
+             valid_until,
+             confidence,
+             provenance
+           from ranked_input
+           where input_rank = 1
+             and not exists (
+               select 1
+               from existing
+               where existing.ordinal = ranked_input.ordinal
+             )
+           returning id, product_id, chain_id, store_id, retailer_product_ref, price_type, price, regular_price, unit_price, currency, observed_at, confidence, provenance
+         ),
+         written as (
+           select ranked_input.ordinal,
+                  coalesce(inserted.id, existing.id) as id,
+                  coalesce(inserted.product_id, existing.product_id) as product_id,
+                  coalesce(inserted.chain_id, existing.chain_id) as chain_id,
+                  coalesce(inserted.store_id, existing.store_id) as store_id,
+                  coalesce(inserted.price_type, existing.price_type) as price_type,
+                  coalesce(inserted.price, existing.price) as price,
+                  coalesce(inserted.regular_price, existing.regular_price) as regular_price,
+                  coalesce(inserted.unit_price, existing.unit_price) as unit_price,
+                  coalesce(inserted.currency, existing.currency) as currency,
+                  coalesce(inserted.observed_at, existing.observed_at) as observed_at,
+                  coalesce(inserted.confidence, existing.confidence) as confidence,
+                  coalesce(inserted.provenance, existing.provenance) as provenance
+           from ranked_input
+           left join existing on existing.ordinal = ranked_input.ordinal
+           left join inserted on inserted.product_id = ranked_input.product_id
+             and inserted.chain_id = ranked_input.chain_id
+             and inserted.store_id is not distinct from ranked_input.store_id
+             and inserted.price_type = ranked_input.price_type
+             and inserted.observed_at = ranked_input.observed_at
+             and inserted.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
+           where inserted.id is not null or existing.id is not null
+         ),
+         latest_upsert as (
+           insert into latest_prices(
+             product_id,
+             chain_id,
+             store_id,
+             price_type,
+             observation_id,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             observed_at,
+             confidence,
+             provenance
+           )
+           select
+             product_id,
+             chain_id,
+             store_id,
+             price_type,
+             id,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             observed_at,
+             confidence,
+             provenance
+           from (
+             select distinct on (product_id, chain_id, store_id, price_type)
+               product_id,
+               chain_id,
+               store_id,
+               price_type,
+               id,
+               price,
+               regular_price,
+               unit_price,
+               currency,
+               observed_at,
+               confidence,
+               provenance
+             from written
+             order by product_id, chain_id, store_id, price_type, observed_at desc, id desc
+           ) latest_input
+           on conflict (product_id, chain_id, store_id, price_type) do update set
+             observation_id = excluded.observation_id,
+             price = excluded.price,
+             regular_price = excluded.regular_price,
+             unit_price = excluded.unit_price,
+             currency = excluded.currency,
+             observed_at = excluded.observed_at,
+             confidence = excluded.confidence,
+             provenance = excluded.provenance,
+             updated_at = now()
+           where latest_prices.observed_at <= excluded.observed_at
+           returning 1
+         )
+         select ordinal, id
+         from written
+         order by ordinal`,
+        [JSON.stringify(observations.map((observation, ordinal) => ({
+          ordinal,
+          product_id: observation.productId,
+          chain_id: observation.chainId,
+          store_id: observation.storeId ?? null,
+          source_run_id: observation.sourceRunId ?? null,
+          raw_record_id: observation.rawRecordId ?? null,
+          retailer_product_ref: observation.retailerProductRef ?? null,
+          price_type: observation.priceType,
+          price: observation.price,
+          regular_price: observation.regularPrice ?? null,
+          unit_price: observation.unitPrice,
+          currency: observation.currency ?? 'SEK',
+          quantity: observation.quantity ?? null,
+          quantity_unit: observation.quantityUnit ?? null,
+          promotion_text: observation.promotionText ?? null,
+          promotion_starts_on: observation.promotionStartsOn ?? null,
+          promotion_ends_on: observation.promotionEndsOn ?? null,
+          member_required: observation.memberRequired ?? false,
+          observed_at: observation.observedAt,
+          valid_from: observation.validFrom ?? null,
+          valid_until: observation.validUntil ?? null,
+          confidence: observation.confidence,
+          provenance: observation.provenance
+        })))]
+      );
+      if (rows.length !== observations.length) throw new Error('Connector price observation upsert did not return an id for every input row');
+
+      const idsByOrdinal = new Map(rows.map((row) => [Number(row.ordinal), row.id]));
+      return {
+        observationIds: observations.map((_, ordinal) => {
+          const id = idsByOrdinal.get(ordinal);
+          if (!id) throw new Error(`Connector price observation upsert did not return an id for input row ${ordinal}`);
+          return id;
+        })
+      };
     }
   };
 }
