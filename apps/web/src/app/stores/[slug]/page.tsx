@@ -1,8 +1,11 @@
 import { notFound } from 'next/navigation';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { osmStores } from '@/lib/osm-stores';
 import { findStore, storePricePercentileRankForStore, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
 import { metadataForStore } from '@/lib/seo';
+
+type ConfidenceLevel = 'high' | 'medium' | 'low';
 
 function cohortKeyFor(store: (typeof storeUniverse)[number]) {
   return store.city || store.district || 'kommun not reported';
@@ -26,6 +29,7 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
       coverageLabel: matchedRank.coverageLabel,
       confidenceLabel: matchedRank.confidenceLabel,
       matchedPerBranchObservationCount: matchedRank.matchedPerBranchObservationCount,
+      confidenceLevel: (matchedRank.matchedPerBranchObservationCount >= 30 && matchedRank.regularPriceObservationCount >= 12 ? 'high' : 'medium') satisfies ConfidenceLevel,
       detail:
         `Ranked from ${matchedRank.matchedPerBranchObservationCount.toLocaleString('sv-SE')} per-branch Lidl offer observations matched to ${matchedRank.externalStoreId}. Lower index means the branch has deeper public offer prices versus regular-price baselines.`,
       cohorts: [
@@ -68,6 +72,7 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
     averageRelativeIndexLabel: 'Not reported',
     coverageLabel: `${storePricePercentileRanks.length.toLocaleString('sv-SE')} matched Lidl stores have per-branch offer ranks; this OSM record is not matched.`,
     confidenceLabel: 'coverage blocker',
+    confidenceLevel: 'low',
     matchedPerBranchObservationCount: 0,
     cohorts: [
       {
@@ -158,6 +163,13 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
           <p className="mt-3 rounded-full bg-white px-3 py-2 text-sm font-black text-cyan-900">
             {pricePercentileRank.statusLabel}
           </p>
+          <div className="mt-4">
+            <ConfidenceBadge
+              level={pricePercentileRank.confidenceLevel}
+              label={pricePercentileRank.confidenceLabel}
+              sampleSize={pricePercentileRank.matchedPerBranchObservationCount}
+            />
+          </div>
           <p className="mt-4 leading-7 text-cyan-950">{pricePercentileRank.detail}</p>
           {pricePercentileRank.isRanked ? (
             <div className="mt-4 grid gap-3 md:grid-cols-3">
