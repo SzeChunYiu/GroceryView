@@ -657,6 +657,7 @@ describe('fetchCoopProducts', () => {
         postalCode: storeId === '252700' ? '16867' : '75323',
         latitude: storeId === '252700' ? 59.354 : 59.8456428,
         longitude: storeId === '252700' ? 17.955 : 17.6954236,
+        services: storeId === '252700' ? ['ATG-ombud'] : ['Hämta – beställ och hämta i butiken'],
         weeklyOffersLink: `https://dr.coop.se/butik/${storeId}`,
         url: `/butiker-erbjudanden/coop/${storeId}/`
       }), { status: 200, headers: { 'content-type': 'application/json' } });
@@ -688,6 +689,7 @@ describe('fetchCoopProducts', () => {
       longitude: 17.6954236,
       weeklyOffersLink: 'https://dr.coop.se/butik/251300',
       url: '/butiker-erbjudanden/coop/251300/',
+      supportsOnlineProductPrices: true,
       sourceUrl: buildCoopStoresUrl(),
       retrievedAt: '2026-05-22T11:00:00.000Z'
     });
@@ -2642,10 +2644,10 @@ describe('fetchCoopProductsForAllStores', () => {
         }), { status: 200, headers: { 'content-type': 'application/json' } });
       }
       if (String(url).includes('/stores/251300?')) {
-        return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323' }), { status: 200 });
+        return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323', services: ['ATG-ombud'] }), { status: 200 });
       }
       if (String(url).includes('/stores/016141?')) {
-        return new Response(JSON.stringify({ ledgerAccountNumber: '016141', name: 'Coop Stockholm', city: 'Stockholm', address: 'Sveavägen 1', postalCode: '11157' }), { status: 200 });
+        return new Response(JSON.stringify({ ledgerAccountNumber: '016141', name: 'Coop Stockholm', city: 'Stockholm', address: 'Sveavägen 1', postalCode: '11157', services: ['Hämta – beställ och hämta i butiken'] }), { status: 200 });
       }
       const body = JSON.parse(String(init?.body));
       const storeId = new URL(String(url)).searchParams.get('store');
@@ -2665,16 +2667,15 @@ describe('fetchCoopProductsForAllStores', () => {
 
     const rows = await fetchCoopProductsForAllStores({
       fetchImpl,
-      maxStores: 2,
+      maxStores: 1,
       queries: ['kaffe'],
       maxRowsPerStore: 1,
       retrievedAt: '2026-05-22T13:38:00.000Z'
     });
 
-    assert.equal(rows.length, 2);
-    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['251300', 39.9], ['016141', 42.9]]);
+    assert.equal(rows.length, 1);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['016141', 42.9]]);
     assert.deepEqual(requestedUrls.filter((url) => url.includes('/search/products?')), [
-      buildCoopSearchUrl('251300'),
       buildCoopSearchUrl('016141')
     ]);
   });
@@ -2701,10 +2702,10 @@ describe('fetchCoopProductsForAllStores', () => {
         }), { status: 200, headers: { 'content-type': 'application/json' } });
       }
       if (String(url).includes('/stores/251300?')) {
-        return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323' }), { status: 200 });
+        return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323', services: ['Hämta – beställ och hämta i butiken'] }), { status: 200 });
       }
       if (String(url).includes('/stores/016141?')) {
-        return new Response(JSON.stringify({ ledgerAccountNumber: '016141', name: 'Coop Stockholm', city: 'Stockholm', address: 'Sveavägen 1', postalCode: '11157' }), { status: 200 });
+        return new Response(JSON.stringify({ ledgerAccountNumber: '016141', name: 'Coop Stockholm', city: 'Stockholm', address: 'Sveavägen 1', postalCode: '11157', services: ['Hämta – beställ och hämta i butiken'] }), { status: 200 });
       }
       const storeId = new URL(String(url)).searchParams.get('store');
       if (storeId === '016141') throw new Error('simulated Coop branch timeout');
@@ -4693,7 +4694,7 @@ describe('daily ingestion runner', () => {
           return new Response(JSON.stringify({ stores: [{ ledgerAccountNumber: '251300' }] }), { status: 200, headers: { 'content-type': 'application/json' } });
         }
         if (String(url).includes('/stores/251300?')) {
-          return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323' }), { status: 200 });
+          return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323', services: ['Hämta – beställ och hämta i butiken'] }), { status: 200 });
         }
         assert.equal(JSON.parse(String(init?.body)).query, 'kaffe');
         return new Response(JSON.stringify({ results: { items: [{

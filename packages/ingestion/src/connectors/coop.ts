@@ -76,6 +76,7 @@ export type CoopStore = {
   longitude: number | null;
   weeklyOffersLink: string;
   url: string;
+  supportsOnlineProductPrices: boolean;
   sourceUrl: string;
   retrievedAt: string;
 };
@@ -136,6 +137,7 @@ type CoopStoreResponse = {
   longitude?: unknown;
   weeklyOffersLink?: unknown;
   url?: unknown;
+  services?: unknown;
   flyers?: CoopStoreFlyer[];
 };
 
@@ -577,6 +579,7 @@ export type FetchCoopStoresOptions = {
   storeApiUrl?: string;
   storeApiSubscriptionKey?: string;
   includeDetails?: boolean;
+  onlineProductPricesOnly?: boolean;
   retrievedAt?: string;
 };
 
@@ -713,7 +716,7 @@ export async function fetchCoopStores(options: FetchCoopStoresOptions = {}): Pro
   const summaries = payload.stores ?? [];
   const rows: CoopStore[] = [];
   const seenStoreIds = new Set<string>();
-  const maxSummaries = options.maxRows ? summaries.slice(0, options.maxRows) : summaries;
+  const maxSummaries = options.maxRows && !options.onlineProductPricesOnly ? summaries.slice(0, options.maxRows) : summaries;
   const concurrency = 8;
   for (let index = 0; index < maxSummaries.length; index += concurrency) {
     const batch = maxSummaries.slice(index, index + concurrency);
@@ -737,6 +740,7 @@ export async function fetchCoopStores(options: FetchCoopStoresOptions = {}): Pro
         ? normalizeCoopStore(summary, sourceUrl, retrievedAt)
         : result.value;
       if (!fallbackRow || seenStoreIds.has(fallbackRow.storeId)) continue;
+      if (options.onlineProductPricesOnly && !fallbackRow.supportsOnlineProductPrices) continue;
       seenStoreIds.add(fallbackRow.storeId);
       rows.push(fallbackRow);
       if (options.maxRows && rows.length >= options.maxRows) break;
@@ -884,6 +888,7 @@ export async function fetchCoopProductsForAllStores(
     storeApiUrl: serviceAccess.storeApiUrl,
     storeApiSubscriptionKey: serviceAccess.storeApiSubscriptionKey,
     includeDetails: options.includeStoreDetails,
+    onlineProductPricesOnly: true,
     retrievedAt: options.retrievedAt
   });
   const rows: CoopStoreProduct[] = [];
@@ -1551,9 +1556,18 @@ export function normalizeCoopStore(
     longitude: numberOrNull(store.longitude),
     weeklyOffersLink: text(store.weeklyOffersLink),
     url: text(store.url),
+    supportsOnlineProductPrices: coopStoreSupportsOnlineProductPrices(store),
     sourceUrl,
     retrievedAt
   };
+}
+
+function coopStoreSupportsOnlineProductPrices(store: CoopStoreResponse): boolean {
+  if (!Array.isArray(store.services)) return false;
+  return store.services.some((service) => {
+    const normalized = text(service).toLowerCase();
+    return normalized.includes('hämta') && normalized.includes('beställ');
+  });
 }
 
 export function normalizeCoopWeeklyDiscount(

@@ -41,7 +41,8 @@ const CONNECTOR_TEMPLATES = [
     parserVersion: 'coop-products-native-v1',
     robotsTxtStatus: 'not_applicable',
     legalReviewStatus: 'approved',
-    hasDataAgreement: true
+    hasDataAgreement: true,
+    storeFilter: (store) => store.supportsOnlineProductPrices === true
   },
   {
     connectorId: 'coop-weekly-all-stores',
@@ -99,8 +100,10 @@ export async function printDailyConnectors({ selfTest = false, storesResult } = 
   const storeExport = storesResult ?? await printDailyConnectorStores({ selfTest });
   return CONNECTOR_TEMPLATES.map((template) => {
     const stores = storeExport.storesByChain[template.chainId] ?? [];
-    if (stores.length === 0) throw new Error(`No daily connector stores exported for ${template.chainId}.`);
-    return { ...template, stores };
+    const connectorStores = typeof template.storeFilter === 'function' ? stores.filter(template.storeFilter) : stores;
+    if (connectorStores.length === 0) throw new Error(`No daily connector stores exported for ${template.chainId}.`);
+    const { storeFilter: _storeFilter, ...connector } = template;
+    return { ...connector, stores: connectorStores };
   });
 }
 

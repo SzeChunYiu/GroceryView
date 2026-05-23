@@ -40,6 +40,10 @@ describe('daily connectors export script', () => {
       'city-gross-public-products-all-stores'
     ]);
     assert.equal(connectors.every((connector) => Array.isArray(connector.stores) && connector.stores.length > 0), true);
+    const coopProductConnector = connectors.find((connector) => connector.connectorId === 'coop-products-all-stores');
+    const coopWeeklyConnector = connectors.find((connector) => connector.connectorId === 'coop-weekly-all-stores');
+    assert.deepEqual(coopProductConnector.stores.map((store) => store.storeId), ['176110']);
+    assert.deepEqual(coopWeeklyConnector.stores.map((store) => store.storeId), ['196183', '176110']);
     assert.deepEqual(connectors.map((connector) => connector.endpointUrl), [
       'groceryview://daily/ica/store-promotions/default-stores',
       'groceryview://daily/willys/products/all-stores',
