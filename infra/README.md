@@ -119,7 +119,7 @@ HOSTED_HTTP_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-http-smoke.json \
   infra/scripts/smoke-hosted-http.sh
 ```
 
-After the hosted database has migrations applied, scan providers are configured, and object storage credentials are populated, run the token-protected PostgreSQL plus scanner readiness smoke:
+After the hosted database has migrations applied, daily ingestion has populated source-run and catalog evidence, scan providers are configured, and object storage credentials are populated, run the token-protected production readiness smoke:
 
 ```bash
 GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
@@ -127,9 +127,9 @@ METRICS_TOKEN=replace-with-deployment-token \
   infra/scripts/smoke-hosted-readiness.sh
 ```
 
-The readiness smoke calls `/api/readiness/postgres`, `/api/readiness/scanning`, `/api/readiness/scan-upload-cors`, `/api/readiness/scan-upload-storage`, and `/api/readiness/scan-upload-write` with `METRICS_TOKEN` and requires ready responses before the deployment can count as database-backed, scanner-provider, scan-upload-CORS, scan-upload-storage, and scan-upload-write smoke evidence.
+The readiness smoke calls `/api/readiness/postgres`, `/api/readiness/source-runs`, `/api/readiness/catalog-coverage`, `/api/readiness/scanning`, `/api/readiness/scan-upload-cors`, `/api/readiness/scan-upload-storage`, and `/api/readiness/scan-upload-write` with `METRICS_TOKEN` and requires ready or complete responses before the deployment can count as database-backed, daily-ingestion, catalog-coverage, scanner-provider, scan-upload-CORS, scan-upload-storage, and scan-upload-write smoke evidence.
 
-Set `HOSTED_READINESS_SMOKE_OUTPUT_PATH` to save passed PostgreSQL, scan-provider, scan-upload-CORS, scan-upload-storage, and scan-upload-write readiness evidence as JSON for release records:
+Set `HOSTED_READINESS_SMOKE_OUTPUT_PATH` to save passed PostgreSQL, source-run, catalog-coverage, scan-provider, scan-upload-CORS, scan-upload-storage, and scan-upload-write readiness evidence as JSON for release records:
 
 ```bash
 GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
