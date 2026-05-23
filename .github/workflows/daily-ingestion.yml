@@ -117,6 +117,7 @@ jobs:
           NODE
 
       - name: Upload production ingestion configuration
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: groceryview-production-ingestion-config
