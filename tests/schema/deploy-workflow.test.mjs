@@ -16,6 +16,12 @@ describe('deploy workflow', () => {
     for (const variable of ['GROCERYVIEW_PRODUCTION_URL', 'GROCERYVIEW_TERMINAL_PRODUCT_ID', 'GROCERYVIEW_SCANNER_USER_ID', 'SUPABASE_PROJECT_REF']) {
       assert.match(workflow, new RegExp(`${variable}:\\s*\\$\\{\\{ vars\\.${variable} \\}\\}`));
     }
+    for (const variableBackedRuntime of ['PUBLIC_WEB_URL', 'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN']) {
+      assert.match(
+        workflow,
+        new RegExp(`${variableBackedRuntime}:\\s*\\$\\{\\{ vars\\.${variableBackedRuntime} \\|\\| secrets\\.${variableBackedRuntime} \\}\\}`)
+      );
+    }
     assert.doesNotMatch(workflow, /gh secret list/);
   });
 
@@ -31,14 +37,12 @@ describe('deploy workflow', () => {
       'VERCEL_PROJECT_ID',
       'METRICS_TOKEN',
       'AUTH_SECRET',
-      'PUBLIC_WEB_URL',
       'NOTIFICATION_WEBHOOK_SECRET',
       'BILLING_WEBHOOK_SECRET',
       'STRIPE_SECRET_KEY',
       'STRIPE_PRICE_PREMIUM_MONTHLY',
       'STRIPE_PRICE_PREMIUM_YEARLY',
       'GROCERYVIEW_SCANNER_BEARER_TOKEN',
-      'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
       'CATALOG_COVERAGE_TARGETS_JSON',
       'SUPABASE_ACCESS_TOKEN',
       'REPLACEMENT_DATABASE_URL',
