@@ -27,6 +27,20 @@ Check names without exposing values:
 npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView
 ```
 
+When the production blocker is specifically database recovery or replacement
+cutover, use a focused scope so unrelated deploy/mobile/scanner secrets do not
+hide the actionable DB prerequisites:
+
+```bash
+npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView --scope db-recovery
+npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView --scope db-cutover
+```
+
+`db-recovery` is ready only when `SUPABASE_ACCESS_TOKEN` and
+`SUPABASE_PROJECT_REF` are available. `db-cutover` is ready only when the current
+`DATABASE_URL` plus either `REPLACEMENT_DATABASE_URL` or `CANDIDATE_DATABASE_URL`
+are configured; the full `all` scope remains the default production-wide gate.
+
 ## Generate coverage targets from the live DB
 
 Run this only after the production database has chains and products, and after

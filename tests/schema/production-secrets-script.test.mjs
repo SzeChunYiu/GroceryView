@@ -55,8 +55,9 @@ describe('production secret audit script', () => {
     ]) {
       assert.match(script, new RegExp(`['"]${variable}['"]`));
     }
-    assert.match(script, /process\.argv\.indexOf\('--env'\)/);
+    assert.match(script, /readOption\('--env'\)/);
     assert.match(script, /process\.argv\.includes\('--from-env'\)/);
+    assert.match(script, /readOption\('--scope'\)/);
     assert.match(script, /process\.env\[name\]/);
     assert.match(script, /push\('--env', environment\)/);
     assert.match(script, /new Set\(parseGhList/);
@@ -120,6 +121,66 @@ describe('production secret audit script', () => {
     assert.equal(JSON.stringify(output).includes('postgres://candidate'), false);
     assert.equal(JSON.stringify(output).includes('sbp_secret'), false);
   });
+
+  it('can focus status on DB recovery prerequisites without unrelated deploy blockers', () => {
+    const result = spawnSync(process.execPath, [scriptPath.pathname, '--from-env', '--scope', 'db-recovery'], {
+      encoding: 'utf8',
+      env: {
+        SUPABASE_PROJECT_REF: 'dgsoqwanrkqgdichtgzl'
+      }
+    });
+    assert.equal(result.status, 1);
+    assert.equal(result.stderr, '');
+    const output = JSON.parse(result.stdout);
+    assert.equal(output.scope, 'db-recovery');
+    assert.equal(output.status, 'blocked');
+    assert.deepEqual(output.missingDbRecoverySecrets, ['SUPABASE_ACCESS_TOKEN']);
+    assert.deepEqual(output.missingDbRecoveryVariables, []);
+
+    const readyResult = spawnSync(process.execPath, [scriptPath.pathname, '--from-env', '--scope', 'db-recovery'], {
+      encoding: 'utf8',
+      env: {
+        SUPABASE_PROJECT_REF: 'dgsoqwanrkqgdichtgzl',
+        SUPABASE_ACCESS_TOKEN: 'sbp_secret'
+      }
+    });
+    const readyOutput = JSON.parse(readyResult.stdout);
+    assert.equal(readyResult.status, 0);
+    assert.equal(readyOutput.scope, 'db-recovery');
+    assert.equal(readyOutput.status, 'ready');
+    assert.equal(readyOutput.missingGithubActionSecrets.length > 0, true);
+    assert.equal(readyOutput.missingRuntimeSecrets.length > 0, true);
+  });
+
+  it('can focus status on DB cutover prerequisites and either candidate secret', () => {
+    const result = spawnSync(process.execPath, [scriptPath.pathname, '--from-env', '--scope', 'db-cutover'], {
+      encoding: 'utf8',
+      env: {
+        DATABASE_URL: 'postgres://current'
+      }
+    });
+    assert.equal(result.status, 1);
+    const output = JSON.parse(result.stdout);
+    assert.equal(output.scope, 'db-cutover');
+    assert.equal(output.status, 'blocked');
+    assert.deepEqual(output.missingDbCutoverSecrets, []);
+    assert.deepEqual(output.missingDbCutoverCandidateSecrets, ['REPLACEMENT_DATABASE_URL', 'CANDIDATE_DATABASE_URL']);
+
+    const readyResult = spawnSync(process.execPath, [scriptPath.pathname, '--from-env', '--scope', 'db-cutover'], {
+      encoding: 'utf8',
+      env: {
+        DATABASE_URL: 'postgres://current',
+        REPLACEMENT_DATABASE_URL: 'postgres://replacement'
+      }
+    });
+    const readyOutput = JSON.parse(readyResult.stdout);
+    assert.equal(readyResult.status, 0);
+    assert.equal(readyOutput.scope, 'db-cutover');
+    assert.equal(readyOutput.status, 'ready');
+    assert.deepEqual(readyOutput.missingDbCutoverSecrets, []);
+    assert.deepEqual(readyOutput.missingDbCutoverCandidateSecrets, []);
+  });
+
 
   it('self-test reports missing required secrets', () => {
     const output = execFileSync(process.execPath, [scriptPath.pathname, '--self-test'], { encoding: 'utf8' });
