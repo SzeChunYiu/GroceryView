@@ -145,6 +145,16 @@ type CoopStoresResponse = {
   stores?: CoopStoreResponse[];
 };
 
+type CoopCategoryTreeResponse = {
+  nodes?: CoopCategoryTreeNode[];
+};
+
+type CoopCategoryTreeNode = {
+  code?: unknown;
+  name?: unknown;
+  children?: CoopCategoryTreeNode[];
+};
+
 type CoopStoreFlyer = {
   startDate?: unknown;
   stopDate?: unknown;
@@ -157,6 +167,10 @@ type CoopStoreFlyer = {
 export const COOP_HANDLA_URL = 'https://www.coop.se/handla/';
 export const COOP_PERSONALIZATION_API_URL = 'https://external.api.coop.se/personalization';
 export const COOP_PERSONALIZATION_SEARCH_PATH = 'search/products';
+export const COOP_PERSONALIZATION_BY_ATTRIBUTE_PATH = 'search/entities/by-attribute';
+export const COOP_ECOMMERCE_API_URL = 'https://external.api.coop.se/ecommerce';
+export const COOP_ECOMMERCE_BASE_STORE = 'coop';
+export const COOP_ECOMMERCE_ANONYMOUS_USER = 'anonymous';
 export const COOP_STORE_API_URL = 'https://proxy.api.coop.se/external/store/';
 export const DEFAULT_COOP_STORE_ID = '251300';
 export const DEFAULT_COOP_DEVICE = 'desktop';
@@ -535,18 +549,25 @@ export type FetchCoopProductsOptions = {
 
 export type FetchCoopProductCatalogOptions = Omit<FetchCoopProductsOptions, 'query' | 'maxRows'> & {
   queries?: readonly string[];
+  categoryIds?: readonly string[];
   maxRows?: number;
   maxRowsPerQuery?: number;
+  maxRowsPerCategory?: number;
+  ecommerceApiUrl?: string;
+  ecommerceApiSubscriptionKey?: string;
 };
 
 export type FetchCoopProductsForAllStoresOptions = Omit<FetchCoopProductsOptions, 'storeId' | 'query' | 'maxRows'> & {
   queries?: readonly string[];
+  categoryIds?: readonly string[];
   maxStores?: number;
   maxRowsPerStore?: number;
   includeStoreDetails?: boolean;
   storeApiVersion?: string;
   storeApiUrl?: string;
   storeApiSubscriptionKey?: string;
+  ecommerceApiUrl?: string;
+  ecommerceApiSubscriptionKey?: string;
 };
 
 export type FetchCoopWeeklyDiscountsOptions = {
@@ -594,6 +615,33 @@ export function buildCoopSearchUrl(
   url.searchParams.set('store', storeId);
   url.searchParams.set('device', device);
   url.searchParams.set('direct', 'true');
+  url.searchParams.set('api-version', apiVersion);
+  return url.toString();
+}
+
+
+export function buildCoopCategoryTreeUrl(
+  storeId = DEFAULT_COOP_STORE_ID,
+  apiVersion = DEFAULT_COOP_API_VERSION,
+  ecommerceApiUrl = COOP_ECOMMERCE_API_URL
+): string {
+  const baseUrl = ecommerceApiUrl.endsWith('/') ? ecommerceApiUrl : `${ecommerceApiUrl}/`;
+  const url = new URL(`${COOP_ECOMMERCE_BASE_STORE}/users/${encodeURIComponent(COOP_ECOMMERCE_ANONYMOUS_USER)}/categories/tree/${encodeURIComponent(storeId)}`, baseUrl);
+  url.searchParams.set('api-version', apiVersion);
+  return url.toString();
+}
+
+export function buildCoopCategoryProductsUrl(
+  storeId = DEFAULT_COOP_STORE_ID,
+  device = DEFAULT_COOP_DEVICE,
+  apiVersion = DEFAULT_COOP_API_VERSION,
+  personalizationApiUrl = COOP_PERSONALIZATION_API_URL
+): string {
+  const baseUrl = personalizationApiUrl.endsWith('/') ? personalizationApiUrl : `${personalizationApiUrl}/`;
+  const url = new URL(COOP_PERSONALIZATION_BY_ATTRIBUTE_PATH, baseUrl);
+  url.searchParams.set('store', storeId);
+  url.searchParams.set('device', device);
+  url.searchParams.set('direct', 'false');
   url.searchParams.set('api-version', apiVersion);
   return url.toString();
 }
@@ -770,6 +818,101 @@ async function fetchCoopStoreDetail(input: {
   return await response.json() as CoopStoreResponse;
 }
 
+
+export async function fetchCoopCategoryIds(options: FetchCoopProductCatalogOptions = {}): Promise<string[]> {
+  const fetchImpl = withCoopRequestTimeout(options.fetchImpl ?? fetch);
+  const serviceAccess = options.subscriptionKey || options.ecommerceApiSubscriptionKey
+    ? {
+        ecommerceApiUrl: options.ecommerceApiUrl ?? COOP_ECOMMERCE_API_URL,
+        ecommerceApiSubscriptionKey: options.ecommerceApiSubscriptionKey ?? options.subscriptionKey!,
+        ecommerceApiVersion: options.apiVersion ?? DEFAULT_COOP_API_VERSION
+      }
+    : {
+        ecommerceApiUrl: COOP_ECOMMERCE_API_URL,
+        ecommerceApiSubscriptionKey: (await fetchCoopPublicServiceAccess(fetchImpl)).personalizationApiSubscriptionKey,
+        ecommerceApiVersion: options.apiVersion ?? DEFAULT_COOP_API_VERSION
+      };
+  const sourceUrl = buildCoopCategoryTreeUrl(
+    options.storeId ?? DEFAULT_COOP_STORE_ID,
+    serviceAccess.ecommerceApiVersion,
+    serviceAccess.ecommerceApiUrl
+  );
+  const response = await fetchImpl(sourceUrl, {
+    headers: {
+      accept: 'application/json',
+      'ocp-apim-subscription-key': serviceAccess.ecommerceApiSubscriptionKey,
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+  if (!response.ok) throw new Error(`Coop category tree request failed: ${response.status}`);
+  const payload = await response.json() as CoopCategoryTreeResponse;
+  const ids: string[] = [];
+  const seen = new Set<string>();
+  for (const node of payload.nodes ?? []) {
+    const id = text(node.code);
+    if (!id || !text(node.name) || seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  if (ids.length === 0) throw new Error('Coop category tree had no usable category ids.');
+  return ids;
+}
+
+export async function fetchCoopProductsByCategory(input: FetchCoopProductCatalogOptions & { categoryId: string }): Promise<CoopProduct[]> {
+  const fetchImpl = withCoopRequestTimeout(input.fetchImpl ?? fetch);
+  const maxRows = input.maxRows ?? input.maxRowsPerCategory ?? Number.POSITIVE_INFINITY;
+  const pageSize = input.maxRowsPerCategory ?? 1000;
+  const retrievedAt = input.retrievedAt ?? new Date().toISOString();
+  const serviceAccess = input.subscriptionKey
+    ? {
+        personalizationApiUrl: input.personalizationApiUrl ?? COOP_PERSONALIZATION_API_URL,
+        personalizationApiSubscriptionKey: input.subscriptionKey,
+        personalizationApiVersion: input.apiVersion ?? DEFAULT_COOP_API_VERSION
+      }
+    : await fetchCoopPublicServiceAccess(fetchImpl);
+  const sourceUrl = buildCoopCategoryProductsUrl(
+    input.storeId ?? DEFAULT_COOP_STORE_ID,
+    input.device ?? DEFAULT_COOP_DEVICE,
+    serviceAccess.personalizationApiVersion,
+    serviceAccess.personalizationApiUrl
+  );
+  const rows: CoopProduct[] = [];
+  const seenCodes = new Set<string>();
+  for (let skip = 0; rows.length < maxRows; skip += pageSize) {
+    const take = Math.min(pageSize, Math.max(0, maxRows - rows.length));
+    if (take <= 0) break;
+    const response = await fetchImpl(sourceUrl, {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'ocp-apim-subscription-key': serviceAccess.personalizationApiSubscriptionKey,
+        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+      },
+      body: JSON.stringify({
+        attribute: { name: 'categoryIds', value: input.categoryId },
+        resultsOptions: { skip, take, sortBy: [], facets: [] },
+        customData: { getEntitiesByAttributeABTest: false }
+      })
+    });
+    if (!response.ok) throw new Error(`Coop category product request failed for ${input.categoryId}: ${response.status}`);
+    const textPayload = await response.text();
+    if (!textPayload) break;
+    const payload = JSON.parse(textPayload) as CoopSearchResponse;
+    const products = payload.results?.items ?? [];
+    for (const product of products) {
+      const row = normalizeCoopProduct(product, sourceUrl, retrievedAt);
+      if (!row || seenCodes.has(row.code)) continue;
+      seenCodes.add(row.code);
+      rows.push(row);
+      if (rows.length >= maxRows) return rows;
+    }
+    const total = numberOrNull(payload.results?.count);
+    if (products.length < take || (total !== null && skip + products.length >= total)) break;
+  }
+  return rows;
+}
+
 export async function fetchCoopProducts(options: FetchCoopProductsOptions = {}): Promise<CoopProduct[]> {
   const fetchImpl = withCoopRequestTimeout(options.fetchImpl ?? fetch);
   const query = options.query ?? DEFAULT_COOP_SEARCH_QUERY;
@@ -831,9 +974,7 @@ export async function fetchCoopProductCatalog(
   options: FetchCoopProductCatalogOptions = {}
 ): Promise<CoopProduct[]> {
   const fetchImpl = withCoopRequestTimeout(options.fetchImpl ?? fetch);
-  const queries = options.queries ?? DEFAULT_COOP_PRODUCT_QUERIES;
   const maxRows = options.maxRows ?? Number.POSITIVE_INFINITY;
-  const maxRowsPerQuery = options.maxRowsPerQuery ?? 1000;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const serviceAccess = options.subscriptionKey
     ? {
@@ -845,13 +986,42 @@ export async function fetchCoopProductCatalog(
 
   const rows: CoopProduct[] = [];
   const seenCodes = new Set<string>();
-  for (const query of queries) {
-    const products = await fetchCoopProducts({
+  if (options.queries) {
+    const maxRowsPerQuery = options.maxRowsPerQuery ?? 1000;
+    for (const query of options.queries) {
+      const products = await fetchCoopProducts({
+        fetchImpl,
+        query,
+        maxRows: maxRowsPerQuery,
+        storeId: options.storeId,
+        device: options.device,
+        apiVersion: serviceAccess.personalizationApiVersion,
+        subscriptionKey: serviceAccess.personalizationApiSubscriptionKey,
+        personalizationApiUrl: serviceAccess.personalizationApiUrl,
+        retrievedAt
+      });
+      for (const product of products) {
+        if (seenCodes.has(product.code)) continue;
+        seenCodes.add(product.code);
+        rows.push(product);
+        if (rows.length >= maxRows) return rows;
+      }
+    }
+    return rows;
+  }
+
+  const categoryIds = options.categoryIds ?? await fetchCoopCategoryIds({
+    ...options,
+    fetchImpl,
+    apiVersion: serviceAccess.personalizationApiVersion,
+    subscriptionKey: serviceAccess.personalizationApiSubscriptionKey
+  });
+  for (const categoryId of categoryIds) {
+    const products = await fetchCoopProductsByCategory({
+      ...options,
       fetchImpl,
-      query,
-      maxRows: maxRowsPerQuery,
-      storeId: options.storeId,
-      device: options.device,
+      categoryId,
+      maxRows: Number.isFinite(maxRows) ? Math.max(0, maxRows - rows.length) : undefined,
       apiVersion: serviceAccess.personalizationApiVersion,
       subscriptionKey: serviceAccess.personalizationApiSubscriptionKey,
       personalizationApiUrl: serviceAccess.personalizationApiUrl,
@@ -893,32 +1063,32 @@ export async function fetchCoopProductsForAllStores(
   });
   const rows: CoopStoreProduct[] = [];
   const failures: string[] = [];
-  const queries = options.queries ?? DEFAULT_COOP_PRODUCT_QUERIES;
   const concurrency = 8;
   for (let index = 0; index < stores.length; index += concurrency) {
     const batch = stores.slice(index, index + concurrency);
     const settled = await Promise.allSettled(batch.map(async (store) => {
-      const storeRows: CoopStoreProduct[] = [];
-      for (const query of queries) {
-        const products = await fetchCoopProducts({
-          fetchImpl,
-          query,
-          maxRows: options.maxRowsPerStore ?? 24,
-          storeId: store.storeId,
-          device: options.device,
-          apiVersion: serviceAccess.personalizationApiVersion,
-          subscriptionKey: serviceAccess.personalizationApiSubscriptionKey,
-          personalizationApiUrl: serviceAccess.personalizationApiUrl,
-          retrievedAt: options.retrievedAt
-        });
-        storeRows.push(...products.map((product) => ({
-          ...product,
-          storeId: store.storeId,
-          storeName: store.name,
-          city: store.city
-        })));
-      }
-      return storeRows;
+      const products = await fetchCoopProductCatalog({
+        fetchImpl,
+        queries: options.queries,
+        categoryIds: options.categoryIds,
+        maxRows: options.maxRowsPerStore,
+        maxRowsPerQuery: options.maxRowsPerStore,
+        maxRowsPerCategory: options.maxRowsPerStore,
+        storeId: store.storeId,
+        device: options.device,
+        apiVersion: serviceAccess.personalizationApiVersion,
+        subscriptionKey: serviceAccess.personalizationApiSubscriptionKey,
+        personalizationApiUrl: serviceAccess.personalizationApiUrl,
+        ecommerceApiUrl: options.ecommerceApiUrl,
+        ecommerceApiSubscriptionKey: options.ecommerceApiSubscriptionKey ?? serviceAccess.personalizationApiSubscriptionKey,
+        retrievedAt: options.retrievedAt
+      });
+      return products.map((product) => ({
+        ...product,
+        storeId: store.storeId,
+        storeName: store.name,
+        city: store.city
+      }));
     }));
     for (let offset = 0; offset < settled.length; offset += 1) {
       const result = settled[offset]!;

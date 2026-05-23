@@ -5,6 +5,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
+  buildCoopCategoryProductsUrl,
+  buildCoopCategoryTreeUrl,
   buildCoopSearchUrl,
   buildCoopStoreInfoUrl,
   buildCoopStoresUrl,
@@ -54,7 +56,9 @@ import {
   fetchCityGrossProductsForAllStores,
   fetchCityGrossStores,
   fetchCoopPublicServiceAccess,
+  fetchCoopCategoryIds,
   fetchCoopProducts,
+  fetchCoopProductCatalog,
   fetchCoopProductsForAllStores,
   fetchCoopStores,
   fetchCoopWeeklyDiscounts,
@@ -784,6 +788,88 @@ describe('fetchCoopProducts', () => {
       personalizationApiSubscriptionKey: 'public-page-key',
       personalizationApiVersion: 'v1'
     });
+  });
+
+  it('fetches Coop top-level category ids from the public Hybris category tree', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        nodes: [
+          { code: '16534', name: 'Frukt & grönsaker', children: [{ code: '32361', name: 'Grönsaker' }] },
+          { code: '6262', name: 'Mejeri & ägg', children: [] },
+          { code: '0001', children: [] }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopCategoryIds({
+      fetchImpl,
+      storeId: '251300',
+      subscriptionKey: 'coop-key'
+    });
+
+    assert.deepEqual(requestedUrls, [buildCoopCategoryTreeUrl('251300')]);
+    assert.deepEqual(rows, ['16534', '6262']);
+  });
+
+  it('fetches Coop full branch catalog pages by category id when no query list is supplied', async () => {
+    const requestedUrls: string[] = [];
+    const requestBodies: unknown[] = [];
+    const fetchImpl: typeof fetch = async (url, init) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildCoopCategoryTreeUrl('251300')) {
+        return new Response(JSON.stringify({
+          nodes: [
+            { code: '16534', name: 'Frukt & grönsaker' },
+            { code: '6262', name: 'Mejeri & ägg' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      requestBodies.push(JSON.parse(String(init?.body)));
+      const body = JSON.parse(String(init?.body));
+      const categoryId = body.attribute.value;
+      const skip = body.resultsOptions.skip;
+      return new Response(JSON.stringify({
+        results: {
+          count: categoryId === '16534' ? 2 : 1,
+          items: [{
+            id: categoryId === '16534' && skip === 0 ? '2317401100009' : '7310865005168',
+            ean: categoryId === '16534' && skip === 0 ? '2317401100009' : '7310865005168',
+            name: categoryId === '16534' && skip === 0 ? 'Banan Styck' : 'Svenskt Smör',
+            manufacturerName: categoryId === '16534' && skip === 0 ? 'Coop' : 'Arla',
+            packageSizeInformation: categoryId === '16534' && skip === 0 ? 'ca 180 g' : '500 g',
+            salesPriceData: { b2cPrice: categoryId === '16534' && skip === 0 ? 3.95 : 45 },
+            comparativePriceData: { b2cPrice: categoryId === '16534' && skip === 0 ? 21.94 : 90 },
+            comparativePriceText: 'kr/kg',
+            availableOnline: true,
+            navCategories: [{ name: categoryId === '16534' ? 'Frukt' : 'Smör', superCategories: [] }]
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopProductCatalog({
+      fetchImpl,
+      storeId: '251300',
+      subscriptionKey: 'coop-key',
+      maxRowsPerCategory: 1,
+      retrievedAt: '2026-05-23T09:00:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopCategoryTreeUrl('251300'),
+      buildCoopCategoryProductsUrl('251300'),
+      buildCoopCategoryProductsUrl('251300')
+    ]);
+    assert.deepEqual(requestBodies.map((body) => (body as { attribute: { name: string; value: string } }).attribute), [
+      { name: 'categoryIds', value: '16534' },
+      { name: 'categoryIds', value: '6262' }
+    ]);
+    assert.deepEqual(rows.map((row) => [row.code, row.name, row.price]), [
+      ['2317401100009', 'Banan Styck', 3.95],
+      ['7310865005168', 'Svenskt Smör', 45]
+    ]);
   });
 });
 
