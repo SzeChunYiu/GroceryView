@@ -1,23 +1,80 @@
 'use client';
 
 import Link from 'next/link';
-import { Activity, BarChart3, Database, Map, PackageSearch, Store, Tags } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import { LanguagePreferenceSwitcher } from '@/components/language-preference-switcher';
+import type { LucideIcon } from 'lucide-react';
 import {
-  defaultLocale,
-  localeCookieName,
-  localeStorageKey,
-  localizedShellCopy,
-  normalizeLocale,
-  type SupportedLocale
-} from '@/lib/i18n';
+  BarChart3,
+  ChevronDown,
+  Database,
+  Flame,
+  Heart,
+  ListChecks,
+  Map,
+  PackageSearch,
+  PiggyBank,
+  Search,
+  ShoppingBasket,
+  Store,
+  Tags,
+  Utensils
+} from 'lucide-react';
+import { useEffect } from 'react';
+import { LanguagePreferenceSwitcher } from '@/components/language-preference-switcher';
+import { defaultLocale, localeCookieName, localeStorageKey, normalizeLocale, type SupportedLocale } from '@/lib/i18n';
 
-const copyByLocale = Object.fromEntries(localizedShellCopy.map((copy) => [copy.locale, copy])) as Record<
-  SupportedLocale,
-  (typeof localizedShellCopy)[number]
->;
-const fallbackCopy = copyByLocale[defaultLocale] ?? localizedShellCopy[0];
+type NavItem = {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+};
+
+type NavGroup = {
+  icon: LucideIcon;
+  items: NavItem[];
+  label: string;
+};
+
+const navGroups: NavGroup[] = [
+  {
+    label: 'Markets',
+    icon: BarChart3,
+    items: [
+      { href: '/', label: 'Overview', icon: BarChart3 },
+      { href: '/chain-index', label: 'Chain index', icon: Database },
+      { href: '/categories', label: 'Categories', icon: Tags },
+      { href: '/map', label: 'Heatmap', icon: Flame },
+      { href: '/deals', label: 'Screener', icon: Search }
+    ]
+  },
+  {
+    label: 'Products',
+    icon: PackageSearch,
+    items: [
+      { href: '/products', label: 'Browse', icon: PackageSearch },
+      { href: '/compare', label: 'Compare', icon: ListChecks }
+    ]
+  },
+  {
+    label: 'Stores',
+    icon: Store,
+    items: [
+      { href: '/map', label: 'Map', icon: Map },
+      { href: '/stores', label: 'Stores', icon: Store }
+    ]
+  },
+  {
+    label: 'Personal',
+    icon: Heart,
+    items: [
+      { href: '/savings-dashboard', label: 'Savings', icon: PiggyBank },
+      { href: '/watchlist', label: 'Watchlist', icon: Heart },
+      { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
+      { href: '/meal-planner', label: 'Meal planner', icon: Utensils }
+    ]
+  }
+];
+
+const mobileNavItems = navGroups.flatMap((group) => group.items);
 
 function readPersistedLocale(): SupportedLocale {
   const localStorageLocale = normalizeLocale(window.localStorage.getItem(localeStorageKey));
@@ -35,34 +92,13 @@ function readPersistedLocale(): SupportedLocale {
   return normalizeLocale(cookieLocale) ?? defaultLocale;
 }
 
-function navItemsForLocale(locale: SupportedLocale) {
-  const copy = copyByLocale[locale] ?? fallbackCopy;
-  return [
-    { href: '/', label: copy.nav.overview, icon: BarChart3 },
-    { href: '/products', label: copy.nav.products, icon: PackageSearch },
-    { href: '/compare', label: copy.nav.compare, icon: Tags },
-    { href: '/meal-cost', label: copy.nav.mealCost, icon: Tags },
-    { href: '/catalogue-savings', label: copy.nav.savings, icon: Tags },
-    { href: '/chain-coverage', label: copy.nav.chain, icon: Tags },
-    { href: '/stores', label: copy.nav.stores, icon: Store },
-    { href: '/openprices-depth', label: copy.nav.openPrices, icon: Activity },
-    { href: '/map', label: copy.nav.map, icon: Map },
-    { href: '/categories', label: copy.nav.categories, icon: Database }
-  ];
-}
-
 export function AppNav() {
-  const [locale, setLocale] = useState<SupportedLocale>(defaultLocale);
-  const navItems = useMemo(() => navItemsForLocale(locale), [locale]);
-
   useEffect(() => {
-    const persistedLocale = readPersistedLocale();
-    setLocale(persistedLocale);
-    document.documentElement.lang = persistedLocale;
+    document.documentElement.lang = readPersistedLocale();
 
     function handleLocaleChanged(event: Event) {
       const nextLocale = normalizeLocale((event as CustomEvent<{ locale?: string }>).detail?.locale);
-      if (nextLocale) setLocale(nextLocale);
+      if (nextLocale) document.documentElement.lang = nextLocale;
     }
 
     window.addEventListener('groceryview:locale-changed', handleLocaleChanged);
@@ -81,14 +117,47 @@ export function AppNav() {
         </Link>
         <div className="flex flex-col gap-3 lg:items-end">
           <LanguagePreferenceSwitcher />
-          <div className="flex gap-2 overflow-x-auto pb-1 lg:justify-end lg:pb-0">
-            {navItems.map((item) => {
+          <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden">
+            {mobileNavItems.map((item) => {
               const Icon = item.icon;
               return (
-                <Link className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900" href={item.href} key={item.href}>
+                <Link className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900" href={item.href} key={`${item.href}-${item.label}`}>
                   <Icon className="h-4 w-4" aria-hidden="true" />
                   {item.label}
                 </Link>
+              );
+            })}
+          </div>
+          <div className="hidden gap-2 lg:flex lg:justify-end">
+            {navGroups.map((group) => {
+              const GroupIcon = group.icon;
+              return (
+                <div className="group relative" key={group.label}>
+                  <button
+                    aria-haspopup="true"
+                    className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm font-black text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900 focus:border-emerald-700 focus:text-emerald-900 focus:outline-none"
+                    type="button"
+                  >
+                    <GroupIcon className="h-4 w-4" aria-hidden="true" />
+                    {group.label}
+                    <ChevronDown className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                  <div className="invisible absolute right-0 top-full z-30 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 opacity-0 shadow-xl shadow-slate-900/10 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                    {group.items.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <Link
+                          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-black text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-900 focus:bg-emerald-50 focus:text-emerald-900 focus:outline-none"
+                          href={item.href}
+                          key={`${group.label}-${item.href}-${item.label}`}
+                        >
+                          <Icon className="h-4 w-4 text-slate-500" aria-hidden="true" />
+                          {item.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             })}
           </div>
