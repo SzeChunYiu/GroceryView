@@ -562,6 +562,7 @@ export type FetchCoopWeeklyDiscountsOptions = {
   personalizationApiUrl?: string;
   retrievedAt?: string;
   flyerOfferHints?: readonly CoopFlyerOfferHint[];
+  pdfTextExtractor?: (input: ArrayBuffer) => Promise<string>;
 };
 
 export type FetchCoopAllStoreWeeklyDiscountsOptions = Omit<FetchCoopWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & {
@@ -965,10 +966,14 @@ export async function fetchCoopWeeklyDiscounts(
     }
 
     const store = await storeResponse.json() as CoopStoreResponse;
-    const currentFlyer = store.flyers?.find((flyer) => flyer.current === true && flyer.pdfExists === true && flyer.isHemmaBilaga !== true);
+    const flyers = (store.flyers ?? [])
+      .filter((flyer) => flyer.pdfExists === true && flyer.isHemmaBilaga !== true && text(flyer.pdfUrl))
+      .sort((left, right) => Number(right.current === true) - Number(left.current === true));
+    const currentFlyer = flyers[0];
     if (!currentFlyer) {
       continue;
     }
+    const storeRowCountBeforeProductSearch = rows.length;
 
     const productSearchUrl = buildCoopSearchUrl(
       storeId,
@@ -1029,9 +1034,396 @@ export async function fetchCoopWeeklyDiscounts(
         return rows;
       }
     }
+
+    if (rows.length === storeRowCountBeforeProductSearch) {
+      for (const flyer of flyers) {
+        const pdfRows = await fetchCoopDrPdfWeeklyDiscounts({
+          fetchImpl,
+          flyerUrl: text(flyer.pdfUrl),
+          pdfTextExtractor: options.pdfTextExtractor,
+          retrievedAt,
+          storeId: text(store.ledgerAccountNumber) || storeId,
+          storeName: text(store.name),
+          region: text(store.city),
+          validFrom: text(flyer.startDate),
+          validTo: text(flyer.stopDate),
+          sourceUrl,
+          maxRows: Math.max(0, maxRows - rows.length)
+        });
+        for (const row of pdfRows) {
+          const seenKey = `${row.storeId}:${row.code}`;
+          if (seenStoreCodes.has(seenKey)) continue;
+          seenStoreCodes.add(seenKey);
+          rows.push(row);
+          if (rows.length >= maxRows) return rows;
+        }
+        if (rows.length > storeRowCountBeforeProductSearch) break;
+      }
+    }
   }
 
   return rows;
+}
+
+type FetchCoopDrPdfWeeklyDiscountsInput = {
+  fetchImpl: typeof fetch;
+  flyerUrl: string;
+  pdfTextExtractor?: (input: ArrayBuffer) => Promise<string>;
+  retrievedAt: string;
+  storeId: string;
+  storeName: string;
+  region: string;
+  validFrom: string;
+  validTo: string;
+  sourceUrl: string;
+  maxRows: number;
+};
+
+async function fetchCoopDrPdfWeeklyDiscounts(input: FetchCoopDrPdfWeeklyDiscountsInput): Promise<CoopWeeklyDiscount[]> {
+  if (!input.flyerUrl || input.maxRows <= 0) return [];
+  const response = await input.fetchImpl(input.flyerUrl, {
+    headers: {
+      accept: 'application/pdf,*/*',
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+  if (!response.ok) {
+    return [];
+  }
+  const contentType = response.headers.get('content-type') ?? '';
+  if (contentType && !contentType.toLowerCase().includes('pdf')) {
+    return [];
+  }
+  try {
+    const text = await (input.pdfTextExtractor ?? extractCoopDrPdfText)(await response.arrayBuffer());
+    return parseCoopDrPdfTextOffers(text, {
+      flyerUrl: input.flyerUrl,
+      sourceUrl: input.sourceUrl,
+      productSearchUrl: input.flyerUrl,
+      retrievedAt: input.retrievedAt,
+      storeId: input.storeId,
+      storeName: input.storeName,
+      region: input.region,
+      validFrom: input.validFrom,
+      validTo: input.validTo,
+      maxRows: input.maxRows
+    });
+  } catch {
+    return [];
+  }
+}
+
+export async function extractCoopDrPdfText(input: ArrayBuffer): Promise<string> {
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  const document = await pdfjs.getDocument({ data: new Uint8Array(input) }).promise;
+  const pages: string[] = [];
+  for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
+    const page = await document.getPage(pageNumber);
+    const content = await page.getTextContent();
+    const lines = content.items
+      .map((item) => 'str' in item ? text(item.str) : '')
+      .filter(Boolean);
+    pages.push(lines.join('\n'));
+  }
+  return pages.join('\n');
+}
+
+export type ParseCoopDrPdfTextOffersOptions = {
+  flyerUrl: string;
+  sourceUrl: string;
+  productSearchUrl: string;
+  retrievedAt: string;
+  storeId: string;
+  storeName: string;
+  region: string;
+  validFrom: string;
+  validTo: string;
+  maxRows?: number;
+};
+
+export function parseCoopDrPdfTextOffers(textContent: string, options: ParseCoopDrPdfTextOffersOptions): CoopWeeklyDiscount[] {
+  const lines = textContent
+    .split(/\r?\n|\s+\|\s+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const rows: CoopWeeklyDiscount[] = [];
+  const seen = new Set<string>();
+  const maxRows = options.maxRows ?? Number.POSITIVE_INFINITY;
+
+  for (const chunk of splitCoopDrPdfPages(lines)) {
+    if (rows.length >= maxRows) break;
+    const remainingRows = Math.max(0, maxRows - rows.length);
+    const linearRows = parseCoopDrLinearPdfTextOffers(chunk, options, remainingRows);
+    const sequentialRows = parseCoopDrSequentialPdfTextOffers(chunk, options, remainingRows);
+    const chosenRows = hasCoopDrColumnarOfferPage(chunk) || sequentialRows.length > linearRows.length
+      ? sequentialRows
+      : linearRows;
+    for (const row of chosenRows) {
+      if (seen.has(row.code)) continue;
+      seen.add(row.code);
+      rows.push(row);
+      if (rows.length >= maxRows) break;
+    }
+  }
+
+  return rows;
+}
+
+function parseCoopDrLinearPdfTextOffers(
+  lines: readonly string[],
+  options: ParseCoopDrPdfTextOffersOptions,
+  maxRows: number
+): CoopWeeklyDiscount[] {
+  const rows: CoopWeeklyDiscount[] = [];
+  const seen = new Set<string>();
+
+  for (let index = 0; index < lines.length && rows.length < maxRows; index += 1) {
+    const priceMatch = coopDrOfferPriceAt(lines, index);
+    if (!priceMatch) continue;
+    const nameIndex = findCoopDrOfferNameIndex(lines, index - 1);
+    if (nameIndex === null) continue;
+    const name = lines[nameIndex]!;
+    const packageText = lines
+      .slice(nameIndex + 1, index)
+      .filter((line) => !isCoopDrNonProductLine(line))
+      .join(' ');
+    const code = `dr:${options.storeId}:${stableCoopDrKey(`${name}:${priceMatch.price}:${options.validFrom}`)}`;
+    if (seen.has(code)) continue;
+    seen.add(code);
+    rows.push({
+      code,
+      ean: '',
+      name,
+      brand: '',
+      packageText,
+      ordinaryPrice: priceMatch.ordinaryPrice,
+      ordinaryPriceText: '',
+      offerPrice: priceMatch.price,
+      offerPriceText: `${priceMatch.price.toFixed(2)} SEK`,
+      offerUnitPrice: priceMatch.unitPrice,
+      offerUnitPriceText: priceMatch.unitText,
+      offerMechanicText: `${name} ${priceMatch.displayText}`.trim(),
+      promotionId: `dr:${options.storeId}:${stableCoopDrKey(`${name}:${priceMatch.displayText}:${options.validFrom}`)}`,
+      medMeraRequired: hasNearbyCoopDrMemberPrice(lines, nameIndex, priceMatch.nextIndex),
+      storeId: options.storeId,
+      storeName: options.storeName,
+      region: options.region,
+      validFrom: options.validFrom,
+      validTo: options.validTo,
+      flyerUrl: options.flyerUrl,
+      productSearchUrl: options.productSearchUrl,
+      sourceUrl: options.sourceUrl,
+      retrievedAt: options.retrievedAt
+    });
+    index = Math.max(index, priceMatch.nextIndex - 1);
+  }
+
+  return rows;
+}
+
+function hasCoopDrColumnarOfferPage(lines: readonly string[]): boolean {
+  return splitCoopDrPdfPages(lines).some((chunk) => {
+    const firstPriceIndex = chunk.findIndex((_, index) => coopDrOfferPriceAt(chunk, index) !== null);
+    if (firstPriceIndex < 12) return false;
+    const nameCount = chunk.slice(0, firstPriceIndex).filter(isCoopDrOfferNameCandidate).length;
+    let priceCount = 0;
+    for (let index = firstPriceIndex; index < chunk.length; index += 1) {
+      const price = coopDrOfferPriceAt(chunk, index);
+      if (!price) continue;
+      priceCount += 1;
+      index = Math.max(index, price.nextIndex - 1);
+    }
+    return nameCount >= 3 && priceCount >= 3;
+  });
+}
+
+
+type CoopDrOfferPriceMatch = {
+  price: number;
+  ordinaryPrice: number;
+  unitPrice: number | null;
+  unitText: string;
+  displayText: string;
+  nextIndex: number;
+};
+
+function coopDrOfferPriceAt(lines: readonly string[], index: number): CoopDrOfferPriceMatch | null {
+  const current = lines[index] ?? '';
+  const next = lines[index + 1] ?? '';
+  const nextNext = lines[index + 2] ?? '';
+  const standalone = current.match(/^(\d{1,4})(?::|:-)$/);
+  const coopGlyphStandalone = current.match(/^(\d{1,4})k$/i);
+  if (standalone || coopGlyphStandalone) {
+    const price = Number((standalone ?? coopGlyphStandalone)![1]);
+    if (!Number.isFinite(price)) return null;
+    const unitText = unitTextFromCoopDrLine(next);
+    return {
+      price,
+      ordinaryPrice: price,
+      unitPrice: unitText === '/kg' ? price : null,
+      unitText,
+      displayText: `${current}${unitText ? ` ${unitText}` : ''}`,
+      nextIndex: unitText ? index + 2 : index + 1
+    };
+  }
+
+  if (/^\d{1,4}$/.test(current) && /^\d{2}$/.test(next) && unitTextFromCoopDrLine(nextNext)) {
+    const price = Number(`${current}.${next}`);
+    if (!Number.isFinite(price)) return null;
+    const unitText = unitTextFromCoopDrLine(nextNext);
+    return {
+      price,
+      ordinaryPrice: price,
+      unitPrice: unitText === '/kg' ? price : null,
+      unitText,
+      displayText: `${current}:${next} ${unitText}`,
+      nextIndex: index + 3
+    };
+  }
+
+  if (/^\d{1,4}$/.test(current) && unitTextFromCoopDrLine(next)) {
+    const price = Number(current);
+    if (!Number.isFinite(price)) return null;
+    const unitText = unitTextFromCoopDrLine(next);
+    return {
+      price,
+      ordinaryPrice: price,
+      unitPrice: unitText === '/kg' ? price : null,
+      unitText,
+      displayText: `${current} ${unitText}`,
+      nextIndex: index + 2
+    };
+  }
+
+  return null;
+}
+
+function findCoopDrOfferNameIndex(lines: readonly string[], startIndex: number): number | null {
+  for (let index = startIndex; index >= Math.max(0, startIndex - 8); index -= 1) {
+    const line = lines[index] ?? '';
+    if (!isCoopDrOfferNameCandidate(line)) continue;
+    if (/^[\p{Lu}ÅÄÖ][\p{L}ÅÄÖåäö'’ -]{1,24}\.$/u.test(line)) {
+      const previousLine = lines[index - 1] ?? '';
+      if (isCoopDrOfferNameCandidate(previousLine) && !previousLine.endsWith('.')) return index - 1;
+    }
+    return index;
+  }
+  return null;
+}
+
+function isCoopDrOfferNameCandidate(line: string): boolean {
+  const normalized = line.trim();
+  if (!normalized || isCoopDrNonProductLine(normalized) || /^\d/.test(normalized)) return false;
+  if (normalized === normalized.toUpperCase() && /[A-ZÅÄÖ]{3}/.test(normalized)) return false;
+  if (/^\p{Ll}/u.test(normalized)) return false;
+  if (normalized.length > 48) return false;
+  if (normalized.includes('/')) return false;
+  if (/[.].*[.]/.test(normalized)) return false;
+  if (/\b(ca\s*)?\d+(?:[,.]\d+)?(?:-\d+(?:[,.]\d+)?)?\s*(g|kg|ml|liter|l|st|pack|förp|disk)\b/i.test(normalized)) return false;
+  if (/\b(klass|välj|gäller|fetthalt|fryst|kyld|jfr-pris|ord\. pris|till låga priser)\b/i.test(normalized)) return false;
+  return true;
+}
+
+function parseCoopDrSequentialPdfTextOffers(
+  lines: readonly string[],
+  options: ParseCoopDrPdfTextOffersOptions,
+  maxRows: number
+): CoopWeeklyDiscount[] {
+  const rows: CoopWeeklyDiscount[] = [];
+  for (const chunk of splitCoopDrPdfPages(lines)) {
+    if (rows.length >= maxRows) break;
+    const firstPriceIndex = chunk.findIndex((_, index) => coopDrOfferPriceAt(chunk, index) !== null);
+    if (firstPriceIndex <= 0) continue;
+    const names = chunk.slice(0, firstPriceIndex).filter(isCoopDrOfferNameCandidate);
+    const prices: CoopDrOfferPriceMatch[] = [];
+    for (let index = firstPriceIndex; index < chunk.length; index += 1) {
+      const price = coopDrOfferPriceAt(chunk, index);
+      if (!price) continue;
+      prices.push(price);
+      index = Math.max(index, price.nextIndex - 1);
+    }
+    const rowCount = Math.min(names.length, prices.length, maxRows - rows.length);
+    for (let index = 0; index < rowCount; index += 1) {
+      const name = names[index]!;
+      const price = prices[index]!;
+      const code = `dr:${options.storeId}:${stableCoopDrKey(`${name}:${price.price}:${options.validFrom}`)}`;
+      rows.push({
+        code,
+        ean: '',
+        name,
+        brand: '',
+        packageText: '',
+        ordinaryPrice: price.ordinaryPrice,
+        ordinaryPriceText: '',
+        offerPrice: price.price,
+        offerPriceText: `${price.price.toFixed(2)} SEK`,
+        offerUnitPrice: price.unitPrice,
+        offerUnitPriceText: price.unitText,
+        offerMechanicText: `${name} ${price.displayText}`.trim(),
+        promotionId: `dr:${options.storeId}:${stableCoopDrKey(`${name}:${price.displayText}:${options.validFrom}`)}`,
+        medMeraRequired: chunk.some((line) => line.trim().toLowerCase() === 'medlemspris'),
+        storeId: options.storeId,
+        storeName: options.storeName,
+        region: options.region,
+        validFrom: options.validFrom,
+        validTo: options.validTo,
+        flyerUrl: options.flyerUrl,
+        productSearchUrl: options.productSearchUrl,
+        sourceUrl: options.sourceUrl,
+        retrievedAt: options.retrievedAt
+      });
+    }
+  }
+  return rows;
+}
+
+function splitCoopDrPdfPages(lines: readonly string[]): string[][] {
+  const chunks: string[][] = [];
+  let current: string[] = [];
+  for (const line of lines) {
+    if (/^c[anx]_\d+_/i.test(line) && current.length > 0) {
+      chunks.push(current);
+      current = [];
+      continue;
+    }
+    current.push(line);
+  }
+  if (current.length > 0) chunks.push(current);
+  return chunks;
+}
+
+function unitTextFromCoopDrLine(line: string): string {
+  const normalized = line.trim().toLowerCase();
+  if (/^\/(st|kg|ask|förp|liter|l|hg|påse|frp)$/.test(normalized)) return normalized;
+  return '';
+}
+
+function isCoopDrNonProductLine(line: string): boolean {
+  const normalized = line.trim().toLowerCase();
+  return (
+    normalized.length <= 1 ||
+    normalized.startsWith('jfr-pris') ||
+    normalized.startsWith('ord. pris') ||
+    normalized.startsWith('tidigare lägsta pris') ||
+    normalized.startsWith('du sparar') ||
+    normalized === 'medlemspris' ||
+    normalized.startsWith('max ') ||
+    normalized.includes('välkommen till') ||
+    normalized.includes('erbjudanden för') ||
+    normalized.includes('missa inte') ||
+    normalized.includes('veckans bästa') ||
+    normalized.startsWith('cx_') ||
+    unitTextFromCoopDrLine(normalized) !== ''
+  );
+}
+
+function hasNearbyCoopDrMemberPrice(lines: readonly string[], nameIndex: number, nextIndex: number): boolean {
+  return lines.slice(nameIndex, Math.min(lines.length, nextIndex + 4)).some((line) => line.trim().toLowerCase() === 'medlemspris');
+}
+
+function stableCoopDrKey(value: string): string {
+  const slug = value.trim().toLowerCase().replace(/[^a-z0-9åäö]+/g, '-').replace(/^-|-$/g, '');
+  return slug || 'offer';
 }
 
 export async function fetchCoopWeeklyDiscountsForAllStores(
