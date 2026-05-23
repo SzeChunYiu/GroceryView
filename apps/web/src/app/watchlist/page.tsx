@@ -1,16 +1,63 @@
 import Link from 'next/link';
+import { buildWatchlistAlerts, planNotifications, type NotificationPreferences } from '@groceryview/core';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
-import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, watchlistAlertBoard, watchlistAlertInputs, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
+import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, watchlistAlertInputs, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+
+type ConfidenceLevel = 'high' | 'medium' | 'low';
+type WatchlistAlert = ReturnType<typeof buildWatchlistAlerts>[number];
+
+const notificationNow = '2026-05-22T10:00:00.000Z';
+const notificationPreferences: NotificationPreferences = {
+  channels: ['email', 'push'],
+  enabledTypes: ['target_price', 'stock_up_opportunity'],
+  quietHours: { startHour: 21, endHour: 7, timezone: 'Europe/Stockholm' }
+};
 
 export function generateMetadata() {
   return routeMetadata('/watchlist');
 }
 
+function productForAlert(productId: string) {
+  return watchlistAlertInputs.products.find((product) => product.productId === productId);
+}
+
+function watchlistItemForAlert(productId: string) {
+  return watchlistAlertInputs.watchlist.find((item) => item.productId === productId);
+}
+
 function priceSource(productId: string) {
-  return watchlistAlertInputs.products.find((product) => product.productId === productId)?.source ?? 'visible price row';
+  return productForAlert(productId)?.source ?? 'visible price row';
+}
+
+function priceRowCount(productId: string) {
+  return productForAlert(productId)?.prices?.length ?? 0;
+}
+
+function confidenceForProduct(productId: string): ConfidenceLevel {
+  const product = productForAlert(productId);
+  const rows = product?.prices?.length ?? 0;
+  if (!product || rows === 0) return 'low';
+  if (rows >= 2) return 'high';
+  return 'medium';
+}
+
+function confidenceForCoverage(priceRows: number, alertCount: number): ConfidenceLevel {
+  if (priceRows >= 6 && alertCount > 0) return 'high';
+  if (priceRows > 0 && alertCount > 0) return 'medium';
+  return 'low';
+}
+
+function notificationEventForAlert(alert: WatchlistAlert) {
+  return {
+    type: alert.type === 'target_price' ? 'target_price' as const : 'stock_up_opportunity' as const,
+    title: alert.productName,
+    body: alert.message,
+    priority: alert.severity === 'urgent' ? 'high' as const : 'normal' as const
+  };
 }
 
 function formatSek(value: number) {
@@ -18,6 +65,16 @@ function formatSek(value: number) {
 }
 
 export default function WatchlistPage() {
+  const watchlistAlerts = buildWatchlistAlerts(watchlistAlertInputs);
+  const plannedNotifications = planNotifications({
+    now: notificationNow,
+    preferences: notificationPreferences,
+    events: watchlistAlerts.map(notificationEventForAlert)
+  });
+  const watchedProducts = watchlistAlertInputs.watchlist.length;
+  const eligiblePriceRows = watchlistAlertInputs.products.reduce((sum, product) => sum + (product.prices?.length ?? 0), 0);
+  const coverageConfidence = confidenceForCoverage(eligiblePriceRows, watchlistAlerts.length);
+
   return (
     <PageShell>
       <Eyebrow>Watchlist price alerts</Eyebrow>
@@ -29,41 +86,47 @@ export default function WatchlistPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Watched products</p>
-          <p className="mt-2 text-5xl font-black text-slate-950">{watchlistAlertBoard.coverage.watchedProducts}</p>
-          <p className="mt-3 font-semibold text-slate-700">filtered against {watchlistAlertBoard.coverage.eligiblePriceRows} visible price rows.</p>
+          <p className="mt-2 text-5xl font-black text-slate-950">{watchedProducts}</p>
+          <p className="mt-3 font-semibold text-slate-700">filtered against {eligiblePriceRows} visible price rows.</p>
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Active alerts</p>
-          <p className="mt-2 text-5xl font-black text-emerald-800">{watchlistAlertBoard.alerts.length}</p>
+          <p className="mt-2 text-5xl font-black text-emerald-800">{watchlistAlerts.length}</p>
           <p className="mt-3 font-semibold text-slate-700">target price, Deal Score, and new-low signals only when core rules pass.</p>
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Planned notifications</p>
-          <p className="mt-2 text-5xl font-black text-slate-950">{watchlistAlertBoard.plannedNotifications.length}</p>
-          <p className="mt-3 font-semibold text-slate-700">email + push rows generated by planNotifications.</p>
+          <p className="mt-2 text-5xl font-black text-slate-950">{plannedNotifications.length}</p>
+          <div className="mt-3">
+            <ConfidenceBadge level={coverageConfidence} label={`${coverageConfidence} alert confidence`} sampleSize={eligiblePriceRows} />
+          </div>
         </Card>
       </div>
 
       <Card className="mt-6">
         <h2 className="text-2xl font-black">Alert board</h2>
         <div className="mt-4 space-y-3">
-          {watchlistAlertBoard.alerts.map((alert, index) => (
+          {watchlistAlerts.map((alert, index) => (
             <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${alert.productId}`} key={`${alert.productId}-${alert.type}-${index}`}>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-xl font-black text-slate-950">{alert.productName}</p>
                   <p className="mt-1 text-sm text-slate-600">{alert.message}</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-700">{priceSource(alert.productId)}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <ConfidenceBadge level={confidenceForProduct(alert.productId)} label={`${confidenceForProduct(alert.productId)} source confidence`} sampleSize={priceRowCount(alert.productId)} />
+                    <span className="text-sm font-semibold text-slate-700">{priceSource(alert.productId)}</span>
+                  </div>
                 </div>
                 <div className="text-right">
                   <p className={`text-2xl font-black ${alert.severity === 'urgent' ? 'text-rose-700' : 'text-emerald-800'}`}>{alert.severity}</p>
                   <p className="text-sm font-semibold capitalize text-slate-600">{alert.type.replaceAll('_', ' ')}</p>
                 </div>
               </div>
-              <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-3">
+              <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-4">
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Metric: {alert.trigger.metric}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Store: {alert.trigger.storeName}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Value: {String(alert.trigger.value)}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Target: {watchlistItemForAlert(alert.productId)?.targetPrice ? formatSek(watchlistItemForAlert(alert.productId)!.targetPrice!) : 'No target'}</p>
               </div>
             </Link>
           ))}
@@ -197,9 +260,9 @@ export default function WatchlistPage() {
 
       <Card className="mt-6">
         <h2 className="text-2xl font-black">Notification plan</h2>
-        <p className="mt-2 text-sm font-semibold text-slate-600">{watchlistAlertBoard.coverage.caveat}</p>
+        <p className="mt-2 text-sm font-semibold text-slate-600">Alerts use visible price rows and allowed price-type filters; rows without the requested price type are excluded instead of estimated.</p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {watchlistAlertBoard.plannedNotifications.map((notification, index) => (
+          {plannedNotifications.map((notification, index) => (
             <div className="rounded-2xl bg-slate-50 p-4" key={`${notification.title}-${notification.channel}-${index}`}>
               <p className="font-black">{notification.title}</p>
               <p className="mt-1 text-sm text-slate-600">{notification.channel} · {notification.type} · {notification.priority}</p>
