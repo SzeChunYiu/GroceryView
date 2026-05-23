@@ -201,6 +201,7 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.equal(isTransientDailyDatabaseError(new Error('Failed to connect to database: {"error":"econnrefused"}')), true);
     assert.equal(isTransientDailyDatabaseError(new Error('Failed to connect to database: {:error, :db_connection_closed_in_auth} 08006')), true);
     assert.equal(isTransientDailyDatabaseError(new Error('57P03: the database system is not accepting connections DETAIL: Hot standby mode is disabled.')), true);
+    assert.equal(isTransientDailyDatabaseError(new Error('(EAUTHQUERY) authentication query failed: connection to database not available XX000')), true);
   });
 
   it('classifies Supabase pooler auth-closed and hot-standby failures as actionable blockers', async () => {
@@ -245,5 +246,39 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.equal(hotStandby.status, 'blocked');
     assert.deepEqual(hotStandby.blockers, ['database_not_accepting_connections']);
     assert.match(hotStandby.error, /Hot standby mode is disabled/);
+  });
+
+  it('classifies Supabase pooler database-unavailable auth query failures without overstating attempts', async () => {
+    let attempts = 0;
+    class SupabaseDatabaseUnavailablePool {
+      async query() {
+        attempts += 1;
+        const error = new Error('(EAUTHQUERY) authentication query failed: connection to database not available XX000');
+        error.code = 'EAUTHQUERY';
+        throw error;
+      }
+
+      async end() {}
+    }
+
+    const result = await checkDailyDatabaseConnectivity(
+      {
+        DATABASE_URL: 'postgres://postgres.dgsoqwanrkqgdichtgzl:super-secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres',
+        GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: '2',
+        GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS: '0',
+        GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS: '1',
+        GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS: '1'
+      },
+      { Pool: SupabaseDatabaseUnavailablePool, sleep: async () => {} }
+    );
+
+    assert.equal(result.status, 'blocked');
+    assert.equal(result.attempts, 2);
+    assert.deepEqual(result.blockers, ['supabase_pooler_database_unavailable']);
+    assert.equal(result.alternateConnections[0].name, 'supabase_transaction_pooler');
+    assert.deepEqual(result.alternateConnections[0].blockers, ['supabase_pooler_database_unavailable']);
+    assert.equal(result.alternateConnections[1].name, 'supabase_direct_host');
+    assert.deepEqual(result.alternateConnections[1].blockers, ['supabase_pooler_database_unavailable']);
+    assert.equal(attempts, 4);
   });
 });

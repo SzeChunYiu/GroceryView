@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 
 const rootPackage = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
 const rootTsconfig = JSON.parse(readFileSync(new URL('../../tsconfig.json', import.meta.url), 'utf8'));
@@ -9,7 +9,48 @@ const readPackage = (path) => JSON.parse(readFileSync(new URL(`../../${path}/pac
 const packages = {
   api: readPackage('packages/api'),
   server: readPackage('packages/server'),
-  mobile: readPackage('apps/mobile')
+  mobile: readPackage('apps/mobile'),
+  web: readPackage('apps/web')
+};
+
+const repoRoot = new URL('../..', import.meta.url);
+
+const collectSourceFiles = (dirUrl) => {
+  const entries = readdirSync(dirUrl, { withFileTypes: true });
+  return entries.flatMap((entry) => {
+    const entryPath = new URL(`${entry.name}${entry.isDirectory() ? '/' : ''}`, dirUrl);
+    if (entry.isDirectory()) {
+      return collectSourceFiles(entryPath);
+    }
+
+    if (!/\.(ts|tsx|mjs|js)$/.test(entry.name)) {
+      return [];
+    }
+
+    return [entryPath];
+  });
+};
+
+const workspacePackageImportsFrom = (sourceDir) => {
+  const imports = new Set();
+  for (const file of collectSourceFiles(new URL(sourceDir, repoRoot))) {
+    if (!statSync(file).isFile()) {
+      continue;
+    }
+
+    const source = readFileSync(file, 'utf8');
+    const patterns = [
+      /\bfrom\s+['"](@groceryview\/[^'"/]+)['"]/g,
+      /\bimport\s*\(\s*['"](@groceryview\/[^'"/]+)['"]\s*\)/g
+    ];
+    for (const pattern of patterns) {
+      for (const match of source.matchAll(pattern)) {
+        imports.add(match[1]);
+      }
+    }
+  }
+
+  return [...imports].sort();
 };
 
 describe('workspace package scripts', () => {
@@ -53,5 +94,16 @@ describe('workspace package scripts', () => {
     ]) {
       assert.deepEqual(paths[`@groceryview/${workspace}`], [`packages/${workspace}/src/index.ts`]);
     }
+  });
+
+  it('declares every local workspace package imported by the web app', () => {
+    const declared = new Set(Object.keys(packages.web.dependencies ?? {}));
+    const localImports = workspacePackageImportsFrom('apps/web/src/');
+
+    assert.deepEqual(
+      localImports.filter((packageName) => !declared.has(packageName)),
+      [],
+      'apps/web/package.json must declare every @groceryview/* package imported by apps/web/src'
+    );
   });
 });
