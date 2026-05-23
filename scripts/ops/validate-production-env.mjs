@@ -20,6 +20,17 @@ export const requiredEnvNames = [
   'CATALOG_COVERAGE_TARGETS_JSON'
 ];
 
+export const requiredDailyIngestionEnvNames = [
+  'AUTH_SECRET',
+  'DATABASE_URL',
+  'PUBLIC_WEB_URL',
+  'NOTIFICATION_WEBHOOK_SECRET',
+  'BILLING_WEBHOOK_SECRET',
+  'METRICS_TOKEN',
+  'GROCERYVIEW_SERVER_URL',
+  'CATALOG_COVERAGE_TARGETS_JSON'
+];
+
 function readJsonValue(env, name) {
   const raw = env[name];
   if (raw?.trim()) return raw;
@@ -107,8 +118,10 @@ function validateConnectorStoreCoverage(connectorStoreIds, targetStores) {
   return targetStores.length;
 }
 
-export function validateProductionEnv(env) {
-  const missingEnv = requiredEnvNames.filter((name) => !env[name]?.trim());
+export function validateProductionEnv(env, options = {}) {
+  const scope = options.scope === 'daily-ingestion' ? 'daily-ingestion' : 'production';
+  const requiredNames = scope === 'daily-ingestion' ? requiredDailyIngestionEnvNames : requiredEnvNames;
+  const missingEnv = requiredNames.filter((name) => !env[name]?.trim());
   if (!env.GROCERYVIEW_DAILY_CONNECTORS_JSON?.trim() && !env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE?.trim()) {
     missingEnv.push('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE');
   }
@@ -170,7 +183,9 @@ function selfTestEnv() {
 
 if (import.meta.url === new URL(process.argv[1], 'file:').href) {
   try {
-    const result = validateProductionEnv(process.argv.includes('--self-test') ? selfTestEnv() : process.env);
+    const scopeIndex = process.argv.indexOf('--scope');
+    const scope = scopeIndex >= 0 ? process.argv[scopeIndex + 1] : undefined;
+    const result = validateProductionEnv(process.argv.includes('--self-test') ? selfTestEnv() : process.env, { scope });
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
