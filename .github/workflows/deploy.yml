@@ -37,6 +37,7 @@ jobs:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_PRICE_PREMIUM_MONTHLY: ${{ secrets.STRIPE_PRICE_PREMIUM_MONTHLY }}
           STRIPE_PRICE_PREMIUM_YEARLY: ${{ secrets.STRIPE_PRICE_PREMIUM_YEARLY }}
+          GROCERYVIEW_SCANNER_BEARER_TOKEN: ${{ secrets.GROCERYVIEW_SCANNER_BEARER_TOKEN }}
           CATALOG_COVERAGE_TARGETS_JSON: ${{ secrets.CATALOG_COVERAGE_TARGETS_JSON }}
         run: npm run ops:check-production-secrets -- --from-env
       - name: Run tests
@@ -71,6 +72,13 @@ jobs:
           READINESS_TIMEOUT_SECONDS: '20'
           HOSTED_READINESS_SMOKE_OUTPUT_PATH: artifacts/deploy-hosted-readiness-smoke.json
         run: infra/scripts/smoke-hosted-readiness.sh
+      - name: Run post-deploy scanner upload smoke
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          GROCERYVIEW_SCANNER_USER_ID: ${{ vars.GROCERYVIEW_SCANNER_USER_ID }}
+          GROCERYVIEW_SCANNER_BEARER_TOKEN: ${{ secrets.GROCERYVIEW_SCANNER_BEARER_TOKEN }}
+          HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH: artifacts/deploy-hosted-scanner-upload-smoke.json
+        run: node infra/scripts/smoke-hosted-scanner-upload.mjs
       - name: Upload deploy smoke evidence
         if: always()
         uses: actions/upload-artifact@v4

@@ -34,6 +34,7 @@ describe('deploy workflow', () => {
       'STRIPE_SECRET_KEY',
       'STRIPE_PRICE_PREMIUM_MONTHLY',
       'STRIPE_PRICE_PREMIUM_YEARLY',
+      'GROCERYVIEW_SCANNER_BEARER_TOKEN',
       'CATALOG_COVERAGE_TARGETS_JSON'
     ]) {
       assert.match(workflow, new RegExp(`${secret}:\\s*\\$\\{\\{ secrets\\.${secret} \\}\\}`));
@@ -46,8 +47,10 @@ describe('deploy workflow', () => {
     assert.match(workflow, /npx\s+--yes\s+vercel@latest\s+deploy\s+--prebuilt\s+--prod\s+--token\s+"\$VERCEL_TOKEN"/);
     assert.match(workflow, /infra\/scripts\/smoke-hosted-http\.sh/);
     assert.match(workflow, /infra\/scripts\/smoke-hosted-readiness\.sh/);
+    assert.match(workflow, /infra\/scripts\/smoke-hosted-scanner-upload\.mjs/);
     assert.match(workflow, /HOSTED_HTTP_SMOKE_OUTPUT_PATH:\s*artifacts\/deploy-hosted-http-smoke\.json/);
     assert.match(workflow, /HOSTED_READINESS_SMOKE_OUTPUT_PATH:\s*artifacts\/deploy-hosted-readiness-smoke\.json/);
+    assert.match(workflow, /HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH:\s*artifacts\/deploy-hosted-scanner-upload-smoke\.json/);
     assert.match(workflow, /actions\/upload-artifact@v4/);
     assert.doesNotMatch(workflow, /Provider-specific deploy command intentionally not wired/);
   });

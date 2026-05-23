@@ -10,7 +10,8 @@ export const requiredGithubActionSecrets = [
   'VERCEL_TOKEN',
   'VERCEL_ORG_ID',
   'VERCEL_PROJECT_ID',
-  'METRICS_TOKEN'
+  'METRICS_TOKEN',
+  'GROCERYVIEW_SCANNER_BEARER_TOKEN'
 ];
 
 export const requiredRuntimeSecrets = [
