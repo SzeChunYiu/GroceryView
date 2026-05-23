@@ -397,6 +397,84 @@ export const watchlistHeartProducts = watchlistHeartSourceRows.map(({ product, c
 
 const groceryObservationCount = pricedProducts.reduce((sum, product) => sum + product.observationCount, 0);
 
+export const pharmacyCategoryNeedles = [
+  'suncare',
+  'sunscreen',
+  'sun-protections',
+  'facial-creams',
+  'facial-sunscreens',
+  'aloe-vera',
+  'body-lotion',
+  'bodylotion',
+  'skin-care',
+  'personal-care',
+  'supplements'
+];
+
+const pharmacyBrandNeedles = [
+  'apoteket',
+  'aco',
+  'eucerin',
+  'cerave',
+  'la roche',
+  'vichy',
+  'nivea sun',
+  'locobase',
+  'idomin',
+  'miniderm',
+  'bepanthen'
+];
+
+function pharmacyOtcEvidenceFor(product: (typeof pricedProducts)[number]) {
+  const categoryText = [product.category, ...product.categories].join(' ').toLowerCase();
+  const brandText = product.brands.toLowerCase();
+  const nameText = product.name.toLowerCase();
+  const categoryEvidence = pharmacyCategoryNeedles.find((needle) => categoryText.includes(needle));
+  const brandEvidence = pharmacyBrandNeedles.find((needle) => brandText.includes(needle) || nameText.includes(needle));
+
+  if (!categoryEvidence && !brandEvidence) return null;
+  return categoryEvidence
+    ? `category:${categoryEvidence}`
+    : `brand/name:${brandEvidence}`;
+}
+
+const pharmacyOtcEvidenceRows = pricedProducts
+  .map((product) => ({ product, evidence: pharmacyOtcEvidenceFor(product) }))
+  .filter((row): row is { product: (typeof pricedProducts)[number]; evidence: string } => row.evidence !== null)
+  .sort((left, right) => {
+    const observationDelta = right.product.observationCount - left.product.observationCount;
+    if (observationDelta !== 0) return observationDelta;
+    return right.product.lastObservedAt.localeCompare(left.product.lastObservedAt);
+  });
+
+export const pharmacyOtcEvidenceBoard = {
+  title: 'OTC pharmacy evidence lane',
+  source: 'OpenPrices + OpenBeautyFacts',
+  productCount: pharmacyOtcEvidenceRows.length,
+  observationCount: pharmacyOtcEvidenceRows.reduce((sum, row) => sum + row.product.observationCount, 0),
+  rows: pharmacyOtcEvidenceRows.slice(0, 8).map(({ product, evidence }) => ({
+    slug: product.slug,
+    code: product.code,
+    name: product.name,
+    brand: product.brands || 'Brand not reported',
+    image: product.image,
+    priceMin: product.priceMin,
+    priceMedian: product.priceMedian,
+    priceMax: product.priceMax,
+    observationCount: product.observationCount,
+    lastObservedAt: product.lastObservedAt,
+    evidence,
+    confidence: product.observationCount >= 2
+      ? 'public observed price history'
+      : 'single public observation'
+  })),
+  guardrails: [
+    'OpenPrices + OpenBeautyFacts rows are public OTC, supplement, suncare, or health/beauty product observations only.',
+    'This is not a pharmacy-chain comparison: no cheapest pharmacy, stock, online-vs-in-store, prescription, or medical advice claim is shown.',
+    'domain=pharmacy connector observations are still required before pharmacy alerts or cross-pharmacy history render.'
+  ]
+};
+
 export const multiVerticalDomainFoundation = SUPPORTED_PRICE_DOMAINS.map((domain) => ({
   slug: domain.slug,
   label: domain.label,
@@ -422,12 +500,12 @@ export const multiVerticalDomainFoundation = SUPPORTED_PRICE_DOMAINS.map((domain
     ? 'Grocery can render verified price observations with source confidence.'
     : domain.slug === 'fuel'
       ? 'Fuel renders only source-backed operator observations; no crowd rows are shown yet.'
-      : 'No non-grocery prices are rendered until connector observations land.',
+      : 'No domain=pharmacy connector observations yet; public OTC evidence is separated from pharmacy-chain claims.',
   migrationFields: ['chains.domain', 'stores.domain', 'products.domain', 'observations.domain', 'latest_prices.domain'],
   schemaDefault: "domain default 'grocery'",
   guardrails: [
     "Existing GroceryView rows default to domain='grocery'.",
-    'Fuel and pharmacy routes may show supported item and location models, but must not show prices before domain-scoped observations exist.',
+    'Fuel and pharmacy routes may show supported item and location models, but must not show chain prices before domain-scoped observations exist.',
     'Fuel price rows must carry domain=fuel, price per litre, grade id, and operator or trusted crowd provenance.',
     'Non-grocery matching remains domain-scoped: fuel grades are not compared to grocery EANs, and pharmacy OTC rows exclude prescription claims.'
   ]

@@ -23,6 +23,7 @@ import {
   marketHeatmapTiles,
   memberOfferAggregationBoard,
   openPriceObservationDepth,
+  pharmacyOtcEvidenceBoard,
   priceDropMoversBoard,
   privateLabelDupeFinder,
   privateFeatureCopy,
@@ -47,6 +48,7 @@ const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
 const homepageMarketHeatmap = marketHeatmapTiles.slice(0, 6);
 const homepageChainIndexTrend = buildChainIndexTrendSeries().series.slice(0, 2);
 const homepageBasketCostHeatmap = basketCostHeatmap.rows.slice(0, 3);
+const homepagePharmacyOtcEvidence = pharmacyOtcEvidenceBoard.rows.slice(0, 3);
 const homepageCommodityMappingReview = {
   queue: commodityMappingReviewPlan.queue.slice(0, 2),
   controls: commodityMappingReviewPlan.reporterControls.slice(0, 1),
@@ -356,6 +358,34 @@ export function MarketShell() {
           ))}
         </div>
         <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-emerald-900">{pwaFirstInstall.evidence}</p>
+      </Card>
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>Pharmacy OTC evidence</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Public OTC item prices before pharmacy-chain claims</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-indigo-950">
+              The homepage now previews the pharmacy vertical with OpenPrices + OpenBeautyFacts OTC rows. These are EAN-coded public observations only: no prescription medicine, medical advice, stock, or cheapest-pharmacy claim is displayed before domain=pharmacy connector rows exist.
+            </p>
+          </div>
+          <Link className="rounded-full bg-indigo-700 px-5 py-3 text-center text-sm font-black text-white" href="/pharmacy">
+            Open pharmacy OTC board
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {homepagePharmacyOtcEvidence.map((row) => (
+            <Link className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm hover:border-indigo-700" data-pharmacy-otc-evidence={row.slug} href="/pharmacy" key={row.slug}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-800">{row.evidence}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{row.name}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{row.brand} · {row.observationCount} observations</p>
+              <p className="mt-3 text-2xl font-black text-indigo-950">{formatSek(row.priceMedian)}</p>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-4 rounded-2xl bg-white/80 p-3 text-xs font-black uppercase tracking-[0.16em] text-indigo-950">
+          {pharmacyOtcEvidenceBoard.source} · not a pharmacy-chain comparison
+        </p>
       </Card>
 
       <Card className="mt-6 border-amber-200 bg-amber-50">

@@ -2788,13 +2788,34 @@ ${seo}`;
     assert.match(fuelRoute, /Fuel prices by grade/);
     assert.match(fuelRoute, /row\.sourceType/);
     assert.match(pharmacyRoute, /domainSlug="pharmacy"/);
-    assert.match(pharmacyRoute, /No pharmacy price observations yet/);
+    assert.match(pharmacyRoute, /No domain=pharmacy connector observations yet/);
     assert.match(pharmacyRoute, /OTC/);
     assert.match(seo, /\/fuel/);
     assert.match(seo, /\/pharmacy/);
     assert.doesNotMatch(fuelRoute, /@\/lib\/demo-data/);
     assert.doesNotMatch(pharmacyRoute, /@\/components\/sample-data/);
   });
+
+  it('surfaces OTC pharmacy price evidence from public observations without medical or prescription claims', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const pharmacyRoute = await read('src/app/pharmacy/page.tsx');
+    const marketShell = await read('src/components/market-shell.tsx');
+
+    assert.match(verified, /export const pharmacyOtcEvidenceBoard/);
+    assert.match(verified, /pharmacyCategoryNeedles/);
+    assert.match(verified, /OpenPrices \+ OpenBeautyFacts/);
+    assert.match(verified, /not a pharmacy-chain comparison/i);
+    assert.match(pharmacyRoute, /pharmacyOtcEvidenceBoard/);
+    assert.match(pharmacyRoute, /OTC price evidence from public observations/);
+    assert.match(pharmacyRoute, /pharmacyOtcEvidenceBoard\.rows\.map/);
+    assert.match(pharmacyRoute, /No prescription medicine/);
+    assert.match(pharmacyRoute, /not a pharmacy-chain comparison/i);
+    assert.match(marketShell, /pharmacyOtcEvidenceBoard/);
+    assert.match(marketShell, /data-pharmacy-otc-evidence/);
+    assert.match(marketShell, /href="\/pharmacy"/);
+    assert.doesNotMatch(pharmacyRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
 
   it('ships next-intl language preference switching with persisted locale and Accept-Language detection', async () => {
     const packageJson = await read('package.json');
