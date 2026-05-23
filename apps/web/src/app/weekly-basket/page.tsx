@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizer } from '@/lib/demo-data';
+import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizerInput } from '@/lib/demo-data';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -12,8 +14,16 @@ function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
 
+const weeklyBasketConfidence = {
+  level: 'medium' as const,
+  caveat: 'The optimizer uses visible price rows for favorite stores only; missing store-product prices reduce coverage instead of being estimated.'
+};
+
 export default function WeeklyBasketPage() {
-  const { comparison, coverage } = weeklyBasketOptimizer;
+  const comparison = compareBasketStrategies(weeklyBasketOptimizerInput);
+  const coverage = summarizeStoreBasketCoverage(weeklyBasketOptimizerInput);
+  const bestSingleStore = comparison.bestSingleStore;
+
   return (
     <PageShell>
       <Eyebrow>Basket optimizer</Eyebrow>
@@ -31,14 +41,40 @@ export default function WeeklyBasketPage() {
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Savings vs best single store</p>
           <p className="mt-2 text-5xl font-black text-slate-950">{formatSek(comparison.savingsVsBestSingleStore)}</p>
-          <p className="mt-3 font-semibold text-slate-700">Best full-coverage store: {comparison.bestSingleStore?.storeName ?? 'none with full coverage'}.</p>
+          <p className="mt-3 font-semibold text-slate-700">Best full-coverage store: {bestSingleStore?.storeName ?? 'none with full coverage'}.</p>
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Coverage confidence</p>
-          <p className="mt-2 text-5xl font-black capitalize text-slate-950">{weeklyBasketOptimizer.confidence.level}</p>
-          <p className="mt-3 font-semibold text-slate-700">{weeklyBasketOptimizer.confidence.caveat}</p>
+          <div className="mt-3">
+            <ConfidenceBadge level={weeklyBasketConfidence.level} label={`${weeklyBasketConfidence.level} confidence`} sampleSize={weeklyBasketOptimizerInput.items.length} />
+          </div>
+          <p className="mt-3 font-semibold text-slate-700">{weeklyBasketConfidence.caveat}</p>
         </Card>
       </div>
+
+      <Card className="mt-6 border-emerald-200 bg-white">
+        <div className="grid gap-5 lg:grid-cols-[0.85fr_1fr] lg:items-start">
+          <div>
+            <Eyebrow>Single vs split shop</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Real basket strategy comparison</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              compareBasketStrategies prices the visible favorite-store rows as both one full-coverage shop and a cheapest split-shop plan. summarizeStoreBasketCoverage keeps missing product rows visible instead of filling gaps.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Best single shop</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{bestSingleStore?.storeName ?? 'No full-coverage store'}</p>
+              <p className="mt-1 text-2xl font-black text-slate-950">{bestSingleStore ? formatSek(bestSingleStore.total) : 'n/a'}</p>
+            </div>
+            <div className="rounded-2xl bg-emerald-50 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">Cheapest split shop</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{comparison.splitStoreCount} stores</p>
+              <p className="mt-1 text-2xl font-black text-emerald-800">{formatSek(comparison.cheapestByProduct.total)}</p>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-sky-200 bg-sky-50/70">
         <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr] lg:items-start">
