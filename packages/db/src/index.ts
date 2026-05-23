@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 
+export * from './queries/categories.js';
 export * from './queries/stores.js';
 export * from './queries/retailers.js';
 

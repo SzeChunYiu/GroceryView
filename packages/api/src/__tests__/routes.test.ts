@@ -134,6 +134,15 @@ describe('createGroceryViewApi', () => {
     ]);
   });
 
+  it('returns category navigation tree nodes with product counts', () => {
+    const api = createGroceryViewApi();
+
+    assert.deepEqual(api.getCategories(), [
+      { id: 'coffee', name: 'Coffee', slug: 'coffee', parentId: null, itemCount: 1 },
+      { id: 'dairy', name: 'Dairy', slug: 'dairy', parentId: null, itemCount: 3 }
+    ]);
+  });
+
   it('builds product price-history reports from persisted observation inputs', () => {
     assert.deepEqual(productPriceHistoryPriceTypes, ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated']);
     assert.deepEqual(productPriceHistoryEndpoint, {

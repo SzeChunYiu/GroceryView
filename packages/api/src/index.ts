@@ -101,6 +101,14 @@ export type Retailer = {
   websiteUrl: string;
 };
 
+export type CategoryTreeNode = {
+  id: string;
+  name: string;
+  slug: string;
+  parentId: string | null;
+  itemCount: number;
+};
+
 export type ProductDetail = SearchableProduct & {
   currentPrices: StorePrice[];
   dealScore: number;
@@ -2018,6 +2026,63 @@ const products: ProductDetail[] = [
     ]
   }
 ];
+
+function categorySlug(segment: string): string {
+  return segment
+    .trim()
+    .toLocaleLowerCase('sv-SE')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function categoryName(segment: string): string {
+  const trimmed = segment.trim();
+  if (!trimmed) return 'Uncategorized';
+  return trimmed
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => `${part[0]?.toLocaleUpperCase('sv-SE') ?? ''}${part.slice(1)}`)
+    .join(' ');
+}
+
+function buildCategoryTree(entries: Array<{ productId: string; categoryPath: readonly string[] }>): CategoryTreeNode[] {
+  const nodes = new Map<string, CategoryTreeNode & { productIds: Set<string> }>();
+
+  for (const entry of entries) {
+    const normalizedSegments = entry.categoryPath.map((segment) => segment.trim()).filter(Boolean);
+    normalizedSegments.forEach((segment, index) => {
+      const slugs = normalizedSegments.slice(0, index + 1).map(categorySlug).filter(Boolean);
+      if (slugs.length === 0) return;
+      const id = slugs.join('/');
+      const parentId = index === 0 ? null : slugs.slice(0, -1).join('/');
+      const current = nodes.get(id) ?? {
+        id,
+        name: categoryName(segment),
+        slug: slugs[slugs.length - 1]!,
+        parentId,
+        itemCount: 0,
+        productIds: new Set<string>()
+      };
+      current.productIds.add(entry.productId);
+      current.itemCount = current.productIds.size;
+      nodes.set(id, current);
+    });
+  }
+
+  return [...nodes.values()]
+    .map(({ productIds: _productIds, ...node }) => node)
+    .sort((left, right) => {
+      const leftDepth = left.id.split('/').length;
+      const rightDepth = right.id.split('/').length;
+      return leftDepth - rightDepth
+        || (left.parentId ?? '').localeCompare(right.parentId ?? '', 'sv-SE')
+        || left.name.localeCompare(right.name, 'sv-SE');
+    });
+}
+
+const categories = buildCategoryTree(products.map((product) => ({ productId: product.id, categoryPath: [product.category] })));
 
 const nutritionProducts: NutritionProduct[] = [
   { productId: 'chicken', name: 'Chicken thighs', price: 69.9, nutritionPerPackage: { proteinGrams: 160, calories: 900, fiberGrams: 0, sugarGrams: 0, saltGrams: 2.4 } },
@@ -4603,6 +4668,10 @@ export function createGroceryViewApi() {
 
     getRetailers() {
       return retailers;
+    },
+
+    getCategories() {
+      return categories.map((category) => ({ ...category }));
     },
 
     getStore(id: string) {

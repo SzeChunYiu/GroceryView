@@ -1969,6 +1969,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (!report) return errorResponse(404, 'Category market not found.');
         return jsonResponse(report);
       }
+      if (method === 'GET' && path === '/api/categories') return jsonResponse(api.getCategories());
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
       if (method === 'GET' && path === '/api/retailers') return jsonResponse(api.getRetailers());
 
@@ -3048,6 +3049,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/ads/disclosure': { get: protectedOperation('Get ad disclosure status with placement labels, premium removal, and ranking separation guardrails.') },
       '/api/notifications/inbox': { get: protectedOperation('Get notification inbox delivery status, holds, suppressions, and alert guardrails.') },
       '/api/receipts/review': { get: protectedOperation('Get receipt review budget impact, match confidence, and writeback guardrails.') },
+      '/api/categories': { get: publicOperation('List the category tree with product counts for navigation and filter sidebars.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
