@@ -3715,9 +3715,9 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              raw_record_id uuid,
              retailer_product_ref text,
              price_type text,
-             price numeric,
-             regular_price numeric,
-             unit_price numeric,
+             price numeric(12, 2),
+             regular_price numeric(12, 2),
+             unit_price numeric(12, 4),
              currency char(3),
              quantity numeric,
              quantity_unit text,
@@ -3728,14 +3728,14 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              observed_at timestamptz,
              valid_from timestamptz,
              valid_until timestamptz,
-             confidence numeric,
+             confidence numeric(5, 4),
              provenance jsonb
            )
          ),
          ranked_input as (
            select input.*,
                   row_number() over (
-                    partition by product_id, chain_id, store_id, price_type, observed_at, retailer_product_ref
+                    partition by product_id, chain_id, store_id, price_type, observed_at, retailer_product_ref, price, unit_price, currency, confidence, provenance
                     order by ordinal
                   ) as input_rank
            from input
@@ -3762,6 +3762,11 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              and observations.price_type = ranked_input.price_type
              and observations.observed_at = ranked_input.observed_at
              and observations.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
+             and observations.price = ranked_input.price
+             and observations.unit_price = ranked_input.unit_price
+             and observations.currency = ranked_input.currency
+             and observations.confidence = ranked_input.confidence
+             and observations.provenance = ranked_input.provenance
            order by ranked_input.ordinal, observations.created_at, observations.id
          ),
          inserted as (
@@ -3843,6 +3848,11 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
              and inserted.price_type = ranked_input.price_type
              and inserted.observed_at = ranked_input.observed_at
              and inserted.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
+             and inserted.price = ranked_input.price
+             and inserted.unit_price = ranked_input.unit_price
+             and inserted.currency = ranked_input.currency
+             and inserted.confidence = ranked_input.confidence
+             and inserted.provenance = ranked_input.provenance
            where inserted.id is not null or existing.id is not null
          ),
          latest_upsert as (

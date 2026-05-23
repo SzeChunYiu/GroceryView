@@ -1646,9 +1646,17 @@ describe('createPostgresPriceObservationWriter', () => {
 
     assert.equal(executor.calls.length, 1);
     assert.match(executor.calls[0]!.sql, /from jsonb_to_recordset\(\$1::jsonb\)/);
-    assert.match(executor.calls[0]!.sql, /partition by product_id, chain_id, store_id, price_type, observed_at, retailer_product_ref/);
+    assert.match(executor.calls[0]!.sql, /price numeric\(12, 2\)/);
+    assert.match(executor.calls[0]!.sql, /unit_price numeric\(12, 4\)/);
+    assert.match(executor.calls[0]!.sql, /confidence numeric\(5, 4\)/);
+    assert.match(executor.calls[0]!.sql, /partition by product_id, chain_id, store_id, price_type, observed_at, retailer_product_ref, price, unit_price, currency, confidence, provenance/);
     assert.match(executor.calls[0]!.sql, /join observations on observations\.product_id = ranked_input\.product_id/);
     assert.match(executor.calls[0]!.sql, /and observations\.retailer_product_ref is not distinct from ranked_input\.retailer_product_ref/);
+    assert.match(executor.calls[0]!.sql, /and observations\.price = ranked_input\.price/);
+    assert.match(executor.calls[0]!.sql, /and observations\.unit_price = ranked_input\.unit_price/);
+    assert.match(executor.calls[0]!.sql, /and observations\.currency = ranked_input\.currency/);
+    assert.match(executor.calls[0]!.sql, /and observations\.confidence = ranked_input\.confidence/);
+    assert.match(executor.calls[0]!.sql, /and observations\.provenance = ranked_input\.provenance/);
     assert.match(executor.calls[0]!.sql, /where input_rank = 1/);
     assert.match(executor.calls[0]!.sql, /and not exists/);
     const observationsInsertSql = executor.calls[0]!.sql.slice(
