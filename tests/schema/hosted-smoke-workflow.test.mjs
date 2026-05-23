@@ -18,7 +18,18 @@ describe('hosted smoke workflow', () => {
     assert.match(workflow, /infra\/scripts\/smoke-hosted-http\.sh/);
     assert.match(workflow, /infra\/scripts\/smoke-hosted-readiness\.sh/);
     assert.match(workflow, /infra\/scripts\/smoke-hosted-scanner-upload\.mjs/);
-    assert.match(readFileSync(new URL('../../infra/scripts/smoke-hosted-readiness.sh', import.meta.url), 'utf8'), /api\/readiness\/scanning/);
+    const readinessSmoke = readFileSync(new URL('../../infra/scripts/smoke-hosted-readiness.sh', import.meta.url), 'utf8');
+    for (const endpoint of [
+      'api/readiness/postgres',
+      'api/readiness/source-runs',
+      'api/readiness/catalog-coverage',
+      'api/readiness/scanning',
+      'api/readiness/scan-upload-cors',
+      'api/readiness/scan-upload-storage',
+      'api/readiness/scan-upload-write'
+    ]) {
+      assert.match(readinessSmoke, new RegExp(endpoint.replaceAll('/', '\\/')));
+    }
     assert.match(workflow, /HOSTED_HTTP_SMOKE_OUTPUT_PATH:\s*artifacts\/hosted-http-smoke\.json/);
     assert.match(workflow, /HOSTED_READINESS_SMOKE_OUTPUT_PATH:\s*artifacts\/hosted-readiness-smoke\.json/);
     assert.match(workflow, /HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH:\s*artifacts\/hosted-scanner-upload-smoke\.json/);

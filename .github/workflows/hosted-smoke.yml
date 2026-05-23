@@ -62,7 +62,7 @@ jobs:
           HOSTED_HTTP_SMOKE_OUTPUT_PATH: artifacts/hosted-http-smoke.json
         run: infra/scripts/smoke-hosted-http.sh
 
-      - name: Run hosted PostgreSQL readiness smoke
+      - name: Run hosted production readiness smoke
         env:
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}

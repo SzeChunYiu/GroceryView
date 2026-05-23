@@ -69,7 +69,7 @@ jobs:
           HTTP_SMOKE_TIMEOUT_SECONDS: '20'
           HOSTED_HTTP_SMOKE_OUTPUT_PATH: artifacts/deploy-hosted-http-smoke.json
         run: infra/scripts/smoke-hosted-http.sh
-      - name: Run post-deploy PostgreSQL readiness smoke
+      - name: Run post-deploy production readiness smoke
         env:
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
