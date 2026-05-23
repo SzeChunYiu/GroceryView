@@ -13,6 +13,7 @@ describe('DB-backed site snapshot export script', () => {
   it('builds a static-site artifact from latest_prices rows without raw private payloads', () => {
     const artifact = buildDbSiteSnapshotArtifact({
       generatedAt: '2026-05-22T21:20:00.000Z',
+      requiredChains: ['willys'],
       rows: [{
         productId: 'product-1',
         productSlug: 'bryggkaffe-450g',
@@ -45,7 +46,7 @@ describe('DB-backed site snapshot export script', () => {
     assert.equal(artifact.status, 'passed');
     assert.equal(artifact.generatedAt, '2026-05-22T21:20:00.000Z');
     assert.equal(artifact.priceRows.length, 1);
-    assert.deepEqual(artifact.coverage, { products: 1, chains: 1, stores: 1, observations: 1 });
+    assert.deepEqual(artifact.coverage, { products: 1, chains: 1, stores: 1, observations: 1, requiredChains: ['willys'], missingRequiredChains: [] });
     assert.deepEqual(artifact.priceRows[0], {
       productSlug: 'bryggkaffe-450g',
       canonicalName: 'Bryggkaffe mellanrost 450 g',
@@ -71,6 +72,57 @@ describe('DB-backed site snapshot export script', () => {
       provenance: { sourceType: 'retailer_page', rawSnapshotRef: 'raw://daily-ingestion/run/sha256-abcd' }
     });
     assert.equal(JSON.stringify(artifact).includes('rawPayload'), false);
+  });
+
+  it('fails closed when required chain coverage is missing from the DB snapshot', () => {
+    assert.throws(() => buildDbSiteSnapshotArtifact({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      requiredChains: ['ica', 'willys'],
+      rows: [{
+        productId: 'product-1',
+        productSlug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        categoryPath: ['Pantry', 'Coffee'],
+        comparableUnit: 'kg',
+        chainId: 'chain-1',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        priceType: 'promotion',
+        observationId: 'observation-2',
+        price: 44.9,
+        unitPrice: 99.7778,
+        currency: 'SEK',
+        observedAt: '2026-05-20T09:00:00.000Z',
+        confidence: 0.88
+      }]
+    }), /db_site_snapshot_missing_required_chains:ica/);
+  });
+
+  it('records required chain coverage when every required chain has latest price evidence', () => {
+    const base = {
+      productId: 'product-1',
+      productSlug: 'bryggkaffe-450g',
+      canonicalName: 'Bryggkaffe mellanrost 450 g',
+      categoryPath: ['Pantry', 'Coffee'],
+      comparableUnit: 'kg',
+      priceType: 'promotion',
+      price: 44.9,
+      unitPrice: 99.7778,
+      currency: 'SEK',
+      observedAt: '2026-05-20T09:00:00.000Z',
+      confidence: 0.88
+    };
+    const artifact = buildDbSiteSnapshotArtifact({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      requiredChains: ['ica', 'willys'],
+      rows: [
+        { ...base, chainId: 'chain-1', chainSlug: 'willys', chainName: 'Willys', observationId: 'observation-willys' },
+        { ...base, chainId: 'chain-2', chainSlug: 'ica', chainName: 'ICA', observationId: 'observation-ica' }
+      ]
+    });
+
+    assert.deepEqual(artifact.coverage.requiredChains, ['ica', 'willys']);
+    assert.deepEqual(artifact.coverage.missingRequiredChains, []);
   });
 
   it('fails closed when the database reader returns no latest price rows', () => {

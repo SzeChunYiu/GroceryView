@@ -120,13 +120,12 @@ checked-in per-source fixtures:
 ```bash
 DATABASE_URL="$DATABASE_URL" \
 GROCERYVIEW_DB_SITE_SNAPSHOT_PATH=/tmp/groceryview-db-site-snapshot.json \
+GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS=ica,willys,coop,hemkop,lidl,city_gross \
 npm run --silent ingest:export-db-snapshot
 ```
 
 The exporter fails closed with `No latest price rows available` when the database
-reader returns no public latest-price rows. The artifact summarizes product, chain,
-store, and observation coverage and carries only the normalized public row plus
-provenance; it does not include raw private payloads. The daily ingestion workflow exports this snapshot after the ingestion write succeeds, checks that the artifact status is `passed` with at least one observation, and uploads it as the `groceryview-db-site-snapshot` artifact. Operators can tune the workflow export with `GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE` and `GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT`.
+reader returns no public latest-price rows, and with `db_site_snapshot_missing_required_chains:<chains>` when `postgres.latest_prices` lacks a public latest-price row for any required launch chain. The artifact summarizes product, chain, store, observation, `requiredChains`, and `missingRequiredChains` coverage and carries only the normalized public row plus provenance; it does not include raw private payloads. The daily ingestion workflow exports this snapshot after the ingestion write succeeds, checks that the artifact status is `passed` with at least one observation and zero missing required chains, and uploads it as the `groceryview-db-site-snapshot` artifact. Operators can tune the workflow export with `GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE`, `GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT`, and `GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS`.
 
 ## Trigger and monitor the daily gate
 
