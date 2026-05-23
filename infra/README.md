@@ -65,6 +65,16 @@ OPEN_PRICES_IMPORT_RESULT_PATH=/tmp/groceryview-open-prices-import-result.json \
 
 The import script creates an `official_api` source run, upserts Open Prices chains/products/aliases, stores each accepted row as a raw price record without a raw response body, writes immutable observations, lets the database adapter roll them into `latest_prices`, and optionally writes the persisted result summary to `OPEN_PRICES_IMPORT_RESULT_PATH`.
 
+The web build now generates its rendered price snapshot from PostgreSQL before `next build`:
+
+```bash
+DATABASE_URL=postgresql://groceryview:groceryview@localhost:5432/groceryview \
+DB_SITE_SNAPSHOT_LIMIT=500 \
+  npm run build --workspace @groceryview/web
+```
+
+`apps/web/scripts/generate-db-site-snapshot.mjs` reads `latest_prices` plus aggregate `observations` history and emits `apps/web/src/lib/ingested/db-site-snapshot.ts`, which backs the product and category static pages. When `DATABASE_URL` is absent, the script keeps a deterministic empty fallback so local CI can still build and typecheck without committing per-source fixture refreshes.
+
 To preflight the saved artifact before a database connection or built DB package is available, run the import script in dry-run mode:
 
 ```bash

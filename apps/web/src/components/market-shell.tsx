@@ -148,9 +148,9 @@ export function MarketShell() {
       <section className="rounded-lg border border-market-ink/10 bg-white">
         <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto_auto] md:items-center">
           <div>
-            <h2 className="text-lg font-black">OpenPrices fixture radar</h2>
+            <h2 className="text-lg font-black">Database price radar</h2>
             <p className="mt-1 text-sm text-market-ink/60">
-              Live driver data is now visible on the homepage before shoppers drill into the full product screener.
+              Build-time Postgres price data is visible on the homepage before shoppers drill into the full product screener.
             </p>
           </div>
           <LightMetric label="Products" value={pricedProducts.length.toLocaleString()} />
@@ -163,7 +163,7 @@ export function MarketShell() {
               icon={<Database size={18} />}
               label="Observed categories"
               value={String(activeOpenPriceCategories)}
-              detail="OpenFoodFacts tags mapped into GroceryView category routes"
+              detail="Observation-backed category tags mapped into GroceryView category routes"
               href="/categories"
             />
             <FixtureMetric

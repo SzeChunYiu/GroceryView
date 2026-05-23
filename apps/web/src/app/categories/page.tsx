@@ -28,7 +28,7 @@ export default function CategoriesIndexPage() {
           {ordered.length} categories of grocery items.
         </h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-market-ink/65">
-          Mapped from OpenFoodFacts category tags. Each card shows count and SEK price range from observed data.
+          Mapped from product category paths in the generated database snapshot. Each card shows count and SEK price range from observed data.
         </p>
       </header>
 

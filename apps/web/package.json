@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "type": "commonjs",
   "scripts": {
+    "prebuild": "npm run snapshot:db",
     "build": "next build --webpack",
     "dev": "next dev",
+    "snapshot:db": "node scripts/generate-db-site-snapshot.mjs",
     "test": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
@@ -15,6 +17,7 @@
     "lightweight-charts": "^5.2.0",
     "lucide-react": "^0.561.0",
     "next": "^16.2.6",
+    "pg": "^8.21.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "tailwind-merge": "^3.4.0"

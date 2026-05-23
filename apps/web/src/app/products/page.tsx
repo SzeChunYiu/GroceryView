@@ -1,16 +1,21 @@
 import Link from 'next/link';
 import { pricedProducts, categoryLabels } from '@/lib/openprices-products';
-import { coopProducts, coopSource } from '@/lib/ingested/coop';
-import { hemkopProducts, hemkopSource } from '@/lib/ingested/hemkop';
-import { icaProducts, icaSource } from '@/lib/ingested/ica';
-import { icaReklambladOffers, icaReklambladSource } from '@/lib/ingested/ica-reklamblad';
-import { mathemProducts, mathemSource } from '@/lib/ingested/mathem';
-import { matpriskollenOffers, matpriskollenSource } from '@/lib/ingested/matpriskollen';
-import { matsparProducts, matsparSource } from '@/lib/ingested/matspar';
-import { openFoodFactsProducts, openFoodFactsSource } from '@/lib/ingested/openfoodfacts';
-import { willysProducts, willysSource } from '@/lib/ingested/willys';
+import {
+  dbLatestPrices,
+  dbSiteSnapshotMeta,
+  dbSourceSummaries
+} from '@/lib/ingested/db-site-snapshot';
 
 export const dynamic = 'force-static';
+
+function formatSek(value: number) {
+  return `SEK ${value.toFixed(2)}`;
+}
+
+function formatObserved(value: string | null) {
+  if (!value) return 'n/a';
+  return value.slice(0, 10);
+}
 
 export default function ProductsIndexPage() {
   const byCat = new Map<string, typeof pricedProducts>();
@@ -20,7 +25,8 @@ export default function ProductsIndexPage() {
     byCat.get(k)!.push(p);
   }
   const ordered = [...byCat.entries()].sort((a, b) => b[1].length - a[1].length);
-  const totalObs = pricedProducts.reduce((s, p) => s + p.observationCount, 0);
+  const totalObs = dbSiteSnapshotMeta.observationCount || pricedProducts.reduce((s, p) => s + p.observationCount, 0);
+  const newestObservedAt = dbSiteSnapshotMeta.newestObservedAt || pricedProducts[0]?.lastObservedAt || null;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
@@ -38,223 +44,69 @@ export default function ProductsIndexPage() {
           {pricedProducts.length.toLocaleString()} products · {totalObs.toLocaleString()} real SEK observations.
         </h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-market-ink/65">
-          Data from OpenPrices (community submissions) + OpenFoodFacts product metadata.
-          Every price below is an observed SEK price submitted by a real shopper, with date.
-          Per-store linkage is being added as the ingestion pipeline matures.
+          Static pages are rendered from the latest Postgres snapshot generated at build time from
+          latest_prices and observations. New imported prices can reach the site through the database-backed
+          build without committing per-retailer fixture files.
         </p>
         <p className="mt-2 text-sm font-semibold text-market-ink/55">
-          OpenFoodFacts export ingest: {openFoodFactsSource.rowCount} verified product rows retrieved {openFoodFactsSource.retrievedAt.slice(0, 10)}.
-        </p>
-        <p className="mt-1 text-sm font-semibold text-market-ink/55">
-          Willys search ingest: {willysSource.rowCount} live SEK product rows retrieved {willysSource.retrievedAt.slice(0, 10)}.
-        </p>
-        <p className="mt-1 text-sm font-semibold text-market-ink/55">
-          Hemköp search ingest: {hemkopSource.rowCount} live SEK product rows retrieved {hemkopSource.retrievedAt.slice(0, 10)}.
-        </p>
-        <p className="mt-1 text-sm font-semibold text-market-ink/55">
-          Mathem search ingest: {mathemSource.rowCount} live SEK product rows retrieved {mathemSource.retrievedAt.slice(0, 10)}.
-        </p>
-        <p className="mt-1 text-sm font-semibold text-market-ink/55">
-          ICA handla ingest: {icaSource.rowCount} public catalog rows retrieved {icaSource.retrievedAt.slice(0, 10)}.
-        </p>
-        <p className="mt-1 text-sm font-semibold text-market-ink/55">
-          ICA reklamblad ingest: {icaReklambladSource.rowCount} public weekly offer rows retrieved {icaReklambladSource.retrievedAt.slice(0, 10)}.
-        </p>
-        <p className="mt-1 text-sm font-semibold text-market-ink/55">
-          Coop search ingest: {coopSource.rowCount} public SEK product rows retrieved {coopSource.retrievedAt.slice(0, 10)}.
-        </p>
-        <p className="mt-1 text-sm font-semibold text-market-ink/55">
-          Matspar search ingest: {matsparSource.rowCount} live SEK comparison rows retrieved {matsparSource.retrievedAt.slice(0, 10)}.
-        </p>
-        <p className="mt-1 text-sm font-semibold text-market-ink/55">
-          Matpriskollen offers ingest: {matpriskollenSource.rowCount} public offer rows retrieved {matpriskollenSource.retrievedAt.slice(0, 10)}.
+          Snapshot source: {dbSiteSnapshotMeta.source} · latest rows: {dbSiteSnapshotMeta.latestPriceCount.toLocaleString()} · newest observation: {formatObserved(newestObservedAt)}.
         </p>
       </header>
 
-      <section className="mb-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {ordered.map(([cat, items]) => (
-          <Link key={cat} href={`/categories/${cat}`} className="rounded-lg border border-market-ink/10 bg-white p-4 hover:border-market-mint/70">
-            <div className="flex items-baseline justify-between">
-              <span className="font-black">{categoryLabels[cat] || cat}</span>
-              <span className="text-sm font-bold text-market-mint">{items.length}</span>
+      {dbSourceSummaries.length > 0 && (
+        <section className="mb-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {dbSourceSummaries.map((source) => (
+            <div key={source.source} className="rounded-lg border border-market-ink/10 bg-white p-4">
+              <div className="flex items-baseline justify-between">
+                <span className="font-black">{source.label}</span>
+                <span className="text-sm font-bold text-market-mint">{source.rowCount}</span>
+              </div>
+              <p className="mt-1 text-xs text-market-ink/55">latest {formatObserved(source.retrievedAt)}</p>
             </div>
-            <p className="mt-1 text-xs text-market-ink/55">
-              from SEK {Math.min(...items.map(i => i.priceMin)).toFixed(2)} to SEK {Math.max(...items.map(i => i.priceMax)).toFixed(2)}
-            </p>
-          </Link>
-        ))}
-      </section>
-
-      <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
-        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
-          <span>OpenFoodFacts product</span>
-          <span>Brand</span>
-          <span>Quantity</span>
-          <span>Nutri-Score</span>
-        </div>
-        <ul className="divide-y divide-market-ink/5">
-          {openFoodFactsProducts.slice(0, 12).map((p) => (
-            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
-              <a href={p.productUrl} className="truncate font-semibold text-market-ink hover:text-market-mint" title={p.name}>
-                {p.name}
-              </a>
-              <span className="truncate text-market-ink/65">{p.brands || 'unknown'}</span>
-              <span className="truncate text-market-ink/65">{p.quantity || 'unknown'}</span>
-              <span className="text-xs font-black uppercase text-market-ink/55">{p.nutriscoreGrade}</span>
-            </li>
           ))}
-        </ul>
-      </section>
+        </section>
+      )}
 
-      <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
-        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
-          <span>Willys product</span>
-          <span>Brand</span>
-          <span>Package</span>
-          <span>Price</span>
-        </div>
-        <ul className="divide-y divide-market-ink/5">
-          {willysProducts.slice(0, 12).map((p) => (
-            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
-              <span className="truncate font-semibold text-market-ink" title={p.name}>{p.name}</span>
-              <span className="truncate text-market-ink/65">{p.brand || 'unknown'}</span>
-              <span className="truncate text-market-ink/65">{p.packageText || 'unknown'}</span>
-              <span className="font-bold">{p.priceText}</span>
-            </li>
+      {ordered.length > 0 && (
+        <section className="mb-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {ordered.map(([cat, items]) => (
+            <Link key={cat} href={`/categories/${cat}`} className="rounded-lg border border-market-ink/10 bg-white p-4 hover:border-market-mint/70">
+              <div className="flex items-baseline justify-between">
+                <span className="font-black">{categoryLabels[cat] || cat}</span>
+                <span className="text-sm font-bold text-market-mint">{items.length}</span>
+              </div>
+              <p className="mt-1 text-xs text-market-ink/55">
+                from {formatSek(Math.min(...items.map(i => i.priceMin)))} to {formatSek(Math.max(...items.map(i => i.priceMax)))}
+              </p>
+            </Link>
           ))}
-        </ul>
-      </section>
+        </section>
+      )}
 
       <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
-        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
-          <span>Hemköp product</span>
-          <span>Brand</span>
-          <span>Package</span>
-          <span>Price</span>
-        </div>
-        <ul className="divide-y divide-market-ink/5">
-          {hemkopProducts.slice(0, 12).map((p) => (
-            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
-              <span className="truncate font-semibold text-market-ink" title={p.name}>{p.name}</span>
-              <span className="truncate text-market-ink/65">{p.brand || 'unknown'}</span>
-              <span className="truncate text-market-ink/65">{p.packageText || 'unknown'}</span>
-              <span className="font-bold">{p.priceText}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
-        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
-          <span>Mathem product</span>
-          <span>Brand</span>
-          <span>Package</span>
-          <span>Price</span>
-        </div>
-        <ul className="divide-y divide-market-ink/5">
-          {mathemProducts.slice(0, 12).map((p) => (
-            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
-              <a href={p.productUrl} className="truncate font-semibold text-market-ink hover:text-market-mint" title={p.name}>{p.name}</a>
-              <span className="truncate text-market-ink/65">{p.brand || 'unknown'}</span>
-              <span className="truncate text-market-ink/65">{p.packageText || 'unknown'}</span>
-              <span className="font-bold">{p.priceText}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
-        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
-          <span>ICA product</span>
-          <span>Brand</span>
-          <span>Category</span>
-          <span>Card price</span>
-        </div>
-        <ul className="divide-y divide-market-ink/5">
-          {icaProducts.slice(0, 12).map((p) => (
-            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
-              <a href={p.productUrl} className="truncate font-semibold text-market-ink hover:text-market-mint" title={p.name}>{p.name}</a>
-              <span className="truncate text-market-ink/65">{p.brand || 'unknown'}</span>
-              <span className="truncate text-market-ink/65">{p.categories[0] || 'uncategorized'}</span>
-              <span className="font-bold">{p.dataPrice || 'store gated'}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
-        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
-          <span>ICA reklamblad offer</span>
-          <span>Brand</span>
-          <span>Package</span>
-          <span>Price</span>
-        </div>
-        <ul className="divide-y divide-market-ink/5">
-          {icaReklambladOffers.slice(0, 12).map((p) => (
-            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
-              <a href={p.flyerUrl} className="truncate font-semibold text-market-ink hover:text-market-mint" title={p.name}>{p.name}</a>
-              <span className="truncate text-market-ink/65">{p.brand || 'unknown'}</span>
-              <span className="truncate text-market-ink/65">{p.packageText || p.category || 'offer'}</span>
-              <span className="font-bold">{p.priceText}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
-        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
-          <span>Coop product</span>
-          <span>Brand</span>
-          <span>Package</span>
-          <span>Price</span>
-        </div>
-        <ul className="divide-y divide-market-ink/5">
-          {coopProducts.slice(0, 12).map((p) => (
-            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
-              <a href={p.productUrl} className="truncate font-semibold text-market-ink hover:text-market-mint" title={p.name}>{p.name}</a>
-              <span className="truncate text-market-ink/65">{p.brand || 'unknown'}</span>
-              <span className="truncate text-market-ink/65">{p.packageText || 'unknown'}</span>
-              <span className="font-bold">{p.priceText}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
-        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
-          <span>Matspar product</span>
-          <span>Brand</span>
-          <span>Package</span>
-          <span>Price</span>
-        </div>
-        <ul className="divide-y divide-market-ink/5">
-          {matsparProducts.slice(0, 12).map((p) => (
-            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
-              <a href={p.productUrl} className="truncate font-semibold text-market-ink hover:text-market-mint" title={p.name}>{p.name}</a>
-              <span className="truncate text-market-ink/65">{p.brand || 'unknown'}</span>
-              <span className="truncate text-market-ink/65">{p.packageText || 'unknown'}</span>
-              <span className="font-bold">{p.priceText}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
-        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
-          <span>Matpriskollen offer</span>
+        <div className="grid grid-cols-[1.8fr_1fr_0.8fr_0.8fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
+          <span>Latest DB price</span>
           <span>Store</span>
-          <span>Package</span>
-          <span>Price</span>
+          <span>Type</span>
+          <span>Observed</span>
+          <span className="text-right">Price</span>
         </div>
         <ul className="divide-y divide-market-ink/5">
-          {matpriskollenOffers.slice(0, 12).map((p) => (
-            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
-              <a href={p.productUrl} className="truncate font-semibold text-market-ink hover:text-market-mint" title={p.name}>{p.name}</a>
-              <span className="truncate text-market-ink/65">{p.store}</span>
-              <span className="truncate text-market-ink/65">{p.packageText || p.category || 'offer'}</span>
-              <span className="font-bold">{p.priceText}</span>
+          {dbLatestPrices.slice(0, 500).map((p) => (
+            <li key={`${p.code}-${p.chainSlug}-${p.storeSlug ?? 'online'}-${p.priceType}`} className="grid grid-cols-[1.8fr_1fr_0.8fr_0.8fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
+              <span className="truncate font-semibold text-market-ink" title={p.productName}>{p.productName}</span>
+              <span className="truncate text-market-ink/65">{p.storeName || p.chainName}</span>
+              <span className="truncate text-market-ink/65">{p.priceType}</span>
+              <span className="truncate text-market-ink/65">{formatObserved(p.observedAt)}</span>
+              <span className="text-right font-bold">{formatSek(p.price)}</span>
             </li>
           ))}
+          {dbLatestPrices.length === 0 && (
+            <li className="px-4 py-4 text-sm text-market-ink/55">
+              No generated Postgres latest-price rows are present in this build. Set DATABASE_URL before the web build
+              to emit the live DB snapshot.
+            </li>
+          )}
         </ul>
       </section>
 
@@ -269,13 +121,18 @@ export default function ProductsIndexPage() {
         <ul className="divide-y divide-market-ink/5">
           {pricedProducts.slice(0, 500).map((p) => (
             <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_1fr_0.6fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
-              <span className="font-semibold truncate" title={p.name}>{p.name}</span>
-              <span className="text-market-ink/65 truncate">{p.brands || '—'}</span>
+              <span className="truncate font-semibold" title={p.name}>{p.name}</span>
+              <span className="truncate text-market-ink/65">{p.brands || 'n/a'}</span>
               <span className="text-market-ink/65">{categoryLabels[p.category] || p.category}</span>
-              <span className="font-bold">SEK {p.priceMedian.toFixed(2)}</span>
+              <span className="font-bold">{formatSek(p.priceMedian)}</span>
               <span className="text-right text-xs text-market-ink/45">{p.observationCount}</span>
             </li>
           ))}
+          {pricedProducts.length === 0 && (
+            <li className="px-4 py-4 text-sm text-market-ink/55">
+              The committed fallback snapshot is empty so local builds can pass without database access.
+            </li>
+          )}
         </ul>
         {pricedProducts.length > 500 && (
           <p className="px-4 py-3 text-xs text-market-ink/55">

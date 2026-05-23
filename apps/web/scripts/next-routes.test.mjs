@@ -105,13 +105,13 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /Source coverage tape/);
   });
 
-  it('surfaces generated OpenPrices and OSM fixture counts on the homepage', async () => {
+  it('surfaces generated database price and OSM counts on the homepage', async () => {
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
 
     assert.match(marketShell, /pricedProducts\.length\.toLocaleString/);
     assert.match(marketShell, /totalObservedPrices\.toLocaleString/);
     assert.match(marketShell, /osmStores\.length\.toLocaleString/);
-    assert.match(marketShell, /OpenPrices fixture radar/);
+    assert.match(marketShell, /Database price radar/);
   });
 
   it('surfaces Stockholm area coverage on the homepage', async () => {
