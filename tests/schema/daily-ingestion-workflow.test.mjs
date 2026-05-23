@@ -23,6 +23,7 @@ describe('daily ingestion workflow', () => {
       'npm run test -w @groceryview/db',
       'npm run test -w @groceryview/ingestion',
       'npm run --silent ops:daily-connectors',
+      'npm run --silent ops:catalog-coverage-targets',
       'npm run --silent ops:validate-production-env',
       'node packages/ingestion/dist/index.js',
       '/api/readiness/postgres',
@@ -33,10 +34,13 @@ describe('daily ingestion workflow', () => {
     }
 
     assert.match(workflow, /npm run --silent ops:daily-connectors >\/tmp\/groceryview-daily-connectors\.json/);
+    assert.match(workflow, /CATALOG_COVERAGE_TARGETS_JSON_FILE=\/tmp\/groceryview-catalog-targets\.json/);
+    assert.match(workflow, /ops:catalog-coverage-targets >\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /ops:validate-production-env\s+--\s+--scope\s+daily-ingestion/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=\/tmp\/groceryview-daily-connectors\.json/);
     assert.doesNotMatch(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON=\$\(npm run --silent ops:daily-connectors\)/);
     assert.doesNotMatch(workflow, /test -n "\$\{GROCERYVIEW_DAILY_CONNECTORS_JSON:-\}"/);
+    assert.doesNotMatch(workflow, /missing production config: CATALOG_COVERAGE_TARGETS_JSON/);
     for (const requiredConfigName of [
       'AUTH_SECRET',
       'DATABASE_URL',
@@ -45,11 +49,9 @@ describe('daily ingestion workflow', () => {
       'BILLING_WEBHOOK_SECRET',
       'METRICS_TOKEN',
       'GROCERYVIEW_SERVER_URL',
-      'CATALOG_COVERAGE_TARGETS_JSON'
     ]) {
       assert.match(workflow, new RegExp(`missing production config: ${requiredConfigName}`));
     }
-    assert.match(workflow, /CATALOG_COVERAGE_TARGETS_JSON/);
     assert.match(workflow, /connectorChainIds/);
     assert.match(workflow, /missingConnectorChains/);
     assert.match(workflow, /connectorStoreCoverageCount/);

@@ -31,7 +31,6 @@ jobs:
           BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
-          CATALOG_COVERAGE_TARGETS_JSON: ${{ secrets.CATALOG_COVERAGE_TARGETS_JSON }}
         run: |
           set -euo pipefail
           missing=0
@@ -42,7 +41,6 @@ jobs:
           if [ -z "${BILLING_WEBHOOK_SECRET:-}" ]; then echo "missing production config: BILLING_WEBHOOK_SECRET" >&2; missing=1; fi
           if [ -z "${METRICS_TOKEN:-}" ]; then echo "missing production config: METRICS_TOKEN" >&2; missing=1; fi
           if [ -z "${GROCERYVIEW_SERVER_URL:-}" ]; then echo "missing production config: GROCERYVIEW_SERVER_URL" >&2; missing=1; fi
-          if [ -z "${CATALOG_COVERAGE_TARGETS_JSON:-}" ]; then echo "missing production config: CATALOG_COVERAGE_TARGETS_JSON" >&2; missing=1; fi
           if [ "${missing}" -ne 0 ]; then exit 1; fi
 
       - name: Install
@@ -62,11 +60,13 @@ jobs:
           BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
-          CATALOG_COVERAGE_TARGETS_JSON: ${{ secrets.CATALOG_COVERAGE_TARGETS_JSON }}
         run: |
           set -euo pipefail
           npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
+            npm run --silent ops:catalog-coverage-targets >/tmp/groceryview-catalog-targets.json
+          GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
+          CATALOG_COVERAGE_TARGETS_JSON_FILE=/tmp/groceryview-catalog-targets.json \
             npm run --silent ops:validate-production-env -- --scope daily-ingestion \
             >/tmp/production-env-validation.json
           node <<'NODE'
