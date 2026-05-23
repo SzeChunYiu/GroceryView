@@ -89,6 +89,7 @@ import {
   type PersistedNotificationTask
 } from '@groceryview/notifications';
 import {
+  createOcrSpaceReceiptProvider,
   planScanReviewWorkItems,
   prepareScanUploadTicket,
   processScanUpload,
@@ -224,6 +225,7 @@ export type RuntimeHandlerOptions = {
   watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
   pgPoolFactory?: RuntimePgPoolFactory;
   notificationProviderFetch?: NotificationProviderFetch;
+  scanProviderFetch?: typeof fetch;
 };
 
 export type FlyerOffersProviderQuery = {
@@ -2548,6 +2550,7 @@ export type RuntimeConfig = {
   sendgridFromEmail?: string;
   expoPushAccessToken?: string;
   metricsToken?: string;
+  ocrSpaceApiKey?: string;
   catalogCoverageTargets?: Omit<CatalogCoverageInput, 'products'>;
 };
 
@@ -2613,6 +2616,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.EXPO_PUSH_ACCESS_TOKEN) throw new Error('EXPO_PUSH_ACCESS_TOKEN is required in production.');
     if (!env.BILLING_WEBHOOK_SECRET) throw new Error('BILLING_WEBHOOK_SECRET is required in production.');
     if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
+    if (!env.OCR_SPACE_API_KEY) throw new Error('OCR_SPACE_API_KEY is required in production.');
     if (!env.CATALOG_COVERAGE_TARGETS_JSON) throw new Error('CATALOG_COVERAGE_TARGETS_JSON is required in production.');
   }
   validatePublicWebUrl(env.PUBLIC_WEB_URL);
@@ -2635,6 +2639,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     ...(env.STRIPE_SECRET_KEY ? { stripeSecretKey: env.STRIPE_SECRET_KEY } : {}),
     ...(Object.keys(stripePriceIds).length > 0 ? { stripePriceIds } : {}),
     metricsToken: env.METRICS_TOKEN,
+    ...(env.OCR_SPACE_API_KEY ? { ocrSpaceApiKey: env.OCR_SPACE_API_KEY } : {}),
     ...(catalogCoverageTargets ? { catalogCoverageTargets } : {})
   };
 }
@@ -2707,7 +2712,17 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     flyerOffersProvider: options.flyerOffersProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider,
-    watchlistPriceAlertWriter: options.watchlistPriceAlertWriter
+    watchlistPriceAlertWriter: options.watchlistPriceAlertWriter,
+    ...(config.ocrSpaceApiKey
+      ? {
+          scanProviders: {
+            receiptOcr: createOcrSpaceReceiptProvider({
+              apiKey: config.ocrSpaceApiKey,
+              ...(options.scanProviderFetch ? { fetch: options.scanProviderFetch } : {})
+            })
+          }
+        }
+      : {})
   };
 }
 

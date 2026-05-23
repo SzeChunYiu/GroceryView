@@ -6,6 +6,7 @@ import { createSessionToken } from '@groceryview/auth';
 import type { PersistedNotificationTask } from '@groceryview/notifications';
 import {
   buildHealthReport,
+  buildRuntimeAuthOptions,
   createRuntimeHttpService,
   createRuntimeHttpHandler,
   isDirectServerEntrypoint,
@@ -250,6 +251,7 @@ describe('runtime config', () => {
       STRIPE_PRICE_PREMIUM_MONTHLY: 'price_monthly_runtime',
       STRIPE_PRICE_PREMIUM_YEARLY: 'price_yearly_runtime',
       METRICS_TOKEN: 'metrics-token',
+      OCR_SPACE_API_KEY: 'ocr-runtime-key',
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -277,6 +279,7 @@ describe('runtime config', () => {
         premium_yearly: 'price_yearly_runtime'
       },
       metricsToken: 'metrics-token',
+      ocrSpaceApiKey: 'ocr-runtime-key',
       catalogCoverageTargets: {
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -286,6 +289,25 @@ describe('runtime config', () => {
         requireEveryProductInEveryStore: true,
         requireEveryStorePriceType: true
       }
+    });
+  });
+
+
+  it('wires OCR.space receipt scanning into runtime scan providers', async () => {
+    const config = loadRuntimeConfig({ NODE_ENV: 'development', OCR_SPACE_API_KEY: 'ocr-runtime-key' });
+    const authOptions = buildRuntimeAuthOptions(config, {
+      scanProviderFetch: async () => new Response(JSON.stringify({
+        IsErroredOnProcessing: false,
+        ParsedResults: [{ ParsedText: 'KAFFE 49.90\nTOTAL 49.90' }]
+      }), { status: 200 })
+    });
+
+    const result = await authOptions.scanProviders?.receiptOcr?.parse('private-upload://receipt-runtime');
+
+    assert.deepEqual(result, {
+      rows: [{ rawName: 'KAFFE', itemTotal: 49.9, confidence: 0.5 }],
+      totalAmount: 49.9,
+      confidence: 0.5
     });
   });
 
@@ -399,6 +421,20 @@ describe('runtime config', () => {
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token'
+    }), /OCR_SPACE_API_KEY is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
+      METRICS_TOKEN: 'metrics-token',
+      OCR_SPACE_API_KEY: 'ocr-runtime-key'
     }), /CATALOG_COVERAGE_TARGETS_JSON is required/);
   });
 
@@ -420,6 +456,7 @@ describe('runtime config', () => {
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
+      OCR_SPACE_API_KEY: 'ocr-runtime-key',
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],

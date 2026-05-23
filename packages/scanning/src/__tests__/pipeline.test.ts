@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildScanProviderReadinessReport, planReceiptAliasGrowth, planScanReviewWorkItems, prepareScanUploadTicket, processScanUpload } from '../index.js';
+import { buildScanProviderReadinessReport, createOcrSpaceReceiptProvider, planReceiptAliasGrowth, planScanReviewWorkItems, prepareScanUploadTicket, processScanUpload } from '../index.js';
 
 describe('buildScanProviderReadinessReport', () => {
   it('fails closed when barcode or receipt OCR providers are missing credentials or health checks', () => {
@@ -413,5 +413,59 @@ describe('planReceiptAliasGrowth', () => {
     assert.deepEqual(plan.rejectedRows, [
       { scanId: 'receipt-commodity-2', rawName: 'Tomat', reason: 'chain_label_required' }
     ]);
+  });
+});
+
+describe('createOcrSpaceReceiptProvider', () => {
+  it('posts receipt payloads to OCR.space and normalizes parsed totals and row confidence', async () => {
+    const calls: Array<{ url: string; init: RequestInit }> = [];
+    const provider = createOcrSpaceReceiptProvider({
+      apiKey: 'ocr-key',
+      endpoint: 'https://api.ocr.space/parse/image',
+      fetch: async (url: string | URL | Request, init?: RequestInit) => {
+        calls.push({ url: String(url), init: init ?? {} });
+        return new Response(JSON.stringify({
+          IsErroredOnProcessing: false,
+          ParsedResults: [
+            {
+              ParsedText: ['ZOEGAS 450G 49.90', 'MJOLK 1L 14.50', 'TOTAL 64.40'].join('\n'),
+              TextOverlay: {
+                Lines: [
+                  { LineText: 'ZOEGAS 450G 49.90', Words: [{ WordText: 'ZOEGAS', Confidence: 96 }, { WordText: '49.90', Confidence: 91 }] },
+                  { LineText: 'MJOLK 1L 14.50', Words: [{ WordText: 'MJOLK', Confidence: 88 }, { WordText: '14.50', Confidence: 84 }] }
+                ]
+              }
+            }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    const result = await provider.parse('private-upload://receipt-1');
+
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0]?.url, 'https://api.ocr.space/parse/image');
+    assert.equal(calls[0]?.init.method, 'POST');
+    assert.equal((calls[0]?.init.headers as Record<string, string>).apikey, 'ocr-key');
+    assert.match(String(calls[0]?.init.body), /url=private-upload%3A%2F%2Freceipt-1/);
+    assert.deepEqual(result, {
+      rows: [
+        { rawName: 'ZOEGAS 450G', itemTotal: 49.9, confidence: 0.91 },
+        { rawName: 'MJOLK 1L', itemTotal: 14.5, confidence: 0.84 }
+      ],
+      totalAmount: 64.4,
+      confidence: 0.88
+    });
+  });
+
+  it('fails closed on missing credentials and provider errors', async () => {
+    assert.throws(() => createOcrSpaceReceiptProvider({ apiKey: ' ' }), /OCR_SPACE_API_KEY is required/);
+
+    const provider = createOcrSpaceReceiptProvider({
+      apiKey: 'ocr-key',
+      fetch: async () => new Response(JSON.stringify({ IsErroredOnProcessing: true, ErrorMessage: ['bad image'] }), { status: 200 })
+    });
+
+    await assert.rejects(() => provider.parse('private-upload://receipt-2'), /OCR.space failed: bad image/);
   });
 });
