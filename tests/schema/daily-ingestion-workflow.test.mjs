@@ -83,6 +83,7 @@ describe('daily ingestion workflow', () => {
     );
     assert.match(workflow, /\/tmp\/daily-db-connectivity\.json/);
     assert.match(workflow, /daily_db_connectivity_diagnostic_missing/);
+    assert.match(workflow, /daily_db_connectivity_database_url_config_missing/);
     assert.match(workflow, /connectivity_status=\$\?/);
     assert.match(workflow, /body\.status !== 'ready'/);
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS \|\| '30' \}\}/);
@@ -103,6 +104,7 @@ describe('daily ingestion workflow', () => {
     );
     assert.match(workflow, /\/tmp\/production-db-migrations\.json/);
     assert.match(workflow, /production_db_migrations_diagnostic_missing/);
+    assert.match(workflow, /production_db_migrations_database_url_config_missing/);
     assert.match(workflow, /migration_status=\$\?/);
     assert.match(workflow, /body\.status !== 'ready'/);
     assert.match(workflow, /name:\s*groceryview-production-db-migrations/);
@@ -143,6 +145,7 @@ describe('daily ingestion workflow', () => {
     assert.doesNotMatch(workflow, /connectorCount !== 6/);
     assert.match(workflow, /daily_ingestion_connectors_status=\$\?/);
     assert.match(workflow, /daily_ingestion_connectors_diagnostic_missing/);
+    assert.match(workflow, /daily_ingestion_database_url_config_missing/);
     assert.match(workflow, /daily_ingestion_result_diagnostic_missing/);
     assert.match(workflow, /ingestion_status=\$\?/);
     assert.match(workflow, /body\.status !== 'succeeded'/);
@@ -165,6 +168,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS:\s*\$\{\{ vars\.GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS \|\| 'ica,willys,coop,hemkop,lidl,city_gross' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE:\s*\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /db_site_snapshot_result_diagnostic_missing/);
+    assert.match(workflow, /db_site_snapshot_database_url_config_missing/);
     assert.match(workflow, /snapshot_status=\$\?/);
     assert.match(workflow, /body\.status !== 'passed'/);
     assert.match(workflow, /body\.coverage\?\.observations < 1/);

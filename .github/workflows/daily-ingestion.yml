@@ -219,7 +219,16 @@ jobs:
           GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS || '30000' }}
         run: |
           set -euo pipefail
-          test -n "${DATABASE_URL:-}"
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/daily-db-connectivity.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "daily_db_connectivity_database_url_config_missing"
+          }
+          EOF
+            cat /tmp/daily-db-connectivity.json
+            exit 1
+          fi
           connectivity_status=0
           npm run --silent ops:check-daily-db-connectivity >/tmp/daily-db-connectivity.json || connectivity_status=$?
           if [ ! -s /tmp/daily-db-connectivity.json ]; then
@@ -249,7 +258,16 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           set -euo pipefail
-          test -n "${DATABASE_URL:-}"
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/production-db-migrations.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "production_db_migrations_database_url_config_missing"
+          }
+          EOF
+            cat /tmp/production-db-migrations.json
+            exit 1
+          fi
           migration_status=0
           npm run --silent ops:apply-db-migrations >/tmp/production-db-migrations.json || migration_status=$?
           if [ ! -s /tmp/production-db-migrations.json ]; then
@@ -284,7 +302,24 @@ jobs:
           GROCERYVIEW_DAILY_BLOCKER_LOG_PATH: codex-tasks/ingestion-blockers.txt
         run: |
           set -euo pipefail
-          test -n "${DATABASE_URL:-}"
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/daily-ingestion-result.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "daily_ingestion_database_url_config_missing"
+          }
+          EOF
+            mkdir -p codex-tasks
+            {
+              echo "# Daily ingestion blockers"
+              echo
+              echo "status: failed"
+              echo "blockers:"
+              echo "- daily_ingestion_database_url_config_missing"
+            } > codex-tasks/ingestion-blockers.txt
+            cat /tmp/daily-ingestion-result.json
+            exit 1
+          fi
           npm run build -w @groceryview/db
           npm run build -w @groceryview/ingestion
           daily_ingestion_connectors_status=0
@@ -382,7 +417,22 @@ jobs:
           GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE: /tmp/groceryview-catalog-targets.json
         run: |
           set -euo pipefail
-          test -n "${DATABASE_URL:-}"
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/groceryview-db-site-snapshot.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "db_site_snapshot_database_url_config_missing"
+          }
+          EOF
+            cat > /tmp/db-site-snapshot-result.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "db_site_snapshot_database_url_config_missing"
+          }
+          EOF
+            cat /tmp/db-site-snapshot-result.json
+            exit 1
+          fi
           snapshot_status=0
           npm run --silent ingest:export-db-snapshot \
             >/tmp/db-site-snapshot-result.json || snapshot_status=$?
