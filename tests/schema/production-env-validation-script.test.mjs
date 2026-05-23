@@ -107,6 +107,40 @@ describe('production env value validation script', () => {
     }).status, 'ready');
   });
 
+  it('accepts daily ingestion scope without notification, mobile, or scanning-only secrets', async () => {
+    const { validateProductionEnv } = await import(scriptPath);
+    const chains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+    assert.equal(validateProductionEnv({
+      AUTH_SECRET: 'test-auth-secret',
+      DATABASE_URL: 'postgres://example/groceryview',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'test-notification-webhook-secret',
+      BILLING_WEBHOOK_SECRET: 'test-billing-webhook-secret',
+      METRICS_TOKEN: 'test-metrics-token',
+      GROCERYVIEW_SERVER_URL: 'https://api.groceryview.example',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(chains.map((chainId) => ({
+        connectorId: `${chainId}-normalized-json`,
+        chainId,
+        sourceType: 'official_api',
+        endpointUrl: `https://sources.example.test/${chainId}/products.json`,
+        parserVersion: 'normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: `${chainId}-odenplan`, name: `${chainId} Odenplan`, address: 'Odenplan', city: 'Stockholm' }]
+      }))),
+      CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
+        targetProducts: ['coffee'],
+        targetCategories: ['coffee'],
+        targetChains: chains,
+        targetStores: chains.map((chainId) => `${chainId}-odenplan`),
+        targetPriceTypes: ['online'],
+        requireEveryProductInEveryStore: false,
+        requireEveryStorePriceType: true
+      })
+    }, { scope: 'daily-ingestion' }).status, 'ready');
+  });
+
   it('fails closed when required env values are missing', () => {
     const result = spawnSync(process.execPath, [scriptPath.pathname], { encoding: 'utf8', env: {} });
     assert.notEqual(result.status, 0);
