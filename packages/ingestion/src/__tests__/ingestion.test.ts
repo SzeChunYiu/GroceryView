@@ -2282,8 +2282,8 @@ describe('fetchIcaReklambladOffers', () => {
     });
 
     assert.equal(requestedUrls[0], 'https://www.ica.se/erbjudanden/ica-focus-1004247/');
-    assert.equal(rows.length, 2);
-    assert.deepEqual(rows.map((row) => row.storeKey), ['store-a', 'store-b']);
+    assert.equal(rows.length, 1);
+    assert.deepEqual(rows.map((row) => row.storeId), ['1735']);
   });
 });
 
@@ -2493,7 +2493,8 @@ describe('fetchMatpriskollenOffers', () => {
       retrievedAt: '2026-05-21T01:20:00.000Z'
     });
 
-    assert.equal(rows.length, 1);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows.map((row) => row.storeKey), ['store-a', 'store-b']);
   });
 });
 
