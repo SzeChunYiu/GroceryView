@@ -1,9 +1,19 @@
 import { AccountBillingActions } from '@/components/account-billing-actions';
 import { AccountMutationActions } from '@/components/account-mutation-actions';
 import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
+import { planAccountDeletion } from '@groceryview/core';
+
+const accountDeletionPlan = planAccountDeletion('signed-in-user');
+const accountDeletionConfirmations = [
+  'Confirm the active session belongs to the account owner.',
+  'Review every account-owned table scheduled for deletion.',
+  'Acknowledge that receipt, basket, watchlist, and preference history cannot be restored after execution.',
+  'Type DELETE ACCOUNT before the destructive job can be queued.'
+];
 
 export function generateMetadata() {
   return routeMetadata('/account');
@@ -91,6 +101,47 @@ export default function AccountPage() {
                 <p className="rounded-2xl border border-sky-100 p-3 text-sm font-bold text-sky-950" key={blocker.productId}>{blocker.productName}: {blocker.blocker}</p>
               ))}
             </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-rose-200 bg-rose-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>Account deletion</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Deletion plan requires owner confirmation</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              The page now uses <code className="rounded bg-white/80 px-1 py-0.5 text-rose-900">planAccountDeletion</code> from <code className="rounded bg-white/80 px-1 py-0.5 text-rose-900">@groceryview/core</code> for the signed-in shopper deletion preview. It only presents the plan and confirmation gates; the destructive delete is still blocked until the account owner reauthenticates and completes the final typed confirmation.
+            </p>
+          </div>
+          <ConfidenceBadge level="high" label="Destructive action gated" sampleSize={accountDeletionPlan.deleteFromTables.length + accountDeletionPlan.anonymizeTables.length} />
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_0.85fr]">
+          <div className="rounded-lg border border-rose-100 bg-white p-4">
+            <p className="text-sm font-black text-slate-950">Core deletion plan</p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">{accountDeletionPlan.reason}</p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-800">Delete records from</p>
+                <ul className="mt-2 space-y-1 text-sm font-semibold text-slate-700">
+                  {accountDeletionPlan.deleteFromTables.map((table) => <li key={table}>{table}</li>)}
+                </ul>
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-800">Anonymize records in</p>
+                <ul className="mt-2 space-y-1 text-sm font-semibold text-slate-700">
+                  {accountDeletionPlan.anonymizeTables.map((table) => <li key={table}>{table}</li>)}
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-lg border border-rose-100 bg-white p-4">
+            <p className="text-sm font-black text-slate-950">Required confirmations</p>
+            <ol className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              {accountDeletionConfirmations.map((confirmation) => (
+                <li className="rounded-lg bg-rose-50 p-3" key={confirmation}>{confirmation}</li>
+              ))}
+            </ol>
           </div>
         </div>
       </Card>
