@@ -1363,8 +1363,21 @@ describe('runtime config', () => {
       }));
 
       assert.equal(response.status, 200);
-      const body = await response.json() as { status: string; evidence: string[]; blockers: string[]; summary: string };
+      const body = await response.json() as {
+        status: string;
+        evidence: string[];
+        blockers: string[];
+        summary: string;
+        target: { host: string; database: string; username: string; isSupabasePooler: boolean; poolerMode: string };
+      };
       assert.equal(body.status, 'ready');
+      assert.deepEqual(body.target, {
+        host: 'runtime-db.example',
+        database: 'groceryview',
+        username: 'runtime-user',
+        isSupabasePooler: false,
+        poolerMode: 'direct'
+      });
       assert.deepEqual(body.blockers, []);
       assert.equal(body.evidence.includes('table:app_users'), true);
       assert.equal(body.evidence.includes('table:alert_rules'), true);

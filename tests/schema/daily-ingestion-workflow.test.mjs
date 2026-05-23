@@ -140,6 +140,9 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /path:\s*\/tmp\/groceryview-db-site-snapshot\.json/);
     assert.match(workflow, /missingProductStorePairs/);
     assert.match(workflow, /requiredActions/);
+    assert.match(workflow, /postgres_readiness_target_mismatch/);
+    assert.match(workflow, /daily-db-connectivity\.json/);
+    assert.match(workflow, /postgres-readiness\.json/);
 
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
       assert.match(workflow, new RegExp(`source_run_missing_fresh_chain:${chain}`));
