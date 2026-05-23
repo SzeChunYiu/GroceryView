@@ -22,6 +22,7 @@ describe('daily ingestion workflow', () => {
       'npm ci',
       'npm run test -w @groceryview/db',
       'npm run test -w @groceryview/ingestion',
+      'npm run --silent ops:daily-connector-stores',
       'npm run --silent ops:daily-connectors',
       'npm run --silent ops:catalog-coverage-targets',
       'npm run --silent ops:validate-production-env',
@@ -35,6 +36,21 @@ describe('daily ingestion workflow', () => {
       assert.match(workflow, new RegExp(command.replaceAll(' ', '\\s+').replaceAll('/', '\\/')));
     }
 
+    assert.match(workflow, /name: Export live store enumeration/);
+    assert.ok(
+      workflow.indexOf('name: Verify ingestion and DB contracts') < workflow.indexOf('name: Export live store enumeration'),
+      'store enumeration must run after package tests and before production config validation'
+    );
+    assert.ok(
+      workflow.indexOf('name: Export live store enumeration') < workflow.indexOf('name: Validate production ingestion configuration'),
+      'store enumeration must prove branch metadata before connector and target validation'
+    );
+    assert.match(workflow, /npm run --silent ops:daily-connector-stores >\/tmp\/daily-connector-stores\.json/);
+    assert.match(workflow, /body\.storesByChain\?\.\[chain\]/);
+    assert.match(workflow, /store_enumeration_missing_chain/);
+    assert.match(workflow, /store_enumeration_empty_chain/);
+    assert.match(workflow, /name:\s*groceryview-daily-connector-stores/);
+    assert.match(workflow, /path:\s*\/tmp\/daily-connector-stores\.json/);
     assert.match(workflow, /npm run --silent ops:daily-connectors >\/tmp\/groceryview-daily-connectors\.json/);
     assert.match(workflow, /CATALOG_COVERAGE_TARGETS_JSON_FILE=\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /ops:catalog-coverage-targets\s+--\s+--from-current-connectors >\/tmp\/groceryview-catalog-targets\.json/);
