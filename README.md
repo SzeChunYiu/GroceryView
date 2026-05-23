@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 23:21 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 01:23 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **281**
+- **Shipped `feat:`/`wire:` PRs to date:** **267**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,26 +42,25 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1165 feat(notifications): add provider delivery adapters
+- #1155 feat(ingest): add ICA Tidaholm promotions
+- #1152 feat(ingest): add Coop branch weekly discounts
+- #1150 feat(ingest): add ICA Tibro promotions
+- #1148 feat(ingest): refresh OpenFoodFacts barcode nutrition
+- #1146 feat(ingest): add Coop weekly branch discounts
+- #1143 feat(ingest): add ICA Hedemyrs promotions
+- #1141 feat(ingest): add Coop Åmål weekly discounts
+- #1139 feat(review): add more-info decision control
 - #1137 feat(ingest): enrich OpenFoodFacts alternate names
 - #1136 feat(account): add billing action controls
 - #1135 feat(ingest): add ICA Nära Klingan promotions
 - #1132 feat(seo): add hreflang alternates
 - #1131 feat(billing): add Stripe portal sessions
 - #1129 feat(persona): add multi-week stock-up list
-- #1128 feat(persona): add meal-prep bulk-buy optimizer
-- #1127 feat(ingest): refresh OpenFoodFacts barcode nutrition
-- #1125 feat(ingest): add Coop weekly daily connector
-- #1124 feat(persona): add local seasonal picks
-- #1121 feat(persona): add saved basket auto-reorder readiness
-- #1119 feat(persona): add premium tier tracking
-- #1117 feat(billing): add Stripe checkout sessions
-- #1115 feat(persona): add verified health label filters
-- #1114 feat(persona): add saved basket auto reorder
 
 ## 🔄 In progress (open PRs)
 
-- #1139 feat(review): add more-info decision control
-- #1138 feat(ingest): refresh OpenFoodFacts barcode nutrition
+- #1166 feat(notifications): wire runtime provider worker
 
 ## 📋 To-do (from GOAL.md backlog)
 
