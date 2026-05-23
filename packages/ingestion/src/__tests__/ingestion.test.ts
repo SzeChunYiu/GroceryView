@@ -22,6 +22,7 @@ import {
   buildHemkopStoresUrl,
   buildHemkopWeeklyDiscountsUrl,
   buildEmaginPdfUrl,
+  buildIcaStoreProductSearchUrl,
   buildIcaStorePromotionsUrl,
   buildLidlOfferPageUrl,
   buildLidlStoreDetailPayloadUrl,
@@ -76,6 +77,8 @@ import {
   fetchHemkopWeeklyDiscountsForAllStores,
   fetchIcaDefaultStoreProducts,
   fetchIcaProducts,
+  ICA_MAXI_CATALOG_SEARCH_INVESTIGATION,
+  ICA_PRODUCT_PAGE_SEARCH_PATH,
   fetchIcaReklambladOffers,
   fetchLidlBulkProducts,
   fetchLidlOffers,
@@ -2507,6 +2510,30 @@ describe('fetchHemkopWeeklyDiscounts', () => {
 });
 
 describe('fetchIcaProducts', () => {
+  it('documents the ICA Maxi catalogue search probe as blocked before replacing promotions', () => {
+    const url = buildIcaStoreProductSearchUrl({
+      storeAccountId: '1003418',
+      query: 'mjölk',
+      maxPageSize: 20
+    });
+
+    assert.equal(new URL(url).pathname, '/stores/1003418/api/webproductpagews/v6/product-pages/search');
+    assert.equal(new URL(url).searchParams.get('q'), 'mjölk');
+    assert.equal(new URL(url).searchParams.get('includeAdditionalPageInfo'), 'true');
+    assert.equal(new URL(url).searchParams.get('maxPageSize'), '20');
+    assert.deepEqual(ICA_MAXI_CATALOG_SEARCH_INVESTIGATION, {
+      status: 'blocked',
+      checkedAt: '2026-05-23T20:53:30.000Z',
+      storeAccountId: '1003418',
+      observedBundlePath: ICA_PRODUCT_PAGE_SEARCH_PATH,
+      probedUrl: url,
+      blockedStatus: 403,
+      reason: 'The frontend bundle references /v6/product-pages/search, but the store-scoped API probe is blocked by CloudFront/AWS WAF without an approved authenticated or WAF-compatible access path.',
+      requiredActions: ['approved_ica_catalog_search_access', 'waf_compatible_fetch_contract', 'pagination_contract_fixture'],
+      fallbackConnector: 'ica-store-promotions'
+    });
+  });
+
   it('fetches ICA store-scoped promotion products with source provenance', async () => {
     const requestedUrls: string[] = [];
     const payload = {
@@ -5890,6 +5917,7 @@ describe('daily ingestion runner', () => {
     assert.equal(result.acceptedCount, 1);
     assert.equal(requestedUrls.length, 1);
     assert.equal(new URL(requestedUrls[0]).pathname, '/stores/1004599/api/product-listing-pages/v1/pages/promotions');
+    assert.doesNotMatch(requestedUrls[0], /webproductpagews\/v6\/product-pages\/search/);
     const observation = firstBatchObservation(executor);
     assert.equal(observation.store_id, 'store-db-2');
     assert.equal(observation.price, 44.9);
