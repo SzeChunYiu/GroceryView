@@ -26,6 +26,7 @@ describe('daily ingestion workflow', () => {
       'npm run --silent ops:daily-connectors',
       'npm run --silent ops:catalog-coverage-targets',
       'npm run --silent ops:validate-production-env',
+      'npm run --silent ops:check-daily-db-connectivity',
       'node packages/ingestion/dist/index.js',
       '/api/readiness/postgres',
       '/api/readiness/source-runs',
@@ -55,6 +56,19 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /CATALOG_COVERAGE_TARGETS_JSON_FILE=\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /ops:catalog-coverage-targets\s+--\s+--from-current-connectors >\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /ops:validate-production-env\s+--\s+--scope\s+daily-ingestion/);
+    assert.match(workflow, /name: Check production DB write connectivity/);
+    assert.ok(
+      workflow.indexOf('name: Validate production ingestion configuration') < workflow.indexOf('name: Check production DB write connectivity'),
+      'DB write connectivity diagnostics must run after env validation so DATABASE_URL exists'
+    );
+    assert.ok(
+      workflow.indexOf('name: Check production DB write connectivity') < workflow.indexOf('name: Run configured daily ingestion'),
+      'DB write connectivity diagnostics must fail before retailer fetches and DB persistence work'
+    );
+    assert.match(workflow, /\/tmp\/daily-db-connectivity\.json/);
+    assert.match(workflow, /body\.status !== 'ready'/);
+    assert.match(workflow, /name:\s*groceryview-daily-db-connectivity/);
+    assert.match(workflow, /path:\s*\/tmp\/daily-db-connectivity\.json/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=\/tmp\/groceryview-daily-connectors\.json/);
     assert.match(workflow, /GROCERYVIEW_DAILY_MAX_CONCURRENCY:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_MAX_CONCURRENCY \|\| '2' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS \|\| '250' \}\}/);
