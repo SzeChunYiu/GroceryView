@@ -116,6 +116,16 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(latestPrices, /unique nulls not distinct \(product_id, chain_id, store_id, price_type\)/);
   });
 
+  it('indexes latest_prices for bounded DB-backed site snapshot exports', () => {
+    assert.match(allMigrations, /create index concurrently if not exists latest_prices_grocery_snapshot_idx/);
+    assert.match(allMigrations, /on latest_prices \(domain, observed_at desc, product_id, chain_id, store_id, price_type\)/);
+    assert.match(allMigrations, /include \(observation_id, price, regular_price, unit_price, currency, confidence, provenance\)/);
+    assert.match(allMigrations, /where domain = 'grocery'/);
+    assert.match(schemaDoc, /latest_prices_grocery_snapshot_idx/);
+    assert.match(schemaDoc, /db-backed site snapshot exporter/i);
+    assert.match(schemaDoc, /do not replace it with a raw `observations` scan/i);
+  });
+
   it('materializes daily and weekly price rollups for chart and 52-week-low reads', () => {
     for (const table of ['price_daily', 'price_weekly']) {
       assert.match(allMigrations, new RegExp(`create table if not exists ${table}\\b`), `${table} table missing`);
