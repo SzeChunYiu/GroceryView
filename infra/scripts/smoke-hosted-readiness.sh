@@ -28,26 +28,38 @@ if [ "$READINESS_TIMEOUT_SECONDS" -lt 1 ]; then
   exit 2
 fi
 
-endpoint="${GROCERYVIEW_SERVER_URL%/}/api/readiness/postgres"
-response="$(
-  curl -fsS \
-    --max-time "$READINESS_TIMEOUT_SECONDS" \
-    -H "x-groceryview-metrics-token: $METRICS_TOKEN" \
-    "$endpoint"
-)"
+check_readiness_endpoint() {
+  local label="$1"
+  local endpoint="$2"
+  local response
+  response="$(
+    curl -fsS \
+      --max-time "$READINESS_TIMEOUT_SECONDS" \
+      -H "x-groceryview-metrics-token: $METRICS_TOKEN" \
+      "$endpoint"
+  )"
 
-if ! printf '%s\n' "$response" | grep -Eq '"status"[[:space:]]*:[[:space:]]*"ready"'; then
-  echo "hosted PostgreSQL readiness smoke failed: expected status=ready from $endpoint" >&2
-  printf '%s\n' "$response" >&2
-  exit 1
-fi
+  if ! printf '%s\n' "$response" | grep -Eq '"status"[[:space:]]*:[[:space:]]*"(ready|complete)"'; then
+    echo "hosted $label readiness smoke failed: expected ready/complete status from $endpoint" >&2
+    printf '%s\n' "$response" >&2
+    exit 1
+  fi
 
-echo "Hosted PostgreSQL readiness smoke passed: $endpoint"
+  echo "Hosted $label readiness smoke passed: $endpoint"
+}
+
+postgres_endpoint="${GROCERYVIEW_SERVER_URL%/}/api/readiness/postgres"
+scan_endpoint="${GROCERYVIEW_SERVER_URL%/}/api/readiness/scanning"
+
+check_readiness_endpoint "PostgreSQL" "$postgres_endpoint"
+check_readiness_endpoint "scan provider" "$scan_endpoint"
 
 if [ -n "$HOSTED_READINESS_SMOKE_OUTPUT_PATH" ]; then
   mkdir -p "$(dirname "$HOSTED_READINESS_SMOKE_OUTPUT_PATH")"
-  HOSTED_READINESS_SMOKE_ENDPOINT="$endpoint"
-  export HOSTED_READINESS_SMOKE_ENDPOINT
+  HOSTED_POSTGRES_READINESS_SMOKE_ENDPOINT="$postgres_endpoint"
+  HOSTED_SCAN_READINESS_SMOKE_ENDPOINT="$scan_endpoint"
+  export HOSTED_POSTGRES_READINESS_SMOKE_ENDPOINT
+  export HOSTED_SCAN_READINESS_SMOKE_ENDPOINT
   export HOSTED_READINESS_SMOKE_OUTPUT_PATH
 
   node --input-type=module <<'NODE'
@@ -55,12 +67,15 @@ import { writeFile } from 'node:fs/promises';
 
 const payload = {
   status: 'ready',
-  endpoint: process.env.HOSTED_READINESS_SMOKE_ENDPOINT,
+  endpoints: {
+    postgres: process.env.HOSTED_POSTGRES_READINESS_SMOKE_ENDPOINT,
+    scanning: process.env.HOSTED_SCAN_READINESS_SMOKE_ENDPOINT
+  },
   checkedAt: new Date().toISOString()
 };
 
 await writeFile(process.env.HOSTED_READINESS_SMOKE_OUTPUT_PATH, `${JSON.stringify(payload, null, 2)}\n`);
 NODE
 
-  echo "Hosted PostgreSQL readiness smoke evidence written: $HOSTED_READINESS_SMOKE_OUTPUT_PATH"
+  echo "Hosted readiness smoke evidence written: $HOSTED_READINESS_SMOKE_OUTPUT_PATH"
 fi

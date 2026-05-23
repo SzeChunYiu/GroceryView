@@ -102,7 +102,7 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /acceptedObservations/);
   });
 
-  it('documents hosted deployment smoke commands for API, product terminal, web, and PostgreSQL readiness evidence', () => {
+  it('documents hosted deployment smoke commands for API, product terminal, web, PostgreSQL, and scan readiness evidence', () => {
     assert.match(infraReadme, /## Hosted deployment smoke/);
     assert.match(infraReadme, /infra\/scripts\/smoke-hosted-http\.sh/);
     assert.match(infraReadme, /infra\/scripts\/smoke-hosted-readiness\.sh/);
@@ -115,19 +115,21 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /\/api\/health/);
     assert.match(infraReadme, /\/api\/products\/\$\{GROCERYVIEW_TERMINAL_PRODUCT_ID:-coffee\}\/terminal/);
     assert.match(infraReadme, /\/api\/readiness\/postgres/);
+    assert.match(infraReadme, /\/api\/readiness\/scanning/);
   });
 
-  it('ships a hosted PostgreSQL readiness smoke script for deployment evidence', () => {
+  it('ships a hosted readiness smoke script for deployment evidence', () => {
     assert.match(hostedReadinessSmokeScript, /GROCERYVIEW_SERVER_URL/);
     assert.match(hostedReadinessSmokeScript, /METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /READINESS_TIMEOUT_SECONDS/);
     assert.match(hostedReadinessSmokeScript, /HOSTED_READINESS_SMOKE_OUTPUT_PATH/);
     assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/postgres/);
+    assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scanning/);
     assert.match(hostedReadinessSmokeScript, /x-groceryview-metrics-token: \$METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /curl -fsS/);
-    assert.match(hostedReadinessSmokeScript, /"status"\[\[:space:\]\]\*:\[\[:space:\]\]\*"ready"/);
+    assert.match(hostedReadinessSmokeScript, /"status"\[\[:space:\]\]\*:\[\[:space:\]\]\*"\(ready\|complete\)"/);
     assert.match(hostedReadinessSmokeScript, /endpoint/);
-    assert.match(hostedReadinessSmokeScript, /Hosted PostgreSQL readiness smoke evidence written/);
+    assert.match(hostedReadinessSmokeScript, /Hosted readiness smoke evidence written/);
   });
 
   it('ships a retailer connector smoke script gated by source access approvals', () => {
