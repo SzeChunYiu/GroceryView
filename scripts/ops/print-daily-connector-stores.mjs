@@ -10,7 +10,8 @@ function toDailyStoreConfig(store) {
     countryCode: store.countryCode ?? 'SE',
     ...(store.latitude === null || store.latitude === undefined ? {} : { latitude: store.latitude }),
     ...(store.longitude === null || store.longitude === undefined ? {} : { longitude: store.longitude }),
-    ...(store.conceptName ? { storeType: store.conceptName } : {})
+    ...(store.conceptName ? { storeType: store.conceptName } : {}),
+    ...(typeof store.supportsOnlineProductPrices === 'boolean' ? { supportsOnlineProductPrices: store.supportsOnlineProductPrices } : {})
   };
 }
 
@@ -65,7 +66,17 @@ export async function printDailyConnectorStores({ fetchers, selfTest = false } =
       address: 'Järnvägsgatan 16',
       city: 'Krylbo',
       latitude: 60.1307271,
-      longitude: 16.213442
+      longitude: 16.213442,
+      supportsOnlineProductPrices: false
+    }, {
+      storeId: '176110',
+      name: 'Coop City Hallsberg',
+      conceptName: 'Coop',
+      address: 'Trädgårdsgatan 6',
+      city: 'Hallsberg',
+      latitude: 59.0649672,
+      longitude: 15.1129595,
+      supportsOnlineProductPrices: true
     }],
     fetchCityGrossStores: async () => [{
       storeId: '21',
