@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, studentDealRecipes } from '@/lib/demo-data';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
@@ -12,7 +13,13 @@ function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
 
+function confidenceLevel(value: string): 'high' | 'medium' | 'low' {
+  return value === 'high' || value === 'medium' || value === 'low' ? value : 'low';
+}
+
 export default function MealPlannerPage() {
+  const dealMealConfidenceLevel = confidenceLevel(dealBasedMeals.coverage.confidence);
+
   return (
     <PageShell>
       <Eyebrow>Deal-based meals</Eyebrow>
@@ -34,7 +41,9 @@ export default function MealPlannerPage() {
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Confidence</p>
-          <p className="mt-2 text-5xl font-black capitalize text-slate-950">{dealBasedMeals.coverage.confidence}</p>
+          <div className="mt-4">
+            <ConfidenceBadge level={dealMealConfidenceLevel} label={`${dealBasedMeals.coverage.confidence} confidence`} sampleSize={dealBasedMeals.coverage.dealCount} />
+          </div>
           <p className="mt-3 font-semibold text-slate-700">{dealBasedMeals.coverage.caveat}</p>
         </Card>
       </div>

@@ -1032,6 +1032,7 @@ describe('verified-data UI', () => {
     const source = await read('src/app/meal-planner/page.tsx');
     assert.match(source, /dealBasedMeals/);
     assert.match(source, /suggestDealBasedMeals/);
+    assert.match(source, /ConfidenceBadge/);
     assert.match(source, /estimatedCostPerServing/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
