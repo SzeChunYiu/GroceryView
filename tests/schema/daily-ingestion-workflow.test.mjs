@@ -52,6 +52,8 @@ describe('daily ingestion workflow', () => {
       'store enumeration must prove branch metadata before connector and target validation'
     );
     assert.match(workflow, /npm run --silent ops:daily-connector-stores >\/tmp\/daily-connector-stores\.json/);
+    assert.match(workflow, /store_enumeration_status=\$\?/);
+    assert.match(workflow, /store_enumeration_diagnostic_missing/);
     assert.match(workflow, /body\.storesByChain\?\.\[chain\]/);
     assert.match(workflow, /store_enumeration_missing_chain/);
     assert.match(workflow, /store_enumeration_empty_chain/);

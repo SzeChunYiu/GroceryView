@@ -78,7 +78,18 @@ jobs:
       - name: Export live store enumeration
         run: |
           set -euo pipefail
-          npm run --silent ops:daily-connector-stores >/tmp/daily-connector-stores.json
+          store_enumeration_status=0
+          npm run --silent ops:daily-connector-stores >/tmp/daily-connector-stores.json || store_enumeration_status=$?
+          if [ ! -s /tmp/daily-connector-stores.json ]; then
+            cat > /tmp/daily-connector-stores.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "store_enumeration_diagnostic_missing",
+            "exitCode": ${store_enumeration_status}
+          }
+          EOF
+          fi
+          cat /tmp/daily-connector-stores.json
           node <<'NODE'
           const body = require('/tmp/daily-connector-stores.json');
           const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
