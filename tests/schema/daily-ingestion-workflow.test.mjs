@@ -92,9 +92,13 @@ describe('daily ingestion workflow', () => {
       'daily ingestion must run only after the target database has the canonical schema'
     );
     assert.match(workflow, /\/tmp\/production-db-migrations\.json/);
+    assert.match(workflow, /production_db_migrations_diagnostic_missing/);
+    assert.match(workflow, /migration_status=\$\?/);
     assert.match(workflow, /body\.status !== 'ready'/);
     assert.match(workflow, /name:\s*groceryview-production-db-migrations/);
     assert.match(workflow, /path:\s*\/tmp\/production-db-migrations\.json/);
+    assert.match(workflow, /name: Upload production DB migrations result\n\s+if:\s*always\(\)/);
+    assert.match(workflow, /name:\s*groceryview-production-db-migrations[\s\S]*if-no-files-found:\s*error/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=\/tmp\/groceryview-daily-connectors\.json/);
     assert.match(workflow, /GROCERYVIEW_DAILY_MAX_CONCURRENCY:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_MAX_CONCURRENCY \|\| '2' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS \|\| '250' \}\}/);
