@@ -2425,6 +2425,43 @@ describe('fetchCityGrossProducts', () => {
     }]);
   });
 
+
+
+  it('paginates the City Gross branch catalog without a query when no row cap is set', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const skip = Number(new URL(String(url)).searchParams.get('skip') ?? '0');
+      const productId = skip === 0 ? 'citygross-full-1' : 'citygross-full-2';
+      return new Response(JSON.stringify({
+        items: [{
+          id: productId,
+          name: `Full catalog product ${skip}`,
+          brand: 'Garant',
+          category: 'Pantry',
+          descriptiveSize: '1 st',
+          productStoreDetails: {
+            prices: { currentPrice: { price: skip === 0 ? 10 : 11, unit: 'PCE' } }
+          }
+        }],
+        totalCount: 2
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCityGrossProducts({
+      fetchImpl,
+      siteId: '21',
+      pageSize: 1,
+      retrievedAt: '2026-05-22T12:41:30.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 0 }),
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 1 })
+    ]);
+    assert.deepEqual(rows.map((row) => [row.code, row.price]), [['citygross-full-1', 10], ['citygross-full-2', 11]]);
+  });
+
   it('can expand City Gross product prices across the live store catalog', async () => {
     const requestedUrls: string[] = [];
     const fetchImpl: typeof fetch = async (url) => {
@@ -2467,6 +2504,51 @@ describe('fetchCityGrossProducts', () => {
     assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['21', 10], ['22', 11]]);
   });
 });
+
+
+
+  it('expands City Gross all-store ingestion from full branch catalogs when no query cap is configured', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/PageData/stores')) {
+        return new Response(JSON.stringify([
+          { data: { storeName: 'Borås', siteId: 21, url: '/butiker/boras/', storeLocation: { coordinates: '57.7141742,12.8669819' } } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const skip = Number(new URL(String(url)).searchParams.get('skip') ?? '0');
+      return new Response(JSON.stringify({
+        items: [{
+          id: `citygross-full-${skip}`,
+          name: `City Gross full catalog ${skip}`,
+          brand: 'Garant',
+          category: 'Pantry',
+          descriptiveSize: '1 st',
+          productStoreDetails: {
+            prices: { currentPrice: { price: skip === 0 ? 10 : 11, unit: 'PCE' } }
+          }
+        }],
+        totalCount: 2
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCityGrossProductsForAllStores({
+      fetchImpl,
+      maxStores: 1,
+      pageSize: 1,
+      retrievedAt: '2026-05-22T12:42:30.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCityGrossStoresUrl(),
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 0 }),
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 1 })
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code, row.price]), [
+      ['21', 'citygross-full-0', 10],
+      ['21', 'citygross-full-1', 11]
+    ]);
+  });
 
 describe('fetchLidlStores', () => {
   it('discovers Lidl public store detail pages and normalizes branch metadata', async () => {
