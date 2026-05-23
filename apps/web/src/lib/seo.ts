@@ -155,6 +155,10 @@ export const routeMetadataCatalog = {
     title: 'Verified Swedish grocery product catalogue | GroceryView',
     description: 'Browse verified product tickers with prices, unit-price cards, OpenFoodFacts metadata, image-first browsing, and deal signals.'
   },
+  '/search': {
+    title: 'Search verified grocery products | GroceryView',
+    description: 'Search GroceryView for Swedish grocery products, chain prices, category tags, and OpenFoodFacts-backed comparisons with confidence metadata.'
+  },
   '/savings-dashboard': {
     title: 'Personal grocery inflation dashboard | GroceryView',
     description: 'Track grocery inflation, fixed-income budgets, weekly student budgets, and staples price stability from real core summaries.'
@@ -279,6 +283,15 @@ export function metadataForProduct(product: ProductSeoInput): Metadata {
     description: `Compare ${product.name}${brand ? ` from ${brand}` : ''} across Swedish grocery data with deal score, unit price, smart swaps, and confidence labels.${priceCopy}`,
     imagePath: `/products/${product.slug}/opengraph-image`,
     imageAlt: `${product.name} verified GroceryView price image`
+  });
+}
+
+export function metadataForItem(product: ProductSeoInput): Metadata {
+  const brand = product.brand ?? product.brands;
+  return routeMetadata({
+    path: `/items/${product.slug}`,
+    title: `${product.name} item details | GroceryView`,
+    description: `View ${product.name}${brand ? ` from ${brand}` : ''} on GroceryView with verified item-level price comparison, unit pricing, and confidence-backed grocery evidence.`
   });
 }
 
