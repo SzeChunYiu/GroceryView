@@ -124,6 +124,9 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /replacement_database_url_missing/);
     assert.match(runbook, /replacement_database_url_matches_current_database_url/);
     assert.match(runbook, /replacement_database_not_writable/);
+    assert.match(runbook, /replacement_database_url_config_missing/);
+    assert.match(runbook, /replacement_ingestion_database_url_config_missing/);
+    assert.match(runbook, /replacement_snapshot_database_url_config_missing/);
     assert.match(runbook, /replacement_daily_connectors_diagnostic_missing/);
     assert.match(runbook, /replacement_catalog_targets_diagnostic_missing/);
     assert.match(runbook, /replacement_daily_ingestion_missing_chain_summary/);

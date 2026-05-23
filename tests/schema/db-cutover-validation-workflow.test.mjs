@@ -43,6 +43,7 @@ describe('production DB cutover validation workflow', () => {
     assert.match(workflow, /DATABASE_URL:\s*\$\{\{ secrets\.REPLACEMENT_DATABASE_URL \|\| secrets\.CANDIDATE_DATABASE_URL \}\}/);
     assert.match(workflow, /\/tmp\/replacement-db-migrations\.json/);
     assert.match(workflow, /replacement_db_migrations_diagnostic_missing/);
+    assert.match(workflow, /replacement_database_url_config_missing/);
     assert.match(workflow, /name:\s*groceryview-replacement-db-migrations/);
     assert.match(workflow, /name:\s*groceryview-replacement-db-migrations[\s\S]*if-no-files-found:\s*error/);
 
@@ -55,6 +56,7 @@ describe('production DB cutover validation workflow', () => {
     assert.match(workflow, /\/tmp\/replacement-daily-connectors\.json/);
     assert.match(workflow, /\/tmp\/replacement-catalog-targets\.json/);
     assert.match(workflow, /\/tmp\/replacement-daily-ingestion-result\.json/);
+    assert.match(workflow, /replacement_ingestion_database_url_config_missing/);
     assert.match(workflow, /replacement_daily_connectors_status=\$\?/);
     assert.match(workflow, /replacement_daily_connectors_diagnostic_missing/);
     assert.match(workflow, /replacement_catalog_targets_status=\$\?/);
@@ -76,6 +78,7 @@ describe('production DB cutover validation workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_PATH:\s*\/tmp\/replacement-db-site-snapshot\.json/);
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS:\s*\$\{\{ vars\.GROCERYVIEW_CUTOVER_DB_SITE_SNAPSHOT_REQUIRED_CHAINS \|\| 'ica,willys,coop,hemkop,lidl,city_gross' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE:\s*\/tmp\/replacement-catalog-targets\.json/);
+    assert.match(workflow, /replacement_snapshot_database_url_config_missing/);
     assert.match(workflow, /replacement_db_site_snapshot_without_observations/);
     assert.match(workflow, /missingRequiredStoreExternalRefs/);
     assert.match(workflow, /missingRequiredStorePriceTypes/);

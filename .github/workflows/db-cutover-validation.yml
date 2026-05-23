@@ -65,7 +65,16 @@ jobs:
           DATABASE_URL: ${{ secrets.REPLACEMENT_DATABASE_URL || secrets.CANDIDATE_DATABASE_URL }}
         run: |
           set -euo pipefail
-          test -n "${DATABASE_URL:-}"
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/replacement-db-migrations.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_database_url_config_missing"
+          }
+          EOF
+            cat /tmp/replacement-db-migrations.json
+            exit 1
+          fi
           migration_status=0
           npm run --silent ops:apply-db-migrations >/tmp/replacement-db-migrations.json || migration_status=$?
           if [ ! -s /tmp/replacement-db-migrations.json ]; then
@@ -99,7 +108,28 @@ jobs:
           GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_CUTOVER_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS || '500' }}
         run: |
           set -euo pipefail
-          test -n "${DATABASE_URL:-}"
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/replacement-daily-connectors.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_ingestion_database_url_config_missing"
+          }
+          EOF
+            cat > /tmp/replacement-catalog-targets.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_ingestion_database_url_config_missing"
+          }
+          EOF
+            cat > /tmp/replacement-daily-ingestion-result.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_ingestion_database_url_config_missing"
+          }
+          EOF
+            cat /tmp/replacement-daily-ingestion-result.json
+            exit 1
+          fi
           replacement_daily_connectors_status=0
           npm run --silent ops:daily-connectors >/tmp/replacement-daily-connectors.json || replacement_daily_connectors_status=$?
           if [ "${replacement_daily_connectors_status}" -ne 0 ] || [ ! -s /tmp/replacement-daily-connectors.json ]; then
@@ -218,7 +248,22 @@ jobs:
           GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE: /tmp/replacement-catalog-targets.json
         run: |
           set -euo pipefail
-          test -n "${DATABASE_URL:-}"
+          if [ -z "${DATABASE_URL:-}" ]; then
+            cat > /tmp/replacement-db-site-snapshot.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_snapshot_database_url_config_missing"
+          }
+          EOF
+            cat > /tmp/replacement-db-site-snapshot-result.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_snapshot_database_url_config_missing"
+          }
+          EOF
+            cat /tmp/replacement-db-site-snapshot-result.json
+            exit 1
+          fi
           snapshot_status=0
           npm run --silent ingest:export-db-snapshot >/tmp/replacement-db-site-snapshot-result.json || snapshot_status=$?
           if [ ! -s /tmp/replacement-db-site-snapshot-result.json ]; then
