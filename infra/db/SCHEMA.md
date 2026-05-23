@@ -228,6 +228,14 @@ Key columns: `user_id`, `watchlist_id`, `product_id`, `store_id`, `alert_type`, 
 
 Indexes: `alerts_active_user_idx`.
 
+### `price_alerts`
+
+Target-price alert subscriptions captured by the web alert API.
+
+Key columns: `id`, `user_email`, `product_id`, `target_price`, `created_at`.
+
+Indexes: `price_alerts_user_created_idx` for account alert reads and `price_alerts_product_idx` for product-scoped alert evaluation.
+
 ### `alert_rules`
 
 Application repository alert rules keyed by the text `app_users` identity used by current API and worker packages.

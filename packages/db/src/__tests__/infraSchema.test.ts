@@ -15,6 +15,7 @@ const receiptUploadsMigration = readFileSync(join(repoRoot, 'infra/db/migrations
 const householdPlansMigration = readFileSync(join(repoRoot, 'infra/db/migrations/008_household_plans.sql'), 'utf8').toLowerCase();
 const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/009_retailer_source_policies.sql'), 'utf8').toLowerCase();
 const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/010_basket_import_reviews.sql'), 'utf8').toLowerCase();
+const priceAlertsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/011_price_alerts.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql') && !entry.startsWith('._'))
@@ -295,6 +296,20 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('household_basket_items'), /quantity numeric\(12, 3\) not null check \(quantity > 0\)/);
     assert.match(repositoryTableDefinition('household_watchlist_items'), /target_price numeric\(12, 2\) check \(target_price is null or target_price >= 0\)/);
     assert.match(repositoryTableDefinition('household_favorite_stores'), /primary key \(household_id, store_id\)/);
+  });
+
+  it('migrates web price alert subscriptions with account and product lookup indexes', () => {
+    assert.match(priceAlertsMigration, /create table if not exists price_alerts/);
+    assert.match(priceAlertsMigration, /id uuid primary key default gen_random_uuid\(\)/);
+    assert.match(priceAlertsMigration, /user_email text not null/);
+    assert.match(priceAlertsMigration, /product_id text not null/);
+    assert.match(priceAlertsMigration, /target_price numeric\(12, 2\) not null check \(target_price >= 0\)/);
+    assert.match(priceAlertsMigration, /created_at timestamptz not null default now\(\)/);
+    assert.match(priceAlertsMigration, /price_alerts_user_created_idx on price_alerts \(user_email, created_at desc, id\)/);
+    assert.match(priceAlertsMigration, /price_alerts_product_idx on price_alerts \(product_id, id\)/);
+    assert.match(schemaDoc, /### `price_alerts`/);
+    assert.match(schemaDoc, /target-price alert subscriptions captured by the web alert api/);
+    assert.match(migrationVerifier, /\bprice_alerts\b/);
   });
 
   it('indexes repository workflow lookups used by adapters and workers', () => {

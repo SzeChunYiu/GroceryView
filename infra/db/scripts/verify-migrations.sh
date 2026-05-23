@@ -70,6 +70,7 @@ REQUIRED_TABLES=(
   baskets
   budgets
   alerts
+  price_alerts
   app_users
   favorite_stores
   user_preferences
