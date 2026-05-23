@@ -17,6 +17,10 @@ describe('daily ingestion workflow', () => {
       workflow.indexOf('name: Preflight required production configuration') < workflow.indexOf('name: Install'),
       'production config preflight must run before npm install and connector generation'
     );
+    assert.match(workflow, /\/tmp\/production-config-preflight\.json/);
+    assert.match(workflow, /production_config_preflight_missing/);
+    assert.match(workflow, /name: Upload production config preflight evidence\n\s+if:\s*always\(\)/);
+    assert.match(workflow, /name:\s*groceryview-production-config-preflight/);
 
     for (const command of [
       'npm ci',
@@ -104,8 +108,9 @@ describe('daily ingestion workflow', () => {
       'METRICS_TOKEN',
       'GROCERYVIEW_SERVER_URL',
     ]) {
-      assert.match(workflow, new RegExp(`missing production config: ${requiredConfigName}`));
+      assert.match(workflow, new RegExp(`'${requiredConfigName}'`));
     }
+    assert.match(workflow, /missing production config: '\s*\+\s*name/);
     assert.match(workflow, /connectorChainIds/);
     assert.match(workflow, /missingConnectorChains/);
     assert.match(workflow, /connectorStoreCoverageCount/);
