@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 03:25 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 04:26 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **259**
+- **Shipped `feat:`/`wire:` PRs to date:** **255**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,6 +42,11 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1204 feat(compare): add price overlay chart
+- #1197 feat(scanning): add hosted upload smoke
+- #1196 feat(watchlist): add price sparklines
+- #1194 feat(scanning): add upload write readiness
+- #1192 feat(scanning): add upload CORS readiness
 - #1190 feat(scanning): add upload storage readiness
 - #1187 feat(deals): add ranked deal screener
 - #1185 feat(scanning): add live provider health checks
@@ -52,15 +57,11 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1177 feat(ingestion): add Hemkop all-store product prices
 - #1175 feat(mobile): add camera capture screens
 - #1173 feat(scanner): upload captured receipt images
-- #1172 feat(readiness): require shelf price coverage by store
-- #1171 feat(mobile): add expo router screens
-- #1170 feat(ingestion): parse Coop DR flyer PDFs
-- #1168 feat(fuel): add OSM station source connector
-- #1166 feat(notifications): wire runtime provider worker
 
 ## 🔄 In progress (open PRs)
 
-- #1192 feat(scanning): add upload CORS readiness
+- #1206 fix(ingestion): use session pooler for daily writes
+- #1205 feat(ingestion): bound bulk daily runner
 
 ## 📋 To-do (from GOAL.md backlog)
 
