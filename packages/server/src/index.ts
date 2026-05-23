@@ -71,15 +71,22 @@ import {
   type WatchlistPriceType
 } from '@groceryview/core';
 import {
+  createExpoPushProvider,
+  createSendgridEmailProvider,
   formatNotificationOperationsMetrics,
   parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
+  runRepositoryNotificationWorkerCycle,
   type DeliveryChannel,
   type NotificationOperationsReport,
   type RepositoryNotificationWorkerCycleResult,
   type NotificationSuppressionWebhookProvider,
+  type NotificationProviderFetch,
+  type NotificationProviders,
+  type NotificationSuppression,
   type NotificationSuppressionEventType,
-  type NotificationSuppressionMutation
+  type NotificationSuppressionMutation,
+  type PersistedNotificationTask
 } from '@groceryview/notifications';
 import {
   planScanReviewWorkItems,
@@ -186,6 +193,9 @@ export type RuntimePersistenceRepository = {
     quantity?: number;
   }): Promise<BasketImportReviewItem>;
   upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
+  listDueNotificationTasks?(now: string): Promise<PersistedNotificationTask[]>;
+  listActiveNotificationSuppressions?(): Promise<NotificationSuppression[]>;
+  upsertNotificationTask?(task: PersistedNotificationTask): Promise<void>;
 };
 
 type RuntimeWatchlistRepository = {
@@ -213,6 +223,7 @@ export type RuntimeHandlerOptions = {
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
   watchlistPriceAlertWriter?: (userId: string, request: WatchlistPriceAlertRequest) => Promise<WatchlistPriceAlertReport>;
   pgPoolFactory?: RuntimePgPoolFactory;
+  notificationProviderFetch?: NotificationProviderFetch;
 };
 
 export type FlyerOffersProviderQuery = {
@@ -2533,6 +2544,9 @@ export type RuntimeConfig = {
   billingWebhookSecret?: string;
   stripeSecretKey?: string;
   stripePriceIds?: Partial<Record<SubscriptionPlan, string>>;
+  sendgridApiKey?: string;
+  sendgridFromEmail?: string;
+  expoPushAccessToken?: string;
   metricsToken?: string;
   catalogCoverageTargets?: Omit<CatalogCoverageInput, 'products'>;
 };
@@ -2588,6 +2602,9 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.DATABASE_URL) throw new Error('DATABASE_URL is required in production.');
     if (!env.PUBLIC_WEB_URL) throw new Error('PUBLIC_WEB_URL is required in production.');
     if (!env.NOTIFICATION_WEBHOOK_SECRET) throw new Error('NOTIFICATION_WEBHOOK_SECRET is required in production.');
+    if (!env.SENDGRID_API_KEY) throw new Error('SENDGRID_API_KEY is required in production.');
+    if (!env.SENDGRID_FROM_EMAIL) throw new Error('SENDGRID_FROM_EMAIL is required in production.');
+    if (!env.EXPO_PUSH_ACCESS_TOKEN) throw new Error('EXPO_PUSH_ACCESS_TOKEN is required in production.');
     if (!env.BILLING_WEBHOOK_SECRET) throw new Error('BILLING_WEBHOOK_SECRET is required in production.');
     if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
     if (!env.CATALOG_COVERAGE_TARGETS_JSON) throw new Error('CATALOG_COVERAGE_TARGETS_JSON is required in production.');
@@ -2605,12 +2622,60 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     databaseUrl: env.DATABASE_URL,
     publicWebUrl: env.PUBLIC_WEB_URL,
     notificationWebhookSecret: env.NOTIFICATION_WEBHOOK_SECRET,
+    ...(env.SENDGRID_API_KEY ? { sendgridApiKey: env.SENDGRID_API_KEY } : {}),
+    ...(env.SENDGRID_FROM_EMAIL ? { sendgridFromEmail: env.SENDGRID_FROM_EMAIL } : {}),
+    ...(env.EXPO_PUSH_ACCESS_TOKEN ? { expoPushAccessToken: env.EXPO_PUSH_ACCESS_TOKEN } : {}),
     billingWebhookSecret: env.BILLING_WEBHOOK_SECRET,
     ...(env.STRIPE_SECRET_KEY ? { stripeSecretKey: env.STRIPE_SECRET_KEY } : {}),
     ...(Object.keys(stripePriceIds).length > 0 ? { stripePriceIds } : {}),
     metricsToken: env.METRICS_TOKEN,
     ...(catalogCoverageTargets ? { catalogCoverageTargets } : {})
   };
+}
+
+
+function buildRuntimeNotificationProviders(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): NotificationProviders {
+  return {
+    ...(config.sendgridApiKey && config.sendgridFromEmail
+      ? {
+          email: createSendgridEmailProvider({
+            apiKey: config.sendgridApiKey,
+            fromEmail: config.sendgridFromEmail,
+            ...(options.notificationProviderFetch ? { fetch: options.notificationProviderFetch } : {})
+          })
+        }
+      : {}),
+    ...(config.expoPushAccessToken
+      ? {
+          push: createExpoPushProvider({
+            accessToken: config.expoPushAccessToken,
+            ...(options.notificationProviderFetch ? { fetch: options.notificationProviderFetch } : {})
+          })
+        }
+      : {})
+  };
+}
+
+function buildRuntimeNotificationWorkerRunner(
+  config: RuntimeConfig,
+  repository: RuntimePersistenceRepository | undefined,
+  options: RuntimeHandlerOptions = {}
+): (() => Promise<RepositoryNotificationWorkerCycleResult>) | undefined {
+  if (!repository?.listDueNotificationTasks || !repository.listActiveNotificationSuppressions || !repository.upsertNotificationTask) return undefined;
+  const providers = buildRuntimeNotificationProviders(config, options);
+  if (!providers.email && !providers.push) return undefined;
+  return () => runRepositoryNotificationWorkerCycle({
+    now: (options.now ?? new Date()).toISOString(),
+    retryDelayMinutes: 15,
+    staleAfterMinutes: 60,
+    repository: {
+      listDueNotificationTasks: (now) => repository.listDueNotificationTasks!(now),
+      listActiveNotificationSuppressions: () => repository.listActiveNotificationSuppressions!(),
+      upsertNotificationTask: (task) => repository.upsertNotificationTask!(task)
+    },
+    providers,
+    alertRecipients: []
+  });
 }
 
 export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): AuthOptions {
@@ -2748,6 +2813,7 @@ function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: Runt
     ...(resource.repository ? { repository: resource.repository } : {}),
     postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider,
     sourceRunHealthProvider: options.sourceRunHealthProvider ?? resource.sourceRunHealthProvider,
+    notificationWorkerRunner: options.notificationWorkerRunner ?? buildRuntimeNotificationWorkerRunner(config, options.repository ?? resource.repository, options),
     catalogCoverageProvider: options.catalogCoverageProvider ?? resource.catalogCoverageProvider,
     flyerOffersProvider: options.flyerOffersProvider ?? resource.flyerOffersProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider ?? resource.storeFlyerOffersProvider,
