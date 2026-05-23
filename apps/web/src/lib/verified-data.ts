@@ -151,6 +151,24 @@ export const multiVerticalDomainFoundation = SUPPORTED_PRICE_DOMAINS.map((domain
   ]
 }));
 
+
+export const fuelStationSourceCoverage = {
+  title: 'OSM fuel station source',
+  source: 'OpenStreetMap Overpass Sweden extract',
+  connector: 'fetchOverpassFuelStations',
+  overpassFilter: 'amenity=fuel',
+  stationScope: 'Sweden and per-county refresh queries',
+  status: 'station locations wired; fuel prices withheld',
+  priceObservationCount: 0,
+  fields: ['osmType', 'osmId', 'name', 'brand', 'operator', 'latitude', 'longitude', 'openingHours', 'availableFuelGrades'],
+  fuelGradeTags: ['fuel:octane_95', 'fuel:octane_98', 'fuel:diesel', 'fuel:hvo100', 'fuel:e85', 'fuel:adblue'],
+  guardrails: [
+    'The connector reads OSM station location and grade availability tags only.',
+    'Fuel pages must not render pump prices until connector or trusted crowd rows write domain=fuel observations.',
+    'Fuel grade matching stays separate from grocery EAN and commodity matching.'
+  ]
+};
+
 type DeliveryVsInStoreBasketPair = {
   matchedToken: string;
   matchEvidence: string;

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { multiVerticalDomainFoundation } from '@/lib/verified-data';
+import { fuelStationSourceCoverage, multiVerticalDomainFoundation } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -41,11 +41,42 @@ function DomainFoundation({ domainSlug }: Readonly<{ domainSlug: 'fuel' }>) {
           {domain.seedItems.map((item) => (
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={item.id}>
               <p className="font-black text-slate-950">{item.label}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-700">{item.id} · kr/{item.comparableUnit} · {item.matchKey}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{item.id} · comparable unit: {item.comparableUnit} · {item.matchKey}</p>
             </div>
           ))}
         </div>
         <p className="mt-4 text-sm font-semibold text-slate-700">{domain.locationStrategy}</p>
+      </Card>
+
+
+      <Card className="mt-6 border-indigo-200 bg-indigo-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">{fuelStationSourceCoverage.source}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">OSM fuel station source</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              The fuel station lane now has a public Overpass connector contract: {fuelStationSourceCoverage.connector} posts an amenity=fuel query ({fuelStationSourceCoverage.overpassFilter}) for {fuelStationSourceCoverage.stationScope}. It is location and grade evidence only; the route must not render pump prices before verified domain=fuel observations exist.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 text-right shadow-sm">
+            <p className="text-4xl font-black text-indigo-900">{fuelStationSourceCoverage.priceObservationCount}</p>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-slate-500">fuel price observations</p>
+            <p className="mt-2 text-xs font-semibold text-slate-600">{fuelStationSourceCoverage.status}</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Station fields</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{fuelStationSourceCoverage.fields.join(', ')}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Fuel grade tags</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{fuelStationSourceCoverage.fuelGradeTags.join(', ')}</p>
+          </div>
+        </div>
+        <ul className="mt-4 space-y-2 text-sm font-semibold leading-6 text-indigo-950">
+          {fuelStationSourceCoverage.guardrails.map((guardrail) => <li key={guardrail}>• {guardrail}</li>)}
+        </ul>
       </Card>
 
       <Card className="mt-6 border-amber-200 bg-amber-50">

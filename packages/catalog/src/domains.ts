@@ -45,7 +45,7 @@ export const SUPPORTED_PRICE_DOMAINS: PriceDomain[] = [
     defaultCurrency: 'SEK',
     status: 'foundation',
     itemMatchStrategy: 'Fuel grade instead of EAN: 95 E10/E5, 98, Diesel, HVO100, E85, and AdBlue',
-    locationStrategy: 'Fuel stations from OSM amenity=fuel plus future operator/crowd price reports',
+    locationStrategy: 'Fuel stations from OSM amenity=fuel via fetchOverpassFuelStations plus future operator/crowd price reports',
     observationsTable: 'observations',
     priceClaim: 'Fuel routes can explain supported grades, station matching, and readiness.',
     priceClaimBoundary: 'No fuel price is rendered until a connector or trusted crowd report writes domain=fuel observations.',
