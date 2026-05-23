@@ -13,6 +13,7 @@ export type DeliveryNotification = {
 export type NotificationSuppressionReason = 'unsubscribed' | 'bounce' | 'complaint';
 
 export type NotificationSuppression = {
+  id?: string;
   recipient: string;
   channel?: DeliveryChannel;
   reason: NotificationSuppressionReason;

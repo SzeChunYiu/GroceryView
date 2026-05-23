@@ -119,7 +119,41 @@ describe('createHttpHandler', () => {
   });
 
   it('serves market, store, product, and index GET endpoints as JSON', async () => {
-    const handle = createHttpHandler();
+    const notificationInboxTaskNowValues: string[] = [];
+    const handle = createHttpHandler(undefined, {
+      now: new Date('2026-05-20T08:00:00.000Z'),
+      notificationInboxRepository: {
+        async listDueNotificationTasks(now) {
+          notificationInboxTaskNowValues.push(now);
+          return [
+            {
+              id: 'receipt-review-quiet-hours',
+              title: 'Receipt review reminder',
+              body: 'Review receipt OCR matches',
+              channel: 'push',
+              type: 'receipt_review',
+              priority: 'normal',
+              sendAt: '2026-05-20T07:00:00.000Z',
+              recipient: 'user-1',
+              attemptCount: 0,
+              maxAttempts: 3,
+              status: 'queued'
+            }
+          ];
+        },
+        async listActiveNotificationSuppressions() {
+          return [
+            {
+              id: 'suppression-provider-record-123',
+              recipient: 'ExponentPushToken[butter]',
+              channel: 'push',
+              reason: 'bounce',
+              active: true
+            }
+          ];
+        }
+      }
+    });
 
     const openApi = await handle(new Request('http://localhost/api/openapi.json'));
     assert.equal(openApi.status, 200);
@@ -273,7 +307,7 @@ describe('createHttpHandler', () => {
       heldCount: number;
       suppressedCount: number;
       summary: { total: number };
-      queue: Array<{ status: string; reason: string }>;
+      queue: Array<{ id: string; status: string; reason: string }>;
       guardrails: string[];
     };
     assert.equal(notificationInboxBody.userId, 'user-1');
@@ -282,6 +316,9 @@ describe('createHttpHandler', () => {
     assert.equal(notificationInboxBody.heldCount, 1);
     assert.equal(notificationInboxBody.suppressedCount, 1);
     assert.equal(notificationInboxBody.summary.total, 2);
+    assert.deepEqual(notificationInboxTaskNowValues, ['2026-05-20T08:00:00.000Z']);
+    assert.equal(notificationInboxBody.queue.some((item) => item.id === 'receipt-review-quiet-hours'), true);
+    assert.equal(notificationInboxBody.queue.some((item) => item.id === 'suppression-provider-record-123'), true);
     assert.match(notificationInboxBody.queue.find((item) => item.status === 'held')?.reason ?? '', /Quiet hours/i);
     assert.match(notificationInboxBody.guardrails[0] ?? '', /Estimated prices never generate household alerts/i);
 

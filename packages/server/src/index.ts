@@ -135,6 +135,10 @@ export type AuthOptions = {
   notificationSuppressionSink?: {
     upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
   };
+  notificationInboxRepository?: {
+    listDueNotificationTasks(now: string): Promise<PersistedNotificationTask[]>;
+    listActiveNotificationSuppressions(): Promise<NotificationSuppression[]>;
+  };
   billingWebhookSecret?: string;
   billingPriceIdPlanMap?: Partial<Record<string, SubscriptionPlan>>;
   billingSubscriptionSink?: {
@@ -1903,7 +1907,16 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
-        if (method === 'GET') return jsonResponse(api.getNotificationInboxReport(user));
+        if (method === 'GET') {
+          const now = (authOptions.now ?? new Date()).toISOString();
+          const [tasks, suppressions] = authOptions.notificationInboxRepository
+            ? await Promise.all([
+                authOptions.notificationInboxRepository.listDueNotificationTasks(now),
+                authOptions.notificationInboxRepository.listActiveNotificationSuppressions()
+              ])
+            : [undefined, undefined];
+          return jsonResponse(api.getNotificationInboxReport(user, { now, tasks, suppressions }));
+        }
       }
       if (path === '/api/receipts/review') {
         const user = userIdFrom(url);
@@ -3478,6 +3491,14 @@ export function buildRepositoryBackedAuthOptions(
     notificationSuppressionSink: {
       upsertNotificationSuppression: (suppression) => repository.upsertNotificationSuppression(suppression)
     },
+    ...(repository.listDueNotificationTasks && repository.listActiveNotificationSuppressions
+      ? {
+          notificationInboxRepository: {
+            listDueNotificationTasks: (now) => repository.listDueNotificationTasks!(now),
+            listActiveNotificationSuppressions: () => repository.listActiveNotificationSuppressions!()
+          }
+        }
+      : {}),
     billingSubscriptionSink: {
       upsertSubscriptionEntitlement: (entitlement) => repository.upsertSubscriptionEntitlement(entitlement)
     }
