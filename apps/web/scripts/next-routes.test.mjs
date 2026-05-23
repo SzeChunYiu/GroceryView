@@ -513,13 +513,26 @@ describe('verified-data UI', () => {
     const verified = await read('src/lib/verified-data.ts');
     const fuelRoute = await read('src/app/fuel/page.tsx');
     const overpass = await read('../../packages/ingestion/src/connectors/overpass.ts');
+    const brandedFuelConnector = await read('../../packages/ingestion/src/connectors/fuel-stations.ts');
+    const fuelArtifact = await read('src/lib/ingested/fuel-stations.ts');
 
     assert.match(overpass, /fetchOverpassFuelStations/);
     assert.match(overpass, /amenity"="fuel/);
+    assert.match(brandedFuelConnector, /SWEDEN_BRANDED_FUEL_STATIONS_OVERPASS_QUERY/);
+    assert.match(brandedFuelConnector, /amenity"="fuel/);
+    assert.match(brandedFuelConnector, /Circle K/);
+    assert.match(brandedFuelConnector, /OKQ8/);
     assert.match(verified, /export const fuelStationSourceCoverage/);
     assert.match(verified, /fetchOverpassFuelStations/);
     assert.match(verified, /amenity=fuel/);
+    assert.match(fuelArtifact, /Row count: [1-9][0-9]{2,} real OSM rows/);
+    assert.match(fuelArtifact, /fetched with curl from Overpass/);
+    assert.match(fuelArtifact, /"latitude"/);
+    assert.match(fuelArtifact, /"longitude"/);
     assert.match(fuelRoute, /fuelStationSourceCoverage/);
+    assert.match(fuelRoute, /fuelStations\.map/);
+    assert.match(fuelRoute, /fuelStationPosition/);
+    assert.match(fuelRoute, /fuelStationSource\.chainCounts/);
     assert.match(fuelRoute, /OSM fuel station source/);
     assert.match(fuelRoute, /amenity=fuel/);
     assert.match(fuelRoute, /verifiedFuelPriceObservations/);
