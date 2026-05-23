@@ -55,6 +55,8 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /production-env-validation\.json/);
     assert.match(runbook, /groceryview-catalog-targets\.json/);
     assert.match(runbook, /groceryview-daily-connectors\.json/);
+    assert.match(runbook, /daily_db_connectivity_database_url_config_missing/);
+    assert.match(runbook, /production_db_migrations_database_url_config_missing/);
   });
 
 
@@ -62,6 +64,7 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /chainSummaries/);
     assert.match(runbook, /groceryview-daily-ingestion-result/);
     assert.match(runbook, /daily_ingestion_connectors_diagnostic_missing/);
+    assert.match(runbook, /daily_ingestion_database_url_config_missing/);
     assert.match(runbook, /daily_ingestion_missing_chain_summary/);
     assert.match(runbook, /daily_ingestion_chain_not_succeeded/);
     assert.match(runbook, /daily_ingestion_chain_without_observations/);
@@ -101,6 +104,7 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /db_site_snapshot_missing_required_store_price_types/);
     assert.match(runbook, /db_site_snapshot_missing_required_categories/);
     assert.match(runbook, /db_site_snapshot_stale_observations/);
+    assert.match(runbook, /db_site_snapshot_database_url_config_missing/);
     assert.match(runbook, /missingRequiredChains/);
     assert.match(runbook, /missingRequiredStoreExternalRefs/);
     assert.match(runbook, /missingRequiredProductSlugs/);
