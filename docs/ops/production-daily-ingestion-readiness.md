@@ -116,6 +116,11 @@ connection to database not available`, the diagnostic reports
 `supabase_pooler_database_unavailable` so the artifact points at a provider
 database/pooler availability incident instead of a generic credential or network
 failure.
+If the pooler returns `(ECIRCUITBREAKER) failed to retrieve database credentials`
+or says new connections are temporarily blocked, the diagnostic reports
+`supabase_pooler_circuit_breaker`; keep using the recovery packet to inspect
+Supabase health, then wait for provider recovery or validate replacement DB
+cutover rather than rotating application credentials blindly.
 
 When connectivity still fails, the daily workflow tries to generate a redacted
 `groceryview-production-db-recovery-packet` artifact with
@@ -361,6 +366,7 @@ The workflow must pass these gates in order:
 - `supabase_direct_host`: an alternate `alternateConnections[]` entry proving whether the direct Supabase DB host accepts writes when the pooler path fails; tune `GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS` if provider startup is flapping.
 - `supabase_pooler_database_unavailable`: Supabase pooler authentication reached the project but reported `connection to database not available` (for example `EAUTHQUERY`); wait for provider recovery, use the recovery packet to inspect Supabase project health, or validate a replacement DB cutover before retrying daily ingestion.
 - `db_recovery_secret_invalid_format`: the injected `SUPABASE_ACCESS_TOKEN` is present but does not look like a Supabase Management API personal access token (`sbp_...`); replace the GitHub secret with a dashboard PAT before relying on recovery evidence.
+- `supabase_pooler_circuit_breaker`: Supabase pooler reached its credential retrieval circuit breaker (for example `ECIRCUITBREAKER` and `new connections are temporarily blocked`); inspect the recovery packet/Supabase service health, wait for provider recovery, or continue replacement DB cutover before retrying ingestion.
 - `production_db_recovery_packet_missing_credentials`: DB connectivity failed, but the workflow could not call Supabase management APIs because `SUPABASE_ACCESS_TOKEN` or `SUPABASE_PROJECT_REF` was absent; inspect `groceryview-production-db-recovery-packet` and configure the missing value before the next failure.
 - `production_db_recovery_packet_diagnostic_missing`: the recovery-packet command failed before writing JSON; inspect `groceryview-production-db-recovery-packet` for the command exit code.
 - `production_db_migrations_diagnostic_missing`: the production DB migration command failed before writing a diagnostic JSON payload; inspect the `groceryview-production-db-migrations` artifact for the command exit code.
