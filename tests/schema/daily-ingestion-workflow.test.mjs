@@ -154,9 +154,14 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /coverage\?\.products\?\.missing/);
     assert.match(workflow, /coverage\?\.categories\?\.missing/);
     assert.match(workflow, /coverage\?\.priceTypes\?\.missing/);
+    assert.match(workflow, /name: Check deployed PostgreSQL readiness\n\s+if:\s*always\(\)/);
+    assert.match(workflow, /postgres_readiness_missing_ingestion_connectivity_diagnostic/);
     assert.match(workflow, /postgres_readiness_target_mismatch/);
     assert.match(workflow, /daily-db-connectivity\.json/);
     assert.match(workflow, /postgres-readiness\.json/);
+    assert.match(workflow, /name: Check deployed daily source-run freshness\n\s+if:\s*always\(\)/);
+    assert.match(workflow, /name: Check deployed catalog product-store coverage\n\s+if:\s*always\(\)/);
+    assert.match(workflow, /name: Upload deployed readiness evidence\n\s+if:\s*always\(\)/);
     assert.match(workflow, /name:\s*groceryview-deployed-readiness/);
     assert.match(workflow, /\/tmp\/postgres-readiness\.json/);
     assert.match(workflow, /\/tmp\/source-run-readiness\.json/);

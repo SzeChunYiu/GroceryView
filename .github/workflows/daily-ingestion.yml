@@ -256,6 +256,7 @@ jobs:
           retention-days: 14
 
       - name: Check deployed PostgreSQL readiness
+        if: always()
         env:
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
@@ -268,7 +269,15 @@ jobs:
             "${GROCERYVIEW_SERVER_URL%/}/api/readiness/postgres" \
             >/tmp/postgres-readiness.json
           node <<'NODE'
+          const { existsSync } = require('node:fs');
           const readiness = require('/tmp/postgres-readiness.json');
+          if (!existsSync('/tmp/daily-db-connectivity.json')) {
+            console.error(JSON.stringify({
+              blocker: 'postgres_readiness_missing_ingestion_connectivity_diagnostic',
+              deployedTarget: readiness.target
+            }));
+            process.exit(1);
+          }
           const connectivity = require('/tmp/daily-db-connectivity.json');
           if (readiness.status !== 'ready') {
             console.error(JSON.stringify(readiness));
@@ -294,6 +303,7 @@ jobs:
           NODE
 
       - name: Check deployed daily source-run freshness
+        if: always()
         env:
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
@@ -339,6 +349,7 @@ jobs:
           NODE
 
       - name: Check deployed catalog product-store coverage
+        if: always()
         env:
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
