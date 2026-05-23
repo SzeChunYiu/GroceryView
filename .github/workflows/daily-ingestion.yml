@@ -127,7 +127,21 @@ jobs:
           GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: ${{ vars.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN || secrets.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN }}
         run: |
           set -euo pipefail
-          npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json
+          daily_connectors_status=0
+          npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json || daily_connectors_status=$?
+          if [ ! -s /tmp/groceryview-daily-connectors.json ]; then
+            cat > /tmp/groceryview-daily-connectors.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "daily_connectors_diagnostic_missing",
+            "exitCode": ${daily_connectors_status}
+          }
+          EOF
+          fi
+          cat /tmp/groceryview-daily-connectors.json
+          if [ "${daily_connectors_status}" -ne 0 ]; then
+            exit "${daily_connectors_status}"
+          fi
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
             npm run --silent ops:catalog-coverage-targets -- --from-current-connectors >/tmp/groceryview-catalog-targets.json
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
