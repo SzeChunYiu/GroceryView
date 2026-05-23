@@ -2537,18 +2537,74 @@ export type PlannedNotification = NotificationEvent & {
   sendAt: string;
 };
 
+type ZonedDateParts = {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+};
+
+function zonedDateParts(date: Date, timeZone: string): ZonedDateParts {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  }).formatToParts(date);
+  const value = (type: Intl.DateTimeFormatPartTypes): number => {
+    const part = parts.find((candidate) => candidate.type === type)?.value;
+    if (!part) throw new Error(`Unable to read ${type} for timezone ${timeZone}.`);
+    return Number(part);
+  };
+  return {
+    year: value('year'),
+    month: value('month'),
+    day: value('day'),
+    hour: value('hour'),
+    minute: value('minute'),
+    second: value('second')
+  };
+}
+
+function timeZoneOffsetMs(date: Date, timeZone: string): number {
+  const parts = zonedDateParts(date, timeZone);
+  const zonedAsUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+  return zonedAsUtc - (date.getTime() - date.getMilliseconds());
+}
+
+function zonedTimeToUtc(year: number, month: number, day: number, hour: number, timeZone: string): Date {
+  const localAsUtc = Date.UTC(year, month - 1, day, hour, 0, 0, 0);
+  const firstPass = localAsUtc - timeZoneOffsetMs(new Date(localAsUtc), timeZone);
+  const secondPass = localAsUtc - timeZoneOffsetMs(new Date(firstPass), timeZone);
+  return new Date(secondPass);
+}
+
 function isQuietHour(date: Date, quietHours: NonNullable<NotificationPreferences['quietHours']>): boolean {
-  void quietHours.timezone;
-  const hour = date.getUTCHours();
+  const hour = zonedDateParts(date, quietHours.timezone).hour;
   if (quietHours.startHour <= quietHours.endHour) return hour >= quietHours.startHour && hour < quietHours.endHour;
   return hour >= quietHours.startHour || hour < quietHours.endHour;
 }
 
 function nextQuietEnd(date: Date, quietHours: NonNullable<NotificationPreferences['quietHours']>): string {
-  const sendAt = new Date(date);
-  if (date.getUTCHours() >= quietHours.startHour) sendAt.setUTCDate(sendAt.getUTCDate() + 1);
-  sendAt.setUTCHours(quietHours.endHour, 0, 0, 0);
-  return sendAt.toISOString();
+  const parts = zonedDateParts(date, quietHours.timezone);
+  const targetLocalDate = Date.UTC(parts.year, parts.month - 1, parts.day);
+  const crossesMidnight = quietHours.startHour > quietHours.endHour;
+  const targetDate = crossesMidnight && parts.hour >= quietHours.startHour
+    ? new Date(targetLocalDate + 24 * 60 * 60 * 1000)
+    : new Date(targetLocalDate);
+  return zonedTimeToUtc(
+    targetDate.getUTCFullYear(),
+    targetDate.getUTCMonth() + 1,
+    targetDate.getUTCDate(),
+    quietHours.endHour,
+    quietHours.timezone
+  ).toISOString();
 }
 
 export function planNotifications(input: {
@@ -2557,6 +2613,7 @@ export function planNotifications(input: {
   events: NotificationEvent[];
 }): PlannedNotification[] {
   const now = new Date(input.now);
+  if (Number.isNaN(now.getTime())) throw new Error('now must be an ISO date.');
   const enabled = new Set(input.preferences.enabledTypes);
   const planned: PlannedNotification[] = [];
 

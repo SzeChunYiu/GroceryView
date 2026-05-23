@@ -16,6 +16,7 @@ import {
   rankNutritionPerKrona,
   planPantryReplenishment,
   planRecurringBasketDigest,
+  planNotifications,
   reviewReceiptScan,
   scoreBand,
   searchProducts,
@@ -69,7 +70,8 @@ import {
   type StorePrice,
   type WatchlistAlert,
   type WatchlistItem,
-  type WatchlistPriceType
+  type WatchlistPriceType,
+  type NotificationType
 } from '@groceryview/core';
 import {
   buildAdDeliveryComplianceReport,
@@ -1204,14 +1206,20 @@ export type NotificationInboxQueueItem = {
   title: string;
   channel: 'push' | 'email';
   status: 'delivered' | 'held' | 'suppressed';
+  sendAt: string;
   reason: string;
   action: string;
   priority: 'normal' | 'high';
   productId?: string;
 };
 
+export type NotificationInboxReportOptions = {
+  now?: string;
+};
+
 export type NotificationInboxReport = {
   userId: string;
+  generatedAt: string;
   trackedItemCount: number;
   activeAlertCount: number;
   deliveredCount: number;
@@ -1325,6 +1333,13 @@ export type FacetedProductSearchResult = {
     sourceTables: ['products', 'latest_prices', 'chains', 'stores'];
   };
 };
+
+const defaultNotificationInboxNow = '2026-05-19T12:00:00.000Z';
+const notificationQuietHours = { startHour: 21, endHour: 7, timezone: 'Europe/Stockholm' } as const;
+
+function watchlistNotificationType(alert: WatchlistAlert): NotificationType {
+  return alert.type === 'target_price' ? 'target_price' : 'favorite_store_deal';
+}
 
 export type RealBasketCompareItem = {
   productId: string;
@@ -4174,19 +4189,44 @@ export function createGroceryViewApi() {
       };
     },
 
-    getNotificationInboxReport(userId: string): NotificationInboxReport {
+    getNotificationInboxReport(userId: string, options: NotificationInboxReportOptions = {}): NotificationInboxReport {
       requireNonEmptyId(userId, 'userId');
+      const generatedAt = options.now ?? defaultNotificationInboxNow;
+      if (Number.isNaN(Date.parse(generatedAt))) throw new Error('now must be an ISO date.');
       const watchlist = this.getWatchlist(userId);
-      const deliveredRows: NotificationInboxQueueItem[] = watchlist.alerts.map((alert, index) => ({
-        id: `alert-${alert.productId}-${alert.type}-${index}`,
-        title: alert.productName,
-        channel: alert.severity === 'urgent' ? 'push' : 'email',
-        status: 'delivered',
-        reason: alert.trigger.metric === 'price_history' ? 'Verified 52-week low signal' : 'Verified shelf price or Deal Score trigger',
-        action: alert.trigger.metric === 'deal_score' ? 'Open deal' : 'Open price history',
-        priority: alert.severity === 'urgent' ? 'high' : 'normal',
-        productId: alert.productId
-      }));
+      const deliveredRows: NotificationInboxQueueItem[] = watchlist.alerts.map((alert, index) => {
+        const channel = alert.severity === 'urgent' ? 'push' : 'email';
+        const priority = alert.severity === 'urgent' ? 'high' : 'normal';
+        const [planned] = planNotifications({
+          now: generatedAt,
+          preferences: {
+            channels: [channel],
+            enabledTypes: [watchlistNotificationType(alert)],
+            quietHours: notificationQuietHours
+          },
+          events: [{
+            type: watchlistNotificationType(alert),
+            title: alert.productName,
+            body: alert.message,
+            priority
+          }]
+        });
+        const sendAt = planned?.sendAt ?? generatedAt;
+        const heldForQuietHours = sendAt !== generatedAt;
+        return {
+          id: `alert-${alert.productId}-${alert.type}-${index}`,
+          title: alert.productName,
+          channel,
+          status: heldForQuietHours ? 'held' : 'delivered',
+          sendAt,
+          reason: heldForQuietHours
+            ? 'Quiet hours 21:00-07:00 Europe/Stockholm'
+            : alert.trigger.metric === 'price_history' ? 'Verified 52-week low signal' : 'Verified shelf price or Deal Score trigger',
+          action: heldForQuietHours ? 'Send after quiet hours' : alert.trigger.metric === 'deal_score' ? 'Open deal' : 'Open price history',
+          priority,
+          productId: alert.productId
+        };
+      });
       const queue: NotificationInboxQueueItem[] = [
         ...deliveredRows,
         {
@@ -4194,6 +4234,7 @@ export function createGroceryViewApi() {
           title: 'Receipt review reminder',
           channel: 'push',
           status: 'held',
+          sendAt: '2026-05-20T05:00:00.000Z',
           reason: 'Quiet hours 21:00-07:00',
           action: 'Send in morning digest',
           priority: 'normal'
@@ -4203,6 +4244,7 @@ export function createGroceryViewApi() {
           title: 'Butter target price',
           channel: 'push',
           status: 'suppressed',
+          sendAt: generatedAt,
           reason: 'Provider token invalid',
           action: 'Request device refresh',
           priority: 'normal',
@@ -4214,6 +4256,7 @@ export function createGroceryViewApi() {
       const suppressedCount = queue.filter((item) => item.status === 'suppressed').length;
       return {
         userId,
+        generatedAt,
         trackedItemCount: watchlist.items.length,
         activeAlertCount: watchlist.alerts.length,
         deliveredCount,

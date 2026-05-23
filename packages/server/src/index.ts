@@ -1903,7 +1903,11 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
-        if (method === 'GET') return jsonResponse(api.getNotificationInboxReport(user));
+        if (method === 'GET') {
+          return jsonResponse(api.getNotificationInboxReport(user, {
+            now: (authOptions.now ?? new Date()).toISOString()
+          }));
+        }
       }
       if (path === '/api/receipts/review') {
         const user = userIdFrom(url);

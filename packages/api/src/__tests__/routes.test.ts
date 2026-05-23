@@ -968,6 +968,7 @@ describe('createGroceryViewApi', () => {
     const report = api.getNotificationInboxReport('user-1');
 
     assert.equal(report.userId, 'user-1');
+    assert.equal(report.generatedAt, '2026-05-19T12:00:00.000Z');
     assert.equal(report.trackedItemCount, 1);
     assert.equal(report.activeAlertCount, 3);
     assert.equal(report.deliveredCount, 3);
@@ -980,9 +981,38 @@ describe('createGroceryViewApi', () => {
       total: 5
     });
     assert.match(report.queue[0]?.title ?? '', /Zoégas Coffee 450g/);
+    assert.deepEqual(report.queue.filter((item) => item.status === 'delivered').map((item) => item.sendAt), [
+      '2026-05-19T12:00:00.000Z',
+      '2026-05-19T12:00:00.000Z',
+      '2026-05-19T12:00:00.000Z'
+    ]);
     assert.match(report.queue.find((item) => item.status === 'held')?.reason ?? '', /Quiet hours/i);
     assert.match(report.queue.find((item) => item.status === 'suppressed')?.reason ?? '', /Provider token invalid/i);
     assert.match(report.guardrails[0], /Estimated prices never generate household alerts/i);
+  });
+
+  it('defers normal watchlist notification sends deterministically during Stockholm quiet hours', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addWatchlistItem('user-1', {
+      productId: 'coffee',
+      targetPrice: 50,
+      alertDealScoreAt: 80,
+      favoriteStoresOnly: true
+    });
+
+    const report = api.getNotificationInboxReport('user-1', { now: '2026-05-19T19:30:00.000Z' });
+
+    assert.equal(report.generatedAt, '2026-05-19T19:30:00.000Z');
+    assert.deepEqual(report.queue.filter((item) => item.productId === 'coffee').map((item) => ({
+      status: item.status,
+      priority: item.priority,
+      sendAt: item.sendAt
+    })), [
+      { status: 'held', priority: 'normal', sendAt: '2026-05-20T05:00:00.000Z' },
+      { status: 'held', priority: 'normal', sendAt: '2026-05-20T05:00:00.000Z' },
+      { status: 'delivered', priority: 'high', sendAt: '2026-05-19T19:30:00.000Z' }
+    ]);
   });
 
   it('serves receipt review reports with budget actuals, match confidence, and writeback guardrails', () => {
