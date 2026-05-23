@@ -35,9 +35,10 @@ function parseGhSecretList(output) {
     .filter(Boolean);
 }
 
-function readGithubSecretNames(repo) {
+function readGithubSecretNames(repo, environment) {
   const args = ['secret', 'list'];
   if (repo) args.push('--repo', repo);
+  if (environment) args.push('--env', environment);
   return parseGhSecretList(execFileSync('gh', args, { encoding: 'utf8' }));
 }
 
@@ -50,12 +51,15 @@ function main() {
 
   const repoIndex = process.argv.indexOf('--repo');
   const repo = repoIndex >= 0 ? process.argv[repoIndex + 1] : undefined;
-  const secretNames = readGithubSecretNames(repo);
+  const envIndex = process.argv.indexOf('--env');
+  const environment = envIndex >= 0 ? process.argv[envIndex + 1] : undefined;
+  const secretNames = readGithubSecretNames(repo, environment);
   const missingGithubActionSecrets = findMissingSecrets(requiredGithubActionSecrets, secretNames);
   const missingRuntimeSecrets = findMissingSecrets(requiredRuntimeSecrets, secretNames);
   const result = {
     status: missingGithubActionSecrets.length === 0 && missingRuntimeSecrets.length === 0 ? 'ready' : 'blocked',
     checkedSecretNames: secretNames.sort(),
+    environment: environment ?? null,
     missingGithubActionSecrets,
     missingRuntimeSecrets
   };
