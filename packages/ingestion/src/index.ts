@@ -77,6 +77,7 @@ export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/willys.js';
+export * from './store-enumerator.js';
 
 export type SourceType =
   | 'official_api'
