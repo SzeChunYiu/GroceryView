@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "next build --webpack",
+    "build": "NODE_OPTIONS=--max-old-space-size=6144 next build --webpack",
     "dev": "next dev",
     "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
     "start": "next start",
