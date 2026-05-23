@@ -31,6 +31,7 @@ jobs:
           BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
+          GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: ${{ vars.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN || secrets.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN }}
         run: |
           set -euo pipefail
           missing=0
@@ -41,6 +42,7 @@ jobs:
           if [ -z "${BILLING_WEBHOOK_SECRET:-}" ]; then echo "missing production config: BILLING_WEBHOOK_SECRET" >&2; missing=1; fi
           if [ -z "${METRICS_TOKEN:-}" ]; then echo "missing production config: METRICS_TOKEN" >&2; missing=1; fi
           if [ -z "${GROCERYVIEW_SERVER_URL:-}" ]; then echo "missing production config: GROCERYVIEW_SERVER_URL" >&2; missing=1; fi
+          if [ -z "${GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN:-}" ]; then echo "missing production config: GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN" >&2; missing=1; fi
           if [ "${missing}" -ne 0 ]; then exit 1; fi
 
       - name: Install
@@ -88,6 +90,7 @@ jobs:
           BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
+          GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: ${{ vars.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN || secrets.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN }}
         run: |
           set -euo pipefail
           npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json
