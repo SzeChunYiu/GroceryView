@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { rankNutritionPerKrona } from '@groceryview/core';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { healthMacroOptimizer, highProteinDealFinder, nutritionPerKrona } from '@/lib/demo-data';
+import { healthMacroOptimizer, highProteinDealFinder, nutritionPerKrona, nutritionPerKronaInputs } from '@/lib/demo-data';
 import { healthVerifiedLabelFilters } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -13,6 +15,11 @@ function formatSek(value: number) {
 }
 
 export default function NutritionValuePage() {
+  const nutritionRankRows = rankNutritionPerKrona(nutritionPerKronaInputs, 'protein').map((row) => ({
+    ...row,
+    source: nutritionPerKronaInputs.find((input) => input.productId === row.productId)?.source ?? 'visible product row'
+  }));
+
   return (
     <PageShell>
       <Eyebrow>Nutrition per krona</Eyebrow>
@@ -34,7 +41,13 @@ export default function NutritionValuePage() {
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Confidence</p>
-          <p className="mt-2 text-5xl font-black capitalize text-slate-950">{nutritionPerKrona.coverage.confidence}</p>
+          <div className="mt-3">
+            <ConfidenceBadge
+              level={nutritionPerKrona.coverage.confidence}
+              label={`${nutritionPerKrona.coverage.confidence} confidence`}
+              sampleSize={nutritionPerKrona.coverage.labelledProducts}
+            />
+          </div>
           <p className="mt-3 font-semibold text-slate-700">{nutritionPerKrona.coverage.caveat}</p>
         </Card>
       </div>
@@ -42,7 +55,7 @@ export default function NutritionValuePage() {
       <Card className="mt-6">
         <h2 className="text-2xl font-black">Protein value leaderboard</h2>
         <div className="mt-4 space-y-3">
-          {nutritionPerKrona.rows.map((row, index) => (
+          {nutritionRankRows.map((row, index) => (
             <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${row.productId}`} key={row.productId}>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
