@@ -7,6 +7,7 @@ import {
   createPostgresSourceRecordWriter,
   type PriceType as DbPriceType,
   type QueryExecutor,
+  type PgLikeClient,
   type SourceRunRecord
 } from '@groceryview/db';
 import { COMMODITIES, findCommodity, type Commodity } from '@groceryview/catalog';
@@ -2605,7 +2606,9 @@ export type DailyIngestionEnv = Partial<Record<
   | 'GROCERYVIEW_DAILY_CONNECTORS_JSON'
   | 'GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE'
   | 'GROCERYVIEW_DATABASE_URL'
-  | 'GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES',
+  | 'GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES'
+  | 'GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS'
+  | 'GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS',
   string
 >>;
 
@@ -3731,6 +3734,35 @@ async function waitForDailyRunnerDelay(delayMs: number): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, delayMs));
 }
 
+function isTransientDailyDatabaseError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /connection\s+(?:to database\s+)?closed|terminating connection|connection terminated|EDBHANDLEREXITED|ECONNRESET|EPIPE|timeout|Connection terminated unexpectedly/i.test(message);
+}
+
+export function createDailyIngestionQueryExecutor(
+  client: PgLikeClient,
+  options: { retryAttempts?: number; retryBaseDelayMs?: number } = {}
+): QueryExecutor {
+  const retryAttempts = normalizeDailyRunnerInteger(options.retryAttempts, 2);
+  const retryBaseDelayMs = normalizeDailyRunnerInteger(options.retryBaseDelayMs, 250);
+  return {
+    async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
+      for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
+        try {
+          const result = await client.query(sql, params);
+          return result.rows as T[];
+        } catch (error) {
+          if (attempt >= retryAttempts || !isTransientDailyDatabaseError(error)) throw error;
+          process.stderr.write(`[daily-ingestion] retrying database query attempt=${attempt + 2}/${retryAttempts + 1}: ${error instanceof Error ? error.message : String(error)}
+`);
+          await waitForDailyRunnerDelay(retryBaseDelayMs * (attempt + 1));
+        }
+      }
+      throw new Error('Daily ingestion database query retry loop exhausted.');
+    }
+  };
+}
+
 async function runDailyIngestionConnector(input: {
   executor: QueryExecutor;
   requestedAt: string;
@@ -3914,7 +3946,10 @@ export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.
   try {
     await pool.query('set default_transaction_read_only=off');
     return await runDailyIngestion({
-      executor: createPgQueryExecutor(pool),
+      executor: createDailyIngestionQueryExecutor(pool, {
+        retryAttempts: env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS) : 2,
+        retryBaseDelayMs: env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS) : 250
+      }),
       requestedAt: new Date().toISOString(),
       connectors
     });
