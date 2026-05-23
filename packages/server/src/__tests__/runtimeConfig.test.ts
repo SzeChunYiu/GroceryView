@@ -1494,7 +1494,7 @@ describe('runtime config', () => {
     class SourceRunPgPool extends RecordingPgPool {
       async query(text: string, values: unknown[] = []): Promise<{ rows: unknown[] }> {
         if (text.includes('from source_runs')) {
-          const finishedAt = new Date().toISOString();
+          const finishedAt = new Date(Date.now() - 60_000).toISOString();
           return {
             rows: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'].map((chainId) => ({
               id: `source-run-${chainId}`,

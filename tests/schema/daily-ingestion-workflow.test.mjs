@@ -109,6 +109,10 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /missingConnectorChains/);
     assert.match(workflow, /connectorStoreCoverageCount/);
     assert.match(workflow, /coverageStoreCount/);
+    assert.match(workflow, /name:\s*groceryview-production-ingestion-config/);
+    assert.match(workflow, /\/tmp\/production-env-validation\.json/);
+    assert.match(workflow, /\/tmp\/groceryview-catalog-targets\.json/);
+    assert.match(workflow, /\/tmp\/groceryview-daily-connectors\.json/);
     assert.doesNotMatch(workflow, /connectorCount !== 6/);
     assert.match(workflow, /body\.status !== 'succeeded'/);
     assert.match(workflow, /chainSummaries/);

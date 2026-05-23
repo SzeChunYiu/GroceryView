@@ -163,7 +163,7 @@ The workflow must pass these gates in order:
 
 1. DB and ingestion package tests
 2. live store enumeration and `groceryview-daily-connector-stores` artifact upload
-3. production ingestion configuration validator
+3. production ingestion configuration validator and `groceryview-production-ingestion-config` artifact upload with `production-env-validation.json`, `groceryview-catalog-targets.json`, and `groceryview-daily-connectors.json`
 4. configured daily ingestion runner; its `chainSummaries` must include every required chain, every summary must be `succeeded`, every official product connector must emit at least one observation for every configured branch in `stores[]`, and every required chain must emit at least one observation id before the workflow uploads `groceryview-daily-ingestion-result`
 5. DB-backed site snapshot export and `groceryview-db-site-snapshot` artifact upload
 6. `/api/readiness/postgres`
@@ -197,5 +197,5 @@ Do not treat the system as production-ready until all are true:
 
 - `npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView` reports `ready`.
 - `npm run ops:validate-production-env` reports `ready` in the deployment environment.
-- the latest `daily-ingestion.yml` run passes and includes the `groceryview-deployed-readiness` artifact.
+- the latest `daily-ingestion.yml` run passes and includes the `groceryview-production-ingestion-config` and `groceryview-deployed-readiness` artifacts.
 - `/api/readiness/postgres`, `/api/readiness/source-runs`, and `/api/readiness/catalog-coverage` all return healthy/complete responses with HTTP 200.

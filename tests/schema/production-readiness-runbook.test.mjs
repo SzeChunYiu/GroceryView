@@ -49,6 +49,13 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /before connector and target validation/);
   });
 
+  it('documents production ingestion config evidence artifacts', () => {
+    assert.match(runbook, /groceryview-production-ingestion-config/);
+    assert.match(runbook, /production-env-validation\.json/);
+    assert.match(runbook, /groceryview-catalog-targets\.json/);
+    assert.match(runbook, /groceryview-daily-connectors\.json/);
+  });
+
 
   it('documents daily ingestion chain summary evidence', () => {
     assert.match(runbook, /chainSummaries/);
