@@ -1143,7 +1143,13 @@ describe('verified-data UI', () => {
 
   it('covers invalid sort query values on the screener route with explicit default selection', async () => {
     const route = await read('src/app/screener/page.tsx');
+    const query = await read('src/lib/screener-query.ts');
 
+    assert.match(query, /SCREENER_SORT_MODES = \['biggest-drop', 'cheapest-per-kg', 'widest-spread'\]/);
+    assert.match(query, /export const SCREENER_SORT_OPTIONS = SCREENER_SORT_MODES\.map/);
+    assert.match(route, /SCREENER_SORT_OPTIONS/);
+    assert.match(route, /const sortOptions = SCREENER_SORT_OPTIONS/);
+    assert.doesNotMatch(route, /const sortOptions = \[/);
     assert.match(route, /function selectedMode\(value: string \| undefined\): SortMode {/);
     assert.match(route, /return normalizeScreenerSort\(value\);/);
     assert.match(route, /const mode = selectedMode\(paramValue\(params\.sort\)\);/);

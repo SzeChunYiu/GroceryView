@@ -10,6 +10,26 @@ export const SCREENER_DEFAULT_QUERY = {
   category: SCREENER_DEFAULT_CATEGORY
 } as const;
 
+export const SCREENER_SORT_MODE_COPY: Record<ScreenerSortMode, { label: string; detail: string }> = {
+  'biggest-drop': {
+    label: 'Biggest drop',
+    detail: 'Latest observed negative move from priceDropMoversBoard.'
+  },
+  'cheapest-per-kg': {
+    label: 'Cheapest per kg',
+    detail: 'Lowest comparable kg price from matched chain rows.'
+  },
+  'widest-spread': {
+    label: 'Widest spread',
+    detail: 'Largest Willys/Hemkop spread from topChainSpreads.'
+  }
+};
+
+export const SCREENER_SORT_OPTIONS = SCREENER_SORT_MODES.map((mode) => ({
+  mode,
+  ...SCREENER_SORT_MODE_COPY[mode]
+}));
+
 export function screenerDefaultHref() {
   const params = new URLSearchParams({ sort: SCREENER_DEFAULT_QUERY.sort });
   return `/screener?${params.toString()}`;
