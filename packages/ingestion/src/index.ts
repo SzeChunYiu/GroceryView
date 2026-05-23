@@ -65,9 +65,11 @@ import {
 import {
   fetchWillysProductsForAllStores,
   fetchWillysWeeklyDiscountsForAllStores,
+  type WillysProduct,
   type WillysStoreProduct,
   type WillysWeeklyDiscount
 } from './connectors/willys.js';
+import { fetchWillysBulkProducts } from './connectors/willys-bulk.js';
 
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/all-store-runner.js';
@@ -84,6 +86,7 @@ export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
 export * from './connectors/lidl-bulk.js';
+export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/st1-fuel.js';
@@ -1693,6 +1696,26 @@ function willysStoreProductToDailyItem(row: WillysStoreProduct): RetailerConnect
   };
 }
 
+function willysBulkProductToDailyItem(row: WillysProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromAxfoodImageUrl(row.imageUrl));
+  return {
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('willys', row.code, barcode),
+    categoryId: stableKeyPart(row.category || 'willys-bulk-products'),
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 
 function hemkopStoreProductToDailyItem(row: HemkopStoreProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
@@ -1949,6 +1972,20 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchWillysBulkProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      minRows: dailyNativeNumberParam(url, 'minRows'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      categoryPaths: dailyNativeStringListParam(url, 'categoryPaths'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysBulkProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL}?`)) {
@@ -2863,6 +2900,7 @@ export const requiredDailyIngestionChainIds = [
 
 export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/willys/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/willys/products/all-stores';
+export const GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL = 'groceryview://daily/willys/products/bulk';
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/hemkop/products/all-stores';
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/ica/store-promotions/default-stores';

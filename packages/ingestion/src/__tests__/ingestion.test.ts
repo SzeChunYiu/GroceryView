@@ -81,6 +81,7 @@ import {
   ICA_PRODUCT_PAGE_SEARCH_PATH,
   fetchIcaReklambladOffers,
   fetchLidlBulkProducts,
+  fetchWillysBulkProducts,
   fetchLidlOffers,
   fetchLidlOffersForAllStores,
   fetchLidlStores,
@@ -109,6 +110,8 @@ import {
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
+  GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL,
+  WILLYS_BULK_MINIMUM_ROWS,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
   normaliseUnitPrice,
@@ -3820,6 +3823,72 @@ describe('fetchWillysProductsForAllStores', () => {
 
 });
 
+describe('fetchWillysBulkProducts', () => {
+  it('fetches Willys chain catalog pages without branch fanout and enforces the 100 row floor', async () => {
+    assert.equal(WILLYS_BULK_MINIMUM_ROWS, 100);
+
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const parsed = new URL(String(url));
+      const page = Number(parsed.searchParams.get('page') ?? '0');
+      return new Response(JSON.stringify({
+        results: [{
+          code: `willys-bulk-product-${page}`,
+          name: `Willys bulk product ${page}`,
+          manufacturer: 'Garant',
+          productLine2: '1 st',
+          priceValue: page === 0 ? 18.5 : 19.5,
+          price: page === 0 ? '18,50 kr' : '19,50 kr',
+          googleAnalyticsCategory: 'Bulk'
+        }],
+        pagination: { currentPage: page, numberOfPages: 2 }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysBulkProducts({
+      fetchImpl,
+      categoryPaths: ['mejeri-ost-och-agg'],
+      minRows: 2,
+      retrievedAt: '2026-05-23T16:25:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.code, row.price]), [
+      ['willys-bulk-product-0', 18.5],
+      ['willys-bulk-product-1', 19.5]
+    ]);
+    assert.deepEqual(requestedUrls, [
+      buildWillysCategoryUrl('mejeri-ost-och-agg', 100, 0),
+      buildWillysCategoryUrl('mejeri-ost-och-agg', 100, 1)
+    ]);
+    assert.equal(requestedUrls.some((url) => url.includes('/axfood/rest/store')), false);
+  });
+
+  it('fails closed when Willys bulk search returns fewer than the required real rows', async () => {
+    const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({
+      results: [{
+        code: 'too-small-willys-bulk-row',
+        name: 'Too small Willys bulk row',
+        manufacturer: 'Garant',
+        productLine2: '1 st',
+        priceValue: 10,
+        price: '10,00 kr'
+      }],
+      pagination: { currentPage: 0, numberOfPages: 1 }
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+
+    await assert.rejects(
+      () => fetchWillysBulkProducts({
+        fetchImpl,
+        categoryPaths: ['mejeri-ost-och-agg'],
+        minRows: 2,
+        retrievedAt: '2026-05-23T16:26:00.000Z'
+      }),
+      /Willys bulk fetch returned only 1 rows; minimum required is 2/
+    );
+  });
+});
+
 describe('fetchMatsparProducts', () => {
   it('fetches public Matspar page data rows with price provenance', async () => {
     const requestedUrls: string[] = [];
@@ -5977,6 +6046,51 @@ describe('daily ingestion runner', () => {
     const observation = firstBatchObservation(executor);
     assert.equal(observation.store_id, 'store-db-2');
     assert.equal(observation.price, 70.88);
+  });
+
+  it('materializes native Willys bulk product prices into chain-level daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T16:30:00.000Z',
+      connectors: [{
+        connectorId: 'willys-products-bulk',
+        chainId: 'willys',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL}?categoryPaths=mejeri-ost-och-agg&minRows=1&maxRows=1`,
+        parserVersion: 'willys-bulk-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        requireStoreScopedPrices: false
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(JSON.stringify({
+          results: [{
+            code: '101205621_ST',
+            name: 'Idealmakaroner Gammaldags',
+            manufacturer: 'Kungsörnen',
+            productLine2: '750g',
+            priceValue: 12.2,
+            price: '12,20 kr',
+            comparePrice: '16,27 kr/kg',
+            googleAnalyticsCategory: 'Pasta'
+          }],
+          pagination: { currentPage: 0, numberOfPages: 1 }
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildWillysCategoryUrl('mejeri-ost-och-agg', 100, 0)
+    ]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 12.2);
   });
 
   it('materializes native Coop all-store branch product prices into daily database observations', async () => {
