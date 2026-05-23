@@ -88,6 +88,7 @@ export * from './connectors/okq8-fuel.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
 export * from './store-enumerator.js';
+export * from './unit-price.js';
 
 export type SourceType =
   | 'official_api'

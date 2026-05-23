@@ -108,6 +108,7 @@ import {
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
+  normaliseUnitPrice,
   normalizeUnitPrice,
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
@@ -4281,6 +4282,12 @@ describe('normalizeUnitPrice', () => {
     assert.deepEqual(normalizeUnitPrice({ price: 49.9, packageSize: 450, packageUnit: 'g' }), { unitPrice: 110.8889, comparableUnit: 'kg' });
     assert.deepEqual(normalizeUnitPrice({ price: 14.9, packageSize: 1, packageUnit: 'l' }), { unitPrice: 14.9, comparableUnit: 'l' });
     assert.deepEqual(normalizeUnitPrice({ price: 34.9, packageSize: 12, packageUnit: 'piece' }), { unitPrice: 2.9083, comparableUnit: 'piece' });
+  });
+
+  it('normalises retailer package strings into comparable unit prices', () => {
+    assert.deepEqual(normaliseUnitPrice(49.9, '500g'), { unitPrice: 99.8, comparableUnit: 'kg' });
+    assert.deepEqual(normaliseUnitPrice(22.5, '1.5L'), { unitPrice: 15, comparableUnit: 'l' });
+    assert.deepEqual(normaliseUnitPrice(29.94, '6-pack'), { unitPrice: 4.99, comparableUnit: 'piece' });
   });
 });
 
