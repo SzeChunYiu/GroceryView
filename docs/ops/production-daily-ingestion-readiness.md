@@ -138,13 +138,29 @@ npm run --silent ops:db-io-hotspots \
 
 Run the same command after the mitigation lands, writing
 `/tmp/groceryview-db-io-hotspots-after.json`, then compare the `queryid` rows and
-block counters. The daily ingestion workflow also captures this automatically
-after production DB connectivity and again after the ingestion result is
-preserved, writing `/tmp/daily-db-io-hotspots-before.json` and
-`/tmp/daily-db-io-hotspots-after.json` into the
-`groceryview-daily-db-io-hotspots` artifact. Empty `hotspots[]` rows are valid
-evidence that no block IO rows were present in `pg_stat_statements`; a workflow
-failure should mean the diagnostic file was missing or the query itself failed.
+block counters with the same reusable script used by the daily workflow:
+
+```bash
+npm run --silent ops:compare-db-io-hotspots -- \
+  --before /tmp/groceryview-db-io-hotspots-before.json \
+  --after /tmp/groceryview-db-io-hotspots-after.json \
+  --out /tmp/groceryview-db-io-hotspots-delta.json
+```
+
+The daily ingestion workflow also captures this automatically after production
+DB connectivity and again after the ingestion result is preserved, writing
+`/tmp/daily-db-io-hotspots-before.json` and
+`/tmp/daily-db-io-hotspots-after.json`, then comparing them into
+`/tmp/daily-db-io-hotspots-delta.json` with
+`ops:compare-db-io-hotspots`. All three files are uploaded in the
+`groceryview-daily-db-io-hotspots` artifact. If either before or after file is
+missing, the delta file is still written with
+`daily_db_io_hotspots_delta_missing_before_or_after` so the artifact identifies
+the missing evidence instead of failing silently. Empty `hotspots[]` rows are
+valid evidence that no block IO rows were present in `pg_stat_statements`; the
+comparison still emits a zero-row delta instead of treating empty before/after
+arrays as a blocker. A workflow failure should mean a diagnostic file was
+missing, the delta file was missing, or the query itself failed.
 If the command fails with `relation "pg_stat_statements" does not exist`, enable
 the Supabase `pg_stat_statements` extension or collect the same query in the SQL
 editor before treating IO evidence as complete.
