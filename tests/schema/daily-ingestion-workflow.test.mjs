@@ -19,6 +19,8 @@ describe('daily ingestion workflow', () => {
     );
     assert.match(workflow, /\/tmp\/production-config-preflight\.json/);
     assert.match(workflow, /production_config_preflight_missing/);
+    assert.match(workflow, /production_config_preflight_status=\$\?/);
+    assert.match(workflow, /production_config_preflight_diagnostic_missing/);
     assert.match(workflow, /name: Upload production config preflight evidence\n\s+if:\s*always\(\)/);
     assert.match(workflow, /name:\s*groceryview-production-config-preflight/);
 
