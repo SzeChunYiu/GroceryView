@@ -755,11 +755,14 @@ describe('createHttpHandler', () => {
     assert.equal(first.status, 200);
     const firstBody = await json(first) as {
       items: Array<{ id: string }>;
-      pagination: { limit: number; nextCursor: string | null; hasMore: boolean; source: string };
+      pagination: { limit: number; nextCursor: string | null; hasMore: boolean; source: string; totalItems: number; totalProductCount: number; totalReturned: number };
       guardrails: string[];
     };
     assert.deepEqual(firstBody.items.map((product) => product.id), ['coffee', 'milk']);
     assert.equal(firstBody.pagination.limit, 2);
+    assert.equal(firstBody.pagination.totalReturned, 2);
+    assert.equal(firstBody.pagination.totalItems, 4);
+    assert.equal(firstBody.pagination.totalProductCount, 4);
     assert.equal(firstBody.pagination.hasMore, true);
     assert.match(firstBody.pagination.nextCursor ?? '', /^[A-Za-z0-9_-]+$/);
     assert.match(firstBody.pagination.source, /cursor pagination/i);
@@ -767,9 +770,12 @@ describe('createHttpHandler', () => {
 
     const second = await handle(new Request(`http://localhost/api/products/search?q=&limit=2&cursor=${firstBody.pagination.nextCursor}`));
     assert.equal(second.status, 200);
-    const secondBody = await json(second) as { items: Array<{ id: string }>; pagination: { limit: number; nextCursor: string | null; hasMore: boolean } };
+    const secondBody = await json(second) as { items: Array<{ id: string }>; pagination: { limit: number; nextCursor: string | null; hasMore: boolean; totalItems: number; totalProductCount: number; totalReturned: number } };
     assert.deepEqual(secondBody.items.map((product) => product.id), ['private-label-milk', 'butter']);
     assert.equal(secondBody.pagination.limit, 2);
+    assert.equal(secondBody.pagination.totalReturned, 2);
+    assert.equal(secondBody.pagination.totalItems, 4);
+    assert.equal(secondBody.pagination.totalProductCount, 4);
     assert.equal(secondBody.pagination.hasMore, false);
     assert.equal(secondBody.pagination.nextCursor, null);
   });
