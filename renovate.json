@@ -1,0 +1,29 @@
+{
+  "extends": ["config:recommended"],
+  "dependencyDashboard": true,
+  "timezone": "Europe/Stockholm",
+  "schedule": ["before 6:00 am on Friday"],
+  "rangeStrategy": "bump",
+  "minimumReleaseAge": "3 days",
+  "recreateWhen": "always",
+  "automerge": false,
+  "packageRules": [
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["patch"],
+      "matchDepTypes": ["dependencies", "devDependencies"],
+      "groupName": "patch dependencies",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "merge",
+      "requiredStatusChecks": ["Test, build, and typecheck"]
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "major"],
+      "matchDepTypes": ["dependencies", "devDependencies"],
+      "groupName": "minor and major dependencies",
+      "automerge": false
+    }
+  ]
+}
