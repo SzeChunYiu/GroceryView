@@ -2211,6 +2211,30 @@ ${seo}`;
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces query-driven chain comparison table on the compare route', async () => {
+    const route = await read('src/app/compare/page.tsx');
+    const compareLib = await read('src/lib/chain-compare.ts');
+
+    assert.match(route, /searchParams\?: Promise<SearchParams>/);
+    assert.match(route, /buildChainComparisonTable/);
+    assert.match(route, /productsParam/);
+    assert.match(route, /Chain comparison table/);
+    assert.match(route, /<table/);
+    assert.match(route, /comparison\.products\.map/);
+    assert.match(route, /ICA/);
+    assert.match(route, /Willys/);
+    assert.match(route, /Coop/);
+    assert.match(compareLib, /COMPARE_CHAIN_ORDER = \[/);
+    assert.match(compareLib, /id: 'ica'/);
+    assert.match(compareLib, /id: 'willys'/);
+    assert.match(compareLib, /id: 'coop'/);
+    assert.match(compareLib, /dbSiteSnapshotGeneratedAt/);
+    assert.match(compareLib, /postgres\.latest_prices\/observations/);
+    assert.match(compareLib, /productsParam\.split\(','\)/);
+    assert.match(compareLib, /axfoodProducts/);
+    assert.doesNotMatch(compareLib, /Math\.random|placeholder|synthetic/i);
+  });
+
   it('surfaces a compare-overlay chart from real price chart series output', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/compare/page.tsx');
