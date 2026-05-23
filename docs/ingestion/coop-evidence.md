@@ -34,6 +34,7 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 - Added this iteration (worker B seventh follow-up): 135120 Coop Åmål Mellanbrogatan, 12 real discount rows. Flyer PDF text from `https://dr.coop.se/Butik/Coop-%C3%85m%C3%A5l-Mellanbrogatan` matched the Avenyn flyer group and verified the offer prices; ordinary prices came from `https://external.api.coop.se/personalization/search/products?store=135120&device=desktop&direct=true&api-version=v1`, with validity and flyer URL from `https://proxy.api.coop.se/external/store/stores/135120?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true`.
 - Added this iteration (worker B eighth follow-up): 086802 Coop Fårbo; 245060 Coop Harads; 235190 Coop Sorsele; 235220 Coop Dorotea; 235400 Coop Åsele, 25 real discount rows. Store API validity and flyer URLs came from the matching `https://proxy.api.coop.se/external/store/stores/<storeId>?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true` responses. Ordinary prices came from the matching store-scoped `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1` responses. Flyer PDF text from each added branch URL verified the emitted small-store offer prices for falukorv, avokado, Finish maskindisktabletter, ost familjefavoriter, spare ribs where emitted, and Coop fiskpinnar.
 - Added this iteration (worker B ninth follow-up): 235460 Coop Hörnefors; 235540 Coop Bollstabruk; 236075 Coop Jörn; 236077 Coop Lövånger; 236402 Coop Köpmanholmen; 236404 Coop Mellansel; 236405 Coop Bredbyn; 236708 Coop Torpshammar; 236742 Coop Fränsta; 236788 Coop Näsåker; 235580 Coop Lycksele; 126500 Coop Alingsås, 166 real discount rows. Store API validity and flyer URLs came from the matching `https://proxy.api.coop.se/external/store/stores/<storeId>?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true` responses. Ordinary prices and offer prices came from the matching store-scoped `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1` responses retrieved at 2026-05-23T00:07:02.085Z. Candidate 086809 Coop Kristdala was inspected but excluded because it returned no qualifying ordinary-price-greater-than-offer-price discount rows.
+- Added this iteration (worker B tenth follow-up): 176211 Stora Coop Ladugårdsängen; 106436 Coop Örkelljunga; 135060 Stora Coop Tanumshede; 086815 Coop Målilla; 192500 Coop Leksand; 056095 Stora Coop Risängen; 235620 Coop Vilhelmina; 245020 Coop Överkalix; 183500 Coop Sveaplan Eskilstuna; 065050 Coop Hyltebruk; 072700 Coop Västervik; 236085 Coop Ånäset; 106114 Stora Coop Falkenberg; 122000 Coop Kongahälla; 056030 Coop Linden Motala; 056215 Coop Stockholmsvägen; 056212 Coop Ullstämma; 016041 Coop Hagastaden; 026828 Coop Bålsta; 126400 Coop Kolla Parkstad; 123300 Coop Öjersjö; 235970 Coop Vemdalen; 016170 Stora Coop Spånga; 055030 Stora Coop Ingelsta; 015480 Stora Coop Barkarby; 232400 Stora Coop Avion; 245270 Coop Arvidsjaur, 524 real discount rows. Store API validity and flyer URLs came from the matching `https://proxy.api.coop.se/external/store/stores/<storeId>?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true` responses. Ordinary prices and offer prices came from the matching store-scoped `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1` responses retrieved at 2026-05-23T12:19:48.579Z. A public curl inspection returned HTTP 200 for https://www.coop.se/handla/ and HTTP 200 application/pdf for https://dr.coop.se/Butik/Stora-Coop-Ladug%C3%A5rds%C3%A4ngen.
 - Stores:
   - 251300, Stora Coop Boländerna, Uppsala, 26 real discount rows
   - 252700, Stora Coop Bromma, Bromma, 24 real discount rows
@@ -196,8 +197,35 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
   - 236788, Coop Näsåker, Näsåker, 12 real discount rows
   - 235580, Coop Lycksele, Lycksele, 17 real discount rows
   - 126500, Coop Alingsås, Alingsås, 20 real discount rows
+  - 176211, Stora Coop Ladugårdsängen, Örebro, 24 real discount rows
+  - 106436, Coop Örkelljunga, Örkelljunga, 22 real discount rows
+  - 135060, Stora Coop Tanumshede, Tanum, 24 real discount rows
+  - 086815, Coop Målilla, Målilla, 13 real discount rows
+  - 192500, Coop Leksand, Leksand, 17 real discount rows
+  - 056095, Stora Coop Risängen, Norrköping, 21 real discount rows
+  - 235620, Coop Vilhelmina, Vilhelmina, 14 real discount rows
+  - 245020, Coop Överkalix, Överkalix, 15 real discount rows
+  - 183500, Coop Sveaplan Eskilstuna, Eskilstuna, 21 real discount rows
+  - 065050, Coop Hyltebruk, Hyltebruk, 20 real discount rows
+  - 072700, Coop Västervik, Västervik, 17 real discount rows
+  - 236085, Coop Ånäset, Ånäset, 10 real discount rows
+  - 106114, Stora Coop Falkenberg, Falkenberg, 24 real discount rows
+  - 122000, Coop Kongahälla, Kungälv, 21 real discount rows
+  - 056030, Coop Linden Motala, Motala, 20 real discount rows
+  - 056215, Coop Stockholmsvägen, Norrköping, 15 real discount rows
+  - 056212, Coop Ullstämma, Linköping, 16 real discount rows
+  - 016041, Coop Hagastaden, Stockholm, 18 real discount rows
+  - 026828, Coop Bålsta, Bålsta, 19 real discount rows
+  - 126400, Coop Kolla Parkstad, Kungsbacka, 16 real discount rows
+  - 123300, Coop Öjersjö, Öjersjö, 23 real discount rows
+  - 235970, Coop Vemdalen, Vemdalen, 19 real discount rows
+  - 016170, Stora Coop Spånga, Spånga, 25 real discount rows
+  - 055030, Stora Coop Ingelsta, Norrköping, 25 real discount rows
+  - 015480, Stora Coop Barkarby, Järfälla, 26 real discount rows
+  - 232400, Stora Coop Avion, Umeå, 18 real discount rows
+  - 245270, Coop Arvidsjaur, Arvidsjaur, 21 real discount rows
 - Flyer validity: 2026-05-18T00:00:00 through 2026-05-24T23:59:59
-- Real current flyer discount rows fetched: 2965
+- Real current flyer discount rows fetched: 3489
 
 Every weekly discount row includes Coop product id/EAN, product name, brand, package label, ordinary B2C SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL, and retrieval timestamp.
 
