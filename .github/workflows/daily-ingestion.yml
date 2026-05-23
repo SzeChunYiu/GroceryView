@@ -88,6 +88,10 @@ jobs:
       - name: Run configured daily ingestion
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_DAILY_MAX_CONCURRENCY: ${{ vars.GROCERYVIEW_DAILY_MAX_CONCURRENCY || '2' }}
+          GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS || '250' }}
+          GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS || '1' }}
+          GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS || '500' }}
         run: |
           set -euo pipefail
           test -n "${DATABASE_URL:-}"

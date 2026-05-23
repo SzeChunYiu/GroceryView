@@ -4363,6 +4363,35 @@ describe('daily ingestion runner', () => {
     assert.equal(configs.connectors[5].chainId, 'city_gross');
   });
 
+
+  it('loads bounded bulk ingestion runner limits from environment', () => {
+    const configs = buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
+        dailyConnectorFixture('ica'),
+        dailyConnectorFixture('willys'),
+        dailyConnectorFixture('coop'),
+        dailyConnectorFixture('hemkop'),
+        dailyConnectorFixture('lidl'),
+        dailyConnectorFixture('city_gross')
+      ]),
+      GROCERYVIEW_DAILY_MAX_CONNECTORS: '4',
+      GROCERYVIEW_DAILY_MAX_CONCURRENCY: '2',
+      GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: '125',
+      GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: '1',
+      GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: '250'
+    });
+
+    assert.equal(configs.connectors.length, 4);
+    assert.deepEqual(configs.runner, {
+      maxConnectors: 4,
+      maxConcurrency: 2,
+      connectorStartDelayMs: 125,
+      connectorRetryAttempts: 1,
+      connectorRetryBaseDelayMs: 250
+    });
+  });
+
   it('forces the production daily ingestion database session into write mode', () => {
     assert.deepEqual(
       buildDailyIngestionPostgresPoolConfig('postgres://user:secret@example/groceryview'),

@@ -78,6 +78,18 @@ npm run --silent ops:daily-connectors > /tmp/groceryview-daily-connectors.json
 
 Use this emitted JSON only for local `ops:validate-production-env` checks or one-off operator debugging when the workflow is not available.
 
+## Bounded bulk ingestion controls
+
+The daily runner is a bounded bulk ingestion path: it loads the generated all-chain connector list, validates all six required chains, then lets operators control production fetch pressure without editing code. Use these environment variables for first-run backfills, rate-limit recovery, or canary batches:
+
+- `GROCERYVIEW_DAILY_MAX_CONNECTORS`: optional canary cap after the generated config has proven all six required chains are present. Leave unset for full daily coverage.
+- `GROCERYVIEW_DAILY_MAX_CONCURRENCY`: maximum connector fetch/parse/persist jobs at once. The workflow defaults to `2`.
+- `GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS`: polite delay before workers start later connectors. The workflow defaults to `250`.
+- `GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS`: connector-level retry attempts for transient fetch/parse failures. The workflow defaults to `1`.
+- `GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS`: base retry backoff. The workflow defaults to `500`.
+
+Do not leave `GROCERYVIEW_DAILY_MAX_CONNECTORS` set for normal production readiness: catalog coverage and source-run readiness still require all six required chains and all targeted product/store pairs.
+
 ## Validate values before relying on cron
 
 Run from an environment that has the real values loaded. The workflow does this automatically; for a local operator check, write the generated connector JSON to a file and pass the file path so large all-store configs do not overflow process environment limits:
