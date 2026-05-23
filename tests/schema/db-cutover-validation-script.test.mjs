@@ -69,7 +69,12 @@ describe('production DB cutover validation script', () => {
     assert.equal(JSON.stringify(result).includes('old-secret'), false);
   });
 
-  it('requires an explicit replacement database URL', async () => {
-    await assert.rejects(() => validateDatabaseCutover({}), /REPLACEMENT_DATABASE_URL is required/);
+  it('emits structured blocked evidence when no replacement database URL is configured', async () => {
+    const result = await validateDatabaseCutover({}, { generatedAt: '2026-05-23T09:50:00.000Z' });
+
+    assert.equal(result.status, 'blocked');
+    assert.deepEqual(result.blockers, ['replacement_database_url_missing']);
+    assert.match(result.nextActions.join('\n'), /REPLACEMENT_DATABASE_URL/);
+    assert.match(result.nextActions.join('\n'), /Production DB cutover validation/);
   });
 });

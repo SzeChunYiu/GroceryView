@@ -26,7 +26,18 @@ function candidateProjectRef(classification) {
 
 export async function validateDatabaseCutover(env = process.env, options = {}) {
   const candidateUrl = env.REPLACEMENT_DATABASE_URL?.trim() || env.CANDIDATE_DATABASE_URL?.trim();
-  if (!candidateUrl) throw new Error('REPLACEMENT_DATABASE_URL is required.');
+  if (!candidateUrl) {
+    return {
+      status: 'blocked',
+      generatedAt: options.generatedAt ?? new Date().toISOString(),
+      blockers: ['replacement_database_url_missing'],
+      nextActions: [
+        'Create a distinct writable replacement database.',
+        'Store its connection string as the repository REPLACEMENT_DATABASE_URL secret or CANDIDATE_DATABASE_URL secret.',
+        'Rerun the Production DB cutover validation workflow before changing production DATABASE_URL.'
+      ]
+    };
+  }
   const currentUrl = env.DATABASE_URL?.trim();
   if (currentUrl && sameNormalizedUrl(currentUrl, candidateUrl)) {
     return {
