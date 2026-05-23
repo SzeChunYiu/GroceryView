@@ -97,6 +97,30 @@ describe('createGroceryViewApi', () => {
     }
   ];
 
+  it('builds store detail reports with opening hours and category-sorted assortment items', () => {
+    const api = createGroceryViewApi();
+
+    const detail = api.getStoreDetail('willys-odenplan');
+
+    assert.equal(detail?.id, 'willys-odenplan');
+    assert.equal(detail?.name, 'Willys Odenplan');
+    assert.equal(detail?.store.id, 'willys-odenplan');
+    assert.equal(detail?.store.address, 'Odenplan, Stockholm');
+    assert.deepEqual(detail?.openingHours, ['Mon-Fri 08:00-22:00', 'Sat-Sun 09:00-21:00']);
+    assert.deepEqual(detail?.assortment.items.map((item) => [item.category, item.productId, item.priceLabel]), [
+      ['coffee', 'coffee', 'verified_shelf'],
+      ['dairy', 'milk', 'verified_shelf'],
+      ['dairy', 'butter', 'verified_shelf'],
+      ['dairy', 'private-label-milk', 'verified_shelf']
+    ]);
+    assert.deepEqual(detail?.assortment.categories.map((category) => [category.category, category.itemCount]), [
+      ['coffee', 1],
+      ['dairy', 3]
+    ]);
+    assert.match(detail?.guardrails[0] ?? '', /verified shelf price rows/i);
+    assert.equal(api.getStoreDetail('missing-store'), null);
+  });
+
   it('builds product price-history reports from persisted observation inputs', () => {
     assert.deepEqual(productPriceHistoryPriceTypes, ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated']);
     assert.deepEqual(productPriceHistoryEndpoint, {

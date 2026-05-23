@@ -2201,6 +2201,60 @@ export function storePricePercentileRankForStore(slug: string) {
   return storePricePercentileRanks.find((rank) => rank.osmSlug === slug) ?? null;
 }
 
+export function storeOpeningHoursLabel(store: (typeof storeUniverse)[number]) {
+  return 'openingHours' in store && typeof store.openingHours === 'string' && store.openingHours.trim().length > 0
+    ? store.openingHours
+    : 'Not reported by OSM';
+}
+
+export function storeAssortmentOverviewForStore(store: (typeof storeUniverse)[number]) {
+  const matchedLidlSummary = lidlStoreOfferSummaries.find((summary) => summary.matchedStore?.slug === store.slug);
+  const rows = matchedLidlSummary?.offers ?? [];
+  const items = rows
+    .map((offer) => ({
+      id: `${offer.storeId}:${offer.code}:${offer.validFrom}`,
+      name: offer.name,
+      category: offer.category || 'lidl-public-offers',
+      priceLabel: formatSek(offer.price),
+      unitPriceLabel: offer.unitPriceText || 'Unit price not reported',
+      packageLabel: offer.packageText || 'Package not reported',
+      validWindow: `${formatLocalizedDate(offer.validFrom, { locale: defaultLocale })} – ${formatLocalizedDate(offer.validTo, { locale: defaultLocale })}`,
+      sourceLabel: 'Lidl public branch offer row',
+      productUrl: offer.productUrl
+    }))
+    .sort((left, right) => left.category.localeCompare(right.category, 'sv') || left.name.localeCompare(right.name, 'sv'));
+
+  const categories = Object.values(
+    items.reduce<Record<string, { category: string; itemCount: number; items: typeof items }>>((ledger, item) => {
+      const row = ledger[item.category] ?? { category: item.category, itemCount: 0, items: [] as typeof items };
+      row.itemCount += 1;
+      row.items.push(item);
+      ledger[item.category] = row;
+      return ledger;
+    }, {})
+  ).sort((left, right) => left.category.localeCompare(right.category, 'sv'));
+
+  return {
+    statusLabel: items.length > 0
+      ? `${items.length.toLocaleString('sv-SE')} branch-specific assortment rows matched`
+      : 'No branch-specific assortment rows matched',
+    sourceLabel: items.length > 0
+      ? `${lidlSource.source} · ${matchedLidlSummary?.externalStoreId}`
+      : `${snapshot.osmSource}; no verified branch assortment feed matched this OSM store`,
+    openingHoursLabel: storeOpeningHoursLabel(store),
+    itemCount: items.length,
+    categoryCount: categories.length,
+    sortedBy: 'category_then_name' as const,
+    items,
+    categories,
+    guardrails: [
+      'Assortment overview only lists branch-specific assortment rows when a public store-offer feed is matched to this OSM store.',
+      'No branch-specific assortment rows are inferred from brand, address, nearby stores, or chain-wide catalogue data.',
+      'Opening hours stay as “Not reported by OSM” unless the store source provides them.'
+    ]
+  };
+}
+
 export const featuredStores = [...osmStores]
   .filter((store) => store.address)
   .sort((a, b) => a.name.localeCompare(b.name, 'sv'))

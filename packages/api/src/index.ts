@@ -90,6 +90,7 @@ export type Store = {
   chain: string;
   district: string;
   address: string;
+  openingHours: string[];
   confidence: 'high' | 'medium' | 'low';
 };
 
@@ -601,6 +602,39 @@ export type StoreCategoryCoverageReport = {
   categoryCount: number;
   fullyPricedCategoryCount: number;
   categories: StoreCategoryCoverageRow[];
+  guardrails: string[];
+};
+
+export type StoreAssortmentItem = {
+  productId: string;
+  productName: string;
+  category: string;
+  price: number;
+  unitPrice: string;
+  priceLabel: 'verified_shelf';
+  dealScore: number;
+  band: ReturnType<typeof scoreBand>;
+};
+
+export type StoreAssortmentCategory = {
+  category: string;
+  itemCount: number;
+  items: StoreAssortmentItem[];
+};
+
+export type StoreDetailReport = Store & {
+  store: Store;
+  storeId: string;
+  storeName: string;
+  address: string;
+  openingHours: string[];
+  assortment: {
+    sortedBy: 'category_then_name';
+    itemCount: number;
+    categoryCount: number;
+    items: StoreAssortmentItem[];
+    categories: StoreAssortmentCategory[];
+  };
   guardrails: string[];
 };
 
@@ -1767,9 +1801,33 @@ export function buildRealBasketComparison(input: RealBasketCompareInput): RealBa
 }
 
 const stores: Store[] = [
-  { id: 'willys-odenplan', name: 'Willys Odenplan', chain: 'willys', district: 'Odenplan', address: 'Odenplan, Stockholm', confidence: 'high' },
-  { id: 'lidl-sveavagen', name: 'Lidl Sveavägen', chain: 'lidl', district: 'Norrmalm', address: 'Sveavägen, Stockholm', confidence: 'medium' },
-  { id: 'coop-odenplan', name: 'Coop Odenplan', chain: 'coop', district: 'Odenplan', address: 'Odenplan, Stockholm', confidence: 'medium' }
+  {
+    id: 'willys-odenplan',
+    name: 'Willys Odenplan',
+    chain: 'willys',
+    district: 'Odenplan',
+    address: 'Odenplan, Stockholm',
+    openingHours: ['Mon-Fri 08:00-22:00', 'Sat-Sun 09:00-21:00'],
+    confidence: 'high'
+  },
+  {
+    id: 'lidl-sveavagen',
+    name: 'Lidl Sveavägen',
+    chain: 'lidl',
+    district: 'Norrmalm',
+    address: 'Sveavägen, Stockholm',
+    openingHours: ['Mon-Sun 08:00-21:00'],
+    confidence: 'medium'
+  },
+  {
+    id: 'coop-odenplan',
+    name: 'Coop Odenplan',
+    chain: 'coop',
+    district: 'Odenplan',
+    address: 'Odenplan, Stockholm',
+    openingHours: ['Mon-Fri 07:00-22:00', 'Sat-Sun 08:00-22:00'],
+    confidence: 'medium'
+  }
 ];
 
 const storeTravelProfiles: Record<string, { distanceKm: number; durationMinutes: number }> = {
@@ -3720,6 +3778,69 @@ function buildStoreCategoryCoverage(storeId: string): StoreCategoryCoverageRepor
   };
 }
 
+function storeAssortmentItemsFor(storeId: string): StoreAssortmentItem[] {
+  requireKnownStore(storeId);
+  return products
+    .flatMap((product) => {
+      const price = product.currentPrices.find((candidate) => candidate.storeId === storeId);
+      if (!price) return [];
+      return [{
+        productId: product.id,
+        productName: product.name,
+        category: product.category,
+        price: price.price,
+        unitPrice: product.unitPrice,
+        priceLabel: 'verified_shelf' as const,
+        dealScore: product.dealScore,
+        band: scoreBand(product.dealScore)
+      }];
+    })
+    .sort((left, right) => left.category.localeCompare(right.category) || left.productName.localeCompare(right.productName));
+}
+
+function storeAssortmentCategoriesFor(items: StoreAssortmentItem[]): StoreAssortmentCategory[] {
+  const grouped = new Map<string, StoreAssortmentItem[]>();
+  for (const item of items) {
+    grouped.set(item.category, [...(grouped.get(item.category) ?? []), item]);
+  }
+  return [...grouped.entries()]
+    .map(([category, categoryItems]) => ({
+      category,
+      itemCount: categoryItems.length,
+      items: categoryItems
+    }))
+    .sort((left, right) => left.category.localeCompare(right.category));
+}
+
+function buildStoreDetailReport(storeId: string): StoreDetailReport | null {
+  const store = stores.find((candidate) => candidate.id === storeId);
+  if (!store) return null;
+
+  const items = storeAssortmentItemsFor(storeId);
+  const categories = storeAssortmentCategoriesFor(items);
+
+  return {
+    ...store,
+    store,
+    storeId: store.id,
+    storeName: store.name,
+    address: store.address,
+    openingHours: store.openingHours,
+    assortment: {
+      sortedBy: 'category_then_name',
+      itemCount: items.length,
+      categoryCount: categories.length,
+      items,
+      categories
+    },
+    guardrails: [
+      'Assortment overview lists only products with verified shelf price rows for this store.',
+      'Missing products stay omitted from store detail items instead of being inferred from another branch.',
+      'Opening hours are reported from the store record and remain empty if the source did not provide them.'
+    ]
+  };
+}
+
 function storeDealsFor(storeId: string): StoreDeal[] {
   requireKnownStore(storeId);
   return products
@@ -4412,6 +4533,10 @@ export function createGroceryViewApi() {
 
     getStore(id: string) {
       return stores.find((store) => store.id === id) ?? null;
+    },
+
+    getStoreDetail(id: string): StoreDetailReport | null {
+      return buildStoreDetailReport(id);
     },
 
     getStoreDeals(storeId: string) {

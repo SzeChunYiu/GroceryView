@@ -192,6 +192,8 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/receipts/review'].get?.summary ?? '', /receipt review/i);
     assert.equal(doc.paths['/api/categories/{category}/market'].get?.security, undefined);
     assert.match(doc.paths['/api/categories/{category}/market'].get?.summary ?? '', /category market/i);
+    assert.equal(doc.paths['/api/stores/{id}'].get?.security, undefined);
+    assert.match(doc.paths['/api/stores/{id}'].get?.summary ?? '', /store profile.*assortment|assortment.*store profile/i);
     assert.equal(doc.paths['/api/stores/{id}/category-coverage'].get?.security, undefined);
     assert.match(doc.paths['/api/stores/{id}/category-coverage'].get?.summary ?? '', /category/i);
     assert.equal(doc.paths['/api/stores/{id}/deal-summary'].get?.security, undefined);
