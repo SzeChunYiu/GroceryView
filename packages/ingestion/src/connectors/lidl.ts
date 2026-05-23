@@ -85,7 +85,10 @@ export const LIDL_STORES_PATH = '/s/sv-SE/butiker/';
 export const DEFAULT_LIDL_OFFER_PATHS = [
   '/c/veckans-frukt-groent/a10094676',
   '/c/lidl-plus-erbjudanden/a10094682',
-  '/c/veckans-blommor/a10094398'
+  '/c/veckans-blommor/a10094398',
+  '/c/veckans-kott-fisk-fagel/a10094678',
+  '/c/veckans-mejeri/a10094680',
+  '/c/veckans-brod/a10094679'
 ] as const;
 
 export type FetchLidlStoresOptions = AllStoreTaskRunnerControls & {

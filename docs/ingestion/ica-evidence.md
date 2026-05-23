@@ -4,13 +4,15 @@
 - Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C
 - Store locator retrieved: 2026-05-23T00:16:08.083Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 93083
-- Stores fetched: 323
+- Real rows fetched: 93084
+- Stores fetched: 324
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
 - Live verification: the latest newly added source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-23 Europe/Stockholm; the wired source row count is recorded below.
 
 ## Source URLs
+
+- Source URL (1003822 ICA Supermarket Toria, retrieved 2026-05-23T15:31:20.601Z, rows 1): https://handlaprivatkund.ica.se/stores/1003822/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=1&maxPageSize=1
 
 - Source URL (1004070 ICA Kvantum Tomelilla, retrieved 2026-05-23T13:26:35.000Z, rows 10): https://handlaprivatkund.ica.se/stores/1004070/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=10&maxPageSize=10
 
@@ -348,7 +350,7 @@
 
 - Source URL (1004393 ICA Supermarket Svenstavik, retrieved 2026-05-22T18:29:09.375Z, rows 15): https://handlaprivatkund.ica.se/stores/1004393/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=15&maxPageSize=15
 
-Every emitted row came from a live store-scoped promotions response for the selected ICA store and includes the exact source URL plus retrieval timestamp. Rows preserve store account, region, ordinary price, unit price, promo price fields when ICA returned them, promotion description, and product detail URLs.
+Latest live fetch for 1003822 ICA Supermarket Toria returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` / connector fetch on 2026-05-23 Europe/Stockholm. Every emitted row came from a live store-scoped promotions response for the selected ICA store and includes the exact source URL plus retrieval timestamp. Rows preserve store account, region, ordinary price, unit price, promo price fields when ICA returned them, promotion description, and product detail URLs.
 
 ## Sample Retrieved Rows
 

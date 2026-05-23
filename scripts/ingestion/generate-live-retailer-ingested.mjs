@@ -15,7 +15,7 @@ import {
 const REPO_ROOT = new URL('../../', import.meta.url);
 const INGESTED_DIR = new URL('apps/web/src/lib/ingested/', REPO_ROOT);
 
-const CITY_GROSS_QUERIES = [DEFAULT_CITY_GROSS_PRODUCT_QUERIES[0]];
+const CITY_GROSS_QUERIES = DEFAULT_CITY_GROSS_PRODUCT_QUERIES.slice(0, 2);
 const WILLYS_QUERIES = DEFAULT_WILLYS_SEARCH_QUERIES;
 const HEMKOP_QUERIES = DEFAULT_HEMKOP_SEARCH_QUERIES;
 const LIDL_OFFER_PATHS = DEFAULT_LIDL_OFFER_PATHS;
@@ -35,7 +35,7 @@ await writeCityGross(cityGrossProducts);
 
 const willysProducts = await fetchWillysProducts({
   queries: WILLYS_QUERIES,
-  maxRows: 1200,
+  maxRows: 1400,
   retrievedAt
 });
 const willysWeeklyDiscounts = await fetchWillysWeeklyDiscountsForAllStores({
@@ -47,7 +47,7 @@ await writeWillys(willysProducts, willysWeeklyDiscounts);
 
 const hemkopProducts = await fetchHemkopProducts({
   queries: HEMKOP_QUERIES,
-  maxRows: 4200,
+  maxRows: 4600,
   pageSize: 100,
   retrievedAt
 });
@@ -59,9 +59,9 @@ const hemkopWeeklyDiscounts = await fetchHemkopWeeklyDiscountsForAllStores({
 await writeHemkop(hemkopProducts, hemkopWeeklyDiscounts);
 
 const lidlStoreOffers = await fetchLidlOffersForAllStores({
-  maxStores: 40,
+  maxStores: 50,
   offerPaths: LIDL_OFFER_PATHS,
-  maxRows: 150,
+  maxRows: 200,
   retrievedAt
 });
 await writeLidl(lidlStoreOffers);

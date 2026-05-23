@@ -414,7 +414,11 @@ export const DEFAULT_WILLYS_SEARCH_QUERIES = [
   'knackebrod',
   'mineralvatten',
   'havredryck',
-  'toalettpapper'
+  'toalettpapper',
+  'krossade tomater',
+  'crème fraiche',
+  'diskmedel',
+  'blöjor'
 ] as const;
 export const DEFAULT_WILLYS_PRODUCTS_MAX_ROWS = 500;
 export const DEFAULT_WILLYS_CATEGORY_PAGE_SIZE = 100;

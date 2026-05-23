@@ -83,7 +83,11 @@ export const DEFAULT_CITY_GROSS_PRODUCT_QUERIES = [
   'smor',
   'ost',
   'kyckling',
-  'yoghurt'
+  'yoghurt',
+  'frukt',
+  'gronsaker',
+  'fisk',
+  'toalettpapper'
 ] as const;
 
 export type FetchCityGrossStoresOptions = {

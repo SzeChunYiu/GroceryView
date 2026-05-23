@@ -305,7 +305,11 @@ export const DEFAULT_HEMKOP_SEARCH_QUERIES = [
   'knackebrod',
   'mineralvatten',
   'havredryck',
-  'toalettpapper'
+  'toalettpapper',
+  'krossade tomater',
+  'crème fraiche',
+  'diskmedel',
+  'blöjor'
 ] as const;
 
 export type FetchHemkopProductsOptions = {
