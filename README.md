@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 06:28 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 07:29 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **245**
+- **Shipped `feat:`/`wire:` PRs to date:** **239**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,6 +42,9 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1239 feat(web): add grocery market heatmap
+- #1232 feat(readiness): configure source run row thresholds
+- #1231 feat(web): sync map and list selection
 - #1228 feat(ingestion): require branch observations
 - #1227 feat(web): add account-bound product watchlist hearts
 - #1219 feat(products): add faceted search surface
@@ -54,14 +57,10 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1194 feat(scanning): add upload write readiness
 - #1192 feat(scanning): add upload CORS readiness
 - #1190 feat(scanning): add upload storage readiness
-- #1187 feat(deals): add ranked deal screener
-- #1185 feat(scanning): add live provider health checks
-- #1183 feat(readiness): expose scan provider health
 
 ## 🔄 In progress (open PRs)
 
-- #1232 feat(readiness): configure source run row thresholds
-- #1231 feat(web): sync map and list selection
+- #1242 Add Supabase project health diagnostic
 
 ## 📋 To-do (from GOAL.md backlog)
 
