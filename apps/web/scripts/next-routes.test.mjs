@@ -738,6 +738,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /future price prediction|forecasted price/i);
   });
 
+  it('surfaces single-shop versus split-shop comparison on the weekly basket route', async () => {
+    const source = await read('src/app/weekly-basket/page.tsx');
+
+    assert.match(source, /compareBasketStrategies/);
+    assert.match(source, /summarizeStoreBasketCoverage/);
+    assert.match(source, /Single vs split shop/);
+    assert.match(source, /Best single shop/);
+    assert.match(source, /Cheapest split shop/);
+    assert.match(source, /savingsVsBestSingleStore/);
+    assert.match(source, /ConfidenceBadge/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces a budget stretch-krona basket optimizer using real basket strategy output', async () => {
     const source = await read('src/app/weekly-basket/page.tsx');
     const demo = await read('src/lib/demo-data.ts');
