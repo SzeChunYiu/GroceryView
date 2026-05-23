@@ -159,6 +159,7 @@ The workflow must pass these gates in order:
 - `daily_ingestion_chain_not_succeeded:<chain>`: at least one connector summary for that required chain did not finish with `status: succeeded`.
 - `daily_ingestion_chain_without_observations:<chain>`: the required chain ran but produced no persisted observation ids in the daily runner result.
 - `<chain>:missing_configured_store_observations:<stores>`: an official product connector fetched accepted rows but at least one configured branch in `stores[]` produced no observations, so the run stops before writing a partial branch-product snapshot.
+- `<chain>:persistence_failed:<message>`: connector output could not be written to `source_runs`, `raw_records`, `observations`, or `latest_prices`; if the source run was already created, ingestion marks that source run `failed` with the sanitized error message instead of leaving it stuck as `running`.
 - `source_run_missing_fresh_chain:<chain>`: no fresh successful daily source run for that chain.
 - `source_run_insufficient_accepted_rows:<chain>:<count>/<min>`: source run completed but accepted too few rows.
 - `missing_store_scoped_prices:<products>`: connector output had accepted products without a branch/store id.

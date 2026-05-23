@@ -3674,20 +3674,21 @@ async function persistDailyConnectorOutput(input: {
     return ids;
   }
 
-  const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product));
-  const aliasesToUpsert: Parameters<typeof upsertDailyAliasBatch>[1] = [];
-  for (const accepted of result.ingestion.accepted) {
-    const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
-    if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
-    aliasesToUpsert.push({
-      productId,
-      alias: accepted.alias.rawName,
-      normalizedAlias: accepted.alias.rawName.trim().toLowerCase().replace(/\s+/g, ' '),
-      sourceRef: result.plan.runKey,
-      matchConfidence: accepted.alias.matchConfidence
-    });
-  }
-  await upsertDailyAliasBatch(executor, aliasesToUpsert);
+  try {
+    const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product));
+    const aliasesToUpsert: Parameters<typeof upsertDailyAliasBatch>[1] = [];
+    for (const accepted of result.ingestion.accepted) {
+      const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
+      if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
+      aliasesToUpsert.push({
+        productId,
+        alias: accepted.alias.rawName,
+        normalizedAlias: accepted.alias.rawName.trim().toLowerCase().replace(/\s+/g, ' '),
+        sourceRef: result.plan.runKey,
+        matchConfidence: accepted.alias.matchConfidence
+      });
+    }
+    await upsertDailyAliasBatch(executor, aliasesToUpsert);
 
   const rawRecordsToUpsert: Parameters<typeof upsertRawRecordBatch>[0] = [];
   const observationsToInsert: Parameters<typeof insertObservationBatch>[0] = [];
@@ -3772,13 +3773,23 @@ async function persistDailyConnectorOutput(input: {
     status: result.rejectedCount > 0 ? 'partial' : 'succeeded'
   });
 
-  return {
-    sourceRunIds: [sourceRun.sourceRunId],
-    rawRecordIds,
-    observationIds,
-    acceptedCount: result.acceptedCount,
-    rejectedCount: result.rejectedCount
-  };
+    return {
+      sourceRunIds: [sourceRun.sourceRunId],
+      rawRecordIds,
+      observationIds,
+      acceptedCount: result.acceptedCount,
+      rejectedCount: result.rejectedCount
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await sourceWriter.finishSourceRun({
+      sourceRunId: sourceRun.sourceRunId,
+      finishedAt: config.requestedAt,
+      status: 'failed',
+      errorMessage: message
+    });
+    throw error;
+  }
 }
 
 type DailyConnectorRunPersistenceResult = Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'> & {
