@@ -336,6 +336,20 @@ jobs:
           node -e "const body=require('/tmp/production-db-migrations.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
           exit "${migration_status}"
 
+      - name: Preserve skipped production DB migrations result
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/production-db-migrations.json ]; then
+            cat > /tmp/production-db-migrations.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "production_db_migrations_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          cat /tmp/production-db-migrations.json
+
       - name: Upload production DB migrations result
         if: always()
         uses: actions/upload-artifact@v4
@@ -448,6 +462,30 @@ jobs:
           }
           NODE
 
+      - name: Preserve skipped daily ingestion result
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/daily-ingestion-result.json ]; then
+            cat > /tmp/daily-ingestion-result.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "daily_ingestion_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          if [ ! -s codex-tasks/ingestion-blockers.txt ]; then
+            mkdir -p codex-tasks
+            {
+              echo "# Daily ingestion blockers"
+              echo
+              echo "status: skipped"
+              echo "blockers:"
+              echo "- daily_ingestion_skipped_after_prior_failure"
+            } > codex-tasks/ingestion-blockers.txt
+          fi
+          cat /tmp/daily-ingestion-result.json
+
       - name: Upload daily ingestion result
         if: always()
         uses: actions/upload-artifact@v4
@@ -506,6 +544,28 @@ jobs:
             process.exit(1);
           }
           NODE
+
+      - name: Preserve skipped DB-backed site snapshot
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/groceryview-db-site-snapshot.json ]; then
+            cat > /tmp/groceryview-db-site-snapshot.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "db_site_snapshot_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          if [ ! -s /tmp/db-site-snapshot-result.json ]; then
+            cat > /tmp/db-site-snapshot-result.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "db_site_snapshot_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          cat /tmp/db-site-snapshot-result.json
 
       - name: Upload DB-backed site snapshot
         if: always()
