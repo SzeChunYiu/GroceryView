@@ -161,6 +161,8 @@ Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `obse
 
 Primary key: `(product_id, chain_id, store_id, price_type)`.
 
+Snapshot IO note: the DB-backed site snapshot exporter was identified as the likely Supabase Disk IO hot read after the all-store daily runner and DB snapshot work landed. Keep `scripts/ingestion/export-db-site-snapshot.mjs` on the `latest_prices_grocery_snapshot_idx` access pattern: filter to `domain='grocery'`, bound confidence/limit, and read the latest rows from `latest_prices` before joining metadata. Do not replace it with a raw `observations` scan or an unbounded latest-price export; preserve the change-only write path so unchanged daily snapshots reuse existing observations instead of silently dropping writes.
+
 ### `price_daily`
 
 Derived daily rollup over immutable `observations` for product charts, 52-week-low checks, and historic range reads. Raw observations remain authoritative; charts and 52-week-low reads must hit `price_daily` or `price_weekly` instead of scanning raw observations for long ranges.
