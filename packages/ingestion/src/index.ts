@@ -2919,6 +2919,22 @@ function validateStoreScopedConnectorOutput(config: DailyIngestionConnectorConfi
   return blockers;
 }
 
+function validateConfiguredStoreObservationCoverage(config: DailyIngestionConnectorConfig, result: RetailerConnectorRunResult): string[] {
+  if (config.requireStoreScopedPrices === false || config.sourceType !== 'official_api') return [];
+  const configuredStores = (config.stores ?? []).map((store) => normalizeDailySlug(store.storeId));
+  if (configuredStores.length === 0) return [];
+  const observedStores = new Set(
+    result.ingestion.accepted
+      .map((accepted) => accepted.priceObservation.storeId?.trim())
+      .filter((storeId): storeId is string => Boolean(storeId))
+      .map((storeId) => normalizeDailySlug(storeId))
+  );
+  const missingStores = configuredStores.filter((storeId) => !observedStores.has(storeId));
+  return missingStores.length > 0
+    ? [`${config.chainId}:missing_configured_store_observations:${missingStores.slice(0, 10).join(',')}`]
+    : [];
+}
+
 async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProduct): Promise<string> {
   const rows = await executor.query<IdRow>(
     `insert into products(
@@ -3879,9 +3895,13 @@ async function runDailyIngestionConnector(input: {
     }
 
     const storeScopeBlockers = validateStoreScopedConnectorOutput(runConfig, result);
-    if (storeScopeBlockers.length > 0) {
+    const storeCoverageBlockers = storeScopeBlockers.length === 0
+      ? validateConfiguredStoreObservationCoverage(runConfig, result)
+      : [];
+    const storeBlockers = [...storeScopeBlockers, ...storeCoverageBlockers];
+    if (storeBlockers.length > 0) {
       return {
-        blockers: storeScopeBlockers,
+        blockers: storeBlockers,
         persistedRuns: 0,
         acceptedCount: 0,
         rejectedCount: 0,
