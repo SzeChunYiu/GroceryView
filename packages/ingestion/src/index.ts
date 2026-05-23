@@ -3769,7 +3769,7 @@ async function waitForDailyRunnerDelay(delayMs: number): Promise<void> {
 
 function isTransientDailyDatabaseError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
-  return /connection\s+(?:to database\s+)?closed|terminating connection|connection terminated|database system is not accepting connections|EDBHANDLEREXITED|ECONNRESET|EPIPE|timeout|Connection terminated unexpectedly/i.test(message);
+  return /connection\s+(?:to database\s+)?closed|terminating connection|connection terminated|database system is not accepting connections|EDBHANDLEREXITED|ECONNRESET|ECONNREFUSED|econnrefused|EPIPE|timeout|Connection terminated unexpectedly/i.test(message);
 }
 
 export function createDailyIngestionQueryExecutor(

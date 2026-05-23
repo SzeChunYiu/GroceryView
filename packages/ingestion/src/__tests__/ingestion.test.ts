@@ -4465,6 +4465,23 @@ describe('daily ingestion runner', () => {
     assert.equal(attempts, 4);
   });
 
+  it('retries Supabase pooler econnrefused startup errors', async () => {
+    let attempts = 0;
+    const client = {
+      async query() {
+        attempts += 1;
+        if (attempts < 3) throw new Error('Failed to connect to database: {:error, :econnrefused}');
+        return { rows: [{ id: 'row-after-pooler-accepts-connections' }] };
+      }
+    };
+
+    const executor = createDailyIngestionQueryExecutor(client, { retryAttempts: 2, retryBaseDelayMs: 0 });
+    const rows = await executor.query<{ id: string }>('set default_transaction_read_only=off');
+
+    assert.deepEqual(rows, [{ id: 'row-after-pooler-accepts-connections' }]);
+    assert.equal(attempts, 3);
+  });
+
   it('fails closed when daily connector config omits any required chain', () => {
     assert.throws(() => buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',
