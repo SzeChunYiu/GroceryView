@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { calculateBrandTierIndices } from '@groceryview/core';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { buildBrandTierPriceObservations } from '@/lib/chain-index-data';
-import { expiryDealRadar, expiryDealRadarReports, kidsSnackLunchboxDeals, singlePortionDealFinder } from '@/lib/demo-data';
+import { dealScreener, expiryDealRadar, expiryDealRadarReports, kidsSnackLunchboxDeals, singlePortionDealFinder } from '@/lib/demo-data';
 import { digitalCatalogueOfferBoard, flyerValidityCalendar, offerExpiryReminderBoard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -44,6 +44,53 @@ export default function DealsPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         This page calls buildExpiryDealRadar with visible product rows plus timestamped expiry-sticker reports. Expired and stale evidence stays visible as coverage context, but it is not promoted as an active deal.
       </p>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Deal screener</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{dealScreener.title}</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              The screener filters visible ranked deal rows from rankDealOpportunities, then exposes minimumScore, sourceConfidence, and categoryFilter controls before a shopper treats a row as actionable.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 text-right shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">minimumScore</p>
+            <p className="mt-1 text-4xl font-black text-emerald-900">{dealScreener.minimumScore}</p>
+            <p className="mt-2 text-sm font-semibold text-slate-700">categoryFilter: {dealScreener.categoryFilter}</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {dealScreener.rows.slice(0, 6).map((deal) => (
+            <Link className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm hover:border-emerald-700" href={`/products/${deal.productId}`} key={`${deal.storeId}-${deal.productId}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{deal.category} · {deal.storeName}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{deal.productName}</h3>
+              <div className="mt-3 grid gap-2 text-sm font-semibold text-slate-700 sm:grid-cols-2">
+                <p className="rounded-2xl bg-emerald-50 p-3">Now {formatSek(deal.currentPrice)}</p>
+                <p className="rounded-2xl bg-emerald-50 p-3">Save {formatSek(deal.savings)}</p>
+                <p className="rounded-2xl bg-emerald-50 p-3">Deal Score {deal.dealScore}</p>
+                <p className="rounded-2xl bg-emerald-50 p-3">{formatPct(deal.discountPercent)} below regular</p>
+              </div>
+              <p className="mt-3 text-xs font-black text-emerald-950">sourceConfidence {deal.sourceConfidenceLabel}</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-[0.85fr_1fr]">
+          <div className="rounded-2xl bg-white/80 p-4">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">category facets</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {dealScreener.categoryFacets.map((facet) => (
+                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950" key={facet.category}>{facet.category}: {facet.count}</span>
+              ))}
+            </div>
+          </div>
+          <ul className="space-y-2 text-sm font-semibold text-emerald-950">
+            {dealScreener.guardrails.map((guardrail) => (
+              <li className="rounded-2xl bg-white/80 p-3" key={guardrail}>• {guardrail}</li>
+            ))}
+          </ul>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
         <div className="grid gap-5 lg:grid-cols-[1fr_0.8fr] lg:items-start">

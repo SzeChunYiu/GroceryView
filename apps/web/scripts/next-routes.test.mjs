@@ -1038,6 +1038,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a deal screener on deals using ranked visible deal rows', async () => {
+    const route = await read('src/app/deals/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+
+    assert.match(demo, /dealScreener/);
+    assert.match(demo, /rankDealOpportunities/);
+    assert.match(demo, /sourceConfidence/);
+    assert.match(route, /dealScreener/);
+    assert.match(route, /Deal screener/);
+    assert.match(route, /minimumScore/);
+    assert.match(route, /categoryFilter/);
+    assert.match(route, /visible ranked deal rows/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
   it('surfaces offer expiry reminders from real Matpriskollen validity windows', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/deals/page.tsx');
