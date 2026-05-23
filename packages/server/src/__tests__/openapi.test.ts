@@ -57,6 +57,7 @@ describe('buildOpenApiDocument', () => {
       '/api/privacy/deletion-plan',
       '/api/privacy/export',
       '/api/privacy/request-fulfillment',
+      '/api/products',
       '/api/products/search',
       '/api/products/{id}',
       '/api/products/{id}/cheapest-now',
