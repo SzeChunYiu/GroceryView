@@ -311,3 +311,82 @@ describe('catalog coverage readiness endpoint', () => {
     assert.equal(JSON.stringify(body).includes('super-secret'), false);
   });
 });
+
+describe('scan provider readiness endpoint', () => {
+  const readyReport = {
+    status: 'ready' as const,
+    blockers: [],
+    evidence: [
+      'scan_provider_configured:barcode:openfoodfacts',
+      'scan_provider_credentials_present:barcode',
+      'scan_provider_health_pass:barcode',
+      'scan_provider_configured:receiptOcr:ocrspace',
+      'scan_provider_credentials_present:receiptOcr',
+      'scan_provider_health_pass:receiptOcr'
+    ],
+    warnings: [],
+    summary: 'Scan providers are ready.'
+  };
+
+  it('requires a metrics token before exposing scan provider readiness evidence', async () => {
+    const handle = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      scanProviderReadinessProvider: async () => readyReport
+    });
+
+    const unauthorized = await handle(new Request('http://localhost/api/readiness/scanning'));
+    assert.equal(unauthorized.status, 401);
+
+    const authorized = await handle(new Request('http://localhost/api/readiness/scanning', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(authorized.status, 200);
+    assert.deepEqual(await authorized.json(), readyReport);
+  });
+
+  it('fails closed when scan provider readiness is blocked or not configured', async () => {
+    const blockedReport = {
+      ...readyReport,
+      status: 'blocked' as const,
+      blockers: ['scan_provider_health_not_run:receiptOcr'],
+      evidence: ['scan_provider_configured:receiptOcr:ocrspace'],
+      summary: 'Scan provider readiness is blocked.'
+    };
+    const blocked = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      scanProviderReadinessProvider: async () => blockedReport
+    });
+    const blockedResponse = await blocked(new Request('http://localhost/api/readiness/scanning', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(blockedResponse.status, 503);
+    assert.deepEqual(await blockedResponse.json(), blockedReport);
+
+    const missingToken = createHttpHandler(undefined, {
+      scanProviderReadinessProvider: async () => readyReport
+    });
+    assert.equal((await missingToken(new Request('http://localhost/api/readiness/scanning'))).status, 503);
+
+    const missingProvider = createHttpHandler(undefined, { notificationMetricsToken: 'metrics-token' });
+    assert.equal((await missingProvider(new Request('http://localhost/api/readiness/scanning', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }))).status, 503);
+  });
+
+  it('fails closed without leaking scan provider errors when the readiness provider throws', async () => {
+    const handle = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      async scanProviderReadinessProvider() {
+        throw new Error('ocr api key=super-secret failed');
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/readiness/scanning', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(response.status, 503);
+    const body = await response.json() as { blockers: string[] };
+    assert.deepEqual(body.blockers, ['scan_provider_readiness_probe_failed']);
+    assert.equal(JSON.stringify(body).includes('super-secret'), false);
+  });
+});

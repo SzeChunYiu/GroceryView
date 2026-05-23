@@ -109,7 +109,7 @@ HOSTED_HTTP_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-http-smoke.json \
   infra/scripts/smoke-hosted-http.sh
 ```
 
-After the hosted database has migrations applied, run the token-protected PostgreSQL readiness smoke:
+After the hosted database has migrations applied and scan providers are configured, run the token-protected PostgreSQL plus scan-provider readiness smoke:
 
 ```bash
 GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
@@ -117,9 +117,9 @@ METRICS_TOKEN=replace-with-deployment-token \
   infra/scripts/smoke-hosted-readiness.sh
 ```
 
-The readiness smoke calls `/api/readiness/postgres` with `METRICS_TOKEN` and requires a `ready` response before the deployment can count as database-backed smoke evidence.
+The readiness smoke calls `/api/readiness/postgres` and `/api/readiness/scanning` with `METRICS_TOKEN` and requires ready responses before the deployment can count as database-backed and scanner-provider smoke evidence.
 
-Set `HOSTED_READINESS_SMOKE_OUTPUT_PATH` to save passed PostgreSQL readiness evidence as JSON for release records:
+Set `HOSTED_READINESS_SMOKE_OUTPUT_PATH` to save passed PostgreSQL and scan-provider readiness evidence as JSON for release records:
 
 ```bash
 GROCERYVIEW_SERVER_URL=https://api.groceryview.example \

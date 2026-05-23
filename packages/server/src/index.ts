@@ -89,11 +89,13 @@ import {
   type PersistedNotificationTask
 } from '@groceryview/notifications';
 import {
+  buildScanProviderReadinessReport,
   createOcrSpaceReceiptProvider,
   createOpenFoodFactsBarcodeProvider,
   planScanReviewWorkItems,
   prepareScanUploadTicket,
   processScanUpload,
+  type ScanProviderReadinessReport,
   type ScanProviders,
   type ScanUpload,
   type ScanUploadStorage
@@ -146,6 +148,7 @@ export type AuthOptions = {
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
+  scanProviderReadinessProvider?: () => Promise<ScanProviderReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
@@ -220,6 +223,7 @@ export type RuntimeHandlerOptions = {
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
+  scanProviderReadinessProvider?: () => Promise<ScanProviderReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
@@ -1163,6 +1167,39 @@ function sourceRunHealthFailureResponse(): SourceRunHealthCheckResult {
   };
 }
 
+
+function scanProviderReadinessFailureResponse(): ScanProviderReadinessReport {
+  return {
+    status: 'blocked',
+    blockers: ['scan_provider_readiness_probe_failed'],
+    evidence: [],
+    warnings: [],
+    summary: 'Scan provider readiness is blocked.'
+  };
+}
+
+function buildRuntimeScanProviderReadinessReport(config: RuntimeConfig): ScanProviderReadinessReport {
+  return buildScanProviderReadinessReport({
+    requiredProviders: ['barcode', 'receiptOcr'],
+    providers: [
+      {
+        kind: 'barcode',
+        providerName: 'openfoodfacts',
+        configured: Boolean(config.openFoodFactsUserAgent),
+        credentialsPresent: Boolean(config.openFoodFactsUserAgent),
+        healthStatus: 'not_run'
+      },
+      {
+        kind: 'receiptOcr',
+        providerName: 'ocrspace',
+        configured: Boolean(config.ocrSpaceApiKey),
+        credentialsPresent: Boolean(config.ocrSpaceApiKey),
+        healthStatus: 'not_run'
+      }
+    ]
+  });
+}
+
 function catalogCoverageFailureResponse(): CatalogCoverageReport {
   return {
     status: 'incomplete',
@@ -1617,6 +1654,21 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           return jsonResponse(report, { status: report.status === 'complete' ? 200 : 503 });
         } catch {
           return jsonResponse(catalogCoverageFailureResponse(), { status: 503 });
+        }
+      }
+
+      if (method === 'GET' && path === '/api/readiness/scanning') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Scan provider readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid scan provider readiness token is required.');
+        }
+        if (!authOptions.scanProviderReadinessProvider) return errorResponse(503, 'Scan provider readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.scanProviderReadinessProvider();
+          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(scanProviderReadinessFailureResponse(), { status: 503 });
         }
       }
 
@@ -2530,6 +2582,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
       '/api/readiness/source-runs': { get: metricsOperation('Check source run freshness and terminal status without exposing source secrets.') },
       '/api/readiness/catalog-coverage': { get: metricsOperation('Check product, chain, store, and product-store catalog coverage without exposing database secrets.') },
+      '/api/readiness/scanning': { get: metricsOperation('Check scan provider configuration and health evidence without exposing provider secrets.') },
       '/api/workers/notifications/run': { post: metricsOperation('Run the configured notification worker cycle for cron execution.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
       '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid, SES, or Expo suppression payloads.') }
@@ -2731,6 +2784,7 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     postgresReadinessProvider: options.postgresReadinessProvider,
     sourceRunHealthProvider: options.sourceRunHealthProvider,
     catalogCoverageProvider: options.catalogCoverageProvider,
+    scanProviderReadinessProvider: options.scanProviderReadinessProvider ?? (() => Promise.resolve(buildRuntimeScanProviderReadinessReport(config))),
     flyerOffersProvider: options.flyerOffersProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider,
@@ -2849,6 +2903,7 @@ function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: Runt
     sourceRunHealthProvider: options.sourceRunHealthProvider ?? resource.sourceRunHealthProvider,
     notificationWorkerRunner: options.notificationWorkerRunner ?? buildRuntimeNotificationWorkerRunner(config, options.repository ?? resource.repository, options),
     catalogCoverageProvider: options.catalogCoverageProvider ?? resource.catalogCoverageProvider,
+    scanProviderReadinessProvider: options.scanProviderReadinessProvider,
     flyerOffersProvider: options.flyerOffersProvider ?? resource.flyerOffersProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider ?? resource.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider ?? resource.watchlistPriceAlertsProvider,
