@@ -68,6 +68,8 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /catalog_targets_status=\$\?/);
     assert.match(workflow, /catalog_targets_diagnostic_missing/);
     assert.match(workflow, /ops:validate-production-env\s+--\s+--scope\s+daily-ingestion/);
+    assert.match(workflow, /production_env_validation_status=\$\?/);
+    assert.match(workflow, /production_env_validation_diagnostic_missing/);
     assert.match(workflow, /name: Check production DB write connectivity/);
     assert.ok(
       workflow.indexOf('name: Validate production ingestion configuration') < workflow.indexOf('name: Check production DB write connectivity'),

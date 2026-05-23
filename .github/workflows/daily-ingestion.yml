@@ -158,10 +158,21 @@ jobs:
           if [ "${catalog_targets_status}" -ne 0 ]; then
             exit "${catalog_targets_status}"
           fi
+          production_env_validation_status=0
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
           CATALOG_COVERAGE_TARGETS_JSON_FILE=/tmp/groceryview-catalog-targets.json \
             npm run --silent ops:validate-production-env -- --scope daily-ingestion \
-            >/tmp/production-env-validation.json
+            >/tmp/production-env-validation.json || production_env_validation_status=$?
+          if [ ! -s /tmp/production-env-validation.json ]; then
+            cat > /tmp/production-env-validation.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "production_env_validation_diagnostic_missing",
+            "exitCode": ${production_env_validation_status}
+          }
+          EOF
+          fi
+          cat /tmp/production-env-validation.json
           node <<'NODE'
           const body = require('/tmp/production-env-validation.json');
           const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
