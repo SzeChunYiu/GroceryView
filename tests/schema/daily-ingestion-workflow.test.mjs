@@ -98,6 +98,16 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /path:\s*\/tmp\/daily-db-connectivity\.json/);
     assert.match(workflow, /name: Upload daily DB connectivity diagnostic\n\s+if:\s*always\(\)/);
     assert.match(workflow, /name:\s*groceryview-daily-db-connectivity[\s\S]*if-no-files-found:\s*error/);
+    assert.match(workflow, /name: Generate production DB recovery packet/);
+    assert.match(workflow, /if:\s*failure\(\)/);
+    assert.match(workflow, /SUPABASE_ACCESS_TOKEN:\s*\$\{\{ secrets\.SUPABASE_ACCESS_TOKEN \}\}/);
+    assert.match(workflow, /SUPABASE_PROJECT_REF:\s*\$\{\{ vars\.SUPABASE_PROJECT_REF \|\| secrets\.SUPABASE_PROJECT_REF \}\}/);
+    assert.match(workflow, /npm run --silent ops:db-recovery-packet >\/tmp\/production-db-recovery-packet\.json/);
+    assert.match(workflow, /production_db_recovery_packet_missing_credentials/);
+    assert.match(workflow, /production_db_recovery_packet_diagnostic_missing/);
+    assert.match(workflow, /name: Upload production DB recovery packet\n\s+if:\s*failure\(\)/);
+    assert.match(workflow, /name:\s*groceryview-production-db-recovery-packet/);
+    assert.match(workflow, /path:\s*\/tmp\/production-db-recovery-packet\.json/);
     assert.match(workflow, /name: Apply production DB migrations/);
     assert.ok(
       workflow.indexOf('name: Check production DB write connectivity') < workflow.indexOf('name: Apply production DB migrations'),

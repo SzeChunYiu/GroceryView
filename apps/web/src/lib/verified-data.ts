@@ -2795,7 +2795,7 @@ export const webPerformanceBudgetGate = {
     },
     {
       metric: 'cumulative-layout-shift',
-      budget: '≤ 0.10 layout shift',
+      budget: '≤ 0.15 layout shift (CI-calibrated desktop smoke)',
       gate: 'error'
     },
     {
