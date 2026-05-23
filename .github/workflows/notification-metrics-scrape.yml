@@ -1,0 +1,66 @@
+name: Notification metrics scrape
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '37 */6 * * *'
+
+concurrency:
+  group: notification-metrics-scrape-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scrape:
+    name: Scrape production notification metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production
+    steps:
+      - name: Preflight notification metrics config
+        env:
+          GROCERYVIEW_API_BASE_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: |
+          if [ -z "$GROCERYVIEW_API_BASE_URL" ]; then
+            echo "missing production config: GROCERYVIEW_API_BASE_URL" >&2
+            exit 1
+          fi
+          if [ -z "$METRICS_TOKEN" ]; then
+            echo "missing production config: METRICS_TOKEN" >&2
+            exit 1
+          fi
+
+      - name: Scrape notification metrics
+        env:
+          GROCERYVIEW_API_BASE_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: |
+          mkdir -p artifacts
+          curl -fsS \
+            --max-time 20 \
+            -H "x-groceryview-metrics-token: $METRICS_TOKEN" \
+            "${GROCERYVIEW_API_BASE_URL%/}/api/metrics/notifications" \
+            -o artifacts/notification-metrics.prom
+          if ! grep -q 'groceryview_notification_worker_events_total' artifacts/notification-metrics.prom; then
+            echo "notification metrics scrape failed: worker event counter missing" >&2
+            cat artifacts/notification-metrics.prom >&2
+            exit 1
+          fi
+          if ! grep -q 'status="delivered"' artifacts/notification-metrics.prom; then
+            echo "notification metrics scrape failed: delivered status series missing" >&2
+            cat artifacts/notification-metrics.prom >&2
+            exit 1
+          fi
+          if ! grep -q 'status="failed"' artifacts/notification-metrics.prom; then
+            echo "notification metrics scrape failed: failed status series missing" >&2
+            cat artifacts/notification-metrics.prom >&2
+            exit 1
+          fi
+
+      - name: Upload notification metrics evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notification-metrics-scrape
+          path: artifacts/notification-metrics.prom
+          if-no-files-found: ignore
