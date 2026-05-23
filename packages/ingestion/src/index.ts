@@ -49,6 +49,8 @@ import {
 import {
   fetchOkq8FuelPrices,
   OKQ8_FUEL_PRICES_URL,
+  type FuelGradeId,
+  type FuelPriceSourceKind,
   type FuelPriceObservation
 } from './connectors/okq8-fuel.js';
 import {
@@ -1847,6 +1849,13 @@ function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorP
     canonicalName: row.gradeLabel,
     productId: row.productId,
     categoryId: 'fuel',
+    fuelGradeId: row.productId,
+    fuelSource: {
+      sourceKind: row.sourceKind,
+      fuelGradeId: row.productId,
+      originalPriceText: row.provenance.originalPriceText,
+      originalEffectiveDate: row.effectiveFrom
+    },
     brand: row.operatorName,
     packageSize: 1,
     packageUnit: 'l',
@@ -2129,6 +2138,18 @@ function optionalBoolean(record: Record<string, unknown>, key: string, path: str
   throw new Error(`${path}.${key} must be a boolean.`);
 }
 
+function optionalFuelSource(record: Record<string, unknown>, path: string): RetailerProductInput['fuelSource'] {
+  const value = record.fuelSource;
+  if (value === undefined || value === null) return undefined;
+  const source = recordFrom(value, `${path}.fuelSource`);
+  return {
+    sourceKind: requiredString(source, 'sourceKind', `${path}.fuelSource`) as FuelPriceSourceKind,
+    fuelGradeId: requiredString(source, 'fuelGradeId', `${path}.fuelSource`) as FuelGradeId,
+    originalPriceText: requiredString(source, 'originalPriceText', `${path}.fuelSource`),
+    originalEffectiveDate: optionalString(source, 'originalEffectiveDate', `${path}.fuelSource`)
+  };
+}
+
 export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnapshot): RetailerConnectorParsedProduct[] {
   let payload: unknown;
   try {
@@ -2155,6 +2176,8 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
       canonicalName: requiredString(record, 'canonicalName', path),
       productId: requiredString(record, 'productId', path),
       categoryId: requiredString(record, 'categoryId', path),
+      fuelGradeId: optionalString(record, 'fuelGradeId', path) as FuelGradeId | undefined,
+      fuelSource: optionalFuelSource(record, path),
       brand: optionalString(record, 'brand', path),
       packageSize: requiredNumber(record, 'packageSize', path),
       packageUnit: requiredString(record, 'packageUnit', path),
@@ -2333,6 +2356,13 @@ export type RetailerProductInput = {
   barcode?: string;
   productKind?: 'branded' | 'commodity';
   commodityId?: string;
+  fuelGradeId?: FuelGradeId;
+  fuelSource?: {
+    sourceKind: FuelPriceSourceKind;
+    fuelGradeId: FuelGradeId;
+    originalPriceText: string;
+    originalEffectiveDate?: string;
+  };
   brand?: string;
   variant?: string;
   isOrganic?: boolean;
@@ -2376,6 +2406,7 @@ export type IngestedProduct = {
   categoryId: string;
   productKind: 'branded' | 'commodity';
   commodityId?: string;
+  fuelGradeId?: FuelGradeId;
   variant?: string;
   isOrganic: boolean;
   originCountry?: string;
@@ -2417,6 +2448,7 @@ export type IngestedPriceObservation = {
   confidenceScore: number;
   isOnlinePrice: boolean;
   isInstorePrice: boolean;
+  fuelSource?: RetailerProductInput['fuelSource'];
 };
 
 export type IngestedPromotionObservation = {
@@ -2548,6 +2580,7 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       categoryId: input.categoryId,
       productKind: classification.productKind,
       commodityId: classification.commodityId,
+      fuelGradeId: input.fuelGradeId,
       variant: input.variant,
       isOrganic: input.isOrganic ?? (/\b(eko|ekologisk|organic)\b/i.test(input.rawName) || /\b(eko|ekologisk|organic)\b/i.test(input.canonicalName)),
       originCountry: input.originCountry?.toUpperCase(),
@@ -2585,7 +2618,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       provenance,
       confidenceScore: confidence,
       isOnlinePrice: input.sourceType === 'official_api' || input.sourceType === 'retailer_online_page',
-      isInstorePrice: input.sourceType === 'receipt_scan' || input.sourceType === 'shelf_photo' || input.sourceType === 'manual_user_report'
+      isInstorePrice: input.sourceType === 'receipt_scan' || input.sourceType === 'shelf_photo' || input.sourceType === 'manual_user_report',
+      fuelSource: input.fuelSource
     },
     promotionObservation: hasPromotion
       ? {
@@ -2915,6 +2949,7 @@ function dailyPayloadHash(payload: unknown): string {
 
 type BatchRawRecordIdRow = { ordinal: number; id: string };
 type BatchObservationIdRow = { id: string };
+type FuelPriceSourceIdRow = { id: string };
 type BatchProductIdRow = { slug: string; id: string };
 
 function chunkDailyRows<T>(rows: T[], size = 250): T[][] {
@@ -3027,8 +3062,9 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
        package_size,
        package_unit,
        comparable_unit,
-       domain
-     ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       domain,
+       fuel_grade_id
+     ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      on conflict (slug) do update set
        canonical_name = excluded.canonical_name,
        brand = excluded.brand,
@@ -3038,6 +3074,7 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
        package_unit = excluded.package_unit,
        comparable_unit = excluded.comparable_unit,
        domain = excluded.domain,
+       fuel_grade_id = excluded.fuel_grade_id,
        updated_at = now()
      returning id`,
     [
@@ -3049,7 +3086,8 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
       product.packageSize,
       product.packageUnit,
       product.comparableUnit,
-      normalizeDailyDomain(domain)
+      normalizeDailyDomain(domain),
+      product.fuelGradeId ?? null
     ]
   );
   const id = rows[0]?.id;
@@ -3075,7 +3113,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            package_size numeric,
            package_unit text,
            comparable_unit text,
-           domain text
+           domain text,
+           fuel_grade_id text
          )
        ),
        upserted as (
@@ -3088,7 +3127,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            package_size,
            package_unit,
            comparable_unit,
-           domain
+           domain,
+           fuel_grade_id
          )
          select
            slug,
@@ -3099,7 +3139,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            package_size,
            package_unit,
            comparable_unit,
-           domain
+           domain,
+           fuel_grade_id
          from input
          on conflict (slug) do update set
            canonical_name = excluded.canonical_name,
@@ -3110,6 +3151,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            package_unit = excluded.package_unit,
            comparable_unit = excluded.comparable_unit,
            domain = excluded.domain,
+           fuel_grade_id = excluded.fuel_grade_id,
            updated_at = now()
          returning slug, id
        )
@@ -3123,7 +3165,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
         package_size: product.packageSize ?? null,
         package_unit: product.packageUnit ?? null,
         comparable_unit: product.comparableUnit,
-        domain: normalizeDailyDomain(domain)
+        domain: normalizeDailyDomain(domain),
+        fuel_grade_id: product.fuelGradeId ?? null
       })))]
     );
     for (const row of rows) ids.set(row.slug, row.id);
@@ -3774,6 +3817,77 @@ async function persistDailyConnectorOutput(input: {
     return ids;
   }
 
+  async function insertFuelPriceSourceObservationLinks(links: Array<{
+    observationId: string;
+    fuelGradeId: FuelGradeId;
+    originalPriceText: string;
+    originalEffectiveDate?: string;
+  }>): Promise<void> {
+    if (links.length === 0) return;
+    const rows = await executor.query<FuelPriceSourceIdRow>(
+      `insert into fuel_price_sources(
+         source_kind,
+         operator_id,
+         operator_name,
+         source_url,
+         parser_version,
+         captured_at,
+         provenance
+       ) values ($1, $2, $3, $4, $5, $6, $7)
+       returning id`,
+      [
+        'operator_public_price_page',
+        normalizeDailySlug(config.chainId),
+        config.chainId.toUpperCase(),
+        config.endpointUrl,
+        config.parserVersion,
+        config.requestedAt ?? result.plan.provenance.capturedAt,
+        JSON.stringify({
+          chainId: config.chainId,
+          connectorId: config.connectorId,
+          sourceRunId: sourceRun.sourceRunId,
+          runKey: result.plan.runKey,
+          domain
+        })
+      ]
+    );
+    const sourceId = rows[0]?.id;
+    if (!sourceId) throw new Error(`Daily ingestion fuel source insert did not return an id: ${config.connectorId}`);
+
+    await executor.query(
+      `insert into fuel_price_source_observations(
+         source_id,
+         observation_id,
+         fuel_grade_id,
+         original_price_text,
+         original_effective_date
+       )
+       select
+         $1,
+         observation_id,
+         fuel_grade_id,
+         original_price_text,
+         original_effective_date
+       from jsonb_to_recordset($2::jsonb) as x(
+         observation_id uuid,
+         fuel_grade_id text,
+         original_price_text text,
+         original_effective_date date
+       )
+       on conflict (observation_id) do update set
+         source_id = excluded.source_id,
+         fuel_grade_id = excluded.fuel_grade_id,
+         original_price_text = excluded.original_price_text,
+         original_effective_date = excluded.original_effective_date`,
+      [sourceId, JSON.stringify(links.map((link) => ({
+        observation_id: link.observationId,
+        fuel_grade_id: link.fuelGradeId,
+        original_price_text: link.originalPriceText,
+        original_effective_date: link.originalEffectiveDate ?? null
+      })))]
+    );
+  }
+
   try {
     const configuredChainId = await getDailyChainId(config.chainId);
     for (const store of config.stores ?? []) {
@@ -3872,7 +3986,22 @@ async function persistDailyConnectorOutput(input: {
     rawRecordIds.push(rawRecordId);
     observationsToInsert[index]!.rawRecordId = rawRecordId;
   }
-  observationIds.push(...await insertObservationBatch(observationsToInsert));
+  const insertedObservationIds = await insertObservationBatch(observationsToInsert);
+  observationIds.push(...insertedObservationIds);
+
+  if (domain === 'fuel') {
+    await insertFuelPriceSourceObservationLinks(result.ingestion.accepted.flatMap((accepted, index) => {
+      const source = accepted.priceObservation.fuelSource;
+      const observationId = insertedObservationIds[index];
+      if (!source || !observationId) return [];
+      return [{
+        observationId,
+        fuelGradeId: source.fuelGradeId,
+        originalPriceText: source.originalPriceText,
+        originalEffectiveDate: source.originalEffectiveDate
+      }];
+    }));
+  }
 
   await sourceWriter.finishSourceRun({
     sourceRunId: sourceRun.sourceRunId,

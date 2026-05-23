@@ -175,6 +175,24 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(schemaDoc, /public routes must not render non-grocery prices until `observations\.domain`/);
   });
 
+  it('models fuel grades and operator or crowd fuel source evidence', () => {
+    for (const table of ['fuel_grades', 'fuel_price_sources', 'fuel_price_source_observations']) {
+      assert.match(allMigrations, new RegExp(`create table if not exists ${table}\\b`), `${table} table missing`);
+      assert.match(schemaDoc, new RegExp(`### \`${table}\``), `${table} missing from SCHEMA.md`);
+      assert.match(migrationVerifier, new RegExp(`\\b${table}\\b`), `${table} missing from migration verifier`);
+    }
+    for (const grade of ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85']) {
+      assert.match(allMigrations, new RegExp(grade), `${grade} missing from fuel grade catalog`);
+    }
+    assert.match(allMigrations, /operator_public_price_page/);
+    assert.match(allMigrations, /crowd_station_report/);
+    assert.match(allMigrations, /original_price_text text not null/);
+    assert.match(allMigrations, /alter table products add column if not exists fuel_grade_id/);
+    assert.match(allMigrations, /products_fuel_grade_domain_check/);
+    assert.match(schemaDoc, /fuel prices are always price per litre/);
+    assert.match(schemaDoc, /community_reporter_trust/);
+  });
+
   it('persists retailer source policy decisions before ingestion fetches run', () => {
     const sourcePolicies = sourcePolicyTableDefinition('retailer_source_policies');
     assert.match(sourcePolicies, /chain_id uuid not null references chains\(id\) on delete cascade/);

@@ -2814,6 +2814,7 @@ ${seo}`;
     const pharmacyRoute = await read('src/app/pharmacy/page.tsx');
     const seo = await read('src/lib/seo.ts');
     const domainMigration = await read('../../infra/db/migrations/011_multi_vertical_domains.sql');
+    const fuelSourceMigration = await read('../../infra/db/migrations/014_fuel_price_sources.sql');
 
     assert.match(catalogDomains, /PriceDomain/);
     assert.match(catalogDomains, /grocery/);
@@ -2828,6 +2829,10 @@ ${seo}`;
     assert.match(domainMigration, /alter table observations add column if not exists domain/);
     assert.match(domainMigration, /default 'grocery'/);
     assert.match(domainMigration, /price_domain_check/);
+    assert.match(fuelSourceMigration, /fuel_grades/);
+    assert.match(fuelSourceMigration, /operator_public_price_page/);
+    assert.match(fuelSourceMigration, /crowd_station_report/);
+    assert.match(fuelSourceMigration, /fuel_price_source_observations/);
 
     assert.match(verified, /multiVerticalDomainFoundation/);
     assert.match(verified, /SUPPORTED_PRICE_DOMAINS/);

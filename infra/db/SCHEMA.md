@@ -43,6 +43,8 @@ The schema stores store location in `stores.position` for map and trip-planning 
 
 Migration 011 adds a `domain` column to `chains`, `stores`, `products`, `observations`, and `latest_prices`. Existing rows default to `grocery`; future verticals are constrained to `fuel` and `pharmacy` until a later migration expands the supported set. This keeps matching domain-scoped: grocery uses EAN + commodity matching, fuel uses fuel grades, and pharmacy uses OTC/health EANs. Public routes must not render non-grocery prices until `observations.domain` has connector or trusted crowd rows for that vertical.
 
+Migration 014 adds the fuel source contract. `fuel_grades` is the only supported grade catalog for the current fuel lane: 95 E10, 98, diesel, HVO100, and E85. `fuel_price_sources` accepts either an operator public price page or a trusted crowd station report, and `fuel_price_source_observations` ties that source evidence to immutable `domain='fuel'` observations with the original price text. Fuel prices are always price per litre; estimated fuel rows are not part of this source model.
+
 ## Tables
 
 ### `chains`
@@ -63,7 +65,7 @@ Indexes: `stores_position_gix` for location queries, plus `stores_name_trgm_idx`
 
 Canonical product records used by search, charts, baskets, and matching.
 
-Key columns: `slug`, `canonical_name`, `domain`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`. Commodity columns (migration 010): `product_kind` (`branded`|`commodity`), `commodity_id`, `variant`, `is_organic`, `origin_country`.
+Key columns: `slug`, `canonical_name`, `domain`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`. Commodity columns (migration 010): `product_kind` (`branded`|`commodity`), `commodity_id`, `variant`, `is_organic`, `origin_country`. Fuel column (migration 014): `fuel_grade_id`.
 
 Indexes: `products_name_trgm_idx` and `products_slug_trgm_idx` for fuzzy product search; `products_commodity_idx` and `products_kind_idx` for commodity matching.
 
@@ -72,6 +74,12 @@ Indexes: `products_name_trgm_idx` and `products_slug_trgm_idx` for fuzzy product
 Canonical generic products for unbranded / loose items (meat, vegetables, fruit, bakery, bulk) that have no EAN and are sold by weight. Chain loose items map here via `products.commodity_id`; cross-chain comparison is on `unit_price` (kr/kg, kr/l, kr/st), not barcode. `is_staple` marks the representative basket behind the per-chain fresh-food index. Starter taxonomy: `packages/catalog/src/commodities.ts`.
 
 Key columns: `slug`, `name_sv`, `name_en`, `category_path`, `comparable_unit` (`kg`|`l`|`st`), `default_variant`, `is_staple`.
+
+### `fuel_grades`
+
+Canonical fuel products for the fuel vertical. Fuel grades are matched by grade id, not EAN or grocery commodity alias, and every supported grade compares on litres only.
+
+Key columns: `id`, `grade_code`, `label`, `comparable_unit`, `match_key`, `active`.
 
 ### `aliases`
 
@@ -106,6 +114,22 @@ Key columns: `chain_id`, `source_surface`, `policy_label`, `robots_url`, `disall
 Allowed `policy_label` values: `allowed`, `fixture_review`, `manual_review`, `blocked`, `stub_only`.
 
 Indexes: `retailer_source_policies_label_review_idx`, `retailer_source_policies_disallowed_gin_idx`, and `retailer_source_policies_provenance_gin_idx`.
+
+### `fuel_price_sources`
+
+Source rows accepted by the fuel lane before facts are linked to observations. Operator rows require `operator_id`, `operator_name`, `source_url`, `parser_version`, and `captured_at`. Crowd rows require `station_id`, `reporter_id`, `reporter_trust_tier`, `evidence_type`, and `submitted_at`, with reporter risk controlled by `community_reporter_trust`.
+
+Key columns: `source_kind`, `operator_id`, `operator_name`, `station_id`, `reporter_id`, `reporter_trust_tier`, `evidence_type`, `source_url`, `parser_version`, `captured_at`, `submitted_at`, `provenance`.
+
+Indexes: `fuel_price_sources_kind_captured_idx`.
+
+### `fuel_price_source_observations`
+
+Join table from a fuel operator/crowd source row to the immutable `observations` row it produced. Stores the grade id plus original source price text so rendered rows can prove the per-litre price was copied from source evidence, not inferred.
+
+Key columns: `source_id`, `observation_id`, `fuel_grade_id`, `original_price_text`, `original_effective_date`.
+
+Indexes: `fuel_price_source_observations_grade_idx`.
 
 ### `observations`
 

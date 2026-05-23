@@ -53,10 +53,13 @@ REQUIRED_TABLES=(
   chains
   stores
   products
+  fuel_grades
   aliases
   source_runs
   raw_records
   retailer_source_policies
+  fuel_price_sources
+  fuel_price_source_observations
   observations
   observations_v2
   latest_prices

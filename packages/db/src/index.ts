@@ -3198,9 +3198,12 @@ export type CheckPostgresRepositoryIntegrationReadinessInput = Omit<CollectPostg
 export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'chains',
   'products',
+  'fuel_grades',
   'source_runs',
   'raw_records',
   'retailer_source_policies',
+  'fuel_price_sources',
+  'fuel_price_source_observations',
   'observations',
   'observations_v2',
   'latest_prices',
@@ -3244,7 +3247,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '010_commodity_taxonomy',
   '011_multi_vertical_domains',
   '012_price_rollups',
-  '013_observations_partitioning'
+  '013_observations_partitioning',
+  '014_fuel_price_sources'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {

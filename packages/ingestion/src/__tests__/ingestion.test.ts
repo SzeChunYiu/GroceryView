@@ -4577,6 +4577,8 @@ class DailyIngestionExecutor implements QueryExecutor {
       const observations = JSON.parse(String(params[0])) as unknown[];
       return observations.map(() => ({ id: `observation-db-${++this.sequence}` })) as T[];
     }
+    if (sql.includes('insert into fuel_price_sources')) return [{ id: `fuel-source-db-${++this.sequence}` }] as T[];
+    if (sql.includes('insert into fuel_price_source_observations')) return [] as T[];
     if (sql.includes('insert into raw_records')) return [{ id: `raw-db-${++this.sequence}` }] as T[];
     if (sql.includes('insert into observations')) return [{ id: `observation-db-${++this.sequence}` }] as T[];
     if (sql.includes('insert into latest_prices')) return [] as T[];
@@ -4601,6 +4603,12 @@ function firstBatchObservation(executor: DailyIngestionExecutor) {
   const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
   const observations = JSON.parse(String(observationInsert?.params[0])) as Array<Record<string, unknown>>;
   return observations[0] ?? {};
+}
+
+function firstBatchProduct(executor: DailyIngestionExecutor) {
+  const productInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into products'));
+  const products = JSON.parse(String(productInsert?.params[0])) as Array<Record<string, unknown>>;
+  return products[0] ?? {};
 }
 
 describe('persistOpenFoodFactsProductMetadata', () => {
@@ -5566,6 +5574,23 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.unit_price, 18.89);
     assert.equal(observation.quantity, 1);
     assert.equal(observation.quantity_unit, 'l');
+    assert.equal(firstBatchProduct(executor).fuel_grade_id, 'fuel-95-e10');
+    const fuelSourceInsert = executor.calls.find((call) => call.sql.includes('insert into fuel_price_sources'));
+    assert.deepEqual(fuelSourceInsert?.params.slice(0, 5), [
+      'operator_public_price_page',
+      'okq8',
+      'OKQ8',
+      GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+      'okq8-fuel-prices-v1'
+    ]);
+    const fuelSourceLink = executor.calls.find((call) => call.sql.includes('insert into fuel_price_source_observations'));
+    const linkedRows = JSON.parse(String(fuelSourceLink?.params[1])) as Array<{ fuel_grade_id: string; original_price_text: string; original_effective_date: string }>;
+    assert.deepEqual(linkedRows[0], {
+      fuel_grade_id: 'fuel-95-e10',
+      observation_id: 'observation-db-7',
+      original_price_text: '18,89 kr',
+      original_effective_date: '2026-05-22'
+    });
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
