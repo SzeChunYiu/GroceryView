@@ -1278,6 +1278,7 @@ describe('verified-data UI', () => {
     assert.match(pkg, /"perf:lighthouse:ci"/);
     assert.match(pkg, /@lhci\/cli/);
     assert.match(lhci, /http:\/\/127\.0\.0\.1:3000\//);
+    assert.match(lhci, /numberOfRuns:\s*3/);
     assert.match(lhci, /categories:performance/);
     assert.match(lhci, /largest-contentful-paint/);
     assert.match(lhci, /cumulative-layout-shift/);
@@ -2699,6 +2700,28 @@ ${seo}`;
     assert.match(shell, /data-api-performance-readiness/);
     assert.match(shell, /Redis cache/);
     assert.match(shell, /cursor pagination/);
+  });
+
+  it('surfaces the TimescaleDB evaluation with declarative partition fallback evidence', async () => {
+    const db = await read('../../packages/db/src/index.ts');
+    const route = await read('src/app/data-sources/page.tsx');
+    const shell = await read('src/components/market-shell.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+
+    assert.match(db, /buildTimescaleDbEvaluationReport/);
+    assert.match(db, /TIMESCALEDB_EVALUATION_FALLBACK_TABLES/);
+    assert.match(verified, /export const timescaleDbEvaluation/);
+    assert.match(verified, /TimescaleDB evaluation/);
+    assert.match(verified, /fallback_ready/);
+    assert.match(verified, /observations_v2/);
+    assert.match(verified, /price_daily/);
+    assert.match(verified, /price_weekly/);
+    assert.match(route, /timescaleDbEvaluation/);
+    assert.match(route, /TimescaleDB evaluation/);
+    assert.match(route, /declarative monthly partitions/);
+    assert.match(shell, /timescaleDbEvaluation/);
+    assert.match(shell, /data-timescale-evaluation/);
+    assert.match(shell, /TimescaleDB/);
   });
 
   it('surfaces verified OSM coverage on the store coverage route', async () => {

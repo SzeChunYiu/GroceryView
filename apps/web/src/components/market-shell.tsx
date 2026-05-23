@@ -36,6 +36,7 @@ import {
   sourceRouteMap,
   storeBrandLedger,
   storeFormatCoverage,
+  timescaleDbEvaluation,
   webPerformanceBudgetGate
 } from '@/lib/verified-data';
 
@@ -73,6 +74,11 @@ const homepageApiPerformanceReadiness = {
   hotEndpoints: apiPerformanceReadiness.hotEndpoints.slice(0, 3),
   cursorEndpoint: apiPerformanceReadiness.cursorEndpoints[0],
   runtimeChecks: apiPerformanceReadiness.requiredRuntime.map((item) => item.label)
+};
+const homepageTimescaleDbEvaluation = {
+  fallbackTables: timescaleDbEvaluation.fallbackTables.slice(0, 3),
+  evaluationSignals: timescaleDbEvaluation.evaluationSignals.slice(0, 2),
+  fallbackFunctions: timescaleDbEvaluation.fallbackFunctions.map((item) => item.name)
 };
 const homepageWebPerformanceBudgetGate = {
   routes: webPerformanceBudgetGate.terminalRoutes.slice(0, 4),
@@ -225,6 +231,39 @@ export function MarketShell() {
           </p>
           <p className="rounded-2xl bg-white/80 p-3 text-xs font-black uppercase tracking-[0.16em] text-cyan-950">
             {homepageApiPerformanceReadiness.runtimeChecks.join(' · ')}
+          </p>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>perf(db)</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">TimescaleDB evaluation with partition fallback</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-fuchsia-950">
+              {timescaleDbEvaluation.title} is {timescaleDbEvaluation.status}: GroceryView keeps declarative monthly partitions, BRIN pruning, and rollup tables live until TimescaleDB hypertable compression and retention policies are proven.
+            </p>
+          </div>
+          <Link className="rounded-full bg-fuchsia-700 px-5 py-3 text-center text-sm font-black text-white" href="/data-sources">
+            Review DB scale contract
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {homepageTimescaleDbEvaluation.fallbackTables.map((item) => (
+            <Link className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm hover:border-fuchsia-700" data-timescale-evaluation={item.table} href="/data-sources" key={item.table}>
+              <p className="font-mono text-sm font-black text-slate-950">{item.table}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{item.role}</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
+          <div className="rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-fuchsia-950">
+            {homepageTimescaleDbEvaluation.evaluationSignals.map((signal) => (
+              <p key={signal.label}>{signal.label}: {signal.state}</p>
+            ))}
+          </div>
+          <p className="rounded-2xl bg-white/80 p-3 text-xs font-black uppercase tracking-[0.16em] text-fuchsia-950">
+            {homepageTimescaleDbEvaluation.fallbackFunctions.join(' · ')}
           </p>
         </div>
       </Card>

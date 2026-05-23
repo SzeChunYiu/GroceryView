@@ -2770,6 +2770,65 @@ export const apiPerformanceReadiness = {
   ]
 };
 
+export const timescaleDbEvaluation = {
+  title: 'TimescaleDB evaluation',
+  status: 'fallback_ready',
+  source: 'packages/db/src/index.ts buildTimescaleDbEvaluationReport over infra/db migrations 012_price_rollups and 013_observations_partitioning',
+  recommendation: 'Use declarative monthly partitions until TimescaleDB hypertable compression and retention policies are installed.',
+  evaluationSignals: [
+    {
+      label: 'Timescale extension',
+      state: 'not assumed installed',
+      evidence: 'timescaleDbEvaluation.timescaleGaps keeps timescaledb_extension_not_installed visible instead of claiming adoption'
+    },
+    {
+      label: 'Hypertable target',
+      state: 'observations_v2 is the candidate hypertable',
+      evidence: 'buildTimescaleDbEvaluationReport requires hypertable:observations_v2 before status can become timescale_ready'
+    },
+    {
+      label: 'Compression + retention',
+      state: 'policy evidence required',
+      evidence: 'compression_policy:observations_v2 and retention_policy:observations_v2 must both exist before TimescaleDB is marked ready'
+    }
+  ],
+  fallbackTables: [
+    {
+      table: 'observations_v2',
+      role: 'declarative monthly partitions plus BRIN pruning for append-only price tape reads'
+    },
+    {
+      table: 'price_daily',
+      role: 'daily rollup table for product charts, 52-week-low badges, and historic range reads'
+    },
+    {
+      table: 'price_weekly',
+      role: 'weekly rollup table for long-range history without scanning raw observations'
+    }
+  ],
+  fallbackFunctions: [
+    {
+      name: 'create_observations_partitions',
+      role: 'pre-create monthly observations_v2 partitions before daily ingestion writes arrive'
+    },
+    {
+      name: 'drop_observations_partitions_before',
+      role: 'retention tiering hook so operators archive/downsample before partition-drop cleanup'
+    }
+  ],
+  timescaleGaps: [
+    'timescaledb_extension_not_installed',
+    'missing_hypertable:observations_v2',
+    'missing_compression_policy:observations_v2',
+    'missing_retention_policy:observations_v2'
+  ],
+  guardrails: [
+    'fallback_ready is not a claim that TimescaleDB is installed in production.',
+    'No long-range chart should read raw observations when price_daily or price_weekly can answer the request.',
+    'TimescaleDB adoption must show extension, hypertable, compression policy, and retention policy evidence before replacing the fallback.'
+  ]
+};
+
 export const webPerformanceBudgetGate = {
   title: 'Lighthouse CI budget',
   status: 'Core Web Vitals budget enforced in CI',
