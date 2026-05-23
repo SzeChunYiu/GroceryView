@@ -365,6 +365,50 @@ export type ProductCatalogListFilter = {
   page?: number;
 };
 
+export type CategoryHierarchyNode = {
+  slug: string;
+  label: string;
+  parentSlug?: string;
+  routable: boolean;
+};
+
+export const groceryCategoryHierarchy: readonly CategoryHierarchyNode[] = [
+  { slug: 'grocery', label: 'Grocery', routable: false },
+  { slug: 'fresh-food', label: 'Fresh food', parentSlug: 'grocery', routable: false },
+  { slug: 'packaged-grocery', label: 'Packaged grocery', parentSlug: 'grocery', routable: false },
+  { slug: 'household-personal', label: 'Household & personal', parentSlug: 'grocery', routable: false },
+  { slug: 'dairy', label: 'Dairy', parentSlug: 'fresh-food', routable: true },
+  { slug: 'bread', label: 'Bread & Bakery', parentSlug: 'fresh-food', routable: true },
+  { slug: 'meat', label: 'Meat & Charcuterie', parentSlug: 'fresh-food', routable: true },
+  { slug: 'fish', label: 'Fish & Seafood', parentSlug: 'fresh-food', routable: true },
+  { slug: 'produce', label: 'Fruit & Vegetables', parentSlug: 'fresh-food', routable: true },
+  { slug: 'breakfast', label: 'Breakfast', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'beverages', label: 'Beverages', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'coffee-tea', label: 'Coffee & Tea', parentSlug: 'beverages', routable: true },
+  { slug: 'alcohol', label: 'Wine, Beer & Spirits', parentSlug: 'beverages', routable: true },
+  { slug: 'snacks', label: 'Snacks', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'sweets', label: 'Sweets & Ice cream', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'frozen', label: 'Frozen', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'pantry', label: 'Pantry', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'plant-based', label: 'Plant-based', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'baby', label: 'Baby', parentSlug: 'household-personal', routable: true },
+  { slug: 'pet', label: 'Pet', parentSlug: 'household-personal', routable: true },
+  { slug: 'household', label: 'Cleaning & Household', parentSlug: 'household-personal', routable: true },
+  { slug: 'personal-care', label: 'Personal care', parentSlug: 'household-personal', routable: true }
+] as const;
+
+export function categoryPathForSlug(slug: string): CategoryHierarchyNode[] {
+  const bySlug = new Map(groceryCategoryHierarchy.map((category) => [category.slug, category]));
+  const path: CategoryHierarchyNode[] = [];
+  let cursor = bySlug.get(slug);
+  if (!cursor) return [{ slug, label: slug.split('-').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' '), routable: true }];
+  while (cursor) {
+    path.unshift(cursor);
+    cursor = cursor.parentSlug ? bySlug.get(cursor.parentSlug) : undefined;
+  }
+  return path;
+}
+
 export type StoreCatalogRecord = {
   storeId: string;
   chainId: string;

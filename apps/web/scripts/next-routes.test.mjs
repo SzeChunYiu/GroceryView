@@ -2369,6 +2369,20 @@ ${seo}`;
     assert.doesNotMatch(productRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('renders category pages with a DB hierarchy-backed breadcrumb component', async () => {
+    const categoryRoute = await read('src/app/categories/[slug]/page.tsx');
+    const breadcrumb = await read('src/components/Breadcrumb.tsx');
+    const db = await read('../../packages/db/src/index.ts');
+
+    assert.match(db, /groceryCategoryHierarchy/);
+    assert.match(db, /categoryPathForSlug/);
+    assert.match(breadcrumb, /aria-label="Breadcrumb"/);
+    assert.match(breadcrumb, /@groceryview\/db/);
+    assert.match(breadcrumb, /CategoryBreadcrumb/);
+    assert.match(categoryRoute, /CategoryBreadcrumb/);
+    assert.match(categoryRoute, /categoryLabel=\{categoryLabel\}/);
+  });
+
   it('ships a fail-closed CMP with Google Consent Mode v2 defaults and audit logging', async () => {
     const layout = await read('src/app/layout.tsx');
     const cmp = await read('src/components/consent-manager.tsx');
