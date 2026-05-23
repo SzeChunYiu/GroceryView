@@ -217,6 +217,7 @@ jobs:
           GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS || '30' }}
           GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS || '10000' }}
           GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS || '30000' }}
+          GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS || '1' }}
           GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS || '1' }}
         run: |
           set -euo pipefail
@@ -242,7 +243,7 @@ jobs:
           EOF
           fi
           cat /tmp/daily-db-connectivity.json
-          node -e "const body=require('/tmp/daily-db-connectivity.json'); for (const candidate of body.alternateConnections ?? []) { if (candidate.name === 'supabase_direct_host') console.error(JSON.stringify({ alternateConnection: candidate.name, status: candidate.status, action: candidate.action })); } if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+          node -e "const body=require('/tmp/daily-db-connectivity.json'); for (const candidate of body.alternateConnections ?? []) { if (candidate.name === 'supabase_direct_host' || candidate.name === 'supabase_transaction_pooler') console.error(JSON.stringify({ alternateConnection: candidate.name, status: candidate.status, action: candidate.action })); } if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
           exit "${connectivity_status}"
 
       - name: Upload daily DB connectivity diagnostic

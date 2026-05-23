@@ -90,7 +90,9 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS \|\| '10000' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS \|\| '30000' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS \|\| '1' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS \|\| '1' \}\}/);
     assert.match(workflow, /supabase_direct_host/);
+    assert.match(workflow, /supabase_transaction_pooler/);
     assert.match(workflow, /alternateConnections/);
     assert.match(workflow, /name:\s*groceryview-daily-db-connectivity/);
     assert.match(workflow, /path:\s*\/tmp\/daily-db-connectivity\.json/);
