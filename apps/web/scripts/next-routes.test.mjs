@@ -148,6 +148,14 @@ describe('verified-data UI', () => {
     assert.match(actions, /review work items/);
     assert.match(actions, /navigator\.mediaDevices\.getUserMedia/);
     assert.match(actions, /facingMode: \{ ideal: 'environment' \}/);
+    assert.match(actions, /document\.createElement\('canvas'\)/);
+    assert.match(actions, /canvas\.toBlob/);
+    assert.match(actions, /fetch\(ticket\.uploadUrl/);
+    assert.match(actions, /method: 'PUT'/);
+    assert.match(actions, /headers: ticket\.headers/);
+    assert.match(actions, /body: blob/);
+    assert.match(actions, /payload: ticket\.payloadUri/);
+    assert.match(actions, /Submit receipt image/);
     assert.match(actions, /Stop receipt camera/);
     assert.match(actions, /Camera access stays local/);
     assert.match(actions, /Sign in first/);
