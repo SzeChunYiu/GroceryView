@@ -232,7 +232,19 @@ export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS = [
   '4508',
   '4265',
   '4353',
-  '4204'
+  '4204',
+  '4797',
+  '4714',
+  '4514',
+  '4770',
+  '4515',
+  '4638',
+  '4624',
+  '4629',
+  '4669',
+  '4774',
+  '4623',
+  '4609'
 ] as const;
 
 export const DEFAULT_HEMKOP_CATEGORY_PAGE_SIZE = 100;

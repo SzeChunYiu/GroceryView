@@ -123,6 +123,42 @@ function readEnvironmentSecretNames(requiredNames) {
   });
 }
 
+function scopeStatus(scope, checks) {
+  if (scope === 'db-recovery') {
+    return checks.missingDbRecoverySecrets.length === 0 && checks.missingDbRecoveryVariables.length === 0
+      ? 'ready'
+      : 'blocked';
+  }
+  if (scope === 'db-cutover') {
+    return checks.missingDbCutoverSecrets.length === 0 && checks.missingDbCutoverCandidateSecrets.length === 0
+      ? 'ready'
+      : 'blocked';
+  }
+  return checks.missingGithubActionSecrets.length === 0 &&
+    checks.missingGithubActionVariables.length === 0 &&
+    checks.missingRuntimeSecrets.length === 0 &&
+    checks.missingDbCutoverSecrets.length === 0 &&
+    checks.missingDbCutoverCandidateSecrets.length === 0 &&
+    checks.missingDbRecoverySecrets.length === 0 &&
+    checks.missingDbRecoveryVariables.length === 0
+    ? 'ready'
+    : 'blocked';
+}
+
+function readOption(name) {
+  const index = process.argv.indexOf(name);
+  return index >= 0 ? process.argv[index + 1] : undefined;
+}
+
+function readScope() {
+  const scope = readOption('--scope') ?? 'all';
+  const supportedScopes = new Set(['all', 'db-recovery', 'db-cutover']);
+  if (!supportedScopes.has(scope)) {
+    throw new Error(`Unsupported --scope ${scope}. Expected one of: ${Array.from(supportedScopes).join(', ')}.`);
+  }
+  return scope;
+}
+
 function main() {
   if (process.argv.includes('--self-test')) {
     const missing = findMissingSecrets(['DATABASE_URL', 'METRICS_TOKEN'], ['DATABASE_URL']);
@@ -131,10 +167,9 @@ function main() {
   }
 
   const fromEnvironment = process.argv.includes('--from-env');
-  const repoIndex = process.argv.indexOf('--repo');
-  const repo = repoIndex >= 0 ? process.argv[repoIndex + 1] : undefined;
-  const envIndex = process.argv.indexOf('--env');
-  const environment = envIndex >= 0 ? process.argv[envIndex + 1] : undefined;
+  const repo = readOption('--repo');
+  const environment = readOption('--env');
+  const scope = readScope();
   const secretNames = fromEnvironment ? readEnvironmentSecretNames(uniqueSecretNames()) : readGithubSecretNames(repo, environment);
   const variableNames = fromEnvironment
     ? readEnvironmentSecretNames(uniqueVariableNames())
@@ -147,17 +182,18 @@ function main() {
   const missingDbCutoverCandidateSecrets = hasReplacementDbCandidate ? [] : replacementDbCandidateSecrets;
   const missingDbRecoverySecrets = findMissingSecrets(requiredDbRecoverySecrets, secretNames);
   const missingDbRecoveryVariables = findMissingSecrets(requiredDbRecoveryVariables, variableNames);
+  const checks = {
+    missingGithubActionSecrets,
+    missingGithubActionVariables,
+    missingRuntimeSecrets,
+    missingDbCutoverSecrets,
+    missingDbCutoverCandidateSecrets,
+    missingDbRecoverySecrets,
+    missingDbRecoveryVariables
+  };
   const result = {
-    status:
-      missingGithubActionSecrets.length === 0 &&
-      missingGithubActionVariables.length === 0 &&
-      missingRuntimeSecrets.length === 0 &&
-      missingDbCutoverSecrets.length === 0 &&
-      missingDbCutoverCandidateSecrets.length === 0 &&
-      missingDbRecoverySecrets.length === 0 &&
-      missingDbRecoveryVariables.length === 0
-        ? 'ready'
-        : 'blocked',
+    status: scopeStatus(scope, checks),
+    scope,
     checkedSecretNames: secretNames.sort(),
     checkedVariableNames: variableNames.sort(),
     environment: environment ?? null,

@@ -13,7 +13,8 @@ import {
   sourceCoverage,
   sourceReadinessMatrix,
   sourceRouteMap,
-  storeBrandLedger
+  storeBrandLedger,
+  timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -166,6 +167,57 @@ export default function DataSourcesPage() {
             </div>
             <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
               {apiPerformanceReadiness.guardrails.map((guardrail) => (
+                <li key={guardrail}>• {guardrail}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-fuchsia-800">perf(db)</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">TimescaleDB evaluation</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              {timescaleDbEvaluation.title} is {timescaleDbEvaluation.status}: {timescaleDbEvaluation.recommendation} The visible contract keeps declarative monthly partitions as the active fallback instead of claiming TimescaleDB adoption without extension, hypertable, compression, and retention evidence.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-fuchsia-900 shadow-sm">{timescaleDbEvaluation.status}</p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {timescaleDbEvaluation.evaluationSignals.map((signal) => (
+            <section className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm" key={signal.label}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">{signal.label}</p>
+              <p className="mt-2 text-sm font-bold leading-6 text-slate-800">{signal.state}</p>
+              <p className="mt-3 rounded-xl bg-fuchsia-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-fuchsia-950">{signal.evidence}</p>
+            </section>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_1fr]">
+          <section className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">Fallback tables</p>
+            <div className="mt-3 space-y-3">
+              {timescaleDbEvaluation.fallbackTables.map((item) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={item.table}>
+                  <p className="font-mono text-sm font-black text-slate-950">{item.table}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{item.role}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+          <section className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">Retention fallback</p>
+            <div className="mt-3 space-y-3">
+              {timescaleDbEvaluation.fallbackFunctions.map((item) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={item.name}>
+                  <p className="font-mono text-sm font-black text-slate-950">{item.name}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{item.role}</p>
+                </div>
+              ))}
+            </div>
+            <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
+              {timescaleDbEvaluation.guardrails.map((guardrail) => (
                 <li key={guardrail}>• {guardrail}</li>
               ))}
             </ul>

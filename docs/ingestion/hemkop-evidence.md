@@ -349,3 +349,40 @@ Sample rows:
 3. 2500298172 | 4003 | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
 4. 2500298127 | 4003 | Smörgåspålägg | 2 för 28 kr | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500299506 | 4003 | Kaffe | 59,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+
+## Hemköp weekly discounts public-store batch expansion 2026-05-23
+
+- Source: www.hemkop.se public Axfood campaign JSON
+- Store catalog source: https://www.hemkop.se/axfood/rest/store
+- Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-23T11:16:28.616Z
+- Public store IDs attempted in current fetch: 12
+- Current fetch rows inspected before de-duping existing rows: 2992
+- New weekly discount rows added and wired: 2992
+- Final real weekly discount rows in file: 20642
+- Added store IDs in this iteration: 4797, 4714, 4514, 4770, 4515, 4638, 4624, 4629, 4669, 4774, 4623, 4609
+- Zero-row public store IDs in current fetch: none
+- Source URLs fetched: 249
+- Web wire: apps/web/src/lib/ingested/hemkop.ts
+- Connector: packages/ingestion/src/connectors/hemkop.ts
+
+Added-store row counts:
+- 4797: 249 rows
+- 4714: 249 rows
+- 4514: 250 rows
+- 4770: 249 rows
+- 4515: 250 rows
+- 4638: 250 rows
+- 4624: 250 rows
+- 4629: 247 rows
+- 4669: 248 rows
+- 4774: 250 rows
+- 4623: 250 rows
+- 4609: 250 rows
+
+Sample newly added rows:
+1. 2500309493 | 4797 | Läsk | 6 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4797&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500303429 | 4797 | Lingongrova, Guldkorn | 19 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4797&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500298172 | 4797 | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4797&type=PERSONAL_GENERAL&page=0&size=100
+4. 2500298127 | 4797 | Smörgåspålägg | 2 för 28 kr | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4797&type=PERSONAL_GENERAL&page=0&size=100
+5. 2500299506 | 4797 | Kaffe | 59,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4797&type=PERSONAL_GENERAL&page=0&size=100

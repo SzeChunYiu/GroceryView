@@ -47,6 +47,13 @@ describe('verified-data UI', () => {
     assert.match(verified, /sourceCoverage/);
   });
 
+
+  it('renders the consent banner visible in the first HTML pass to avoid homepage CLS', async () => {
+    const consentManager = await read('src/components/consent-manager.tsx');
+    assert.match(consentManager, /useState\(true\)/);
+    assert.match(consentManager, /Cookie consent banner/);
+  });
+
   it('removes rendered dependencies on old demo and sample drivers', async () => {
     const renderedSources = await Promise.all(appFiles.map(read));
     const joined = renderedSources.join('\n');
@@ -520,6 +527,25 @@ describe('verified-data UI', () => {
     assert.match(fuelRoute, /price per litre/);
     assert.match(fuelRoute, /operator domain=fuel observations/);
     assert.doesNotMatch(fuelRoute, /currentPrice|price SEK/);
+  });
+
+  it('surfaces fuel target price alerts through the real watchlist engine without station-price claims', async () => {
+    const fuelRoute = await read('src/app/fuel/page.tsx');
+    const fuelPrices = await read('src/lib/fuel-prices.ts');
+    const core = await read('../../packages/core/src/index.ts');
+
+    assert.match(core, /export function buildWatchlistAlerts/);
+    assert.match(fuelPrices, /buildWatchlistAlerts/);
+    assert.match(fuelPrices, /export const fuelPriceTargetAlerts/);
+    assert.match(fuelPrices, /okq8-operator-price-page/);
+    assert.match(fuelPrices, /95 E10 alert/);
+    assert.match(fuelRoute, /fuelPriceTargetAlerts/);
+    assert.match(fuelRoute, /Fuel target price alerts/);
+    assert.match(fuelPrices, /target 19 kr\/l/i);
+    assert.match(fuelRoute, /target\.targetLabel/);
+    assert.match(fuelPrices, /No station-level fuel alert/);
+    assert.match(fuelRoute, /fuelPriceTargetAlerts\.guardrails\.map/);
+    assert.doesNotMatch(fuelRoute, /near me pump price|synthetic station/i);
   });
 
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
@@ -1259,6 +1285,33 @@ describe('verified-data UI', () => {
     assert.match(nextConfig, /remotePatterns/);
     assert.match(nextConfig, /assets\.axfood\.se/);
     assert.match(nextConfig, /images\.openfoodfacts\.org/);
+  });
+
+  it('ships a Lighthouse CI performance budget gate for web terminal routes', async () => {
+    const pkg = await read('package.json');
+    const lhci = await read('lighthouserc.cjs');
+    const workflow = await read('../../.github/workflows/ci.yml');
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(pkg, /"perf:lighthouse:ci"/);
+    assert.match(pkg, /@lhci\/cli/);
+    assert.match(lhci, /http:\/\/127\.0\.0\.1:3000\//);
+    assert.match(lhci, /numberOfRuns:\s*3/);
+    assert.match(lhci, /categories:performance/);
+    assert.match(lhci, /largest-contentful-paint/);
+    assert.match(lhci, /cumulative-layout-shift/);
+    assert.match(lhci, /'cumulative-layout-shift': \['error', \{ maxNumericValue: 0\.15 \}\]/);
+    assert.match(lhci, /total-byte-weight/);
+    assert.match(lhci, /filesystem/);
+    assert.match(workflow, /Lighthouse performance budget/);
+    assert.match(workflow, /npm run perf:lighthouse:ci -w @groceryview\/web/);
+    assert.match(verified, /export const webPerformanceBudgetGate/);
+    assert.match(verified, /Core Web Vitals budget/);
+    assert.match(verified, /≤ 0\.15 layout shift/);
+    assert.match(shell, /webPerformanceBudgetGate/);
+    assert.match(shell, /Lighthouse CI budget/);
+    assert.doesNotMatch(shell, /NoVerifiedData/);
   });
 
 
@@ -2666,6 +2719,28 @@ ${seo}`;
     assert.match(shell, /data-api-performance-readiness/);
     assert.match(shell, /Redis cache/);
     assert.match(shell, /cursor pagination/);
+  });
+
+  it('surfaces the TimescaleDB evaluation with declarative partition fallback evidence', async () => {
+    const db = await read('../../packages/db/src/index.ts');
+    const route = await read('src/app/data-sources/page.tsx');
+    const shell = await read('src/components/market-shell.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+
+    assert.match(db, /buildTimescaleDbEvaluationReport/);
+    assert.match(db, /TIMESCALEDB_EVALUATION_FALLBACK_TABLES/);
+    assert.match(verified, /export const timescaleDbEvaluation/);
+    assert.match(verified, /TimescaleDB evaluation/);
+    assert.match(verified, /fallback_ready/);
+    assert.match(verified, /observations_v2/);
+    assert.match(verified, /price_daily/);
+    assert.match(verified, /price_weekly/);
+    assert.match(route, /timescaleDbEvaluation/);
+    assert.match(route, /TimescaleDB evaluation/);
+    assert.match(route, /declarative monthly partitions/);
+    assert.match(shell, /timescaleDbEvaluation/);
+    assert.match(shell, /data-timescale-evaluation/);
+    assert.match(shell, /TimescaleDB/);
   });
 
   it('surfaces verified OSM coverage on the store coverage route', async () => {

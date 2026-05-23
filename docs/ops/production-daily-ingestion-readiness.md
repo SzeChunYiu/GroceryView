@@ -27,6 +27,20 @@ Check names without exposing values:
 npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView
 ```
 
+When the production blocker is specifically database recovery or replacement
+cutover, use a focused scope so unrelated deploy/mobile/scanner secrets do not
+hide the actionable DB prerequisites:
+
+```bash
+npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView --scope db-recovery
+npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView --scope db-cutover
+```
+
+`db-recovery` is ready only when `SUPABASE_ACCESS_TOKEN` and
+`SUPABASE_PROJECT_REF` are available. `db-cutover` is ready only when the current
+`DATABASE_URL` plus either `REPLACEMENT_DATABASE_URL` or `CANDIDATE_DATABASE_URL`
+are configured; the full `all` scope remains the default production-wide gate.
+
 ## Generate coverage targets from the live DB
 
 Run this only after the production database has chains and products, and after
@@ -70,11 +84,23 @@ numbers as launch catalogs grow; leaving them at `1` only proves connector liven
 not product-volume readiness.
 
 When `DATABASE_URL` points at a Supabase pooler host and the primary write probe
-fails, `ops:check-daily-db-connectivity` also records an `alternateConnections[]`
-entry named `supabase_direct_host`. Operators can tune
+fails, `ops:check-daily-db-connectivity` also records `alternateConnections[]`
+entries named `supabase_transaction_pooler` and `supabase_direct_host` when they
+can be derived. Operators can tune
+`GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS` and
 `GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS` in the daily workflow variables
-(default `1`) to retry this direct-host proof before deciding whether to switch
-`DATABASE_URL` to the direct host or continue replacement DB cutover.
+(default `1`) to retry those proofs before deciding whether to switch
+`DATABASE_URL` to the direct host, keep waiting on pooler recovery, or continue
+replacement DB cutover.
+
+When connectivity still fails, the daily workflow tries to generate a redacted
+`groceryview-production-db-recovery-packet` artifact with
+`npm run --silent ops:db-recovery-packet`. Configure `SUPABASE_ACCESS_TOKEN` and
+`SUPABASE_PROJECT_REF` so failed readiness runs can attach Supabase service
+health, management SQL probe status, and cutover/recovery actions without
+dumping database credentials. If those values are absent, the artifact is still
+written with `production_db_recovery_packet_missing_credentials` so operators can
+fix the evidence gap before retrying.
 
 ## Export live branch metadata and connector config
 
@@ -266,14 +292,15 @@ The workflow must pass these gates in order:
 2. DB and ingestion package tests
 3. live store enumeration and always-attempted `groceryview-daily-connector-stores` artifact upload for success or failure diagnostics; if the enumeration command exits before writing JSON, the workflow writes a fail-closed `store_enumeration_diagnostic_missing` payload with the command exit code
 4. production ingestion configuration validator and always-attempted `groceryview-production-ingestion-config` artifact upload with `production-env-validation.json`, `groceryview-catalog-targets.json`, and `groceryview-daily-connectors.json` for success or failure diagnostics; if daily connector generation exits before writing JSON, the workflow writes a fail-closed `daily_connectors_diagnostic_missing` payload with the command exit code, if catalog target generation exits before writing JSON, it writes a fail-closed `catalog_targets_diagnostic_missing` payload with the command exit code, and if production env validation exits before writing JSON, it writes a fail-closed `production_env_validation_diagnostic_missing` payload with the command exit code
-5. production DB write connectivity diagnostic and always-attempted `groceryview-daily-db-connectivity` artifact upload; if this downstream step unexpectedly loses `DATABASE_URL` after preflight, it writes `daily_db_connectivity_database_url_config_missing`, if a Supabase pooler probe fails but a direct host can be derived, the artifact includes `alternateConnections[]` with `supabase_direct_host`, and if the diagnostic command exits before writing JSON, the workflow writes a fail-closed `daily_db_connectivity_diagnostic_missing` artifact instead of silently ignoring the missing evidence
-6. production DB migration application and always-attempted `groceryview-production-db-migrations` artifact upload; if this downstream step unexpectedly loses `DATABASE_URL` after preflight, it writes `production_db_migrations_database_url_config_missing`, and if the migration command exits before writing JSON, the workflow writes a fail-closed `production_db_migrations_diagnostic_missing` artifact instead of silently ignoring missing schema evidence
-7. configured daily ingestion runner; its `chainSummaries` must include every required chain, every summary must be `succeeded`, every official product connector must emit at least one observation for every configured branch in `stores[]`, every required chain must emit at least one observation id, and the workflow always attempts to upload `groceryview-daily-ingestion-result` for success or failure diagnostics; if this downstream step unexpectedly loses `DATABASE_URL` after preflight, it writes `daily_ingestion_database_url_config_missing` to the result artifact and blocker log, if connector generation inside the runner step exits before ingestion starts, the workflow writes a fail-closed `daily_ingestion_connectors_diagnostic_missing` result and blocker log, and if the runner exits before writing JSON, it writes a fail-closed `daily_ingestion_result_diagnostic_missing` artifact instead of silently losing the run evidence
-8. DB-backed site snapshot export and always-attempted `groceryview-db-site-snapshot` artifact upload with `groceryview-db-site-snapshot.json` and `db-site-snapshot-result.json` for success or failure diagnostics; if this downstream step unexpectedly loses `DATABASE_URL` after preflight, it writes `db_site_snapshot_database_url_config_missing` to both snapshot evidence files, and if the export command exits before writing the result JSON, the workflow writes a fail-closed `db_site_snapshot_result_diagnostic_missing` payload with the command exit code
-9. always-attempted `/api/readiness/postgres`, including non-secret `postgres_readiness_config_missing` config diagnostics before curl, a fail-closed `postgres_readiness_diagnostic_missing` payload when curl exits before writing JSON, and a target match against the daily DB connectivity diagnostic; if that diagnostic was not produced, the workflow fails with `postgres_readiness_missing_ingestion_connectivity_diagnostic`
-10. always-attempted `/api/readiness/source-runs`, including non-secret `source_run_readiness_config_missing` config diagnostics before curl, a fail-closed `source_run_readiness_diagnostic_missing` payload when curl exits before writing JSON, zero blockers, zero missing fresh chains, zero insufficient accepted-row blockers, at least six succeeded daily source-run evidence entries, and a latest successful finish timestamp
-11. always-attempted `/api/readiness/catalog-coverage`, including non-secret `catalog_coverage_readiness_config_missing` config diagnostics before curl, a fail-closed `catalog_coverage_readiness_diagnostic_missing` payload when curl exits before writing JSON, and zero missing chain, store, product, category, price-type, product-store pair, and store-price-type gaps
-12. upload `groceryview-deployed-readiness` with `postgres-readiness.json`, `source-run-readiness.json`, and `catalog-coverage-readiness.json`, failing the upload if any of those three evidence files is missing
+5. production DB write connectivity diagnostic and always-attempted `groceryview-daily-db-connectivity` artifact upload; if this downstream step unexpectedly loses `DATABASE_URL` after preflight, it writes `daily_db_connectivity_database_url_config_missing`, if a Supabase pooler probe fails but alternate endpoints can be derived, the artifact includes `alternateConnections[]` with `supabase_transaction_pooler` and/or `supabase_direct_host`, and if the diagnostic command exits before writing JSON, the workflow writes a fail-closed `daily_db_connectivity_diagnostic_missing` artifact instead of silently ignoring the missing evidence
+6. on DB-connectivity failure, a `groceryview-production-db-recovery-packet` artifact upload with redacted Supabase project health, management SQL probe status, and recommended cutover/recovery actions from `ops:db-recovery-packet`; if management credentials are unavailable, the workflow writes `production_db_recovery_packet_missing_credentials`, and if the packet command exits before writing JSON, it writes `production_db_recovery_packet_diagnostic_missing`
+7. production DB migration application and always-attempted `groceryview-production-db-migrations` artifact upload; if this downstream step unexpectedly loses `DATABASE_URL` after preflight, it writes `production_db_migrations_database_url_config_missing`, and if the migration command exits before writing JSON, the workflow writes a fail-closed `production_db_migrations_diagnostic_missing` artifact instead of silently ignoring missing schema evidence, and if an earlier failure skips the migration step entirely, the upload still preserves `production_db_migrations_skipped_after_prior_failure`
+8. configured daily ingestion runner; its `chainSummaries` must include every required chain, every summary must be `succeeded`, every official product connector must emit at least one observation for every configured branch in `stores[]`, every required chain must emit at least one observation id, and the workflow always attempts to upload `groceryview-daily-ingestion-result` for success or failure diagnostics; if this downstream step unexpectedly loses `DATABASE_URL` after preflight, it writes `daily_ingestion_database_url_config_missing` to the result artifact and blocker log, if connector generation inside the runner step exits before ingestion starts, the workflow writes a fail-closed `daily_ingestion_connectors_diagnostic_missing` result and blocker log, and if the runner exits before writing JSON, it writes a fail-closed `daily_ingestion_result_diagnostic_missing` artifact instead of silently losing the run evidence, and if an earlier failure skips the runner entirely, the upload still preserves `daily_ingestion_skipped_after_prior_failure` in both the JSON result and blocker log
+9. DB-backed site snapshot export and always-attempted `groceryview-db-site-snapshot` artifact upload with `groceryview-db-site-snapshot.json` and `db-site-snapshot-result.json` for success or failure diagnostics; if this downstream step unexpectedly loses `DATABASE_URL` after preflight, it writes `db_site_snapshot_database_url_config_missing` to both snapshot evidence files, and if the export command exits before writing the result JSON, the workflow writes a fail-closed `db_site_snapshot_result_diagnostic_missing` payload with the command exit code, and if an earlier failure skips snapshot export entirely, the upload still preserves `db_site_snapshot_skipped_after_prior_failure` in both snapshot files
+10. always-attempted `/api/readiness/postgres`, including non-secret `postgres_readiness_config_missing` config diagnostics before curl, a fail-closed `postgres_readiness_diagnostic_missing` payload when curl exits before writing JSON, and a target match against the daily DB connectivity diagnostic; if that diagnostic was not produced, the workflow fails with `postgres_readiness_missing_ingestion_connectivity_diagnostic`
+11. always-attempted `/api/readiness/source-runs`, including non-secret `source_run_readiness_config_missing` config diagnostics before curl, a fail-closed `source_run_readiness_diagnostic_missing` payload when curl exits before writing JSON, zero blockers, zero missing fresh chains, zero insufficient accepted-row blockers, at least six succeeded daily source-run evidence entries, and a latest successful finish timestamp
+12. always-attempted `/api/readiness/catalog-coverage`, including non-secret `catalog_coverage_readiness_config_missing` config diagnostics before curl, a fail-closed `catalog_coverage_readiness_diagnostic_missing` payload when curl exits before writing JSON, and zero missing chain, store, product, category, price-type, product-store pair, and store-price-type gaps
+13. upload `groceryview-deployed-readiness` with `postgres-readiness.json`, `source-run-readiness.json`, and `catalog-coverage-readiness.json`, failing the upload if any of those three evidence files is missing
 
 ## Expected blocker meanings
 
@@ -290,6 +317,7 @@ The workflow must pass these gates in order:
 - `daily_ingestion_database_url_config_missing`: production config preflight passed, but the downstream ingestion runner step did not receive `DATABASE_URL`; inspect `groceryview-daily-ingestion-result` and the blocker log before retrying.
 - `daily_ingestion_connectors_diagnostic_missing`: the daily ingestion step could not regenerate connector JSON before starting the runner; inspect the `groceryview-daily-ingestion-result` artifact and blocker log for the command exit code.
 - `daily_ingestion_result_diagnostic_missing`: the configured daily ingestion runner failed before writing its result JSON payload; inspect the `groceryview-daily-ingestion-result` artifact for the command exit code.
+- `daily_ingestion_skipped_after_prior_failure`: an earlier fail-closed gate stopped the runner before it could execute; the workflow still uploaded the result JSON and blocker log.
 - `daily_ingestion_missing_chain_summary:<chain>`: the daily runner JSON did not include a `chainSummaries` entry for a required chain.
 - `daily_ingestion_chain_not_succeeded:<chain>`: at least one connector summary for that required chain did not finish with `status: succeeded`.
 - `daily_ingestion_chain_without_observations:<chain>`: the required chain ran but produced no persisted observation ids in the daily runner result.
@@ -297,11 +325,16 @@ The workflow must pass these gates in order:
 - `<chain>:persistence_failed:<message>`: connector output could not be written to `source_runs`, `raw_records`, `observations`, or `latest_prices`; if the source run was already created, ingestion marks that source run `failed` with the sanitized error message instead of leaving it stuck as `running`.
 - `db_site_snapshot_database_url_config_missing`: production config preflight passed, but the downstream DB-backed site snapshot step did not receive `DATABASE_URL`; inspect `groceryview-db-site-snapshot` for the preserved config blocker.
 - `db_site_snapshot_result_diagnostic_missing`: DB-backed site snapshot export failed before writing `db-site-snapshot-result.json`; inspect the `groceryview-db-site-snapshot` artifact for the command exit code.
+- `db_site_snapshot_skipped_after_prior_failure`: an earlier fail-closed gate stopped snapshot export before it could execute; the workflow still uploaded both snapshot evidence files.
 - `source_run_missing_fresh_chain:<chain>`: no fresh successful daily source run for that chain.
 - `source_run_insufficient_accepted_rows:<chain>:<count>/<min>`: source run completed but accepted too few rows.
 - `daily_db_connectivity_diagnostic_missing`: the production DB connectivity command failed before writing a diagnostic JSON payload; inspect the `groceryview-daily-db-connectivity` artifact for the command exit code.
+- `supabase_transaction_pooler`: an alternate `alternateConnections[]` entry proving whether the original Supabase transaction-pooler endpoint accepts writes when the session-pooler rewrite fails; tune `GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS` if provider startup is flapping.
 - `supabase_direct_host`: an alternate `alternateConnections[]` entry proving whether the direct Supabase DB host accepts writes when the pooler path fails; tune `GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS` if provider startup is flapping.
+- `production_db_recovery_packet_missing_credentials`: DB connectivity failed, but the workflow could not call Supabase management APIs because `SUPABASE_ACCESS_TOKEN` or `SUPABASE_PROJECT_REF` was absent; inspect `groceryview-production-db-recovery-packet` and configure the missing value before the next failure.
+- `production_db_recovery_packet_diagnostic_missing`: the recovery-packet command failed before writing JSON; inspect `groceryview-production-db-recovery-packet` for the command exit code.
 - `production_db_migrations_diagnostic_missing`: the production DB migration command failed before writing a diagnostic JSON payload; inspect the `groceryview-production-db-migrations` artifact for the command exit code.
+- `production_db_migrations_skipped_after_prior_failure`: an earlier fail-closed gate stopped migration execution; the workflow still uploaded a structured migration artifact so the run evidence is complete.
 - `postgres_readiness_config_missing`: deployed PostgreSQL readiness could not be probed because `GROCERYVIEW_SERVER_URL` or `METRICS_TOKEN` was missing; inspect `groceryview-deployed-readiness` for the non-secret missing-key list.
 - `postgres_readiness_diagnostic_missing`: deployed PostgreSQL readiness curl failed before writing JSON; inspect `groceryview-deployed-readiness` for the curl exit code.
 - `source_run_readiness_config_missing`: deployed source-run readiness could not be probed because `GROCERYVIEW_SERVER_URL` or `METRICS_TOKEN` was missing; inspect `groceryview-deployed-readiness` for the non-secret missing-key list.

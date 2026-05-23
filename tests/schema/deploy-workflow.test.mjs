@@ -13,7 +13,7 @@ describe('deploy workflow', () => {
     assert.match(workflow, /deploy\/groceryview\.manifest\.json/);
     assert.match(workflow, /environment:\s*production/);
     assert.match(workflow, /ops:check-production-secrets -- --from-env/);
-    for (const variable of ['GROCERYVIEW_PRODUCTION_URL', 'GROCERYVIEW_TERMINAL_PRODUCT_ID', 'GROCERYVIEW_SCANNER_USER_ID']) {
+    for (const variable of ['GROCERYVIEW_PRODUCTION_URL', 'GROCERYVIEW_TERMINAL_PRODUCT_ID', 'GROCERYVIEW_SCANNER_USER_ID', 'SUPABASE_PROJECT_REF']) {
       assert.match(workflow, new RegExp(`${variable}:\\s*\\$\\{\\{ vars\\.${variable} \\}\\}`));
     }
     assert.doesNotMatch(workflow, /gh secret list/);
@@ -39,7 +39,10 @@ describe('deploy workflow', () => {
       'STRIPE_PRICE_PREMIUM_YEARLY',
       'GROCERYVIEW_SCANNER_BEARER_TOKEN',
       'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
-      'CATALOG_COVERAGE_TARGETS_JSON'
+      'CATALOG_COVERAGE_TARGETS_JSON',
+      'SUPABASE_ACCESS_TOKEN',
+      'REPLACEMENT_DATABASE_URL',
+      'CANDIDATE_DATABASE_URL'
     ]) {
       assert.match(workflow, new RegExp(`${secret}:\\s*\\$\\{\\{ secrets\\.${secret} \\}\\}`));
     }

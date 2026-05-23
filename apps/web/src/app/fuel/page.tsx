@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { formatFuelPrice, fuelPriceSourceSchema, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
+import { formatFuelPrice, fuelPriceSourceSchema, fuelPriceTargetAlerts, verifiedFuelPriceObservations, verifiedFuelPriceSource } from '@/lib/fuel-prices';
 import { fuelStationSourceCoverage, multiVerticalDomainFoundation } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -45,6 +45,50 @@ export default function FuelPage() {
           <p className="mt-3 text-sm font-semibold text-slate-700">Captured {freshnessLabel(verifiedFuelPriceSource.capturedAt)}.</p>
         </Card>
       </div>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>{fuelPriceTargetAlerts.source}</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black text-emerald-950">Fuel target price alerts</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-emerald-950">
+              The fuel lane now adapts GroceryView&apos;s real watchlist alert engine to operator fuel rows: targets are shopper-defined kr/l thresholds, and triggered alerts stay scoped to the OKQ8 operator price page evidence.
+            </p>
+          </div>
+          <p className="rounded-2xl bg-white p-4 text-center text-sm font-black text-emerald-950 shadow-sm">
+            {fuelPriceTargetAlerts.alertCount} active · {fuelPriceTargetAlerts.targetCount} watched
+          </p>
+        </div>
+
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {fuelPriceTargetAlerts.targets.map((target) => (
+            <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm" key={target.id}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{target.name}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{target.label}</h3>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{target.targetLabel} · observed {target.observedPriceLabel}</p>
+              <p className={target.isTriggered ? 'mt-3 text-sm font-black text-emerald-800' : 'mt-3 text-sm font-black text-slate-600'}>
+                {target.isTriggered ? 'Alert active from verified operator row' : 'Watching; current price is still above target'}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 space-y-3">
+          {fuelPriceTargetAlerts.alerts.map((alert) => (
+            <div className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm" key={`${alert.productId}-${alert.type}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{alert.alertName}</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{alert.productName}: {alert.observedPriceLabel} is below {alert.targetLabel}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{alert.evidence}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          {fuelPriceTargetAlerts.guardrails.map((guardrail) => (
+            <p className="rounded-2xl bg-white p-3 text-xs font-bold leading-5 text-emerald-950" key={guardrail}>{guardrail}</p>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">

@@ -35,7 +35,9 @@ import {
   sourceReadinessMatrix,
   sourceRouteMap,
   storeBrandLedger,
-  storeFormatCoverage
+  storeFormatCoverage,
+  timescaleDbEvaluation,
+  webPerformanceBudgetGate
 } from '@/lib/verified-data';
 
 const featureReadinessQueue = Object.entries(privateFeatureCopy).slice(0, 6);
@@ -72,6 +74,16 @@ const homepageApiPerformanceReadiness = {
   hotEndpoints: apiPerformanceReadiness.hotEndpoints.slice(0, 3),
   cursorEndpoint: apiPerformanceReadiness.cursorEndpoints[0],
   runtimeChecks: apiPerformanceReadiness.requiredRuntime.map((item) => item.label)
+};
+const homepageTimescaleDbEvaluation = {
+  fallbackTables: timescaleDbEvaluation.fallbackTables.slice(0, 3),
+  evaluationSignals: timescaleDbEvaluation.evaluationSignals.slice(0, 2),
+  fallbackFunctions: timescaleDbEvaluation.fallbackFunctions.map((item) => item.name)
+};
+const homepageWebPerformanceBudgetGate = {
+  routes: webPerformanceBudgetGate.terminalRoutes.slice(0, 4),
+  assertions: webPerformanceBudgetGate.assertions.slice(0, 4),
+  guardrails: webPerformanceBudgetGate.guardrails.slice(0, 2)
 };
 const elderlyAccessibilityMode = {
   persona: 'Elderly / seniors',
@@ -219,6 +231,71 @@ export function MarketShell() {
           </p>
           <p className="rounded-2xl bg-white/80 p-3 text-xs font-black uppercase tracking-[0.16em] text-cyan-950">
             {homepageApiPerformanceReadiness.runtimeChecks.join(' · ')}
+          </p>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>perf(db)</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">TimescaleDB evaluation with partition fallback</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-fuchsia-950">
+              {timescaleDbEvaluation.title} is {timescaleDbEvaluation.status}: GroceryView keeps declarative monthly partitions, BRIN pruning, and rollup tables live until TimescaleDB hypertable compression and retention policies are proven.
+            </p>
+          </div>
+          <Link className="rounded-full bg-fuchsia-700 px-5 py-3 text-center text-sm font-black text-white" href="/data-sources">
+            Review DB scale contract
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {homepageTimescaleDbEvaluation.fallbackTables.map((item) => (
+            <Link className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm hover:border-fuchsia-700" data-timescale-evaluation={item.table} href="/data-sources" key={item.table}>
+              <p className="font-mono text-sm font-black text-slate-950">{item.table}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{item.role}</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
+          <div className="rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-fuchsia-950">
+            {homepageTimescaleDbEvaluation.evaluationSignals.map((signal) => (
+              <p key={signal.label}>{signal.label}: {signal.state}</p>
+            ))}
+          </div>
+          <p className="rounded-2xl bg-white/80 p-3 text-xs font-black uppercase tracking-[0.16em] text-fuchsia-950">
+            {homepageTimescaleDbEvaluation.fallbackFunctions.join(' · ')}
+          </p>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-violet-200 bg-violet-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>perf(web)</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Lighthouse CI budget</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-violet-950">
+              The public terminal now has a Core Web Vitals budget in the required CI workflow. Lighthouse checks the homepage, products, compare, and source-evidence routes after the Next build, then fails the PR if the budget is crossed.
+            </p>
+          </div>
+          <Link className="rounded-full bg-violet-700 px-5 py-3 text-center text-sm font-black text-white" href="/data-sources">
+            {webPerformanceBudgetGate.command}
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-4">
+          {homepageWebPerformanceBudgetGate.assertions.map((assertion) => (
+            <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm" key={assertion.metric}>
+              <p className="font-mono text-sm font-black text-slate-950">{assertion.metric}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{assertion.budget}</p>
+              <p className="mt-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-violet-950">{assertion.gate} gate</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr]">
+          <p className="rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-violet-950">
+            Routes under budget: {homepageWebPerformanceBudgetGate.routes.join(' · ')}
+          </p>
+          <p className="rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-violet-950">
+            {homepageWebPerformanceBudgetGate.guardrails.join(' ')}
           </p>
         </div>
       </Card>
