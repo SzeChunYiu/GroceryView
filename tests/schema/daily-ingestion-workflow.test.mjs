@@ -220,9 +220,35 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /daily_db_io_hotspots_after_database_url_config_missing/);
     assert.match(workflow, /db_io_hotspots_after_status=\$\?/);
     assert.match(workflow, /daily_db_io_hotspots_after_diagnostic_missing/);
+    assert.match(workflow, /name: Compare daily DB IO hotspots\n\s+if:\s*always\(\)/);
+    assert.ok(
+      workflow.indexOf('name: Capture daily DB IO hotspots after ingestion') < workflow.indexOf('name: Compare daily DB IO hotspots'),
+      'DB IO hotspot delta must be produced after the after-ingestion capture'
+    );
+    assert.ok(
+      workflow.indexOf('name: Compare daily DB IO hotspots') < workflow.indexOf('name: Upload daily DB IO hotspots'),
+      'DB IO hotspot delta must be produced before the hotspot artifact upload'
+    );
+    assert.match(workflow, /\/tmp\/daily-db-io-hotspots-delta\.json/);
+    assert.match(workflow, /daily_db_io_hotspots_delta_missing_before_or_after/);
+    assert.match(workflow, /sharedQueryCount/);
+    assert.match(workflow, /beforeOnlyQueryIds/);
+    assert.match(workflow, /afterOnlyQueryIds/);
+    for (const counter of [
+      'sharedBlksRead',
+      'sharedBlksWritten',
+      'localBlksRead',
+      'localBlksWritten',
+      'tempBlksRead',
+      'tempBlksWritten',
+      'blkReadTimeMs',
+      'blkWriteTimeMs'
+    ]) {
+      assert.match(workflow, new RegExp(`'${counter}'`));
+    }
     assert.match(workflow, /name: Upload daily DB IO hotspots\n\s+if:\s*always\(\)/);
     assert.match(workflow, /name:\s*groceryview-daily-db-io-hotspots/);
-    assert.match(workflow, /path:\s*\|\n\s+\/tmp\/daily-db-io-hotspots-before\.json\n\s+\/tmp\/daily-db-io-hotspots-after\.json/);
+    assert.match(workflow, /path:\s*\|\n\s+\/tmp\/daily-db-io-hotspots-before\.json\n\s+\/tmp\/daily-db-io-hotspots-after\.json\n\s+\/tmp\/daily-db-io-hotspots-delta\.json/);
     assert.match(workflow, /name:\s*groceryview-daily-db-io-hotspots[\s\S]*if-no-files-found:\s*error/);
     assert.doesNotMatch(workflow, /hotspots\.length/);
     assert.match(workflow, /name: Export DB-backed site snapshot/);

@@ -646,6 +646,71 @@ jobs:
           cat /tmp/daily-db-io-hotspots-after.json
           exit "${db_io_hotspots_after_status}"
 
+      - name: Compare daily DB IO hotspots
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/daily-db-io-hotspots-before.json ] || [ ! -s /tmp/daily-db-io-hotspots-after.json ]; then
+            cat > /tmp/daily-db-io-hotspots-delta.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "daily_db_io_hotspots_delta_missing_before_or_after"
+          }
+          EOF
+            cat /tmp/daily-db-io-hotspots-delta.json
+            exit 0
+          fi
+          node <<'NODE' >/tmp/daily-db-io-hotspots-delta.json
+          const fs = require('node:fs');
+          const before = JSON.parse(fs.readFileSync('/tmp/daily-db-io-hotspots-before.json', 'utf8'));
+          const after = JSON.parse(fs.readFileSync('/tmp/daily-db-io-hotspots-after.json', 'utf8'));
+          const counters = [
+            'sharedBlksRead',
+            'sharedBlksWritten',
+            'localBlksRead',
+            'localBlksWritten',
+            'tempBlksRead',
+            'tempBlksWritten',
+            'blkReadTimeMs',
+            'blkWriteTimeMs'
+          ];
+          const beforeRows = new Map((before.hotspots ?? []).map((row) => [String(row.queryid), row]));
+          const afterRows = new Map((after.hotspots ?? []).map((row) => [String(row.queryid), row]));
+          const sharedQueryIds = [...beforeRows.keys()]
+            .filter((queryid) => afterRows.has(queryid))
+            .sort();
+          const rows = sharedQueryIds.map((queryid) => {
+            const beforeRow = beforeRows.get(queryid);
+            const afterRow = afterRows.get(queryid);
+            const delta = Object.fromEntries(counters.map((counter) => [
+              counter,
+              Number(afterRow[counter] ?? 0) - Number(beforeRow[counter] ?? 0)
+            ]));
+            return {
+              queryid,
+              querySnippet: afterRow.querySnippet ?? beforeRow.querySnippet,
+              before: Object.fromEntries(counters.map((counter) => [counter, Number(beforeRow[counter] ?? 0)])),
+              after: Object.fromEntries(counters.map((counter) => [counter, Number(afterRow[counter] ?? 0)])),
+              delta
+            };
+          });
+          const body = {
+            status: 'compared',
+            comparedAt: new Date().toISOString(),
+            beforeStatus: before.status,
+            afterStatus: after.status,
+            beforeHotspotCount: before.hotspots?.length ?? 0,
+            afterHotspotCount: after.hotspots?.length ?? 0,
+            sharedQueryCount: rows.length,
+            beforeOnlyQueryIds: [...beforeRows.keys()].filter((queryid) => !afterRows.has(queryid)).sort(),
+            afterOnlyQueryIds: [...afterRows.keys()].filter((queryid) => !beforeRows.has(queryid)).sort(),
+            counters,
+            rows
+          };
+          console.log(JSON.stringify(body, null, 2));
+          NODE
+          cat /tmp/daily-db-io-hotspots-delta.json
+
       - name: Upload daily DB IO hotspots
         if: always()
         uses: actions/upload-artifact@v4
@@ -654,6 +719,7 @@ jobs:
           path: |
             /tmp/daily-db-io-hotspots-before.json
             /tmp/daily-db-io-hotspots-after.json
+            /tmp/daily-db-io-hotspots-delta.json
           if-no-files-found: error
           retention-days: 14
 
