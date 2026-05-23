@@ -1131,6 +1131,18 @@ describe('verified-data UI', () => {
     assert.match(route, /href={categoryHref\('all', mode\)}/);
   });
 
+  it('ships the weekly price-drop digest API from PostgreSQL latest_prices rows', async () => {
+    assert.equal(await fileExists('src/app/api/digest/route.ts'), true);
+    const route = await read('src/app/api/digest/route.ts');
+    assert.match(route, /createPostgresWeeklyPriceDropDigestReader/);
+    assert.match(route, /createPgQueryExecutor/);
+    assert.match(route, /DATABASE_URL/);
+    assert.match(route, /postgres\.latest_prices/);
+    assert.match(route, /NextResponse\.json/);
+    assert.match(route, /force-dynamic/);
+    assert.doesNotMatch(route, /process\.env\.DATABASE_URL.*json/i);
+  });
+
   it('surfaces offer expiry reminders from real Matpriskollen validity windows', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/deals/page.tsx');

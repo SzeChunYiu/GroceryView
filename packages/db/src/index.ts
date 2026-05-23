@@ -523,6 +523,38 @@ export type PostgresPriceReader = {
   listPriceObservationHistory(filter: PriceObservationHistoryFilter): Promise<PriceObservationHistoryRecord[]>;
 };
 
+export type WeeklyPriceDropDigestFilter = {
+  since: string;
+  until: string;
+  limit?: number;
+};
+
+export type WeeklyPriceDropDigestItem = {
+  rank: number;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  brand?: string;
+  chainSlug: string;
+  chainName: string;
+  storeSlug?: string;
+  storeName?: string;
+  priceType: PriceType;
+  price: number;
+  regularPrice: number;
+  savingsAmount: number;
+  dropPercent: number;
+  currency: string;
+  observedAt: string;
+  confidence: number;
+  emailSubject: string;
+  emailPreview: string;
+};
+
+export type PostgresWeeklyPriceDropDigestReader = {
+  listWeeklyPriceDropDigest(filter: WeeklyPriceDropDigestFilter): Promise<WeeklyPriceDropDigestItem[]>;
+};
+
 export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
   productSlug: string;
   canonicalName: string;
@@ -1514,6 +1546,24 @@ type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
   valid_until: string | Date | null;
   retailer_product_ref: string | null;
 };
+type WeeklyPriceDropDigestRow = {
+  product_id: string;
+  product_slug: string;
+  product_name: string;
+  brand: string | null;
+  chain_slug: string;
+  chain_name: string;
+  store_slug: string | null;
+  store_name: string | null;
+  price_type: PriceType;
+  price: string | number;
+  regular_price: string | number;
+  savings_amount: string | number;
+  drop_percent: string | number;
+  currency: string;
+  observed_at: string | Date;
+  confidence: string | number;
+};
 type PriceObservationHistoryRow = {
   id: string;
   product_id: string;
@@ -1719,6 +1769,44 @@ function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): Site
     ...(row.valid_from ? { validFrom: asIso(row.valid_from) } : {}),
     ...(row.valid_until ? { validUntil: asIso(row.valid_until) } : {}),
     ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {})
+  };
+}
+
+function formatDigestMoney(currency: string, value: number): string {
+  return `${currency} ${value.toFixed(2)}`;
+}
+
+function formatDigestPercent(value: number): string {
+  return `${Math.round(value)}%`;
+}
+
+function mapWeeklyPriceDropDigestRow(row: WeeklyPriceDropDigestRow, index: number): WeeklyPriceDropDigestItem {
+  const price = Number(row.price);
+  const regularPrice = Number(row.regular_price);
+  const savingsAmount = Number(row.savings_amount);
+  const dropPercent = Number(row.drop_percent);
+  const location = row.store_name ?? row.chain_name;
+
+  return {
+    rank: index + 1,
+    productId: row.product_id,
+    productSlug: row.product_slug,
+    productName: row.product_name,
+    ...(row.brand ? { brand: row.brand } : {}),
+    chainSlug: row.chain_slug,
+    chainName: row.chain_name,
+    ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
+    ...(row.store_name ? { storeName: row.store_name } : {}),
+    priceType: row.price_type,
+    price,
+    regularPrice,
+    savingsAmount,
+    dropPercent,
+    currency: row.currency,
+    observedAt: asIso(row.observed_at),
+    confidence: Number(row.confidence),
+    emailSubject: `${formatDigestPercent(dropPercent)} drop: ${row.product_name} at ${row.chain_name}`,
+    emailPreview: `Now ${formatDigestMoney(row.currency, price)}, down from ${formatDigestMoney(row.currency, regularPrice)}. Save ${formatDigestMoney(row.currency, savingsAmount)} at ${location}.`
   };
 }
 
@@ -4255,6 +4343,47 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
         [minConfidence, limit]
       );
       return rows.map(mapSiteLatestPriceSnapshotRow);
+    }
+  };
+}
+
+export function createPostgresWeeklyPriceDropDigestReader(executor: QueryExecutor): PostgresWeeklyPriceDropDigestReader {
+  return {
+    async listWeeklyPriceDropDigest(filter) {
+      const limit = Math.min(Math.max(filter.limit ?? 10, 1), 10);
+      const rows = await executor.query<WeeklyPriceDropDigestRow>(
+        `/* weekly_price_drop_digest */
+         select latest_prices.product_id,
+                products.slug as product_slug,
+                products.canonical_name as product_name,
+                products.brand,
+                chains.slug as chain_slug,
+                chains.name as chain_name,
+                stores.slug as store_slug,
+                stores.name as store_name,
+                latest_prices.price_type,
+                latest_prices.price,
+                latest_prices.regular_price,
+                round((latest_prices.regular_price - latest_prices.price)::numeric, 2) as savings_amount,
+                round((((latest_prices.regular_price - latest_prices.price) / nullif(latest_prices.regular_price, 0)) * 100)::numeric, 2) as drop_percent,
+                latest_prices.currency,
+                latest_prices.observed_at,
+                latest_prices.confidence
+         from latest_prices
+         join products on products.id = latest_prices.product_id
+         join chains on chains.id = latest_prices.chain_id
+         left join stores on stores.id = latest_prices.store_id
+         where latest_prices.domain = 'grocery'
+           and latest_prices.observed_at >= $1::timestamptz
+           and latest_prices.observed_at < $2::timestamptz
+           and latest_prices.regular_price is not null
+           and latest_prices.regular_price > latest_prices.price
+           and latest_prices.price >= 0
+         order by drop_percent desc, savings_amount desc, latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
+         limit $3`,
+        [filter.since, filter.until, limit]
+      );
+      return rows.map(mapWeeklyPriceDropDigestRow);
     }
   };
 }

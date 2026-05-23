@@ -9,6 +9,7 @@ import {
   createPostgresSiteSnapshotReader,
   createPostgresSourceRecordReader,
   createPostgresSourceRecordWriter,
+  createPostgresWeeklyPriceDropDigestReader,
   persistOpenPricesArtifact,
   type QueryExecutor
 } from '../index.js';
@@ -330,6 +331,26 @@ class RecordingQueryExecutor implements QueryExecutor {
       provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
     }
   ];
+  weeklyPriceDropDigestRows: unknown[] = [
+    {
+      product_id: 'product-1',
+      product_slug: 'bryggkaffe-450g',
+      product_name: 'Bryggkaffe mellanrost 450 g',
+      brand: 'Rosteriet',
+      chain_slug: 'willys',
+      chain_name: 'Willys',
+      store_slug: 'willys-hemma-stockholm-torsplan',
+      store_name: 'Willys Hemma Stockholm Torsplan',
+      price_type: 'promotion',
+      price: '44.90',
+      regular_price: '59.90',
+      savings_amount: '15.00',
+      drop_percent: '25.04',
+      currency: 'SEK',
+      observed_at: '2026-05-22T09:00:00.000Z',
+      confidence: '0.8800'
+    }
+  ];
   siteSnapshotRows: unknown[] = [
     {
       product_id: 'product-1',
@@ -397,6 +418,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('insert into products')) return this.productId === undefined ? ([] as T[]) : ([{ id: this.productId }] as T[]);
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
     if (sql.includes('left join latest_prices')) return this.catalogCoverageRows as T[];
+    if (sql.includes('weekly_price_drop_digest')) return this.weeklyPriceDropDigestRows as T[];
     if (sql.includes('join products on products.id = latest_prices.product_id')) return this.siteSnapshotRows as T[];
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
     if (sql.includes('retailer_product_ref is not distinct from')) return this.existingObservationRows as T[];
@@ -1983,6 +2005,55 @@ describe('createPostgresSiteSnapshotReader', () => {
     assert.match(executor.calls[0]!.sql, /latest_prices\.confidence >= \$1/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.domain = 'grocery'/);
     assert.deepEqual(executor.calls[0]!.params, [0.8, 25]);
+  });
+});
+
+describe('createPostgresWeeklyPriceDropDigestReader', () => {
+  it('lists top weekly latest_prices drops with email-ready copy and bounded SQL', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresWeeklyPriceDropDigestReader(executor);
+
+    assert.deepEqual(
+      await reader.listWeeklyPriceDropDigest({
+        since: '2026-05-16T00:00:00.000Z',
+        until: '2026-05-23T00:00:00.000Z',
+        limit: 10
+      }),
+      [
+        {
+          rank: 1,
+          productId: 'product-1',
+          productSlug: 'bryggkaffe-450g',
+          productName: 'Bryggkaffe mellanrost 450 g',
+          brand: 'Rosteriet',
+          chainSlug: 'willys',
+          chainName: 'Willys',
+          storeSlug: 'willys-hemma-stockholm-torsplan',
+          storeName: 'Willys Hemma Stockholm Torsplan',
+          priceType: 'promotion',
+          price: 44.9,
+          regularPrice: 59.9,
+          savingsAmount: 15,
+          dropPercent: 25.04,
+          currency: 'SEK',
+          observedAt: '2026-05-22T09:00:00.000Z',
+          confidence: 0.88,
+          emailSubject: '25% drop: Bryggkaffe mellanrost 450 g at Willys',
+          emailPreview: 'Now SEK 44.90, down from SEK 59.90. Save SEK 15.00 at Willys Hemma Stockholm Torsplan.'
+        }
+      ]
+    );
+
+    assert.match(executor.calls[0]!.sql, /weekly_price_drop_digest/);
+    assert.match(executor.calls[0]!.sql, /from latest_prices/);
+    assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
+    assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.domain = 'grocery'/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.observed_at >= \$1::timestamptz/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.observed_at < \$2::timestamptz/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.regular_price > latest_prices\.price/);
+    assert.match(executor.calls[0]!.sql, /limit \$3/);
+    assert.deepEqual(executor.calls[0]!.params, ['2026-05-16T00:00:00.000Z', '2026-05-23T00:00:00.000Z', 10]);
   });
 });
 
