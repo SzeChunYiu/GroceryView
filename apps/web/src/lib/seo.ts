@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-export const siteUrl = 'https://grocery-web-mu.vercel.app';
+export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://grocery-web-mu.vercel.app';
 export const siteName = 'GroceryView';
 
 const defaultDescription = 'Verified Swedish grocery price intelligence with product tickers, chain comparisons, store coverage, and confidence-labelled savings signals.';
@@ -14,6 +14,9 @@ type RouteMetadataConfig = {
   imagePath?: string;
   imageAlt?: string;
 };
+
+export type QueryValue = string | string[] | undefined;
+export type RouteSearchParams = Record<string, QueryValue>;
 
 type ProductSeoInput = {
   slug: string;
@@ -33,6 +36,41 @@ type StoreSeoInput = {
   city?: string;
   district?: string;
 };
+
+const FILTER_QUERY_KEYS = new Set([
+  'q',
+  'query',
+  'search',
+  'page',
+  'pageSize',
+  'sort',
+  'brand',
+  'store',
+  'storeId',
+  'minPrice',
+  'maxPrice',
+  'inStock',
+  'inStockOnly',
+  'min',
+  'max',
+  'category',
+  'label',
+  'chain',
+  'minConfidence',
+  'search_term_string',
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_term',
+  'utm_content',
+  'gclid',
+  'fbclid',
+  'msclkid',
+  'ref',
+  'source'
+]);
+
+const PRESERVE_QUERY_KEYS = new Set(['lang', 'currency']);
 
 export const routeMetadataCatalog = {
   '/': {
@@ -165,7 +203,7 @@ export const routeMetadataCatalog = {
   },
   '/screener': {
     title: 'Verified deal screener | GroceryView',
-    description: 'Sort and filter verified grocery deal rows by biggest price drop, cheapest SEK per kg, and widest cross-chain spread.'
+    description: 'Sort and filter verified deal rows by biggest price drop, cheapest SEK per kg, and widest cross-chain spread.'
   },
   '/seasonal-calendar': {
     title: 'Seasonal produce price calendar | GroceryView',
@@ -181,7 +219,7 @@ export const routeMetadataCatalog = {
   },
   '/stores': {
     title: 'Sweden grocery store directory | GroceryView',
-    description: 'Browse verified Swedish grocery store locations, brands, formats, and source coverage from OpenStreetMap.'
+    description: 'Browse verified grocery store locations, brands, formats, and source coverage from OpenStreetMap.'
   },
   '/unit-price-alerts': {
     title: 'Unit-price spread alerts | GroceryView',
@@ -199,6 +237,38 @@ export const routeMetadataCatalog = {
 
 function absoluteUrl(path: string) {
   return new URL(path, siteUrl).toString();
+}
+
+function hasValue(value: QueryValue): value is string | string[] {
+  if (!value) return false;
+  if (Array.isArray(value)) {
+    return value.some((item) => typeof item === 'string' && item.length > 0);
+  }
+  return value.length > 0;
+}
+
+function canonicalSearchParams(searchParams: RouteSearchParams = {}, preserve: ReadonlySet<string> = PRESERVE_QUERY_KEYS): URLSearchParams {
+  const canonicalParams = new URLSearchParams();
+  for (const [key, rawValue] of Object.entries(searchParams)) {
+    if (!hasValue(rawValue)) continue;
+    if (FILTER_QUERY_KEYS.has(key)) continue;
+    if (!preserve.has(key)) continue;
+
+    if (Array.isArray(rawValue)) {
+      for (const value of rawValue) {
+        if (value.length > 0) canonicalParams.append(key, value);
+      }
+      continue;
+    }
+
+    canonicalParams.set(key, rawValue);
+  }
+  return canonicalParams;
+}
+
+export function canonicalUrl(pathname: string, searchParams: RouteSearchParams = {}, preserve: ReadonlySet<string> = PRESERVE_QUERY_KEYS): string {
+  const query = canonicalSearchParams(searchParams, preserve).toString();
+  return query ? `${siteUrl}${pathname}?${query}` : `${siteUrl}${pathname}`;
 }
 
 export function languageAlternateUrls(path: string) {
@@ -221,13 +291,18 @@ function truncateDescription(description: string) {
   return description.length > 180 ? `${description.slice(0, 177)}...` : description;
 }
 
-export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMetadataConfig): Metadata {
-  const config = typeof route === 'string' ? { path: route, ...routeMetadataCatalog[route] } : route;
-  const canonical = absoluteUrl(config.path);
-  const title = config.title;
-  const description = truncateDescription(config.description || defaultDescription);
-  const image = config.imagePath ? [{ url: absoluteUrl(config.imagePath), width: 1200, height: 630, alt: config.imageAlt ?? title }] : undefined;
-  const robots = config.noIndex
+export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMetadataConfig, searchParams: RouteSearchParams = {}): Metadata {
+  const base =
+    typeof route === 'string'
+      ? { path: route, ...(routeMetadataCatalog[route as keyof typeof routeMetadataCatalog] || {}) }
+      : route;
+
+  const path = base.path;
+  const canonical = canonicalUrl(path, searchParams);
+  const title = base.title || 'GroceryView';
+  const description = truncateDescription(base.description || defaultDescription);
+  const image = base.imagePath ? [{ url: absoluteUrl(base.imagePath), width: 1200, height: 630, alt: base.imageAlt ?? title }] : undefined;
+  const robots = base.noIndex
     ? { index: false, follow: false }
     : {
         index: true,
@@ -246,7 +321,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
     title,
     description,
     manifest: '/manifest.webmanifest',
-    alternates: { canonical: canonical, languages: languageAlternateUrls(config.path) },
+    alternates: { canonical, languages: languageAlternateUrls(path) },
     other: {
       'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat
     },
@@ -265,7 +340,7 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
       description,
       ...(image ? { images: image.map(({ url, alt }) => ({ url, alt })) } : {})
     },
-    robots: robots
+    robots
   };
 }
 
@@ -282,12 +357,15 @@ export function metadataForProduct(product: ProductSeoInput): Metadata {
   });
 }
 
-export function metadataForCategory(category: { slug: string; label: string }): Metadata {
-  return routeMetadata({
-    path: `/categories/${category.slug}`,
-    title: `${category.label} grocery deals and price coverage | GroceryView`,
-    description: `Browse verified ${category.label} grocery rows with category deal leaders, chain spreads, OpenPrices observations, and source freshness.`
-  });
+export function metadataForCategory(category: { slug: string; label: string }, searchParams: RouteSearchParams = {}): Metadata {
+  return routeMetadata(
+    {
+      path: `/categories/${category.slug}`,
+      title: `${category.label} grocery deals and price coverage | GroceryView`,
+      description: `Browse verified ${category.label} grocery rows with category deal leaders, chain spreads, OpenPrices observations, and source freshness.`
+    },
+    searchParams
+  );
 }
 
 export function metadataForStore(store: StoreSeoInput): Metadata {

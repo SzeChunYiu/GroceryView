@@ -6,13 +6,14 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { categoryDealLeaderCandidates, categorySummaries, dataFreshnessBadges, formatPct, formatSek } from '@/lib/verified-data';
-import { metadataForCategory } from '@/lib/seo';
+import { metadataForCategory, RouteSearchParams } from '@/lib/seo';
 
-export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+export async function generateMetadata({ params, searchParams }: Readonly<{ params: Promise<{ slug: string }>; searchParams?: Promise<RouteSearchParams> }>) {
   const { slug } = await params;
   const label = categoryLabels[slug];
+  const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as RouteSearchParams;
   if (!label) notFound();
-  return metadataForCategory({ slug, label });
+  return metadataForCategory({ slug, label }, resolvedSearchParams);
 }
 
 export function generateStaticParams() { return categorySummaries.map((category) => ({ slug: category.slug })); }
