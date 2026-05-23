@@ -34,16 +34,38 @@ jobs:
           GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: ${{ vars.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN || secrets.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN }}
         run: |
           set -euo pipefail
-          missing=0
-          if [ -z "${AUTH_SECRET:-}" ]; then echo "missing production config: AUTH_SECRET" >&2; missing=1; fi
-          if [ -z "${DATABASE_URL:-}" ]; then echo "missing production config: DATABASE_URL" >&2; missing=1; fi
-          if [ -z "${PUBLIC_WEB_URL:-}" ]; then echo "missing production config: PUBLIC_WEB_URL" >&2; missing=1; fi
-          if [ -z "${NOTIFICATION_WEBHOOK_SECRET:-}" ]; then echo "missing production config: NOTIFICATION_WEBHOOK_SECRET" >&2; missing=1; fi
-          if [ -z "${BILLING_WEBHOOK_SECRET:-}" ]; then echo "missing production config: BILLING_WEBHOOK_SECRET" >&2; missing=1; fi
-          if [ -z "${METRICS_TOKEN:-}" ]; then echo "missing production config: METRICS_TOKEN" >&2; missing=1; fi
-          if [ -z "${GROCERYVIEW_SERVER_URL:-}" ]; then echo "missing production config: GROCERYVIEW_SERVER_URL" >&2; missing=1; fi
-          if [ -z "${GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN:-}" ]; then echo "missing production config: GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN" >&2; missing=1; fi
-          if [ "${missing}" -ne 0 ]; then exit 1; fi
+          node <<'NODE' >/tmp/production-config-preflight.json
+          const required = [
+            'AUTH_SECRET',
+            'DATABASE_URL',
+            'PUBLIC_WEB_URL',
+            'NOTIFICATION_WEBHOOK_SECRET',
+            'BILLING_WEBHOOK_SECRET',
+            'METRICS_TOKEN',
+            'GROCERYVIEW_SERVER_URL',
+            'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN'
+          ];
+          const missing = required.filter((name) => !process.env[name]);
+          const body = {
+            status: missing.length === 0 ? 'ready' : 'blocked',
+            checkedAt: new Date().toISOString(),
+            required,
+            missing,
+            blocker: missing.length > 0 ? 'production_config_preflight_missing' : undefined
+          };
+          console.log(JSON.stringify(body, null, 2));
+          NODE
+          cat /tmp/production-config-preflight.json
+          node -e "const body=require('/tmp/production-config-preflight.json'); if (body.status !== 'ready') { for (const name of body.missing) console.error('missing production config: ' + name); console.error(body.blocker); process.exit(1); }"
+
+      - name: Upload production config preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-production-config-preflight
+          path: /tmp/production-config-preflight.json
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Install
         run: npm ci
