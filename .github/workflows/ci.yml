@@ -23,5 +23,7 @@ jobs:
         run: npm test
       - name: Build workspaces
         run: npm run build
+      - name: Lighthouse performance budget
+        run: npm run perf:lighthouse:ci -w @groceryview/web
       - name: Typecheck
         run: npm run typecheck
