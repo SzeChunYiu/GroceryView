@@ -8,6 +8,7 @@ const DEFAULT_RETRY_ATTEMPTS = 30;
 const DEFAULT_RETRY_BASE_DELAY_MS = 10_000;
 const DEFAULT_RETRY_MAX_DELAY_MS = 30_000;
 const DEFAULT_DIRECT_PROBE_ATTEMPTS = 1;
+const DEFAULT_ALTERNATE_POOLER_PROBE_ATTEMPTS = 1;
 
 export function redactDatabaseUrl(rawUrl) {
   const url = new URL(rawUrl);
@@ -47,6 +48,14 @@ export function classifyDatabaseUrl(rawUrl) {
     transformedForDailyWrites,
     redactedUrl: redactDatabaseUrl(rawUrl)
   };
+}
+
+export function buildSupabaseTransactionPoolerConnectionString(rawUrl) {
+  const classification = classifyDatabaseUrl(rawUrl);
+  if (!classification.transformedForDailyWrites) return null;
+  const url = new URL(rawUrl);
+  url.port = String(classification.originalPort);
+  return url.toString();
 }
 
 export function buildSupabaseDirectConnectionString(rawUrl) {
@@ -176,6 +185,37 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
   }
 
   const alternateConnections = [];
+  const transactionPoolerConnectionString = buildSupabaseTransactionPoolerConnectionString(databaseUrl);
+  if (transactionPoolerConnectionString) {
+    const transactionProbeAttempts = parsePositiveInteger(env.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS, DEFAULT_ALTERNATE_POOLER_PROBE_ATTEMPTS);
+    const transactionClassification = classifyDatabaseUrl(transactionPoolerConnectionString);
+    const transactionProbe = await probeConnection({
+      connectionString: transactionPoolerConnectionString,
+      retryAttempts: transactionProbeAttempts,
+      retryBaseDelayMs,
+      retryMaxDelayMs,
+      Pool,
+      wait
+    });
+    alternateConnections.push({
+      name: 'supabase_transaction_pooler',
+      status: transactionProbe.status,
+      attempts: transactionProbe.attempts,
+      host: transactionClassification.host,
+      port: transactionClassification.originalPort,
+      originalPort: transactionClassification.originalPort,
+      database: transactionClassification.database,
+      username: transactionClassification.username,
+      poolerMode: 'transaction',
+      redactedUrl: transactionClassification.redactedUrl,
+      blockers: transactionProbe.blockers,
+      error: transactionProbe.error,
+      action: transactionProbe.status === 'ready'
+        ? 'Transaction pooler accepts writes; the session-pooler endpoint is the blocker, but run migrations and ingestion only through a validated session/direct/replacement DB path.'
+        : 'Transaction pooler also failed; continue provider recovery or replacement DB cutover.'
+    });
+  }
+
   const directConnectionString = buildSupabaseDirectConnectionString(databaseUrl);
   if (directConnectionString) {
     const directProbeAttempts = parsePositiveInteger(env.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS, DEFAULT_DIRECT_PROBE_ATTEMPTS);
