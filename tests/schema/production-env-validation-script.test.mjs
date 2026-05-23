@@ -22,7 +22,7 @@ function parseEnvExample(text) {
 
 describe('production env value validation script', () => {
   it('validates daily connectors and catalog coverage targets for all required chains', () => {
-    for (const name of ['GROCERYVIEW_DAILY_CONNECTORS_JSON', 'CATALOG_COVERAGE_TARGETS_JSON', 'EXPO_PUSH_ACCESS_TOKEN', 'SENDGRID_FROM_EMAIL', 'SENDGRID_API_KEY', 'OCR_SPACE_API_KEY', 'OCR_SPACE_HEALTHCHECK_IMAGE_URL', 'OPENFOODFACTS_USER_AGENT', 'OPENFOODFACTS_HEALTHCHECK_BARCODE', 'S3_ENDPOINT', 'S3_REGION', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY']) {
+    for (const name of ['GROCERYVIEW_DAILY_CONNECTORS_JSON', 'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN', 'CATALOG_COVERAGE_TARGETS_JSON', 'EXPO_PUSH_ACCESS_TOKEN', 'SENDGRID_FROM_EMAIL', 'SENDGRID_API_KEY', 'OCR_SPACE_API_KEY', 'OCR_SPACE_HEALTHCHECK_IMAGE_URL', 'OPENFOODFACTS_USER_AGENT', 'OPENFOODFACTS_HEALTHCHECK_BARCODE', 'S3_ENDPOINT', 'S3_REGION', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY']) {
       assert.match(script, new RegExp(name));
     }
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
@@ -46,7 +46,8 @@ describe('production env value validation script', () => {
       connectorStoreCoverageCount: 6,
       coverageProductCount: 2,
       coverageStoreCount: 6,
-      coveragePriceTypes: ['online']
+      coveragePriceTypes: ['online'],
+      sourceRunMinimumChains: ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys']
     });
   });
 
@@ -60,7 +61,8 @@ describe('production env value validation script', () => {
       connectorStoreCoverageCount: 6,
       coverageProductCount: 1,
       coverageStoreCount: 6,
-      coveragePriceTypes: ['online']
+      coveragePriceTypes: ['online'],
+      sourceRunMinimumChains: ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys']
     });
   });
 
@@ -113,6 +115,7 @@ describe('production env value validation script', () => {
       S3_ACCESS_KEY_ID: 'test-s3-access-key',
       S3_SECRET_ACCESS_KEY: 'test-s3-secret-key',
       GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE: connectorPath,
+      GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: JSON.stringify(Object.fromEntries(chains.map((chainId) => [chainId, 10]))),
       CATALOG_COVERAGE_TARGETS_JSON_FILE: catalogTargetPath
     }).status, 'ready');
   });
@@ -139,6 +142,7 @@ describe('production env value validation script', () => {
         hasDataAgreement: true,
         stores: [{ storeId: `${chainId}-odenplan`, name: `${chainId} Odenplan`, address: 'Odenplan', city: 'Stockholm' }]
       }))),
+      GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: JSON.stringify(Object.fromEntries(chains.map((chainId) => [chainId, 10]))),
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -156,6 +160,7 @@ describe('production env value validation script', () => {
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, /Missing required env/);
     assert.match(result.stderr, /GROCERYVIEW_DAILY_CONNECTORS_JSON/);
+    assert.match(result.stderr, /GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN/);
     assert.match(result.stderr, /CATALOG_COVERAGE_TARGETS_JSON/);
   });
 
@@ -192,6 +197,7 @@ describe('production env value validation script', () => {
         hasDataAgreement: true,
         stores: [{ storeId: `${chainId}-odenplan`, name: `${chainId} Odenplan`, address: 'Odenplan', city: 'Stockholm' }]
       }))),
+      GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: JSON.stringify(Object.fromEntries(chains.map((chainId) => [chainId, 10]))),
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -239,7 +245,8 @@ describe('production env value validation script', () => {
         legalReviewStatus: 'approved',
         hasDataAgreement: true,
         stores: [{ storeId: `${chainId}-odenplan`, name: `${chainId} Odenplan`, address: 'Odenplan', city: 'Stockholm' }]
-      })))
+      }))),
+      GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: JSON.stringify(Object.fromEntries(chains.map((chainId) => [chainId, 10])))
     };
     const result = spawnSync(process.execPath, [scriptPath.pathname], {
       encoding: 'utf8',

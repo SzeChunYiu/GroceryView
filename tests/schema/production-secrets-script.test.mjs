@@ -38,6 +38,7 @@ describe('production secret audit script', () => {
       'S3_BUCKET',
       'S3_ACCESS_KEY_ID',
       'S3_SECRET_ACCESS_KEY',
+      'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
       'CATALOG_COVERAGE_TARGETS_JSON'
     ]) {
       assert.match(script, new RegExp(`['"]${secret}['"]`));
