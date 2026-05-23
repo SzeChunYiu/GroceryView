@@ -1634,6 +1634,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004486',
     storeName: 'ICA Supermarket Tibro',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003801',
+    storeName: 'ICA Kvantum Tidaholm',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 

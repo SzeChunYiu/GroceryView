@@ -2,15 +2,17 @@
 
 - Source: ICA public store-scoped promotions JSON
 - Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C
-- Store locator retrieved: 2026-05-22T23:57:52.465Z
+- Store locator retrieved: 2026-05-23T00:16:08.083Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 93050
-- Stores fetched: 319
+- Real rows fetched: 93053
+- Stores fetched: 320
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
 - Live verification: 1 newly added source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-23 Europe/Stockholm; the wired source row count is recorded below.
 
 ## Source URLs
+
+- Source URL (1003801 ICA Kvantum Tidaholm, retrieved 2026-05-23T00:16:08.083Z, rows 3): https://handlaprivatkund.ica.se/stores/1003801/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=3&maxPageSize=3
 
 - Source URL (1004486 ICA Supermarket Tibro, retrieved 2026-05-22T23:57:52.465Z, rows 80): https://handlaprivatkund.ica.se/stores/1004486/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=80&maxPageSize=80
 
