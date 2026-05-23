@@ -2047,7 +2047,7 @@ describe('fetchHemkopWeeklyDiscounts', () => {
     });
 
     assert.deepEqual(requestedUrls, [
-      buildHemkopStoresUrl({ online: true }),
+      buildHemkopStoresUrl(),
       buildHemkopWeeklyDiscountsUrl('4003', 1, 0),
       buildHemkopWeeklyDiscountsUrl('4798', 1, 0)
     ]);
@@ -3864,7 +3864,7 @@ describe('fetchWillysWeeklyDiscounts', () => {
     });
 
     assert.deepEqual(requestedUrls, [
-      buildWillysStoresUrl({ online: true }),
+      buildWillysStoresUrl(),
       buildWillysWeeklyDiscountsUrl('2110', 1, 0),
       buildWillysWeeklyDiscountsUrl('2187', 1, 0)
     ]);
@@ -5510,7 +5510,7 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'succeeded');
     assert.equal(result.acceptedCount, 1);
     assert.deepEqual(requestedUrls, [
-      buildWillysStoresUrl({ online: true }),
+      buildWillysStoresUrl(),
       buildWillysWeeklyDiscountsUrl('2110', 100, 0)
     ]);
     const observation = firstBatchObservation(executor);
@@ -5765,7 +5765,7 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'succeeded');
     assert.equal(result.acceptedCount, 1);
     assert.deepEqual(requestedUrls, [
-      buildHemkopStoresUrl({ online: true }),
+      buildHemkopStoresUrl(),
       buildHemkopWeeklyDiscountsUrl('4003', 100, 0)
     ]);
     const observation = firstBatchObservation(executor);

@@ -736,7 +736,6 @@ export async function fetchWillysWeeklyDiscountsForAllStores(
 ): Promise<WillysWeeklyDiscount[]> {
   const stores = await fetchWillysStores({
     fetchImpl: options.fetchImpl,
-    online: true,
     maxRows: options.maxStores,
     retrievedAt: options.retrievedAt,
     storeApiUrl: options.storeApiUrl

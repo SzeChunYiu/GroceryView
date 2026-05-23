@@ -633,7 +633,6 @@ export async function fetchHemkopWeeklyDiscountsForAllStores(
 ): Promise<HemkopWeeklyDiscount[]> {
   const stores = await fetchHemkopStores({
     fetchImpl: options.fetchImpl,
-    online: true,
     maxRows: options.maxStores,
     retrievedAt: options.retrievedAt,
     storeApiUrl: options.storeApiUrl
