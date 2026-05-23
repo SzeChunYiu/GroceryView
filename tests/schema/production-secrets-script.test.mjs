@@ -12,6 +12,8 @@ describe('production secret audit script', () => {
     for (const secret of [
       'DATABASE_URL',
       'GROCERYVIEW_SERVER_URL',
+      'GROCERYVIEW_API_BASE_URL',
+      'EXPO_TOKEN',
       'METRICS_TOKEN',
       'AUTH_SECRET',
       'PUBLIC_WEB_URL',
