@@ -1,15 +1,15 @@
 import Link from 'next/link';
 import { buildExpiryDealRadar } from '@groceryview/core';
+import { expiryDealReports } from '@groceryview/api';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { expiryDealRadarReports } from '@/lib/demo-data';
 import { routeMetadata } from '@/lib/seo';
 
 const now = '2026-05-22T10:00:00.000Z';
 const maxDistanceKm = 5;
 const radar = buildExpiryDealRadar({
   now,
-  reports: expiryDealRadarReports,
+  reports: expiryDealReports,
   maxDistanceKm
 });
 
@@ -17,12 +17,16 @@ const activeItems = radar.stores.flatMap((store) =>
   store.items.map((item) => ({
     ...item,
     storeName: store.storeName,
-    source: sourceFor(item.id)
+    source: 'timestamped expiry report'
   }))
 );
 
-const staleReports = expiryDealRadarReports.filter((report) => radar.staleReportIds.includes(report.id));
-const confidenceLevel = activeItems.some((item) => item.verification === 'needs_confirmation') ? 'medium' : 'high';
+const staleReports = expiryDealReports.filter((report) => radar.staleReportIds.includes(report.id));
+const confidenceLevel = activeItems.length === 0
+  ? 'low'
+  : activeItems.every((item) => item.verification === 'verified')
+    ? 'high'
+    : 'medium';
 
 export function generateMetadata() {
   return routeMetadata('/expiry-deals');
@@ -34,10 +38,6 @@ function formatSek(value: number) {
 
 function formatHours(value: number) {
   return new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(value);
-}
-
-function sourceFor(reportId: string) {
-  return expiryDealRadarReports.find((report) => report.id === reportId)?.source ?? 'timestamped expiry report';
 }
 
 function confidenceFor(item: { verification: 'verified' | 'needs_confirmation'; photoCount: number; verificationCount: number }) {
@@ -67,7 +67,7 @@ export default function ExpiryDealsPage() {
             This route calls buildExpiryDealRadar from @groceryview/core with timestamped visible product rows and community expiry-sticker reports. Expired or stale evidence is retained below, but only current near-expiry rows are ranked as active deals.
           </p>
         </div>
-        <ConfidenceBadge level={confidenceLevel} label="radar confidence" sampleSize={expiryDealRadarReports.length} />
+        <ConfidenceBadge level={confidenceLevel} label="radar confidence" sampleSize={expiryDealReports.length} />
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-4">

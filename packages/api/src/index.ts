@@ -1773,7 +1773,7 @@ const mealDeals: MealDeal[] = [
   { productId: 'milk', name: 'Arla Milk 1L', category: 'dairy', price: 13.9, dealScore: 73 }
 ];
 
-const expiryDealReports: ExpiryDealReport[] = [
+export const expiryDealReports: ExpiryDealReport[] = [
   {
     id: 'expiry-chicken-hemkop',
     productId: 'chicken',
