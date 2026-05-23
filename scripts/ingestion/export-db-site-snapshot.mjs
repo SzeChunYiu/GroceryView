@@ -548,6 +548,74 @@ function writeTextFile(path, text) {
   writeFileSync(path, text);
 }
 
+function pathExists(path) {
+  try {
+    readFileSync(path);
+    return true;
+  } catch (error) {
+    if (error?.code === 'ENOENT') return false;
+    throw error;
+  }
+}
+
+function parsePositiveNumber(value, name) {
+  if (!value) return undefined;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) throw new Error(`${name} must be a positive number.`);
+  return parsed;
+}
+
+const COVERAGE_GAP_KEYS = [
+  'missingRequiredChains',
+  'missingRequiredStoreExternalRefs',
+  'missingRequiredProductSlugs',
+  'missingRequiredStorePriceTypes',
+  'missingRequiredCategorySlugs'
+];
+
+export function validateDbSiteSnapshotCacheArtifact({ artifact, cacheTtlSeconds, maxObservedAgeHours, now = new Date() }) {
+  if (!artifact || typeof artifact !== 'object' || Array.isArray(artifact)) return false;
+  if (artifact.status !== 'passed') return false;
+  if (!Array.isArray(artifact.priceRows) || artifact.priceRows.length === 0) return false;
+  const coverage = artifact.coverage;
+  if (!coverage || typeof coverage !== 'object' || Array.isArray(coverage)) return false;
+  if (typeof coverage.observations !== 'number' || coverage.observations < 1) return false;
+  if (COVERAGE_GAP_KEYS.some((key) => !Array.isArray(coverage[key]) || coverage[key].length > 0)) return false;
+  if (coverage.staleObservationCount !== undefined && coverage.staleObservationCount !== 0) return false;
+
+  const nowMs = now instanceof Date ? now.getTime() : Date.parse(now);
+  const generatedAtMs = Date.parse(artifact.generatedAt);
+  if (!Number.isFinite(nowMs) || !Number.isFinite(generatedAtMs)) return false;
+  const cacheTtlMs = cacheTtlSeconds * 1000;
+  if (generatedAtMs > nowMs || nowMs - generatedAtMs > cacheTtlMs) return false;
+
+  if (maxObservedAgeHours !== undefined) {
+    const maxObservedAgeMs = maxObservedAgeHours * 60 * 60 * 1000;
+    const hasStaleObservation = artifact.priceRows.some((row) => {
+      const observedAtMs = Date.parse(row.observedAt);
+      return !Number.isFinite(observedAtMs) || nowMs - observedAtMs > maxObservedAgeMs;
+    });
+    if (hasStaleObservation) return false;
+  }
+
+  return true;
+}
+
+export function readFreshDbSiteSnapshotCache({ outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath, cacheTtlSeconds, maxObservedAgeHours }) {
+  if (cacheTtlSeconds === undefined || !outputPath) return undefined;
+  const requestedOutputPaths = [outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath].filter(Boolean);
+  if (requestedOutputPaths.some((path) => !pathExists(path))) return undefined;
+  const artifact = JSON.parse(readFileSync(outputPath, 'utf8'));
+  return validateDbSiteSnapshotCacheArtifact({ artifact, cacheTtlSeconds, maxObservedAgeHours }) ? artifact : undefined;
+}
+
+function writeDbSiteSnapshotOutputs({ artifact, outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath }) {
+  if (outputPath) writeTextFile(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
+  if (modulePath) writeTextFile(modulePath, renderDbSiteProductsModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows }));
+  if (chainObservationsModulePath) writeTextFile(chainObservationsModulePath, renderDbSiteChainObservationsModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows }));
+  if (ingestedOverridesModulePath) writeTextFile(ingestedOverridesModulePath, renderDbSiteIngestedOverridesModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows }));
+}
+
 async function exportDbSiteSnapshotFromEnv(env = process.env) {
   const databaseUrl = env.DATABASE_URL?.trim();
   if (!databaseUrl) throw new Error('DATABASE_URL is required for DB-to-site snapshot export.');
@@ -560,7 +628,8 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   const limit = env.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT ? Number(env.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT) : undefined;
   if (minConfidence !== undefined && !Number.isFinite(minConfidence)) throw new Error('GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE must be a number.');
   if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) throw new Error('GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT must be a positive integer.');
-  const maxObservedAgeHours = env.GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS ? Number(env.GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS) : undefined;
+  const maxObservedAgeHours = parsePositiveNumber(env.GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS, 'GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS');
+  const cacheTtlSeconds = parsePositiveNumber(env.GROCERYVIEW_DB_SITE_SNAPSHOT_CACHE_TTL_SECONDS, 'GROCERYVIEW_DB_SITE_SNAPSHOT_CACHE_TTL_SECONDS');
   const requiredChains = parseRequiredSnapshotChains(env.GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS);
   const requiredStoreTargetsJson = env.GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE
     ? readFileSync(env.GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE, 'utf8')
@@ -569,6 +638,12 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   const requiredProductSlugs = parseRequiredProductSlugsFromCatalogTargets(requiredStoreTargetsJson);
   const requiredPriceTypes = parseRequiredPriceTypesFromCatalogTargets(requiredStoreTargetsJson);
   const requiredCategorySlugs = parseRequiredCategorySlugsFromCatalogTargets(requiredStoreTargetsJson);
+
+  const cachedArtifact = readFreshDbSiteSnapshotCache({ outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath, cacheTtlSeconds, maxObservedAgeHours });
+  if (cachedArtifact) {
+    writeDbSiteSnapshotOutputs({ artifact: cachedArtifact, outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath });
+    return cachedArtifact;
+  }
 
   const [{ createPgQueryExecutor, createPostgresSiteSnapshotReader }, pg] = await Promise.all([
     import('@groceryview/db'),
@@ -579,10 +654,7 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
     const reader = createPostgresSiteSnapshotReader(createPgQueryExecutor(pool));
     const rows = await reader.listLatestPriceSnapshotRows({ minConfidence, limit });
     const artifact = buildDbSiteSnapshotArtifact({ rows, requiredChains, requiredStoreExternalRefs, requiredProductSlugs, requiredPriceTypes, requiredCategorySlugs, maxObservedAgeHours });
-    if (outputPath) writeTextFile(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
-    if (modulePath) writeTextFile(modulePath, renderDbSiteProductsModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows }));
-    if (chainObservationsModulePath) writeTextFile(chainObservationsModulePath, renderDbSiteChainObservationsModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows }));
-    if (ingestedOverridesModulePath) writeTextFile(ingestedOverridesModulePath, renderDbSiteIngestedOverridesModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows }));
+    writeDbSiteSnapshotOutputs({ artifact, outputPath, modulePath, chainObservationsModulePath, ingestedOverridesModulePath });
     return artifact;
   } finally {
     await pool.end();
