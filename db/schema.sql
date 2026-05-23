@@ -297,7 +297,7 @@ create table if not exists fuel_price_source_observations (
 
 create table if not exists notification_tasks (
   id text primary key,
-  channel text not null check (channel in ('push', 'email')),
+  channel text not null check (channel in ('push', 'email', 'telegram')),
   type text not null,
   title text not null,
   body text not null,
@@ -314,10 +314,23 @@ create table if not exists notification_tasks (
 create table if not exists notification_suppressions (
   id text primary key,
   recipient text not null,
-  channel text check (channel in ('push', 'email')),
+  channel text check (channel in ('push', 'email', 'telegram')),
   reason text not null check (reason in ('unsubscribed', 'bounce', 'complaint')),
   active boolean not null default true,
   updated_at timestamptz not null
+);
+
+create table if not exists notification_subscriptions (
+  id text primary key,
+  user_id text not null,
+  channel text not null check (channel in ('push', 'email', 'telegram')),
+  recipient text not null,
+  chat_id text,
+  product_id text,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  check (channel <> 'telegram' or chat_id is not null)
 );
 
 create table if not exists human_reviewers (
@@ -375,6 +388,8 @@ create index if not exists fuel_price_sources_kind_captured_idx on fuel_price_so
 create index if not exists fuel_price_source_observations_grade_idx on fuel_price_source_observations(fuel_grade_id, created_at desc);
 create index if not exists notification_tasks_status_send_idx on notification_tasks(status, send_at);
 create index if not exists notification_suppressions_active_recipient_idx on notification_suppressions(active, recipient);
+create index if not exists notification_subscriptions_active_product_idx on notification_subscriptions (active, product_id, channel);
+create index if not exists notification_subscriptions_user_idx on notification_subscriptions (user_id, channel, id);
 create index if not exists human_reviewers_role_active_idx on human_reviewers(role, active);
 create index if not exists human_review_assignments_status_due_idx on human_review_assignments(status, due_at);
 create index if not exists human_review_assignments_assignee_status_idx on human_review_assignments(assignee_id, status);

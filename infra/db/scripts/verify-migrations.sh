@@ -84,6 +84,7 @@ REQUIRED_TABLES=(
   subscription_entitlements
   notification_tasks
   notification_suppressions
+  notification_subscriptions
   alert_rules
   pantry_items
   receipt_uploads

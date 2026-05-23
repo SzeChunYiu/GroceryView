@@ -252,6 +252,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       STRIPE_SECRET_KEY: 'sk_test_runtime',
       STRIPE_PRICE_PREMIUM_MONTHLY: 'price_monthly_runtime',
@@ -295,6 +296,7 @@ describe('runtime config', () => {
       sendgridApiKey: 'sg-runtime-key',
       sendgridFromEmail: 'alerts@groceryview.se',
       expoPushAccessToken: 'expo-runtime-token',
+      telegramBotToken: 'telegram-runtime-token',
       billingWebhookSecret: 'billing-webhook-secret',
       stripeSecretKey: 'sk_test_runtime',
       stripePriceIds: {
@@ -703,6 +705,18 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token'
+    }), /TELEGRAM_BOT_TOKEN is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token'
     }), /BILLING_WEBHOOK_SECRET is required/);
     assert.throws(() => loadRuntimeConfig({
       NODE_ENV: 'production',
@@ -714,6 +728,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret'
     }), /METRICS_TOKEN is required/);
     assert.throws(() => loadRuntimeConfig({
@@ -726,6 +741,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token'
     }), /OCR_SPACE_API_KEY is required/);
@@ -739,6 +755,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key'
@@ -753,6 +770,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
@@ -768,6 +786,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
@@ -784,6 +803,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
@@ -806,6 +826,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
@@ -843,6 +864,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
