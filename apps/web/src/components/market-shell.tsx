@@ -20,6 +20,7 @@ import {
   formatSek,
   freshestOpenPrices,
   homepageAdaptiveProductCards,
+  icaStorePromotionEvidence,
   localeFormattingShowcase,
   marketHeatmapTiles,
   memberOfferAggregationBoard,
@@ -45,6 +46,7 @@ const homepageClaimLedger = sourceClaimLedger.slice(0, 3);
 const homepageSourceReadiness = sourceReadinessMatrix.slice(0, 3);
 const homepageChainSavings = chainSavingsLedger.slice(0, 2);
 const homepageRouteMap = sourceRouteMap.slice(0, 3);
+const homepageIcaStorePromotionImports = icaStorePromotionEvidence.latestStores.slice(0, 3);
 const homepageFreshOpenPrices = freshestOpenPrices.slice(3, 9);
 const homepageMapChainIndex = mapChainIndexScores.slice(0, 3);
 const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
@@ -161,6 +163,41 @@ export function MarketShell() {
       </section>
 
       <div className="mt-6"><MetricGrid /></div>
+
+      <Card className="mt-6 border-red-200 bg-red-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>Latest ICA store-scoped promotions</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">{icaStorePromotionEvidence.title}</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-red-950">
+              The homepage now wires the newest ICA handlaprivatkund store-scoped promotion import into a visible evidence surface. It shows storeAccountId, row counts, retrievedAt, and sourceUrl provenance while explicitly blocking branch shelf-price, stock, loyalty, or checkout-total claims.
+            </p>
+          </div>
+          <Link className="rounded-full bg-red-700 px-5 py-3 text-center text-sm font-black text-white" href="/data-sources">
+            Inspect ICA source import
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {homepageIcaStorePromotionImports.map((store) => (
+            <Link
+              className="rounded-2xl border border-red-100 bg-white p-4 shadow-sm hover:border-red-700"
+              data-ica-store-promotion-import={store.storeAccountId}
+              href="/data-sources"
+              key={`${store.storeAccountId}-${store.retrievedAt}`}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-red-800">storeAccountId {store.storeAccountId}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{store.storeName}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{store.rowCount.toLocaleString('sv-SE')} rows · retrieved {store.retrievedAt}</p>
+              <p className="mt-3 rounded-2xl bg-red-50 p-3 text-xs font-bold leading-5 text-red-950">No branch shelf-price claim; sourceUrl retained on the data sources route.</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          {icaStorePromotionEvidence.guardrails.map((guardrail) => (
+            <p className="rounded-2xl bg-white/80 p-3 text-xs font-bold leading-5 text-red-950" key={guardrail}>{guardrail}</p>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-slate-900 bg-slate-950 text-white">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
