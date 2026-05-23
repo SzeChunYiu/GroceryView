@@ -137,6 +137,25 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+      - name: Apply production DB migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}"
+          npm run --silent ops:apply-db-migrations >/tmp/production-db-migrations.json
+          cat /tmp/production-db-migrations.json
+          node -e "const body=require('/tmp/production-db-migrations.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+
+      - name: Upload production DB migrations result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-production-db-migrations
+          path: /tmp/production-db-migrations.json
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Run configured daily ingestion
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
