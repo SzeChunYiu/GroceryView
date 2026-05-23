@@ -76,11 +76,15 @@ export const DEFAULT_MATPRISKOLLEN_REGIONS = [
   { name: 'malmo', lat: 55.605, lon: 13.0038 },
   { name: 'stockholm', lat: 59.3293, lon: 18.0686 },
   { name: 'goteborg', lat: 57.7089, lon: 11.9746 },
-  { name: 'uppsala', lat: 59.8586, lon: 17.6389 }
+  { name: 'uppsala', lat: 59.8586, lon: 17.6389 },
+  { name: 'linkoping', lat: 58.4108, lon: 15.6214 },
+  { name: 'orebro', lat: 59.2753, lon: 15.2134 },
+  { name: 'vasteras', lat: 59.6099, lon: 16.5448 },
+  { name: 'umea', lat: 63.8258, lon: 20.263 }
 ] as const;
-export const DEFAULT_MATPRISKOLLEN_STORE_LIMIT = 60;
+export const DEFAULT_MATPRISKOLLEN_STORE_LIMIT = 90;
 export const DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE = 200;
-export const DEFAULT_MATPRISKOLLEN_MAX_ROWS = 1000;
+export const DEFAULT_MATPRISKOLLEN_MAX_ROWS = 1600;
 export const DEFAULT_MATPRISKOLLEN_GROCERY_STORE_PATTERN = /(willys|lidl|coop|ica|hemk[oö]p|city gross)/i;
 
 export type MatpriskollenRegion = {

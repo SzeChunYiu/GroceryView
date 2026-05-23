@@ -393,9 +393,29 @@ export const DEFAULT_WILLYS_SEARCH_QUERIES = [
   'lax',
   'tonfisk',
   'gurka',
-  'paprika'
+  'paprika',
+  'notfars',
+  'flaskfile',
+  'bacon',
+  'skinka',
+  'leverpastej',
+  'kottbullar',
+  'vegofars',
+  'halloumi',
+  'mozzarella',
+  'parmesan',
+  'havredryck',
+  'sojadryck',
+  'protein',
+  'kikartor',
+  'kidneybonor',
+  'kokosmjolk',
+  'pesto',
+  'pastasas',
+  'tacosas',
+  'oliver'
 ] as const;
-export const DEFAULT_WILLYS_PRODUCTS_MAX_ROWS = 500;
+export const DEFAULT_WILLYS_PRODUCTS_MAX_ROWS = 900;
 export const DEFAULT_WILLYS_CATEGORY_PAGE_SIZE = 100;
 
 export type FetchWillysProductsOptions = {

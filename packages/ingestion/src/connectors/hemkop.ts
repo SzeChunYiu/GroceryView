@@ -264,7 +264,28 @@ export const DEFAULT_HEMKOP_SEARCH_QUERIES = [
   'banan',
   'kyckling',
   'ketchup',
-  'havregryn'
+  'havregryn',
+  'juice',
+  'flingor',
+  'mjol',
+  'olja',
+  'tomat',
+  'fisk',
+  'kottfars',
+  'korv',
+  'glass',
+  'choklad',
+  'frukt',
+  'gronsaker',
+  'godis',
+  'soppa',
+  'tacos',
+  'nudlar',
+  'falukorv',
+  'lax',
+  'tonfisk',
+  'gurka',
+  'paprika'
 ] as const;
 
 export type FetchHemkopProductsOptions = {

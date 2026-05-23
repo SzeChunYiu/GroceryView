@@ -82,8 +82,21 @@ export const LIDL_BASE_URL = 'https://www.lidl.se';
 export const LIDL_STORES_PATH = '/s/sv-SE/butiker/';
 export const DEFAULT_LIDL_OFFER_PATHS = [
   '/c/veckans-frukt-groent/a10094676',
+  '/c/mandag-soendag/a10094677',
+  '/c/torsdag-soendag/a10094678',
+  '/c/fira-matriket-tre-ar-med-oss/a10094679',
+  '/c/xxl/a10094680',
+  '/c/bjud-pa-spaennande-smaker/a10094681',
   '/c/lidl-plus-erbjudanden/a10094682',
-  '/c/veckans-blommor/a10094398'
+  '/c/superklipp-fran-torsdag/a10094683',
+  '/c/veckans-frukt-groent/a10094782',
+  '/c/mandag-soendag/a10094783',
+  '/c/torsdag-soendag/a10094784',
+  '/c/med-smak-av-alperna/a10094785',
+  '/c/superklipp-fran-torsdag/a10094787',
+  '/c/lidl-plus-erbjudanden/a10094788',
+  '/c/veckans-blommor/a10094398',
+  '/c/veckans-blommor/a10094884'
 ] as const;
 
 export type FetchLidlStoresOptions = {

@@ -165,9 +165,29 @@ export const DEFAULT_MATHEM_SEARCH_QUERIES = [
   'hushallspapper',
   'toalettpapper',
   'fryspasar',
-  'aluminiumfolie'
+  'aluminiumfolie',
+  'havredryck',
+  'sojadryck',
+  'protein',
+  'risgryn',
+  'nudlar',
+  'couscous',
+  'matvete',
+  'risoni',
+  'pesto',
+  'pastasas',
+  'tacosas',
+  'grillost',
+  'halloumi',
+  'mozzarella',
+  'parmesan',
+  'oliver',
+  'kapris',
+  'kikartor',
+  'kidneybonor',
+  'kokosmjolk'
 ] as const;
-export const DEFAULT_MATHEM_MAX_ROWS = 4200;
+export const DEFAULT_MATHEM_MAX_ROWS = 4600;
 
 export type FetchMathemProductsOptions = {
   fetchImpl?: typeof fetch;
