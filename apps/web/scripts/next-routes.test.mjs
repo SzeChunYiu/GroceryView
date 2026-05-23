@@ -1025,6 +1025,24 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('wires the unit price alert page to the alert API controls', async () => {
+    const route = await read('src/app/unit-price-alerts/page.tsx');
+    const actions = await read('src/components/unit-price-alert-actions.tsx');
+
+    assert.match(route, /UnitPriceAlertActions/);
+    assert.match(route, /suggestedAlerts=/);
+    assert.match(actions, /'use client'/);
+    assert.match(actions, /fetch\(`\/api\/alerts\?userEmail=\$\{encodeURIComponent\(userEmail\)\}`/);
+    assert.match(actions, /fetch\('\/api\/alerts'/);
+    assert.match(actions, /method: 'POST'/);
+    assert.match(actions, /JSON\.stringify\(\{ userEmail, productId, targetPrice: Number\(targetPrice\) \}\)/);
+    assert.match(actions, /fetch\(`\/api\/alerts\/\$\{encodeURIComponent\(alertId\)\}\?userEmail=\$\{encodeURIComponent\(userEmail\)\}`/);
+    assert.match(actions, /method: 'DELETE'/);
+    assert.match(actions, /Sign in or enter alert email first/);
+    assert.match(actions, /No anonymous unit price alert writes/);
+    assert.doesNotMatch(actions, /demo-data|sample-data|localStorage\.setItem/i);
+  });
+
   it('surfaces budget essentials price-drop alerts using the real watchlist engine', async () => {
     const source = await read('src/app/watchlist/page.tsx');
     const demo = await read('src/lib/demo-data.ts');
