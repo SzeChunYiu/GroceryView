@@ -36,6 +36,7 @@ describe('buildOpenApiDocument', () => {
       '/api/deals/discounts',
       '/api/deals/flyer-offers',
       '/api/expiry-deals/radar',
+      '/api/fuel',
       '/api/health',
       '/api/households/current',
       '/api/human-review/assignments',
@@ -178,6 +179,8 @@ describe('buildOpenApiDocument', () => {
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
     assert.equal(doc.paths['/api/openapi.json'].get?.security, undefined);
     assert.match(doc.paths['/api/openapi.json'].get?.summary ?? '', /openapi|developer/i);
+    assert.equal(doc.paths['/api/fuel'].get?.security, undefined);
+    assert.match(doc.paths['/api/fuel'].get?.summary ?? '', /fuel price observations/i);
     assert.equal(doc.paths['/api/nutrition/value'].get?.security, undefined);
     assert.match(doc.paths['/api/nutrition/value'].get?.summary ?? '', /nutrition.*krona/i);
     assert.deepEqual(doc.paths['/api/pantry/replenishment'].get?.security, [{ bearerAuth: [] }]);

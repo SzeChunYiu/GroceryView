@@ -19,8 +19,11 @@ Price and ingestion records expose provenance directly:
 - `retailer_source_policies.provenance`: source-policy metadata such as robots crawl evidence, reviewer, policy matrix version, and source-policy notes.
 - `observations.provenance`: normalized price metadata such as extraction rule, original displayed price, campaign identifiers, and review notes.
 - `latest_prices.provenance`: copied from the winning observation so API callers can show source context without joining.
+- `fuel_price_sources.provenance`: source-level fuel evidence such as operator page, crowd reporter metadata, legal review, and policy notes.
+- `fuel_price_source_observations`: links fuel source evidence to immutable `domain='fuel'` observations while preserving the original source price text.
 
 Every price-bearing row carries `price_type`, `confidence`, `observed_at`, and `provenance` either directly or through its referenced observation.
+Fuel-domain rows carry litre unit prices through immutable `domain = fuel` observations and fuel source links.
 
 ## Partitioning Plan
 

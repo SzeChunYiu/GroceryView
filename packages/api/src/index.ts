@@ -637,6 +637,50 @@ export type PriceFreshnessReport = {
   backfillProductIds: string[];
 };
 
+export type FuelGrade = '95' | '98' | 'diesel' | 'HVO100' | 'E85';
+export type FuelSourceKind = 'operator' | 'crowd';
+
+export type FuelPriceSource = {
+  id: string;
+  kind: FuelSourceKind;
+  name: string;
+  operatorName?: string;
+  reporterId?: string;
+  sourceUrl: string;
+  legalReviewStatus: LegalReviewStatus;
+};
+
+export type FuelPriceObservation = {
+  id: string;
+  domain: 'fuel';
+  grade: FuelGrade;
+  label: string;
+  pricePerLitre: {
+    amount: number;
+    currency: 'SEK';
+  };
+  litreBasis: 1;
+  observedAt: string;
+  validFrom: string;
+  confidence: number;
+  source: FuelPriceSource;
+  provenance: {
+    sourceRunId: string;
+    sourceUrl: string;
+    capturedAt: string;
+    parserVersion: string;
+  };
+};
+
+export type FuelPricesReport = {
+  domain: 'fuel';
+  litreBasis: 1;
+  grades: FuelGrade[];
+  observations: FuelPriceObservation[];
+  sources: FuelPriceSource[];
+  guardrails: string[];
+};
+
 export type ProductPriceDistributionScope = 'stockholm' | 'local_area';
 
 export type ProductPriceDistribution = {
@@ -1633,7 +1677,6 @@ const stores: Store[] = [
   { id: 'coop-odenplan', name: 'Coop Odenplan', chain: 'coop', district: 'Odenplan', address: 'Odenplan, Stockholm', confidence: 'medium' }
 ];
 
-
 const storeTravelProfiles: Record<string, { distanceKm: number; durationMinutes: number }> = {
   'willys-odenplan': { distanceKm: 0.5, durationMinutes: 5.29 },
   'lidl-sveavagen': { distanceKm: 0.8, durationMinutes: 7 },
@@ -1674,6 +1717,40 @@ const retailerHandoffSupport: Record<string, { retailerName: string; support: Re
     }
   }
 };
+
+const st1FuelSource: FuelPriceSource = {
+  id: 'st1-business-listpris',
+  kind: 'operator',
+  name: 'St1 Business listpris',
+  operatorName: 'St1 Sverige AB',
+  sourceUrl: 'https://st1.se/foretag/listpris',
+  legalReviewStatus: 'approved'
+};
+
+const fuelPriceObservations: FuelPriceObservation[] = [
+  ['98', 'Bensin 98', 20.19],
+  ['95', 'Bensin 95', 18.89],
+  ['E85', 'E85', 15.84],
+  ['diesel', 'Diesel', 21.34],
+  ['HVO100', 'HVO100', 29.74]
+].map(([grade, label, amount]) => ({
+  id: `fuel-st1-${String(grade).toLowerCase()}-2026-05-23`,
+  domain: 'fuel',
+  grade: grade as FuelGrade,
+  label: String(label),
+  pricePerLitre: { amount: Number(amount), currency: 'SEK' },
+  litreBasis: 1,
+  observedAt: '2026-05-22T22:01:00.000Z',
+  validFrom: '2026-05-22T22:01:00.000Z',
+  confidence: 0.95,
+  source: st1FuelSource,
+  provenance: {
+    sourceRunId: 'st1-fuel-2026-05-23',
+    sourceUrl: st1FuelSource.sourceUrl,
+    capturedAt: '2026-05-23T13:42:57.000Z',
+    parserVersion: 'st1-fuel-listpris-v1'
+  }
+}));
 
 const products: ProductDetail[] = [
   {
@@ -3909,6 +3986,21 @@ export function createGroceryViewApi() {
           };
         });
       return { city: 'Stockholm', indices: [buildStockholmGroceryIndex()], movers, topDeals };
+    },
+
+    getFuelPrices(): FuelPricesReport {
+      return {
+        domain: 'fuel',
+        litreBasis: 1,
+        grades: fuelPriceObservations.map((row) => row.grade),
+        observations: fuelPriceObservations,
+        sources: [st1FuelSource],
+        guardrails: [
+          'Fuel rows are official operator list-price observations, not estimated grocery prices.',
+          'Community fuel reports must carry reporter provenance before they can appear next to operator rows.',
+          'The fuel domain is separate from grocery product Deal Score calculations.'
+        ]
+      };
     },
 
     getNutritionValueReport(metric: NutritionMetric = 'protein'): NutritionValueReport {

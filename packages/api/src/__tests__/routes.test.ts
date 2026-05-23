@@ -704,6 +704,19 @@ describe('createGroceryViewApi', () => {
       }
     );
 
+    const fuel = api.getFuelPrices();
+    assert.equal(fuel.domain, 'fuel');
+    assert.equal(fuel.litreBasis, 1);
+    assert.deepEqual(fuel.observations.map((row) => [row.grade, row.pricePerLitre.amount, row.source.kind]), [
+      ['98', 20.19, 'operator'],
+      ['95', 18.89, 'operator'],
+      ['E85', 15.84, 'operator'],
+      ['diesel', 21.34, 'operator'],
+      ['HVO100', 29.74, 'operator']
+    ]);
+    assert.equal(fuel.sources[0]?.operatorName, 'St1 Sverige AB');
+    assert.match(fuel.guardrails[0], /operator list-price observations/i);
+
     const search = api.searchProducts('coffee');
     assert.equal(search[0].ticker, 'ZOEGAS-COFFEE-450G');
 
