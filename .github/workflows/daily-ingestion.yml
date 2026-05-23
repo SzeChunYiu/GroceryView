@@ -309,11 +309,25 @@ jobs:
             'source_run_missing_fresh_chain:lidl',
             'source_run_missing_fresh_chain:city_gross'
           ];
-          if (body.report?.status !== 'healthy') {
+          const sourceRunSummary = {
+            blockerCount: body.summary?.blockers?.total ?? body.report?.blockers?.length ?? 0,
+            missingFreshChains: body.summary?.blockers?.missingFreshChains ?? 0,
+            insufficientAcceptedRows: body.summary?.blockers?.insufficientAcceptedRows ?? 0,
+            succeededEvidence: body.summary?.evidence?.succeeded ?? 0,
+            latestSuccessfulFinishedAt: body.summary?.latestSuccessfulFinishedAt
+          };
+          if (
+            body.report?.status !== 'healthy' ||
+            sourceRunSummary.blockerCount !== 0 ||
+            sourceRunSummary.missingFreshChains !== 0 ||
+            sourceRunSummary.insufficientAcceptedRows !== 0 ||
+            sourceRunSummary.succeededEvidence < requiredMissingChainBlockers.length ||
+            !sourceRunSummary.latestSuccessfulFinishedAt
+          ) {
             for (const blocker of requiredMissingChainBlockers) {
               if (body.report?.blockers?.includes(blocker)) console.error(blocker);
             }
-            console.error(JSON.stringify(body));
+            console.error(JSON.stringify({ ...body, sourceRunSummary }));
             process.exit(1);
           }
           NODE
