@@ -46,6 +46,9 @@ import {
   type IcaStoreConfig
 } from './connectors/ica.js';
 import {
+  fetchIcaMaxiBulkProducts
+} from './connectors/ica-bulk.js';
+import {
   fetchPharmacyProducts,
   type ApohemProduct,
   DEFAULT_APOHEM_SOURCE_PATHS,
@@ -77,6 +80,7 @@ export * from './connectors/citygross.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
+export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
 export * from './connectors/lidl.js';
 export * from './connectors/mathem.js';
@@ -1967,6 +1971,20 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(icaProductToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_ICA_MAXI_BULK_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_ICA_MAXI_BULK_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchIcaMaxiBulkProducts({
+      ...runnerControlsFromUrl(url),
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      maxPageSize: dailyNativeNumberParam(url, 'maxPageSize'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(icaProductToDailyItem) });
+  }
+
   if (sourceUrl === GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL}?`)) {
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
@@ -2864,6 +2882,7 @@ export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL = 'groceryview://da
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/hemkop/products/all-stores';
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/ica/store-promotions/default-stores';
+export const GROCERYVIEW_DAILY_ICA_MAXI_BULK_PRODUCTS_URL = 'groceryview://daily/ica/products/maxi-stores';
 export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lidl/public-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';

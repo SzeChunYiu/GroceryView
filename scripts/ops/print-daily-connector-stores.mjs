@@ -66,6 +66,11 @@ export async function printDailyConnectorStores({ fetchers, selfTest = false, re
       storeName: 'ICA Kvantum Kungsholmen',
       regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d',
       city: 'Stockholm'
+    }, {
+      storeAccountId: '1003380',
+      storeName: 'Maxi ICA Stormarknad Solna',
+      regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d',
+      city: 'Solna'
     }],
     fetchWillysStores: async () => [{
       storeId: '2149',

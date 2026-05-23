@@ -19,6 +19,7 @@ describe('daily connectors export script', () => {
     const connectors = JSON.parse(output);
     assert.deepEqual(connectors.map((connector) => connector.chainId), [
       'ica',
+      'ica',
       'willys',
       'willys',
       'coop',
@@ -32,6 +33,7 @@ describe('daily connectors export script', () => {
     ]);
     assert.deepEqual(connectors.map((connector) => connector.connectorId), [
       'ica-store-promotions-default-stores',
+      'ica-maxi-bulk-products',
       'willys-products-all-stores',
       'willys-weekly-all-stores',
       'coop-products-all-stores',
@@ -63,6 +65,7 @@ describe('daily connectors export script', () => {
     assert.deepEqual(coopWeeklyConnector.stores.map((store) => store.storeId), ['196183', '176110']);
     assert.deepEqual(connectors.map((connector) => connector.endpointUrl), [
       'groceryview://daily/ica/store-promotions/default-stores',
+      'groceryview://daily/ica/products/maxi-stores',
       'groceryview://daily/willys/products/all-stores',
       'groceryview://daily/willys/weekly-offers/all-stores',
       'groceryview://daily/coop/products/all-stores',
@@ -76,6 +79,7 @@ describe('daily connectors export script', () => {
     ]);
     assert.deepEqual(connectors.map((connector) => connector.parserVersion), [
       'ica-store-promotions-native-v1',
+      'ica-maxi-bulk-native-v1',
       'willys-products-native-v1',
       'willys-weekly-native-v1',
       'coop-products-native-v1',

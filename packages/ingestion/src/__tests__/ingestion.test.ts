@@ -75,6 +75,7 @@ import {
   fetchHemkopWeeklyDiscounts,
   fetchHemkopWeeklyDiscountsForAllStores,
   fetchIcaDefaultStoreProducts,
+  fetchIcaMaxiBulkProducts,
   fetchIcaProducts,
   fetchIcaReklambladOffers,
   fetchLidlBulkProducts,
@@ -100,6 +101,7 @@ import {
   GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
+  GROCERYVIEW_DAILY_ICA_MAXI_BULK_PRODUCTS_URL,
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
@@ -2728,6 +2730,50 @@ describe('fetchIcaProducts', () => {
       }],
       fetchImpl: async () => new Response('permanent store failure', { status: 500 })
     }), /ICA all-store promotion requests missing configured branches: 1003654/);
+  });
+
+  it('fetches ICA Maxi bulk products from Maxi-only store branches', async () => {
+    const requestedUrls: string[] = [];
+    const rows = await fetchIcaMaxiBulkProducts({
+      retrievedAt: '2026-05-23T20:32:00.000Z',
+      maxRows: 1,
+      stores: [
+        {
+          storeAccountId: '1003380',
+          storeName: 'Maxi ICA Stormarknad Solna',
+          regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+        },
+        {
+          storeAccountId: '1015001',
+          storeName: 'Maxi ICA Stormarknad Bromma',
+          regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+        }
+      ],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        const storeAccountId = String(url).match(/\/stores\/([^/]+)\//)?.[1] ?? 'unknown';
+        return Response.json({
+          productGroups: [{
+            type: 'ON_OFFER',
+            decoratedProducts: [{
+              productId: `maxi-product-${storeAccountId}`,
+              retailerProductId: `maxi-retailer-${storeAccountId}`,
+              name: `Maxi Product ${storeAccountId}`,
+              price: { amount: 21, currency: 'SEK' }
+            }]
+          }]
+        });
+      }
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildIcaStorePromotionsUrl('1003380', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1),
+      buildIcaStorePromotionsUrl('1015001', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1)
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeAccountId, row.storeName, row.code]), [
+      ['1003380', 'Maxi ICA Stormarknad Solna', 'maxi-retailer-1003380'],
+      ['1015001', 'Maxi ICA Stormarknad Bromma', 'maxi-retailer-1015001']
+    ]);
   });
 });
 
@@ -5894,6 +5940,50 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.store_id, 'store-db-2');
     assert.equal(observation.price, 44.9);
     assert.equal(observation.regular_price, 59.9);
+  });
+
+  it('materializes native ICA Maxi bulk product prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T20:33:00.000Z',
+      connectors: [{
+        connectorId: 'ica-maxi-bulk-products',
+        chainId: 'ica',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_ICA_MAXI_BULK_PRODUCTS_URL}?maxStores=1&maxRows=1`,
+        parserVersion: 'ica-maxi-bulk-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '1003380', name: 'Maxi ICA Stormarknad Solna', address: 'Svetsarvägen 16', city: 'Solna' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return Response.json({
+          productGroups: [{
+            type: 'ON_OFFER',
+            decoratedProducts: [{
+              productId: 'maxi-product-1003380',
+              retailerProductId: 'maxi-retailer-1003380',
+              name: 'Maxi bulk coffee 450g',
+              brand: 'ICA',
+              packSizeDescription: '450g',
+              price: { amount: 52.9, currency: 'SEK' }
+            }]
+          }]
+        });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(requestedUrls.length, 1);
+    assert.equal(new URL(requestedUrls[0]).pathname, '/stores/1003380/api/product-listing-pages/v1/pages/promotions');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 52.9);
   });
 
   it('materializes native Willys all-store branch product prices into daily database observations', async () => {

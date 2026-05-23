@@ -14,6 +14,17 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: true
   },
   {
+    connectorId: 'ica-maxi-bulk-products',
+    chainId: 'ica',
+    sourceType: 'official_api',
+    endpointUrl: 'groceryview://daily/ica/products/maxi-stores',
+    parserVersion: 'ica-maxi-bulk-native-v1',
+    robotsTxtStatus: 'not_applicable',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: true,
+    storeFilter: (store) => /\bmaxi\b/i.test(store.name)
+  },
+  {
     connectorId: 'willys-products-all-stores',
     chainId: 'willys',
     sourceType: 'official_api',
