@@ -22,7 +22,7 @@ function parseEnvExample(text) {
 
 describe('production env value validation script', () => {
   it('validates daily connectors and catalog coverage targets for all required chains', () => {
-    for (const name of ['GROCERYVIEW_DAILY_CONNECTORS_JSON', 'CATALOG_COVERAGE_TARGETS_JSON']) {
+    for (const name of ['GROCERYVIEW_DAILY_CONNECTORS_JSON', 'CATALOG_COVERAGE_TARGETS_JSON', 'EXPO_PUSH_ACCESS_TOKEN', 'SENDGRID_FROM_EMAIL', 'SENDGRID_API_KEY']) {
       assert.match(script, new RegExp(name));
     }
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
@@ -84,6 +84,9 @@ describe('production env value validation script', () => {
       NOTIFICATION_WEBHOOK_SECRET: 'test-notification-webhook-secret',
       BILLING_WEBHOOK_SECRET: 'test-billing-webhook-secret',
       METRICS_TOKEN: 'test-metrics-token',
+      SENDGRID_API_KEY: 'sg-test-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-push-token',
       GROCERYVIEW_SERVER_URL: 'https://api.groceryview.example',
       GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE: connectorPath,
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
@@ -113,6 +116,9 @@ describe('production env value validation script', () => {
       NOTIFICATION_WEBHOOK_SECRET: 'test-notification-webhook-secret',
       BILLING_WEBHOOK_SECRET: 'test-billing-webhook-secret',
       METRICS_TOKEN: 'test-metrics-token',
+      SENDGRID_API_KEY: 'sg-test-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-push-token',
       GROCERYVIEW_SERVER_URL: 'https://api.groceryview.example',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(chains.map((chainId) => ({
         connectorId: `${chainId}-normalized-json`,
