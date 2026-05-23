@@ -24,6 +24,7 @@ describe('deployment manifest', () => {
       'STRIPE_PRICE_PREMIUM_MONTHLY',
       'STRIPE_PRICE_PREMIUM_YEARLY',
       'METRICS_TOKEN',
+      'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
       'CATALOG_COVERAGE_TARGETS_JSON'
     ]);
   });

@@ -18,6 +18,7 @@ GitHub Actions / deployment must have these names configured:
 - `STRIPE_PRICE_PREMIUM_YEARLY`
 - `METRICS_TOKEN`
 - `GROCERYVIEW_SERVER_URL`
+- `GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN`
 - `CATALOG_COVERAGE_TARGETS_JSON`
 
 Check names without exposing values:
@@ -51,6 +52,22 @@ Every `targetStores[]` entry must also appear in the matching daily connector
 branch-scoped before it writes `latest_prices`. The exported target also requires
 `targetPriceTypes: ["online"]` and `requireEveryStorePriceType: true` so weekly
 flyer promotions cannot satisfy branch branch-product-price readiness by themselves.
+
+## Configure source-run row thresholds
+
+Set `GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN` in the deployment/GitHub
+secret store to the minimum accepted product rows required before
+`/api/readiness/source-runs` treats a fresh daily source run as meaningful. The
+value is compact JSON keyed by required chain id:
+
+```json
+{"ica":10,"willys":10,"coop":10,"hemkop":5,"lidl":5,"city_gross":5}
+```
+
+Production startup requires this value, and `ops:validate-production-env` fails
+closed unless every required chain has a positive integer threshold. Raise these
+numbers as launch catalogs grow; leaving them at `1` only proves connector liveness,
+not product-volume readiness.
 
 ## Export live branch metadata and connector config
 
@@ -107,9 +124,11 @@ This fails closed unless:
 - generated daily connector JSON has all six required chains: `ica`, `willys`, `coop`, `hemkop`, `lidl`, `city_gross`
 - every store-scoped connector lists the branch metadata it can emit in `stores[]`
 - catalog `targetStores[]` are covered by daily connector `stores[]`
+- `GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN` has a positive integer threshold for all six required chains
 - catalog coverage targets have non-empty product/category/chain/store arrays
 - catalog target chains contain all six required chains
-- `requireEveryProductInEveryStore` is `true`
+- `requireEveryProductInEveryStore` is `false`
+- `requireEveryStorePriceType` is `true`
 
 ## Export a DB-backed site snapshot
 

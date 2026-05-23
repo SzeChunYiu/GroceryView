@@ -46,7 +46,7 @@ class RecordingPgPool {
     }
   ];
 
-  async query(text: string, values: unknown[] = []) {
+  async query(text: string, values: unknown[] = []): Promise<{ rows: unknown[] }> {
     this.calls.push({ text, values });
     if (text.includes('information_schema.tables')) {
       return {
@@ -261,6 +261,14 @@ describe('runtime config', () => {
       S3_ACCESS_KEY_ID: 'runtime-access-key',
       S3_SECRET_ACCESS_KEY: 'runtime-secret-key',
       SCAN_UPLOAD_MAX_BYTES: '7654321',
+      GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: JSON.stringify({
+        ica: 10,
+        willys: 10,
+        coop: 10,
+        hemkop: 5,
+        lidl: 5,
+        city_gross: 5
+      }),
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -298,6 +306,14 @@ describe('runtime config', () => {
       s3AccessKeyId: 'runtime-access-key',
       s3SecretAccessKey: 'runtime-secret-key',
       scanUploadMaxBytes: 7654321,
+      sourceRunMinAcceptedRowsByChain: {
+        ica: 10,
+        willys: 10,
+        coop: 10,
+        hemkop: 5,
+        lidl: 5,
+        city_gross: 5
+      },
       catalogCoverageTargets: {
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -774,6 +790,35 @@ describe('runtime config', () => {
       S3_ACCESS_KEY_ID: 'runtime-access-key',
       S3_SECRET_ACCESS_KEY: 'runtime-secret-key'
     }), /CATALOG_COVERAGE_TARGETS_JSON is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
+      METRICS_TOKEN: 'metrics-token',
+      OCR_SPACE_API_KEY: 'ocr-runtime-key',
+      OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
+      OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se',
+      OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
+      S3_ENDPOINT: 'https://storage.example',
+      S3_REGION: 'eu-north-1',
+      S3_BUCKET: 'groceryview-receipts',
+      S3_ACCESS_KEY_ID: 'runtime-access-key',
+      S3_SECRET_ACCESS_KEY: 'runtime-secret-key',
+      CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
+        targetProducts: ['coffee'],
+        targetCategories: ['coffee'],
+        targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
+        targetStores: ['willys-odenplan'],
+        targetPriceTypes: ['online']
+      })
+    }), /GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN is required/);
   });
 
   it('rejects invalid public web urls', () => {
@@ -803,6 +848,7 @@ describe('runtime config', () => {
       S3_BUCKET: 'groceryview-receipts',
       S3_ACCESS_KEY_ID: 'runtime-access-key',
       S3_SECRET_ACCESS_KEY: 'runtime-secret-key',
+      GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: JSON.stringify({ willys: 10 }),
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -1442,6 +1488,55 @@ describe('runtime config', () => {
 
     assert.equal(pool.closed, true);
     assert.equal(pool.calls.some((call) => call.text.includes('from source_runs')), true);
+  });
+
+  it('uses configured minimum accepted rows for runtime source-run readiness', async () => {
+    class SourceRunPgPool extends RecordingPgPool {
+      async query(text: string, values: unknown[] = []): Promise<{ rows: unknown[] }> {
+        if (text.includes('from source_runs')) {
+          const finishedAt = new Date().toISOString();
+          return {
+            rows: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'].map((chainId) => ({
+              id: `source-run-${chainId}`,
+              source_type: 'official_api',
+              source_name: `${chainId}-daily`,
+              source_url: `https://sources.example.test/${chainId}`,
+              started_at: finishedAt,
+              finished_at: finishedAt,
+              status: 'succeeded',
+              provenance: { chainId, cadence: 'daily', acceptedCount: 1 },
+              error_message: null
+            }))
+          };
+        }
+        return super.query(text, values);
+      }
+    }
+
+    const pool = new SourceRunPgPool();
+    const service = createRuntimeHttpService(
+      {
+        NODE_ENV: 'development',
+        DATABASE_URL: 'postgres://runtime-user:runtime-password@runtime-db.example/groceryview',
+        METRICS_TOKEN: 'metrics-secret',
+        GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: JSON.stringify({ willys: 10 })
+      },
+      { pgPoolFactory: () => pool }
+    );
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/source-runs', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 503);
+      const body = await response.json() as { report: { blockers: string[] } };
+      assert.equal(body.report.blockers.includes('source_run_insufficient_accepted_rows:willys:1/10'), true);
+      assert.equal(body.report.blockers.some((blocker) => blocker.startsWith('source_run_missing_fresh_chain:')), false);
+      assert.equal(JSON.stringify(body).includes('runtime-password'), false);
+    } finally {
+      await service.close();
+    }
   });
 
   it('exposes catalog coverage readiness from PostgreSQL coverage rows and configured targets', async () => {

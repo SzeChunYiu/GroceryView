@@ -38,6 +38,7 @@ describe('deploy workflow', () => {
       'STRIPE_PRICE_PREMIUM_MONTHLY',
       'STRIPE_PRICE_PREMIUM_YEARLY',
       'GROCERYVIEW_SCANNER_BEARER_TOKEN',
+      'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
       'CATALOG_COVERAGE_TARGETS_JSON'
     ]) {
       assert.match(workflow, new RegExp(`${secret}:\\s*\\$\\{\\{ secrets\\.${secret} \\}\\}`));

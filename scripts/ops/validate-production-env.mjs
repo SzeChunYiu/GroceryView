@@ -24,6 +24,7 @@ export const requiredEnvNames = [
   'S3_BUCKET',
   'S3_ACCESS_KEY_ID',
   'S3_SECRET_ACCESS_KEY',
+  'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
   'CATALOG_COVERAGE_TARGETS_JSON'
 ];
 
@@ -35,6 +36,7 @@ export const requiredDailyIngestionEnvNames = [
   'BILLING_WEBHOOK_SECRET',
   'METRICS_TOKEN',
   'GROCERYVIEW_SERVER_URL',
+  'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
   'CATALOG_COVERAGE_TARGETS_JSON'
 ];
 
@@ -95,6 +97,24 @@ function validateDailyConnectors(env) {
   return { connectorCount: connectors.length, connectorStoreCount: connectorStoreIds.length, connectorStoreIds, connectorChainIds: [...new Set(connectorChainIds)].sort() };
 }
 
+
+function validateSourceRunMinimums(env) {
+  const thresholds = parseJsonEnv(env, 'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN');
+  if (thresholds === null || typeof thresholds !== 'object' || Array.isArray(thresholds)) {
+    throw new Error('GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN must be an object.');
+  }
+  const entries = Object.entries(thresholds);
+  if (entries.length === 0) throw new Error('GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN must include at least one chain threshold.');
+  const chainIds = entries.map(([chainId]) => chainId.trim());
+  requireRequiredChains('GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN', chainIds);
+  for (const [chainId, minimum] of entries) {
+    if (!Number.isInteger(minimum) || minimum < 1) {
+      throw new Error(`GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN.${chainId} must be a positive integer.`);
+    }
+  }
+  return { chains: chainIds.sort(), minimums: Object.fromEntries(entries.map(([chainId, minimum]) => [chainId.trim(), minimum])) };
+}
+
 function validateCatalogTargets(env) {
   const targets = parseJsonEnv(env, 'CATALOG_COVERAGE_TARGETS_JSON');
   if (targets === null || typeof targets !== 'object' || Array.isArray(targets)) throw new Error('CATALOG_COVERAGE_TARGETS_JSON must be an object.');
@@ -138,6 +158,7 @@ export function validateProductionEnv(env, options = {}) {
   new URL(env.GROCERYVIEW_SERVER_URL);
   const connectors = validateDailyConnectors(env);
   const coverage = validateCatalogTargets(env);
+  const sourceRunMinimums = validateSourceRunMinimums(env);
   const connectorStoreCoverageCount = validateConnectorStoreCoverage(connectors.connectorStoreIds, coverage.targetStores);
   return {
     status: 'ready',
@@ -147,7 +168,8 @@ export function validateProductionEnv(env, options = {}) {
     connectorStoreCoverageCount,
     coverageProductCount: coverage.productCount,
     coverageStoreCount: coverage.storeCount,
-    coveragePriceTypes: coverage.targetPriceTypes
+    coveragePriceTypes: coverage.targetPriceTypes,
+    sourceRunMinimumChains: sourceRunMinimums.chains
   };
 }
 
@@ -184,6 +206,7 @@ function selfTestEnv() {
       hasDataAgreement: true,
       stores: [{ storeId: `${chainId}-odenplan`, name: `${chainId} Odenplan`, address: 'Odenplan', city: 'Stockholm' }]
     }))),
+    GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: JSON.stringify(Object.fromEntries(chains.map((chainId) => [chainId, 10]))),
     CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
       targetProducts: ['coffee', 'milk'],
       targetCategories: ['coffee', 'dairy'],

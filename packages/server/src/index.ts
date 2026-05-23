@@ -2984,7 +2984,42 @@ export type RuntimeConfig = {
   s3SecretAccessKey?: string;
   scanUploadMaxBytes?: number;
   catalogCoverageTargets?: Omit<CatalogCoverageInput, 'products'>;
+  sourceRunMinAcceptedRowsByChain?: Readonly<Record<string, number>>;
 };
+
+const defaultSourceRunMinAcceptedRowsByChain: Readonly<Record<(typeof requiredDailyChainIds)[number], number>> = {
+  ica: 1,
+  willys: 1,
+  coop: 1,
+  hemkop: 1,
+  lidl: 1,
+  city_gross: 1
+};
+
+function parseSourceRunMinAcceptedRowsByChain(value: string | undefined): Readonly<Record<string, number>> | undefined {
+  if (!value?.trim()) return undefined;
+  const parsed = JSON.parse(value) as unknown;
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN must be a JSON object.');
+  }
+  const entries = Object.entries(parsed as Record<string, unknown>);
+  if (entries.length === 0) {
+    throw new Error('GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN must include at least one chain threshold.');
+  }
+  const knownChains = new Set<string>(requiredDailyChainIds);
+  const thresholds: Record<string, number> = {};
+  for (const [rawChainId, rawMinimum] of entries) {
+    const chainId = rawChainId.trim();
+    if (!knownChains.has(chainId)) {
+      throw new Error(`GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN.${rawChainId} must be one of: ${requiredDailyChainIds.join(', ')}.`);
+    }
+    if (typeof rawMinimum !== 'number' || !Number.isInteger(rawMinimum) || rawMinimum < 1) {
+      throw new Error(`GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN.${rawChainId} must be a positive integer.`);
+    }
+    thresholds[chainId] = rawMinimum;
+  }
+  return thresholds;
+}
 
 function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCoverageInput, 'products'> | undefined {
   if (!value?.trim()) return undefined;
@@ -3058,11 +3093,13 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.S3_ACCESS_KEY_ID) throw new Error('S3_ACCESS_KEY_ID is required in production.');
     if (!env.S3_SECRET_ACCESS_KEY) throw new Error('S3_SECRET_ACCESS_KEY is required in production.');
     if (!env.CATALOG_COVERAGE_TARGETS_JSON) throw new Error('CATALOG_COVERAGE_TARGETS_JSON is required in production.');
+    if (!env.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN) throw new Error('GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN is required in production.');
   }
   validatePublicWebUrl(env.PUBLIC_WEB_URL);
   const scanUploadMaxBytes = Number(env.SCAN_UPLOAD_MAX_BYTES ?? '5000000');
   if (!Number.isInteger(scanUploadMaxBytes) || scanUploadMaxBytes <= 0) throw new Error('SCAN_UPLOAD_MAX_BYTES must be a positive integer.');
   const catalogCoverageTargets = parseCatalogCoverageTargets(env.CATALOG_COVERAGE_TARGETS_JSON);
+  const sourceRunMinAcceptedRowsByChain = parseSourceRunMinAcceptedRowsByChain(env.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN);
   const stripePriceIds: Partial<Record<SubscriptionPlan, string>> = {
     ...(env.STRIPE_PRICE_PREMIUM_MONTHLY ? { premium_monthly: env.STRIPE_PRICE_PREMIUM_MONTHLY } : {}),
     ...(env.STRIPE_PRICE_PREMIUM_YEARLY ? { premium_yearly: env.STRIPE_PRICE_PREMIUM_YEARLY } : {})
@@ -3091,7 +3128,8 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     ...(env.S3_ACCESS_KEY_ID ? { s3AccessKeyId: env.S3_ACCESS_KEY_ID } : {}),
     ...(env.S3_SECRET_ACCESS_KEY ? { s3SecretAccessKey: env.S3_SECRET_ACCESS_KEY } : {}),
     scanUploadMaxBytes,
-    ...(catalogCoverageTargets ? { catalogCoverageTargets } : {})
+    ...(catalogCoverageTargets ? { catalogCoverageTargets } : {}),
+    ...(sourceRunMinAcceptedRowsByChain ? { sourceRunMinAcceptedRowsByChain } : {})
   };
 }
 
@@ -3363,7 +3401,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
         maxRunningMinutes: 120,
         staleAfterMinutes: 24 * 60,
         requiredFreshChainIds: requiredDailyChainIds,
-        requiredAcceptedCountByChain: { ica: 1, willys: 1, coop: 1, hemkop: 1, lidl: 1, city_gross: 1 },
+        requiredAcceptedCountByChain: config.sourceRunMinAcceptedRowsByChain ?? defaultSourceRunMinAcceptedRowsByChain,
         filter: { limit: 100 }
       }),
     ...(config.catalogCoverageTargets
