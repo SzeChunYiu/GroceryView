@@ -244,12 +244,47 @@ async function extractArrayFromTypeScriptModule(fileUrl, exportName) {
     } else if (char === ']') {
       depth -= 1;
       if (depth === 0) {
-        return JSON.parse(text.slice(arrayStart, index + 1));
+        const value = text.slice(arrayStart, index + 1);
+        try {
+          return JSON.parse(value);
+        } catch (error) {
+          return resolveSpreadArray(fileUrl, text, value);
+        }
       }
     }
   }
 
   throw new Error(`Could not find array end for ${exportName} in ${fileUrl.pathname}`);
+}
+
+async function resolveSpreadArray(fileUrl, text, value) {
+  const names = [...value.matchAll(/\.\.\.([A-Za-z0-9_]+)/g)].map((match) => match[1]);
+  if (names.length === 0) {
+    throw new Error(`Export in ${fileUrl.pathname} is not JSON and has no spread arrays`);
+  }
+
+  const rows = [];
+  for (const name of names) {
+    const importedFrom = importedModulePath(text, name);
+    if (importedFrom) {
+      rows.push(...await extractArrayFromTypeScriptModule(new URL(importedFrom, fileUrl), name));
+      continue;
+    }
+
+    rows.push(...await extractArrayFromTypeScriptModule(fileUrl, name));
+  }
+  return rows;
+}
+
+function importedModulePath(text, name) {
+  const importPattern = /import\s+\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g;
+  for (const match of text.matchAll(importPattern)) {
+    const names = match[1].split(',').map((part) => part.trim().split(/\s+as\s+/).at(-1)?.trim());
+    if (names.includes(name)) {
+      return `${match[2]}.ts`;
+    }
+  }
+  return null;
 }
 
 function normalizeOpenFoodFactsExportRecord(record) {

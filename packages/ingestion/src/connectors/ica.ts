@@ -1656,6 +1656,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003801',
     storeName: 'ICA Kvantum Tidaholm',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003693',
+    storeName: 'ICA Supermarket Tierp',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 

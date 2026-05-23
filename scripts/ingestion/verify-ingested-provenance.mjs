@@ -101,8 +101,8 @@ const failures = [];
 
 for (const dataset of DATASETS) {
   const text = await readFile(new URL(dataset.file, INGESTED_DIR), 'utf8');
-  const rows = extractJsonExport(text, dataset.rows);
-  const source = extractJsonExport(text, dataset.source);
+  const rows = await extractJsonExport(new URL(dataset.file, INGESTED_DIR), text, dataset.rows);
+  const source = await extractJsonExport(new URL(dataset.file, INGESTED_DIR), text, dataset.source);
   const sourceRowCount = rowCount(source, dataset.sourceRowCount);
   const label = `${dataset.file}:${dataset.rows}`;
   const duplicateKeys = countDuplicates(rows.map((row) => rowKey(row, dataset.key)));
@@ -144,7 +144,7 @@ if (failures.length > 0) {
   console.log(JSON.stringify({ status: 'ok', summaries }, null, 2));
 }
 
-function extractJsonExport(text, exportName) {
+async function extractJsonExport(fileUrl, text, exportName) {
   const marker = `export const ${exportName}`;
   const markerIndex = text.indexOf(marker);
   if (markerIndex < 0) {
@@ -156,7 +156,44 @@ function extractJsonExport(text, exportName) {
   if (start < 0) {
     throw new Error(`Missing JSON value for export ${exportName}`);
   }
-  return JSON.parse(text.slice(start, matchingJsonEnd(text, start) + 1));
+  const value = text.slice(start, matchingJsonEnd(text, start) + 1);
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    return resolveSpreadArray(fileUrl, text, value);
+  }
+}
+
+async function resolveSpreadArray(fileUrl, text, value) {
+  const names = [...value.matchAll(/\.\.\.([A-Za-z0-9_]+)/g)].map((match) => match[1]);
+  if (names.length === 0) {
+    throw new Error(`Export in ${fileUrl.pathname} is not JSON and has no spread arrays`);
+  }
+
+  const rows = [];
+  for (const name of names) {
+    const importedFrom = importedModulePath(text, name);
+    if (importedFrom) {
+      const importedUrl = new URL(importedFrom, fileUrl);
+      const importedText = await readFile(importedUrl, 'utf8');
+      rows.push(...await extractJsonExport(importedUrl, importedText, name));
+      continue;
+    }
+
+    rows.push(...await extractJsonExport(fileUrl, text, name));
+  }
+  return rows;
+}
+
+function importedModulePath(text, name) {
+  const importPattern = /import\s+\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g;
+  for (const match of text.matchAll(importPattern)) {
+    const names = match[1].split(',').map((part) => part.trim().split(/\s+as\s+/).at(-1)?.trim());
+    if (names.includes(name)) {
+      return `${match[2]}.ts`;
+    }
+  }
+  return null;
 }
 
 function firstJsonStart(text, fromIndex) {
