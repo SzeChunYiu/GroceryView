@@ -287,8 +287,19 @@ jobs:
         run: |
           set -euo pipefail
           test -n "${DATABASE_URL:-}"
+          snapshot_status=0
           npm run --silent ingest:export-db-snapshot \
-            >/tmp/db-site-snapshot-result.json
+            >/tmp/db-site-snapshot-result.json || snapshot_status=$?
+          if [ ! -s /tmp/db-site-snapshot-result.json ]; then
+            cat > /tmp/db-site-snapshot-result.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "db_site_snapshot_result_diagnostic_missing",
+            "exitCode": ${snapshot_status}
+          }
+          EOF
+          fi
+          cat /tmp/db-site-snapshot-result.json
           node <<'NODE'
           const body = require('/tmp/db-site-snapshot-result.json');
           if (body.status !== 'passed' || body.coverage?.observations < 1 || (body.coverage?.missingRequiredChains?.length ?? 0) > 0 || (body.coverage?.missingRequiredStoreExternalRefs?.length ?? 0) > 0 || (body.coverage?.missingRequiredProductSlugs?.length ?? 0) > 0 || (body.coverage?.missingRequiredStorePriceTypes?.length ?? 0) > 0 || (body.coverage?.missingRequiredCategorySlugs?.length ?? 0) > 0 || (body.coverage?.staleObservationCount ?? 0) > 0) {

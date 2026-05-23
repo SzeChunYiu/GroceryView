@@ -150,6 +150,8 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS:\s*\$\{\{ vars\.GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS \|\| '36' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS:\s*\$\{\{ vars\.GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS \|\| 'ica,willys,coop,hemkop,lidl,city_gross' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE:\s*\/tmp\/groceryview-catalog-targets\.json/);
+    assert.match(workflow, /db_site_snapshot_result_diagnostic_missing/);
+    assert.match(workflow, /snapshot_status=\$\?/);
     assert.match(workflow, /body\.status !== 'passed'/);
     assert.match(workflow, /body\.coverage\?\.observations < 1/);
     assert.match(workflow, /missingRequiredChains/);
