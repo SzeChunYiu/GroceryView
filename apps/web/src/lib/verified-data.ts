@@ -1589,7 +1589,43 @@ export type AdaptiveProductCard = {
   unitSortPrice: number | null;
   defaultCompareMode: 'total' | 'unit';
   cheapestUnitBadge: string | null;
+  sparklineWindowDays: 7;
+  sparklinePoints: Array<{
+    date: string;
+    price: number;
+    priceLabel: string;
+  }>;
+  sparklineLabel: string;
 };
+
+function isOpenPricesProduct(product: (typeof productUniverse)[number]): product is (typeof pricedProducts)[number] {
+  return 'observations' in product;
+}
+
+function sevenDaySparklinePoints(product: (typeof productUniverse)[number]): AdaptiveProductCard['sparklinePoints'] {
+  if (!isOpenPricesProduct(product)) return [];
+
+  const latestObservedAt = product.lastObservedAt.includes('T')
+    ? product.lastObservedAt
+    : `${product.lastObservedAt}T00:00:00.000Z`;
+  const priceChartSeries = buildPriceChartSeries({
+    observations: compareOverlayObservationsFor(product),
+    asOf: latestObservedAt,
+    rangeDays: 7,
+    markerLimitPerSeries: 0
+  });
+  const series = priceChartSeries.series[0];
+  if (!series) return [];
+
+  return series.points
+    .slice(-7)
+    .map((point) => ({
+      date: point.time.slice(0, 10),
+      price: point.value,
+      priceLabel: formatSek(point.value)
+    }));
+}
+
 export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((product) => {
   const isChainProduct = 'lowestPrice' in product;
   const totalPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
@@ -1601,6 +1637,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
       .map((row) => row.price === null ? null : normalizeComparableUnitPrice(row.price, packageText)?.unitPrice ?? null)
       .filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
     : [];
+  const sparklinePoints = sevenDaySparklinePoints(product);
 
   return {
     slug: product.slug,
@@ -1621,7 +1658,12 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     totalSortPrice: totalPrice,
     unitSortPrice: normalizedUnit?.unitSortPrice ?? null,
     defaultCompareMode: productKind === 'commodity' ? 'unit' : 'total',
-    cheapestUnitBadge: normalizedUnit ? cheapestUnitBadge(normalizedUnit.unitPrice, peerUnitPrices, normalizedUnit.unitLabel) : null
+    cheapestUnitBadge: normalizedUnit ? cheapestUnitBadge(normalizedUnit.unitPrice, peerUnitPrices, normalizedUnit.unitLabel) : null,
+    sparklineWindowDays: 7,
+    sparklinePoints,
+    sparklineLabel: sparklinePoints.length >= 2
+      ? `${sparklinePoints.length} observed daily points from price_daily/OpenPrices history`
+      : '7-day sparkline waits for at least two observed price-history points'
   };
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);

@@ -38,6 +38,51 @@ function secondaryLabel(card: AdaptiveProductCard, compareMode: CompareMode) {
   return `${alternatePrice} · ${card.packageLabel}`;
 }
 
+function sparklinePath(points: AdaptiveProductCard['sparklinePoints'], width = 160, height = 44) {
+  if (points.length < 2) return null;
+  const prices = points.map((point) => point.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+  return points
+    .map((point, index) => {
+      const x = (index / (points.length - 1)) * width;
+      const y = height - ((point.price - min) / range) * height;
+      return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    })
+    .join(' ');
+}
+
+function PriceHistorySparkline({ card }: Readonly<{ card: AdaptiveProductCard }>) {
+  const path = sparklinePath(card.sparklinePoints);
+  const latest = card.sparklinePoints.at(-1);
+
+  return (
+    <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[0.65rem] font-black uppercase tracking-[0.18em] text-slate-500">7-day price history</p>
+        <p className="text-xs font-bold text-slate-700">{latest?.priceLabel ?? 'No line yet'}</p>
+      </div>
+      {path ? (
+        <svg
+          aria-label={`${card.name} 7-day price history sparkline`}
+          className="mt-2 h-11 w-full overflow-visible"
+          preserveAspectRatio="none"
+          role="img"
+          viewBox="0 0 160 44"
+        >
+          <title>{`${card.name} 7-day price history`}</title>
+          <path d="M 0 44 L 160 44" fill="none" stroke="#e2e8f0" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+          <path d={path} fill="none" stroke="#059669" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+        </svg>
+      ) : (
+        <p className="mt-2 rounded-xl bg-slate-50 p-2 text-xs font-semibold text-slate-600">Needs at least two observed price-history points.</p>
+      )}
+      <p className="mt-2 text-xs font-semibold text-slate-600">{card.sparklineLabel}</p>
+    </div>
+  );
+}
+
 export function ProductPriceCards({
   cards,
   eyebrow = 'Adaptive product cards',
@@ -128,6 +173,7 @@ export function ProductPriceCards({
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+            <PriceHistorySparkline card={card} />
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
             {card.cheapestUnitBadge ? (
               <p className="mt-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950">{card.cheapestUnitBadge}</p>
