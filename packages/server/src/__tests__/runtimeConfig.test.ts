@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createSessionToken } from '@groceryview/auth';
+import type { PersistedNotificationTask } from '@groceryview/notifications';
 import {
   buildHealthReport,
   createRuntimeHttpService,
@@ -237,6 +238,9 @@ describe('runtime config', () => {
       DATABASE_URL: 'postgres://example',
       PUBLIC_WEB_URL: 'https://groceryview.example',
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       STRIPE_SECRET_KEY: 'sk_test_runtime',
       STRIPE_PRICE_PREMIUM_MONTHLY: 'price_monthly_runtime',
@@ -257,6 +261,9 @@ describe('runtime config', () => {
       databaseUrl: 'postgres://example',
       publicWebUrl: 'https://groceryview.example',
       notificationWebhookSecret: 'webhook-secret',
+      sendgridApiKey: 'sg-runtime-key',
+      sendgridFromEmail: 'alerts@groceryview.se',
+      expoPushAccessToken: 'expo-runtime-token',
       billingWebhookSecret: 'billing-webhook-secret',
       stripeSecretKey: 'sk_test_runtime',
       stripePriceIds: {
@@ -323,6 +330,36 @@ describe('runtime config', () => {
       DATABASE_URL: 'postgres://example',
       PUBLIC_WEB_URL: 'https://groceryview.example',
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret'
+    }), /SENDGRID_API_KEY is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key'
+    }), /SENDGRID_FROM_EMAIL is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se'
+    }), /EXPO_PUSH_ACCESS_TOKEN is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token'
     }), /BILLING_WEBHOOK_SECRET is required/);
     assert.throws(() => loadRuntimeConfig({
       NODE_ENV: 'production',
@@ -331,6 +368,9 @@ describe('runtime config', () => {
       DATABASE_URL: 'postgres://example',
       PUBLIC_WEB_URL: 'https://groceryview.example',
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret'
     }), /METRICS_TOKEN is required/);
     assert.throws(() => loadRuntimeConfig({
@@ -340,6 +380,9 @@ describe('runtime config', () => {
       DATABASE_URL: 'postgres://example',
       PUBLIC_WEB_URL: 'https://groceryview.example',
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token'
     }), /CATALOG_COVERAGE_TARGETS_JSON is required/);
@@ -358,6 +401,9 @@ describe('runtime config', () => {
       DATABASE_URL: 'postgres://example',
       PUBLIC_WEB_URL: 'mailto:support@groceryview.example',
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
@@ -805,6 +851,97 @@ describe('runtime config', () => {
     assert.equal(pool.calls.some((call) => call.text.includes('from latest_prices')), true);
     assert.equal(pool.calls.some((call) => call.text.includes('insert into watchlist_items')), true);
     assert.equal(pool.calls.find((call) => call.text.includes('insert into watchlist_items'))?.values[1], 'coffee');
+  });
+
+
+  it('runs the runtime notification worker with SendGrid and Expo providers from env', async () => {
+    const providerCalls: Array<{ url: string; body: unknown; authorization?: string }> = [];
+    const deliveredTaskIds: string[] = [];
+    const repository: RuntimePersistenceRepository = {
+      async getSubscriptionEntitlement() { return null; },
+      async upsertSubscriptionEntitlement() {},
+      async upsertBudget() {},
+      async getBudget() { return null; },
+      async getHumanReviewer() { return null; },
+      async listOpenHumanReviewAssignments() { return []; },
+      async saveHumanReviewAssignment() {},
+      async upsertNotificationSuppression() {},
+      async listDueNotificationTasks() {
+        return [
+          {
+            id: 'email-task',
+            channel: 'email',
+            type: 'weekly_report',
+            title: 'Weekly report',
+            body: 'You saved 58 SEK',
+            priority: 'normal',
+            sendAt: '2026-05-23T00:00:00.000Z',
+            recipient: 'shopper@example.com',
+            attemptCount: 0,
+            maxAttempts: 3,
+            status: 'queued'
+          },
+          {
+            id: 'push-task',
+            channel: 'push',
+            type: 'target_price',
+            title: 'Coffee deal',
+            body: 'Zoegas below 50 SEK',
+            priority: 'high',
+            sendAt: '2026-05-23T00:00:00.000Z',
+            recipient: 'ExponentPushToken[device]',
+            attemptCount: 0,
+            maxAttempts: 3,
+            status: 'queued'
+          }
+        ];
+      },
+      async listActiveNotificationSuppressions() { return []; },
+      async upsertNotificationTask(task: PersistedNotificationTask) { if (task.status === 'delivered') deliveredTaskIds.push(task.id); }
+    };
+
+    const service = createRuntimeHttpService(
+      {
+        NODE_ENV: 'development',
+        PORT: '3000',
+        AUTH_SECRET: 'auth-secret',
+        PUBLIC_WEB_URL: 'https://groceryview.example',
+        NOTIFICATION_WEBHOOK_SECRET: 'notification-secret',
+        SENDGRID_API_KEY: 'sendgrid-runtime-key',
+        SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+        EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+        BILLING_WEBHOOK_SECRET: 'billing-secret',
+        METRICS_TOKEN: 'metrics-secret'
+      },
+      {
+        repository,
+        now: new Date('2026-05-23T00:01:00.000Z'),
+        notificationProviderFetch: async (url: string, init: RequestInit) => {
+          providerCalls.push({
+            url: String(url),
+            body: JSON.parse(String(init.body)),
+            authorization: (init.headers as Record<string, string>).authorization
+          });
+          if (String(url).includes('sendgrid')) return new Response('', { status: 202, headers: { 'x-message-id': 'sg-runtime-1' } });
+          return Response.json({ data: [{ status: 'ok', id: 'expo-runtime-1' }] });
+        }
+      }
+    );
+
+    const response = await service.handler(new Request('http://localhost/api/workers/notifications/run', {
+      method: 'POST',
+      headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+    }));
+
+    assert.equal(response.status, 202);
+    const body = await response.json() as { report: { status: string }; worker: { delivered: number } };
+    assert.equal(body.report.status, 'healthy');
+    assert.equal(body.worker.delivered, 2);
+    assert.deepEqual(deliveredTaskIds.sort(), ['email-task', 'push-task']);
+    assert.deepEqual(providerCalls.map((call) => [call.url, call.authorization]), [
+      ['https://api.sendgrid.com/v3/mail/send', 'Bearer sendgrid-runtime-key'],
+      ['https://exp.host/--/api/v2/push/send', 'Bearer expo-runtime-token']
+    ]);
   });
 
   it('exposes PostgreSQL readiness from the runtime DATABASE_URL pool without leaking secrets', async () => {
