@@ -58,6 +58,12 @@ export type HemkopStore = {
   retrievedAt: string;
 };
 
+export type HemkopStoreProduct = HemkopProduct & {
+  storeId: string;
+  storeName: string;
+  city: string;
+};
+
 type HemkopSearchProduct = {
   code?: unknown;
   name?: unknown;
@@ -242,9 +248,16 @@ export const DEFAULT_HEMKOP_SEARCH_QUERIES = [
 export type FetchHemkopProductsOptions = {
   fetchImpl?: typeof fetch;
   queries?: readonly string[];
+  storeId?: string;
   maxRows?: number;
   pageSize?: number;
   retrievedAt?: string;
+};
+
+export type FetchHemkopProductsForAllStoresOptions = Omit<FetchHemkopProductsOptions, 'storeId' | 'maxRows'> & {
+  storeApiUrl?: string;
+  maxStores?: number;
+  maxRowsPerStore?: number;
 };
 
 export type FetchHemkopWeeklyDiscountsOptions = {
@@ -269,9 +282,10 @@ export type FetchHemkopStoresOptions = {
   storeApiUrl?: string;
 };
 
-export function buildHemkopSearchUrl(query: string, size?: number, page = 0): string {
+export function buildHemkopSearchUrl(query: string, size?: number, page = 0, storeId?: string): string {
   const url = new URL(HEMKOP_SEARCH_BASE_URL);
   url.searchParams.set('q', query);
+  if (storeId) url.searchParams.set('store', storeId);
   if (size !== undefined) {
     url.searchParams.set('page', String(page));
     url.searchParams.set('size', String(size));
@@ -340,7 +354,7 @@ export async function fetchHemkopProducts(options: FetchHemkopProductsOptions = 
     let pageCount: number | null = null;
 
     while (rows.length < maxRows && (pageCount === null || page < pageCount)) {
-      const sourceUrl = buildHemkopSearchUrl(query, pageSize, page);
+      const sourceUrl = buildHemkopSearchUrl(query, pageSize, page, options.storeId);
       const response = await fetchImpl(sourceUrl, {
         headers: {
           accept: 'application/json',
@@ -376,6 +390,51 @@ export async function fetchHemkopProducts(options: FetchHemkopProductsOptions = 
     }
   }
 
+  return rows;
+}
+
+
+export async function fetchHemkopProductsForAllStores(
+  options: FetchHemkopProductsForAllStoresOptions = {}
+): Promise<HemkopStoreProduct[]> {
+  const stores = await fetchHemkopStores({
+    fetchImpl: options.fetchImpl,
+    online: true,
+    maxRows: options.maxStores,
+    retrievedAt: options.retrievedAt,
+    storeApiUrl: options.storeApiUrl
+  });
+  const rows: HemkopStoreProduct[] = [];
+  const failures: string[] = [];
+  const concurrency = 8;
+  for (let index = 0; index < stores.length; index += concurrency) {
+    const batch = stores.slice(index, index + concurrency);
+    const settled = await Promise.allSettled(batch.map(async (store) => {
+      const products = await fetchHemkopProducts({
+        fetchImpl: options.fetchImpl,
+        queries: options.queries,
+        storeId: store.storeId,
+        maxRows: options.maxRowsPerStore ?? 24,
+        pageSize: options.maxRowsPerStore ?? options.pageSize,
+        retrievedAt: options.retrievedAt
+      });
+      return products.map((product) => ({
+        ...product,
+        storeId: store.storeId,
+        storeName: store.name,
+        city: store.city
+      }));
+    }));
+    for (let offset = 0; offset < settled.length; offset += 1) {
+      const result = settled[offset]!;
+      if (result.status === 'fulfilled') {
+        rows.push(...result.value);
+      } else {
+        failures.push(`${batch[offset]?.storeId ?? 'unknown'}:${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
+      }
+    }
+  }
+  if (rows.length === 0 && failures.length > 0) throw new Error(`Hemkop all-store product requests returned no usable branch products: ${failures[0]}`);
   return rows;
 }
 

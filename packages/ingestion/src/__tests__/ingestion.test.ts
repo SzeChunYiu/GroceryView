@@ -57,6 +57,7 @@ import {
   fetchCoopWeeklyDiscounts,
   fetchCoopWeeklyDiscountsForAllStores,
   fetchHemkopProducts,
+  fetchHemkopProductsForAllStores,
   fetchHemkopStores,
   fetchHemkopWeeklyDiscounts,
   fetchHemkopWeeklyDiscountsForAllStores,
@@ -80,6 +81,7 @@ import {
   GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
+  GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
@@ -1488,6 +1490,48 @@ describe('fetchHemkopProducts', () => {
 
     assert.equal(rows.length, 1);
   });
+
+  it('fans Hemkop branch product prices across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: { line1: 'Masthuggstorget 3', town: 'Göteborg' } },
+          { storeId: '4798', name: 'Hemköp Bollnäs', address: { line1: 'Långgatan 10', town: 'Bollnäs' } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('store') ?? 'unknown';
+      return new Response(JSON.stringify({ results: [{
+        code: `hemkop-store-product-${storeId}`,
+        name: `Hemkop product ${storeId}`,
+        manufacturer: 'Hemköp',
+        productLine2: '500g',
+        googleAnalyticsCategory: 'Kaffe',
+        priceValue: 42,
+        price: '42,00 kr'
+      }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopProductsForAllStores({
+      fetchImpl,
+      queries: ['kaffe'],
+      maxStores: 2,
+      maxRowsPerStore: 1,
+      retrievedAt: '2026-05-23T02:20:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildHemkopStoresUrl({ online: true }),
+      buildHemkopSearchUrl('kaffe', 1, 0, '4003'),
+      buildHemkopSearchUrl('kaffe', 1, 0, '4798')
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.storeName, row.code]), [
+      ['4003', 'Hemköp Göteborg Masthuggstorget', 'hemkop-store-product-4003'],
+      ['4798', 'Hemköp Bollnäs', 'hemkop-store-product-4798']
+    ]);
+  });
+
 });
 
 describe('fetchHemkopWeeklyDiscounts', () => {
@@ -4673,6 +4717,54 @@ describe('daily ingestion runner', () => {
     const observation = firstBatchObservation(executor);
     assert.equal(observation.store_id, 'store-db-2');
     assert.equal(observation.price, 19.5);
+  });
+
+
+  it('materializes native Hemkop all-store branch product prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T13:47:00.000Z',
+      connectors: [{
+        connectorId: 'hemkop-products-all-stores',
+        chainId: 'hemkop',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL}?queries=kaffe&maxStores=1&maxRowsPerStore=1`,
+        parserVersion: 'hemkop-products-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: 'Masthuggstorget 3', city: 'Göteborg' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/axfood/rest/store')) {
+          return new Response(JSON.stringify([
+            { storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: { line1: 'Masthuggstorget 3', town: 'Göteborg' }, onlineStore: true }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({ results: [{
+          code: '101205621_ST',
+          name: 'Idealmakaroner Gammaldags',
+          manufacturer: 'Kungsörnen',
+          productLine2: '750g',
+          googleAnalyticsCategory: 'Skafferi',
+          priceValue: 14.14,
+          price: '14,14 kr'
+        }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildHemkopStoresUrl({ online: true }),
+      buildHemkopSearchUrl('kaffe', 1, 0, '4003')
+    ]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 14.14);
   });
 
   it('materializes native Hemkop all-store weekly offers into daily database observations', async () => {

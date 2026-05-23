@@ -54,6 +54,16 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: true
   },
   {
+    connectorId: 'hemkop-products-all-stores',
+    chainId: 'hemkop',
+    sourceType: 'official_api',
+    endpointUrl: 'groceryview://daily/hemkop/products/all-stores',
+    parserVersion: 'hemkop-products-native-v1',
+    robotsTxtStatus: 'not_applicable',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: true
+  },
+  {
     connectorId: 'hemkop-weekly-all-stores',
     chainId: 'hemkop',
     sourceType: 'flyer_campaign',
