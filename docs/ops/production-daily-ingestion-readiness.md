@@ -4,13 +4,12 @@ This runbook is the operator path for enabling the daily ingestion objective:
 DB ready, data ingested every day, all required chains covered, and product-by-store
 coverage checked after every run.
 
-## Required secrets
+## Required secrets and variables
 
-GitHub Actions / deployment must have these names configured:
+GitHub Actions / deployment must have these secret-only names configured:
 
 - `AUTH_SECRET`
 - `DATABASE_URL`
-- `PUBLIC_WEB_URL`
 - `NOTIFICATION_WEBHOOK_SECRET`
 - `BILLING_WEBHOOK_SECRET`
 - `STRIPE_SECRET_KEY`
@@ -18,8 +17,15 @@ GitHub Actions / deployment must have these names configured:
 - `STRIPE_PRICE_PREMIUM_YEARLY`
 - `METRICS_TOKEN`
 - `GROCERYVIEW_SERVER_URL`
-- `GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN`
 - `CATALOG_COVERAGE_TARGETS_JSON`
+
+These runtime values may be configured as a GitHub variable or secret:
+
+- `PUBLIC_WEB_URL`
+- `GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN`
+
+The daily workflow injects either form into the runtime environment, and
+`ops:check-production-secrets` accepts either source.
 
 Check names without exposing values:
 
@@ -78,8 +84,8 @@ flyer promotions cannot satisfy branch branch-product-price readiness by themsel
 
 ## Configure source-run row thresholds
 
-Set `GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN` in the deployment/GitHub
-secret store to the minimum accepted product rows required before
+Set `GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN` as a deployment/GitHub
+variable or secret to the minimum accepted product rows required before
 `/api/readiness/source-runs` treats a fresh daily source run as meaningful. The
 value is compact JSON keyed by required chain id:
 
