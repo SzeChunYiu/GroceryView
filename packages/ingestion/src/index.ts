@@ -66,6 +66,7 @@ import {
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';
+export * from './connectors/fuel-stations.js';
 export * from './connectors/citygross.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
@@ -77,6 +78,7 @@ export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/willys.js';
+export * from './store-enumerator.js';
 
 export type SourceType =
   | 'official_api'

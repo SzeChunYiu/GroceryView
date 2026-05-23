@@ -12,6 +12,7 @@ codex-tasks/
 packages/*/dist/
 packages/*/dist-test/
 apps/*/dist/
+apps/*/.next/
 packages/core/src/*.js
 apps/*/dist-test/
 __pycache__/

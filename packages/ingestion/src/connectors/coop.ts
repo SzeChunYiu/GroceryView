@@ -1320,7 +1320,7 @@ export async function extractCoopDrPdfText(input: ArrayBuffer): Promise<string> 
     const page = await document.getPage(pageNumber);
     const content = await page.getTextContent();
     const lines = content.items
-      .map((item) => 'str' in item ? text(item.str) : '')
+      .map((item: { str?: unknown }) => typeof item.str === 'string' ? text(item.str) : '')
       .filter(Boolean);
     pages.push(lines.join('\n'));
   }

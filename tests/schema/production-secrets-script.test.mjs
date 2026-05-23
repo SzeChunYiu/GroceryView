@@ -271,15 +271,18 @@ process.exit(1);
     const result = spawnSync(process.execPath, [scriptPath.pathname, '--from-env', '--scope', 'db-cutover'], {
       encoding: 'utf8',
       env: {
-        DATABASE_URL: 'postgres://current'
+        DATABASE_URL: 'postgres://current',
+        SUPABASE_ACCESS_TOKEN: 'not-a-management-token'
       }
     });
     assert.equal(result.status, 1);
     const output = JSON.parse(result.stdout);
     assert.equal(output.scope, 'db-cutover');
     assert.equal(output.status, 'blocked');
+    assert.equal(output.blocker, 'db_cutover_prerequisites_missing');
     assert.deepEqual(output.missingDbCutoverSecrets, []);
     assert.deepEqual(output.missingDbCutoverCandidateSecrets, ['REPLACEMENT_DATABASE_URL', 'CANDIDATE_DATABASE_URL']);
+    assert.deepEqual(output.invalidDbRecoverySecrets, ['SUPABASE_ACCESS_TOKEN']);
 
     const readyResult = spawnSync(process.execPath, [scriptPath.pathname, '--from-env', '--scope', 'db-cutover'], {
       encoding: 'utf8',

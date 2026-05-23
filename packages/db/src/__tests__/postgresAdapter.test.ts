@@ -324,6 +324,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       currency: 'SEK',
       observed_at: '2026-05-20T09:00:00.000Z',
       confidence: 0.88,
+      member_required: false,
       provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
     }
   ];
@@ -333,6 +334,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       product_slug: 'bryggkaffe-450g',
       canonical_name: 'Bryggkaffe mellanrost 450 g',
       brand: 'Rosteriet',
+      image_url: 'https://example.invalid/coffee.png',
       category_path: ['Pantry', 'Coffee'],
       package_size: '450.000',
       package_unit: 'g',
@@ -353,6 +355,13 @@ class RecordingQueryExecutor implements QueryExecutor {
       currency: 'SEK',
       observed_at: '2026-05-20T09:00:00.000Z',
       confidence: 0.88,
+      promotion_text: null,
+      promotion_starts_on: null,
+      promotion_ends_on: null,
+      member_required: false,
+      valid_from: null,
+      valid_until: null,
+      retailer_product_ref: null,
       provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
     }
   ];
@@ -1803,6 +1812,7 @@ describe('createPostgresSiteSnapshotReader', () => {
         productSlug: 'bryggkaffe-450g',
         canonicalName: 'Bryggkaffe mellanrost 450 g',
         brand: 'Rosteriet',
+        imageUrl: 'https://example.invalid/coffee.png',
         categoryPath: ['Pantry', 'Coffee'],
         packageSize: 450,
         packageUnit: 'g',
@@ -1823,15 +1833,18 @@ describe('createPostgresSiteSnapshotReader', () => {
         currency: 'SEK',
         observedAt: '2026-05-20T09:00:00.000Z',
         confidence: 0.88,
+        memberRequired: false,
         provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
       }
     ]);
 
     assert.match(executor.calls[0]!.sql, /from latest_prices/);
+    assert.match(executor.calls[0]!.sql, /join observations on observations\.id = latest_prices\.observation_id/);
     assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
     assert.match(executor.calls[0]!.sql, /join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.confidence >= \$1/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.domain = 'grocery'/);
     assert.deepEqual(executor.calls[0]!.params, [0.8, 25]);
   });
 });

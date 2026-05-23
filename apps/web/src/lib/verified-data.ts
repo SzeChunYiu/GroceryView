@@ -4,12 +4,22 @@ import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, 
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
 import { icaStorePromotionSourceSummary } from './ingested/ica-source-summary';
-import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
-import { mathemProducts, mathemSource } from './ingested/mathem';
+import { icaReklambladOffers as staticIcaReklambladOffers, icaReklambladSource as staticIcaReklambladSource } from './ingested/ica-reklamblad';
+import { mathemProducts as staticMathemProducts, mathemSource as staticMathemSource } from './ingested/mathem';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
-import { lidlStoreOffers, lidlSource } from './ingested/lidl';
-import { matpriskollenOffers } from './ingested/matpriskollen';
+import { lidlStoreOffers as staticLidlStoreOffers, lidlSource as staticLidlSource } from './ingested/lidl';
+import { matpriskollenOffers as staticMatpriskollenOffers } from './ingested/matpriskollen';
 import { verifiedFuelPriceObservations, verifiedFuelPriceSource } from './fuel-prices';
+import {
+  dbSiteIcaReklambladOffers,
+  dbSiteIcaReklambladSource,
+  dbSiteLidlSource,
+  dbSiteLidlStoreOffers,
+  dbSiteMathemProducts,
+  dbSiteMathemSource,
+  dbSiteMatpriskollenOffers,
+  dbSiteMatpriskollenSource
+} from './generated/db-site-ingested-overrides';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { osmStores } from './osm-stores';
 import {
@@ -20,6 +30,14 @@ import {
   formatLocalizedUnitPrice,
   supportedCurrencies
 } from './i18n';
+
+const icaReklambladOffers = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladOffers : staticIcaReklambladOffers;
+const icaReklambladSource = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladSource : staticIcaReklambladSource;
+const mathemProducts = dbSiteMathemProducts.length > 0 ? dbSiteMathemProducts : staticMathemProducts;
+const mathemSource = dbSiteMathemProducts.length > 0 ? dbSiteMathemSource : staticMathemSource;
+const lidlStoreOffers = dbSiteLidlStoreOffers.length > 0 ? dbSiteLidlStoreOffers : staticLidlStoreOffers;
+const lidlSource = dbSiteLidlStoreOffers.length > 0 ? dbSiteLidlSource : staticLidlSource;
+const matpriskollenOffers = dbSiteMatpriskollenOffers.length > 0 ? dbSiteMatpriskollenOffers : staticMatpriskollenOffers;
 
 export const snapshot = {
   retrievedLabel: '20-21 May 2026',
@@ -1667,6 +1685,64 @@ export const icaStorePromotionEvidence = {
     'Rows come from ICA public store-scoped promotion listing JSON and retain storeAccountId, regionId, retrievedAt, and sourceUrl evidence.',
     'No branch shelf-price claim: these are promotion listing rows, not guaranteed in-store shelf prices, stock levels, or checkout totals.',
     'The latest-store card is a provenance surface only; it does not rank ICA branches or compare availability across stores.'
+  ]
+};
+
+export const allStoreDailyRunnerReadiness = {
+  title: 'All-store daily batch runner',
+  status: 'visible_workflow_contract_ready',
+  runnerPath: 'packages/ingestion/src/connectors/all-store-runner.ts',
+  workflowPath: '.github/workflows/daily-ingestion.yml',
+  storeEnumerationArtifact: 'groceryview-daily-connector-stores',
+  connectorArtifact: 'groceryview-daily-connectors',
+  requiredChains: ['ICA', 'Willys', 'Coop', 'Hemköp', 'Lidl', 'City Gross'],
+  runnerControls: [
+    {
+      name: 'storeConcurrency',
+      defaultValue: '4 workers',
+      purpose: 'caps concurrent branch fetches so all-store jobs can finish without overloading retailer endpoints'
+    },
+    {
+      name: 'storeStartDelayMs',
+      defaultValue: '0 ms',
+      purpose: 'optionally spaces store starts for conservative production runs'
+    },
+    {
+      name: 'storeRetryAttempts',
+      defaultValue: '1 retry',
+      purpose: 'retries transient per-store fetch failures before recording a store failure'
+    },
+    {
+      name: 'storeRetryBaseDelayMs',
+      defaultValue: '250 ms',
+      purpose: 'applies a bounded backoff between per-store retries'
+    },
+    {
+      name: 'failOnStoreFailure',
+      defaultValue: 'false unless configured',
+      purpose: 'lets production decide whether any branch failure should block the daily run'
+    }
+  ],
+  allStoreConnectorUrls: [
+    { chain: 'Willys', scope: 'weekly offers', url: 'groceryview://daily/willys/weekly-offers/all-stores' },
+    { chain: 'Willys', scope: 'products', url: 'groceryview://daily/willys/products/all-stores' },
+    { chain: 'Hemköp', scope: 'products', url: 'groceryview://daily/hemkop/products/all-stores' },
+    { chain: 'Hemköp', scope: 'weekly offers', url: 'groceryview://daily/hemkop/weekly-offers/all-stores' },
+    { chain: 'Coop', scope: 'weekly offers', url: 'groceryview://daily/coop/weekly-offers/all-stores' },
+    { chain: 'Coop', scope: 'products', url: 'groceryview://daily/coop/products/all-stores' },
+    { chain: 'Lidl', scope: 'public offers', url: 'groceryview://daily/lidl/public-offers/all-stores' },
+    { chain: 'City Gross', scope: 'public products', url: 'groceryview://daily/city-gross/public-products/all-stores' }
+  ],
+  workflowSteps: [
+    'Export live store enumeration',
+    'Validate production ingestion configuration',
+    'Run daily ingestion',
+    'Upload deployed readiness evidence'
+  ],
+  guardrails: [
+    'This is an operator-readiness contract, not proof that production has completed a fresh all-store run today.',
+    'All-store connector URLs enumerate branches for supported chains before daily writes; missing secrets or DB blockers still fail closed.',
+    'Per-store fetch failures stay visible through runner failure rows instead of being hidden behind a partial aggregate.'
   ]
 };
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import {
+  allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
   categoryQualityMatrix,
   commodityIngestionClassifierEvidence,
@@ -39,6 +40,56 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <Card className="mt-6 border-lime-200 bg-lime-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-lime-800">All-store daily batch runner</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">{allStoreDailyRunnerReadiness.title}</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              All-store daily ingestion now has a visible readiness contract: the workflow enumerates live stores, emits daily connector configs, and passes bounded runner controls into branch-scoped connectors before source-run evidence can be accepted.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-lime-900 shadow-sm">{allStoreDailyRunnerReadiness.status}</p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {allStoreDailyRunnerReadiness.runnerControls.map((control) => (
+            <section className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm" key={control.name}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">{control.name}</p>
+              <p className="mt-2 text-sm font-black text-slate-950">{control.defaultValue}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{control.purpose}</p>
+            </section>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          <section className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">All-store connector URLs</p>
+            <div className="mt-3 space-y-3">
+              {allStoreDailyRunnerReadiness.allStoreConnectorUrls.map((connector) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={connector.url}>
+                  <p className="text-sm font-black text-slate-950">{connector.chain} · {connector.scope}</p>
+                  <p className="mt-1 break-all font-mono text-xs font-semibold text-slate-600">{connector.url}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+          <section className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">Workflow evidence</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{allStoreDailyRunnerReadiness.workflowPath}</p>
+            <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">{allStoreDailyRunnerReadiness.runnerPath}</p>
+            <div className="mt-3 grid gap-2">
+              {allStoreDailyRunnerReadiness.workflowSteps.map((step) => (
+                <p className="rounded-xl bg-lime-50 p-3 text-sm font-bold text-lime-950" key={step}>{step}</p>
+              ))}
+            </div>
+          </section>
+        </div>
+        <ul className="mt-4 grid gap-2 text-sm font-semibold leading-6 text-lime-950 md:grid-cols-3">
+          {allStoreDailyRunnerReadiness.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white p-3" key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
+      </Card>
 
       <Card className="mt-6 border-red-200 bg-red-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">

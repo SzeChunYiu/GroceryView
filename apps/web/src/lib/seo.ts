@@ -93,6 +93,10 @@ export const routeMetadataCatalog = {
     title: 'Verified grocery deal radar | GroceryView',
     description: 'Find expiry deals, single-portion deals, lunchbox deals, and trusted deal opportunities from visible source-backed rows.'
   },
+  '/expiry-deals': {
+    title: 'Near-expiry grocery deal radar | GroceryView',
+    description: 'Surface near-expiry markdowns from timestamped product rows with verification, stale evidence, and confidence labels.'
+  },
   '/fuel': {
     title: 'Fuel prices by grade | GroceryView',
     description: 'View source-backed fuel observations by grade with price per litre, domain=fuel modeling, and operator provenance.'

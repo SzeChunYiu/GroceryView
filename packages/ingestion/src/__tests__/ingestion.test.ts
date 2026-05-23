@@ -35,6 +35,8 @@ import {
   buildOpenPricesConnectorUrl,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
+  BRANDED_FUEL_STATIONS_OVERPASS_URL,
+  BRANDED_SWEDISH_FUEL_STATION_CHAINS,
   confidenceForSource,
   buildSwedishCountyFuelOverpassQuery,
   buildSwedishCountyGroceryOverpassQuery,
@@ -50,6 +52,7 @@ import {
   fetchOpenFoodFactsSwedenCatalog,
   fetchOkq8FuelPrices,
   fetchOpenFoodFactsRetailerEnrichments,
+  fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
@@ -104,6 +107,7 @@ import {
   offerSelectorFixturesCanEmitOfferFacts,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
+  parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
@@ -117,17 +121,36 @@ import {
   OVERPASS_INTERPRETER_URL,
   STOCKHOLM_FUEL_OVERPASS_QUERY,
   STOCKHOLM_GROCERY_OVERPASS_QUERY,
+  STORE_ENUMERATOR_OVERPASS_URL,
+  SWEDEN_BRANDED_FUEL_STATIONS_OVERPASS_QUERY,
   SWEDEN_FUEL_OVERPASS_QUERY,
   SWEDEN_GROCERY_OVERPASS_QUERY,
   SWEDISH_COUNTY_ISO3166_2_CODES,
+  buildAxfoodStoreSearchUrl,
+  buildCoopStoreMapUrl,
+  fetchStoreEnumeratorStores,
+  mergeStoreEnumerations,
+  normalizeAxfoodStore,
+  normalizeLidlStoreFromUrl,
+  normalizeOsmSupermarket,
+  parseCityGrossStores,
+  parseCoopStoreMap,
+  parseCoopStoreServiceAccess,
+  parseIcaInitialStores,
+  parseIcaStoresHtml,
+  parseLidlCityStores,
+  parseLidlOverviewLinks,
+  parseOsmSupermarkets,
   parseOverpassFuelStations,
   parseOverpassGroceryStores,
   retailerRobotsPolicyMatrix,
   runAllStoreTasks,
   runRetailerConnector,
   runDailyIngestion,
+  storeEnumeratorSources,
   runOpenFoodFactsProductMetadataEnrichment,
   stockholmStoreLocatorFixtures,
+  validateEnumeratedStores,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
   scbCoicopFoodCategoryCodes,
@@ -146,6 +169,171 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+
+describe('store enumerator', () => {
+  const capturedAt = '2026-05-23T13:45:00.000Z';
+
+  it('parses every supported official locator shape into typed branch rows with citations', async () => {
+    const icaFallbackRows = parseIcaStoresHtml(`
+      <div class="ids-store-card__short-info">
+        <span class="ids-store-card__store-name">ICA Nära A-Livs</span>
+        <span class="ids-store-card__store-address">Gamla Vägen 91, Fjälkinge</span>
+        <a href="https://www.ica.se/butiker/nara/kristianstad/ica-nara-a-livs-1004177/">Gå till butikssidan</a>
+      </div>
+    `, capturedAt);
+    const icaRows = parseIcaInitialStores(`
+      <script>window.__INITIAL_DATA__ = {"SlimStores":{"slimStores":[{
+        "storeId":"884",
+        "accountNumber":"1004058",
+        "storeName":"ICA Trumpeten Kristinehamn",
+        "address":{"street":"Djurgårdsvägen 33","city":"Kristinehamn","postalCode":"68153"},
+        "lat":"59.30028",
+        "lng":"14.09321",
+        "bhsUrl":"https:\u002F\u002Fwww.ica.se\u002Fbutiker\u002Fnara\u002Fkristinehamn\u002Fica-nara-kristinehamn-1004058\u002F",
+        "todayOpeningHours":{"label":"Lördag","opens":"09:00","closes":"21:00","isClosed":false}
+      }]}};</script>
+    `, capturedAt);
+
+    const willysRows = [
+      normalizeAxfoodStore('willys', {
+        storeId: '2149',
+        displayName: 'Willys Alingsås Hagaplan',
+        geoPoint: { latitude: 57.9374, longitude: 12.5333 },
+        openingHours: ['Mån 08:00-21:00'],
+        address: { line1: 'Hagaplan', postalCode: '44134', town: 'Alingsås', phoneNumber: '0322-651980' }
+      }, buildAxfoodStoreSearchUrl('willys'), capturedAt)
+    ].filter((row): row is NonNullable<typeof row> => row !== null);
+
+    const hemkopRows = [
+      normalizeAxfoodStore('hemkop', {
+        storeId: '4660',
+        displayName: 'Hemköp Alingsås',
+        geoPoint: { latitude: 57.9262, longitude: 12.5256 },
+        openingHours: ['Mån 07:00-21:00'],
+        address: { line1: 'Sveagatan 8', postalCode: '44132', town: 'Alingsås', phoneNumber: '0322-611977' }
+      }, buildAxfoodStoreSearchUrl('hemkop'), capturedAt)
+    ].filter((row): row is NonNullable<typeof row> => row !== null);
+
+    assert.deepEqual(parseCoopStoreServiceAccess(`
+      <script>window.coopSettings = {"serviceAccess":{"storeApiUrl":"https://proxy.api.coop.se/external/store/","storeApiSubscriptionKey":"public-store-key"}}</script>
+    `), {
+      storeApiUrl: 'https://proxy.api.coop.se/external/store/',
+      storeApiSubscriptionKey: 'public-store-key'
+    });
+
+    const coopRows = parseCoopStoreMap([{
+      storeId: 598,
+      ledgerAccountNumber: '196183',
+      name: 'Coop Krylbo',
+      address: 'Järnvägsgatan 16',
+      phone: '010-7412170',
+      latitude: 60.1307271,
+      longitude: 16.213442,
+      url: '/butiker-erbjudanden/coop/coop-krylbo/',
+      city: 'Krylbo',
+      postalCode: '77571',
+      openingHoursToday: '9-20'
+    }], buildCoopStoreMapUrl('https://proxy.api.coop.se/external/store/'), capturedAt);
+
+    const cityGrossRows = parseCityGrossStores([{
+      data: {
+        id: 3094,
+        siteId: 21,
+        name: 'Borås',
+        storeName: 'Borås',
+        url: '/butiker/boras/',
+        storeLocation: { coordinates: '57.7141742,12.866981900000042' }
+      }
+    }], 'https://www.citygross.se/api/v1/PageData/stores', capturedAt);
+
+    const lidlOverview = parseLidlOverviewLinks(`
+      <a class="stores-overview-country__link-city" href="/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/">Alingsås</a>
+      <a href="/s/sv-SE/butiker/stockholm/" class="stores-overview-country__link-city">Stockholm</a>
+    `);
+    const lidlRows = [
+      ...lidlOverview.stores.map((store) => normalizeLidlStoreFromUrl(store.url, store.address.raw, store.sourceRefs[0].sourceUrl, capturedAt)),
+      ...parseLidlCityStores(`
+        <a class="store-tile-detail-page__link" aria-label="Lidl-butik Folkungagatan 51, 116 22 Stockholm" href="/s/sv-SE/butiker/stockholm/folkungagatan-51/"></a>
+      `, lidlOverview.cityUrls[0], capturedAt)
+    ];
+
+    const rows = [...icaRows, ...willysRows, ...hemkopRows, ...coopRows, ...cityGrossRows, ...lidlRows];
+    const validation = validateEnumeratedStores(rows);
+
+    assert.equal(icaFallbackRows[0]?.retailerStoreId, '1004177');
+    assert.equal(icaRows[0]?.retailerStoreId, '1004058');
+    assert.equal(icaRows[0]?.coordinates?.latitude, 59.30028);
+    assert.equal(validation.status, 'valid');
+    assert.deepEqual(validation.chainIds, ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys']);
+    assert.equal(rows.find((row) => row.chainId === 'city_gross')?.coordinates?.latitude, 57.7141742);
+    assert.ok(rows.every((row) => row.sourceRefs.every((ref) => ref.sourceUrl.startsWith('https://'))));
+    assert.ok(storeEnumeratorSources.some((source) => source.sourceId === 'osm-overpass-supermarkets'));
+  });
+
+  it('normalizes OSM supermarket rows and merges them without dropping official locator ids', () => {
+    const official = parseCoopStoreMap([{
+      storeId: 598,
+      name: 'Coop Krylbo',
+      address: 'Järnvägsgatan 16',
+      city: 'Krylbo',
+      postalCode: '77571',
+      url: '/butiker-erbjudanden/coop/coop-krylbo/'
+    }], buildCoopStoreMapUrl('https://proxy.api.coop.se/external/store/'), capturedAt);
+    const osmRows = parseOsmSupermarkets({
+      elements: [{
+        type: 'node',
+        id: 123,
+        lat: 60.1307,
+        lon: 16.2134,
+        tags: {
+          shop: 'supermarket',
+          brand: 'Coop',
+          name: 'Coop Krylbo',
+          website: 'https://www.coop.se/butiker-erbjudanden/coop/coop-krylbo/',
+          'addr:city': 'Krylbo'
+        }
+      }]
+    }, capturedAt);
+
+    const merged = mergeStoreEnumerations(official, osmRows);
+
+    assert.equal(normalizeOsmSupermarket({
+      type: 'node',
+      id: 456,
+      tags: { amenity: 'supermarket', brand: 'Lidl', name: 'Lidl Test' }
+    }, capturedAt)?.identifierKind, 'osm_element');
+    assert.equal(merged.length, 1);
+    assert.equal(merged[0].storeId, 'coop:598');
+    assert.deepEqual(merged[0].sourceRefs.map((ref) => ref.sourceId).sort(), ['coop-store-map', 'osm-overpass-supermarkets']);
+    assert.equal(merged[0].sourceRefs.find((ref) => ref.sourceId === 'osm-overpass-supermarkets')?.sourceUrl, STORE_ENUMERATOR_OVERPASS_URL);
+  });
+
+  it('lets the bulk runner fetch selected chains with one typed loop surface', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          storeId: String(url).includes('willys') ? '2149' : '4660',
+          displayName: String(url).includes('willys') ? 'Willys Alingsås Hagaplan' : 'Hemköp Alingsås',
+          address: { line1: 'Testgatan 1', postalCode: '11122', town: 'Teststad' }
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchStoreEnumeratorStores({
+      chains: ['willys', 'hemkop'],
+      includeOsm: false,
+      fetchImpl,
+      retrievedAt: capturedAt
+    });
+
+    assert.deepEqual(rows.map((row) => row.storeId), ['willys:2149', 'hemkop:4660']);
+    assert.equal(requestedUrls[0], buildAxfoodStoreSearchUrl('willys'));
+    assert.equal(requestedUrls[1], buildAxfoodStoreSearchUrl('hemkop'));
   });
 });
 
@@ -1553,6 +1741,79 @@ describe('fetchOverpassFuelStations', () => {
 
     assert.equal(rows.length, 1);
     assert.equal(rows[0].name, 'Valid station');
+  });
+});
+
+describe('fetchBrandedSwedishFuelStations', () => {
+  it('posts a Sweden amenity=fuel Overpass query for the requested fuel chains', async () => {
+    const requestedBodies: string[] = [];
+    const fetchImpl: typeof fetch = async (url, init) => {
+      assert.equal(String(url), BRANDED_FUEL_STATIONS_OVERPASS_URL);
+      assert.equal(init?.method, 'POST');
+      requestedBodies.push(String(init?.body));
+      return new Response(JSON.stringify({
+        elements: [{
+          type: 'node',
+          id: 29592701,
+          lat: 59.5174583,
+          lon: 18.0722494,
+          tags: {
+            amenity: 'fuel',
+            brand: 'Circle K',
+            name: 'Circle K',
+            website: 'https://www.circlek.se/station/circle-k-vallentuna'
+          }
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchBrandedSwedishFuelStations({
+      fetchImpl,
+      retrievedAt: '2026-05-23T12:00:00.000Z'
+    });
+
+    const postedQuery = new URLSearchParams(requestedBodies[0]).get('data') ?? '';
+    assert.match(postedQuery, /ISO3166-1/);
+    assert.match(postedQuery, /amenity"="fuel/);
+    for (const chain of BRANDED_SWEDISH_FUEL_STATION_CHAINS) {
+      assert.match(postedQuery, new RegExp(chain));
+    }
+    assert.equal(SWEDEN_BRANDED_FUEL_STATIONS_OVERPASS_QUERY.includes('Circle K'), true);
+    assert.deepEqual(rows, [{
+      osmType: 'node',
+      osmId: 29592701,
+      name: 'Circle K',
+      chain: 'Circle K',
+      brand: 'Circle K',
+      operator: '',
+      amenity: 'fuel',
+      latitude: 59.5174583,
+      longitude: 18.0722494,
+      street: '',
+      houseNumber: '',
+      postcode: '',
+      city: '',
+      openingHours: '',
+      website: 'https://www.circlek.se/station/circle-k-vallentuna',
+      phone: '',
+      sourceUrl: BRANDED_FUEL_STATIONS_OVERPASS_URL,
+      retrievedAt: '2026-05-23T12:00:00.000Z'
+    }]);
+  });
+
+  it('keeps only requested fuel chains with coordinates', () => {
+    const rows = parseBrandedSwedishFuelStations({
+      elements: [
+        { type: 'node', id: 1, lat: 59, lon: 18, tags: { amenity: 'fuel', brand: 'OKQ8', name: 'OKQ8 Test' } },
+        { type: 'node', id: 2, lat: 59, lon: 18, tags: { amenity: 'fuel', brand: 'Other Fuel' } },
+        { type: 'node', id: 3, tags: { amenity: 'fuel', brand: 'Preem', name: 'Missing coordinates' } },
+        { type: 'node', id: 4, lat: 59, lon: 18, tags: { amenity: 'charging_station', brand: 'Circle K' } }
+      ]
+    }, '2026-05-23T12:00:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].chain, 'OKQ8');
+    assert.equal(rows[0].amenity, 'fuel');
   });
 });
 
