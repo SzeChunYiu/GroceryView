@@ -65,10 +65,12 @@ describe('production env value validation script', () => {
   });
 
 
-  it('accepts daily connector config by file path to avoid oversized process environments', async () => {
+  it('accepts daily connector and catalog coverage target config by file path to avoid oversized process environments', async () => {
     const { validateProductionEnv } = await import(scriptPath);
     const chains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
-    const connectorPath = join(mkdtempSync(join(tmpdir(), 'groceryview-connectors-')), 'connectors.json');
+    const tempDir = mkdtempSync(join(tmpdir(), 'groceryview-production-env-'));
+    const connectorPath = join(tempDir, 'connectors.json');
+    const catalogTargetPath = join(tempDir, 'catalog-targets.json');
     writeFileSync(connectorPath, JSON.stringify(chains.map((chainId) => ({
       connectorId: `${chainId}-normalized-json`,
       chainId,
@@ -80,6 +82,15 @@ describe('production env value validation script', () => {
       hasDataAgreement: true,
       stores: [{ storeId: `${chainId}-odenplan`, name: `${chainId} Odenplan`, address: 'Odenplan', city: 'Stockholm' }]
     }))));
+    writeFileSync(catalogTargetPath, JSON.stringify({
+      targetProducts: ['coffee'],
+      targetCategories: ['coffee'],
+      targetChains: chains,
+      targetStores: chains.map((chainId) => `${chainId}-odenplan`),
+      targetPriceTypes: ['online'],
+      requireEveryProductInEveryStore: false,
+      requireEveryStorePriceType: true
+    }));
 
     assert.equal(validateProductionEnv({
       AUTH_SECRET: 'test-auth-secret',
@@ -97,15 +108,7 @@ describe('production env value validation script', () => {
       OPENFOODFACTS_USER_AGENT: 'GroceryView/0.1 test@groceryview.se',
       OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
       GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE: connectorPath,
-      CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
-        targetProducts: ['coffee'],
-        targetCategories: ['coffee'],
-        targetChains: chains,
-        targetStores: chains.map((chainId) => `${chainId}-odenplan`),
-        targetPriceTypes: ['online'],
-        requireEveryProductInEveryStore: false,
-        requireEveryStorePriceType: true
-      })
+      CATALOG_COVERAGE_TARGETS_JSON_FILE: catalogTargetPath
     }).status, 'ready');
   });
 
