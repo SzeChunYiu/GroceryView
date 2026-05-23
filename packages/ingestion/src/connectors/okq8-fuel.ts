@@ -1,11 +1,11 @@
-export type FuelGradeId = 'fuel-95-e10' | 'fuel-98' | 'fuel-diesel' | 'fuel-hvo100' | 'fuel-e85';
+export type FuelGradeId = 'fuel-95-e10' | 'fuel-98' | 'fuel-diesel' | 'fuel-hvo100' | 'fuel-e85' | 'fuel-adblue';
 
 export type FuelPriceSourceKind = 'operator_public_price_page' | 'crowd_station_report';
 
 export type FuelPriceObservation = {
   domain: 'fuel';
   productId: FuelGradeId;
-  fuelGrade: '95' | '98' | 'diesel' | 'hvo100' | 'e85';
+  fuelGrade: '95' | '98' | 'diesel' | 'hvo100' | 'e85' | 'adblue';
   gradeLabel: string;
   chainId: 'okq8';
   operatorName: 'OKQ8';

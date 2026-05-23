@@ -359,6 +359,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_migration:012_price_rollups',
       'missing_migration:013_observations_partitioning',
       'missing_migration:014_fuel_price_sources',
+      'missing_migration:015_fuel_adblue_grade',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -439,6 +440,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'migration:012_price_rollups',
         'migration:013_observations_partitioning',
         'migration:014_fuel_price_sources',
+        'migration:015_fuel_adblue_grade',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',

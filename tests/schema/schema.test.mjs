@@ -104,6 +104,7 @@ describe('db/schema.sql', () => {
     assert.match(schema, /fuel-diesel/);
     assert.match(schema, /fuel-hvo100/);
     assert.match(schema, /fuel-e85/);
+    assert.match(schema, /fuel-adblue/);
     assert.match(schema, /source_kind in \('operator_public_price_page', 'crowd_station_report'\)/);
     assert.match(schema, /reporter_id text references community_reporter_trust/);
     assert.match(schema, /price_observation_id bigint not null references price_observations/);

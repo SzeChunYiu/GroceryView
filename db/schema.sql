@@ -240,8 +240,8 @@ create table if not exists community_reporter_trust (
 );
 
 create table if not exists fuel_grades (
-  id text primary key check (id in ('fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85')),
-  grade_code text not null unique check (grade_code in ('95', '98', 'diesel', 'hvo100', 'e85')),
+  id text primary key check (id in ('fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85', 'fuel-adblue')),
+  grade_code text not null unique check (grade_code in ('95', '98', 'diesel', 'hvo100', 'e85', 'adblue')),
   label text not null,
   comparable_unit text not null default 'l' check (comparable_unit = 'l'),
   match_key text not null default 'fuel_grade' check (match_key = 'fuel_grade'),

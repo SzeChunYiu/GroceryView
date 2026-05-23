@@ -3275,7 +3275,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '011_multi_vertical_domains',
   '012_price_rollups',
   '013_observations_partitioning',
-  '014_fuel_price_sources'
+  '014_fuel_price_sources',
+  '015_fuel_adblue_grade'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {

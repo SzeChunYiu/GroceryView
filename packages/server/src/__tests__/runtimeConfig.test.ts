@@ -106,7 +106,8 @@ class RecordingPgPool {
           '011_multi_vertical_domains',
           '012_price_rollups',
           '013_observations_partitioning',
-          '014_fuel_price_sources'
+          '014_fuel_price_sources',
+          '015_fuel_adblue_grade'
         ].map((version) => ({ version }))
       };
     }
@@ -1447,6 +1448,7 @@ describe('runtime config', () => {
       assert.equal(body.evidence.includes('migration:012_price_rollups'), true);
       assert.equal(body.evidence.includes('migration:013_observations_partitioning'), true);
       assert.equal(body.evidence.includes('migration:014_fuel_price_sources'), true);
+      assert.equal(body.evidence.includes('migration:015_fuel_adblue_grade'), true);
       assert.equal(JSON.stringify(body).includes('runtime-password'), false);
     } finally {
       await service.close();

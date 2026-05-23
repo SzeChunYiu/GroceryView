@@ -181,7 +181,7 @@ describe('infra/db PostgreSQL schema contract', () => {
       assert.match(schemaDoc, new RegExp(`### \`${table}\``), `${table} missing from SCHEMA.md`);
       assert.match(migrationVerifier, new RegExp(`\\b${table}\\b`), `${table} missing from migration verifier`);
     }
-    for (const grade of ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85']) {
+    for (const grade of ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85', 'fuel-adblue']) {
       assert.match(allMigrations, new RegExp(grade), `${grade} missing from fuel grade catalog`);
     }
     assert.match(allMigrations, /operator_public_price_page/);

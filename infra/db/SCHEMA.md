@@ -43,7 +43,7 @@ The schema stores store location in `stores.position` for map and trip-planning 
 
 Migration 011 adds a `domain` column to `chains`, `stores`, `products`, `observations`, and `latest_prices`. Existing rows default to `grocery`; future verticals are constrained to `fuel` and `pharmacy` until a later migration expands the supported set. This keeps matching domain-scoped: grocery uses EAN + commodity matching, fuel uses fuel grades, and pharmacy uses OTC/health EANs. Public routes must not render non-grocery prices until `observations.domain` has connector or trusted crowd rows for that vertical.
 
-Migration 014 adds the fuel source contract. `fuel_grades` is the only supported grade catalog for the current fuel lane: 95 E10, 98, diesel, HVO100, and E85. `fuel_price_sources` accepts either an operator public price page or a trusted crowd station report, and `fuel_price_source_observations` ties that source evidence to immutable `domain='fuel'` observations with the original price text. Fuel prices are always price per litre; estimated fuel rows are not part of this source model.
+Migration 014 adds the fuel source contract, and migration 015 adds AdBlue to the same catalog. `fuel_grades` is the only supported grade catalog for the current fuel lane: 95 E10, 98, diesel, HVO100, E85, and AdBlue. `fuel_price_sources` accepts either an operator public price page or a trusted crowd station report, and `fuel_price_source_observations` ties that source evidence to immutable `domain='fuel'` observations with the original price text. Fuel prices are always price per litre; estimated fuel rows are not part of this source model.
 
 ## Tables
 
