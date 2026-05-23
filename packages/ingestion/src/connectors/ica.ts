@@ -1636,6 +1636,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
+    storeAccountId: '1004587',
+    storeName: 'ICA Kvantum Kista',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
     storeAccountId: '1003801',
     storeName: 'ICA Kvantum Tidaholm',
     regionId: DEFAULT_ICA_REGION_ID
