@@ -362,6 +362,7 @@ export type ProductCatalogListFilter = {
   search?: string;
   categoryPath?: string[];
   limit?: number;
+  page?: number;
 };
 
 export type StoreCatalogRecord = {
@@ -2941,7 +2942,10 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
     },
 
     async listProducts(filter = {}) {
-      const limit = Math.min(Math.max(filter.limit ?? 100, 1), 500);
+      const limit = Math.min(Math.max(filter.limit ?? 50, 1), 500);
+      const rawPage = Math.trunc(filter.page ?? 1);
+      const page = Number.isFinite(rawPage) ? Math.max(rawPage, 1) : 1;
+      const offset = (page - 1) * limit;
       const rows = await executor.query<ProductCatalogRow>(
         `select id,
                 slug,
@@ -2987,15 +2991,16 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
                       select 1
                       from aliases
                       where aliases.product_id = products.id
-                        and aliases.normalized_alias % lower(query.term)
+                      and aliases.normalized_alias % lower(query.term)
                     ) then 3
                     else 4
                   end,
                   greatest(similarity(products.canonical_name, coalesce(query.term, '')), similarity(products.slug, coalesce(query.term, ''))) desc,
                   canonical_name,
                   slug
-         limit $3`,
-        [filter.search ?? null, filter.categoryPath ?? null, limit]
+         limit $3
+         offset $4`,
+        [filter.search ?? null, filter.categoryPath ?? null, limit, offset]
       );
       return rows.map(mapProductCatalog);
     },

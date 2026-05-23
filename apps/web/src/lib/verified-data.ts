@@ -282,7 +282,7 @@ export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.fla
   });
 });
 
-const rawFacetedProductSearch = buildFacetedProductSearch({ rows: facetedSearchRows, filters: { limit: 8 } });
+const rawFacetedProductSearch = buildFacetedProductSearch({ rows: facetedSearchRows });
 const facetedProductIds = new Set(rawFacetedProductSearch.products.map((product) => product.productId));
 const labelCounts = axfoodProducts.reduce<Map<string, number>>((counts, product) => {
   if (!facetedProductIds.has(product.code)) return counts;
@@ -302,7 +302,7 @@ export const facetedProductSearch = {
     productCount: rawFacetedProductSearch.evidence.pricedProductCount,
     latestPriceCount: rawFacetedProductSearch.evidence.latestPriceCount
   },
-  resultCards: rawFacetedProductSearch.products.slice(0, 6).map((product) => {
+  resultCards: rawFacetedProductSearch.products.map((product) => {
     const cheapest = product.currentPrices[0] ?? null;
     return {
       slug: product.slug,

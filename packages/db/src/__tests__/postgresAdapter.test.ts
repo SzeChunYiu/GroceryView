@@ -1148,7 +1148,17 @@ describe('createPostgresCatalogReader', () => {
     assert.match(executor.calls[0]!.sql, /category_path @> \$2::text\[\]/);
     assert.match(executor.calls[0]!.sql, /when products\.barcode = query\.term then 0/);
     assert.match(executor.calls[0]!.sql, /similarity\(products\.canonical_name, coalesce\(query\.term, ''\)\)/);
-    assert.deepEqual(executor.calls[0]!.params, ['kaffe', ['Pantry', 'Coffee'], 25]);
+    assert.match(executor.calls[0]!.sql, /offset \$4/);
+    assert.deepEqual(executor.calls[0]!.params, ['kaffe', ['Pantry', 'Coffee'], 25, 0]);
+  });
+
+  it('supports page-based offsets for product listings', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    await reader.listProducts({ limit: 25, page: 3 });
+
+    assert.deepEqual(executor.calls[0]!.params, [null, null, 25, 50]);
   });
 
   it('clamps product list limits to a safe range', async () => {
@@ -1157,9 +1167,11 @@ describe('createPostgresCatalogReader', () => {
 
     await reader.listProducts({ limit: 5000 });
     await reader.listProducts({ limit: 0 });
+    await reader.listProducts({ limit: 25, page: 0 });
 
-    assert.deepEqual(executor.calls[0]!.params, [null, null, 500]);
-    assert.deepEqual(executor.calls[1]!.params, [null, null, 1]);
+    assert.deepEqual(executor.calls[0]!.params, [null, null, 500, 0]);
+    assert.deepEqual(executor.calls[1]!.params, [null, null, 1, 0]);
+    assert.deepEqual(executor.calls[2]!.params, [null, null, 25, 0]);
   });
 
   it('reads stores by slug with chain and coordinate metadata', async () => {
