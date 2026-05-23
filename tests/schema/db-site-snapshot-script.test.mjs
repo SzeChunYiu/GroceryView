@@ -1,13 +1,17 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   buildDbSiteChainPriceObservations,
   buildDbSiteAxfoodProducts,
   buildDbSiteSnapshotArtifact,
+  readFreshDbSiteSnapshotCache,
   renderDbSiteChainObservationsModule,
   renderDbSiteIngestedOverridesModule,
-  renderDbSiteProductsModule
+  renderDbSiteProductsModule,
+  validateDbSiteSnapshotCacheArtifact
 } from '../../scripts/ingestion/export-db-site-snapshot.mjs';
 
 const rootPackage = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
@@ -414,6 +418,101 @@ describe('DB-backed site snapshot export script', () => {
     assert.equal(artifact.coverage.maxObservedAgeHours, 72);
     assert.equal(artifact.coverage.staleObservationCount, 0);
     assert.deepEqual(artifact.coverage.staleObservationIds, []);
+  });
+
+  it('accepts a cached snapshot only while TTL, coverage, and freshness are still valid', () => {
+    const artifact = buildDbSiteSnapshotArtifact({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      requiredChains: ['willys'],
+      maxObservedAgeHours: 36,
+      rows: [{
+        productId: 'product-1',
+        productSlug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        categoryPath: ['Pantry', 'Coffee'],
+        comparableUnit: 'kg',
+        chainId: 'chain-1',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        priceType: 'online',
+        observationId: 'observation-fresh',
+        price: 44.9,
+        unitPrice: 99.7778,
+        currency: 'SEK',
+        observedAt: '2026-05-22T09:00:00.000Z',
+        confidence: 0.88
+      }]
+    });
+
+    assert.equal(validateDbSiteSnapshotCacheArtifact({
+      artifact,
+      cacheTtlSeconds: 60 * 60,
+      maxObservedAgeHours: 36,
+      now: new Date('2026-05-22T21:40:00.000Z')
+    }), true);
+    assert.equal(validateDbSiteSnapshotCacheArtifact({
+      artifact,
+      cacheTtlSeconds: 60,
+      maxObservedAgeHours: 36,
+      now: new Date('2026-05-22T21:40:00.000Z')
+    }), false);
+    assert.equal(validateDbSiteSnapshotCacheArtifact({
+      artifact,
+      cacheTtlSeconds: 60 * 60,
+      maxObservedAgeHours: 12,
+      now: new Date('2026-05-22T21:40:00.000Z')
+    }), false);
+    assert.equal(validateDbSiteSnapshotCacheArtifact({
+      artifact: { ...artifact, coverage: { ...artifact.coverage, missingRequiredChains: ['ica'] } },
+      cacheTtlSeconds: 60 * 60,
+      maxObservedAgeHours: 36,
+      now: new Date('2026-05-22T21:40:00.000Z')
+    }), false);
+  });
+
+  it('reuses a cached snapshot only when every requested output already exists', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'db-site-snapshot-cache-'));
+    try {
+      const outputPath = join(dir, 'snapshot.json');
+      const modulePath = join(dir, 'db-site-products.ts');
+      const artifact = buildDbSiteSnapshotArtifact({
+        generatedAt: new Date().toISOString(),
+        requiredChains: ['willys'],
+        rows: [{
+          productId: 'product-1',
+          productSlug: 'bryggkaffe-450g',
+          canonicalName: 'Bryggkaffe mellanrost 450 g',
+          categoryPath: ['Pantry', 'Coffee'],
+          comparableUnit: 'kg',
+          chainId: 'chain-1',
+          chainSlug: 'willys',
+          chainName: 'Willys',
+          priceType: 'online',
+          observationId: 'observation-fresh',
+          price: 44.9,
+          unitPrice: 99.7778,
+          currency: 'SEK',
+          observedAt: new Date().toISOString(),
+          confidence: 0.88
+        }]
+      });
+      writeFileSync(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
+
+      assert.equal(readFreshDbSiteSnapshotCache({
+        outputPath,
+        modulePath,
+        cacheTtlSeconds: 60
+      }), undefined);
+
+      writeFileSync(modulePath, renderDbSiteProductsModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows }));
+      assert.deepEqual(readFreshDbSiteSnapshotCache({
+        outputPath,
+        modulePath,
+        cacheTtlSeconds: 60
+      }), artifact);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it('fails closed when the database reader returns no latest price rows', () => {

@@ -209,12 +209,24 @@ GROCERYVIEW_DB_SITE_SNAPSHOT_CHAIN_OBSERVATIONS_MODULE_PATH=apps/web/src/lib/gen
 GROCERYVIEW_DB_SITE_SNAPSHOT_INGESTED_OVERRIDES_MODULE_PATH=apps/web/src/lib/generated/db-site-ingested-overrides.ts \
 GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS=ica,willys,coop,hemkop,lidl,city_gross \
 GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS=36 \
+GROCERYVIEW_DB_SITE_SNAPSHOT_CACHE_TTL_SECONDS=900 \
 GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE=/tmp/groceryview-catalog-targets.json \
 npm run --silent ingest:export-db-snapshot
 ```
 
 The exporter fails closed with `No latest price rows available` when the database
 reader returns no public latest-price rows, and with `db_site_snapshot_missing_required_chains:<chains>` when `postgres.latest_prices` lacks a public latest-price row for any required launch chain, and with `db_site_snapshot_missing_required_stores:<stores>` when the snapshot lacks latest-price evidence for any target store external ref exported in the catalog coverage targets, with `db_site_snapshot_missing_required_products:<products>` when any target product lacks latest-price evidence, with `db_site_snapshot_missing_required_store_price_types:<store:price-type>` when any target store lacks a required latest-price type, with `db_site_snapshot_missing_required_categories:<categories>` when any target category lacks latest-price evidence, and with `db_site_snapshot_stale_observations:<observation-ids>` when any exported latest-price row is older than `GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS`. The deploy workflow runs this exporter before `npm run build`, so the checked-out fallback modules are replaced from Postgres without a per-branch fixture PR. It writes the matched-product module used by product/comparison pages, the chain-index observation module, and the Matpriskollen/Lidl/ICA/Mathem-compatible override module that replaces hand-committed ingested fixtures during production builds. The artifact summarizes product, chain, store, observation, `requiredChains`, `missingRequiredChains`, `requiredStoreExternalRefs`, `missingRequiredStoreExternalRefs`, `requiredProductSlugs`, `missingRequiredProductSlugs`, `requiredPriceTypes`, `missingRequiredStorePriceTypes`, `requiredCategorySlugs`, `missingRequiredCategorySlugs`, `maxObservedAgeHours`, and `staleObservationCount` coverage and carries only the normalized public row plus provenance; it does not include raw private payloads. The daily ingestion workflow exports this snapshot after the ingestion write succeeds, checks that the artifact status is `passed` with at least one observation, zero missing required chains, zero missing required stores, zero missing required products, zero missing store price-type pairs, and zero missing required categories, and zero stale observations, and uploads it and the `db-site-snapshot-result.json` command summary as the `groceryview-db-site-snapshot` artifact. Operators can tune the workflow export with `GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE`, `GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT`, `GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS`, `GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS`, and `GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE`.
+
+`GROCERYVIEW_DB_SITE_SNAPSHOT_CACHE_TTL_SECONDS` is an opt-in DB load guard for
+fresh reruns. When set, the exporter reuses the existing snapshot JSON only if
+the snapshot path and every requested generated module path already exists, the
+artifact status is `passed`, all coverage gap arrays remain empty, `generatedAt`
+is still inside the TTL, and every cached row still satisfies
+`GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS` relative to the current
+run. A missing output, expired TTL, failed coverage, stale observation, invalid
+artifact, or unset snapshot path falls through to the normal Postgres reader.
+Even on cache reuse, the exporter rewrites each requested output path from the
+cached artifact so the invocation does not silently skip artifact/module writes.
 
 
 ## Replacement DB cutover validation
