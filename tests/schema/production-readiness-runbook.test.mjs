@@ -19,6 +19,20 @@ describe('production daily ingestion readiness runbook', () => {
     assert.doesNotMatch(runbook, /GROCERYVIEW_DAILY_CONNECTORS_JSON=\$\(npm run --silent ops:daily-connectors\)/);
     assert.doesNotMatch(runbook, /Use the emitted JSON as the `GROCERYVIEW_DAILY_CONNECTORS_JSON` secret\/value/);
   });
+  it('documents bounded bulk daily ingestion runner controls', () => {
+    for (const name of [
+      'GROCERYVIEW_DAILY_MAX_CONNECTORS',
+      'GROCERYVIEW_DAILY_MAX_CONCURRENCY',
+      'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS',
+      'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS',
+      'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'
+    ]) {
+      assert.match(runbook, new RegExp(name));
+    }
+    assert.match(runbook, /bounded bulk/);
+    assert.match(runbook, /all six required chains/);
+  });
+
   it('documents DB-to-site snapshot generation after daily ingestion writes latest_prices', () => {
     assert.match(runbook, /npm run --silent ingest:export-db-snapshot/);
     assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_PATH=/);

@@ -2608,13 +2608,25 @@ export type DailyIngestionEnv = Partial<Record<
   | 'GROCERYVIEW_DATABASE_URL'
   | 'GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES'
   | 'GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS'
-  | 'GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS',
+  | 'GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS'
+  | 'GROCERYVIEW_DAILY_MAX_CONNECTORS'
+  | 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS',
   string
 >>;
 
 export type DailyIngestionEnvConfig = {
   databaseUrl: string;
   connectors: DailyIngestionConnectorConfig[];
+  runner: {
+    maxConnectors?: number;
+    maxConcurrency?: number;
+    connectorStartDelayMs?: number;
+    connectorRetryAttempts?: number;
+    connectorRetryBaseDelayMs?: number;
+  };
 };
 
 export type DailyIngestionRunInput = {
@@ -2749,15 +2761,32 @@ function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[
   return connectors;
 }
 
+function dailyRunnerIntegerFromEnv(value: string | undefined, fallback?: number): number | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return fallback;
+  const parsed = Number(trimmed);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(0, Math.floor(parsed));
+}
+
 export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): DailyIngestionEnvConfig {
   const databaseUrl = env.DATABASE_URL?.trim();
   if (!databaseUrl) throw new Error('DATABASE_URL is required for daily ingestion.');
   const connectorsJson = env.GROCERYVIEW_DAILY_CONNECTORS_JSON?.trim()
     ?? (env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE?.trim() ? readFileSync(env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE.trim(), 'utf8') : undefined);
   if (!connectorsJson) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE is required for daily ingestion.');
+  const parsedConnectors = parseDailyConnectorsJson(connectorsJson);
+  const maxConnectors = dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_MAX_CONNECTORS);
   return {
     databaseUrl,
-    connectors: parseDailyConnectorsJson(connectorsJson)
+    connectors: maxConnectors && maxConnectors > 0 ? parsedConnectors.slice(0, maxConnectors) : parsedConnectors,
+    runner: {
+      maxConnectors,
+      maxConcurrency: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY),
+      connectorStartDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS),
+      connectorRetryAttempts: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS),
+      connectorRetryBaseDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS)
+    }
   };
 }
 
@@ -3939,7 +3968,7 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
 }
 
 export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.env): Promise<DailyIngestionRunResult> {
-  const { databaseUrl, connectors } = buildDailyConnectorConfigsFromEnv(env);
+  const { databaseUrl, connectors, runner } = buildDailyConnectorConfigsFromEnv(env);
   const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void>; on?(event: 'error', listener: (error: unknown) => void): void } };
   if (!pg.Pool) throw new Error('pg Pool export is not available.');
   const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
@@ -3955,7 +3984,11 @@ export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.
     return await runDailyIngestion({
       executor,
       requestedAt: new Date().toISOString(),
-      connectors
+      connectors,
+      maxConcurrency: runner.maxConcurrency,
+      connectorStartDelayMs: runner.connectorStartDelayMs,
+      connectorRetryAttempts: runner.connectorRetryAttempts,
+      connectorRetryBaseDelayMs: runner.connectorRetryBaseDelayMs
     });
   } finally {
     await pool.end();

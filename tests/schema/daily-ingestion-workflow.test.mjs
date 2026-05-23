@@ -38,6 +38,10 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /ops:catalog-coverage-targets\s+--\s+--from-current-connectors >\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /ops:validate-production-env\s+--\s+--scope\s+daily-ingestion/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=\/tmp\/groceryview-daily-connectors\.json/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_MAX_CONCURRENCY:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_MAX_CONCURRENCY \|\| '2' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS \|\| '250' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS \|\| '1' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS \|\| '500' \}\}/);
     assert.doesNotMatch(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON=\$\(npm run --silent ops:daily-connectors\)/);
     assert.doesNotMatch(workflow, /test -n "\$\{GROCERYVIEW_DAILY_CONNECTORS_JSON:-\}"/);
     assert.doesNotMatch(workflow, /missing production config: CATALOG_COVERAGE_TARGETS_JSON/);
