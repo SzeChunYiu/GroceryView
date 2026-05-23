@@ -271,6 +271,7 @@ jobs:
           GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS || '250' }}
           GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS || '1' }}
           GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS || '500' }}
+          GROCERYVIEW_DAILY_BLOCKER_LOG_PATH: codex-tasks/ingestion-blockers.txt
         run: |
           set -euo pipefail
           test -n "${DATABASE_URL:-}"
@@ -289,6 +290,16 @@ jobs:
             "exitCode": ${ingestion_status}
           }
           EOF
+          fi
+          if [ ! -s codex-tasks/ingestion-blockers.txt ]; then
+            mkdir -p codex-tasks
+            {
+              echo "# Daily ingestion blockers"
+              echo
+              echo "status: failed"
+              echo "blockers:"
+              echo "- daily_ingestion_blocker_log_missing"
+            } > codex-tasks/ingestion-blockers.txt
           fi
           cat /tmp/daily-ingestion-result.json
           node <<'NODE'
@@ -321,7 +332,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: groceryview-daily-ingestion-result
-          path: /tmp/daily-ingestion-result.json
+          path: |
+            /tmp/daily-ingestion-result.json
+            codex-tasks/ingestion-blockers.txt
           if-no-files-found: error
           retention-days: 14
 

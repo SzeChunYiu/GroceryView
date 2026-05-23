@@ -26,7 +26,8 @@ describe('daily connectors export script', () => {
       'hemkop',
       'hemkop',
       'lidl',
-      'city_gross'
+      'city_gross',
+      'okq8'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.connectorId), [
       'ica-store-promotions-default-stores',
@@ -37,9 +38,19 @@ describe('daily connectors export script', () => {
       'hemkop-products-all-stores',
       'hemkop-weekly-all-stores',
       'lidl-public-offers-all-stores',
-      'city-gross-public-products-all-stores'
+      'city-gross-public-products-all-stores',
+      'okq8-fuel-prices'
     ]);
-    assert.equal(connectors.every((connector) => Array.isArray(connector.stores) && connector.stores.length > 0), true);
+    assert.equal(
+      connectors
+        .filter((connector) => connector.requireStoreScopedPrices !== false)
+        .every((connector) => Array.isArray(connector.stores) && connector.stores.length > 0),
+      true
+    );
+    const okq8FuelConnector = connectors.find((connector) => connector.connectorId === 'okq8-fuel-prices');
+    assert.equal(okq8FuelConnector.domain, 'fuel');
+    assert.equal(okq8FuelConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(okq8FuelConnector.stores, []);
     const coopProductConnector = connectors.find((connector) => connector.connectorId === 'coop-products-all-stores');
     const coopWeeklyConnector = connectors.find((connector) => connector.connectorId === 'coop-weekly-all-stores');
     assert.deepEqual(coopProductConnector.stores.map((store) => store.storeId), ['176110']);
@@ -53,7 +64,8 @@ describe('daily connectors export script', () => {
       'groceryview://daily/hemkop/products/all-stores',
       'groceryview://daily/hemkop/weekly-offers/all-stores',
       'groceryview://daily/lidl/public-offers/all-stores',
-      'groceryview://daily/city-gross/public-products/all-stores'
+      'groceryview://daily/city-gross/public-products/all-stores',
+      'https://www.okq8.se/foretag/priser/'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.parserVersion), [
       'ica-store-promotions-native-v1',
@@ -64,7 +76,8 @@ describe('daily connectors export script', () => {
       'hemkop-products-native-v1',
       'hemkop-weekly-native-v1',
       'lidl-public-offers-native-v1',
-      'citygross-products-native-v1'
+      'citygross-products-native-v1',
+      'okq8-fuel-prices-v1'
     ]);
   });
 });
