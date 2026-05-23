@@ -64,7 +64,7 @@ jobs:
           set -euo pipefail
           npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
-            npm run --silent ops:catalog-coverage-targets >/tmp/groceryview-catalog-targets.json
+            npm run --silent ops:catalog-coverage-targets -- --from-current-connectors >/tmp/groceryview-catalog-targets.json
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
           CATALOG_COVERAGE_TARGETS_JSON_FILE=/tmp/groceryview-catalog-targets.json \
             npm run --silent ops:validate-production-env -- --scope daily-ingestion \

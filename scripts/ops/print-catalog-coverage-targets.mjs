@@ -107,6 +107,18 @@ async function readCatalogRows(databaseUrl, { retryAttempts = 2, retryBaseDelayM
 }
 
 async function main() {
+  if (process.argv.includes('--from-current-connectors')) {
+    const connectorStoreIds = connectorStoreIdsFromEnv();
+    if (!connectorStoreIds || connectorStoreIds.length === 0) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE with stores is required for --from-current-connectors.');
+    const targets = buildCatalogCoverageTargets({
+      products: [{ id: 'daily-ingestion-connector-target', category_id: 'daily-ingestion' }],
+      stores: connectorStoreIds.map((storeId) => ({ id: storeId, slug: storeId, external_ref: storeId })),
+      chains: requiredDailyChainIds.map((id) => ({ id }))
+    }, { connectorStoreIds });
+    process.stdout.write(`${JSON.stringify(targets)}\n`);
+    return;
+  }
+
   if (
     process.argv.includes('--self-test') ||
     process.argv.includes('--self-test-hyphenated-chain-slugs') ||

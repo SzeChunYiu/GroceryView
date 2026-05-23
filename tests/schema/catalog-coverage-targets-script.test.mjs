@@ -16,6 +16,7 @@ describe('catalog coverage target export script', () => {
     assert.match(script, /from chains order by slug/);
     assert.match(script, /retrying catalog target DB read/);
     assert.match(script, /CATALOG_COVERAGE_TARGET_PRODUCT_LIMIT/);
+    assert.match(script, /--from-current-connectors/);
     assert.match(script, /terminating connection/);
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
       assert.match(script, new RegExp(`['"]${chain}['"]`));
@@ -53,3 +54,7 @@ describe('catalog coverage target export script', () => {
     assert.equal(targets.requireEveryStorePriceType, true);
   });
 });
+
+
+// The daily workflow uses connector-derived targets during env validation so it does not
+// depend on the production DB before the ingestion step has a chance to repair coverage.
