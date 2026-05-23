@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
-import { adaptiveProductCards, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
+import { adaptiveProductCards, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
@@ -14,6 +14,7 @@ export function generateMetadata() {
 }
 
 type SearchParams = {
+  brand?: string | string[];
   page?: string | string[];
 };
 
@@ -24,14 +25,28 @@ function toPageNumber(value: string | string[] | undefined): number {
   return parsed;
 }
 
-function productsPageUrl(page: number) {
-  return page <= 1 ? '/products' : `/products?page=${page}`;
+function normalizeSelectedBrand(brand: string | string[] | undefined) {
+  const requested = (Array.isArray(brand) ? brand[0] : brand)?.trim();
+  if (!requested) return '';
+  return productBrandFilterOptions.find((option) => option.value.toLocaleLowerCase('sv-SE') === requested.toLocaleLowerCase('sv-SE'))?.value ?? '';
+}
+
+function productsPageUrl(page: number, selectedBrand = '') {
+  const params = new URLSearchParams();
+  if (selectedBrand) params.set('brand', selectedBrand);
+  if (page > 1) params.set('page', String(page));
+  const query = params.toString();
+  return query ? `/products?${query}` : '/products';
 }
 
 export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = facetedProductSearch;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
+  const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
+  const productCards = selectedBrand
+    ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
+    : adaptiveProductCards;
   const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
   const currentPage = Math.min(requestedPage, totalPages);
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
@@ -134,14 +149,14 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             </p>
             <div className="flex gap-3">
               {currentPage > 1 ? (
-                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1)}>
+                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1, selectedBrand)}>
                   Previous
                 </Link>
               ) : (
                 <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Previous</span>
               )}
               {currentPage < totalPages ? (
-                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1)}>
+                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1, selectedBrand)}>
                   Next
                 </Link>
               ) : (
@@ -307,10 +322,36 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         </div>
       </Card>
       <div className="mt-6">
+        <Card className="mb-4 border-emerald-200 bg-emerald-50/70">
+          <form action="/products" className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end" method="get">
+            <div>
+              <label className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800" htmlFor="products-brand-filter">Brand filter</label>
+              <select
+                className="mt-2 min-h-11 w-full rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm font-bold text-slate-900"
+                defaultValue={selectedBrand}
+                id="products-brand-filter"
+                name="brand"
+              >
+                <option value="">All brands</option>
+                {productBrandFilterOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label} ({option.productCount})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button className="rounded-xl bg-emerald-700 px-5 py-3 text-sm font-black text-white" type="submit">Apply brand</button>
+          </form>
+          <p className="mt-3 text-sm font-bold text-emerald-950">
+            {selectedBrand
+              ? `Showing ${productCards.length.toLocaleString('sv-SE')} verified product card${productCards.length === 1 ? '' : 's'} for ${selectedBrand}.`
+              : 'Brand options are reused from the shared verified product option set so homepage and catalogue filters stay consistent.'}
+          </p>
+        </Card>
         <ProductPriceCards
-          cards={adaptiveProductCards}
+          cards={productCards}
           eyebrow="Product-card display"
-          title="Adaptive total ⇄ per-unit price cards"
+          title={selectedBrand ? `${selectedBrand} adaptive total ⇄ per-unit price cards` : 'Adaptive total ⇄ per-unit price cards'}
           intro="Branded products lead with the actual pack price, commodity-like produce leads with comparable unit price, and the toggle flips the sort key across every card."
         />
       </div>
