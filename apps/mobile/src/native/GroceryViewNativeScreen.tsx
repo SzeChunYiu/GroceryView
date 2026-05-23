@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { buildMobileScreenBlueprints, type MobileScreenAction, type MobileScreenBlueprint } from '../index';
+import { buildMobileScreenBlueprints, type MobileScreenAction, type MobileScreenBlueprint } from '../index.js';
 
 export type GroceryViewNativeScreenProps = {
   screenName: string;

@@ -6,8 +6,15 @@
     "declaration": true,
     "noEmit": false,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {},
+    "jsx": "react-jsx"
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.test.ts", "src/__tests__/**"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/__tests__/**"
+  ]
 }
