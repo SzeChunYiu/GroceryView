@@ -6,6 +6,7 @@ import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedS
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
+  allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
   chainSavingsLedger,
   chainCategoryCoverage,
@@ -47,6 +48,10 @@ const homepageSourceReadiness = sourceReadinessMatrix.slice(0, 3);
 const homepageChainSavings = chainSavingsLedger.slice(0, 2);
 const homepageRouteMap = sourceRouteMap.slice(0, 3);
 const homepageIcaStorePromotionImports = icaStorePromotionEvidence.latestStores.slice(0, 3);
+const homepageAllStoreDailyRunner = {
+  controls: allStoreDailyRunnerReadiness.runnerControls.slice(0, 3),
+  connectorUrls: allStoreDailyRunnerReadiness.allStoreConnectorUrls.slice(0, 4)
+};
 const homepageFreshOpenPrices = freshestOpenPrices.slice(3, 9);
 const homepageMapChainIndex = mapChainIndexScores.slice(0, 3);
 const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
@@ -195,6 +200,42 @@ export function MarketShell() {
         <div className="mt-4 grid gap-2 md:grid-cols-3">
           {icaStorePromotionEvidence.guardrails.map((guardrail) => (
             <p className="rounded-2xl bg-white/80 p-3 text-xs font-bold leading-5 text-red-950" key={guardrail}>{guardrail}</p>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>All-store daily batch runner</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">{allStoreDailyRunnerReadiness.title}</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-lime-950">
+              The homepage now exposes the operator contract that fans daily ingestion across all enumerated stores. The runner controls concurrency, retries, and fail-on-store behavior before supported chain connector URLs write source-run evidence into the database.
+            </p>
+          </div>
+          <Link className="rounded-full bg-lime-700 px-5 py-3 text-center text-sm font-black text-white" href="/data-sources">
+            Inspect batch contract
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {homepageAllStoreDailyRunner.controls.map((control) => (
+            <Link
+              className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm hover:border-lime-700"
+              data-all-store-daily-runner={control.name}
+              href="/data-sources"
+              key={control.name}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">{control.name}</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{control.defaultValue}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{control.purpose}</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-4">
+          {homepageAllStoreDailyRunner.connectorUrls.map((connector) => (
+            <p className="rounded-2xl bg-white/80 p-3 text-xs font-bold leading-5 text-lime-950" key={connector.url}>
+              {connector.chain} · {connector.scope}
+            </p>
           ))}
         </div>
       </Card>
