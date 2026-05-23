@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 22:38 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 23:50 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**24** store pages, ~**35** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **208**
+- **Shipped `feat:`/`wire:` PRs to date:** **207**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,6 +42,14 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1470 feat(api): add category tree endpoint
+- #1469 feat(web): add dietary product filters
+- #1468 feat: add household shared list collaboration
+- #1466 feat(api): add supported retailers endpoint
+- #1464 feat(web): add price change webhook
+- #1461 feat(stores): add store detail assortment overview
+- #1460 feat(web): add checkable shopping list
+- #1457 feat: add URL-backed faceted product search
 - #1455 feat(ingest): persist Matspar daily prices
 - #1451 feat: wire unit price alerts to API
 - #1450 feat(web): add price history CSV export
@@ -49,22 +57,15 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1434 feat(web): add trending products carousel
 - #1439 feat(ingest): deepen Matpriskollen offer rows
 - #1449 feat(api): export product price history csv
-- #1447 feat(web): align desktop nav groups to ticket spec
-- #1444 feat(web): add ICA locator entry point from stores directory
-- #1436 feat(ingest): expand Apohem public product rows
-- #1438 feat(ingest): deepen City Gross public rows
-- #1445 feat(ingest): deepen Matspar public product rows
-- #1443 feat: add chain comparison table
-- #1440 feat(web): build sitemap from catalog records
-- #1425 feat: add Willys bulk ingestion connector
 
 ## 🔄 In progress (open PRs)
 
-- #1457 feat: add URL-backed faceted product search
-- #1456 [codex] Add Norway coverage readiness gate
-- #1454 Add Telegram price alert notifications
+- #1472 Add canonical URL tags for filtered category and search pages
+- #1471 Add breadcrumbs to category and item pages
+- #1467 [codex] Add auth route crawl rules
+- #1462 Add robots and sitemap crawl policy for public pages
+- #1459 Add empty state illustration for zero search results
 - #1453 [codex] Carry trust evidence for receipt alias candidates _(draft)_
-- #1452 [codex] Build retailer browser overlay extension
 - #1441 Add query-driven chain comparison table
 - #1433 [codex] Add confidence badge tooltip _(draft)_
 - #1416 [codex] Add DB snapshot partial cache CLI smoke
