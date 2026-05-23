@@ -190,9 +190,20 @@ jobs:
         run: |
           set -euo pipefail
           test -n "${DATABASE_URL:-}"
-          npm run --silent ops:apply-db-migrations >/tmp/production-db-migrations.json
+          migration_status=0
+          npm run --silent ops:apply-db-migrations >/tmp/production-db-migrations.json || migration_status=$?
+          if [ ! -s /tmp/production-db-migrations.json ]; then
+            cat > /tmp/production-db-migrations.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "production_db_migrations_diagnostic_missing",
+            "exitCode": ${migration_status}
+          }
+          EOF
+          fi
           cat /tmp/production-db-migrations.json
           node -e "const body=require('/tmp/production-db-migrations.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+          exit "${migration_status}"
 
       - name: Upload production DB migrations result
         if: always()
@@ -200,7 +211,7 @@ jobs:
         with:
           name: groceryview-production-db-migrations
           path: /tmp/production-db-migrations.json
-          if-no-files-found: ignore
+          if-no-files-found: error
           retention-days: 14
 
       - name: Run configured daily ingestion

@@ -166,12 +166,13 @@ The workflow must pass these gates in order:
 3. live store enumeration and always-attempted `groceryview-daily-connector-stores` artifact upload for success or failure diagnostics
 4. production ingestion configuration validator and always-attempted `groceryview-production-ingestion-config` artifact upload with `production-env-validation.json`, `groceryview-catalog-targets.json`, and `groceryview-daily-connectors.json` for success or failure diagnostics
 5. production DB write connectivity diagnostic and always-attempted `groceryview-daily-db-connectivity` artifact upload; if the diagnostic command exits before writing JSON, the workflow writes a fail-closed `daily_db_connectivity_diagnostic_missing` artifact instead of silently ignoring the missing evidence
-6. configured daily ingestion runner; its `chainSummaries` must include every required chain, every summary must be `succeeded`, every official product connector must emit at least one observation for every configured branch in `stores[]`, every required chain must emit at least one observation id, and the workflow always attempts to upload `groceryview-daily-ingestion-result` for success or failure diagnostics
-7. DB-backed site snapshot export and always-attempted `groceryview-db-site-snapshot` artifact upload with `groceryview-db-site-snapshot.json` and `db-site-snapshot-result.json` for success or failure diagnostics
-8. always-attempted `/api/readiness/postgres`, including a target match against the daily DB connectivity diagnostic; if that diagnostic was not produced, the workflow fails with `postgres_readiness_missing_ingestion_connectivity_diagnostic`
-9. always-attempted `/api/readiness/source-runs`, including zero blockers, zero missing fresh chains, zero insufficient accepted-row blockers, at least six succeeded daily source-run evidence entries, and a latest successful finish timestamp
-10. always-attempted `/api/readiness/catalog-coverage`, including zero missing chain, store, product, category, price-type, product-store pair, and store-price-type gaps
-11. upload `groceryview-deployed-readiness` with `postgres-readiness.json`, `source-run-readiness.json`, and `catalog-coverage-readiness.json`
+6. production DB migration application and always-attempted `groceryview-production-db-migrations` artifact upload; if the migration command exits before writing JSON, the workflow writes a fail-closed `production_db_migrations_diagnostic_missing` artifact instead of silently ignoring missing schema evidence
+7. configured daily ingestion runner; its `chainSummaries` must include every required chain, every summary must be `succeeded`, every official product connector must emit at least one observation for every configured branch in `stores[]`, every required chain must emit at least one observation id, and the workflow always attempts to upload `groceryview-daily-ingestion-result` for success or failure diagnostics
+8. DB-backed site snapshot export and always-attempted `groceryview-db-site-snapshot` artifact upload with `groceryview-db-site-snapshot.json` and `db-site-snapshot-result.json` for success or failure diagnostics
+9. always-attempted `/api/readiness/postgres`, including a target match against the daily DB connectivity diagnostic; if that diagnostic was not produced, the workflow fails with `postgres_readiness_missing_ingestion_connectivity_diagnostic`
+10. always-attempted `/api/readiness/source-runs`, including zero blockers, zero missing fresh chains, zero insufficient accepted-row blockers, at least six succeeded daily source-run evidence entries, and a latest successful finish timestamp
+11. always-attempted `/api/readiness/catalog-coverage`, including zero missing chain, store, product, category, price-type, product-store pair, and store-price-type gaps
+12. upload `groceryview-deployed-readiness` with `postgres-readiness.json`, `source-run-readiness.json`, and `catalog-coverage-readiness.json`
 
 ## Expected blocker meanings
 
@@ -186,6 +187,7 @@ The workflow must pass these gates in order:
 - `source_run_missing_fresh_chain:<chain>`: no fresh successful daily source run for that chain.
 - `source_run_insufficient_accepted_rows:<chain>:<count>/<min>`: source run completed but accepted too few rows.
 - `daily_db_connectivity_diagnostic_missing`: the production DB connectivity command failed before writing a diagnostic JSON payload; inspect the `groceryview-daily-db-connectivity` artifact for the command exit code.
+- `production_db_migrations_diagnostic_missing`: the production DB migration command failed before writing a diagnostic JSON payload; inspect the `groceryview-production-db-migrations` artifact for the command exit code.
 - `postgres_readiness_missing_ingestion_connectivity_diagnostic`: deployed PostgreSQL readiness was probed, but the daily DB connectivity diagnostic was not available for target matching.
 - `missing_store_scoped_prices:<products>`: connector output had accepted products without a branch/store id.
 - `unknown_store_ids:<stores>`: connector output referenced branch ids not declared in connector `stores[]`.
@@ -202,5 +204,5 @@ Do not treat the system as production-ready until all are true:
 
 - `npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView` reports `ready`.
 - `npm run ops:validate-production-env` reports `ready` in the deployment environment.
-- the latest `daily-ingestion.yml` run passes and includes the always-attempted `groceryview-production-config-preflight`, `groceryview-daily-connector-stores`, `groceryview-production-ingestion-config`, `groceryview-daily-db-connectivity`, `groceryview-daily-ingestion-result`, `groceryview-db-site-snapshot`, and `groceryview-deployed-readiness` artifacts, with `groceryview-db-site-snapshot` preserving both normalized rows and `db-site-snapshot-result.json` coverage diagnostics when export validation fails after files are written.
+- the latest `daily-ingestion.yml` run passes and includes the always-attempted `groceryview-production-config-preflight`, `groceryview-daily-connector-stores`, `groceryview-production-ingestion-config`, `groceryview-daily-db-connectivity`, `groceryview-production-db-migrations`, `groceryview-daily-ingestion-result`, `groceryview-db-site-snapshot`, and `groceryview-deployed-readiness` artifacts, with `groceryview-db-site-snapshot` preserving both normalized rows and `db-site-snapshot-result.json` coverage diagnostics when export validation fails after files are written.
 - `/api/readiness/postgres`, `/api/readiness/source-runs`, and `/api/readiness/catalog-coverage` all return healthy/complete responses with HTTP 200; source-run readiness has zero blockers, zero missing fresh chains, zero insufficient accepted-row blockers, at least six succeeded evidence entries, and a latest successful finish timestamp; and catalog coverage has no missing dimension, product-store-pair, or store-price-type gaps.
