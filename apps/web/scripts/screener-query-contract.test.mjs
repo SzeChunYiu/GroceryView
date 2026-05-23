@@ -68,6 +68,7 @@ function installScreenerRuntime(nextStubs) {
   Module._resolveFilename = function resolveScreenerImports(request, parent, isMain, options) {
     if (request === 'next/link') return nextStubs.link;
     if (request === 'next/navigation') return nextStubs.navigation;
+    if (request === 'next-intl') return nextStubs.nextIntl;
     if (request.startsWith('@/')) {
       return originalResolveFilename.call(this, join(webRoot, 'src', request.slice(2)), parent, isMain, options);
     }
@@ -95,6 +96,7 @@ async function createNextStubs() {
   const stubDir = await mkdtemp(join(tmpdir(), 'groceryview-screener-next-'));
   const navigation = join(stubDir, 'navigation.cjs');
   const link = join(stubDir, 'link.cjs');
+  const nextIntl = join(stubDir, 'next-intl.cjs');
   await writeFile(navigation, [
     "exports.usePathname = () => '/screener';",
     'exports.useRouter = () => ({ push() {}, replace() {}, refresh() {}, prefetch() {}, back() {}, forward() {} });',
@@ -107,7 +109,10 @@ async function createNextStubs() {
     '};',
     'module.exports.default = module.exports;'
   ].join('\n'));
-  return { dir: stubDir, link, navigation };
+  await writeFile(nextIntl, [
+    'exports.createTranslator = ({ messages = {} } = {}) => (key) => messages[key] ?? key;'
+  ].join('\n'));
+  return { dir: stubDir, link, navigation, nextIntl };
 }
 
 function summaryText(html) {

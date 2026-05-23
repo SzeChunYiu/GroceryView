@@ -11,7 +11,7 @@ import {
   snapshot,
   topChainSpreads
 } from '@/lib/verified-data';
-import { SCREENER_DEFAULT_CATEGORY, normalizeScreenerCategory, normalizeScreenerSort, type ScreenerSortMode, screenerCategoryHref, screenerSortHref } from '@/lib/screener-query';
+import { SCREENER_DEFAULT_CATEGORY, SCREENER_SORT_OPTIONS, normalizeScreenerCategory, normalizeScreenerSort, type ScreenerSortMode, screenerCategoryHref, screenerSortHref } from '@/lib/screener-query';
 import { routeMetadata } from '@/lib/seo';
 
 type SortMode = ScreenerSortMode;
@@ -37,23 +37,7 @@ type ScreenerRow = {
   };
 };
 
-const sortOptions = [
-  {
-    mode: 'biggest-drop',
-    label: 'Biggest drop',
-    detail: 'Latest observed negative move from priceDropMoversBoard.'
-  },
-  {
-    mode: 'cheapest-per-kg',
-    label: 'Cheapest per kg',
-    detail: 'Lowest comparable kg price from matched chain rows.'
-  },
-  {
-    mode: 'widest-spread',
-    label: 'Widest spread',
-    detail: 'Largest Willys/Hemkop spread from topChainSpreads.'
-  }
-] satisfies { mode: SortMode; label: string; detail: string }[];
+const sortOptions = SCREENER_SORT_OPTIONS;
 
 export function generateMetadata() {
   return routeMetadata('/screener');
