@@ -7,12 +7,37 @@ import { adaptiveProductCards, facetedProductSearch, formatSek, immigrantFamilia
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
+const PRODUCTS_PER_PAGE = 50;
+
 export function generateMetadata() {
   return routeMetadata('/products');
 }
 
-export default function ProductsPage() {
+type SearchParams = {
+  page?: string | string[];
+};
+
+function toPageNumber(value: string | string[] | undefined): number {
+  const raw = Array.isArray(value) ? value[0] : value;
+  const parsed = Number.parseInt(raw ?? '1', 10);
+  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) return 1;
+  return parsed;
+}
+
+function productsPageUrl(page: number) {
+  return page <= 1 ? '/products' : `/products?page=${page}`;
+}
+
+export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
+  const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = facetedProductSearch;
+  const requestedPage = toPageNumber(resolvedSearchParams.page);
+  const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
+  const currentPage = Math.min(requestedPage, totalPages);
+  const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const pagedResultCards = resultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
+  const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
+  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
 
   return (
     <PageShell>
@@ -80,7 +105,7 @@ export default function ProductsPage() {
           </div>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {resultCards.map((product) => (
+          {pagedResultCards.map((product) => (
             <Link className="group rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700" href={`/products/${product.slug}`} key={product.slug}>
               <div className="flex gap-3">
                 {product.imageUrl ? (
@@ -102,6 +127,29 @@ export default function ProductsPage() {
             </Link>
           ))}
         </div>
+        {resultCards.length > PRODUCTS_PER_PAGE ? (
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
+            <p className="font-black text-slate-700">
+              Showing {rangeStart}-{rangeEnd} of {resultCards.length} instant products (page {currentPage}/{totalPages})
+            </p>
+            <div className="flex gap-3">
+              {currentPage > 1 ? (
+                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1)}>
+                  Previous
+                </Link>
+              ) : (
+                <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Previous</span>
+              )}
+              {currentPage < totalPages ? (
+                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1)}>
+                  Next
+                </Link>
+              ) : (
+                <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Next</span>
+              )}
+            </div>
+          </div>
+        ) : null}
       </Card>
       <Card className="mt-8 border-rose-200 bg-rose-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
