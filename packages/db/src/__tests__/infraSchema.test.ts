@@ -111,6 +111,13 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(observations, /confidence numeric\(5, 4\) not null check \(confidence between 0 and 1\)/);
   });
 
+  it('tracks observed product availability without deleting price facts', () => {
+    assert.match(allMigrations, /alter table observations add column if not exists is_available boolean not null default true/);
+    assert.match(allMigrations, /alter table latest_prices add column if not exists is_available boolean not null default true/);
+    assert.match(schemaDoc, /is_available/);
+    assert.match(schemaDoc, /out-of-stock/i);
+  });
+
   it('keeps connector observation writes idempotent without overwriting history', () => {
     assert.match(allMigrations, /create unique index if not exists observations_connector_idempotency_idx/);
     for (const column of [
@@ -124,6 +131,7 @@ describe('infra/db PostgreSQL schema contract', () => {
       'price',
       'unit_price',
       'currency',
+      'is_available',
       'confidence',
       'provenance'
     ]) {
@@ -131,6 +139,21 @@ describe('infra/db PostgreSQL schema contract', () => {
     }
     assert.match(allMigrations, /nulls not distinct/);
     assert.match(schemaDoc, /exact connector replay idempotency/);
+  });
+
+  it('tracks observation availability through immutable rows, rollups, and static snapshots', () => {
+    for (const table of ['observations', 'latest_prices', 'observations_v2']) {
+      assert.match(
+        allMigrations,
+        new RegExp(`alter table ${table} add column if not exists is_available boolean not null default true`),
+        `${table}.is_available migration missing`
+      );
+    }
+    assert.match(allMigrations, /observations_connector_idempotency_idx[\s\S]*is_available/);
+    assert.match(allMigrations, /latest_prices_grocery_snapshot_idx[\s\S]*is_available/);
+    assert.match(schemaDoc, /observations\.is_available/);
+    assert.match(schemaDoc, /latest_prices\.is_available/);
+    assert.match(schemaDoc, /Out of stock/i);
   });
 
   it('keeps latest prices derived from observations and uniquely addressable', () => {
@@ -142,7 +165,7 @@ describe('infra/db PostgreSQL schema contract', () => {
   it('indexes latest_prices for bounded DB-backed site snapshot exports', () => {
     assert.match(allMigrations, /create index concurrently if not exists latest_prices_grocery_snapshot_idx/);
     assert.match(allMigrations, /on latest_prices \(domain, observed_at desc, product_id, chain_id, store_id, price_type\)/);
-    assert.match(allMigrations, /include \(observation_id, price, regular_price, unit_price, currency, confidence, provenance\)/);
+    assert.match(allMigrations, /include \(observation_id, price, regular_price, unit_price, currency, is_available, confidence, provenance\)/);
     assert.match(allMigrations, /where domain = 'grocery'/);
     assert.match(schemaDoc, /latest_prices_grocery_snapshot_idx/);
     assert.match(schemaDoc, /db-backed site snapshot exporter/i);

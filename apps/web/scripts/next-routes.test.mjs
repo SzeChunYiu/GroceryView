@@ -62,6 +62,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(joined, /products \} from ['"]@\/lib\/demo-data/);
   });
 
+  it('surfaces latest_prices availability as an out-of-stock product card badge', async () => {
+    const productCards = await read('src/components/product-price-cards.tsx');
+    const productsPage = await read('src/app/products/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+
+    assert.match(productCards, /card\.isAvailable === false/);
+    assert.match(productCards, /Out of stock/);
+    assert.match(productsPage, /product\.isAvailable === false/);
+    assert.match(productsPage, /Out of stock/);
+    assert.match(verified, /isAvailable/);
+    assert.match(verified, /outOfStockLatestPriceCount/);
+  });
+
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {
     const featureRoutes = ['scanner','household','coupon-stacks','price-reports','shopping-trips','privacy'];
     const verified = await read('src/lib/verified-data.ts');
@@ -2775,6 +2788,7 @@ ${seo}`;
     assert.match(verified, /imageAlt/);
     assert.match(verified, /sparklinePoints/);
     assert.match(verified, /sparklineWindowDays: 7/);
+    assert.match(verified, /isAvailable/);
     assert.match(products, /ProductPriceCards/);
     assert.match(products, /adaptiveProductCards/);
     assert.match(products, /searchParams/);
@@ -2795,6 +2809,7 @@ ${seo}`;
     assert.match(cards, /unitSortPrice/);
     assert.match(cards, /totalSortPrice/);
     assert.match(cards, /cheapest-per-unit/);
+    assert.match(cards, /Out of stock/);
     assert.match(cards, /No synthetic product images/);
     assert.match(cards, /No synthetic unit prices/);
   });

@@ -190,6 +190,7 @@ describe('DB-backed site snapshot export script', () => {
       unitPrice: 99.7778,
       currency: 'SEK',
       observedAt: '2026-05-20T09:00:00.000Z',
+      isAvailable: true,
       confidence: 0.88,
       observationId: 'observation-2',
       promotionText: 'Veckokampanj',
@@ -723,6 +724,7 @@ describe('DB-backed site snapshot export script', () => {
           price: 58.9,
           priceText: '58,90 kr',
           priceUnit: 'kr/st',
+          isAvailable: true,
           savings: null,
           url: ''
         },
@@ -730,6 +732,7 @@ describe('DB-backed site snapshot export script', () => {
           price: 44.9,
           priceText: '44,90 kr',
           priceUnit: 'kr/st',
+          isAvailable: true,
           savings: 15,
           url: ''
         }

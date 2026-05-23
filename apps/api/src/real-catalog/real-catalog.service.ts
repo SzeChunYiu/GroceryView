@@ -26,6 +26,7 @@ type CatalogPriceSqlRow = {
   price_type: RealCatalogPriceType | null;
   confidence: string | number | null;
   observed_at: string | Date | null;
+  is_available: boolean | null;
   chain_id: string | null;
   chain_slug: string | null;
   chain_name: string | null;
@@ -93,6 +94,7 @@ function mapCatalogRow(row: CatalogPriceSqlRow): RealCatalogSearchPriceRow {
     ...(row.price_type ? { priceType: row.price_type } : {}),
     ...(row.confidence === null ? {} : { confidence: Number(row.confidence) }),
     ...(iso(row.observed_at) ? { observedAt: iso(row.observed_at) } : {}),
+    ...(row.is_available === null ? {} : { isAvailable: row.is_available !== false }),
     ...(row.chain_id ? { chainId: row.chain_id } : {}),
     ...(row.chain_slug ? { chainSlug: row.chain_slug } : {}),
     ...(row.chain_name ? { chainName: row.chain_name } : {}),
@@ -264,6 +266,7 @@ export class RealCatalogService {
              latest_prices.price_type,
              latest_prices.confidence,
              latest_prices.observed_at,
+             latest_prices.is_available,
              chains.id::text as chain_id,
              chains.slug as chain_slug,
              chains.name as chain_name,
@@ -306,6 +309,7 @@ export class RealCatalogService {
              latest_prices.price_type,
              latest_prices.confidence,
              latest_prices.observed_at,
+             latest_prices.is_available,
              chains.id::text as chain_id,
              chains.slug as chain_slug,
              chains.name as chain_name,

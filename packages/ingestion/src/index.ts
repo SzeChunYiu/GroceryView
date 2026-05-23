@@ -1807,6 +1807,7 @@ function coopStoreProductToDailyItem(row: CoopStoreProduct): RetailerConnectorPa
     regularPrice: row.promotionPrice !== null && row.price > row.promotionPrice ? row.price : undefined,
     promoText: row.promotionText || undefined,
     memberOnly: row.medMeraRequired,
+    isAvailable: row.availableOnline,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl
   };
@@ -1901,6 +1902,7 @@ function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsed
     regularPrice: row.originalPrice !== null && row.originalPrice > row.price ? row.originalPrice : undefined,
     promoText: row.originalPrice !== null && row.originalPrice > row.price ? 'Public pharmacy discounted price' : undefined,
     memberOnly: false,
+    isAvailable: availabilityFromStockStatus(row.stockStatus) ?? true,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl
   };
@@ -2207,6 +2209,52 @@ function optionalBoolean(record: Record<string, unknown>, key: string, path: str
   throw new Error(`${path}.${key} must be a boolean.`);
 }
 
+function availabilityFromStockStatus(value: unknown): boolean | undefined {
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.trim().toLowerCase().replace(/[\s-]+/g, '_');
+  if (!normalized) return undefined;
+  if (
+    normalized.includes('out_of_stock') ||
+    normalized.includes('sold_out') ||
+    normalized.includes('unavailable') ||
+    normalized.includes('not_available') ||
+    normalized.includes('not_found') ||
+    normalized.includes('http_404') ||
+    normalized.includes('404') ||
+    normalized.includes('empty_stock')
+  ) {
+    return false;
+  }
+  if (
+    normalized.includes('in_stock') ||
+    normalized.includes('buyable') ||
+    normalized === 'available' ||
+    normalized === 'i_lager'
+  ) {
+    return true;
+  }
+  return undefined;
+}
+
+function optionalAvailability(record: Record<string, unknown>, path: string): boolean | undefined {
+  const explicit = optionalBoolean(record, 'isAvailable', path);
+  if (explicit !== undefined) return explicit;
+  const available = record.available;
+  if (typeof available === 'boolean') return available;
+  if (typeof available === 'string' && ['true', 'false'].includes(available.toLowerCase())) return available.toLowerCase() === 'true';
+  const fromAvailableStatus = availabilityFromStockStatus(available);
+  if (fromAvailableStatus !== undefined) return fromAvailableStatus;
+  const fromStatus = availabilityFromStockStatus(record.stockStatus ?? record.availabilityStatus ?? record.stock);
+  if (fromStatus !== undefined) return fromStatus;
+  const availability = record.availability;
+  if (availability && typeof availability === 'object' && !Array.isArray(availability)) {
+    const availabilityRecord = availability as Record<string, unknown>;
+    return optionalBoolean(availabilityRecord, 'isAvailable', `${path}.availability`) ??
+      availabilityFromStockStatus(availabilityRecord.status ?? availabilityRecord.stockStatus);
+  }
+  return undefined;
+}
+
 function optionalFuelSource(record: Record<string, unknown>, path: string): RetailerProductInput['fuelSource'] {
   const value = record.fuelSource;
   if (value === undefined || value === null) return undefined;
@@ -2255,6 +2303,7 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
       regularPrice: optionalNumber(record, 'regularPrice', path),
       promoText: optionalString(record, 'promoText', path),
       memberOnly: optionalBoolean(record, 'memberOnly', path),
+      isAvailable: optionalAvailability(record, path),
       validFrom: optionalString(record, 'validFrom', path),
       validUntil: optionalString(record, 'validUntil', path),
       observedAt: optionalString(record, 'observedAt', path),
@@ -2444,6 +2493,7 @@ export type RetailerProductInput = {
   regularPrice?: number;
   promoText?: string;
   memberOnly?: boolean;
+  isAvailable?: boolean;
   validFrom?: string;
   validUntil?: string;
   sourceUrl?: string;
@@ -2518,6 +2568,7 @@ export type IngestedPriceObservation = {
   confidenceScore: number;
   isOnlinePrice: boolean;
   isInstorePrice: boolean;
+  isAvailable: boolean;
   fuelSource?: RetailerProductInput['fuelSource'];
 };
 
@@ -2689,6 +2740,7 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       confidenceScore: confidence,
       isOnlinePrice: input.sourceType === 'official_api' || input.sourceType === 'retailer_online_page',
       isInstorePrice: input.sourceType === 'receipt_scan' || input.sourceType === 'shelf_photo' || input.sourceType === 'manual_user_report',
+      isAvailable: input.isAvailable ?? true,
       fuelSource: input.fuelSource
     },
     promotionObservation: hasPromotion
@@ -3837,6 +3889,7 @@ async function persistDailyConnectorOutput(input: {
         storeId: accepted.priceObservation.storeId,
         priceType: accepted.priceObservation.priceType,
         price: accepted.priceObservation.price,
+        isAvailable: accepted.priceObservation.isAvailable,
         observedAt: accepted.priceObservation.observedAt
       };
       const rawProvenance = {
@@ -3861,7 +3914,8 @@ async function persistDailyConnectorOutput(input: {
           retailerProductId: accepted.priceObservation.retailerProductId ?? null,
           storeId: accepted.priceObservation.storeId ?? null,
           observedAt: accepted.priceObservation.observedAt,
-          price: accepted.priceObservation.price
+          price: accepted.priceObservation.price,
+          isAvailable: accepted.priceObservation.isAvailable
         }),
         provenance: rawProvenance
       });
@@ -3882,6 +3936,7 @@ async function persistDailyConnectorOutput(input: {
         promotionStartsOn: accepted.promotionObservation?.validFrom?.slice(0, 10),
         promotionEndsOn: accepted.promotionObservation?.validUntil?.slice(0, 10),
         memberRequired: accepted.promotionObservation?.memberOnly ?? false,
+        isAvailable: accepted.priceObservation.isAvailable,
         observedAt: accepted.priceObservation.observedAt,
         validFrom: accepted.priceObservation.validFrom,
         validUntil: accepted.priceObservation.validUntil,

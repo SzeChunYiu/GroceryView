@@ -5042,7 +5042,8 @@ describe('parseRetailerProductJsonSnapshot', () => {
             price: '49.90',
             regularPrice: 69.9,
             promoText: 'Veckans erbjudande',
-            memberOnly: 'false'
+            memberOnly: 'false',
+            stockStatus: 'http_404'
           }]
         }),
         contentType: 'application/json',
@@ -5056,6 +5057,7 @@ describe('parseRetailerProductJsonSnapshot', () => {
     assert.equal(result.status, 'completed');
     assert.equal(result.acceptedCount, 1);
     assert.equal(result.ingestion.accepted[0].priceObservation.unitPrice, 110.8889);
+    assert.equal(result.ingestion.accepted[0].priceObservation.isAvailable, false);
     assert.equal(result.ingestion.accepted[0].priceObservation.parserVersion, 'normalized-json-v1');
     assert.equal(result.ingestion.accepted[0].priceObservation.rawSnapshotRef, 'raw://normalized/willys:official-api:willys-normalized-json:2026-05-20.json');
   });
@@ -5676,6 +5678,7 @@ describe('daily ingestion runner', () => {
           packageUnit: 'g',
           price: 49.9,
           regularPrice: 69.9,
+          isAvailable: false,
           promoText: 'Veckans erbjudande'
         }]
       }), { status: 200, headers: { 'content-type': 'application/json' } })
@@ -5708,6 +5711,7 @@ describe('daily ingestion runner', () => {
     assert.equal('product' in rawRows[0]!.payload, false);
     assert.deepEqual(Object.keys(rawRows[0]!.payload).sort(), [
       'chainId',
+      'isAvailable',
       'observedAt',
       'price',
       'priceType',
@@ -5718,9 +5722,10 @@ describe('daily ingestion runner', () => {
     const storeInsert = executor.calls.find((call) => call.sql.includes('insert into stores'));
     assert.equal(storeInsert?.params[0], 'willys-odenplan');
     const latestPriceInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
-    const observationRows = JSON.parse(String(latestPriceInsert?.params[0])) as Array<{ store_id: string; domain: string }>;
+    const observationRows = JSON.parse(String(latestPriceInsert?.params[0])) as Array<{ store_id: string; domain: string; is_available?: boolean }>;
     assert.equal(observationRows[0]?.store_id, 'store-db-2');
     assert.equal(observationRows[0]?.domain, 'grocery');
+    assert.equal(observationRows[0]?.is_available, false);
   });
 
   it('reuses daily chain, store, and product ids while persisting a connector batch', async () => {
@@ -6014,6 +6019,7 @@ describe('daily ingestion runner', () => {
           name: 'Kaffefilter Vit 1x4 100-pack',
           manufacturerName: 'Coop',
           packageSizeInformation: '100-pack',
+          availableOnline: false,
           salesPriceData: { b2cPrice: 19.5 }
         }] } }), { status: 200, headers: { 'content-type': 'application/json' } });
       }
@@ -6029,6 +6035,7 @@ describe('daily ingestion runner', () => {
     const observation = firstBatchObservation(executor);
     assert.equal(observation.store_id, 'store-db-2');
     assert.equal(observation.price, 19.5);
+    assert.equal(observation.is_available, false);
   });
 
 

@@ -168,7 +168,12 @@ export function ProductPriceCards({
                 <h3 className="mt-2 text-lg font-black text-slate-950">{card.name}</h3>
                 <p className="mt-1 text-sm text-slate-600">{card.brand}</p>
               </div>
-              <span className="rounded-full bg-white px-3 py-1 text-[0.7rem] font-black text-slate-700">{resolvedMode(card, compareMode)}</span>
+              <div className="flex flex-col items-end gap-2">
+                {card.isAvailable === false ? (
+                  <span className="rounded-full bg-rose-100 px-3 py-1 text-[0.7rem] font-black text-rose-900">Out of stock</span>
+                ) : null}
+                <span className="rounded-full bg-white px-3 py-1 text-[0.7rem] font-black text-slate-700">{resolvedMode(card, compareMode)}</span>
+              </div>
             </div>
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>

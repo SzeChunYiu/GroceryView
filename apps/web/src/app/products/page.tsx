@@ -129,7 +129,12 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
                   </div>
                 ) : null}
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">{product.brand}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">{product.brand}</p>
+                    {product.isAvailable === false ? (
+                      <span className="rounded-full bg-rose-100 px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-rose-900">Out of stock</span>
+                    ) : null}
+                  </div>
                   <h3 className="mt-1 text-lg font-black text-slate-950">{product.name}</h3>
                   <p className="mt-1 text-xs font-semibold text-slate-500">{product.categoryLabel}</p>
                 </div>

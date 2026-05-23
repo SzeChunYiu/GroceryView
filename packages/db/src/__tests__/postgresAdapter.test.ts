@@ -284,6 +284,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       promotion_starts_on: '2026-05-18',
       promotion_ends_on: '2026-05-24',
       member_required: true,
+      is_available: false,
       observed_at: new Date('2026-05-20T09:00:00.000Z'),
       valid_from: '2026-05-18T00:00:00.000Z',
       valid_until: '2026-05-24T23:59:59.000Z',
@@ -309,6 +310,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       promotion_starts_on: null,
       promotion_ends_on: null,
       member_required: false,
+      is_available: true,
       observed_at: '2026-05-20T08:00:00.000Z',
       valid_from: null,
       valid_until: null,
@@ -327,6 +329,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       regular_price: null,
       unit_price: '110.8889',
       currency: 'SEK',
+      is_available: true,
       observed_at: new Date('2026-05-20T08:00:00.000Z'),
       confidence: '0.9100',
       provenance: '{"sourceType":"retailer_api","sourceName":"Willys"}'
@@ -341,6 +344,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       regular_price: '59.90',
       unit_price: 99.7778,
       currency: 'SEK',
+      is_available: false,
       observed_at: '2026-05-20T09:00:00.000Z',
       confidence: 0.88,
       member_required: false,
@@ -392,6 +396,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       regular_price: '59.90',
       unit_price: 99.7778,
       currency: 'SEK',
+      is_available: false,
       observed_at: '2026-05-20T09:00:00.000Z',
       confidence: 0.88,
       promotion_text: null,
@@ -1677,8 +1682,9 @@ describe('persistOpenPricesArtifact', () => {
       110.8889,
       'SEK'
     ]);
-    assert.equal(observationInsert.params[18], '2026-05-19T00:00:00.000Z');
-    assert.equal(observationInsert.params[21], 0.95);
+    assert.equal(observationInsert.params[18], true);
+    assert.equal(observationInsert.params[19], '2026-05-19T00:00:00.000Z');
+    assert.equal(observationInsert.params[22], 0.95);
     assert.equal(executor.calls.some((call) => /update observations\b/.test(call.sql)), false);
 
     const latestInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
@@ -1703,6 +1709,7 @@ describe('createPostgresPriceObservationWriter', () => {
         currency: 'SEK',
         observed_at: '2026-05-20T08:00:00.000Z',
         confidence: '0.9100',
+        is_available: true,
         provenance: '{"sourceType":"retailer_api","sourceName":"Willys"}'
       }
     ];
@@ -1726,7 +1733,8 @@ describe('createPostgresPriceObservationWriter', () => {
     );
 
     assert.match(executor.calls[0]!.sql, /insert into observations/);
-    assert.equal(executor.calls[0]!.params[18], '2026-05-21T08:00:00.000Z');
+    assert.equal(executor.calls[0]!.params[18], true);
+    assert.equal(executor.calls[0]!.params[19], '2026-05-21T08:00:00.000Z');
     assert.match(executor.calls[1]!.sql, /insert into latest_prices/);
     assert.equal(executor.calls[1]!.params[5], 'observation-1');
   });
@@ -1754,6 +1762,7 @@ describe('createPostgresPriceObservationWriter', () => {
         promotionStartsOn: '2026-05-18',
         promotionEndsOn: '2026-05-24',
         memberRequired: true,
+        isAvailable: false,
         observedAt: '2026-05-20T08:00:00.000Z',
         validFrom: '2026-05-18T00:00:00.000Z',
         validUntil: '2026-05-24T23:59:59.000Z',
@@ -1764,7 +1773,7 @@ describe('createPostgresPriceObservationWriter', () => {
     );
 
     assert.match(executor.calls[0]!.sql, /insert into observations/);
-    assert.match(executor.calls[0]!.sql, /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*confidence,\s*provenance\s*\) do nothing/);
+    assert.match(executor.calls[0]!.sql, /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*confidence,\s*provenance\s*\) do nothing/);
     assert.match(executor.calls[0]!.sql, /returning id/);
     assert.deepEqual(executor.calls[0]!.params.slice(0, 12), [
       'product-1',
@@ -1780,7 +1789,8 @@ describe('createPostgresPriceObservationWriter', () => {
       110.8889,
       'SEK'
     ]);
-    assert.equal(executor.calls[0]!.params[22], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
+    assert.equal(executor.calls[0]!.params[18], false);
+    assert.equal(executor.calls[0]!.params[23], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
 
     assert.match(executor.calls[1]!.sql, /insert into latest_prices/);
     assert.match(executor.calls[1]!.sql, /on conflict \(product_id, chain_id, store_id, price_type\) do update/);
@@ -1797,6 +1807,7 @@ describe('createPostgresPriceObservationWriter', () => {
       110.8889,
       'SEK',
       '2026-05-20T08:00:00.000Z',
+      false,
       0.91,
       JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' })
     ]);
@@ -1819,6 +1830,7 @@ describe('createPostgresPriceObservationWriter', () => {
         price: 49.9,
         unitPrice: 110.8889,
         currency: 'SEK',
+        isAvailable: false,
         observedAt: '2026-05-20T08:00:00.000Z',
         confidence: 0.91,
         provenance: { sourceType: 'retailer_api', sourceName: 'Willys', replay: true }
@@ -1843,6 +1855,7 @@ describe('createPostgresPriceObservationWriter', () => {
       49.9,
       110.8889,
       'SEK',
+      false,
       0.91,
       JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', replay: true })
     ]);
@@ -1904,6 +1917,7 @@ describe('createPostgresPriceObservationWriter', () => {
           quantityUnit: 'g',
           promotionText: 'Veckans erbjudande',
           memberRequired: false,
+          isAvailable: false,
           observedAt: '2026-05-21T03:17:00.000Z',
           confidence: 0.95,
           provenance: { connectorId: 'willys-normalized-json', runKey: 'willys:2026-05-21' }
@@ -1934,15 +1948,17 @@ describe('createPostgresPriceObservationWriter', () => {
     assert.match(executor.calls[0]!.sql, /from jsonb_to_recordset\(\$1::jsonb\)/);
     assert.match(executor.calls[0]!.sql, /price numeric\(12, 2\)/);
     assert.match(executor.calls[0]!.sql, /unit_price numeric\(12, 4\)/);
+    assert.match(executor.calls[0]!.sql, /is_available boolean/);
     assert.match(executor.calls[0]!.sql, /confidence numeric\(5, 4\)/);
     assert.match(executor.calls[0]!.sql, /domain text/);
-    assert.match(executor.calls[0]!.sql, /partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, confidence, provenance/);
+    assert.match(executor.calls[0]!.sql, /partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, confidence, provenance/);
     assert.match(executor.calls[0]!.sql, /join observations on observations\.product_id = ranked_input\.product_id/);
     assert.match(executor.calls[0]!.sql, /and observations\.domain = ranked_input\.domain/);
     assert.match(executor.calls[0]!.sql, /and observations\.retailer_product_ref is not distinct from ranked_input\.retailer_product_ref/);
     assert.match(executor.calls[0]!.sql, /and observations\.price = ranked_input\.price/);
     assert.match(executor.calls[0]!.sql, /and observations\.unit_price = ranked_input\.unit_price/);
     assert.match(executor.calls[0]!.sql, /and observations\.currency = ranked_input\.currency/);
+    assert.match(executor.calls[0]!.sql, /and observations\.is_available = ranked_input\.is_available/);
     assert.match(executor.calls[0]!.sql, /and observations\.confidence = ranked_input\.confidence/);
     assert.match(executor.calls[0]!.sql, /and observations\.provenance = ranked_input\.provenance/);
     assert.match(executor.calls[0]!.sql, /where input_rank = 1/);
@@ -1977,6 +1993,7 @@ describe('createPostgresPriceObservationWriter', () => {
       promotion_starts_on: null,
       promotion_ends_on: null,
       member_required: false,
+      is_available: false,
       observed_at: '2026-05-21T03:17:00.000Z',
       valid_from: null,
       valid_until: null,
@@ -2018,6 +2035,7 @@ describe('createPostgresSiteSnapshotReader', () => {
         regularPrice: 59.9,
         unitPrice: 99.7778,
         currency: 'SEK',
+        isAvailable: false,
         observedAt: '2026-05-20T09:00:00.000Z',
         confidence: 0.88,
         memberRequired: false,
@@ -2027,6 +2045,8 @@ describe('createPostgresSiteSnapshotReader', () => {
 
     assert.match(executor.calls[0]!.sql, /from latest_prices/);
     assert.match(executor.calls[0]!.sql, /join observations on observations\.id = latest_prices\.observation_id/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.is_available/);
+    assert.match(executor.calls[0]!.sql, /observations\.is_available/);
     assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
     assert.match(executor.calls[0]!.sql, /join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
@@ -2099,6 +2119,7 @@ describe('createPostgresPriceReader', () => {
         price: 49.9,
         unitPrice: 110.8889,
         currency: 'SEK',
+        isAvailable: true,
         observedAt: '2026-05-20T08:00:00.000Z',
         confidence: 0.91,
         provenance: { sourceType: 'retailer_api', sourceName: 'Willys' }
@@ -2115,6 +2136,7 @@ describe('createPostgresPriceReader', () => {
         currency: 'SEK',
         observedAt: '2026-05-20T09:00:00.000Z',
         confidence: 0.88,
+        isAvailable: false,
         provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
       }
     ]);
@@ -2159,6 +2181,7 @@ describe('createPostgresPriceReader', () => {
           promotionStartsOn: '2026-05-18',
           promotionEndsOn: '2026-05-24',
           memberRequired: true,
+          isAvailable: false,
           observedAt: '2026-05-20T09:00:00.000Z',
           validFrom: '2026-05-18T00:00:00.000Z',
           validUntil: '2026-05-24T23:59:59.000Z',
@@ -2176,12 +2199,14 @@ describe('createPostgresPriceReader', () => {
           memberRequired: false,
           observedAt: '2026-05-20T08:00:00.000Z',
           confidence: 0.91,
+          isAvailable: true,
           provenance: { sourceType: 'retailer_api' }
         }
       ]
     );
 
     assert.match(executor.calls[0]!.sql, /from observations/);
+    assert.match(executor.calls[0]!.sql, /is_available/);
     assert.match(executor.calls[0]!.sql, /where product_id = \$1/);
     assert.match(executor.calls[0]!.sql, /\$2::uuid is null or chain_id = \$2::uuid/);
     assert.match(executor.calls[0]!.sql, /\$3::uuid is null or store_id = \$3::uuid/);
