@@ -123,6 +123,7 @@ import {
   parseOverpassFuelStations,
   parseOverpassGroceryStores,
   retailerRobotsPolicyMatrix,
+  runAllStoreTasks,
   runRetailerConnector,
   runDailyIngestion,
   runOpenFoodFactsProductMetadataEnrichment,
@@ -4713,6 +4714,39 @@ describe('runOpenFoodFactsProductMetadataEnrichment', () => {
 });
 
 describe('daily ingestion runner', () => {
+  it('runs all-store work with bounded concurrency and store-level retry controls', async () => {
+    const stores = ['store-1', 'store-2', 'store-3', 'store-4'];
+    const attempts = new Map<string, number>();
+    let active = 0;
+    let maxActive = 0;
+
+    const result = await runAllStoreTasks({
+      stores,
+      storeId: (store) => store,
+      storeConcurrency: 2,
+      storeRetryAttempts: 1,
+      storeRetryBaseDelayMs: 0,
+      task: async (store) => {
+        attempts.set(store, (attempts.get(store) ?? 0) + 1);
+        if (store === 'store-3' && attempts.get(store) === 1) {
+          throw new Error('temporary branch throttle');
+        }
+        active += 1;
+        maxActive = Math.max(maxActive, active);
+        await new Promise((resolve) => setTimeout(resolve, 5));
+        active -= 1;
+        return [`row:${store}`];
+      }
+    });
+
+    assert.deepEqual(result, {
+      rows: ['row:store-1', 'row:store-2', 'row:store-3', 'row:store-4'],
+      failures: []
+    });
+    assert.equal(attempts.get('store-3'), 2);
+    assert.equal(maxActive, 2);
+  });
+
   it('loads connector config from environment without exposing secrets', () => {
     const configs = buildDailyConnectorConfigsFromEnv({
       DATABASE_URL: 'postgres://user:secret@example/groceryview',
@@ -4745,6 +4779,10 @@ describe('daily ingestion runner', () => {
       GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: '125',
       GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: '2',
       GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: '500',
+      GROCERYVIEW_DAILY_STORE_CONCURRENCY: '6',
+      GROCERYVIEW_DAILY_STORE_START_DELAY_MS: '75',
+      GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS: '3',
+      GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS: '250',
       GROCERYVIEW_DAILY_BLOCKER_LOG_PATH: '/tmp/groceryview-ingestion-blockers.txt',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
         dailyConnectorFixture('ica'),
@@ -4762,6 +4800,21 @@ describe('daily ingestion runner', () => {
       connectorRetryAttempts: 2,
       connectorRetryBaseDelayMs: 500,
       blockerLogPath: '/tmp/groceryview-ingestion-blockers.txt'
+    });
+    assert.equal(configs.connectors[0]?.storeConcurrency, 6);
+    assert.equal(configs.connectors[0]?.storeStartDelayMs, 75);
+    assert.equal(configs.connectors[0]?.storeRetryAttempts, 3);
+    assert.equal(configs.connectors[0]?.storeRetryBaseDelayMs, 250);
+    assert.deepEqual(configs.runner, {
+      maxConnectors: undefined,
+      maxConcurrency: 3,
+      connectorStartDelayMs: 125,
+      connectorRetryAttempts: 2,
+      connectorRetryBaseDelayMs: 500,
+      storeConcurrency: 6,
+      storeStartDelayMs: 75,
+      storeRetryAttempts: 3,
+      storeRetryBaseDelayMs: 250
     });
   });
 
@@ -4802,7 +4855,11 @@ describe('daily ingestion runner', () => {
       GROCERYVIEW_DAILY_MAX_CONCURRENCY: '2',
       GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: '125',
       GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: '1',
-      GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: '250'
+      GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: '250',
+      GROCERYVIEW_DAILY_STORE_CONCURRENCY: '5',
+      GROCERYVIEW_DAILY_STORE_START_DELAY_MS: '50',
+      GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS: '2',
+      GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS: '100'
     });
 
     assert.equal(configs.connectors.length, 4);
@@ -4811,8 +4868,13 @@ describe('daily ingestion runner', () => {
       maxConcurrency: 2,
       connectorStartDelayMs: 125,
       connectorRetryAttempts: 1,
-      connectorRetryBaseDelayMs: 250
+      connectorRetryBaseDelayMs: 250,
+      storeConcurrency: 5,
+      storeStartDelayMs: 50,
+      storeRetryAttempts: 2,
+      storeRetryBaseDelayMs: 100
     });
+    assert.equal(configs.connectors[0]?.storeConcurrency, 5);
   });
 
   it('forces the production daily ingestion database session into write mode', () => {
