@@ -110,6 +110,28 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(observations, /confidence numeric\(5, 4\) not null check \(confidence between 0 and 1\)/);
   });
 
+  it('keeps connector observation writes idempotent without overwriting history', () => {
+    assert.match(allMigrations, /create unique index if not exists observations_connector_idempotency_idx/);
+    for (const column of [
+      'product_id',
+      'chain_id',
+      'store_id',
+      'domain',
+      'retailer_product_ref',
+      'price_type',
+      'observed_at',
+      'price',
+      'unit_price',
+      'currency',
+      'confidence',
+      'provenance'
+    ]) {
+      assert.match(allMigrations, new RegExp(`\\b${column}\\b`), `idempotency index missing ${column}`);
+    }
+    assert.match(allMigrations, /nulls not distinct/);
+    assert.match(schemaDoc, /exact connector replay idempotency/);
+  });
+
   it('keeps latest prices derived from observations and uniquely addressable', () => {
     const latestPrices = tableDefinition('latest_prices');
     assert.match(latestPrices, /observation_id uuid not null references observations\(id\)/);
