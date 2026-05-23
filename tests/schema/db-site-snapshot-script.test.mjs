@@ -1,5 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -510,6 +511,62 @@ describe('DB-backed site snapshot export script', () => {
         modulePath,
         cacheTtlSeconds: 60
       }), artifact);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('falls through to the Postgres reader path when the CLI cache is expired without rewriting stale outputs', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'db-site-snapshot-cli-cache-miss-'));
+    try {
+      const outputPath = join(dir, 'snapshot.json');
+      const modulePath = join(dir, 'db-site-products.ts');
+      const artifact = buildDbSiteSnapshotArtifact({
+        generatedAt: '2026-05-22T20:00:00.000Z',
+        requiredChains: ['willys'],
+        rows: [{
+          productId: 'product-1',
+          productSlug: 'bryggkaffe-450g',
+          canonicalName: 'Bryggkaffe mellanrost 450 g',
+          categoryPath: ['Pantry', 'Coffee'],
+          comparableUnit: 'kg',
+          chainId: 'chain-1',
+          chainSlug: 'willys',
+          chainName: 'Willys',
+          priceType: 'online',
+          observationId: 'observation-stale-cache',
+          price: 44.9,
+          unitPrice: 99.7778,
+          currency: 'SEK',
+          observedAt: '2026-05-22T19:00:00.000Z',
+          confidence: 0.88
+        }]
+      });
+      const staleSnapshot = `${JSON.stringify(artifact, null, 2)}\n`;
+      const staleModule = renderDbSiteProductsModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows });
+      writeFileSync(outputPath, staleSnapshot);
+      writeFileSync(modulePath, staleModule);
+
+      const result = spawnSync('npm', ['run', '--silent', 'ingest:export-db-snapshot'], {
+        cwd: new URL('../..', import.meta.url),
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          DATABASE_URL: 'postgres://groceryview:groceryview@127.0.0.1:1/groceryview',
+          GROCERYVIEW_DB_SITE_SNAPSHOT_CACHE_TTL_SECONDS: '1',
+          GROCERYVIEW_DB_SITE_SNAPSHOT_PATH: outputPath,
+          GROCERYVIEW_DB_SITE_SNAPSHOT_MODULE_PATH: modulePath,
+          GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS: 'willys'
+        },
+        timeout: 5000
+      });
+
+      assert.equal(result.status, 1);
+      assert.equal(result.error, undefined);
+      assert.match(result.stderr, /ECONNREFUSED|connect ECONNREFUSED/);
+      assert.equal(result.stdout, '');
+      assert.equal(readFileSync(outputPath, 'utf8'), staleSnapshot);
+      assert.equal(readFileSync(modulePath, 'utf8'), staleModule);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
