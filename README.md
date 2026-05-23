@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 02:24 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 03:25 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **265**
+- **Shipped `feat:`/`wire:` PRs to date:** **259**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,6 +42,12 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1190 feat(scanning): add upload storage readiness
+- #1187 feat(deals): add ranked deal screener
+- #1185 feat(scanning): add live provider health checks
+- #1183 feat(readiness): expose scan provider health
+- #1181 feat(scanning): add OpenFoodFacts barcode provider
+- #1179 feat(map): highlight cheapest branch evidence
 - #1178 feat(scanning): add OCR.space receipt provider
 - #1177 feat(ingestion): add Hemkop all-store product prices
 - #1175 feat(mobile): add camera capture screens
@@ -51,16 +57,10 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1170 feat(ingestion): parse Coop DR flyer PDFs
 - #1168 feat(fuel): add OSM station source connector
 - #1166 feat(notifications): wire runtime provider worker
-- #1165 feat(notifications): add provider delivery adapters
-- #1155 feat(ingest): add ICA Tidaholm promotions
-- #1152 feat(ingest): add Coop branch weekly discounts
-- #1150 feat(ingest): add ICA Tibro promotions
-- #1148 feat(ingest): refresh OpenFoodFacts barcode nutrition
-- #1146 feat(ingest): add Coop weekly branch discounts
 
 ## 🔄 In progress (open PRs)
 
-_(no open PRs)_
+- #1192 feat(scanning): add upload CORS readiness
 
 ## 📋 To-do (from GOAL.md backlog)
 
