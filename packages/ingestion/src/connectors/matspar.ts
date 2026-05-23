@@ -101,7 +101,7 @@ export const DEFAULT_MATSPAR_SEARCH_QUERIES = [
   'havredryck'
 ] as const;
 export const DEFAULT_MATSPAR_SEARCH_PAGES = [1, 2] as const;
-export const DEFAULT_MATSPAR_MAX_ROWS = 3000;
+export const DEFAULT_MATSPAR_MAX_ROWS = 4000;
 
 export type FetchMatsparProductsOptions = {
   fetchImpl?: typeof fetch;
