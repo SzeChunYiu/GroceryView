@@ -452,3 +452,96 @@ export async function processScanUpload(input: { upload: ScanUpload; providers: 
     lowConfidenceRows
   };
 }
+
+export type OcrSpaceReceiptProviderOptions = {
+  apiKey: string;
+  endpoint?: string;
+  fetch?: typeof fetch;
+};
+
+type OcrSpaceWord = { WordText?: string; Confidence?: number };
+type OcrSpaceLine = { LineText?: string; Words?: OcrSpaceWord[] };
+type OcrSpaceResult = {
+  ParsedText?: string;
+  TextOverlay?: { Lines?: OcrSpaceLine[] };
+};
+type OcrSpaceResponse = {
+  IsErroredOnProcessing?: boolean;
+  ErrorMessage?: string | string[];
+  ParsedResults?: OcrSpaceResult[];
+};
+
+function requiredOcrSpaceApiKey(apiKey: string): string {
+  const normalized = apiKey.trim();
+  if (!normalized) throw new Error('OCR_SPACE_API_KEY is required.');
+  return normalized;
+}
+
+function parseReceiptMoney(value: string): number | null {
+  const normalized = value.replace(',', '.');
+  const amount = Number(normalized);
+  return Number.isFinite(amount) ? Math.round(amount * 100) / 100 : null;
+}
+
+function confidenceFromLine(line: OcrSpaceLine): number {
+  const confidences = (line.Words ?? [])
+    .map((word) => typeof word.Confidence === 'number' ? word.Confidence : null)
+    .filter((confidence): confidence is number => confidence !== null);
+  if (confidences.length === 0) return 0.5;
+  const lowest = Math.min(...confidences);
+  return Math.round(Math.max(0, Math.min(1, lowest / 100)) * 100) / 100;
+}
+
+function parseReceiptRowsFromOcrSpace(result: OcrSpaceResult): ReceiptOcrRow[] {
+  const lines = result.TextOverlay?.Lines?.length
+    ? result.TextOverlay.Lines.map((line) => ({ text: line.LineText ?? '', confidence: confidenceFromLine(line) }))
+    : (result.ParsedText ?? '').split(/\r?\n/).map((line) => ({ text: line, confidence: 0.5 }));
+
+  const rows: ReceiptOcrRow[] = [];
+  for (const line of lines) {
+    const trimmed = line.text.trim();
+    if (!trimmed || /^total\b/i.test(trimmed)) continue;
+    const match = trimmed.match(/^(.*?)(\d+(?:[,.]\d{2}))\s*$/);
+    if (!match) continue;
+    const itemTotal = parseReceiptMoney(match[2]!);
+    const rawName = match[1]!.trim().replace(/\s+/g, ' ');
+    if (!rawName || itemTotal === null) continue;
+    rows.push({ rawName, itemTotal, confidence: line.confidence });
+  }
+  return rows;
+}
+
+function parseReceiptTotalFromText(text: string, fallback: number): number {
+  const totalLine = text.split(/\r?\n/).find((line) => /^\s*total\b/i.test(line));
+  const match = totalLine?.match(/(\d+(?:[,.]\d{2}))\s*$/);
+  const total = match ? parseReceiptMoney(match[1]!) : null;
+  return total ?? fallback;
+}
+
+function normalizeOcrSpaceError(response: OcrSpaceResponse): string {
+  const message = Array.isArray(response.ErrorMessage) ? response.ErrorMessage.join('; ') : response.ErrorMessage;
+  return message?.trim() || 'unknown OCR.space error';
+}
+
+export function createOcrSpaceReceiptProvider(options: OcrSpaceReceiptProviderOptions): NonNullable<ScanProviders['receiptOcr']> {
+  const apiKey = requiredOcrSpaceApiKey(options.apiKey);
+  const endpoint = options.endpoint ?? 'https://api.ocr.space/parse/image';
+  const fetcher = options.fetch ?? fetch;
+  return {
+    async parse(payload: string): Promise<ReceiptOcrResult> {
+      if (!payload.trim()) throw new Error('receipt OCR payload is required.');
+      const body = new URLSearchParams({ url: payload, isOverlayRequired: 'true', scale: 'true', OCREngine: '2' });
+      const response = await fetcher(endpoint, { method: 'POST', headers: { apikey: apiKey, 'content-type': 'application/x-www-form-urlencoded' }, body });
+      if (!response.ok) throw new Error(`OCR.space HTTP ${response.status}`);
+      const parsed = await response.json() as OcrSpaceResponse;
+      if (parsed.IsErroredOnProcessing) throw new Error(`OCR.space failed: ${normalizeOcrSpaceError(parsed)}`);
+      const firstResult = parsed.ParsedResults?.[0];
+      if (!firstResult) throw new Error('OCR.space returned no parsed receipt text.');
+      const rows = parseReceiptRowsFromOcrSpace(firstResult);
+      const rowTotal = Math.round(rows.reduce((sum, row) => sum + row.itemTotal, 0) * 100) / 100;
+      const totalAmount = parseReceiptTotalFromText(firstResult.ParsedText ?? '', rowTotal);
+      const confidence = rows.length > 0 ? Math.round((rows.reduce((sum, row) => sum + row.confidence, 0) / rows.length) * 100) / 100 : 0;
+      return { rows, totalAmount, confidence };
+    }
+  };
+}
