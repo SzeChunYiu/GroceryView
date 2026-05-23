@@ -748,6 +748,67 @@ export type OpenPricesArtifactPersistenceResult = {
   chainIds: string[];
 };
 
+export type CountryIngestionRunRecord = {
+  countryCode: string;
+  requestedAt: string;
+  targetCount: number;
+};
+
+export type CountryIngestionTargetRecord = {
+  targetKey: string;
+  countryCode: string;
+  chainId: string;
+  chainDisplayName?: string;
+  storeId: string;
+  storeName?: string;
+  addressLine1?: string;
+  city?: string;
+  region?: string;
+  latitude?: number;
+  longitude?: number;
+  onlineOrderUrl?: string;
+};
+
+export type CountryIngestionObservationRecord = {
+  product: OpenPricesArtifactProduct;
+  alias: OpenPricesArtifactAlias;
+  priceObservation: OpenPricesArtifactPriceObservation & {
+    storeId?: string;
+    promoText?: string;
+    memberPrice?: number;
+    promoPrice?: number;
+  };
+  promotionObservation?: {
+    promoText?: string;
+    memberOnly?: boolean;
+  } | null;
+};
+
+export type CountryIngestionUpsertRecord = {
+  countryRunId?: string;
+  target: CountryIngestionTargetRecord;
+  connectorPlan?: {
+    connectorId: string;
+    runKey: string;
+    sourceRunId: string;
+    provenance: Record<string, unknown>;
+  };
+  observation: CountryIngestionObservationRecord;
+};
+
+export type PostgresCountryIngestionWriter = {
+  beginRun(run: CountryIngestionRunRecord): Promise<{ countryRunId: string }>;
+  upsertObservation(record: CountryIngestionUpsertRecord): Promise<{ observationId: string; rawRecordId: string; productId: string; chainId: string; storeId: string }>;
+  finishRun(run: {
+    countryRunId?: string;
+    status: 'succeeded' | 'partial' | 'failed';
+    acceptedCount: number;
+    upsertedCount: number;
+    blockerCount: number;
+    finishedAt: string;
+  }): Promise<void>;
+};
+
 export type HumanReviewerRecord = {
   id: string;
   role: 'viewer' | 'moderator' | 'lead';
@@ -2792,6 +2853,188 @@ async function upsertOpenPricesProduct(executor: QueryExecutor, product: OpenPri
   const id = rows[0]?.id;
   if (!id) throw new Error(`Open Prices product upsert did not return an id: ${slug}`);
   return id;
+}
+
+async function upsertCountryIngestionStore(
+  executor: QueryExecutor,
+  target: CountryIngestionTargetRecord,
+  chainId: string
+): Promise<string> {
+  const slug = normalizeImportSlug(target.storeId);
+  const name = target.storeName?.trim() || target.storeId;
+  const countryCode = target.countryCode.trim().toUpperCase() || 'SE';
+  const longitude = Number.isFinite(target.longitude) ? target.longitude : null;
+  const latitude = Number.isFinite(target.latitude) ? target.latitude : null;
+  const rows = await executor.query<IdRow>(
+    `insert into stores(
+       chain_id,
+       slug,
+       external_ref,
+       name,
+       address_line1,
+       city,
+       region,
+       country_code,
+       position,
+       online_order_url
+     ) values (
+       $1, $2, $3, $4, $5, $6, $7, $8,
+       case when $9::double precision is null or $10::double precision is null
+         then null
+         else ST_SetSRID(ST_MakePoint($9::double precision, $10::double precision), 4326)::geography
+       end,
+       $11
+     )
+     on conflict (slug) do update set
+       chain_id = excluded.chain_id,
+       external_ref = excluded.external_ref,
+       name = excluded.name,
+       address_line1 = excluded.address_line1,
+       city = excluded.city,
+       region = excluded.region,
+       country_code = excluded.country_code,
+       position = excluded.position,
+       online_order_url = excluded.online_order_url,
+       updated_at = now()
+     returning id`,
+    [
+      chainId,
+      slug,
+      target.storeId,
+      name,
+      target.addressLine1?.trim() || name,
+      target.city?.trim() || target.region?.trim() || 'Unknown',
+      target.region?.trim() || null,
+      countryCode,
+      longitude,
+      latitude,
+      target.onlineOrderUrl?.trim() || null
+    ]
+  );
+  const id = rows[0]?.id;
+  if (!id) throw new Error(`Country ingestion store upsert did not return an id: ${slug}`);
+  return id;
+}
+
+export function createPostgresCountryIngestionWriter(executor: QueryExecutor): PostgresCountryIngestionWriter {
+  const sourceWriter = createPostgresSourceRecordWriter(executor);
+  const aliasRepository = createPostgresProductAliasRepository(executor);
+  const priceWriter = createPostgresPriceObservationWriter(executor);
+
+  return {
+    async beginRun(run) {
+      const sourceRun = await sourceWriter.createSourceRun({
+        sourceType: 'retailer_api',
+        sourceName: `Country ingestion batch ${run.countryCode}`,
+        startedAt: run.requestedAt,
+        status: 'running',
+        provenance: {
+          source: 'country_batch_runner',
+          countryCode: run.countryCode,
+          targetCount: run.targetCount
+        }
+      });
+      return { countryRunId: sourceRun.sourceRunId };
+    },
+
+    async upsertObservation(record) {
+      if (!record.countryRunId?.trim()) throw new Error('countryRunId is required for country ingestion DB upserts.');
+      const priceObservation = record.observation.priceObservation;
+      const chainId = await upsertOpenPricesChain(
+        executor,
+        record.target.chainId || priceObservation.chainId
+      );
+      const storeId = await upsertCountryIngestionStore(executor, record.target, chainId);
+      const productId = await upsertOpenPricesProduct(executor, record.observation.product);
+
+      await aliasRepository.upsertProductAlias({
+        productId,
+        alias: record.observation.alias.rawName,
+        normalizedAlias: normalizeAlias(record.observation.alias.rawName),
+        sourceType: 'retailer',
+        sourceRef: record.target.targetKey,
+        matchConfidence: record.observation.alias.matchConfidence
+      });
+
+      const payload = {
+        target: record.target,
+        connectorPlan: record.connectorPlan ?? null,
+        product: record.observation.product,
+        alias: record.observation.alias,
+        priceObservation,
+        promotionObservation: record.observation.promotionObservation ?? null
+      };
+      const rawRecord = await sourceWriter.upsertRawRecord({
+        sourceRunId: record.countryRunId,
+        recordType: 'price',
+        externalRef: priceObservation.retailerProductId ?? record.observation.product.id,
+        observedAt: priceObservation.observedAt,
+        payload,
+        payloadHash: contentHashForPayload({
+          targetKey: record.target.targetKey,
+          productId: record.observation.product.id,
+          retailerProductId: priceObservation.retailerProductId ?? null,
+          observedAt: priceObservation.observedAt,
+          price: priceObservation.price
+        }),
+        provenance: {
+          source: 'country_batch_runner',
+          targetKey: record.target.targetKey,
+          connectorRunKey: record.connectorPlan?.runKey,
+          parserVersion: priceObservation.parserVersion,
+          rawSnapshotRef: priceObservation.rawSnapshotRef,
+          sourceUrl: priceObservation.sourceUrl
+        }
+      });
+
+      const observation = await priceWriter.recordPriceObservation({
+        productId,
+        chainId,
+        storeId,
+        sourceRunId: record.countryRunId,
+        rawRecordId: rawRecord.rawRecordId,
+        retailerProductRef: priceObservation.retailerProductId,
+        priceType: mapOpenPricesPriceType(priceObservation.priceType),
+        price: priceObservation.price,
+        regularPrice: priceObservation.regularPrice,
+        unitPrice: priceObservation.unitPrice,
+        currency: priceObservation.currency,
+        quantity: record.observation.product.packageSize,
+        quantityUnit: record.observation.product.packageUnit,
+        promotionText: record.observation.promotionObservation?.promoText ?? priceObservation.promoText,
+        memberRequired: record.observation.promotionObservation?.memberOnly ?? priceObservation.priceType === 'member',
+        observedAt: priceObservation.observedAt,
+        confidence: priceObservation.confidenceScore,
+        provenance: {
+          ...(priceObservation.provenance ?? {}),
+          source: 'country_batch_runner',
+          targetKey: record.target.targetKey,
+          connectorRunKey: record.connectorPlan?.runKey,
+          rawRecordId: rawRecord.rawRecordId
+        }
+      });
+
+      return {
+        observationId: observation.observationId,
+        rawRecordId: rawRecord.rawRecordId,
+        productId,
+        chainId,
+        storeId
+      };
+    },
+
+    async finishRun(run) {
+      if (!run.countryRunId?.trim()) throw new Error('countryRunId is required to finish a country ingestion run.');
+      await sourceWriter.finishSourceRun({
+        sourceRunId: run.countryRunId,
+        finishedAt: run.finishedAt,
+        status: run.status,
+        errorMessage: run.blockerCount > 0
+          ? `Country ingestion completed with ${run.blockerCount} blocker(s), ${run.acceptedCount} accepted, ${run.upsertedCount} upserted.`
+          : undefined
+      });
+    }
+  };
 }
 
 export async function persistOpenPricesArtifact(

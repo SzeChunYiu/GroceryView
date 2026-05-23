@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   createPostgresCatalogReader,
+  createPostgresCountryIngestionWriter,
   createPostgresPriceObservationWriter,
   createPostgresPriceReader,
   createPostgresProductAliasRepository,
@@ -20,6 +21,7 @@ class RecordingQueryExecutor implements QueryExecutor {
   rawRecordId: string | undefined = 'raw-record-1';
   chainId: string | undefined = 'chain-open-prices';
   productId: string | undefined = 'product-open-prices';
+  storeId: string | undefined = 'store-country-1';
   watchlistRows: unknown[] = [
     {
       product_id: 'coffee',
@@ -392,6 +394,9 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('insert into raw_records')) return this.rawRecordId === undefined ? ([] as T[]) : ([{ id: this.rawRecordId }] as T[]);
     if (sql.includes('from raw_records')) return this.rawRecordRows as T[];
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
+    if (sql.includes('insert into chains')) return this.chainId === undefined ? ([] as T[]) : ([{ id: this.chainId }] as T[]);
+    if (sql.includes('insert into products')) return this.productId === undefined ? ([] as T[]) : ([{ id: this.productId }] as T[]);
+    if (sql.includes('insert into stores')) return this.storeId === undefined ? ([] as T[]) : ([{ id: this.storeId }] as T[]);
     if (sql.includes('left join latest_prices')) return this.catalogCoverageRows as T[];
     if (sql.includes('join products on products.id = latest_prices.product_id')) return this.siteSnapshotRows as T[];
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
@@ -1544,6 +1549,172 @@ describe('createPostgresSourceRecordReader', () => {
     const reader = createPostgresSourceRecordReader(executor);
 
     assert.equal(await reader.getRawRecordByHash('source-run-1', 'sha256:missing'), null);
+  });
+});
+
+describe('createPostgresCountryIngestionWriter', () => {
+  it('begins one country run and upserts chain, store, product, raw record, observation, and latest price rows', async () => {
+    const executor = new RecordingQueryExecutor();
+    const writer = createPostgresCountryIngestionWriter(executor);
+
+    assert.deepEqual(
+      await writer.beginRun({
+        countryCode: 'SE',
+        requestedAt: '2026-05-22T09:00:00.000Z',
+        targetCount: 2
+      }),
+      { countryRunId: 'source-run-1' }
+    );
+
+    const upsert = await writer.upsertObservation({
+      countryRunId: 'source-run-1',
+      target: {
+        targetKey: 'se:willys:willys-odenplan',
+        countryCode: 'SE',
+        chainId: 'willys',
+        chainDisplayName: 'Willys',
+        storeId: 'willys-odenplan',
+        storeName: 'Willys Odenplan',
+        addressLine1: 'Odengatan 31',
+        city: 'Stockholm',
+        region: 'Stockholm',
+        latitude: 59.343,
+        longitude: 18.049,
+        onlineOrderUrl: 'https://example.invalid/willys/odenplan'
+      },
+      connectorPlan: {
+        connectorId: 'willys-country',
+        runKey: 'willys:official-api:willys-country:2026-05-22',
+        sourceRunId: 'source-run:willys:official-api:willys-country:2026-05-22',
+        provenance: { parserVersion: 'country-json-v1' }
+      },
+      observation: {
+        product: {
+          id: 'coffee-450g',
+          canonicalName: 'Bryggkaffe 450 g',
+          brand: 'Rosteriet',
+          categoryId: 'coffee',
+          packageSize: 450,
+          packageUnit: 'g',
+          comparableUnit: 'kg'
+        },
+        alias: {
+          rawName: 'Bryggkaffe 450g',
+          matchConfidence: 0.95
+        },
+        priceObservation: {
+          productId: 'coffee-450g',
+          retailerProductId: 'wil-coffee-450',
+          chainId: 'willys',
+          storeId: 'willys-odenplan',
+          observedAt: '2026-05-22T09:00:00.000Z',
+          price: 49.9,
+          unitPrice: 110.8889,
+          currency: 'SEK',
+          regularPrice: 59.9,
+          priceType: 'online',
+          parserVersion: 'country-json-v1',
+          rawSnapshotRef: 'raw://willys/odenplan',
+          sourceUrl: 'https://example.test/willys/odenplan',
+          confidenceScore: 0.95,
+          provenance: { sourceType: 'official_api' }
+        },
+        promotionObservation: {
+          promoText: 'Veckopris',
+          memberOnly: false
+        }
+      }
+    });
+
+    assert.deepEqual(upsert, {
+      observationId: 'observation-1',
+      rawRecordId: 'raw-record-1',
+      productId: 'product-open-prices',
+      chainId: 'chain-open-prices',
+      storeId: 'store-country-1'
+    });
+
+    assert.match(executor.calls[0]!.sql, /insert into source_runs/);
+    assert.equal(executor.calls[0]!.params[0], 'retailer_api');
+    assert.equal(executor.calls[0]!.params[1], 'Country ingestion batch SE');
+    const chainCall = executor.calls.find((call) => call.sql.includes('insert into chains'));
+    const storeCall = executor.calls.find((call) => call.sql.includes('insert into stores'));
+    const productCall = executor.calls.find((call) => call.sql.includes('insert into products'));
+    const aliasCall = executor.calls.find((call) => call.sql.includes('insert into aliases'));
+    const rawRecordCall = executor.calls.find((call) => call.sql.includes('insert into raw_records'));
+    const observationCall = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    const latestPriceCall = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
+
+    assert.ok(chainCall);
+    assert.ok(storeCall);
+    assert.deepEqual(storeCall.params.slice(0, 8), [
+      'chain-open-prices',
+      'willys-odenplan',
+      'willys-odenplan',
+      'Willys Odenplan',
+      'Odengatan 31',
+      'Stockholm',
+      'Stockholm',
+      'SE'
+    ]);
+    assert.ok(productCall);
+    assert.ok(aliasCall);
+    assert.ok(rawRecordCall);
+    assert.ok(observationCall);
+    assert.equal(observationCall.params[2], 'store-country-1');
+    assert.ok(latestPriceCall);
+
+    await writer.finishRun({
+      countryRunId: 'source-run-1',
+      status: 'partial',
+      acceptedCount: 2,
+      upsertedCount: 1,
+      blockerCount: 1,
+      finishedAt: '2026-05-22T09:05:00.000Z'
+    });
+    assert.match(executor.calls.at(-1)!.sql, /update source_runs/);
+    assert.equal(executor.calls.at(-1)!.params[2], 'partial');
+    assert.match(String(executor.calls.at(-1)!.params[3]), /1 blocker/);
+  });
+
+  it('fails closed before writing observations when a country run id is missing', async () => {
+    const executor = new RecordingQueryExecutor();
+    const writer = createPostgresCountryIngestionWriter(executor);
+
+    await assert.rejects(
+      writer.upsertObservation({
+        target: {
+          targetKey: 'se:willys:store',
+          countryCode: 'SE',
+          chainId: 'willys',
+          storeId: 'store'
+        },
+        observation: {
+          product: {
+            id: 'coffee',
+            canonicalName: 'Coffee',
+            comparableUnit: 'kg'
+          },
+          alias: {
+            rawName: 'Coffee',
+            matchConfidence: 0.9
+          },
+          priceObservation: {
+            productId: 'coffee',
+            chainId: 'willys',
+            observedAt: '2026-05-22T09:00:00.000Z',
+            price: 49.9,
+            unitPrice: 110.8889,
+            currency: 'SEK',
+            priceType: 'online',
+            rawSnapshotRef: 'raw://coffee',
+            confidenceScore: 0.95
+          }
+        }
+      }),
+      /countryRunId is required/
+    );
+    assert.equal(executor.calls.some((call) => call.sql.includes('insert into observations')), false);
   });
 });
 

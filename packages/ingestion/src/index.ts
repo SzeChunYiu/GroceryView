@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFile, mkdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname } from 'node:path';
 import {
@@ -4247,6 +4248,428 @@ export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.
   } finally {
     await pool.end();
   }
+}
+
+export type CountryIngestionStoreInput = {
+  storeId: string;
+  storeName?: string;
+  addressLine1?: string;
+  city?: string;
+  region?: string;
+  countryCode?: string;
+  latitude?: number;
+  longitude?: number;
+  onlineOrderUrl?: string;
+  endpointUrl?: string;
+  connectorId?: string;
+  parserVersion?: string;
+  previousRunKeys?: string[];
+  disabled?: boolean;
+  blockerReason?: string;
+};
+
+export type CountryIngestionChainInput = {
+  chainId: string;
+  displayName?: string;
+  sourceType: RetailerConnectorKind;
+  robotsTxtStatus: RobotsTxtStatus;
+  legalReviewStatus: LegalReviewStatus;
+  hasDataAgreement: boolean;
+  endpointUrl?: string;
+  connectorId: string;
+  parserVersion: string;
+  previousRunKeys?: string[];
+  stores: CountryIngestionStoreInput[];
+};
+
+export type CountryIngestionTarget = RetailerConnectorPlanInput & {
+  targetKey: string;
+  countryCode: string;
+  storeId: string;
+  storeName?: string;
+  addressLine1?: string;
+  city?: string;
+  region?: string;
+  latitude?: number;
+  longitude?: number;
+  onlineOrderUrl?: string;
+  chainDisplayName?: string;
+};
+
+export type CountryIngestionEnumeration = {
+  targets: CountryIngestionTarget[];
+  blockers: CountryIngestionBlocker[];
+};
+
+export type CountryIngestionBlocker = {
+  targetKey: string;
+  chainId?: string;
+  storeId?: string;
+  attempt?: number;
+  reason: string;
+  error?: string;
+};
+
+export type CountryIngestionRunRecord = {
+  countryCode: string;
+  requestedAt: string;
+  targetCount: number;
+};
+
+export type CountryIngestionUpsertRecord = {
+  countryRunId?: string;
+  target: CountryIngestionTarget;
+  connectorPlan: RetailerConnectorRunPlan;
+  observation: IngestionOutput;
+};
+
+export type CountryIngestionDbWriter = {
+  beginRun?(run: CountryIngestionRunRecord): Promise<{ countryRunId?: string } | void> | { countryRunId?: string } | void;
+  upsertObservation(record: CountryIngestionUpsertRecord): Promise<{ observationId?: string } | void> | { observationId?: string } | void;
+  finishRun?(run: {
+    countryRunId?: string;
+    status: 'succeeded' | 'partial' | 'failed';
+    acceptedCount: number;
+    upsertedCount: number;
+    blockerCount: number;
+    finishedAt: string;
+  }): Promise<void> | void;
+};
+
+export type CountryIngestionConnectorFactory = (target: CountryIngestionTarget) => {
+  fetcher: RetailerConnectorFetcher;
+  parser: RetailerConnectorParser;
+};
+
+export type CountryIngestionRetryOptions = {
+  maxAttempts?: number;
+  backoffMs?: number;
+};
+
+export type RunCountryIngestionBatchInput = {
+  countryCode?: string;
+  requestedAt: string;
+  chains: CountryIngestionChainInput[];
+  connectorFactory: CountryIngestionConnectorFactory;
+  db: CountryIngestionDbWriter;
+  concurrency?: number;
+  rateLimitMs?: number;
+  retry?: CountryIngestionRetryOptions;
+  blockerLogPath?: string;
+  wait?: (milliseconds: number) => Promise<void> | void;
+  now?: () => number;
+  finishedAt?: string;
+};
+
+export type CountryIngestionTargetResult = {
+  target: CountryIngestionTarget;
+  attempts: number;
+  status: RetailerConnectorRunResult['status'] | 'upsert_failed';
+  acceptedCount: number;
+  rejectedCount: number;
+  upsertedCount: number;
+  error?: string;
+};
+
+export type CountryIngestionBatchResult = {
+  status: 'succeeded' | 'partial' | 'failed';
+  countryCode: string;
+  countryRunId?: string;
+  targetCount: number;
+  completedTargetCount: number;
+  blockedTargetCount: number;
+  duplicateTargetCount: number;
+  failedTargetCount: number;
+  acceptedCount: number;
+  rejectedCount: number;
+  upsertedCount: number;
+  blockers: CountryIngestionBlocker[];
+  targetResults: CountryIngestionTargetResult[];
+  blockerLogPath: string;
+};
+
+const DEFAULT_INGESTION_BLOCKER_LOG_PATH = 'codex-tasks/ingestion-blockers.txt';
+
+export function enumerateCountryIngestionTargets(input: {
+  countryCode?: string;
+  requestedAt: string;
+  chains: CountryIngestionChainInput[];
+}): CountryIngestionEnumeration {
+  if (Number.isNaN(Date.parse(input.requestedAt))) throw new Error('requestedAt must be an ISO date.');
+  const countryCode = (input.countryCode ?? 'SE').trim().toUpperCase();
+  if (!countryCode) throw new Error('countryCode is required.');
+
+  const targets: CountryIngestionTarget[] = [];
+  const blockers: CountryIngestionBlocker[] = [];
+
+  for (const chain of input.chains) {
+    const chainId = chain.chainId.trim();
+    if (!chainId) throw new Error('chainId is required.');
+    if (!chain.connectorId.trim()) throw new Error(`connectorId is required for ${chainId}.`);
+    if (!chain.parserVersion.trim()) throw new Error(`parserVersion is required for ${chainId}.`);
+    if (chain.stores.length === 0) {
+      blockers.push({
+        targetKey: `${stableKeyPart(countryCode)}:${stableKeyPart(chainId)}:no-stores`,
+        chainId,
+        reason: 'chain_has_no_stores'
+      });
+      continue;
+    }
+
+    for (const store of chain.stores) {
+      const storeId = store.storeId.trim();
+      if (!storeId) throw new Error(`storeId is required for ${chainId}.`);
+      const targetKey = [stableKeyPart(countryCode), stableKeyPart(chainId), stableKeyPart(storeId)].join(':');
+      if (store.disabled) {
+        blockers.push({
+          targetKey,
+          chainId,
+          storeId,
+          reason: store.blockerReason?.trim() || 'store_disabled'
+        });
+        continue;
+      }
+
+      targets.push({
+        targetKey,
+        countryCode,
+        storeId,
+        storeName: store.storeName,
+        addressLine1: store.addressLine1,
+        city: store.city,
+        region: store.region,
+        latitude: store.latitude,
+        longitude: store.longitude,
+        onlineOrderUrl: store.onlineOrderUrl,
+        chainDisplayName: chain.displayName,
+        connectorId: store.connectorId ?? chain.connectorId,
+        requestedAt: input.requestedAt,
+        chainId,
+        sourceType: chain.sourceType,
+        robotsTxtStatus: chain.robotsTxtStatus,
+        legalReviewStatus: chain.legalReviewStatus,
+        hasDataAgreement: chain.hasDataAgreement,
+        endpointUrl: store.endpointUrl ?? chain.endpointUrl,
+        parserVersion: store.parserVersion ?? chain.parserVersion,
+        previousRunKeys: store.previousRunKeys ?? chain.previousRunKeys
+      });
+    }
+  }
+
+  return { targets, blockers };
+}
+
+export async function appendIngestionBlockers(
+  blockers: CountryIngestionBlocker[],
+  blockerLogPath = DEFAULT_INGESTION_BLOCKER_LOG_PATH
+): Promise<void> {
+  if (blockers.length === 0) return;
+  await mkdir(dirname(blockerLogPath), { recursive: true });
+  const lines = blockers.map((blocker) => JSON.stringify({
+    loggedAt: new Date().toISOString(),
+    targetKey: blocker.targetKey,
+    chainId: blocker.chainId,
+    storeId: blocker.storeId,
+    attempt: blocker.attempt,
+    reason: blocker.reason,
+    error: blocker.error
+  }));
+  await appendFile(blockerLogPath, `${lines.join('\n')}\n`, 'utf8');
+}
+
+export async function runCountryIngestionBatch(input: RunCountryIngestionBatchInput): Promise<CountryIngestionBatchResult> {
+  const concurrency = boundedPositiveInteger(valueOrDefault(input.concurrency, 3), 'concurrency');
+  const rateLimitMs = boundedNonNegativeInteger(valueOrDefault(input.rateLimitMs, 1000), 'rateLimitMs');
+  const maxAttempts = boundedPositiveInteger(valueOrDefault(input.retry?.maxAttempts, 3), 'retry.maxAttempts');
+  const backoffMs = boundedNonNegativeInteger(valueOrDefault(input.retry?.backoffMs, rateLimitMs), 'retry.backoffMs');
+  const wait = input.wait ?? ((milliseconds: number) => new Promise<void>((resolve) => setTimeout(resolve, milliseconds)));
+  const now = input.now ?? (() => Date.now());
+  const blockerLogPath = input.blockerLogPath ?? DEFAULT_INGESTION_BLOCKER_LOG_PATH;
+  const enumeration = enumerateCountryIngestionTargets(input);
+  const blockers = [...enumeration.blockers];
+  const countryRun = await input.db.beginRun?.({
+    countryCode: input.countryCode ?? 'SE',
+    requestedAt: input.requestedAt,
+    targetCount: enumeration.targets.length
+  });
+  const countryRunId = typeof countryRun === 'object' && countryRun ? countryRun.countryRunId : undefined;
+  const targetResults: CountryIngestionTargetResult[] = [];
+  let nextAllowedStart = now();
+  let cursor = 0;
+
+  async function waitForRateLimit(): Promise<void> {
+    if (rateLimitMs === 0) return;
+    const current = now();
+    const waitMs = Math.max(0, nextAllowedStart - current);
+    nextAllowedStart = Math.max(current, nextAllowedStart) + rateLimitMs;
+    if (waitMs > 0) await wait(waitMs);
+  }
+
+  async function runTarget(target: CountryIngestionTarget): Promise<void> {
+    let finalResult: CountryIngestionTargetResult | null = null;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      if (attempt > 1 && backoffMs > 0) await wait(backoffMs * (attempt - 1));
+      await waitForRateLimit();
+
+      const connector = input.connectorFactory(target);
+      const result = await runRetailerConnector({
+        ...target,
+        fetcher: connector.fetcher,
+        parser: connector.parser
+      });
+
+      if (result.status === 'completed') {
+        let upsertedCount = 0;
+        try {
+          for (const observation of result.ingestion.accepted) {
+            await input.db.upsertObservation({
+              countryRunId,
+              target,
+              connectorPlan: result.plan,
+              observation
+            });
+            upsertedCount += 1;
+          }
+          for (const rejected of result.ingestion.rejected) {
+            blockers.push({
+              targetKey: target.targetKey,
+              chainId: target.chainId,
+              storeId: target.storeId,
+              attempt,
+              reason: 'ingestion_record_rejected',
+              error: rejected.reason
+            });
+          }
+          finalResult = {
+            target,
+            attempts: attempt,
+            status: result.status,
+            acceptedCount: result.acceptedCount,
+            rejectedCount: result.rejectedCount,
+            upsertedCount
+          };
+          break;
+        } catch (error) {
+          finalResult = {
+            target,
+            attempts: attempt,
+            status: 'upsert_failed',
+            acceptedCount: result.acceptedCount,
+            rejectedCount: result.rejectedCount,
+            upsertedCount,
+            error: ingestionBatchErrorMessage(error)
+          };
+        }
+      } else {
+        finalResult = {
+          target,
+          attempts: attempt,
+          status: result.status,
+          acceptedCount: result.acceptedCount,
+          rejectedCount: result.rejectedCount,
+          upsertedCount: 0,
+          error: result.error
+        };
+        if (result.status === 'blocked' || result.status === 'duplicate') break;
+      }
+
+      if (attempt === maxAttempts) break;
+    }
+
+    const targetResult = finalResult ?? {
+      target,
+      attempts: 0,
+      status: 'failed' as const,
+      acceptedCount: 0,
+      rejectedCount: 0,
+      upsertedCount: 0,
+      error: 'target did not run'
+    };
+
+    if (targetResult.status !== 'completed') {
+      blockers.push({
+        targetKey: target.targetKey,
+        chainId: target.chainId,
+        storeId: target.storeId,
+        attempt: targetResult.attempts,
+        reason: `target_${targetResult.status}`,
+        error: targetResult.error
+      });
+    }
+    targetResults.push(targetResult);
+  }
+
+  async function worker(): Promise<void> {
+    while (true) {
+      const current = cursor;
+      cursor += 1;
+      const target = enumeration.targets[current];
+      if (!target) return;
+      await runTarget(target);
+    }
+  }
+
+  await Promise.all(Array.from({ length: Math.min(concurrency, enumeration.targets.length) }, () => worker()));
+
+  const completedTargetCount = targetResults.filter((result) => result.status === 'completed').length;
+  const blockedTargetCount = targetResults.filter((result) => result.status === 'blocked').length + enumeration.blockers.length;
+  const duplicateTargetCount = targetResults.filter((result) => result.status === 'duplicate').length;
+  const failedTargetCount = targetResults.filter((result) => result.status === 'failed' || result.status === 'upsert_failed').length;
+  const acceptedCount = targetResults.reduce((sum, result) => sum + result.acceptedCount, 0);
+  const rejectedCount = targetResults.reduce((sum, result) => sum + result.rejectedCount, 0);
+  const upsertedCount = targetResults.reduce((sum, result) => sum + result.upsertedCount, 0);
+  const status: CountryIngestionBatchResult['status'] =
+    blockers.length === 0 && completedTargetCount === enumeration.targets.length
+      ? 'succeeded'
+      : completedTargetCount > 0 || upsertedCount > 0
+        ? 'partial'
+        : 'failed';
+
+  await appendIngestionBlockers(blockers, blockerLogPath);
+  await input.db.finishRun?.({
+    countryRunId,
+    status,
+    acceptedCount,
+    upsertedCount,
+    blockerCount: blockers.length,
+    finishedAt: input.finishedAt ?? new Date().toISOString()
+  });
+
+  return {
+    status,
+    countryCode: input.countryCode ?? 'SE',
+    countryRunId,
+    targetCount: enumeration.targets.length,
+    completedTargetCount,
+    blockedTargetCount,
+    duplicateTargetCount,
+    failedTargetCount,
+    acceptedCount,
+    rejectedCount,
+    upsertedCount,
+    blockers,
+    targetResults,
+    blockerLogPath
+  };
+}
+
+function valueOrDefault(value: number | undefined, fallback: number): number {
+  return value === undefined ? fallback : value;
+}
+
+function boundedPositiveInteger(value: number, name: string): number {
+  if (!Number.isInteger(value) || value < 1) throw new Error(`${name} must be a positive integer.`);
+  return value;
+}
+
+function boundedNonNegativeInteger(value: number, name: string): number {
+  if (!Number.isInteger(value) || value < 0) throw new Error(`${name} must be a non-negative integer.`);
+  return value;
+}
+
+function ingestionBatchErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Unknown error.';
 }
 
 if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').href) {

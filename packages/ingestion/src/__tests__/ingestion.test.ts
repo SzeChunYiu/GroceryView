@@ -1,10 +1,12 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
+  appendIngestionBlockers,
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,
   buildCoopSearchUrl,
@@ -15,6 +17,7 @@ import {
   buildDailyConnectorConfigsFromEnv,
   buildDailyIngestionPostgresPoolConfig,
   createDailyIngestionQueryExecutor,
+  enumerateCountryIngestionTargets,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
   buildHemkopCategoryUrl,
@@ -146,6 +149,7 @@ import {
   parseOverpassGroceryStores,
   retailerRobotsPolicyMatrix,
   runAllStoreTasks,
+  runCountryIngestionBatch,
   runRetailerConnector,
   runDailyIngestion,
   storeEnumeratorSources,
@@ -6308,5 +6312,209 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('country ingestion batch runner', () => {
+  it('enumerates every enabled chain-store target and reports skipped stores as blockers', () => {
+    const enumeration = enumerateCountryIngestionTargets({
+      countryCode: 'SE',
+      requestedAt: '2026-05-22T08:00:00.000Z',
+      chains: [{
+        chainId: 'willys',
+        displayName: 'Willys',
+        sourceType: 'official_api',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        connectorId: 'willys-store',
+        parserVersion: 'willys-store-v1',
+        stores: [
+          { storeId: 'willys-odenplan', endpointUrl: 'https://example.test/willys/odenplan' },
+          { storeId: 'willys-torsplan', endpointUrl: 'https://example.test/willys/torsplan' }
+        ]
+      }, {
+        chainId: 'coop',
+        sourceType: 'retailer_online_page',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        connectorId: 'coop-store',
+        parserVersion: 'coop-store-v1',
+        stores: [{ storeId: 'coop-medborgarplatsen', disabled: true, blockerReason: 'robots_policy_pending' }]
+      }, {
+        chainId: 'hemkop',
+        sourceType: 'retailer_online_page',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        connectorId: 'hemkop-store',
+        parserVersion: 'hemkop-store-v1',
+        stores: []
+      }]
+    });
+
+    assert.deepEqual(enumeration.targets.map((target) => target.targetKey), [
+      'se:willys:willys-odenplan',
+      'se:willys:willys-torsplan'
+    ]);
+    assert.equal(enumeration.targets[0].endpointUrl, 'https://example.test/willys/odenplan');
+    assert.deepEqual(enumeration.blockers.map((blocker) => blocker.reason), [
+      'robots_policy_pending',
+      'chain_has_no_stores'
+    ]);
+  });
+
+  it('runs all targets with bounded concurrency, polite rate limiting, retry, DB upserts, and blocker logging', async () => {
+    const tempDir = await mkdtemp(join(tmpdir(), 'groceryview-ingestion-'));
+    const blockerLogPath = join(tempDir, 'codex-tasks', 'ingestion-blockers.txt');
+    const attemptsByStore = new Map<string, number>();
+    const upsertedTargets: string[] = [];
+    const finishStatuses: string[] = [];
+    const waitCalls: number[] = [];
+    let clock = 0;
+    let inFlight = 0;
+    let maxInFlight = 0;
+
+    try {
+      const result = await runCountryIngestionBatch({
+        countryCode: 'SE',
+        requestedAt: '2026-05-22T09:00:00.000Z',
+        concurrency: 2,
+        rateLimitMs: 25,
+        retry: { maxAttempts: 2, backoffMs: 10 },
+        blockerLogPath,
+        now: () => clock,
+        wait: async (milliseconds) => {
+          waitCalls.push(milliseconds);
+          clock += milliseconds;
+        },
+        chains: [{
+          chainId: 'willys',
+          sourceType: 'official_api',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          connectorId: 'willys-country',
+          parserVersion: 'country-json-v1',
+          stores: [
+            { storeId: 'store-a', endpointUrl: 'https://example.test/a' },
+            { storeId: 'store-b', endpointUrl: 'https://example.test/b' },
+            { storeId: 'store-disabled', endpointUrl: 'https://example.test/disabled', disabled: true, blockerReason: 'legal_review_pending' }
+          ]
+        }],
+        connectorFactory: (target) => ({
+          fetcher: async (plan) => {
+            const attempt = (attemptsByStore.get(target.storeId) ?? 0) + 1;
+            attemptsByStore.set(target.storeId, attempt);
+            inFlight += 1;
+            maxInFlight = Math.max(maxInFlight, inFlight);
+            await new Promise((resolve) => setTimeout(resolve, 5));
+            inFlight -= 1;
+            if (target.storeId === 'store-b' && attempt === 1) {
+              return {
+                statusCode: 503,
+                body: 'busy',
+                contentType: 'text/plain',
+                retrievedAt: plan.provenance.capturedAt,
+                sourceUrl: plan.provenance.sourceUrl,
+                rawSnapshotRef: `raw://${target.storeId}/failed`
+              };
+            }
+            return {
+              statusCode: 200,
+              body: JSON.stringify({ items: [{ id: `${target.storeId}-coffee` }] }),
+              contentType: 'application/json',
+              retrievedAt: plan.provenance.capturedAt,
+              sourceUrl: plan.provenance.sourceUrl,
+              rawSnapshotRef: `raw://${target.storeId}/ok`
+            };
+          },
+          parser: (_snapshot, plan) => [{
+            storeId: target.storeId,
+            retailerProductId: `${target.storeId}-coffee`,
+            rawName: `Coffee ${target.storeId}`,
+            canonicalName: `Coffee ${target.storeId}`,
+            productId: `coffee-${target.storeId}`,
+            categoryId: 'coffee',
+            brand: 'Rosteriet',
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 49.9,
+            sourceUrl: plan.provenance.sourceUrl
+          }]
+        }),
+        db: {
+          beginRun: (run) => {
+            assert.equal(run.countryCode, 'SE');
+            assert.equal(run.targetCount, 2);
+            return { countryRunId: 'country-run-1' };
+          },
+          upsertObservation: ({ countryRunId, target, observation }) => {
+            assert.equal(countryRunId, 'country-run-1');
+            assert.equal(observation.priceObservation.storeId, target.storeId);
+            upsertedTargets.push(target.targetKey);
+            return { observationId: `observation-${upsertedTargets.length}` };
+          },
+          finishRun: (run) => {
+            finishStatuses.push(run.status);
+            assert.equal(run.countryRunId, 'country-run-1');
+            assert.equal(run.upsertedCount, 2);
+            assert.equal(run.blockerCount, 1);
+          }
+        }
+      });
+
+      assert.equal(result.status, 'partial');
+      assert.equal(result.countryRunId, 'country-run-1');
+      assert.equal(result.targetCount, 2);
+      assert.equal(result.completedTargetCount, 2);
+      assert.equal(result.blockedTargetCount, 1);
+      assert.equal(result.failedTargetCount, 0);
+      assert.equal(result.acceptedCount, 2);
+      assert.equal(result.upsertedCount, 2);
+      assert.equal(attemptsByStore.get('store-b'), 2);
+      assert.equal(maxInFlight <= 2, true);
+      assert.deepEqual(upsertedTargets.sort(), ['se:willys:store-a', 'se:willys:store-b']);
+      assert.deepEqual(finishStatuses, ['partial']);
+      assert.equal(waitCalls.some((milliseconds) => milliseconds >= 25), true);
+      assert.equal(waitCalls.includes(10), true);
+
+      const blockerLog = await readFile(blockerLogPath, 'utf8');
+      assert.match(blockerLog, /"targetKey":"se:willys:store-disabled"/);
+      assert.match(blockerLog, /"reason":"legal_review_pending"/);
+    } finally {
+      await rm(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('appends blocker records to the default ingestion blocker file format', async () => {
+    const tempDir = await mkdtemp(join(tmpdir(), 'groceryview-blockers-'));
+    const blockerLogPath = join(tempDir, 'codex-tasks', 'ingestion-blockers.txt');
+
+    try {
+      await appendIngestionBlockers([{
+        targetKey: 'se:ica:store-1',
+        chainId: 'ica',
+        storeId: 'store-1',
+        attempt: 2,
+        reason: 'target_failed',
+        error: 'HTTP 429'
+      }], blockerLogPath);
+
+      const lines = (await readFile(blockerLogPath, 'utf8')).trim().split('\n');
+      assert.equal(lines.length, 1);
+      assert.deepEqual(JSON.parse(lines[0]), {
+        loggedAt: JSON.parse(lines[0]).loggedAt,
+        targetKey: 'se:ica:store-1',
+        chainId: 'ica',
+        storeId: 'store-1',
+        attempt: 2,
+        reason: 'target_failed',
+        error: 'HTTP 429'
+      });
+    } finally {
+      await rm(tempDir, { recursive: true, force: true });
+    }
   });
 });
