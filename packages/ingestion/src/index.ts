@@ -1897,7 +1897,7 @@ function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsed
     regularPrice: row.originalPrice !== null && row.originalPrice > row.price ? row.originalPrice : undefined,
     promoText: row.originalPrice !== null && row.originalPrice > row.price ? 'Public pharmacy discounted price' : undefined,
     memberOnly: false,
-    observedAt: row.retrievedAt,
+    observedAt: row.retrievedDate,
     sourceUrl: row.sourceUrl
   };
 }
@@ -2094,7 +2094,7 @@ export async function fetchDailyConnectorSnapshot(
       sourcePaths: dailyNativeStringListParam(url, 'sourcePaths') ?? DEFAULT_APOHEM_SOURCE_PATHS,
       apotekHjartatUrls: dailyNativeStringListParam(url, 'apotekHjartatUrls') ?? DEFAULT_APOTEK_HJARTAT_SEARCH_URLS,
       maxRows: dailyNativeNumberParam(url, 'maxRows'),
-      retrievedAt
+      retrievedDate: retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(pharmacyProductToDailyItem) });
   }

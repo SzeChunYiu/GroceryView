@@ -87,7 +87,10 @@ import {
   fetchWillysStores,
   fetchWillysWeeklyDiscounts,
   fetchWillysWeeklyDiscountsForAllStores,
+  findPharmacyEanMatches,
   parseIcaReklambladOffers,
+  parseApohemProducts,
+  parseApotekHjartatProducts,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
   GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL,
@@ -3945,6 +3948,117 @@ describe('fetchWillysWeeklyDiscounts', () => {
       buildWillysWeeklyDiscountsUrl(storeId, 1, 0)
     ));
     assert.deepEqual(rows.map((row) => row.storeId), [...DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS]);
+  });
+});
+
+describe('pharmacy connectors', () => {
+  it('parses Apohem SSR rows and excludes prescription products', () => {
+    const html = `<script>window.CURRENT_PAGE = ${JSON.stringify({
+      listing: {
+        products: [
+          {
+            url: '/receptfritt/pamol-500mg',
+            displayName: 'Pamol 500mg Paracetamol 20 tabletter',
+            brandName: 'Pamol',
+            variationCode: '501',
+            variationEAN: '7046260604841',
+            price: {
+              current: { inclVat: 42, vatPercent: 12 },
+              previous: { inclVat: 49 }
+            },
+            images: [{ url: '/globalassets/pamol.png' }],
+            stock: { status: 'inStock' },
+            isotc: true,
+            isPrescriptionProduct: false
+          },
+          {
+            url: '/receptbelagt/example',
+            displayName: 'Prescription only product',
+            variationEAN: '1234567890123',
+            price: { current: { inclVat: 99 } },
+            isPrescriptionProduct: true
+          }
+        ]
+      }
+    })};</script>`;
+
+    const rows = parseApohemProducts(html, 'https://www.apohem.se/receptfritt', '2026-05-23T13:50:47.183Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].chain, 'apohem');
+    assert.equal(rows[0].ean, '7046260604841');
+    assert.equal(rows[0].category, 'otc');
+    assert.equal(rows[0].sourceUrl, 'https://www.apohem.se/receptfritt');
+    assert.equal(rows[0].retrievedDate, '2026-05-23T13:50:47.183Z');
+  });
+
+  it('parses Apotek Hjärtat rows, excludes prescription groups, and matches EANs across chains', () => {
+    const initialData = JSON.stringify({
+      search: {
+        products: [
+          {
+            url: '/varumarken/la-roche-posay/toleriane-sensitive',
+            productName: 'La Roche-Posay Toleriane Sensitive Oparf 40 ml',
+            sku: '1001',
+            gtin: '3337875578486',
+            price: { current: { inclVat: 189, vatPercent: 25 } },
+            storePrice: 199,
+            images: [{ url: 'https://assets.icanet.se/3337875578486.webp' }],
+            variant: { stockStatus: 'inStock' },
+            brands: [{ title: 'La Roche-Posay' }],
+            isBuyableWithoutPrescription: true,
+            belongsToPrescriptionProductGroup: false,
+            trackingProductInformation: { category: 'Hudvard' }
+          },
+          {
+            url: '/receptbelagt/example',
+            productName: 'Prescription group product',
+            sku: '1002',
+            gtin: '1234567890123',
+            price: { current: { inclVat: 120 } },
+            isBuyableWithoutPrescription: false,
+            belongsToPrescriptionProductGroup: true
+          }
+        ]
+      }
+    });
+    const html = `<script>window.INITIAL_DATA = JSON.parse('${initialData}');</script>`;
+
+    const hjartatRows = parseApotekHjartatProducts(
+      html,
+      'https://www.apotekhjartat.se/search?q=la%20roche',
+      '2026-05-23T13:50:47.183Z'
+    );
+    const matches = findPharmacyEanMatches([
+      {
+        chain: 'apohem',
+        code: 'apohem-1',
+        ean: '3337875578486',
+        name: 'La Roche-Posay Toleriane Sensitive Soothing Moisturizer 40 ml',
+        brand: 'La Roche-Posay',
+        category: 'beauty',
+        price: 169,
+        priceText: '169.00 SEK',
+        originalPrice: null,
+        originalPriceText: '',
+        vatPercent: 25,
+        stockStatus: 'inStock',
+        productUrl: 'https://www.apohem.se/hudvard/toleriane-sensitive',
+        imageUrl: '',
+        isOtc: false,
+        sourceUrl: 'https://www.apohem.se/sok?q=la%20roche',
+        retrievedDate: '2026-05-23T13:50:47.183Z'
+      },
+      ...hjartatRows
+    ]);
+
+    assert.equal(hjartatRows.length, 1);
+    assert.equal(hjartatRows[0].chain, 'apotek-hjartat');
+    assert.equal(hjartatRows[0].ean, '3337875578486');
+    assert.equal(hjartatRows[0].category, 'beauty');
+    assert.equal(hjartatRows[0].sourceUrl, 'https://www.apotekhjartat.se/search?q=la%20roche');
+    assert.equal(hjartatRows[0].retrievedDate, '2026-05-23T13:50:47.183Z');
+    assert.equal(matches.length, 2);
   });
 });
 

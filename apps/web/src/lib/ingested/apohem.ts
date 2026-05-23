@@ -24,12 +24,12 @@ export type ApohemIngestedProduct = {
   imageUrl: string;
   isOtc: boolean;
   sourceUrl: string;
-  retrievedAt: string;
+  retrievedDate: string;
 };
 
 export const apohemSource = {
   "source": "apohem.se public SSR CURRENT_PAGE + apotekhjartat.se public INITIAL_DATA search HTML",
-  "retrievedAt": "2026-05-23T13:50:47.183Z",
+  "retrievedDate": "2026-05-23T13:50:47.183Z",
   "rowCount": 90,
   "sourceUrls": [
     "https://www.apohem.se/sok?q=vitamin",
@@ -258,7 +258,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350014910585.png?ref=8DEA1DCCA4",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -277,7 +277,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350014910547.jpg?ref=608B6B315D",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -296,7 +296,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350014910561.jpg?ref=A543EEDBD9",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -315,7 +315,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7315695704656_1.png?ref=9A09799148",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -334,7 +334,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/6430013130489_original.jpg?ref=6BE9C3225C",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -353,7 +353,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350014910271_base.jpg?ref=C31107FA94",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -372,7 +372,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350014910356_c1n1.jpg?ref=27ECFC272D",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -391,7 +391,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350023030687-1.png?ref=83DBF7782F",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -410,7 +410,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875797597_0.jpg?ref=4746ED307D",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -429,7 +429,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/03337875816847_c1c1.jpg?ref=BF275C9308",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -448,7 +448,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875578486_base.png?ref=B5A9BDF03A",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -467,7 +467,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875797719_0.jpg?ref=36532935FA",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -486,7 +486,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875757515_0.jpg?ref=78AEE3332C",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -505,7 +505,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875806961_0.jpg?ref=BCDA6A5560",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -524,7 +524,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875549530_1.png?ref=843271CA76",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -543,7 +543,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875816809_1.jpg?ref=2116F05712",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -562,7 +562,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875588348_1.jpg?ref=537C935F37",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -581,7 +581,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875757614.png?ref=658987968F",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -600,7 +600,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875863377_0.jpg?ref=9C869DC412",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -619,7 +619,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3433422406599_1.png?ref=C01EA608A6",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -638,7 +638,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875876940_0.jpg?ref=614DF990AA",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -657,7 +657,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/03337872419904_c1n1.jpg?ref=48835753E3",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -676,7 +676,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337872411083_0.jpg?ref=093BBC7915",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -695,7 +695,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/03337872420269_c1n1.png?ref=11AEDBA7AA",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -714,7 +714,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046265357131_base.jpg?ref=39C9690686",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -733,7 +733,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046260604841_base.jpg?ref=182AABEDCC",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -752,7 +752,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046260976108_1.png?ref=5A2E7BC570",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -771,7 +771,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/ibuprofen-orifarm-30-tabletter.png?ref=80B81AC10A",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -790,7 +790,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07046260885349_c1c1.png?ref=29A401D19F",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -809,7 +809,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/naproxen-orifarm-20-tabletter.jpg?ref=5A70968E38",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -828,7 +828,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046261461948---mrhi-1.png?ref=DD5B0B44D9",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -847,7 +847,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/5054563073181_2.jpg?ref=14C7C52D4D",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -866,7 +866,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046264739679.jpg?ref=780A215DE7",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -885,7 +885,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046260074873_11.png?ref=EA77711D46",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -904,7 +904,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046260427426_base.jpg?ref=7D88DCD60A",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -923,7 +923,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046260070127_11.png?ref=4C1F12DDBA",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -942,7 +942,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875777797_0.jpg?ref=0E22D77CFE",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -961,7 +961,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875545822_0.jpg?ref=890B807B70",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -980,7 +980,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/c7fc208401e8c60ae17d0dc25ed05e381ca88c24.jpg?ref=55D47E7A05",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -999,7 +999,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875761123_0.jpg?ref=6F769A33A1",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1018,7 +1018,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875528092_2.jpg?ref=73ADEFADA7",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1037,7 +1037,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875761116_0.jpg?ref=E1EABA827F",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1056,7 +1056,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875920582_1.jpg?ref=896AE4C0E2",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1075,7 +1075,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337872413025_base.jpg?ref=381522EEA8",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1094,7 +1094,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875940412_0.jpg?ref=2437844C12",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1113,7 +1113,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/8809782555508.jpg?ref=153EB9DE06",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1132,7 +1132,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7393481008164_0.jpg?ref=46CC85E494",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1151,7 +1151,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7319861021363_base.jpg?ref=A6AA07DA4D",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1170,7 +1170,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/8809700320812_1.png?ref=634A86585A",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1189,7 +1189,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/4005800033094.jpg?ref=364D75B351",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1208,7 +1208,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350012338510_0.jpg?ref=60C7DB9CF3",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1227,7 +1227,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350095270028_1.png?ref=2A88E7926E",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1246,7 +1246,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7042760010007.png?ref=DBAF4C3566",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1265,7 +1265,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7042760010052.png?ref=0A62C2DA08",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1284,7 +1284,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350014910882_c1n1.jpg?ref=9D30CD88BC",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1303,7 +1303,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350014910462_c1n1.jpg?ref=1B288C6621",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1322,7 +1322,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350014910264_c1n1.jpg?ref=40ACA09E22",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1341,7 +1341,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350012335816.jpg?ref=B7303F3AD3",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1360,7 +1360,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7201-1.png?ref=FA3DAF5AB1",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1379,7 +1379,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/vitamin-d3k2-ean-7350107070400.png?ref=645CA2BC20",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1398,7 +1398,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350012337940.png?ref=825FF39357",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apohem",
@@ -1417,7 +1417,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/boc_kork_ge_2022_magnesium_100_tabl_150cc_clean.png?ref=3D56C2370B",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1436,7 +1436,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731682288/03337875797597_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1455,7 +1455,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731682326/03337875797719_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1474,7 +1474,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1765465730/3337875816847.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1493,7 +1493,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1740752598/1052987.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1512,7 +1512,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732115266/03337875761116_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1531,7 +1531,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731919102/03337875888851_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1550,7 +1550,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731668717/03337875578486_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1569,7 +1569,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1777471665/03337875917407_15.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1588,7 +1588,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715236081/1038560_C1N1_byexpt.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1607,7 +1607,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731682358/03337875806961_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1626,7 +1626,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762337067/03337875816809.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1645,7 +1645,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732106676/03433422406599_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1664,7 +1664,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732106662/03337875777797_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1683,7 +1683,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731667375/03337872419904_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1702,7 +1702,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732096213/03337875757515_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1721,7 +1721,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732106691/03337872420269_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1740,7 +1740,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731917843/03337875863377_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1759,7 +1759,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715242016/1038557_C1N1_destqv.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1778,7 +1778,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771949003/7315695704656_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1797,7 +1797,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771949012/7315695704670_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1816,7 +1816,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738165898/7340160909090.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1835,7 +1835,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738165904/7340160909113.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1854,7 +1854,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715228392/1056125_s8qvpc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1873,7 +1873,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771948997/7315695704632_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1892,7 +1892,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771949006/7315695704649_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1911,7 +1911,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715234244/1061434_uegf4x.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1930,7 +1930,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716365974/1065987_hg1qjz.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -1949,7 +1949,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771949000/7315695589994_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T13:50:47.183Z"
+    "retrievedDate": "2026-05-23T13:50:47.183Z"
   }
 ];
 

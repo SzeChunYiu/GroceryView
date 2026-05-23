@@ -19,7 +19,7 @@ export type ApohemProduct = {
   imageUrl: string;
   isOtc: boolean;
   sourceUrl: string;
-  retrievedAt: string;
+  retrievedDate: string;
 };
 
 type ApohemSearchProduct = {
@@ -70,7 +70,7 @@ export type FetchApohemProductsOptions = {
   sourcePaths?: readonly string[];
   apotekHjartatUrls?: readonly string[];
   maxRows?: number;
-  retrievedAt?: string;
+  retrievedDate?: string;
 };
 
 export const APOHEM_BASE_URL = 'https://www.apohem.se';
@@ -92,7 +92,7 @@ export const DEFAULT_APOTEK_HJARTAT_SEARCH_URLS = [
 
 export async function fetchApohemProducts(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const retrievedDate = options.retrievedDate ?? new Date().toISOString();
   const rows: ApohemProduct[] = [];
   const seen = new Set<string>();
 
@@ -102,7 +102,7 @@ export async function fetchApohemProducts(options: FetchApohemProductsOptions = 
     if (!response.ok) {
       throw new Error(`Apohem request failed for ${sourceUrl}: ${response.status}`);
     }
-    addRows(rows, seen, parseApohemProducts(await response.text(), sourceUrl, retrievedAt), options.maxRows);
+    addRows(rows, seen, parseApohemProducts(await response.text(), sourceUrl, retrievedDate), options.maxRows);
     if (options.maxRows && rows.length >= options.maxRows) {
       return rows;
     }
@@ -113,7 +113,7 @@ export async function fetchApohemProducts(options: FetchApohemProductsOptions = 
 
 export async function fetchApotekHjartatProducts(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const retrievedDate = options.retrievedDate ?? new Date().toISOString();
   const rows: ApohemProduct[] = [];
   const seen = new Set<string>();
 
@@ -122,7 +122,7 @@ export async function fetchApotekHjartatProducts(options: FetchApohemProductsOpt
     if (!response.ok) {
       throw new Error(`Apotek Hjärtat request failed for ${sourceUrl}: ${response.status}`);
     }
-    addRows(rows, seen, parseApotekHjartatProducts(await response.text(), sourceUrl, retrievedAt), options.maxRows);
+    addRows(rows, seen, parseApotekHjartatProducts(await response.text(), sourceUrl, retrievedDate), options.maxRows);
     if (options.maxRows && rows.length >= options.maxRows) {
       return rows;
     }
@@ -132,10 +132,10 @@ export async function fetchApotekHjartatProducts(options: FetchApohemProductsOpt
 }
 
 export async function fetchPharmacyProducts(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {
-  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const retrievedDate = options.retrievedDate ?? new Date().toISOString();
   const [apohemRows, hjartatRows] = await Promise.all([
-    fetchApohemProducts({ ...options, retrievedAt }),
-    fetchApotekHjartatProducts({ ...options, retrievedAt })
+    fetchApohemProducts({ ...options, retrievedDate }),
+    fetchApotekHjartatProducts({ ...options, retrievedDate })
   ]);
   const rows: ApohemProduct[] = [];
   const seen = new Set<string>();
@@ -144,7 +144,7 @@ export async function fetchPharmacyProducts(options: FetchApohemProductsOptions 
   return rows;
 }
 
-export function parseApohemProducts(html: string, sourceUrl: string, retrievedAt: string): ApohemProduct[] {
+export function parseApohemProducts(html: string, sourceUrl: string, retrievedDate: string): ApohemProduct[] {
   const data = extractWindowJsonObject(html, 'CURRENT_PAGE');
   const products: ApohemSearchProduct[] = [];
   visit(data, (value) => {
@@ -155,11 +155,11 @@ export function parseApohemProducts(html: string, sourceUrl: string, retrievedAt
   });
 
   return products
-    .map((product) => normalizeApohemProduct(product, sourceUrl, retrievedAt))
+    .map((product) => normalizeApohemProduct(product, sourceUrl, retrievedDate))
     .filter((product): product is ApohemProduct => product !== null);
 }
 
-export function parseApotekHjartatProducts(html: string, sourceUrl: string, retrievedAt: string): ApohemProduct[] {
+export function parseApotekHjartatProducts(html: string, sourceUrl: string, retrievedDate: string): ApohemProduct[] {
   const data = extractInitialData(html);
   const products: ApotekHjartatProduct[] = [];
   visit(data, (value) => {
@@ -170,14 +170,14 @@ export function parseApotekHjartatProducts(html: string, sourceUrl: string, retr
   });
 
   return products
-    .map((product) => normalizeApotekHjartatProduct(product, sourceUrl, retrievedAt))
+    .map((product) => normalizeApotekHjartatProduct(product, sourceUrl, retrievedDate))
     .filter((product): product is ApohemProduct => product !== null);
 }
 
 export function normalizeApohemProduct(
   product: ApohemSearchProduct,
   sourceUrl: string,
-  retrievedAt: string
+  retrievedDate: string
 ): ApohemProduct | null {
   if (product.isPrescriptionProduct === true) {
     return null;
@@ -207,14 +207,14 @@ export function normalizeApohemProduct(
     imageUrl: absoluteUrl(product.images?.[0]?.url, APOHEM_BASE_URL),
     isOtc: product.isotc === true,
     sourceUrl,
-    retrievedAt
+    retrievedDate
   };
 }
 
 export function normalizeApotekHjartatProduct(
   product: ApotekHjartatProduct,
   sourceUrl: string,
-  retrievedAt: string
+  retrievedDate: string
 ): ApohemProduct | null {
   if (product.belongsToPrescriptionProductGroup === true || product.isBuyableWithoutPrescription === false) {
     return null;
@@ -244,7 +244,7 @@ export function normalizeApotekHjartatProduct(
     imageUrl: absoluteUrl(product.images?.[0]?.url ?? product.swatchImage?.url, APOTEK_HJARTAT_BASE_URL),
     isOtc: product.isOtcMedicine === true,
     sourceUrl,
-    retrievedAt
+    retrievedDate
   };
 }
 

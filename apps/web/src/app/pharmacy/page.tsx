@@ -59,7 +59,7 @@ function categoryRows(category: PharmacyProductCategory) {
 
 function sourceLabel(sourceUrl: string) {
   const url = new URL(sourceUrl);
-  return `${url.hostname}${url.pathname}`;
+  return `${url.hostname}${url.pathname}${url.search}`;
 }
 
 function DomainFoundationSummary({ domainSlug }: Readonly<{ domainSlug: 'pharmacy' }>) {
@@ -105,7 +105,7 @@ export default function PharmacyPage() {
             {apohemSource.rowCount} EAN-coded OTC, supplement, and beauty rows.
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-white/75">
-            Apohem and Apotek Hjärtat public pages retrieved {formatDate(apohemSource.retrievedAt)}. Prescription product
+            Apohem and Apotek Hjärtat public pages retrieved {formatDate(apohemSource.retrievedDate)}. Prescription product
             groups are excluded before the static rows are surfaced.
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function PharmacyPage() {
             <MetadataRow label="Chains" value={uniqueSourceHostnames.join(' + ')} />
             <MetadataRow label="Rows" value={apohemSource.rowCount.toLocaleString()} />
             <MetadataRow label="EAN matches" value={apohemSource.eanMatchCount.toLocaleString()} />
-            <MetadataRow label="Retrieved" value={formatDate(apohemSource.retrievedAt)} />
+            <MetadataRow label="Retrieved" value={formatDate(apohemSource.retrievedDate)} />
           </dl>
         </div>
       </header>
@@ -232,7 +232,7 @@ function ProductSection({ title, products }: { title: string; products: ApohemIn
         <span>Source</span>
       </div>
       <ul className="divide-y divide-market-ink/5">
-        {products.slice(0, 18).map((product) => (
+        {products.map((product) => (
           <li
             key={`${product.chain}-${product.ean}`}
             className="grid gap-3 px-4 py-3 text-sm hover:bg-market-oat/45 md:grid-cols-[1.4fr_0.8fr_0.7fr_0.7fr_0.9fr]"
@@ -248,8 +248,9 @@ function ProductSection({ title, products }: { title: string; products: ApohemIn
             <span className="font-semibold text-market-ink/70">{chainLabels[product.chain]}</span>
             <span className="font-mono text-xs text-market-ink/65">{product.ean}</span>
             <span className="font-black tabular-nums">{product.priceText}</span>
-            <a href={product.sourceUrl} className="truncate text-xs font-bold text-market-mint" title={product.sourceUrl}>
-              {sourceLabel(product.sourceUrl)}
+            <a href={product.sourceUrl} className="min-w-0 text-xs font-bold text-market-mint" title={product.sourceUrl}>
+              <span className="block truncate">{sourceLabel(product.sourceUrl)}</span>
+              <span className="mt-1 block text-market-ink/50">{formatDate(product.retrievedDate)}</span>
             </a>
           </li>
         ))}
