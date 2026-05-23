@@ -118,6 +118,7 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /\/api\/readiness\/scanning/);
     assert.match(infraReadme, /\/api\/readiness\/scan-upload-cors/);
     assert.match(infraReadme, /\/api\/readiness\/scan-upload-storage/);
+    assert.match(infraReadme, /\/api\/readiness\/scan-upload-write/);
   });
 
   it('ships a hosted readiness smoke script for deployment evidence', () => {
@@ -129,6 +130,7 @@ describe('local infrastructure compose', () => {
     assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scanning/);
     assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scan-upload-cors/);
     assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scan-upload-storage/);
+    assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/scan-upload-write/);
     assert.match(hostedReadinessSmokeScript, /x-groceryview-metrics-token: \$METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /curl -fsS/);
     assert.match(hostedReadinessSmokeScript, /"status"\[\[:space:\]\]\*:\[\[:space:\]\]\*"\(ready\|complete\)"/);

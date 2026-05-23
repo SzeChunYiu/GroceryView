@@ -117,9 +117,9 @@ METRICS_TOKEN=replace-with-deployment-token \
   infra/scripts/smoke-hosted-readiness.sh
 ```
 
-The readiness smoke calls `/api/readiness/postgres`, `/api/readiness/scanning`, `/api/readiness/scan-upload-cors`, and `/api/readiness/scan-upload-storage` with `METRICS_TOKEN` and requires ready responses before the deployment can count as database-backed, scanner-provider, scan-upload-CORS, and scan-upload-storage smoke evidence.
+The readiness smoke calls `/api/readiness/postgres`, `/api/readiness/scanning`, `/api/readiness/scan-upload-cors`, `/api/readiness/scan-upload-storage`, and `/api/readiness/scan-upload-write` with `METRICS_TOKEN` and requires ready responses before the deployment can count as database-backed, scanner-provider, scan-upload-CORS, scan-upload-storage, and scan-upload-write smoke evidence.
 
-Set `HOSTED_READINESS_SMOKE_OUTPUT_PATH` to save passed PostgreSQL, scan-provider, scan-upload-CORS, and scan-upload-storage readiness evidence as JSON for release records:
+Set `HOSTED_READINESS_SMOKE_OUTPUT_PATH` to save passed PostgreSQL, scan-provider, scan-upload-CORS, scan-upload-storage, and scan-upload-write readiness evidence as JSON for release records:
 
 ```bash
 GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
