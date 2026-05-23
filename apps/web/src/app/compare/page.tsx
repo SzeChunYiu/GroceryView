@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { axfoodProducts, type AxfoodProduct } from '@/lib/axfood-products';
+import { dbSiteAxfoodProducts, dbSiteSnapshotGeneratedAt } from '@/lib/generated/db-site-products';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -7,12 +9,156 @@ export function generateMetadata() {
   return routeMetadata('/compare');
 }
 
-export default function ComparePage() {
+type SearchParams = {
+  products?: string | string[];
+};
+
+type ChainCell = AxfoodProduct['chains'][string] & { price: number };
+
+const COMPARE_CHAINS = [
+  { id: 'ica', label: 'ICA' },
+  { id: 'willys', label: 'Willys' },
+  { id: 'coop', label: 'Coop' }
+] as const;
+
+function parseProductsParam(value: string | string[] | undefined) {
+  const raw = Array.isArray(value) ? value.join(',') : value;
+  return [...new Set((raw ?? '').split(',').map((part) => part.trim()).filter(Boolean))].slice(0, 12);
+}
+
+function normalizeProductId(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function findComparableProduct(id: string) {
+  const normalized = normalizeProductId(id);
+  return axfoodProducts.find((product) =>
+    [product.slug, product.code].some((candidate) => normalizeProductId(candidate) === normalized)
+  );
+}
+
+function fallbackComparableProducts() {
+  return [...axfoodProducts]
+    .filter((product) => COMPARE_CHAINS.some((chain) => typeof product.chains[chain.id]?.price === 'number'))
+    .sort((left, right) => right.inChains.length - left.inChains.length || right.spreadPct - left.spreadPct)
+    .slice(0, 2);
+}
+
+function comparisonRows(requestedProductIds: string[]) {
+  if (requestedProductIds.length === 0) return fallbackComparableProducts().map((product) => ({ requestedId: product.slug, product }));
+  return requestedProductIds.map((requestedId) => ({ requestedId, product: findComparableProduct(requestedId) }));
+}
+
+function chainCell(product: AxfoodProduct, chainId: string): ChainCell | null {
+  const row = product.chains[chainId];
+  if (!row || typeof row.price !== 'number') return null;
+  return row as ChainCell;
+}
+
+export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
+  const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
+  const requestedProductIds = parseProductsParam(resolvedSearchParams.products);
+  const rows = comparisonRows(requestedProductIds);
+  const matchedRows = rows.filter((row): row is { requestedId: string; product: AxfoodProduct } => row.product !== undefined);
+  const missingProductIds = rows.filter((row) => row.product === undefined).map((row) => row.requestedId);
+  const exampleProductIds = fallbackComparableProducts().map((product) => product.slug);
+  const snapshotSourceLabel = dbSiteAxfoodProducts.length > 0
+    ? `packages/db exported snapshot generated ${dbSiteSnapshotGeneratedAt ?? 'without timestamp'}`
+    : 'local static chain snapshot fallback; production builds replace this from packages/db';
+
   return (
     <PageShell>
-      <Eyebrow>Willys vs Hemköp</Eyebrow>
+      <Eyebrow>Chain compare</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Comparable chain prices</h1>
-      <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Rows appear only when the same Axfood product code is present in both chain catalogues. Savings are not shown across unmatched products.</p>
+      <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Rows appear only when the same product id has verified chain price evidence. Savings are not shown across unmatched products.</p>
+      <Card className="mt-6 overflow-hidden border-slate-300 bg-white">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-600">products query</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">ICA / Willys / Coop price table</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              Pass product slugs or codes as <code className="rounded bg-slate-100 px-1 font-black">?products=id1,id2</code>.
+              The table reads the shared chain map used by the DB-backed site snapshot and leaves cells empty when a chain has no verified row.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-black text-slate-700">
+            {matchedRows.length.toLocaleString('sv-SE')} matched / {rows.length.toLocaleString('sv-SE')} requested
+          </div>
+        </div>
+
+        {requestedProductIds.length === 0 ? (
+          <p className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950">
+            No products query was supplied, so this preview shows example products. Try <Link className="font-black underline" href={`/compare?products=${exampleProductIds.join(',')}`}>/compare?products={exampleProductIds.join(',')}</Link>.
+          </p>
+        ) : null}
+
+        {missingProductIds.length > 0 ? (
+          <p className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm font-semibold leading-6 text-rose-950">
+            Not found in the chain snapshot: {missingProductIds.join(', ')}.
+          </p>
+        ) : null}
+
+        <div className="mt-5 overflow-x-auto">
+          <table className="min-w-full border-separate border-spacing-0 text-left text-sm">
+            <thead>
+              <tr>
+                <th className="sticky left-0 z-10 border-b border-slate-200 bg-white py-3 pr-4 font-black text-slate-700">Product</th>
+                {COMPARE_CHAINS.map((chain) => (
+                  <th className="border-b border-slate-200 px-4 py-3 font-black text-slate-700" key={chain.id}>{chain.label}</th>
+                ))}
+                <th className="border-b border-slate-200 px-4 py-3 font-black text-slate-700">Best verified</th>
+              </tr>
+            </thead>
+            <tbody>
+              {matchedRows.map(({ requestedId, product }) => {
+                const pricedCells = COMPARE_CHAINS
+                  .map((chain) => ({ chain, row: chainCell(product, chain.id) }))
+                  .filter((cell): cell is { chain: (typeof COMPARE_CHAINS)[number]; row: NonNullable<ReturnType<typeof chainCell>> } => cell.row !== null)
+                  .sort((left, right) => left.row.price - right.row.price || left.chain.label.localeCompare(right.chain.label, 'sv'));
+                const best = pricedCells[0];
+
+                return (
+                  <tr className="align-top" key={requestedId}>
+                    <td className="sticky left-0 z-10 border-b border-slate-100 bg-white py-4 pr-4">
+                      <Link className="font-black text-slate-950 hover:text-emerald-800" href={`/products/${product.slug}`}>{product.name}</Link>
+                      <p className="mt-1 text-xs font-semibold text-slate-500">{product.brand || 'Brand not reported'} · {product.subline}</p>
+                      <p className="mt-1 text-xs font-black text-slate-400">id {product.slug}</p>
+                    </td>
+                    {COMPARE_CHAINS.map((chain) => {
+                      const row = chainCell(product, chain.id);
+                      return (
+                        <td className="border-b border-slate-100 px-4 py-4" key={`${product.slug}-${chain.id}`}>
+                          {row ? (
+                            <div className="grid gap-1">
+                              <p className="text-lg font-black text-slate-950">{row.priceText || formatSek(row.price)}</p>
+                              <p className="text-xs font-semibold text-slate-500">{row.priceUnit}</p>
+                              {typeof row.savings === 'number' && row.savings > 0 ? <p className="text-xs font-black text-emerald-800">saving {formatSek(row.savings)}</p> : null}
+                            </div>
+                          ) : (
+                            <span className="text-xs font-semibold text-slate-400">No verified {chain.label} row</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                    <td className="border-b border-slate-100 px-4 py-4">
+                      {best ? (
+                        <p className="rounded-full bg-emerald-100 px-3 py-2 text-center text-xs font-black text-emerald-950">
+                          {best.chain.label} · {best.row.priceText || formatSek(best.row.price)}
+                        </p>
+                      ) : (
+                        <span className="text-xs font-semibold text-slate-400">No ICA/Willys/Coop price</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-xs font-semibold leading-5 text-slate-600">
+          Source: {snapshotSourceLabel}. Missing cells are shown explicitly instead of substituting Hemköp, Lidl, OpenPrices, or fabricated prices.
+        </p>
+      </Card>
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>

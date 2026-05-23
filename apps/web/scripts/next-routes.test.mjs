@@ -2211,6 +2211,23 @@ ${seo}`;
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('renders query-driven ICA Willys Coop product comparison from the DB chain snapshot', async () => {
+    const route = await read('src/app/compare/page.tsx');
+
+    assert.match(route, /parseProductsParam/);
+    assert.match(route, /products=id1,id2/);
+    assert.match(route, /COMPARE_CHAINS/);
+    assert.match(route, /id: 'ica'/);
+    assert.match(route, /id: 'willys'/);
+    assert.match(route, /id: 'coop'/);
+    assert.match(route, /dbSiteAxfoodProducts/);
+    assert.match(route, /packages\/db exported snapshot/);
+    assert.match(route, /chainCell\(product, chain\.id\)/);
+    assert.match(route, /No verified \{chain\.label\} row/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces a compare-overlay chart from real price chart series output', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/compare/page.tsx');
