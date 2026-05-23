@@ -15,6 +15,7 @@
     "@groceryview/catalog": "0.1.0",
     "@groceryview/core": "0.1.0",
     "@groceryview/db": "0.1.0",
+    "@groceryview/ops": "0.1.0",
     "@groceryview/scanning": "0.1.0",
     "@tanstack/react-query": "^5.90.11",
     "class-variance-authority": "^0.7.1",
