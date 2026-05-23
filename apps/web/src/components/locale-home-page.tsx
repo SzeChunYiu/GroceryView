@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Card, PageShell } from './data-ui';
 import { MarketShell } from './market-shell';
+import { stores } from '@/lib/demo-data';
 import { localeOptionFor, localizedShellCopy, type BlockedLocaleRoute, type SupportedLocale } from '@/lib/i18n';
 import { siteUrl } from '@/lib/seo';
 
@@ -57,7 +58,7 @@ export function blockedLocaleMetadata(locale: BlockedLocaleRoute): Metadata {
 }
 
 export function LocaleHomePage({ locale }: { locale: SupportedLocale }) {
-  return <MarketShell />;
+  return <MarketShell nearbyStores={stores} />;
 }
 
 export function BlockedLocalePage({ locale }: { locale: BlockedLocaleRoute }) {

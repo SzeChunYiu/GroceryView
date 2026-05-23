@@ -1,3 +1,4 @@
+import { stores } from '@/lib/demo-data';
 import { MarketShell } from '@/components/market-shell';
 import { routeMetadata } from '@/lib/seo';
 
@@ -7,5 +8,5 @@ export function generateMetadata() {
 
 
 export default function HomePage() {
-  return <MarketShell />;
+  return <MarketShell nearbyStores={stores} />;
 }

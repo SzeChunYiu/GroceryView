@@ -532,6 +532,8 @@ export const stores = [
     format: 'discount supermarket',
     bestCategory: 'Coffee',
     distanceLabel: '1.2 km from saved area',
+    lat: 59.3436,
+    lng: 18.0473,
     mobileRoute: '/stores?selectedStoreId=willys-odenplan'
   },
   {
@@ -542,6 +544,8 @@ export const stores = [
     format: 'convenience supermarket',
     bestCategory: 'Snacks',
     distanceLabel: '0.6 km from saved area',
+    lat: 59.3341,
+    lng: 18.0636,
     mobileRoute: '/stores?selectedStoreId=ica-nara-sergels-torg'
   },
   {
@@ -552,6 +556,8 @@ export const stores = [
     format: 'mid-size supermarket',
     bestCategory: 'Dairy',
     distanceLabel: '2.4 km from saved area',
+    lat: 59.3135,
+    lng: 18.0766,
     mobileRoute: '/stores?selectedStoreId=coop-swedenborgsgatan'
   },
   {
@@ -562,6 +568,8 @@ export const stores = [
     format: 'discount supermarket',
     bestCategory: 'Dairy',
     distanceLabel: '1.6 km from saved area',
+    lat: 59.3463,
+    lng: 18.0520,
     mobileRoute: '/stores?selectedStoreId=lidl-sveavagen'
   },
   {
@@ -572,6 +580,8 @@ export const stores = [
     format: 'mid-size supermarket',
     bestCategory: 'Pantry',
     distanceLabel: '1.1 km from saved area',
+    lat: 59.3337,
+    lng: 18.0623,
     mobileRoute: '/stores?selectedStoreId=hemkop-stockholm'
   },
   {
@@ -582,6 +592,8 @@ export const stores = [
     format: 'big-box supermarket',
     bestCategory: 'Frozen',
     distanceLabel: '8.7 km from saved area',
+    lat: 59.5254,
+    lng: 17.9282,
     mobileRoute: '/stores?selectedStoreId=city-gross-stockholm'
   },
   {
@@ -591,6 +603,8 @@ export const stores = [
     format: 'social supermarket',
     bestCategory: 'Pantry',
     distanceLabel: '5.8 km from saved area',
+    lat: 59.3010,
+    lng: 17.9851,
     mobileRoute: '/stores?selectedStoreId=matmissionen-hagersten'
   },
   {
@@ -600,6 +614,8 @@ export const stores = [
     format: 'neighborhood supermarket',
     bestCategory: 'Breakfast',
     distanceLabel: '3.1 km from saved area',
+    lat: 59.3167,
+    lng: 18.0339,
     mobileRoute: '/stores?selectedStoreId=tempo-hornstull'
   },
   {
@@ -610,6 +626,8 @@ export const stores = [
     format: 'large supermarket',
     bestCategory: 'Dinner staples',
     distanceLabel: '4.4 km from saved area',
+    lat: 59.3038,
+    lng: 18.0225,
     mobileRoute: '/stores?selectedStoreId=ica-kvantum-liljeholmen'
   },
   {
@@ -620,6 +638,8 @@ export const stores = [
     format: 'mid-size supermarket',
     bestCategory: 'Beverages',
     distanceLabel: '3.3 km from saved area',
+    lat: 59.3130,
+    lng: 18.0474,
     mobileRoute: '/stores?selectedStoreId=hemkop-hornstull'
   },
   {
@@ -630,6 +650,8 @@ export const stores = [
     format: 'large supermarket',
     bestCategory: 'Produce',
     distanceLabel: '2.8 km from saved area',
+    lat: 59.3320,
+    lng: 18.0350,
     mobileRoute: '/stores?selectedStoreId=coop-daglivs-fridhemsplan'
   },
   {
@@ -640,6 +662,8 @@ export const stores = [
     format: 'mid-size supermarket',
     bestCategory: 'Meat',
     distanceLabel: '3.7 km from saved area',
+    lat: 59.3098,
+    lng: 18.0806,
     mobileRoute: '/stores?selectedStoreId=hemkop-skanstull'
   },
   {
@@ -650,6 +674,8 @@ export const stores = [
     format: 'hypermarket',
     bestCategory: 'Personal care',
     distanceLabel: '2.9 km from saved area',
+    lat: 59.3307,
+    lng: 18.0244,
     mobileRoute: '/stores?selectedStoreId=ica-maxi-lindhagen'
   },
   {
@@ -660,6 +686,8 @@ export const stores = [
     format: 'mid-size supermarket',
     bestCategory: 'Plant-based',
     distanceLabel: '1.9 km from saved area',
+    lat: 59.3410,
+    lng: 18.0541,
     mobileRoute: '/stores?selectedStoreId=coop-norra-stationsgatan'
   },
   {
@@ -670,6 +698,8 @@ export const stores = [
     format: 'discount supermarket',
     bestCategory: 'Frozen',
     distanceLabel: '3.6 km from saved area',
+    lat: 59.3119,
+    lng: 18.0990,
     mobileRoute: '/stores?selectedStoreId=willys-skanstull'
   },
   {
@@ -680,6 +710,8 @@ export const stores = [
     format: 'discount supermarket',
     bestCategory: 'Frozen snacks',
     distanceLabel: '4.2 km from saved area',
+    lat: 59.3090,
+    lng: 18.0955,
     mobileRoute: '/stores?selectedStoreId=lidl-hammarby-sjostad'
   },
   {
@@ -690,6 +722,8 @@ export const stores = [
     format: 'mid-size supermarket',
     bestCategory: 'Lunchbox value',
     distanceLabel: '3.4 km from saved area',
+    lat: 59.3131,
+    lng: 18.0696,
     mobileRoute: '/stores?selectedStoreId=coop-medborgarplatsen'
   },
   {
@@ -700,6 +734,8 @@ export const stores = [
     format: 'convenience supermarket',
     bestCategory: 'Beverages',
     distanceLabel: '3.0 km from saved area',
+    lat: 59.3170,
+    lng: 18.0542,
     mobileRoute: '/stores?selectedStoreId=ica-nara-mariatorget'
   },
   {
@@ -710,6 +746,8 @@ export const stores = [
     format: 'discount supermarket',
     bestCategory: 'Protein snacks',
     distanceLabel: '2.6 km from saved area',
+    lat: 59.3381,
+    lng: 18.0420,
     mobileRoute: '/stores?selectedStoreId=willys-fridhemsplan'
   }
 ];

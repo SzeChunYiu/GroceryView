@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import { ProductPriceCards } from './product-price-cards';
 import { TrendingCarousel } from './TrendingCarousel';
+import NearbyStoresWidget from '@/components/NearbyStoresWidget';
 import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedShellCopy } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
@@ -134,7 +135,18 @@ function heatmapTileClass(heatScore: number) {
   return 'border-emerald-300 bg-emerald-50 text-emerald-950';
 }
 
-export function MarketShell() {
+type NearbyStore = {
+  slug: string;
+  name: string;
+  mobileRoute?: string;
+  district?: string;
+  format?: string;
+  lat?: number;
+  lng?: number;
+  distanceLabel?: string;
+};
+
+export function MarketShell({ nearbyStores = [] }: Readonly<{ nearbyStores?: NearbyStore[] }>) {
   return (
     <PageShell>
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
@@ -168,6 +180,8 @@ export function MarketShell() {
           </div>
         </Card>
       </section>
+
+      <NearbyStoresWidget stores={nearbyStores} />
 
       <div className="mt-6"><MetricGrid /></div>
 
