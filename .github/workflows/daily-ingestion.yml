@@ -116,6 +116,17 @@ jobs:
           }
           NODE
 
+      - name: Upload production ingestion configuration
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-production-ingestion-config
+          path: |
+            /tmp/production-env-validation.json
+            /tmp/groceryview-catalog-targets.json
+            /tmp/groceryview-daily-connectors.json
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Check production DB write connectivity
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
