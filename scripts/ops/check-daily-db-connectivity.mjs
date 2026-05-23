@@ -97,7 +97,9 @@ export function isTransientDailyDatabaseError(error) {
     'hot standby mode is disabled',
     'edbhandlerexited',
     'eauthquery',
+    'ecircuitbreaker',
     'connection to database not available',
+    'new connections are temporarily blocked',
     'timeout',
     'epipe'
   ].some((signature) => text.includes(signature));
@@ -105,6 +107,7 @@ export function isTransientDailyDatabaseError(error) {
 
 function blockerForError(error) {
   const text = errorText(error).toLowerCase();
+  if (text.includes('ecircuitbreaker') && text.includes('new connections are temporarily blocked')) return 'supabase_pooler_circuit_breaker';
   if (text.includes('eauthquery') && text.includes('connection to database not available')) return 'supabase_pooler_database_unavailable';
   if (text.includes('database system is not accepting connections')) return 'database_not_accepting_connections';
   if (text.includes('db_connection_closed_in_auth')) return 'supabase_pooler_auth_closed';

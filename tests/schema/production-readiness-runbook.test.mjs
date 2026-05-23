@@ -45,6 +45,7 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /supabase_direct_host/);
     assert.match(runbook, /supabase_transaction_pooler/);
     assert.match(runbook, /supabase_pooler_database_unavailable/);
+    assert.match(runbook, /supabase_pooler_circuit_breaker/);
     assert.match(runbook, /alternateConnections/);
     assert.match(runbook, /groceryview-production-db-recovery-packet/);
     assert.match(runbook, /ops:db-recovery-packet/);
