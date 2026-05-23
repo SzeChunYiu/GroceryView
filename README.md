@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 13:30 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 13:45 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -42,6 +42,9 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1319 feat(ingest): add ICA Tomelilla store prices
+- #1314 feat(fuel): prices
+- #1317 feat(ingest): add Coop branch weekly discounts
 - #1313 feat(ingest): add ICA Supermarket Tierp prices
 - #1312 feat(fuel): surface target price alerts
 - #1308 feat(ingest): add ICA Kvantum Kista promotions
@@ -54,15 +57,11 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1271 feat(fuel): prices
 - #1258 feat(fuel): prices
 - #1265 feat(web): surface commodity mapping curator review
-- #1257 feat(web): add basket cost heatmap by area
-- #1250 feat(web): add chain index trend chart
-- #1239 feat(web): add grocery market heatmap
 
 ## 🔄 In progress (open PRs)
 
-- #1318 docs(readme): refresh live status board
-- #1317 feat(ingest): add Coop branch weekly discounts
-- #1314 feat(fuel): prices
+- #1322 Pass variable-backed runtime values to deploy audit
+- #1321 docs(readme): refresh live status board
 - #1310 feat(ingest): add Coop branch weekly discounts
 - #1309 feat(ingest): deepen real grocery source rows
 - #1306 feat(ingest): expand Coop weekly branch discounts
@@ -70,7 +69,7 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1304 feat(ingest): add ICA Tierp promotions
 - #1298 feat(ingest): deepen Matspar Matpriskollen Lidl ICA rows
 - #1283 feat(web): add verified deal screener
-- #1262 feat(web): product cross chain table (WIP from LUNARC fleet)
+- #1262 fix(db): make connector observation upserts append-only
 - #1261 feat(web): nav groups (WIP from LUNARC fleet)
 - #1260 feat(web): dark mode (WIP from LUNARC fleet)
 
