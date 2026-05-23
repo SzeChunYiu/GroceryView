@@ -1656,7 +1656,8 @@ describe('fetchIcaProducts', () => {
     assert.ok(maxActiveRequests <= 8, `expected at most 8 in-flight ICA store requests, saw ${maxActiveRequests}`);
   });
 
-  it('keeps ICA batch ingestion alive when one regional store endpoint fails', async () => {
+  it('retries transient ICA branch failures and fails closed if a configured branch stays missing', async () => {
+    const attempts = new Map<string, number>();
     const rows = await fetchIcaDefaultStoreProducts({
       retrievedAt: '2026-05-22T08:49:49.000Z',
       maxRows: 1,
@@ -1673,16 +1674,18 @@ describe('fetchIcaProducts', () => {
         }
       ],
       fetchImpl: async (url) => {
-        if (String(url).includes('/stores/1003654/')) {
+        const storeAccountId = String(url).match(/\/stores\/([^/]+)\//)?.[1] ?? 'unknown';
+        attempts.set(storeAccountId, (attempts.get(storeAccountId) ?? 0) + 1);
+        if (storeAccountId === '1003654' && attempts.get(storeAccountId) === 1) {
           return new Response('temporary store failure', { status: 500 });
         }
         return Response.json({
           productGroups: [{
             type: 'ON_OFFER',
             decoratedProducts: [{
-              productId: 'product-1004599',
-              retailerProductId: 'retailer-1004599',
-              name: 'Product 1004599',
+              productId: `product-${storeAccountId}`,
+              retailerProductId: `retailer-${storeAccountId}`,
+              name: `Product ${storeAccountId}`,
               price: { amount: 10, currency: 'SEK' }
             }]
           }]
@@ -1691,8 +1694,21 @@ describe('fetchIcaProducts', () => {
     });
 
     assert.deepEqual(rows.map((row) => [row.storeAccountId, row.code]), [
-      ['1004599', 'retailer-1004599']
+      ['1004599', 'retailer-1004599'],
+      ['1003654', 'retailer-1003654']
     ]);
+    assert.equal(attempts.get('1003654'), 2);
+
+    await assert.rejects(() => fetchIcaDefaultStoreProducts({
+      retrievedAt: '2026-05-22T08:49:49.000Z',
+      maxRows: 1,
+      stores: [{
+        storeAccountId: '1003654',
+        storeName: 'ICA Regional 500',
+        regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+      }],
+      fetchImpl: async () => new Response('permanent store failure', { status: 500 })
+    }), /ICA all-store promotion requests missing configured branches: 1003654/);
   });
 });
 

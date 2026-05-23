@@ -1715,19 +1715,48 @@ export async function fetchIcaDefaultStoreProducts(
 ): Promise<IcaProduct[]> {
   const stores = options.stores ?? DEFAULT_ICA_STORE_CONFIGS;
   const concurrency = 8;
-  const batches: PromiseSettledResult<IcaProduct[]>[] = [];
+  const maxAttempts = 2;
+  const fetchStore = async (store: IcaStoreConfig): Promise<IcaProduct[]> => {
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        const rows = await fetchIcaProducts({
+          ...options,
+          storeAccountId: store.storeAccountId,
+          storeName: store.storeName,
+          regionId: store.regionId
+        });
+        if (rows.length > 0 || attempt === maxAttempts) {
+          return rows;
+        }
+        lastError = new Error('no ICA products returned');
+      } catch (error) {
+        lastError = error;
+        if (attempt === maxAttempts) {
+          throw error;
+        }
+      }
+    }
+    throw lastError instanceof Error ? lastError : new Error(String(lastError));
+  };
+  const batches: Array<{ store: IcaStoreConfig; result: PromiseSettledResult<IcaProduct[]> }> = [];
   for (let index = 0; index < stores.length; index += concurrency) {
     const batch = stores.slice(index, index + concurrency);
-    batches.push(...await Promise.allSettled(batch.map((store) => fetchIcaProducts({
-      ...options,
-      storeAccountId: store.storeAccountId,
-      storeName: store.storeName,
-      regionId: store.regionId
-    }))));
+    const results = await Promise.allSettled(batch.map((store) => fetchStore(store)));
+    batches.push(...results.map((result, resultIndex) => ({
+      store: batch[resultIndex]!,
+      result
+    })));
   }
-  const rows = batches.flatMap((batch) => batch.status === 'fulfilled' ? batch.value : []);
+  const rows = batches.flatMap((batch) => batch.result.status === 'fulfilled' ? batch.result.value : []);
+  const missingStoreIds = batches
+    .filter((batch) => batch.result.status === 'rejected' || batch.result.value.length === 0)
+    .map((batch) => batch.store.storeAccountId);
+  if (missingStoreIds.length > 0) {
+    throw new Error(`ICA all-store promotion requests missing configured branches: ${missingStoreIds.join(', ')}`);
+  }
   if (rows.length === 0) {
-    const firstFailure = batches.find((batch) => batch.status === 'rejected');
+    const firstFailure = batches.find((batch) => batch.result.status === 'rejected')?.result;
     const reason = firstFailure?.status === 'rejected'
       ? firstFailure.reason instanceof Error ? firstFailure.reason.message : String(firstFailure.reason)
       : 'no ICA products returned';
