@@ -25,6 +25,32 @@ function icaStoreToDailyStoreConfig(store) {
   };
 }
 
+
+function storeFetchErrorMessage(chainId, error) {
+  return `${chainId} store catalog fetch failed: ${error instanceof Error ? error.message : String(error)}`;
+}
+
+async function waitForRetryDelay(delayMs) {
+  if (!delayMs || delayMs <= 0) return;
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+}
+
+async function fetchStoreCatalogWithRetry(chainId, fetchStoreCatalog, { retryAttempts = 2, retryBaseDelayMs = 250 } = {}) {
+  let lastError;
+  for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
+    try {
+      return await fetchStoreCatalog();
+    } catch (error) {
+      lastError = error;
+      if (attempt >= retryAttempts) break;
+      process.stderr.write(`[daily-connectors] retrying ${chainId} store catalog fetch attempt=${attempt + 2}/${retryAttempts + 1}: ${error instanceof Error ? error.message : String(error)}
+`);
+      await waitForRetryDelay(retryBaseDelayMs * (attempt + 1));
+    }
+  }
+  throw new Error(storeFetchErrorMessage(chainId, lastError));
+}
+
 async function loadStoreFetchers() {
   try {
     return await import('../../packages/ingestion/dist/index.js');
@@ -33,7 +59,7 @@ async function loadStoreFetchers() {
   }
 }
 
-export async function printDailyConnectorStores({ fetchers, selfTest = false } = {}) {
+export async function printDailyConnectorStores({ fetchers, selfTest = false, retryAttempts = 2, retryBaseDelayMs = 250 } = {}) {
   const source = fetchers ?? (selfTest ? {
     DEFAULT_ICA_STORE_CONFIGS: [{
       storeAccountId: '1004599',
@@ -97,12 +123,13 @@ export async function printDailyConnectorStores({ fetchers, selfTest = false } =
     }]
   } : await loadStoreFetchers());
 
+  const retryOptions = { retryAttempts, retryBaseDelayMs };
   const [willysStores, hemkopStores, coopStores, cityGrossStores, lidlStores] = await Promise.all([
-    source.fetchWillysStores({ online: true }),
-    source.fetchHemkopStores({ online: true }),
-    source.fetchCoopStores(),
-    source.fetchCityGrossStores(),
-    source.fetchLidlStores()
+    fetchStoreCatalogWithRetry('willys', () => source.fetchWillysStores({ online: true }), retryOptions),
+    fetchStoreCatalogWithRetry('hemkop', () => source.fetchHemkopStores({ online: true }), retryOptions),
+    fetchStoreCatalogWithRetry('coop', () => source.fetchCoopStores(), retryOptions),
+    fetchStoreCatalogWithRetry('city_gross', () => source.fetchCityGrossStores(), retryOptions),
+    fetchStoreCatalogWithRetry('lidl', () => source.fetchLidlStores(), retryOptions)
   ]);
 
   return {
