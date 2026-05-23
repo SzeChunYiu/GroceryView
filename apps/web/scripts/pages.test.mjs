@@ -9,5 +9,11 @@ describe('legacy static page generator', () => {
     assert.match(packageJson.scripts.build, /--webpack/);
     const app = await readFile(new URL('../src/app/page.tsx', import.meta.url), 'utf8');
     assert.match(app, /MarketShell/);
+    assert.match(app, /searchParams/);
+    assert.match(app, /params\.brand/);
+    const shell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    assert.match(shell, /name="brand"/);
+    assert.match(shell, /productBrandFilterOptions/);
+    assert.match(shell, /selectedBrand/);
   });
 });

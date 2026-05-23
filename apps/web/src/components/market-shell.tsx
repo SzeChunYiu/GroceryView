@@ -8,6 +8,7 @@ import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
+  adaptiveProductCards,
   chainSavingsLedger,
   chainCategoryCoverage,
   categoryDealLeaders,
@@ -30,6 +31,7 @@ import {
   priceDropMoversBoard,
   privateLabelDupeFinder,
   privateFeatureCopy,
+  productBrandFilterOptions,
   snapshot,
   sourceClaimLedger,
   sourceCoverage,
@@ -132,7 +134,18 @@ function heatmapTileClass(heatScore: number) {
   return 'border-emerald-300 bg-emerald-50 text-emerald-950';
 }
 
-export function MarketShell() {
+function normalizeSelectedBrand(brand: string | undefined) {
+  const requested = brand?.trim();
+  if (!requested) return '';
+  return productBrandFilterOptions.find((option) => option.value.toLocaleLowerCase('sv-SE') === requested.toLocaleLowerCase('sv-SE'))?.value ?? '';
+}
+
+export function MarketShell({ selectedBrand }: Readonly<{ selectedBrand?: string }>) {
+  const normalizedSelectedBrand = normalizeSelectedBrand(selectedBrand);
+  const productCards = normalizedSelectedBrand
+    ? adaptiveProductCards.filter((card) => card.brand === normalizedSelectedBrand)
+    : homepageAdaptiveProductCards;
+
   return (
     <PageShell>
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
@@ -767,15 +780,39 @@ export function MarketShell() {
             <Eyebrow>Verified product universe</Eyebrow>
             <h2 className="mt-2 text-2xl font-black tracking-tight">Products that can already support public browsing</h2>
           </div>
-          <p className="max-w-xl text-sm leading-6 text-slate-600">
-            Chain spread rows and OpenPrices observations are shown together, with every card linking to a verified product page.
-          </p>
+          <form action="/" className="grid gap-2 sm:min-w-[20rem]" method="get">
+            <label className="text-xs font-black uppercase tracking-[0.18em] text-slate-500" htmlFor="brand-filter">Brand filter</label>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <select
+                className="min-h-11 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-900"
+                defaultValue={normalizedSelectedBrand}
+                id="brand-filter"
+                name="brand"
+              >
+                <option value="">All brands</option>
+                {productBrandFilterOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label} ({option.productCount})
+                  </option>
+                ))}
+              </select>
+              <button className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-black text-white" type="submit">Apply</button>
+            </div>
+          </form>
         </div>
+        <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-600">
+          Chain spread rows and OpenPrices observations are shown together, with every card linking to a verified product page. Brand options come from distinct reported brands in the generated product data.
+        </p>
+        {normalizedSelectedBrand ? (
+          <p className="mt-3 text-sm font-black text-emerald-800">
+            Showing {productCards.length.toLocaleString('sv-SE')} verified product card{productCards.length === 1 ? '' : 's'} for {normalizedSelectedBrand}.
+          </p>
+        ) : null}
         <div className="mt-5">
           <ProductPriceCards
-            cards={homepageAdaptiveProductCards}
+            cards={productCards}
             eyebrow="Product-card display"
-            title="Homepage cards show pack price and jämförpris"
+            title={normalizedSelectedBrand ? `${normalizedSelectedBrand} cards show pack price and jämförpris` : 'Homepage cards show pack price and jämförpris'}
             intro="The homepage now uses the same adaptive total/per-unit card model as the product catalogue, with no hidden actual price."
           />
         </div>
