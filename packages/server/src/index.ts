@@ -1104,6 +1104,15 @@ export type PostgresReadinessDiagnostics = {
 
 export type HttpPostgresReadinessReport = PostgresIntegrationReadinessReport & {
   diagnostics: PostgresReadinessDiagnostics;
+  target?: PostgresReadinessTarget;
+};
+
+export type PostgresReadinessTarget = {
+  host: string;
+  database: string;
+  username: string;
+  isSupabasePooler: boolean;
+  poolerMode: 'direct' | 'session' | 'transaction';
 };
 
 export function summarizePostgresReadinessForHttp(report: PostgresIntegrationReadinessReport): PostgresReadinessDiagnostics {
@@ -1131,9 +1140,27 @@ export function summarizePostgresReadinessForHttp(report: PostgresIntegrationRea
   };
 }
 
-function postgresReadinessResponse(report: PostgresIntegrationReadinessReport): HttpPostgresReadinessReport {
+export function postgresReadinessTargetFromDatabaseUrl(databaseUrl: string | undefined): PostgresReadinessTarget | undefined {
+  if (!databaseUrl?.trim()) return undefined;
+  const url = new URL(databaseUrl);
+  const port = url.port ? Number.parseInt(url.port, 10) : 5432;
+  const isSupabasePooler = url.hostname.endsWith('.pooler.supabase.com');
+  return {
+    host: url.hostname,
+    database: url.pathname.replace(/^\//, '') || 'postgres',
+    username: decodeURIComponent(url.username),
+    isSupabasePooler,
+    poolerMode: isSupabasePooler ? (port === 5432 ? 'session' : 'transaction') : 'direct'
+  };
+}
+
+function postgresReadinessResponse(
+  report: PostgresIntegrationReadinessReport,
+  target?: PostgresReadinessTarget
+): HttpPostgresReadinessReport {
   return {
     ...report,
+    ...(target ? { target } : {}),
     diagnostics: summarizePostgresReadinessForHttp(report)
   };
 }
@@ -1904,7 +1931,10 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
 
         try {
           const report = await authOptions.postgresReadinessProvider();
-          return jsonResponse(postgresReadinessResponse(report), { status: report.status === 'ready' ? 200 : 503 });
+          return jsonResponse(
+            postgresReadinessResponse(report, postgresReadinessTargetFromDatabaseUrl(authOptions.runtimeConfig?.databaseUrl ?? process.env.DATABASE_URL)),
+            { status: report.status === 'ready' ? 200 : 503 }
+          );
         } catch {
           return jsonResponse(
             postgresReadinessResponse({

@@ -247,7 +247,31 @@ jobs:
             -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
             "${GROCERYVIEW_SERVER_URL%/}/api/readiness/postgres" \
             >/tmp/postgres-readiness.json
-          node -e "const body=require('/tmp/postgres-readiness.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+          node <<'NODE'
+          const readiness = require('/tmp/postgres-readiness.json');
+          const connectivity = require('/tmp/daily-db-connectivity.json');
+          if (readiness.status !== 'ready') {
+            console.error(JSON.stringify(readiness));
+            process.exit(1);
+          }
+          if (
+            readiness.target?.host !== connectivity.host ||
+            readiness.target?.database !== connectivity.database ||
+            readiness.target?.username !== connectivity.username
+          ) {
+            console.error(JSON.stringify({
+              blocker: 'postgres_readiness_target_mismatch',
+              deployedTarget: readiness.target,
+              ingestionTarget: {
+                host: connectivity.host,
+                database: connectivity.database,
+                username: connectivity.username,
+                poolerMode: connectivity.poolerMode
+              }
+            }));
+            process.exit(1);
+          }
+          NODE
 
       - name: Check deployed daily source-run freshness
         env:
