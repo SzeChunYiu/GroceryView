@@ -107,6 +107,12 @@ import {
   normalizeUnitPrice,
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
+  parseAxfoodStoreList,
+  parseCityGrossSites,
+  parseIcaStoreList,
+  parseLidlStoreDirectoryLinks,
+  parseLidlStorePayload,
+  parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
   parseBrandedSwedishFuelStations,
@@ -150,9 +156,12 @@ import {
   runAllStoreTasks,
   runRetailerConnector,
   runDailyIngestion,
+  STORE_ENUMERATOR_CHAIN_IDS,
+  storeEnumeratorSourceCitations,
   storeEnumeratorSources,
   runOpenFoodFactsProductMetadataEnrichment,
   stockholmStoreLocatorFixtures,
+  validateStoreEnumerationResults,
   validateEnumeratedStores,
   ST1_FUEL_PRICE_URL,
   validateOfferSelectorFixtures,
@@ -337,6 +346,188 @@ describe('store enumerator', () => {
     assert.deepEqual(rows.map((row) => row.storeId), ['willys:2149', 'hemkop:4660']);
     assert.equal(requestedUrls[0], buildAxfoodStoreSearchUrl('willys'));
     assert.equal(requestedUrls[1], buildAxfoodStoreSearchUrl('hemkop'));
+  });
+});
+
+describe('store enumerator full branch source parsers', () => {
+  const retrievedAt = '2026-05-23T19:45:00.000Z';
+
+  it('normalizes official locator branches for every supported chain', () => {
+    const icaStores = parseIcaStoreList([{
+      storeName: 'ICA Nära A-Livs',
+      profile: 'Nära',
+      phoneNumber: '044 50392',
+      address: {
+        street: 'Gamla Vägen 91',
+        city: 'Fjälkinge',
+        postalCode: '29167',
+        coordinates: { coordinateX: '56.04189', coordinateY: '14.27984' }
+      },
+      storeId: '2527',
+      accountNumber: '1004177',
+      bhsUrl: 'https://www.ica.se/butiker/nara/kristianstad/ica-nara-a-livs-1004177/'
+    }], retrievedAt);
+
+    const willysStores = parseAxfoodStoreList('willys', [{
+      storeId: '2196',
+      name: 'Willys Stockholm Mariahallen',
+      geoPoint: { latitude: 59.3186, longitude: 18.0606 },
+      address: { line1: 'Hornsgatan 74', town: 'Stockholm', postalCode: '11821' },
+      onlineStore: true,
+      clickAndCollect: true
+    }, {
+      storeId: '2002',
+      name: '',
+      external: true
+    }], retrievedAt);
+
+    const hemkopStores = parseAxfoodStoreList('hemkop', [{
+      storeId: '3858',
+      name: 'Hemköp Stockholm City',
+      geoPoint: { latitude: 59.3317, longitude: 18.0619 },
+      address: { line1: 'Åhléns City', town: 'Stockholm', postalCode: '11121' }
+    }], retrievedAt);
+
+    const coopStores = parseCoopStoreMap([{
+      storeId: 1234,
+      ledgerAccountNumber: 700123,
+      name: 'Stora Coop Sundby Park',
+      address: 'Landsvägen 51',
+      city: 'Sundbyberg',
+      postalCode: '17265',
+      latitude: 59.362,
+      longitude: 17.971,
+      url: '/butiker-erbjudanden/stora-coop/stora-coop-sundby-park/'
+    }], retrievedAt);
+
+    const lidlStores = parseLidlStorePayload({
+      objectNumber: 'SE00107',
+      storeName: 'Karlskoga Skranta',
+      status: { name: 'open' },
+      address: {
+        streetName: 'Baggängsvägen',
+        streetNumber: '2',
+        city: 'Karlskoga',
+        zip: '691 45',
+        longitude: 14.50129,
+        latitude: 59.31622
+      }
+    }, retrievedAt);
+
+    const cityGrossStores = parseCityGrossSites({
+      sites: [{
+        id: 21,
+        type: 3,
+        name: 'Borås',
+        streetAddress: 'Göteborgsvägen 181',
+        zipcode: '50463',
+        city: 'Borås',
+        email: 'cateringboras@citygross.se',
+        storeNumber: '3204'
+      }, {
+        id: 89,
+        type: 4,
+        name: 'Åkersberga'
+      }]
+    }, retrievedAt);
+
+    assert.equal(icaStores[0].storeId, 'ica:1004177');
+    assert.equal(icaStores[0].latitude, 56.04189);
+    assert.equal(willysStores.length, 1);
+    assert.equal(willysStores[0].sourceIds[0], 'willys_axfood_store_locator');
+    assert.equal(hemkopStores[0].storeId, 'hemkop:3858');
+    assert.equal(coopStores[0].storeId, 'coop:700123');
+    assert.equal(lidlStores[0].storeId, 'lidl:se00107');
+    assert.equal(cityGrossStores.length, 1);
+    assert.equal(cityGrossStores[0].storeId, 'city_gross:3204');
+  });
+
+  it('dereferences Lidl Nuxt payloads for city links and branch rows', () => {
+    const payload = [
+      { data: 1 },
+      { links: 2, stores: 12 },
+      [3],
+      { name: 4, numberOfStores: 5, url: 6 },
+      'Karlskoga',
+      1,
+      '/s/sv-SE/butiker/karlskoga/baggaengsvaegen-2/',
+      'SE00107',
+      'Karlskoga Skranta',
+      'Baggängsvägen',
+      '2',
+      '691 45',
+      [13],
+      { objectNumber: 7, storeName: 8, address: 14, status: 18 },
+      { streetName: 9, streetNumber: 10, city: 4, zip: 11, longitude: 15, latitude: 16 },
+      14.50129,
+      59.31622,
+      'open',
+      { name: 17 }
+    ];
+
+    const links = parseLidlStoreDirectoryLinks(payload);
+    const stores = parseLidlStorePayload(payload, retrievedAt);
+
+    assert.deepEqual(links, [{
+      name: 'Karlskoga',
+      numberOfStores: 1,
+      url: 'https://www.lidl.se/s/sv-SE/butiker/karlskoga/baggaengsvaegen-2/'
+    }]);
+    assert.equal(stores[0].sourceStoreId, 'SE00107');
+    assert.equal(stores[0].address, 'Baggängsvägen 2');
+    assert.equal(stores[0].longitude, 14.50129);
+  });
+
+  it('classifies OSM rows and validates source citations without fabricated placeholders', () => {
+    const osmBranches = parseOsmChainStores([{
+      osmType: 'node',
+      osmId: 29898149,
+      name: 'ICA nära Karlaplan',
+      brand: 'ICA Nära',
+      shop: 'supermarket',
+      latitude: 59.337217,
+      longitude: 18.0911217,
+      street: 'Karlaplan',
+      houseNumber: '10',
+      postcode: '11520',
+      city: 'Stockholm',
+      openingHours: '',
+      website: 'https://www.ica.se/butiker/nara/stockholm/ica-karlaplan-1003714/',
+      phone: '',
+      sourceUrl: OVERPASS_INTERPRETER_URL,
+      retrievedAt
+    }], retrievedAt);
+
+    assert.equal(osmBranches[0].chainId, 'ica');
+    assert.equal(osmBranches[0].sourceIds[0], 'osm_overpass_sweden');
+    assert.equal(storeEnumeratorSourceCitations.length, STORE_ENUMERATOR_CHAIN_IDS.length + 1);
+
+    const validation = validateStoreEnumerationResults(STORE_ENUMERATOR_CHAIN_IDS.map((chainId) => ({
+      chainId,
+      retrievedAt,
+      sourceCitations: storeEnumeratorSourceCitations.filter((citation) => citation.chainIds.includes(chainId) && citation.sourceId !== 'osm_overpass_sweden'),
+      stores: [{
+        chainId,
+        storeId: `${chainId}:fixture-branch`,
+        sourceStoreId: 'fixture-branch',
+        sourceIds: [storeEnumeratorSourceCitations.find((citation) => citation.chainIds.length === 1 && citation.chainIds[0] === chainId)?.sourceId ?? 'ica_public_store_locator'],
+        name: `${chainId} fixture branch`,
+        address: 'Testgatan 1',
+        city: 'Stockholm',
+        postalCode: '11122',
+        countryCode: 'SE',
+        status: 'open',
+        sourceUrl: 'https://example.com/store-locator',
+        retrievedAt
+      }],
+      issues: []
+    })));
+
+    assert.deepEqual(validation, {
+      status: 'valid',
+      chainIds: ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys'],
+      issues: []
+    });
   });
 });
 
