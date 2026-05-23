@@ -106,6 +106,7 @@ import {
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
+  GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
@@ -3964,6 +3965,33 @@ describe('fetchMatsparProducts', () => {
 
     assert.equal(rows.length, 1);
   });
+
+  it('fails closed when Matspar search returns fewer than the required real rows', async () => {
+    const pageData = {
+      payload: {
+        products: [{
+          productid: 1,
+          name: 'Too small Matspar row set',
+          price: 1000
+        }]
+      }
+    };
+    const fetchImpl: typeof fetch = async () => new Response(
+      `<script>window.__PAGEDATA__ = JSON.parse(${JSON.stringify(JSON.stringify(pageData))});</script>`,
+      { status: 200 }
+    );
+
+    await assert.rejects(
+      () => fetchMatsparProducts({
+        queries: ['makaroner'],
+        pages: [1],
+        minRows: 2,
+        fetchImpl,
+        retrievedAt: '2026-05-21T01:10:00.000Z'
+      }),
+      /Matspar fetch returned only 1 rows; minimum required is 2/
+    );
+  });
 });
 
 describe('fetchWillysProducts', () => {
@@ -6096,6 +6124,76 @@ describe('daily ingestion runner', () => {
     const observation = firstBatchObservation(executor);
     assert.equal(observation.store_id, null);
     assert.equal(observation.price, 12.2);
+  });
+
+  it('materializes native Matspar aggregate public prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const products = Array.from({ length: 100 }, (_, index) => ({
+      productid: 3270 + index,
+      name: index === 0 ? 'Snabbmakaroner' : `Matspar produkt ${index}`,
+      brand: 'Kungsörnen',
+      image: `matspar-image-${index}`,
+      weight_pretty: '750g',
+      country_from: 'Sverige',
+      slug: index === 0 ? 'produkt/snabbmakaroner-750-g-kungsornen' : `produkt/matspar-produkt-${index}`,
+      price: 1500 + index,
+      median_price: 1750 + index,
+      w_prices: { 1886: 1665, 1887: 1877 }
+    }));
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T17:05:00.000Z',
+      connectors: [{
+        connectorId: 'matspar-public-search',
+        chainId: 'matspar',
+        sourceType: 'retailer_online_page',
+        endpointUrl: `${GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL}?queries=makaroner&pages=1&minRows=100&maxRows=100`,
+        parserVersion: 'matspar-public-search-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        const pageData = { payload: { products } };
+        return new Response(
+          `<script>window.__PAGEDATA__ = JSON.parse(${JSON.stringify(JSON.stringify(pageData))});</script>`,
+          { status: 200, headers: { 'content-type': 'text/html' } }
+        );
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 100);
+    assert.equal(result.observationIds.length, 100);
+    assert.deepEqual(requestedUrls, [buildMatsparSearchUrl('makaroner')]);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.slug, 'matspar-3270');
+    assert.equal(product.brand, 'Kungsörnen');
+    assert.equal(product.category_id, 'matspar-makaroner');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.retailer_product_ref, '3270');
+    assert.equal(observation.price, 15);
+    assert.equal(observation.quantity, 750);
+    assert.equal(observation.quantity_unit, 'g');
+    assert.equal(observation.is_available, true);
+    assert.equal(observation.domain, 'grocery');
+    const provenance = observation.provenance as Record<string, unknown>;
+    assert.deepEqual(provenance, {
+      sourceType: 'retailer_online_page',
+      sourceUrl: 'https://www.matspar.se/produkt/snabbmakaroner-750-g-kungsornen',
+      parserVersion: 'matspar-public-search-v1',
+      rawSnapshotRef: String(provenance.rawSnapshotRef),
+      chainId: 'matspar',
+      cadence: 'daily',
+      connectorId: 'matspar-public-search',
+      runKey: 'matspar:retailer-online-page:matspar-public-search:2026-05-23',
+      domain: 'grocery'
+    });
   });
 
   it('materializes native Coop all-store branch product prices into daily database observations', async () => {

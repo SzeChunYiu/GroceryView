@@ -63,6 +63,11 @@ import {
   type FuelPriceObservation
 } from './connectors/okq8-fuel.js';
 import {
+  fetchMatsparProducts,
+  MATSPAR_MINIMUM_ROWS,
+  type MatsparProduct
+} from './connectors/matspar.js';
+import {
   fetchWillysProductsForAllStores,
   fetchWillysWeeklyDiscountsForAllStores,
   type WillysProduct,
@@ -1641,6 +1646,16 @@ function dailyNativeStringListParam(url: URL, name: string): string[] | undefine
   return value.split(',').map((part) => part.trim()).filter(Boolean);
 }
 
+function dailyNativeNumberListParam(url: URL, name: string): number[] | undefined {
+  const values = dailyNativeStringListParam(url, name);
+  if (!values) return undefined;
+  return values.map((value) => {
+    const parsed = Number(value);
+    if (!Number.isInteger(parsed) || parsed < 1) throw new Error(`${name} must be a comma-separated list of positive integers.`);
+    return parsed;
+  });
+}
+
 function validDailyBarcode(value: string | undefined): string | undefined {
   const barcode = value?.trim();
   return barcode && /^\d{8,14}$/.test(barcode) ? barcode : undefined;
@@ -1877,6 +1892,35 @@ function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorPa
     memberOnly: false,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl
+  };
+}
+
+function matsparCategoryId(row: MatsparProduct): string {
+  try {
+    const query = new URL(row.sourceUrl).searchParams.get('q');
+    if (query?.trim()) return `matspar-${stableKeyPart(query)}`;
+  } catch {
+    // Keep a stable category even if a captured row has a malformed source URL.
+  }
+  return 'matspar-public-search';
+}
+
+function matsparProductToDailyItem(row: MatsparProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `matspar-${stableKeyPart(row.code)}`,
+    categoryId: matsparCategoryId(row),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    isAvailable: true,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.productUrl || row.sourceUrl
   };
 }
 
@@ -2117,6 +2161,20 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(cityGrossProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchMatsparProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      queries: dailyNativeStringListParam(url, 'queries'),
+      pages: dailyNativeNumberListParam(url, 'pages'),
+      minRows: dailyNativeNumberParam(url, 'minRows') ?? MATSPAR_MINIMUM_ROWS,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(matsparProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL}?`)) {
@@ -2960,6 +3018,7 @@ export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lid
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
+export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 
@@ -3932,6 +3991,7 @@ async function persistDailyConnectorOutput(input: {
       };
       const rawProvenance = {
         sourceType: accepted.priceObservation.provenance.sourceType,
+        sourceUrl: accepted.priceObservation.provenance.sourceUrl,
         parserVersion: accepted.priceObservation.provenance.parserVersion,
         rawSnapshotRef: accepted.priceObservation.provenance.rawSnapshotRef,
         chainId: config.chainId,

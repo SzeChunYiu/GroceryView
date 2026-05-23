@@ -1,6 +1,6 @@
 # Grocery Data Sources — Reverse-Engineering Inventory
 
-Updated: 2026-05-21 by operator. Add new sources here as you discover them.
+Updated: 2026-05-23 by operator. Add new sources here as you discover them.
 
 This document is the canonical inventory of every external data source the
 GroceryView ingestion layer pulls from (or could pull from). Each entry lists
@@ -83,8 +83,13 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 - `coop.se/erbjudanden` — Coop offers.
 - `willys.se/erbjudanden`, `hemkop.se/erbjudanden` — already exposed as JSON at `/_next/data/{buildId}/sv/erbjudanden.json` per willys-mcp repo.
 
-### 2.8 Matspar / Matpriskollen ⏳ pending (competitor aggregators)
-- Match competitor sites to understand their schema; do NOT redistribute their proprietary aggregation. They proved the model works.
+### 2.8 Matspar ✅ shipped / Matpriskollen ⏳ pending (competitor aggregators)
+- **Matspar endpoint:** public search pages at `https://www.matspar.se/kategori?q={query}` with embedded `window.__PAGEDATA__` product rows.
+- **What Matspar returns:** Matspar product id, product name, brand, package text, current aggregate SEK price, median price, warehouse price coverage count, search URL, and product URL.
+- **Per-branch granularity:** ❌ no — this is an aggregate public search price, not a specific store or branch price.
+- **Guardrail:** the daily native connector enforces at least 100 real rows before persisting; rows keep Matspar product/source provenance and do not pretend to be per-store evidence.
+- **Lands in:** `packages/ingestion/src/connectors/matspar.ts`, daily DB observations through `groceryview://daily/matspar/products/public-search`, and the generated web artifact `apps/web/src/lib/ingested/matspar.ts`.
+- **Matpriskollen:** still useful for schema comparison, but not yet part of the daily DB connector set.
 
 ---
 
