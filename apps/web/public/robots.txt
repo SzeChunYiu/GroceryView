@@ -1,0 +1,20 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /account/
+Disallow: /api/
+Disallow: /login/
+Disallow: /household/
+Disallow: /scanner/
+Disallow: /weekly-basket/
+Disallow: /privacy/
+
+Allow: /
+Allow: /categories
+Allow: /categories/
+Allow: /categories/*
+Allow: /products
+Allow: /products/
+Allow: /products/*
+Allow: /sitemap.xml
+
+Sitemap: https://grocery-web-mu.vercel.app/sitemap.xml
