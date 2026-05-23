@@ -14,6 +14,12 @@ export const requiredGithubActionSecrets = [
   'GROCERYVIEW_SCANNER_BEARER_TOKEN'
 ];
 
+export const requiredGithubActionVariables = [
+  'GROCERYVIEW_PRODUCTION_URL',
+  'GROCERYVIEW_TERMINAL_PRODUCT_ID',
+  'GROCERYVIEW_SCANNER_USER_ID'
+];
+
 export const requiredRuntimeSecrets = [
   'AUTH_SECRET',
   'DATABASE_URL',
@@ -48,25 +54,33 @@ function uniqueSecretNames() {
   return Array.from(new Set([...requiredGithubActionSecrets, ...requiredRuntimeSecrets]));
 }
 
-function parseGhSecretList(output) {
+function parseGhList(output) {
   return output
     .split('\n')
     .map((line) => line.trim().split(/\s+/)[0])
     .filter(Boolean);
 }
 
-function readGithubSecretNames(repo, environment) {
-  const args = ['secret', 'list'];
+function readGithubNames(kind, repo, environment) {
+  const args = [kind, 'list'];
   if (repo) args.push('--repo', repo);
-  const names = new Set(parseGhSecretList(execFileSync('gh', args, { encoding: 'utf8' })));
+  const names = new Set(parseGhList(execFileSync('gh', args, { encoding: 'utf8' })));
   if (environment) {
     const environmentArgs = [...args];
     environmentArgs.push('--env', environment);
-    for (const name of parseGhSecretList(execFileSync('gh', environmentArgs, { encoding: 'utf8' }))) {
+    for (const name of parseGhList(execFileSync('gh', environmentArgs, { encoding: 'utf8' }))) {
       names.add(name);
     }
   }
   return Array.from(names);
+}
+
+function readGithubSecretNames(repo, environment) {
+  return readGithubNames('secret', repo, environment);
+}
+
+function readGithubVariableNames(repo, environment) {
+  return readGithubNames('variable', repo, environment);
 }
 
 function readEnvironmentSecretNames(requiredNames) {
@@ -89,14 +103,23 @@ function main() {
   const envIndex = process.argv.indexOf('--env');
   const environment = envIndex >= 0 ? process.argv[envIndex + 1] : undefined;
   const secretNames = fromEnvironment ? readEnvironmentSecretNames(uniqueSecretNames()) : readGithubSecretNames(repo, environment);
+  const variableNames = fromEnvironment
+    ? readEnvironmentSecretNames(requiredGithubActionVariables)
+    : readGithubVariableNames(repo, environment);
   const missingGithubActionSecrets = findMissingSecrets(requiredGithubActionSecrets, secretNames);
+  const missingGithubActionVariables = findMissingSecrets(requiredGithubActionVariables, variableNames);
   const missingRuntimeSecrets = findMissingSecrets(requiredRuntimeSecrets, secretNames);
   const result = {
-    status: missingGithubActionSecrets.length === 0 && missingRuntimeSecrets.length === 0 ? 'ready' : 'blocked',
+    status:
+      missingGithubActionSecrets.length === 0 && missingGithubActionVariables.length === 0 && missingRuntimeSecrets.length === 0
+        ? 'ready'
+        : 'blocked',
     checkedSecretNames: secretNames.sort(),
+    checkedVariableNames: variableNames.sort(),
     environment: environment ?? null,
     source: fromEnvironment ? 'environment' : 'github',
     missingGithubActionSecrets,
+    missingGithubActionVariables,
     missingRuntimeSecrets
   };
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);

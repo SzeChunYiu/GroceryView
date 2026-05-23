@@ -43,11 +43,19 @@ describe('production secret audit script', () => {
       assert.match(script, new RegExp(`['"]${secret}['"]`));
     }
     assert.doesNotMatch(script, /['"]GROCERYVIEW_DAILY_CONNECTORS_JSON['"]/);
+    for (const variable of [
+      'GROCERYVIEW_PRODUCTION_URL',
+      'GROCERYVIEW_TERMINAL_PRODUCT_ID',
+      'GROCERYVIEW_SCANNER_USER_ID'
+    ]) {
+      assert.match(script, new RegExp(`['"]${variable}['"]`));
+    }
     assert.match(script, /process\.argv\.indexOf\('--env'\)/);
     assert.match(script, /process\.argv\.includes\('--from-env'\)/);
     assert.match(script, /process\.env\[name\]/);
     assert.match(script, /push\('--env', environment\)/);
-    assert.match(script, /new Set\(parseGhSecretList/);
+    assert.match(script, /new Set\(parseGhList/);
+    assert.match(script, /readGithubNames\('variable'/);
     assert.equal(pkg.scripts['ops:check-production-secrets'], 'node scripts/ops/check-production-secrets.mjs');
   });
 
@@ -64,6 +72,12 @@ describe('production secret audit script', () => {
     const output = JSON.parse(result.stdout);
     assert.equal(output.source, 'environment');
     assert.deepEqual(output.checkedSecretNames, ['DATABASE_URL', 'METRICS_TOKEN']);
+    assert.deepEqual(output.checkedVariableNames, []);
+    assert.deepEqual(output.missingGithubActionVariables, [
+      'GROCERYVIEW_PRODUCTION_URL',
+      'GROCERYVIEW_TERMINAL_PRODUCT_ID',
+      'GROCERYVIEW_SCANNER_USER_ID'
+    ]);
     assert.deepEqual(output.missingGithubActionSecrets, [
       'GROCERYVIEW_SERVER_URL',
       'GROCERYVIEW_API_BASE_URL',
