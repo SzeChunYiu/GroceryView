@@ -395,7 +395,26 @@ export const DEFAULT_WILLYS_SEARCH_QUERIES = [
   'lax',
   'tonfisk',
   'gurka',
-  'paprika'
+  'paprika',
+  'morot',
+  'lok',
+  'vitlok',
+  'apelsin',
+  'apple',
+  'citron',
+  'broccoli',
+  'majs',
+  'bonor',
+  'linser',
+  'skinka',
+  'bacon',
+  'gradde',
+  'kvarg',
+  'flingor',
+  'knackebrod',
+  'mineralvatten',
+  'havredryck',
+  'toalettpapper'
 ] as const;
 export const DEFAULT_WILLYS_PRODUCTS_MAX_ROWS = 500;
 export const DEFAULT_WILLYS_CATEGORY_PAGE_SIZE = 100;
