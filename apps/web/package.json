@@ -5,6 +5,8 @@
   "scripts": {
     "build": "next build --webpack",
     "dev": "next dev",
+    "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
+    "start": "next start",
     "test": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
@@ -24,6 +26,7 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.15.1",
     "@types/geojson": "^7946.0.16",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

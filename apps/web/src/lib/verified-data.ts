@@ -2770,6 +2770,47 @@ export const apiPerformanceReadiness = {
   ]
 };
 
+export const webPerformanceBudgetGate = {
+  title: 'Lighthouse CI budget',
+  status: 'Core Web Vitals budget enforced in CI',
+  command: 'npm run perf:lighthouse:ci -w @groceryview/web',
+  configPath: 'apps/web/lighthouserc.cjs',
+  workflow: '.github/workflows/ci.yml',
+  terminalRoutes: [
+    '/',
+    '/products',
+    '/compare',
+    '/data-sources'
+  ],
+  assertions: [
+    {
+      metric: 'categories:performance',
+      budget: 'minimum Lighthouse performance score 0.45',
+      gate: 'error'
+    },
+    {
+      metric: 'largest-contentful-paint',
+      budget: '≤ 6000 ms desktop CI route load',
+      gate: 'error'
+    },
+    {
+      metric: 'cumulative-layout-shift',
+      budget: '≤ 0.10 layout shift',
+      gate: 'error'
+    },
+    {
+      metric: 'total-byte-weight',
+      budget: '≤ 9 MB transferred bytes per terminal route',
+      gate: 'error'
+    }
+  ],
+  guardrails: [
+    'The Lighthouse CI budget runs after Next build in the required CI workflow, so regressions block PR checks instead of becoming a production surprise.',
+    'The budget covers the public terminal homepage plus product discovery, compare, and data-source evidence routes.',
+    'Lighthouse reports are stored in .lighthouseci as filesystem artifacts during CI; no secret token or external performance SaaS is required.'
+  ]
+};
+
 export const chainSavingsLedger = Object.values(
   matchedChainProducts.reduce<Record<string, {
     chain: string;

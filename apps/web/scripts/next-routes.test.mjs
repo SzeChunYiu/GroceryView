@@ -1261,6 +1261,30 @@ describe('verified-data UI', () => {
     assert.match(nextConfig, /images\.openfoodfacts\.org/);
   });
 
+  it('ships a Lighthouse CI performance budget gate for web terminal routes', async () => {
+    const pkg = await read('package.json');
+    const lhci = await read('lighthouserc.cjs');
+    const workflow = await read('../../.github/workflows/ci.yml');
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(pkg, /"perf:lighthouse:ci"/);
+    assert.match(pkg, /@lhci\/cli/);
+    assert.match(lhci, /http:\/\/127\.0\.0\.1:3000\//);
+    assert.match(lhci, /categories:performance/);
+    assert.match(lhci, /largest-contentful-paint/);
+    assert.match(lhci, /cumulative-layout-shift/);
+    assert.match(lhci, /total-byte-weight/);
+    assert.match(lhci, /filesystem/);
+    assert.match(workflow, /Lighthouse performance budget/);
+    assert.match(workflow, /npm run perf:lighthouse:ci -w @groceryview\/web/);
+    assert.match(verified, /export const webPerformanceBudgetGate/);
+    assert.match(verified, /Core Web Vitals budget/);
+    assert.match(shell, /webPerformanceBudgetGate/);
+    assert.match(shell, /Lighthouse CI budget/);
+    assert.doesNotMatch(shell, /NoVerifiedData/);
+  });
+
 
   it('ships a persisted language preference switcher with RTL and browser-language detection', async () => {
     const nav = await read('src/components/app-nav.tsx');
