@@ -252,7 +252,9 @@ describe('runtime config', () => {
       STRIPE_PRICE_PREMIUM_YEARLY: 'price_yearly_runtime',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
+      OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se',
+      OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -281,7 +283,9 @@ describe('runtime config', () => {
       },
       metricsToken: 'metrics-token',
       ocrSpaceApiKey: 'ocr-runtime-key',
+      ocrSpaceHealthcheckImageUrl: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       openFoodFactsUserAgent: 'GroceryView/1.0 contact@groceryview.se',
+      openFoodFactsHealthcheckBarcode: '0735000123456',
       catalogCoverageTargets: {
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
@@ -332,6 +336,72 @@ describe('runtime config', () => {
       totalAmount: 49.9,
       confidence: 0.5
     });
+  });
+
+
+  it('runs runtime scan provider health checks before marking scanning readiness ready', async () => {
+    const service = createRuntimeHttpService({
+      NODE_ENV: 'development',
+      METRICS_TOKEN: 'metrics-secret',
+      OCR_SPACE_API_KEY: 'ocr-runtime-key',
+      OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
+      OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se',
+      OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456'
+    }, {
+      scanProviderFetch: async (url) => {
+        const urlText = String(url);
+        if (urlText.includes('openfoodfacts')) {
+          return new Response(JSON.stringify({
+            status: 1,
+            code: '0735000123456',
+            product: { product_name: 'Zoegas Skånerost 450g' }
+          }), { status: 200 });
+        }
+        return new Response(JSON.stringify({
+          IsErroredOnProcessing: false,
+          ParsedResults: [{ ParsedText: 'KAFFE 49.90\nTOTAL 49.90' }]
+        }), { status: 200 });
+      }
+    });
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/scanning', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 200);
+      const body = await response.json() as { status: string; blockers: string[]; evidence: string[] };
+      assert.equal(body.status, 'ready');
+      assert.deepEqual(body.blockers, []);
+      assert.equal(body.evidence.includes('scan_provider_health_pass:barcode'), true);
+      assert.equal(body.evidence.includes('scan_provider_health_pass:receiptOcr'), true);
+      assert.equal(JSON.stringify(body).includes('ocr-runtime-key'), false);
+    } finally {
+      await service.close();
+    }
+  });
+
+  it('keeps runtime scanning readiness blocked until scan provider healthcheck payloads are configured', async () => {
+    const service = createRuntimeHttpService({
+      NODE_ENV: 'development',
+      METRICS_TOKEN: 'metrics-secret',
+      OCR_SPACE_API_KEY: 'ocr-runtime-key',
+      OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se'
+    });
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/scanning', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 503);
+      const body = await response.json() as { status: string; blockers: string[] };
+      assert.equal(body.status, 'blocked');
+      assert.equal(body.blockers.includes('scan_provider_health_not_run:barcode'), true);
+      assert.equal(body.blockers.includes('scan_provider_health_not_run:receiptOcr'), true);
+    } finally {
+      await service.close();
+    }
   });
 
   it('loads catalog coverage targets from runtime environment JSON', () => {
@@ -458,6 +528,21 @@ describe('runtime config', () => {
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key'
+    }), /OCR_SPACE_HEALTHCHECK_IMAGE_URL is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
+      METRICS_TOKEN: 'metrics-token',
+      OCR_SPACE_API_KEY: 'ocr-runtime-key',
+      OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg'
     }), /OPENFOODFACTS_USER_AGENT is required/);
     assert.throws(() => loadRuntimeConfig({
       NODE_ENV: 'production',
@@ -472,7 +557,25 @@ describe('runtime config', () => {
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
+      OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se'
+    }), /OPENFOODFACTS_HEALTHCHECK_BARCODE is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
+      METRICS_TOKEN: 'metrics-token',
+      OCR_SPACE_API_KEY: 'ocr-runtime-key',
+      OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
+      OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se',
+      OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456'
     }), /CATALOG_COVERAGE_TARGETS_JSON is required/);
   });
 
@@ -495,7 +598,9 @@ describe('runtime config', () => {
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
+      OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/1.0 contact@groceryview.se',
+      OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],

@@ -22,7 +22,7 @@ function parseEnvExample(text) {
 
 describe('production env value validation script', () => {
   it('validates daily connectors and catalog coverage targets for all required chains', () => {
-    for (const name of ['GROCERYVIEW_DAILY_CONNECTORS_JSON', 'CATALOG_COVERAGE_TARGETS_JSON', 'EXPO_PUSH_ACCESS_TOKEN', 'SENDGRID_FROM_EMAIL', 'SENDGRID_API_KEY', 'OCR_SPACE_API_KEY', 'OPENFOODFACTS_USER_AGENT']) {
+    for (const name of ['GROCERYVIEW_DAILY_CONNECTORS_JSON', 'CATALOG_COVERAGE_TARGETS_JSON', 'EXPO_PUSH_ACCESS_TOKEN', 'SENDGRID_FROM_EMAIL', 'SENDGRID_API_KEY', 'OCR_SPACE_API_KEY', 'OCR_SPACE_HEALTHCHECK_IMAGE_URL', 'OPENFOODFACTS_USER_AGENT', 'OPENFOODFACTS_HEALTHCHECK_BARCODE']) {
       assert.match(script, new RegExp(name));
     }
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
@@ -93,7 +93,9 @@ describe('production env value validation script', () => {
       EXPO_PUSH_ACCESS_TOKEN: 'expo-push-token',
       GROCERYVIEW_SERVER_URL: 'https://api.groceryview.example',
       OCR_SPACE_API_KEY: 'test-ocr-space-key',
+      OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/0.1 test@groceryview.se',
+      OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
       GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE: connectorPath,
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
@@ -163,7 +165,9 @@ describe('production env value validation script', () => {
       EXPO_PUSH_ACCESS_TOKEN: 'expo-push-token',
       GROCERYVIEW_SERVER_URL: 'https://api.groceryview.example',
       OCR_SPACE_API_KEY: 'test-ocr-space-key',
+      OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/0.1 test@groceryview.se',
+      OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(chains.map((chainId) => ({
         connectorId: `${chainId}-normalized-json`,
         chainId,
@@ -204,7 +208,9 @@ describe('production env value validation script', () => {
       EXPO_PUSH_ACCESS_TOKEN: 'expo-push-token',
       GROCERYVIEW_SERVER_URL: 'https://api.groceryview.example',
       OCR_SPACE_API_KEY: 'test-ocr-space-key',
+      OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/0.1 test@groceryview.se',
+      OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(chains.map((chainId) => ({
         connectorId: `${chainId}-normalized-json`,
         chainId,

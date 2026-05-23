@@ -16,7 +16,9 @@ export const requiredEnvNames = [
   'METRICS_TOKEN',
   'GROCERYVIEW_SERVER_URL',
   'OCR_SPACE_API_KEY',
+  'OCR_SPACE_HEALTHCHECK_IMAGE_URL',
   'OPENFOODFACTS_USER_AGENT',
+  'OPENFOODFACTS_HEALTHCHECK_BARCODE',
   'CATALOG_COVERAGE_TARGETS_JSON'
 ];
 
@@ -157,7 +159,9 @@ function selfTestEnv() {
     METRICS_TOKEN: 'self-test-metrics-token',
     GROCERYVIEW_SERVER_URL: 'https://api.groceryview.example',
     OCR_SPACE_API_KEY: 'self-test-ocr-space-key',
+    OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
     OPENFOODFACTS_USER_AGENT: 'GroceryView/0.1 self-test@groceryview.se',
+    OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
     GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(chains.map((chainId) => ({
       connectorId: `${chainId}-normalized-json`,
       chainId,
