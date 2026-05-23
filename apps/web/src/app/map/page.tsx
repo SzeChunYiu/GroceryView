@@ -2,6 +2,7 @@ import { calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { StoreMap } from '@/components/store-map';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
+import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -39,6 +40,12 @@ function heatTone(index: number) {
   if (index < 96) return 'bg-emerald-100 text-emerald-950';
   if (index > 104) return 'bg-rose-100 text-rose-950';
   return 'bg-amber-100 text-amber-950';
+}
+
+function basketHeatTone(tone: string) {
+  if (tone === 'cool') return 'border-emerald-200 bg-emerald-50 text-emerald-950';
+  if (tone === 'hot') return 'border-rose-200 bg-rose-50 text-rose-950';
+  return 'border-amber-200 bg-amber-50 text-amber-950';
 }
 
 function buildDistrictHeatOverlay() {
@@ -231,6 +238,46 @@ export default function MapPage() {
             </div>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-fuchsia-800">{basketCostHeatmap.statusLabel}</p>
+            <h2 className="mt-2 text-3xl font-black text-fuchsia-950">Basket-cost heatmap by area</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-fuchsia-900">
+              The map now shows area rows from the visible weekly basket optimizer. compareBasketStrategies and summarizeStoreBasketCoverage price only known favorite-store rows, so missing basket products stay visible as coverage gaps. No branch-level basket quote is claimed.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/80 p-4 text-right">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-fuchsia-800">Basket rows</p>
+            <p className="mt-2 text-3xl font-black text-fuchsia-950">{basketCostHeatmap.rows.length}</p>
+            <p className="mt-2 text-sm font-semibold text-fuchsia-900">{basketCostHeatmap.basketLineCount} basket lines · {basketCostHeatmap.favoriteStoreCount} favorite stores</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {basketCostHeatmap.rows.map((row) => (
+            <div className={`rounded-2xl border p-4 ${basketHeatTone(row.heatTone)}`} data-basket-cost-heatmap={row.area} key={row.storeId}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] opacity-70">{row.area}</p>
+                  <p className="mt-2 text-lg font-black">{row.storeName}</p>
+                </div>
+                <p className="rounded-full bg-white/85 px-3 py-2 text-xl font-black">{row.relativeBasketIndex.toFixed(1)}</p>
+              </div>
+              <p className="mt-3 text-sm font-black">{row.knownBasketTotal.toFixed(2)} SEK known basket total</p>
+              <p className="mt-1 text-xs font-semibold leading-5 opacity-80">
+                Coverage {formatPct(row.coveragePercent)} · {row.pricedProductCount} priced · {row.missingProductCount} missing.
+              </p>
+              <p className="mt-3 rounded-xl bg-white/75 p-2 text-xs font-bold leading-5 opacity-80">{row.areaEvidence}</p>
+            </div>
+          ))}
+        </div>
+        <ul className="mt-4 grid gap-2 md:grid-cols-3">
+          {basketCostHeatmap.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white/80 p-3 text-xs font-bold leading-5 text-fuchsia-950" key={guardrail}>{guardrail}</li>
+          ))}
+        </ul>
       </Card>
 
       <Card className="mt-6 border-sky-200 bg-sky-50">

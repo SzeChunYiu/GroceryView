@@ -1575,6 +1575,28 @@ ${seo}`;
     assert.match(route, /chain-index proxy/);
   });
 
+  it('surfaces a basket-cost heatmap by area from the weekly basket optimizer without branch-price invention', async () => {
+    const heatmap = await read('src/lib/map-basket-cost-heatmap.ts');
+    const route = await read('src/app/map/page.tsx');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(heatmap, /basketCostHeatmap/);
+    assert.match(heatmap, /compareBasketStrategies/);
+    assert.match(heatmap, /summarizeStoreBasketCoverage/);
+    assert.match(heatmap, /weeklyBasketOptimizerInput/);
+    assert.match(heatmap, /storeUniverse/);
+    assert.match(heatmap, /branch-level basket prices are not invented/);
+    assert.match(route, /basketCostHeatmap/);
+    assert.match(route, /Basket-cost heatmap by area/);
+    assert.match(route, /data-basket-cost-heatmap/);
+    assert.match(route, /No branch-level basket quote/);
+    assert.match(shell, /homepageBasketCostHeatmap/);
+    assert.match(shell, /Basket-cost heatmap/);
+    assert.match(shell, /data-basket-cost-heatmap/);
+    assert.match(shell, /Basket-cost heatmap by area/);
+    assert.doesNotMatch(`${heatmap}\n${route}\n${shell}`, /Math\.random|Date\.now/);
+  });
+
   it('surfaces a cheapest-branch-near-me highlight from branch-level evidence', async () => {
     const route = await read('src/app/map/page.tsx');
 
