@@ -15,6 +15,8 @@ export const requiredEnvNames = [
   'BILLING_WEBHOOK_SECRET',
   'METRICS_TOKEN',
   'GROCERYVIEW_SERVER_URL',
+  'OCR_SPACE_API_KEY',
+  'OPENFOODFACTS_USER_AGENT',
   'CATALOG_COVERAGE_TARGETS_JSON'
 ];
 
@@ -141,6 +143,8 @@ function selfTestEnv() {
     BILLING_WEBHOOK_SECRET: 'self-test-billing-webhook-secret',
     METRICS_TOKEN: 'self-test-metrics-token',
     GROCERYVIEW_SERVER_URL: 'https://api.groceryview.example',
+    OCR_SPACE_API_KEY: 'self-test-ocr-space-key',
+    OPENFOODFACTS_USER_AGENT: 'GroceryView/0.1 self-test@groceryview.se',
     GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(chains.map((chainId) => ({
       connectorId: `${chainId}-normalized-json`,
       chainId,
