@@ -3877,14 +3877,26 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
   const retryBaseDelayMs = normalizeDailyRunnerInteger(input.connectorRetryBaseDelayMs, 250);
   const results = new Array<DailyConnectorRunPersistenceResult | undefined>(input.connectors.length);
   let nextConnectorIndex = 0;
+  let nextConnectorStartAt = 0;
+  let connectorStartsScheduled = 0;
+
+  async function waitForConnectorStartSlot(): Promise<void> {
+    if (connectorStartDelayMs <= 0) return;
+
+    const now = Date.now();
+    const scheduledStartAt = connectorStartsScheduled === 0 ? now : Math.max(now, nextConnectorStartAt);
+    connectorStartsScheduled += 1;
+    nextConnectorStartAt = scheduledStartAt + connectorStartDelayMs;
+    await waitForDailyRunnerDelay(Math.max(0, scheduledStartAt - now));
+  }
 
   async function worker(): Promise<void> {
     while (nextConnectorIndex < input.connectors.length) {
       const connectorIndex = nextConnectorIndex;
       nextConnectorIndex += 1;
-      if (connectorIndex > 0) await waitForDailyRunnerDelay(connectorStartDelayMs);
       const config = input.connectors[connectorIndex];
       if (!config) continue;
+      await waitForConnectorStartSlot();
       results[connectorIndex] = await runDailyIngestionConnector({
         executor: input.executor,
         requestedAt: input.requestedAt,

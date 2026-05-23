@@ -1129,6 +1129,7 @@ describe('verified-data UI', () => {
     assert.match(source, /personalGroceryInflation/);
     assert.match(source, /inflationPercent/);
     assert.match(source, /itemContributions/);
+    assert.match(source, /ConfidenceBadge/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
