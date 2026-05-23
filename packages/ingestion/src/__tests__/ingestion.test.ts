@@ -32,6 +32,7 @@ import {
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
   confidenceForSource,
+  buildSwedishCountyFuelOverpassQuery,
   buildSwedishCountyGroceryOverpassQuery,
   buildWillysSearchUrl,
   buildWillysStoresUrl,
@@ -43,6 +44,7 @@ import {
   fetchOpenFoodFactsProducts,
   fetchOpenFoodFactsSwedenCatalog,
   fetchOpenFoodFactsRetailerEnrichments,
+  fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
   fetchCityGrossProducts,
@@ -99,9 +101,12 @@ import {
   offerVisibilityBoundaryPlans,
   OPENFOODFACTS_EXPORT_URL,
   OVERPASS_INTERPRETER_URL,
+  STOCKHOLM_FUEL_OVERPASS_QUERY,
   STOCKHOLM_GROCERY_OVERPASS_QUERY,
+  SWEDEN_FUEL_OVERPASS_QUERY,
   SWEDEN_GROCERY_OVERPASS_QUERY,
   SWEDISH_COUNTY_ISO3166_2_CODES,
+  parseOverpassFuelStations,
   parseOverpassGroceryStores,
   retailerRobotsPolicyMatrix,
   runRetailerConnector,
@@ -1106,6 +1111,94 @@ describe('fetchOverpassGroceryStores', () => {
 
     assert.equal(rows.length, 1);
     assert.equal(rows[0].name, 'Valid');
+  });
+});
+
+
+describe('fetchOverpassFuelStations', () => {
+  it('ships a Sweden-wide amenity=fuel query for the fuel station refresh', () => {
+    assert.match(SWEDEN_FUEL_OVERPASS_QUERY, /ISO3166-1"="SE/);
+    assert.match(SWEDEN_FUEL_OVERPASS_QUERY, /admin_level=2/);
+    assert.match(SWEDEN_FUEL_OVERPASS_QUERY, /amenity"="fuel/);
+    assert.doesNotMatch(SWEDEN_FUEL_OVERPASS_QUERY, /shop"~"/);
+    assert.doesNotMatch(SWEDEN_FUEL_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
+    assert.match(STOCKHOLM_FUEL_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
+    assert.match(buildSwedishCountyFuelOverpassQuery('SE-M'), /ISO3166-2"="SE-M/);
+    assert.match(buildSwedishCountyFuelOverpassQuery('SE-M'), /admin_level=4/);
+  });
+
+  it('posts the public fuel station query and preserves OSM provenance without prices', async () => {
+    const requestedBodies: string[] = [];
+    const fetchImpl: typeof fetch = async (url, init) => {
+      assert.equal(String(url), OVERPASS_INTERPRETER_URL);
+      assert.equal(init?.method, 'POST');
+      requestedBodies.push(String(init?.body));
+      return new Response(JSON.stringify({
+        elements: [{
+          type: 'node',
+          id: 987654,
+          lat: 59.334,
+          lon: 18.031,
+          tags: {
+            amenity: 'fuel',
+            name: 'Circle K Norrmalm',
+            brand: 'Circle K',
+            operator: 'Circle K Sverige AB',
+            'addr:street': 'Sveavägen',
+            'addr:housenumber': '155',
+            'addr:postcode': '11346',
+            'addr:city': 'Stockholm',
+            opening_hours: '24/7',
+            website: 'https://www.circlek.se/',
+            phone: '+468000000',
+            'fuel:octane_95': 'yes',
+            'fuel:diesel': 'yes',
+            'fuel:e85': 'no',
+            'fuel:adblue': 'yes'
+          }
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOverpassFuelStations({
+      fetchImpl,
+      retrievedAt: '2026-05-23T08:00:00.000Z'
+    });
+
+    assert.match(requestedBodies[0], /amenity%22%3D%22fuel|amenity"="fuel/);
+    assert.deepEqual(rows, [{
+      osmType: 'node',
+      osmId: 987654,
+      name: 'Circle K Norrmalm',
+      brand: 'Circle K',
+      operator: 'Circle K Sverige AB',
+      latitude: 59.334,
+      longitude: 18.031,
+      street: 'Sveavägen',
+      houseNumber: '155',
+      postcode: '11346',
+      city: 'Stockholm',
+      openingHours: '24/7',
+      website: 'https://www.circlek.se/',
+      phone: '+468000000',
+      availableFuelGrades: ['95', 'diesel', 'adblue'],
+      sourceUrl: OVERPASS_INTERPRETER_URL,
+      retrievedAt: '2026-05-23T08:00:00.000Z'
+    }]);
+  });
+
+  it('drops fuel station elements without coordinates, names, or amenity=fuel', () => {
+    const rows = parseOverpassFuelStations({
+      elements: [
+        { type: 'node', id: 1, lat: 59, lon: 18, tags: { amenity: 'fuel', name: 'Valid station' } },
+        { type: 'node', id: 2, tags: { amenity: 'fuel', name: 'Missing coordinates' } },
+        { type: 'node', id: 3, lat: 59, lon: 18, tags: { amenity: 'fuel' } },
+        { type: 'node', id: 4, lat: 59, lon: 18, tags: { amenity: 'charging_station', name: 'Wrong amenity' } }
+      ]
+    }, '2026-05-23T08:00:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].name, 'Valid station');
   });
 });
 

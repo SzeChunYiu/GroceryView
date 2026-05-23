@@ -493,6 +493,25 @@ describe('verified-data UI', () => {
   });
 
 
+
+  it('surfaces the fuel OSM station connector without rendering fuel prices', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const fuelRoute = await read('src/app/fuel/page.tsx');
+    const overpass = await read('../../packages/ingestion/src/connectors/overpass.ts');
+
+    assert.match(overpass, /fetchOverpassFuelStations/);
+    assert.match(overpass, /amenity"="fuel/);
+    assert.match(verified, /export const fuelStationSourceCoverage/);
+    assert.match(verified, /fetchOverpassFuelStations/);
+    assert.match(verified, /amenity=fuel/);
+    assert.match(fuelRoute, /fuelStationSourceCoverage/);
+    assert.match(fuelRoute, /OSM fuel station source/);
+    assert.match(fuelRoute, /amenity=fuel/);
+    assert.match(fuelRoute, /No fuel price observations yet/);
+    assert.match(fuelRoute, /must not render pump prices/);
+    assert.doesNotMatch(fuelRoute, /currentPrice|unitPrice|price SEK|kr\/l/);
+  });
+
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/basket-ideas/page.tsx');
