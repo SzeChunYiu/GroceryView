@@ -169,6 +169,7 @@ The workflow must pass these gates in order:
 6. `/api/readiness/postgres`
 7. `/api/readiness/source-runs`
 8. `/api/readiness/catalog-coverage`
+9. upload `groceryview-deployed-readiness` with `postgres-readiness.json`, `source-run-readiness.json`, and `catalog-coverage-readiness.json`
 
 ## Expected blocker meanings
 
@@ -196,5 +197,5 @@ Do not treat the system as production-ready until all are true:
 
 - `npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView` reports `ready`.
 - `npm run ops:validate-production-env` reports `ready` in the deployment environment.
-- the latest `daily-ingestion.yml` run passes.
+- the latest `daily-ingestion.yml` run passes and includes the `groceryview-deployed-readiness` artifact.
 - `/api/readiness/postgres`, `/api/readiness/source-runs`, and `/api/readiness/catalog-coverage` all return healthy/complete responses with HTTP 200.
