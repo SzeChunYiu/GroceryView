@@ -15,6 +15,7 @@ import {
   createDailyIngestionQueryExecutor,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
+  buildHemkopCategoryUrl,
   buildHemkopSearchUrl,
   buildHemkopStoresUrl,
   buildHemkopWeeklyDiscountsUrl,
@@ -35,6 +36,7 @@ import {
   confidenceForSource,
   buildSwedishCountyFuelOverpassQuery,
   buildSwedishCountyGroceryOverpassQuery,
+  buildWillysCategoryUrl,
   buildWillysSearchUrl,
   buildWillysStoresUrl,
   buildWillysWeeklyDiscountsUrl,
@@ -2817,6 +2819,74 @@ describe('fetchCoopProductsForAllStores', () => {
 
     assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['251300', 39.9]]);
   });
+  it('fetches Hemkop full branch catalog pages from top-level category paths when no query list is supplied', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = Number(new URL(String(url)).searchParams.get('page') ?? '0');
+      return new Response(JSON.stringify({
+        results: [{
+          code: `hemkop-category-product-${page}`,
+          name: `Hemkop category product ${page}`,
+          manufacturer: 'Garant',
+          productLine2: '1 st',
+          priceValue: page === 0 ? 21.5 : 22.5,
+          price: page === 0 ? '21,50 kr' : '22,50 kr'
+        }],
+        pagination: { currentPage: page, numberOfPages: 2 }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopProducts({
+      fetchImpl,
+      categoryPaths: ['mejeri-ost-och-agg'],
+      storeId: '4003',
+      retrievedAt: '2026-05-23T08:12:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.code, row.price]), [
+      ['hemkop-category-product-0', 21.5],
+      ['hemkop-category-product-1', 22.5]
+    ]);
+    assert.deepEqual(requestedUrls, [
+      buildHemkopCategoryUrl('mejeri-ost-och-agg', 100, 0, '4003'),
+      buildHemkopCategoryUrl('mejeri-ost-och-agg', 100, 1, '4003')
+    ]);
+  });
+
+  it('expands Hemkop all-store ingestion from category catalogs when query sampling is not configured', async () => {
+    const requestedProductUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: { line1: 'Masthuggstorget 3', town: 'Göteborg', postalCode: '41327' }, onlineStore: true }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      requestedProductUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          code: 'hemkop-full-catalog-product',
+          name: 'Hemkop full catalog product',
+          manufacturer: 'Garant',
+          productLine2: '1 st',
+          priceValue: 29.9,
+          price: '29,90 kr'
+        }],
+        pagination: { currentPage: 0, numberOfPages: 1 }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopProductsForAllStores({
+      fetchImpl,
+      maxStores: 1,
+      categoryPaths: ['mejeri-ost-och-agg'],
+      retrievedAt: '2026-05-23T08:13:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code, row.price]), [['4003', 'hemkop-full-catalog-product', 29.9]]);
+    assert.deepEqual(requestedProductUrls, [buildHemkopCategoryUrl('mejeri-ost-och-agg', 100, 0, '4003')]);
+  });
+
 });
 
 describe('fetchWillysProductsForAllStores', () => {
@@ -2890,6 +2960,74 @@ describe('fetchWillysProductsForAllStores', () => {
     });
 
     assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['2149', 70.88]]);
+  });
+
+  it('fetches Willys full branch catalog pages from top-level category paths when no query list is supplied', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = Number(new URL(String(url)).searchParams.get('page') ?? '0');
+      return new Response(JSON.stringify({
+        results: [{
+          code: `willys-category-product-${page}`,
+          name: `Willys category product ${page}`,
+          manufacturer: 'Garant',
+          productLine2: '1 st',
+          priceValue: page === 0 ? 12.5 : 13.5,
+          price: page === 0 ? '12,50 kr' : '13,50 kr'
+        }],
+        pagination: { currentPage: page, numberOfPages: 2 }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysProducts({
+      fetchImpl,
+      categoryPaths: ['mejeri-ost-och-agg'],
+      storeId: '2110',
+      retrievedAt: '2026-05-23T08:10:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.code, row.price]), [
+      ['willys-category-product-0', 12.5],
+      ['willys-category-product-1', 13.5]
+    ]);
+    assert.deepEqual(requestedUrls, [
+      buildWillysCategoryUrl('mejeri-ost-och-agg', 100, 0, '2110'),
+      buildWillysCategoryUrl('mejeri-ost-och-agg', 100, 1, '2110')
+    ]);
+  });
+
+  it('expands Willys all-store ingestion from category catalogs when query sampling is not configured', async () => {
+    const requestedProductUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '2149', name: 'Willys Alingsås Hagaplan', address: { line1: 'Hagaplan 1', town: 'Alingsås', postalCode: '44131' }, onlineStore: true }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      requestedProductUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          code: 'willys-full-catalog-product',
+          name: 'Willys full catalog product',
+          manufacturer: 'Garant',
+          productLine2: '1 st',
+          priceValue: 19.9,
+          price: '19,90 kr'
+        }],
+        pagination: { currentPage: 0, numberOfPages: 1 }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysProductsForAllStores({
+      fetchImpl,
+      maxStores: 1,
+      categoryPaths: ['mejeri-ost-och-agg'],
+      retrievedAt: '2026-05-23T08:11:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code, row.price]), [['2149', 'willys-full-catalog-product', 19.9]]);
+    assert.deepEqual(requestedProductUrls, [buildWillysCategoryUrl('mejeri-ost-och-agg', 100, 0, '2149')]);
   });
 
 });

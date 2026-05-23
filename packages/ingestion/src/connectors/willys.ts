@@ -83,6 +83,16 @@ type WillysSearchProduct = {
 
 type WillysSearchResponse = {
   results?: WillysSearchProduct[];
+  pagination?: {
+    numberOfPages?: unknown;
+    currentPage?: unknown;
+  };
+};
+
+type AxfoodCategoryTreeNode = {
+  url?: unknown;
+  valid?: unknown;
+  children?: AxfoodCategoryTreeNode[];
 };
 
 type AxfoodCampaignPromotion = {
@@ -148,6 +158,8 @@ type WillysStoreApiRow = {
 export const WILLYS_SEARCH_BASE_URL = 'https://www.willys.se/search';
 export const WILLYS_WEEKLY_DISCOUNTS_BASE_URL = 'https://www.willys.se/search/campaigns/offline';
 export const WILLYS_STORE_API_URL = 'https://www.willys.se/axfood/rest/store';
+export const WILLYS_CATEGORY_TREE_URL = 'https://www.willys.se/leftMenu/categorytree';
+export const WILLYS_CATEGORY_BASE_URL = 'https://www.willys.se/c';
 export const DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_ID = '2110';
 export const DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS = [
   '2110',
@@ -372,10 +384,13 @@ export const DEFAULT_WILLYS_SEARCH_QUERIES = [
   'paprika'
 ] as const;
 export const DEFAULT_WILLYS_PRODUCTS_MAX_ROWS = 500;
+export const DEFAULT_WILLYS_CATEGORY_PAGE_SIZE = 100;
 
 export type FetchWillysProductsOptions = {
   fetchImpl?: typeof fetch;
   queries?: readonly string[];
+  categoryPaths?: readonly string[];
+  categoryTreeUrl?: string;
   storeId?: string;
   maxRows?: number;
   retrievedAt?: string;
@@ -428,6 +443,34 @@ export function buildWillysSearchUrl(query: string, storeId?: string): string {
   return url.toString();
 }
 
+export function buildWillysCategoryUrl(categoryPath: string, size = DEFAULT_WILLYS_CATEGORY_PAGE_SIZE, page = 0, storeId?: string): string {
+  const safePath = categoryPath.split('/').filter(Boolean).map(encodeURIComponent).join('/');
+  const url = new URL(`${WILLYS_CATEGORY_BASE_URL}/${safePath}`);
+  url.searchParams.set('page', String(page));
+  url.searchParams.set('size', String(size));
+  if (storeId) url.searchParams.set('store', storeId);
+  return url.toString();
+}
+
+export async function fetchWillysCategoryPaths(options: { fetchImpl?: typeof fetch; categoryTreeUrl?: string } = {}): Promise<string[]> {
+  const fetchImpl = withWillysRequestTimeout(options.fetchImpl ?? fetch);
+  const sourceUrl = options.categoryTreeUrl ?? WILLYS_CATEGORY_TREE_URL;
+  const response = await fetchImpl(sourceUrl, {
+    headers: {
+      accept: 'application/json',
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+  if (!response.ok) throw new Error(`Willys category tree request failed: ${response.status}`);
+  const root = await response.json() as AxfoodCategoryTreeNode;
+  const paths = (root.children ?? [])
+    .filter((node) => node.valid !== false)
+    .map((node) => text(node.url))
+    .filter((url): url is string => Boolean(url));
+  if (paths.length === 0) throw new Error('Willys category tree had no usable category paths.');
+  return paths;
+}
+
 export function buildWillysWeeklyDiscountsUrl(
   storeId = DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_ID,
   size = 100,
@@ -477,41 +520,79 @@ export async function fetchWillysStores(options: FetchWillysStoresOptions = {}):
 
 export async function fetchWillysProducts(options: FetchWillysProductsOptions = {}): Promise<WillysProduct[]> {
   const fetchImpl = withWillysRequestTimeout(options.fetchImpl ?? fetch);
-  const queries = options.queries ?? DEFAULT_WILLYS_SEARCH_QUERIES;
-  const maxRows = options.maxRows ?? DEFAULT_WILLYS_PRODUCTS_MAX_ROWS;
+  const maxRows = options.maxRows ?? Number.POSITIVE_INFINITY;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: WillysProduct[] = [];
   const seenCodes = new Set<string>();
 
-  for (const query of queries) {
-    const sourceUrl = buildWillysSearchUrl(query, options.storeId);
-    const response = await fetchImpl(sourceUrl, {
-      headers: {
-        accept: 'application/json',
-        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-      }
-    });
+  if (options.queries) {
+    for (const query of options.queries) {
+      const sourceUrl = buildWillysSearchUrl(query, options.storeId);
+      const response = await fetchImpl(sourceUrl, {
+        headers: {
+          accept: 'application/json',
+          'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+        }
+      });
 
-    if (!response.ok) {
-      throw new Error(`Willys search request failed for ${query}: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`Willys search request failed for ${query}: ${response.status}`);
+      }
+
+      const payload = await response.json() as WillysSearchResponse;
+      for (const product of payload.results ?? []) {
+        const row = normalizeWillysProduct(product, sourceUrl, retrievedAt);
+        if (!row || seenCodes.has(row.code)) continue;
+        seenCodes.add(row.code);
+        rows.push(row);
+        if (rows.length >= maxRows) return rows;
+      }
     }
+    return rows;
+  }
 
-    const payload = await response.json() as WillysSearchResponse;
-    for (const product of payload.results ?? []) {
-      const row = normalizeWillysProduct(product, sourceUrl, retrievedAt);
-      if (!row || seenCodes.has(row.code)) {
-        continue;
+  const categoryPaths = options.categoryPaths ?? await fetchWillysCategoryPaths({
+    fetchImpl,
+    categoryTreeUrl: options.categoryTreeUrl
+  });
+  for (const categoryPath of categoryPaths) {
+    let page = 0;
+    let pageCount: number | null = null;
+
+    while (rows.length < maxRows && (pageCount === null || page < pageCount)) {
+      const sourceUrl = buildWillysCategoryUrl(categoryPath, DEFAULT_WILLYS_CATEGORY_PAGE_SIZE, page, options.storeId);
+      const response = await fetchImpl(sourceUrl, {
+        headers: {
+          accept: 'application/json',
+          'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Willys category request failed for ${categoryPath}: ${response.status}`);
       }
-      seenCodes.add(row.code);
-      rows.push(row);
-      if (rows.length >= maxRows) {
-        return rows;
+
+      const payload = await response.json() as WillysSearchResponse;
+      const results = payload.results ?? [];
+      const responsePageCount = numberOrNull(payload.pagination?.numberOfPages);
+      pageCount = responsePageCount && responsePageCount > 0 ? responsePageCount : page + 1;
+
+      for (const product of results) {
+        const row = normalizeWillysProduct(product, sourceUrl, retrievedAt);
+        if (!row || seenCodes.has(row.code)) continue;
+        seenCodes.add(row.code);
+        rows.push(row);
+        if (rows.length >= maxRows) return rows;
       }
+
+      if (results.length === 0) break;
+      page += 1;
     }
   }
 
   return rows;
 }
+
 
 export async function fetchWillysProductsForAllStores(
   options: FetchWillysProductsForAllStoresOptions = {}
@@ -532,8 +613,10 @@ export async function fetchWillysProductsForAllStores(
       const products = await fetchWillysProducts({
         fetchImpl: options.fetchImpl,
         queries: options.queries,
+        categoryPaths: options.categoryPaths,
+        categoryTreeUrl: options.categoryTreeUrl,
         storeId: store.storeId,
-        maxRows: options.maxRowsPerStore ?? 24,
+        maxRows: options.maxRowsPerStore,
         retrievedAt: options.retrievedAt
       });
       return products.map((product) => ({
