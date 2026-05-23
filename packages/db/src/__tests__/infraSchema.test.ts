@@ -13,6 +13,7 @@ const pantryInventoryMigration = readFileSync(join(repoRoot, 'infra/db/migration
 const sourceRunsOfficialApiMigration = readFileSync(join(repoRoot, 'infra/db/migrations/006_source_runs_official_api.sql'), 'utf8').toLowerCase();
 const receiptUploadsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/007_receipt_uploads.sql'), 'utf8').toLowerCase();
 const householdPlansMigration = readFileSync(join(repoRoot, 'infra/db/migrations/008_household_plans.sql'), 'utf8').toLowerCase();
+const householdCollaborationRlsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/018_household_collaboration_rls.sql'), 'utf8').toLowerCase();
 const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/009_retailer_source_policies.sql'), 'utf8').toLowerCase();
 const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/010_basket_import_reviews.sql'), 'utf8').toLowerCase();
 const priceAlertsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/011_price_alerts.sql'), 'utf8').toLowerCase();
@@ -358,6 +359,20 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(householdPlansMigration, /household_members_user_idx on household_members \(user_id, household_id\)/);
     assert.match(householdPlansMigration, /household_basket_items_product_idx on household_basket_items \(product_id, household_id\)/);
     assert.match(householdPlansMigration, /household_watchlist_items_product_idx on household_watchlist_items \(product_id, household_id\)/);
+  });
+
+  it('protects household collaboration tables with Supabase RLS and editor attribution columns', () => {
+    assert.match(householdCollaborationRlsMigration, /alter table household_members add column if not exists role text not null default 'editor'/);
+    assert.match(householdCollaborationRlsMigration, /alter table household_basket_items add column if not exists checked boolean not null default false/);
+    assert.match(householdCollaborationRlsMigration, /alter table household_basket_items add column if not exists checked_by text/);
+    assert.match(householdCollaborationRlsMigration, /alter table household_basket_items add column if not exists checked_at timestamptz/);
+    for (const table of ['household_plans', 'household_members', 'household_basket_items', 'household_watchlist_items', 'household_favorite_stores']) {
+      assert.match(householdCollaborationRlsMigration, new RegExp(`alter table ${table} enable row level security`));
+      assert.match(householdCollaborationRlsMigration, new RegExp(`household_${table}_member_select`));
+    }
+    assert.match(householdCollaborationRlsMigration, /auth\.uid\(\)::text/);
+    assert.match(householdCollaborationRlsMigration, /in \('owner', 'editor'\)/);
+    assert.match(householdCollaborationRlsMigration, /with check/);
   });
 
   it('keeps the migration verifier aligned with catalog and repository tables', () => {

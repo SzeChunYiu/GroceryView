@@ -117,6 +117,11 @@ describe('verified-data UI', () => {
     assert.match(actions, /\/api\/households\/current\?userId=\$\{encodeURIComponent\(userId\)\}/);
     assert.match(actions, /method: 'GET'/);
     assert.match(actions, /method: 'PUT'/);
+    assert.match(actions, /\/api\/households\/join\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /\/api\/households\/current\/basket\/check\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /inviteToken/);
+    assert.match(actions, /checkedAt/);
+    assert.match(actions, /checkedBy/);
     assert.match(actions, /householdId/);
     assert.match(actions, /weeklyBudget/);
     assert.match(actions, /approvalLimit/);

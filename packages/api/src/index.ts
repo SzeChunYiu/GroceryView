@@ -1149,6 +1149,19 @@ export type HouseholdPlanRequest = {
   sharedFavoriteStoreIds?: string[];
 };
 
+export type HouseholdJoinRequest = {
+  householdId: string;
+  inviteToken: string;
+  displayName: string;
+  role?: 'editor' | 'viewer';
+};
+
+export type HouseholdBasketCheckRequest = {
+  productId: string;
+  checked: boolean;
+  checkedAt?: string;
+};
+
 export type HouseholdApprovalPolicy = {
   approvalLimit: number;
   reviewer: string;
@@ -3258,7 +3271,8 @@ function normalizeHouseholdPlan(userId: string, input: HouseholdPlanRequest): Ho
   const members = requireArray(input.members, 'members').map((member) => {
     requireNonEmptyId(member.userId, 'member.userId');
     requireNonEmptyId(member.displayName, 'member.displayName');
-    return { userId: member.userId, displayName: member.displayName };
+    if (member.role && !['owner', 'editor', 'viewer'].includes(member.role)) throw new Error(`Unsupported household member role: ${member.role}`);
+    return { userId: member.userId, displayName: member.displayName, ...(member.role ? { role: member.role } : {}) };
   });
   if (members.length === 0) throw new Error('members must include at least one household member');
   const memberIds = new Set(members.map((member) => member.userId));
@@ -3278,7 +3292,14 @@ function normalizeHouseholdPlan(userId: string, input: HouseholdPlanRequest): Ho
     if (!Number.isInteger(item.quantity) || item.quantity <= 0 || item.quantity > 99) {
       throw new Error('quantity must be an integer between 1 and 99');
     }
-    household.addBasketItem({ productId: item.productId, quantity: item.quantity, addedBy: item.addedBy });
+    household.addBasketItem({
+      productId: item.productId,
+      quantity: item.quantity,
+      addedBy: item.addedBy,
+      checked: item.checked ?? false,
+      ...(item.checkedBy ? { checkedBy: item.checkedBy } : {}),
+      ...(item.checkedAt ? { checkedAt: item.checkedAt } : {})
+    });
   }
 
   for (const item of input.watchlistItems ?? []) {
@@ -3310,6 +3331,38 @@ function normalizeHouseholdPlan(userId: string, input: HouseholdPlanRequest): Ho
       requiresOwnerApproval: summary.estimatedTotal > input.approvalLimit
     }
   };
+}
+
+function householdPlanRequestFromPlan(plan: HouseholdPlan): HouseholdPlanRequest {
+  return {
+    householdId: plan.household.id,
+    name: plan.household.name,
+    weeklyBudget: plan.household.weeklyBudget,
+    approvalLimit: plan.approvalPolicy.approvalLimit,
+    reviewer: plan.approvalPolicy.reviewer,
+    members: plan.household.members.map((member) => ({ ...member })),
+    basketItems: plan.household.basketItems.map((item) => ({ ...item })),
+    watchlistItems: plan.household.watchlistItems.map((item) => ({ ...item })),
+    sharedFavoriteStoreIds: [...plan.household.sharedFavoriteStoreIds]
+  };
+}
+
+function householdStateFromPlan(plan: HouseholdPlan) {
+  const household = createHouseholdState({
+    id: plan.household.id,
+    name: plan.household.name,
+    weeklyBudget: plan.household.weeklyBudget,
+    members: plan.household.members
+  });
+  for (const item of plan.household.basketItems) household.addBasketItem(item);
+  for (const item of plan.household.watchlistItems) household.addWatchlistItem(item);
+  household.setSharedFavoriteStores(plan.household.sharedFavoriteStoreIds);
+  return household;
+}
+
+function validateHouseholdInviteToken(householdId: string, inviteToken: string): void {
+  requireNonEmptyId(inviteToken, 'inviteToken');
+  if (inviteToken !== `${householdId}:join`) throw new Error('Household invite token is invalid or expired');
 }
 
 function basketInputItems(userItems: BasketItemRequest[]) {
@@ -4183,6 +4236,7 @@ export function createGroceryViewApi() {
   const categoryBudgets = new Map<string, CategoryBudgetPatch[]>();
   const subscriptionEntitlements = new Map<string, SubscriptionEntitlementSnapshot>();
   const householdPlans = new Map<string, HouseholdPlan>();
+  const householdIdByUserId = new Map<string, string>();
   const basketImportReviews = new Map<string, BasketImportReviewItem[]>();
 
   const productSnapshots = () =>
@@ -5071,13 +5125,63 @@ export function createGroceryViewApi() {
 
     upsertHouseholdPlan(userId: string, input: HouseholdPlanRequest): HouseholdPlan {
       const plan = normalizeHouseholdPlan(userId, input);
-      householdPlans.set(userId, plan);
+      householdPlans.set(plan.household.id, plan);
+      for (const member of plan.household.members) householdIdByUserId.set(member.userId, plan.household.id);
       return plan;
     },
 
     getHouseholdPlan(userId: string): HouseholdPlan | null {
       requireNonEmptyId(userId, 'userId');
-      return householdPlans.get(userId) ?? null;
+      const householdId = householdIdByUserId.get(userId);
+      return householdId ? householdPlans.get(householdId) ?? null : null;
+    },
+
+    joinHouseholdPlan(userId: string, input: HouseholdJoinRequest): HouseholdPlan {
+      requireNonEmptyId(userId, 'userId');
+      requireNonEmptyId(input.householdId, 'householdId');
+      requireNonEmptyId(input.displayName, 'displayName');
+      validateHouseholdInviteToken(input.householdId, input.inviteToken);
+      const existing = householdPlans.get(input.householdId);
+      if (!existing) throw new Error(`Household plan not found: ${input.householdId}`);
+      if (existing.household.members.some((member) => member.userId === userId)) {
+        householdIdByUserId.set(userId, existing.household.id);
+        return existing;
+      }
+      const request = householdPlanRequestFromPlan(existing);
+      request.members = [
+        ...request.members,
+        { userId, displayName: input.displayName, role: input.role ?? 'editor' }
+      ];
+      const plan = normalizeHouseholdPlan(userId, request);
+      householdPlans.set(plan.household.id, plan);
+      for (const member of plan.household.members) householdIdByUserId.set(member.userId, plan.household.id);
+      return plan;
+    },
+
+    checkHouseholdBasketItem(userId: string, input: HouseholdBasketCheckRequest): HouseholdPlan {
+      requireNonEmptyId(userId, 'userId');
+      requireNonEmptyId(input.productId, 'productId');
+      const householdId = householdIdByUserId.get(userId);
+      const existing = householdId ? householdPlans.get(householdId) : null;
+      if (!existing) throw new Error('Household plan not found');
+      const household = householdStateFromPlan(existing);
+      household.checkBasketItem({
+        productId: input.productId,
+        checked: input.checked,
+        checkedBy: userId,
+        ...(input.checkedAt ? { checkedAt: input.checkedAt } : {})
+      });
+      const snapshot = household.snapshot();
+      const plan = normalizeHouseholdPlan(userId, {
+        ...householdPlanRequestFromPlan(existing),
+        members: snapshot.members,
+        basketItems: snapshot.basketItems,
+        watchlistItems: snapshot.watchlistItems,
+        sharedFavoriteStoreIds: snapshot.sharedFavoriteStoreIds
+      });
+      householdPlans.set(plan.household.id, plan);
+      for (const member of plan.household.members) householdIdByUserId.set(member.userId, plan.household.id);
+      return plan;
     },
 
     upsertSubscriptionEntitlement(userId: string, entitlement: SubscriptionEntitlementSnapshot) {

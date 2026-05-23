@@ -175,11 +175,11 @@ class RecordingQueryExecutor implements QueryExecutor {
     }
   ];
   householdMemberRows: unknown[] = [
-    { household_id: 'house-1', user_id: 'partner', display_name: 'Mina' },
-    { household_id: 'house-1', user_id: 'user-1', display_name: 'Alex' }
+    { household_id: 'house-1', user_id: 'partner', display_name: 'Mina', role: 'editor' },
+    { household_id: 'house-1', user_id: 'user-1', display_name: 'Alex', role: 'owner' }
   ];
   householdBasketItemRows: unknown[] = [
-    { household_id: 'house-1', line_position: 0, product_id: 'milk', quantity: '2.000', added_by: 'partner' }
+    { household_id: 'house-1', line_position: 0, product_id: 'milk', quantity: '2.000', added_by: 'partner', checked: true, checked_by: 'user-1', checked_at: '2026-05-20T08:02:00.000Z' }
   ];
   householdWatchlistItemRows: unknown[] = [
     { household_id: 'house-1', line_position: 0, product_id: 'coffee', added_by: 'user-1', target_price: '50.00' }
@@ -1105,10 +1105,10 @@ describe('createPostgresRepository', () => {
       approvalLimit: 400,
       reviewer: 'user-1',
       members: [
-        { userId: 'user-1', displayName: 'Alex' },
-        { userId: 'partner', displayName: 'Mina' }
+        { userId: 'user-1', displayName: 'Alex', role: 'owner' },
+        { userId: 'partner', displayName: 'Mina', role: 'editor' }
       ],
-      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner' }],
+      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner', checked: true, checkedBy: 'user-1', checkedAt: '2026-05-20T08:02:00.000Z' }],
       watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
       sharedFavoriteStoreIds: ['lidl-sveavagen', 'willys-odenplan'],
       createdAt: '2026-05-20T08:00:00.000Z',
@@ -1123,10 +1123,10 @@ describe('createPostgresRepository', () => {
       approvalLimit: 400,
       reviewer: 'user-1',
       members: [
-        { userId: 'partner', displayName: 'Mina' },
-        { userId: 'user-1', displayName: 'Alex' }
+        { userId: 'partner', displayName: 'Mina', role: 'editor' },
+        { userId: 'user-1', displayName: 'Alex', role: 'owner' }
       ],
-      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner' }],
+      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner', checked: true, checkedBy: 'user-1', checkedAt: '2026-05-20T08:02:00.000Z' }],
       watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
       sharedFavoriteStoreIds: ['lidl-sveavagen', 'willys-odenplan'],
       createdAt: '2026-05-20T08:00:00.000Z',
@@ -1142,8 +1142,8 @@ describe('createPostgresRepository', () => {
       '2026-05-20T08:00:00.000Z',
       '2026-05-20T08:01:00.000Z'
     ]);
-    assert.deepEqual(executor.calls[5].params, ['house-1', 'user-1', 'Alex']);
-    assert.deepEqual(executor.calls[7].params, ['house-1', 0, 'milk', 2, 'partner']);
+    assert.deepEqual(executor.calls[5].params, ['house-1', 'user-1', 'Alex', 'owner']);
+    assert.deepEqual(executor.calls[7].params, ['house-1', 0, 'milk', 2, 'partner', true, 'user-1', '2026-05-20T08:02:00.000Z']);
     assert.deepEqual(executor.calls[8].params, ['house-1', 0, 'coffee', 'user-1', 50]);
     assert.deepEqual(executor.calls[10].params, ['house-1', 'willys-odenplan']);
     assert.deepEqual(executor.calls[11].params, ['user-1']);

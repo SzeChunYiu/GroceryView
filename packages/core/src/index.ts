@@ -3719,12 +3719,16 @@ export function reviewReceiptScan(input: ReceiptReviewInput): ReceiptReview {
 export type HouseholdMember = {
   userId: string;
   displayName: string;
+  role?: 'owner' | 'editor' | 'viewer';
 };
 
 export type HouseholdBasketItem = {
   productId: string;
   quantity: number;
   addedBy: string;
+  checked?: boolean;
+  checkedBy?: string;
+  checkedAt?: string;
 };
 
 export type HouseholdWatchlistItem = {
@@ -3757,11 +3761,42 @@ export function createHouseholdState(input: {
   const requireMember = (userId: string): void => {
     if (!memberIds.has(userId)) throw new Error(`Household member not found: ${userId}`);
   };
+  const canEdit = (userId: string): boolean => {
+    const member = input.members.find((candidate) => candidate.userId === userId);
+    return member?.role !== 'viewer';
+  };
+  const cloneBasketItem = (item: HouseholdBasketItem): HouseholdBasketItem => ({
+    productId: item.productId,
+    quantity: item.quantity,
+    addedBy: item.addedBy,
+    checked: item.checked ?? false,
+    ...(item.checkedBy ? { checkedBy: item.checkedBy } : {}),
+    ...(item.checkedAt ? { checkedAt: item.checkedAt } : {})
+  });
 
   return {
     addBasketItem(item: HouseholdBasketItem) {
       requireMember(item.addedBy);
-      basketItems.push({ ...item });
+      if (item.checkedBy) {
+        requireMember(item.checkedBy);
+        if (!canEdit(item.checkedBy)) throw new Error('viewer cannot edit household shopping list');
+      }
+      if (item.checked && !item.checkedBy) throw new Error('checked household basket items require checkedBy');
+      basketItems.push(cloneBasketItem(item));
+    },
+    checkBasketItem(input: { productId: string; checked: boolean; checkedBy: string; checkedAt?: string }) {
+      requireMember(input.checkedBy);
+      if (!canEdit(input.checkedBy)) throw new Error('viewer cannot edit household shopping list');
+      const item = basketItems.find((candidate) => candidate.productId === input.productId);
+      if (!item) throw new Error(`Household basket item not found: ${input.productId}`);
+      item.checked = input.checked;
+      if (input.checked) {
+        item.checkedBy = input.checkedBy;
+        item.checkedAt = input.checkedAt;
+      } else {
+        delete item.checkedBy;
+        delete item.checkedAt;
+      }
     },
     addWatchlistItem(item: HouseholdWatchlistItem) {
       requireMember(item.addedBy);
@@ -3776,7 +3811,7 @@ export function createHouseholdState(input: {
         name: input.name,
         weeklyBudget: input.weeklyBudget,
         members: input.members.map((member) => ({ ...member })),
-        basketItems: basketItems.map((item) => ({ ...item })),
+        basketItems: basketItems.map(cloneBasketItem),
         watchlistItems: watchlistItems.map((item) => ({ ...item })),
         sharedFavoriteStoreIds: [...sharedFavoriteStoreIds]
       };
@@ -3788,7 +3823,9 @@ export type HouseholdSummary = {
   householdId: string;
   estimatedTotal: number;
   remainingBudget: number;
-  memberContributions: Array<{ userId: string; displayName: string; itemCount: number }>;
+  checkedItemCount: number;
+  openItemCount: number;
+  memberContributions: Array<{ userId: string; displayName: string; itemCount: number; checkedItemCount: number }>;
   sharedFavoriteStoreIds: string[];
 };
 
@@ -3800,10 +3837,13 @@ export function summarizeHousehold(snapshot: HouseholdSnapshot, priceByProductId
     householdId: snapshot.id,
     estimatedTotal,
     remainingBudget: Math.round((snapshot.weeklyBudget - estimatedTotal) * 100) / 100,
+    checkedItemCount: snapshot.basketItems.filter((item) => item.checked === true).length,
+    openItemCount: snapshot.basketItems.filter((item) => item.checked !== true).length,
     memberContributions: snapshot.members.map((member) => ({
       userId: member.userId,
       displayName: member.displayName,
-      itemCount: snapshot.basketItems.filter((item) => item.addedBy === member.userId).length
+      itemCount: snapshot.basketItems.filter((item) => item.addedBy === member.userId).length,
+      checkedItemCount: snapshot.basketItems.filter((item) => item.checkedBy === member.userId).length
     })),
     sharedFavoriteStoreIds: [...snapshot.sharedFavoriteStoreIds]
   };

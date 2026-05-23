@@ -15,6 +15,8 @@ import {
   type FlyerOfferObservationInput,
   type FlyerOfferReport,
   type FlyerOfferStoreSummary,
+  type HouseholdBasketCheckRequest,
+  type HouseholdJoinRequest,
   type HouseholdPlanRequest,
   type StoreFlyerOfferReport,
   type WatchlistPriceAlertReport,
@@ -550,6 +552,17 @@ function optionalString(value: unknown, field: string): string | undefined {
   return trimmed ? trimmed : undefined;
 }
 
+function requiredBoolean(value: unknown, field: string): boolean {
+  if (typeof value !== 'boolean') throw new Error(`${field} must be a boolean.`);
+  return value;
+}
+
+function optionalHouseholdJoinRole(value: unknown): HouseholdJoinRequest['role'] {
+  if (value === undefined) return undefined;
+  if (value === 'editor' || value === 'viewer') return value;
+  throw new Error('role must be editor or viewer.');
+}
+
 const isoTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
 function requiredIsoTimestamp(value: unknown, field: string): string {
@@ -1059,12 +1072,16 @@ function householdPlanRequestFromBody(body: JsonRecord): HouseholdPlanRequest {
     reviewer: requiredString(body.reviewer, 'reviewer'),
     members: requiredRecordArray(body.members, 'members').map((member) => ({
       userId: requiredString(member.userId, 'members.userId'),
-      displayName: requiredString(member.displayName, 'members.displayName')
+      displayName: requiredString(member.displayName, 'members.displayName'),
+      ...(member.role === undefined ? {} : { role: requiredString(member.role, 'members.role') as HouseholdPlanRequest['members'][number]['role'] })
     })),
     basketItems: (optionalRecordArray(body.basketItems, 'basketItems') ?? []).map((item) => ({
       productId: requiredString(item.productId, 'basketItems.productId'),
       quantity: requiredNumber(item.quantity, 'basketItems.quantity'),
-      addedBy: requiredString(item.addedBy, 'basketItems.addedBy')
+      addedBy: requiredString(item.addedBy, 'basketItems.addedBy'),
+      ...(item.checked === undefined ? {} : { checked: requiredBoolean(item.checked, 'basketItems.checked') }),
+      ...(item.checkedBy === undefined ? {} : { checkedBy: requiredString(item.checkedBy, 'basketItems.checkedBy') }),
+      ...(item.checkedAt === undefined ? {} : { checkedAt: requiredString(item.checkedAt, 'basketItems.checkedAt') })
     })),
     watchlistItems: (optionalRecordArray(body.watchlistItems, 'watchlistItems') ?? []).map((item) => {
       const targetPrice = optionalNumber(item.targetPrice, 'watchlistItems.targetPrice');
@@ -1075,6 +1092,24 @@ function householdPlanRequestFromBody(body: JsonRecord): HouseholdPlanRequest {
       };
     }),
     sharedFavoriteStoreIds: optionalStringArray(body.sharedFavoriteStoreIds, 'sharedFavoriteStoreIds') ?? []
+  };
+}
+
+function householdJoinRequestFromBody(body: JsonRecord): HouseholdJoinRequest {
+  const role = optionalHouseholdJoinRole(body.role);
+  return {
+    householdId: requiredString(body.householdId, 'householdId'),
+    inviteToken: requiredString(body.inviteToken, 'inviteToken'),
+    displayName: requiredString(body.displayName, 'displayName'),
+    ...(role === undefined ? {} : { role })
+  };
+}
+
+function householdBasketCheckRequestFromBody(body: JsonRecord): HouseholdBasketCheckRequest {
+  return {
+    productId: requiredString(body.productId, 'productId'),
+    checked: requiredBoolean(body.checked, 'checked'),
+    ...(body.checkedAt === undefined ? {} : { checkedAt: requiredString(body.checkedAt, 'checkedAt') })
   };
 }
 
@@ -2789,6 +2824,28 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      if (path === '/api/households/join') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse({ userId: user, ...api.joinHouseholdPlan(user, householdJoinRequestFromBody(body)) });
+        }
+      }
+
+      if (path === '/api/households/current/basket/check') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse({ userId: user, ...api.checkHouseholdBasketItem(user, householdBasketCheckRequestFromBody(body)) });
+        }
+      }
+
       if (path === '/api/privacy/export') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -3025,6 +3082,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
         get: protectedOperation('Get the signed-in user household plan.'),
         put: protectedOperation('Create or replace the signed-in user household plan and budget summary.')
       },
+      '/api/households/join': { post: protectedOperation('Join an existing household from a signed-in invite token.') },
+      '/api/households/current/basket/check': { post: protectedOperation('Check or uncheck a shared household shopping-list item with member attribution.') },
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/privacy/request-fulfillment': { post: protectedOperation('Classify privacy export, deletion, and ad opt-out requests by fulfillment deadline.') },

@@ -25,6 +25,16 @@ describe('authenticated HTTP routes', () => {
       body: JSON.stringify({ householdId: 'house-1', name: 'Home', weeklyBudget: 100, approvalLimit: 100, reviewer: 'user-1', members: [{ userId: 'user-1', displayName: 'Alex' }], basketItems: [], sharedFavoriteStoreIds: [] })
     }));
     assert.equal(unauthenticatedHousehold.status, 401);
+    const unauthenticatedHouseholdJoin = await handle(new Request('http://localhost/api/households/join?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ householdId: 'house-1', inviteToken: 'house-1:join', displayName: 'Alex' })
+    }));
+    assert.equal(unauthenticatedHouseholdJoin.status, 401);
+    const unauthenticatedHouseholdCheck = await handle(new Request('http://localhost/api/households/current/basket/check?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ productId: 'milk', checked: true })
+    }));
+    assert.equal(unauthenticatedHouseholdCheck.status, 401);
     const unauthenticatedScan = await handle(new Request('http://localhost/api/scans/process?userId=user-1', {
       method: 'POST',
       body: JSON.stringify({ scanId: 'scan-1', kind: 'barcode', payload: '0735000123456' })
@@ -73,6 +83,18 @@ describe('authenticated HTTP routes', () => {
       body: JSON.stringify({ householdId: 'house-1', name: 'Home', weeklyBudget: 100, approvalLimit: 100, reviewer: 'user-1', members: [{ userId: 'user-1', displayName: 'Alex' }], basketItems: [], sharedFavoriteStoreIds: [] })
     }));
     assert.equal(forbiddenHousehold.status, 403);
+    const forbiddenHouseholdJoin = await handle(new Request('http://localhost/api/households/join?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${wrongUserToken}` },
+      body: JSON.stringify({ householdId: 'house-1', inviteToken: 'house-1:join', displayName: 'Alex' })
+    }));
+    assert.equal(forbiddenHouseholdJoin.status, 403);
+    const forbiddenHouseholdCheck = await handle(new Request('http://localhost/api/households/current/basket/check?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${wrongUserToken}` },
+      body: JSON.stringify({ productId: 'milk', checked: true })
+    }));
+    assert.equal(forbiddenHouseholdCheck.status, 403);
     const forbiddenScan = await handle(new Request('http://localhost/api/scans/process?userId=user-1', {
       method: 'POST',
       headers: { authorization: `Bearer ${wrongUserToken}` },
