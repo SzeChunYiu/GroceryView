@@ -1274,12 +1274,14 @@ describe('verified-data UI', () => {
     assert.match(lhci, /categories:performance/);
     assert.match(lhci, /largest-contentful-paint/);
     assert.match(lhci, /cumulative-layout-shift/);
+    assert.match(lhci, /'cumulative-layout-shift': \['error', \{ maxNumericValue: 0\.15 \}\]/);
     assert.match(lhci, /total-byte-weight/);
     assert.match(lhci, /filesystem/);
     assert.match(workflow, /Lighthouse performance budget/);
     assert.match(workflow, /npm run perf:lighthouse:ci -w @groceryview\/web/);
     assert.match(verified, /export const webPerformanceBudgetGate/);
     assert.match(verified, /Core Web Vitals budget/);
+    assert.match(verified, /≤ 0\.15 layout shift/);
     assert.match(shell, /webPerformanceBudgetGate/);
     assert.match(shell, /Lighthouse CI budget/);
     assert.doesNotMatch(shell, /NoVerifiedData/);
