@@ -1,3 +1,4 @@
+import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
 import { buildPriceChartSeries, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
@@ -200,6 +201,105 @@ export const matchedChainProducts = axfoodProducts.filter((product) => product.i
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
+
+const chainDisplayNames: Record<string, string> = {
+  willys: 'Willys',
+  hemkop: 'Hemköp'
+};
+
+function readableLabel(label: string) {
+  const known: Record<string, string> = {
+    ecological: 'Ekologisk',
+    eu_ecological: 'EU-ekologisk',
+    fairtrade: 'Fairtrade',
+    fairtrade_facet: 'Fairtrade',
+    from_sweden: 'Från Sverige',
+    keyhole: 'Nyckelhålet',
+    krav: 'KRAV',
+    laktosfree: 'Laktosfri',
+    swedish_flag: 'Svenskt ursprung'
+  };
+  return known[label] ?? label.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function sortedCountFacets(counts: Map<string, number>) {
+  return [...counts.entries()]
+    .map(([value, count]) => ({ value, label: readableLabel(value), count }))
+    .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, 'sv'));
+}
+
+export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.flatMap((product) => {
+  const packageAmount = unitAmountFromPackage(product.subline);
+  return chainPriceRows(product).flatMap((priceRow) => {
+    const price = priceRow.price;
+    if (typeof price !== 'number') return [];
+    const normalizedUnit = normalizeComparableUnitPrice(price, product.subline);
+    const comparableUnit = packageAmount?.unit ?? (priceRow.priceUnit.replace(/^kr\//, '') || 'st');
+    return {
+      productId: product.code,
+      slug: product.slug,
+      canonicalName: product.name,
+      brand: product.brand,
+      categoryPath: [labelFromSlug(product.category)],
+      ...(packageAmount ? { packageSize: packageAmount.amount, packageUnit: packageAmount.unit } : {}),
+      comparableUnit,
+      ...(product.image ? { imageUrl: product.image } : {}),
+      observationId: `axfood-${product.code}-${priceRow.chain}`,
+      price,
+      unitPrice: normalizedUnit?.unitPrice ?? price,
+      currency: observedSnapshotCurrency,
+      priceType: priceRow.savings ? 'promotion' : 'online',
+      confidence: 0.95,
+      observedAt: '2026-05-21T00:00:00.000Z',
+      chainId: priceRow.chain,
+      chainSlug: priceRow.chain,
+      chainName: chainDisplayNames[priceRow.chain] ?? priceRow.chain,
+      storeId: `${priceRow.chain}-online-catalog`,
+      storeSlug: `${priceRow.chain}-online-catalog`,
+      storeName: `${chainDisplayNames[priceRow.chain] ?? priceRow.chain} online catalog`
+    } satisfies RealCatalogSearchPriceRow;
+  });
+});
+
+const rawFacetedProductSearch = buildFacetedProductSearch({ rows: facetedSearchRows, filters: { limit: 8 } });
+const facetedProductIds = new Set(rawFacetedProductSearch.products.map((product) => product.productId));
+const labelCounts = axfoodProducts.reduce<Map<string, number>>((counts, product) => {
+  if (!facetedProductIds.has(product.code)) return counts;
+  for (const label of product.labels) counts.set(label, (counts.get(label) ?? 0) + 1);
+  return counts;
+}, new Map());
+
+export const facetedProductSearch = {
+  ...rawFacetedProductSearch,
+  title: 'Instant faceted search',
+  categoryFacets: rawFacetedProductSearch.facets.categories.slice(0, 6),
+  chainFacets: rawFacetedProductSearch.facets.chains,
+  labelFacets: sortedCountFacets(labelCounts).slice(0, 8),
+  priceRange: rawFacetedProductSearch.facets.priceRange,
+  inStockOnly: {
+    label: 'In-stock / priced rows only',
+    productCount: rawFacetedProductSearch.evidence.pricedProductCount,
+    latestPriceCount: rawFacetedProductSearch.evidence.latestPriceCount
+  },
+  resultCards: rawFacetedProductSearch.products.slice(0, 6).map((product) => {
+    const cheapest = product.currentPrices[0] ?? null;
+    return {
+      slug: product.slug,
+      name: product.canonicalName,
+      brand: product.brand ?? 'Brand not reported',
+      imageUrl: product.imageUrl,
+      categoryLabel: product.categoryPath[0] ?? 'Category not reported',
+      cheapestPriceLabel: formatSek(product.cheapestPrice),
+      unitPriceLabel: cheapest ? formatLocalizedUnitPrice(cheapest.unitPrice, {
+        locale: defaultLocale,
+        currency: cheapest.currency,
+        unit: product.comparableUnit
+      }) : 'No current price row',
+      chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
+      sourceTables: rawFacetedProductSearch.evidence.sourceTables
+    };
+  })
+};
 
 const groceryObservationCount = pricedProducts.reduce((sum, product) => sum + product.observationCount, 0);
 
