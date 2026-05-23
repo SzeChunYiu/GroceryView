@@ -129,7 +129,38 @@ jobs:
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
             node packages/ingestion/dist/index.js \
             >/tmp/daily-ingestion-result.json
-          node -e "const body=require('/tmp/daily-ingestion-result.json'); if (body.status !== 'succeeded') { console.error(JSON.stringify(body)); process.exit(1); }"
+          node <<'NODE'
+          const body = require('/tmp/daily-ingestion-result.json');
+          const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+          const summaries = Array.isArray(body.chainSummaries) ? body.chainSummaries : [];
+          if (body.status !== 'succeeded') {
+            console.error(JSON.stringify(body));
+            process.exit(1);
+          }
+          for (const chain of requiredChains) {
+            const chainSummaries = summaries.filter((summary) => summary.chainId === chain);
+            if (chainSummaries.length === 0) {
+              console.error(`daily_ingestion_missing_chain_summary:${chain}`);
+              process.exit(1);
+            }
+            if (chainSummaries.some((summary) => summary.status !== 'succeeded')) {
+              console.error(`daily_ingestion_chain_not_succeeded:${chain}`);
+              process.exit(1);
+            }
+            if (chainSummaries.every((summary) => (summary.observationIds?.length ?? 0) === 0)) {
+              console.error(`daily_ingestion_chain_without_observations:${chain}`);
+              process.exit(1);
+            }
+          }
+          NODE
+
+      - name: Upload daily ingestion result
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-daily-ingestion-result
+          path: /tmp/daily-ingestion-result.json
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Export DB-backed site snapshot
         env:

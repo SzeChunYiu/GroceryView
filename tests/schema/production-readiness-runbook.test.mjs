@@ -42,6 +42,15 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /before connector and target validation/);
   });
 
+
+  it('documents daily ingestion chain summary evidence', () => {
+    assert.match(runbook, /chainSummaries/);
+    assert.match(runbook, /groceryview-daily-ingestion-result/);
+    assert.match(runbook, /daily_ingestion_missing_chain_summary/);
+    assert.match(runbook, /daily_ingestion_chain_not_succeeded/);
+    assert.match(runbook, /daily_ingestion_chain_without_observations/);
+  });
+
   it('documents DB-to-site snapshot generation after daily ingestion writes latest_prices', () => {
     assert.match(runbook, /npm run --silent ingest:export-db-snapshot/);
     assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_PATH=/);

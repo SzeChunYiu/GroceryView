@@ -80,6 +80,12 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /coverageStoreCount/);
     assert.doesNotMatch(workflow, /connectorCount !== 6/);
     assert.match(workflow, /body\.status !== 'succeeded'/);
+    assert.match(workflow, /chainSummaries/);
+    assert.match(workflow, /daily_ingestion_missing_chain_summary/);
+    assert.match(workflow, /daily_ingestion_chain_not_succeeded/);
+    assert.match(workflow, /daily_ingestion_chain_without_observations/);
+    assert.match(workflow, /name:\s*groceryview-daily-ingestion-result/);
+    assert.match(workflow, /path:\s*\/tmp\/daily-ingestion-result\.json/);
     assert.match(workflow, /name: Export DB-backed site snapshot/);
     assert.ok(
       workflow.indexOf('name: Run configured daily ingestion') < workflow.indexOf('name: Export DB-backed site snapshot'),
