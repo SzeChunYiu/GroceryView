@@ -1,80 +1,72 @@
-import { Database, Download, MapPin, ReceiptText, ShieldCheck } from "lucide-react";
-import { privacyControls } from "@/components/sample-data";
+import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { PrivacyRequestActions } from '@/components/privacy-request-actions';
+import { routeMetadata } from '@/lib/seo';
 
-const auditEvents = [
-  { label: "Receipt image purge", detail: "3 files scheduled after review", tone: "good" },
-  { label: "Location downgrade", detail: "2 observations stored at district precision", tone: "good" },
-  { label: "Contribution export", detail: "Anonymous price rows ready for catalog backfill", tone: "neutral" },
-];
-
-export default function PrivacyPage() {
-  return (
-    <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-6 py-8">
-      <section className="grid gap-6 lg:grid-cols-[1fr_0.8fr]">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Privacy</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-zinc-950">Data sharing guardrails</h1>
-          <p className="mt-4 max-w-2xl leading-7 text-zinc-600">
-            Review what is retained, shared, anonymized, and exported before household or catalog workflows use the data.
-          </p>
-        </div>
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
-          <ShieldCheck className="h-6 w-6 text-emerald-700" aria-hidden="true" />
-          <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-emerald-800">Current posture</p>
-          <p className="mt-2 text-2xl font-semibold text-emerald-950">Minimal retention</p>
-          <p className="mt-2 text-sm leading-6 text-emerald-900">Raw receipt media is separated from price facts and removed after review windows close.</p>
-        </div>
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2">
-        {privacyControls.map((control) => (
-          <article className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm" key={control.label}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="font-semibold text-zinc-950">{control.label}</p>
-                <p className="mt-2 text-sm text-zinc-500">{control.detail}</p>
-              </div>
-              <span className="rounded-lg bg-zinc-100 px-3 py-1 text-sm font-semibold text-zinc-700">{control.state}</span>
-            </div>
-          </article>
-        ))}
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-[0.75fr_1.25fr]">
-        <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Export controls</p>
-          <div className="mt-5 grid gap-3">
-            <Action icon={Download} label="Download household data" detail="Receipt summaries and budget allocations" />
-            <Action icon={Database} label="Catalog contribution log" detail="Anonymous price observations only" />
-            <Action icon={MapPin} label="Location precision report" detail="Store district, never exact route history" />
-          </div>
-        </div>
-        <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
-          {auditEvents.map((event) => (
-            <article className="grid gap-2 border-b border-zinc-200 px-5 py-4 last:border-b-0 sm:grid-cols-[1fr_auto]" key={event.label}>
-              <div>
-                <p className="font-semibold text-zinc-950">{event.label}</p>
-                <p className="mt-1 text-sm text-zinc-500">{event.detail}</p>
-              </div>
-              <span className={`h-fit rounded-lg px-3 py-1 text-sm font-semibold ${event.tone === "good" ? "bg-emerald-50 text-emerald-800" : "bg-zinc-100 text-zinc-700"}`}>
-                {event.tone === "good" ? "Protected" : "Ready"}
-              </span>
-            </article>
-          ))}
-        </div>
-      </section>
-    </main>
-  );
+export function generateMetadata() {
+  return routeMetadata('/privacy');
 }
 
-function Action({ icon: Icon, label, detail }: { icon: typeof ReceiptText; label: string; detail: string }) {
+const titles: Record<string, string> = {
+  'weekly-basket': 'Weekly basket planner',
+  watchlist: 'Watchlist alerts',
+  scanner: 'Receipt scanner',
+  household: 'Household profile',
+  account: 'Account and alerts',
+  'basket-ideas': 'Basket ideas',
+  'coupon-stacks': 'Coupon stacks',
+  deals: 'Deal radar',
+  'meal-planner': 'Meal planner',
+  'nutrition-value': 'Nutrition value',
+  'pantry-planner': 'Pantry planner',
+  'price-reports': 'Price reports',
+  'savings-dashboard': 'Savings dashboard',
+  'shopping-trips': 'Shopping trips',
+  privacy: 'Privacy controls'
+};
+
+export default function FeaturePage() {
+  const route = 'privacy';
   return (
-    <div className="flex items-start gap-3 rounded-lg bg-zinc-50 p-3">
-      <Icon className="mt-0.5 h-5 w-5 text-emerald-700" aria-hidden="true" />
-      <div>
-        <p className="font-semibold text-zinc-950">{label}</p>
-        <p className="mt-1 text-sm text-zinc-500">{detail}</p>
+    <PageShell>
+      <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Integritetspolicy / Privacy policy</p>
+      <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">Privacy policy and GDPR data subject rights</h1>
+      <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
+        GroceryView keeps private grocery data account-bound. Export my data, Delete my account, and ad-data opt-out requests require a signed-in session and never run as anonymous public actions.
+      </p>
+
+      <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
+      <PrivacyRequestActions />
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <Card>
+          <h2 className="text-2xl font-black text-slate-950">Svensk sammanfattning</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            Vi behandlar konto, hushåll, varukorg, bevakningar, kvitton och skanningsdata endast för att leverera prisjämförelse, historik, aviseringar och datarättigheter. Ingen privat rad visas i den statiska publika versionen.
+          </p>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-700">
+            <li>GDPR data subject rights: åtkomst/export, rättelse via konto, radering, invändning mot annonsdata och begränsning när data inte längre behövs.</li>
+            <li>Kvitto- och scannerbilder är känsliga: receipt retention är begränsad till matchning, granskning och lagstadgad audit, därefter raderas eller anonymiseras underlaget.</li>
+            <li>Receipt encryption gäller för uppladdad bild och extraherade rader i lagring; åtkomst kräver signerad bearer-session och kontoägarskap.</li>
+          </ul>
+        </Card>
+
+        <Card>
+          <h2 className="text-2xl font-black text-slate-950">English policy summary</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            GroceryView uses account, household, basket, watchlist, receipt, and scanner records only to provide grocery price intelligence, account controls, notifications, and legal privacy workflows.
+          </p>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-700">
+            <li>Export my data returns account-owned records only after a verified session identifies the user.</li>
+            <li>Delete my account creates a destructive deletion plan for account, receipt, basket, notification, and subscription records before execution.</li>
+            <li>No anonymous privacy requests are accepted; every data-subject workflow must be account-bound and auditable.</li>
+          </ul>
+        </Card>
       </div>
-    </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <TopSpreads limit={5} />
+        <SourceCoverage />
+      </div>
+    </PageShell>
   );
 }

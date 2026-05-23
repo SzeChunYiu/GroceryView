@@ -1,58 +1,69 @@
-import { Camera, CheckCircle2, CircleAlert, ScanLine } from "lucide-react";
-import { scannerQueue } from "@/components/sample-data";
+import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { ScannerUploadActions } from '@/components/scanner-upload-actions';
+import { routeMetadata } from '@/lib/seo';
+import { receiptFedAliasGrowthPlan } from '@/lib/verified-data';
+
+export function generateMetadata() {
+  return routeMetadata('/scanner');
+}
+
+export const dynamic = 'force-static';
+
+const route = 'scanner';
 
 export default function ScannerPage() {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-6 py-8">
-      <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Scanner</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-zinc-950">Receipt and barcode desk</h1>
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            <ScannerStat icon={Camera} label="Captured" value="18" />
-            <ScannerStat icon={CheckCircle2} label="Matched" value="15" />
-            <ScannerStat icon={CircleAlert} label="Review" value="3" />
+    <PageShell>
+      <NoVerifiedData route={route} title="Receipt scanner has no production uploads in this static snapshot" />
+      <Card className="mt-6 border-indigo-200 bg-indigo-50/80">
+        <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-800">Receipt OCR alias growth</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Receipt-fed commodity alias growth</h1>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              Scanner rows can propose loose-item aliases only when they carry {receiptFedAliasGrowthPlan.evidenceRequirement} (chain label + kr + weight): the chain label, observed SEK total, and weight/unit evidence from receipt OCR.
+            </p>
+            <p className="mt-3 rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-indigo-950">
+              No private receipt images are shown here. Alias candidates stay in human review until a reviewer accepts {receiptFedAliasGrowthPlan.reviewAction}.
+            </p>
           </div>
-        </div>
-        <div className="rounded-lg border border-zinc-200 bg-zinc-950 p-5 text-white shadow-sm">
-          <ScanLine className="h-7 w-7 text-emerald-300" aria-hidden="true" />
-          <div className="mt-8 aspect-[4/3] rounded-lg border border-dashed border-white/30 bg-white/5" />
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <button className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-zinc-950" type="button">
-              Receipt
-            </button>
-            <button className="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold text-white" type="button">
-              Barcode
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
-        {scannerQueue.map((row) => (
-          <article className="grid gap-3 border-b border-zinc-200 px-5 py-4 last:border-b-0 md:grid-cols-[1fr_0.7fr_0.5fr_0.5fr]" key={row.item}>
-            <div>
-              <p className="font-semibold text-zinc-950">{row.item}</p>
-              <p className="text-sm text-zinc-500">Owner: {row.owner}</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-700">Candidate rows</p>
+              <p className="mt-2 text-4xl font-black text-indigo-950">{receiptFedAliasGrowthPlan.candidates.length}</p>
+              <p className="mt-2 text-sm font-semibold text-indigo-900">{receiptFedAliasGrowthPlan.status}</p>
             </div>
-            <p className="font-medium text-zinc-700">{row.status}</p>
-            <p className="tabular-nums text-zinc-700">{row.confidence}%</p>
-            <button className="w-fit rounded-lg border border-zinc-300 px-3 py-2 text-sm font-semibold text-zinc-800" type="button">
-              Review
-            </button>
-          </article>
-        ))}
-      </section>
-    </main>
-  );
-}
-
-function ScannerStat({ icon: Icon, label, value }: { icon: typeof Camera; label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-      <Icon className="h-5 w-5 text-emerald-700" aria-hidden="true" />
-      <p className="mt-3 text-sm text-zinc-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-zinc-950">{value}</p>
-    </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-700">Review action</p>
+              <p className="mt-2 break-all text-lg font-black text-indigo-950">{receiptFedAliasGrowthPlan.reviewAction}</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {receiptFedAliasGrowthPlan.candidates.map((candidate) => (
+            <div className="rounded-2xl bg-white/80 p-4" key={candidate.id}>
+              <p className="text-sm font-black text-slate-950">{candidate.normalizedAlias}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{candidate.chainLabel} · {candidate.itemTotal} kr · {candidate.quantity} {candidate.comparableUnit}</p>
+              <p className="mt-2 text-2xl font-black text-indigo-950">{candidate.unitPrice} kr/{candidate.comparableUnit}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">Priority {candidate.priority}; evidence {candidate.evidence.join(' · ')}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 rounded-2xl bg-white/80 p-4">
+          <p className="text-sm font-black text-slate-950">Guardrails</p>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
+            {receiptFedAliasGrowthPlan.guardrails.map((guardrail) => (
+              <li key={guardrail}>• {guardrail}</li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm font-bold text-indigo-950">Next runtime step: {receiptFedAliasGrowthPlan.nextRuntimeStep}</p>
+        </div>
+      </Card>
+      <ScannerUploadActions />
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <TopSpreads limit={5} />
+        <SourceCoverage />
+      </div>
+    </PageShell>
   );
 }

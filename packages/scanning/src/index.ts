@@ -253,6 +253,177 @@ export function planScanReviewWorkItems(scans: ScanReviewWorkItemInput[]): ScanR
   return items.sort((left, right) => scanReviewPriorityRank[left.priority] - scanReviewPriorityRank[right.priority] || left.id.localeCompare(right.id));
 }
 
+
+export type ReceiptAliasGrowthRow = ReceiptOcrRow & {
+  quantityText?: string;
+};
+
+export type ReceiptAliasGrowthReceipt = {
+  scanId: string;
+  chainLabel: string;
+  observedAt: string;
+  rows: ReceiptAliasGrowthRow[];
+};
+
+export type ReceiptAliasGrowthRejectedRow = {
+  scanId: string;
+  rawName: string;
+  reason:
+    | 'chain_label_required'
+    | 'observed_at_required'
+    | 'receipt_row_confidence_below_threshold'
+    | 'item_total_required'
+    | 'quantity_or_weight_required'
+    | 'alias_required';
+};
+
+export type ReceiptAliasGrowthCandidate = {
+  id: string;
+  scanId: string;
+  chainLabel: string;
+  rawName: string;
+  normalizedAlias: string;
+  itemTotal: number;
+  quantity: number;
+  comparableUnit: 'kg' | 'l' | 'st';
+  unitPrice: number;
+  confidence: number;
+  priority: ScanReviewPriority;
+  observedAt: string;
+  reviewAction: 'create_commodity_alias_candidate';
+  evidence: string[];
+};
+
+export type ReceiptAliasGrowthPlan = {
+  status: 'review_required' | 'blocked';
+  candidates: ReceiptAliasGrowthCandidate[];
+  rejectedRows: ReceiptAliasGrowthRejectedRow[];
+  guardrails: string[];
+  summary: string;
+};
+
+const receiptQuantityPattern = /(\d+(?:[,.]\d+)?)\s*(kg|g|l|ml|st)\b/i;
+
+function roundScanMoney(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function parseReceiptQuantity(rawName: string, quantityText?: string): { quantity: number; comparableUnit: 'kg' | 'l' | 'st'; evidenceValue: string } | null {
+  const source = [quantityText, rawName].filter(Boolean).join(' ');
+  const match = source.match(receiptQuantityPattern);
+  if (!match) return null;
+  const parsedValue = Number(match[1].replace(',', '.'));
+  if (!Number.isFinite(parsedValue) || parsedValue <= 0) return null;
+  const unit = match[2].toLowerCase();
+  if (unit === 'kg') return { quantity: parsedValue, comparableUnit: 'kg', evidenceValue: `${parsedValue} kg` };
+  if (unit === 'g') return { quantity: roundScanMoney(parsedValue / 1000), comparableUnit: 'kg', evidenceValue: `${roundScanMoney(parsedValue / 1000)} kg` };
+  if (unit === 'l') return { quantity: parsedValue, comparableUnit: 'l', evidenceValue: `${parsedValue} l` };
+  if (unit === 'ml') return { quantity: roundScanMoney(parsedValue / 1000), comparableUnit: 'l', evidenceValue: `${roundScanMoney(parsedValue / 1000)} l` };
+  return { quantity: parsedValue, comparableUnit: 'st', evidenceValue: `${parsedValue} st` };
+}
+
+function normalizeReceiptAlias(rawName: string): string {
+  return rawName
+    .normalize('NFKD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(receiptQuantityPattern, ' ')
+    .replace(/\b(sek|kr|pris|jmf|jämförpris)\b/gi, ' ')
+    .replace(/[^\p{Letter}\p{Number}]+/gu, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function aliasCandidateId(scanId: string, normalizedAlias: string): string {
+  const slug = normalizedAlias.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'unknown';
+  return `alias-${scanId}-${slug}`;
+}
+
+function rejectReceiptAliasRow(rejectedRows: ReceiptAliasGrowthRejectedRow[], scanId: string, rawName: string, reason: ReceiptAliasGrowthRejectedRow['reason']): void {
+  rejectedRows.push({ scanId, rawName, reason });
+}
+
+export function planReceiptAliasGrowth(input: { receipts: ReceiptAliasGrowthReceipt[]; minimumConfidence?: number }): ReceiptAliasGrowthPlan {
+  const minimumConfidence = input.minimumConfidence ?? 0.55;
+  const candidates: ReceiptAliasGrowthCandidate[] = [];
+  const rejectedRows: ReceiptAliasGrowthRejectedRow[] = [];
+
+  for (const receipt of input.receipts) {
+    if (!receipt.scanId.trim()) throw new Error('scanId is required.');
+    const chainLabel = receipt.chainLabel.trim();
+    const observedAtIsValid = !Number.isNaN(Date.parse(receipt.observedAt));
+
+    for (const row of receipt.rows) {
+      const rawName = row.rawName.trim();
+      if (!chainLabel) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'chain_label_required');
+        continue;
+      }
+      if (!observedAtIsValid) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'observed_at_required');
+        continue;
+      }
+      validateScanConfidence(row.confidence, 'receipt row confidence');
+      if (row.confidence < minimumConfidence) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'receipt_row_confidence_below_threshold');
+        continue;
+      }
+      if (!Number.isFinite(row.itemTotal) || row.itemTotal <= 0) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'item_total_required');
+        continue;
+      }
+      const quantity = parseReceiptQuantity(rawName, row.quantityText);
+      if (!quantity) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'quantity_or_weight_required');
+        continue;
+      }
+      const normalizedAlias = normalizeReceiptAlias(rawName);
+      if (!normalizedAlias) {
+        rejectReceiptAliasRow(rejectedRows, receipt.scanId, rawName, 'alias_required');
+        continue;
+      }
+
+      candidates.push({
+        id: aliasCandidateId(receipt.scanId, normalizedAlias),
+        scanId: receipt.scanId,
+        chainLabel,
+        rawName,
+        normalizedAlias,
+        itemTotal: roundScanMoney(row.itemTotal),
+        quantity: quantity.quantity,
+        comparableUnit: quantity.comparableUnit,
+        unitPrice: roundScanMoney(row.itemTotal / quantity.quantity),
+        confidence: row.confidence,
+        priority: row.confidence < 0.8 ? 'high' : 'medium',
+        observedAt: receipt.observedAt,
+        reviewAction: 'create_commodity_alias_candidate',
+        evidence: [
+          `chain_label:${chainLabel}`,
+          `item_total_sek:${roundScanMoney(row.itemTotal)}`,
+          `quantity:${quantity.evidenceValue}`,
+          `source:receipt_ocr`
+        ]
+      });
+    }
+  }
+
+  candidates.sort((left, right) =>
+    left.normalizedAlias.localeCompare(right.normalizedAlias) ||
+    left.id.localeCompare(right.id)
+  );
+
+  return {
+    status: candidates.length > 0 ? 'review_required' : 'blocked',
+    candidates,
+    rejectedRows,
+    guardrails: [
+      'Receipt-fed aliases are review candidates only; they do not update product_aliases or commodity mappings automatically.',
+      'Every candidate requires chain label + kr + weight evidence before human review.',
+      'Private receipt images stay out of this plan; only normalized OCR metadata is used.'
+    ],
+    summary: `${candidates.length} alias candidates require human review; ${rejectedRows.length} receipt rows were rejected.`
+  };
+}
+
 export async function processScanUpload(input: { upload: ScanUpload; providers: ScanProviders }): Promise<ScanPipelineResult> {
   if (Number.isNaN(Date.parse(input.upload.uploadedAt))) throw new Error('uploadedAt must be an ISO date.');
   if (!input.upload.payload.trim()) throw new Error('payload is required.');
@@ -279,5 +450,153 @@ export async function processScanUpload(input: { upload: ScanUpload; providers: 
     confidence: parsed.confidence,
     needsHumanReview: parsed.confidence < 0.8 || lowConfidenceRows.length > 0,
     lowConfidenceRows
+  };
+}
+
+
+export type OpenFoodFactsBarcodeProviderOptions = {
+  userAgent: string;
+  endpoint?: string;
+  fetch?: typeof fetch;
+};
+
+type OpenFoodFactsProductResponse = {
+  status?: number;
+  code?: string;
+  product?: {
+    product_name?: string;
+    brands?: string;
+    quantity?: string;
+  };
+};
+
+function requiredOpenFoodFactsUserAgent(userAgent: string): string {
+  const normalized = userAgent.trim();
+  if (!normalized) throw new Error('OPENFOODFACTS_USER_AGENT is required.');
+  return normalized;
+}
+
+function normalizeBarcode(barcode: string): string {
+  const normalized = barcode.trim();
+  if (!/^\d{8,14}$/.test(normalized)) throw new Error('barcode must contain 8 to 14 digits.');
+  return normalized;
+}
+
+export function createOpenFoodFactsBarcodeProvider(options: OpenFoodFactsBarcodeProviderOptions): NonNullable<ScanProviders['barcode']> {
+  const userAgent = requiredOpenFoodFactsUserAgent(options.userAgent);
+  const endpoint = options.endpoint ?? 'https://world.openfoodfacts.org/api/v2/product';
+  const fetcher = options.fetch ?? fetch;
+  return {
+    async lookup(barcode: string): Promise<BarcodeLookup> {
+      const normalizedBarcode = normalizeBarcode(barcode);
+      const fields = new URLSearchParams({ fields: 'code,product_name,brands,quantity,status' });
+      const response = await fetcher(`${endpoint}/${encodeURIComponent(normalizedBarcode)}.json?${fields.toString()}`, {
+        method: 'GET',
+        headers: { 'user-agent': userAgent, accept: 'application/json' }
+      });
+      if (!response.ok) throw new Error(`OpenFoodFacts HTTP ${response.status}`);
+      const parsed = await response.json() as OpenFoodFactsProductResponse;
+      if (parsed.status !== 1 || !parsed.product) throw new Error(`OpenFoodFacts did not resolve barcode ${normalizedBarcode}.`);
+      const hasName = Boolean(parsed.product.product_name?.trim());
+      return {
+        productId: `openfoodfacts:${parsed.code?.trim() || normalizedBarcode}`,
+        barcode: normalizedBarcode,
+        confidence: hasName ? 0.86 : 0.65,
+        needsHumanReview: !hasName
+      };
+    }
+  };
+}
+
+export type OcrSpaceReceiptProviderOptions = {
+  apiKey: string;
+  endpoint?: string;
+  fetch?: typeof fetch;
+};
+
+type OcrSpaceWord = { WordText?: string; Confidence?: number };
+type OcrSpaceLine = { LineText?: string; Words?: OcrSpaceWord[] };
+type OcrSpaceResult = {
+  ParsedText?: string;
+  TextOverlay?: { Lines?: OcrSpaceLine[] };
+};
+type OcrSpaceResponse = {
+  IsErroredOnProcessing?: boolean;
+  ErrorMessage?: string | string[];
+  ParsedResults?: OcrSpaceResult[];
+};
+
+function requiredOcrSpaceApiKey(apiKey: string): string {
+  const normalized = apiKey.trim();
+  if (!normalized) throw new Error('OCR_SPACE_API_KEY is required.');
+  return normalized;
+}
+
+function parseReceiptMoney(value: string): number | null {
+  const normalized = value.replace(',', '.');
+  const amount = Number(normalized);
+  return Number.isFinite(amount) ? Math.round(amount * 100) / 100 : null;
+}
+
+function confidenceFromLine(line: OcrSpaceLine): number {
+  const confidences = (line.Words ?? [])
+    .map((word) => typeof word.Confidence === 'number' ? word.Confidence : null)
+    .filter((confidence): confidence is number => confidence !== null);
+  if (confidences.length === 0) return 0.5;
+  const lowest = Math.min(...confidences);
+  return Math.round(Math.max(0, Math.min(1, lowest / 100)) * 100) / 100;
+}
+
+function parseReceiptRowsFromOcrSpace(result: OcrSpaceResult): ReceiptOcrRow[] {
+  const lines = result.TextOverlay?.Lines?.length
+    ? result.TextOverlay.Lines.map((line) => ({ text: line.LineText ?? '', confidence: confidenceFromLine(line) }))
+    : (result.ParsedText ?? '').split(/\r?\n/).map((line) => ({ text: line, confidence: 0.5 }));
+
+  const rows: ReceiptOcrRow[] = [];
+  for (const line of lines) {
+    const trimmed = line.text.trim();
+    if (!trimmed || /^total\b/i.test(trimmed)) continue;
+    const match = trimmed.match(/^(.*?)(\d+(?:[,.]\d{2}))\s*$/);
+    if (!match) continue;
+    const itemTotal = parseReceiptMoney(match[2]!);
+    const rawName = match[1]!.trim().replace(/\s+/g, ' ');
+    if (!rawName || itemTotal === null) continue;
+    rows.push({ rawName, itemTotal, confidence: line.confidence });
+  }
+  return rows;
+}
+
+function parseReceiptTotalFromText(text: string, fallback: number): number {
+  const totalLine = text.split(/\r?\n/).find((line) => /^\s*total\b/i.test(line));
+  const match = totalLine?.match(/(\d+(?:[,.]\d{2}))\s*$/);
+  const total = match ? parseReceiptMoney(match[1]!) : null;
+  return total ?? fallback;
+}
+
+function normalizeOcrSpaceError(response: OcrSpaceResponse): string {
+  const message = Array.isArray(response.ErrorMessage) ? response.ErrorMessage.join('; ') : response.ErrorMessage;
+  return message?.trim() || 'unknown OCR.space error';
+}
+
+export function createOcrSpaceReceiptProvider(options: OcrSpaceReceiptProviderOptions): NonNullable<ScanProviders['receiptOcr']> {
+  const apiKey = requiredOcrSpaceApiKey(options.apiKey);
+  const endpoint = options.endpoint ?? 'https://api.ocr.space/parse/image';
+  const fetcher = options.fetch ?? fetch;
+  return {
+    async parse(payload: string): Promise<ReceiptOcrResult> {
+      if (!payload.trim()) throw new Error('receipt OCR payload is required.');
+      const body = new URLSearchParams({ url: payload, isOverlayRequired: 'true', scale: 'true', OCREngine: '2' });
+      const response = await fetcher(endpoint, { method: 'POST', headers: { apikey: apiKey, 'content-type': 'application/x-www-form-urlencoded' }, body });
+      if (!response.ok) throw new Error(`OCR.space HTTP ${response.status}`);
+      const parsed = await response.json() as OcrSpaceResponse;
+      if (parsed.IsErroredOnProcessing) throw new Error(`OCR.space failed: ${normalizeOcrSpaceError(parsed)}`);
+      const firstResult = parsed.ParsedResults?.[0];
+      if (!firstResult) throw new Error('OCR.space returned no parsed receipt text.');
+      const rows = parseReceiptRowsFromOcrSpace(firstResult);
+      const rowTotal = Math.round(rows.reduce((sum, row) => sum + row.itemTotal, 0) * 100) / 100;
+      const totalAmount = parseReceiptTotalFromText(firstResult.ParsedText ?? '', rowTotal);
+      const confidence = rows.length > 0 ? Math.round((rows.reduce((sum, row) => sum + row.confidence, 0) / rows.length) * 100) / 100 : 0;
+      return { rows, totalAmount, confidence };
+    }
   };
 }

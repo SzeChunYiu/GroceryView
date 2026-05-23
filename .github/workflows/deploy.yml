@@ -2,6 +2,8 @@ name: Deploy
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 
 jobs:
   deploy:
@@ -18,6 +20,34 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Audit production secrets
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
+          GROCERYVIEW_API_BASE_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          PUBLIC_WEB_URL: ${{ secrets.PUBLIC_WEB_URL }}
+          NOTIFICATION_WEBHOOK_SECRET: ${{ secrets.NOTIFICATION_WEBHOOK_SECRET }}
+          BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_PRICE_PREMIUM_MONTHLY: ${{ secrets.STRIPE_PRICE_PREMIUM_MONTHLY }}
+          STRIPE_PRICE_PREMIUM_YEARLY: ${{ secrets.STRIPE_PRICE_PREMIUM_YEARLY }}
+          GROCERYVIEW_SCANNER_BEARER_TOKEN: ${{ secrets.GROCERYVIEW_SCANNER_BEARER_TOKEN }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          REPLACEMENT_DATABASE_URL: ${{ secrets.REPLACEMENT_DATABASE_URL }}
+          CANDIDATE_DATABASE_URL: ${{ secrets.CANDIDATE_DATABASE_URL }}
+          GROCERYVIEW_PRODUCTION_URL: ${{ vars.GROCERYVIEW_PRODUCTION_URL }}
+          GROCERYVIEW_TERMINAL_PRODUCT_ID: ${{ vars.GROCERYVIEW_TERMINAL_PRODUCT_ID }}
+          GROCERYVIEW_SCANNER_USER_ID: ${{ vars.GROCERYVIEW_SCANNER_USER_ID }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+          GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: ${{ secrets.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN }}
+          CATALOG_COVERAGE_TARGETS_JSON: ${{ secrets.CATALOG_COVERAGE_TARGETS_JSON }}
+        run: npm run ops:check-production-secrets -- --from-env
       - name: Run tests
         run: npm test
       - name: Build workspaces
@@ -26,7 +56,45 @@ jobs:
         run: npm run typecheck
       - name: Validate deployment manifest
         run: test -f deploy/groceryview.manifest.json && cat deploy/groceryview.manifest.json
-      - name: Deployment handoff
+      - name: Deploy to Vercel production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          echo "Deployment manifest verified."
-          echo "Provider-specific deploy command intentionally not wired until hosting target is selected."
+          npx --yes vercel@latest pull --yes --environment=production --token "$VERCEL_TOKEN"
+          npx --yes vercel@latest build --prod --token "$VERCEL_TOKEN"
+          npx --yes vercel@latest deploy --prebuilt --prod --token "$VERCEL_TOKEN"
+      - name: Run post-deploy hosted HTTP smoke
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          GROCERYVIEW_WEB_URL: ${{ vars.GROCERYVIEW_PRODUCTION_URL }}
+          GROCERYVIEW_TERMINAL_PRODUCT_ID: ${{ vars.GROCERYVIEW_TERMINAL_PRODUCT_ID }}
+          HTTP_SMOKE_TIMEOUT_SECONDS: '20'
+          HOSTED_HTTP_SMOKE_OUTPUT_PATH: artifacts/deploy-hosted-http-smoke.json
+        run: infra/scripts/smoke-hosted-http.sh
+      - name: Run post-deploy production readiness smoke
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+          READINESS_TIMEOUT_SECONDS: '20'
+          HOSTED_READINESS_SMOKE_OUTPUT_PATH: artifacts/deploy-hosted-readiness-smoke.json
+        run: infra/scripts/smoke-hosted-readiness.sh
+      - name: Run post-deploy scanner upload smoke
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
+          GROCERYVIEW_SCANNER_USER_ID: ${{ vars.GROCERYVIEW_SCANNER_USER_ID }}
+          GROCERYVIEW_SCANNER_BEARER_TOKEN: ${{ secrets.GROCERYVIEW_SCANNER_BEARER_TOKEN }}
+          HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH: artifacts/deploy-hosted-scanner-upload-smoke.json
+        run: node infra/scripts/smoke-hosted-scanner-upload.mjs
+      - name: Upload deploy smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-hosted-smoke-evidence
+          path: artifacts/*.json
+          if-no-files-found: ignore
+      - name: Verify production visible artifact
+        env:
+          GROCERYVIEW_PRODUCTION_URL: ${{ vars.GROCERYVIEW_PRODUCTION_URL }}
+        run: node apps/web/scripts/check-production-visible-artifact.mjs

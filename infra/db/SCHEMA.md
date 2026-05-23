@@ -24,19 +24,26 @@ Every price-bearing row carries `price_type`, `confidence`, `observed_at`, and `
 
 ## Partitioning Plan
 
-`observations` is intentionally kept as a single table for the first migration so early API and worker lanes can integrate without partition-management code. When write volume requires partitioning, add a follow-up migration that:
+Migration 013 builds the first time-series partition lane without breaking existing `latest_prices` foreign keys:
 
-1. creates `observations_v2 partition by range (observed_at)`,
-2. creates monthly partitions named `observations_YYYY_MM`,
-3. recreates the product/time, store/time, price type/time, and provenance indexes on each partition,
-4. backfills from `observations`,
-5. swaps read/write code to `observations_v2`.
+1. `observations` remains the canonical immutable write table for current adapters.
+2. `observations_v2` is a mirror table partitioned by range on `observed_at`.
+3. Monthly range partitions are named `observations_YYYY_MM` and can be pre-created with `create_observations_partitions(window_start, months_ahead)`.
+4. `ensure_observations_monthly_partition(partition_month)` auto-creates the matching month before trigger-synced writes land.
+5. Each monthly partition carries product/time, store/time, price type/time, domain/time, provenance GIN, and BRIN indexes. BRIN keeps append-only time pruning cheap at large row counts.
+6. `drop_observations_partitions_before(cutoff_month)` is the retention tiering hook: operators can archive a month, then perform retention by partition drop instead of row deletes.
 
-The same pattern can be reused for long-term raw payload retention in `raw_records` if retailer capture volume grows faster than normalized observations.
+The same monthly range partition and retention by partition drop pattern can be reused for long-term raw payload retention in `raw_records` if retailer capture volume grows faster than normalized observations.
 
 ## Deal Score Boundary
 
 The schema stores store location in `stores.position` for map and trip-planning features. Distance or travel time must not be stored as an input to default Deal Score ranking. Deal Score should use price history, discount depth, confidence, and provenance; distance can be applied later as an explicit user-side filter or trip-planning sort.
+
+## Multi-Vertical Price Domain Model
+
+Migration 011 adds a `domain` column to `chains`, `stores`, `products`, `observations`, and `latest_prices`. Existing rows default to `grocery`; future verticals are constrained to `fuel` and `pharmacy` until a later migration expands the supported set. This keeps matching domain-scoped: grocery uses EAN + commodity matching, fuel uses fuel grades, and pharmacy uses OTC/health EANs. Public routes must not render non-grocery prices until `observations.domain` has connector or trusted crowd rows for that vertical.
+
+Migration 014 adds the fuel source contract. `fuel_grades` is the only supported grade catalog for the current fuel lane: 95 E10, 98, diesel, HVO100, and E85. `fuel_price_sources` accepts either an operator public price page or a trusted crowd station report, and `fuel_price_source_observations` ties that source evidence to immutable `domain='fuel'` observations with the original price text. Fuel prices are always price per litre; estimated fuel rows are not part of this source model.
 
 ## Tables
 
@@ -44,13 +51,13 @@ The schema stores store location in `stores.position` for map and trip-planning 
 
 Retail banners such as ICA, Willys, Coop, Lidl, Hemkop, and City Gross.
 
-Key columns: `slug`, `name`, `country_code`, `website_url`.
+Key columns: `slug`, `name`, `domain`, `country_code`, `website_url`.
 
 ### `stores`
 
 Physical or online stores belonging to a chain.
 
-Key columns: `chain_id`, `slug`, `external_ref`, address fields, `position`, `store_type`, `opening_hours`, `online_order_url`.
+Key columns: `chain_id`, `slug`, `domain`, `external_ref`, address fields, `position`, `store_type`, `opening_hours`, `online_order_url`.
 
 Indexes: `stores_position_gix` for location queries, plus `stores_name_trgm_idx` and `stores_slug_trgm_idx` for fuzzy store search.
 
@@ -58,9 +65,21 @@ Indexes: `stores_position_gix` for location queries, plus `stores_name_trgm_idx`
 
 Canonical product records used by search, charts, baskets, and matching.
 
-Key columns: `slug`, `canonical_name`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`.
+Key columns: `slug`, `canonical_name`, `domain`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`. Commodity columns (migration 010): `product_kind` (`branded`|`commodity`), `commodity_id`, `variant`, `is_organic`, `origin_country`. Fuel column (migration 014): `fuel_grade_id`.
 
-Indexes: `products_name_trgm_idx` and `products_slug_trgm_idx` for fuzzy product search.
+Indexes: `products_name_trgm_idx` and `products_slug_trgm_idx` for fuzzy product search; `products_commodity_idx` and `products_kind_idx` for commodity matching.
+
+### `commodities`
+
+Canonical generic products for unbranded / loose items (meat, vegetables, fruit, bakery, bulk) that have no EAN and are sold by weight. Chain loose items map here via `products.commodity_id`; cross-chain comparison is on `unit_price` (kr/kg, kr/l, kr/st), not barcode. `is_staple` marks the representative basket behind the per-chain fresh-food index. Starter taxonomy: `packages/catalog/src/commodities.ts`.
+
+Key columns: `slug`, `name_sv`, `name_en`, `category_path`, `comparable_unit` (`kg`|`l`|`st`), `default_variant`, `is_staple`.
+
+### `fuel_grades`
+
+Canonical fuel products for the fuel vertical. Fuel grades are matched by grade id, not EAN or grocery commodity alias, and every supported grade compares on litres only.
+
+Key columns: `id`, `grade_code`, `label`, `comparable_unit`, `match_key`, `active`.
 
 ### `aliases`
 
@@ -96,23 +115,67 @@ Allowed `policy_label` values: `allowed`, `fixture_review`, `manual_review`, `bl
 
 Indexes: `retailer_source_policies_label_review_idx`, `retailer_source_policies_disallowed_gin_idx`, and `retailer_source_policies_provenance_gin_idx`.
 
+### `fuel_price_sources`
+
+Source rows accepted by the fuel lane before facts are linked to observations. Operator rows require `operator_id`, `operator_name`, `source_url`, `parser_version`, and `captured_at`. Crowd rows require `station_id`, `reporter_id`, `reporter_trust_tier`, `evidence_type`, and `submitted_at`, with reporter risk controlled by `community_reporter_trust`.
+
+Key columns: `source_kind`, `operator_id`, `operator_name`, `station_id`, `reporter_id`, `reporter_trust_tier`, `evidence_type`, `source_url`, `parser_version`, `captured_at`, `submitted_at`, `provenance`.
+
+Indexes: `fuel_price_sources_kind_captured_idx`.
+
+### `fuel_price_source_observations`
+
+Join table from a fuel operator/crowd source row to the immutable `observations` row it produced. Stores the grade id plus original source price text so rendered rows can prove the per-litre price was copied from source evidence, not inferred.
+
+Key columns: `source_id`, `observation_id`, `fuel_grade_id`, `original_price_text`, `original_effective_date`.
+
+Indexes: `fuel_price_source_observations_grade_idx`.
+
 ### `observations`
 
 Immutable normalized price facts. This is the canonical table for historical charts and price provenance.
 
-Key columns: `product_id`, `chain_id`, `store_id`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `observed_at`, validity window fields, `confidence`, `provenance`.
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `observed_at`, validity window fields, `confidence`, `provenance`.
+
+Write policy: daily ingestion uses change-only writes. Before inserting a new immutable observation, the PostgreSQL writer compares the incoming `(product_id, chain_id, store_id, price_type)` price tuple with `latest_prices`; unchanged current snapshots reuse the existing `observation_id` instead of creating another daily duplicate. Changed rows keep temporal state by writing `valid_from` from source evidence or defaulting it to `observed_at`.
 
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
 Indexes: product/time, store/time, price type/time, and provenance GIN.
 
+### `observations_v2`
+
+Range-partitioned monthly mirror of immutable `observations` for high-volume history reads. It is populated by `observations_partition_lane_sync`, which calls `ensure_observations_monthly_partition()` before copying inserts and updates from the canonical table.
+
+Key columns: same price, source, provenance, validity, domain, and observed-time fields as `observations`. The partitioned primary key is `(id, observed_at)` because PostgreSQL range-partitioned unique keys must include the partition key.
+
+Partitions: monthly range partitions named `observations_YYYY_MM`, plus `observations_default` for rows outside the pre-created window. Operators should drain the default partition by creating the matching monthly partition before long-term retention.
+
+Indexes: parent and per-partition product/time, store/time, price type/time, domain/time, provenance GIN, and `observed_at` BRIN. Retention uses `drop_observations_partitions_before(cutoff_month)` after archive/downsample handoff.
+
 ### `latest_prices`
 
-Materialized latest price lookup for API and UI reads. Each row references the observation that won the rollup.
+Materialized latest price lookup for API and UI reads, and the write-side change detector for daily ingestion. Each row references the observation that won the rollup.
 
-Key columns: `product_id`, `chain_id`, `store_id`, `price_type`, `observation_id`, `price`, `regular_price`, `unit_price`, `currency`, `observed_at`, `confidence`, `provenance`, `updated_at`.
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `observation_id`, `price`, `regular_price`, `unit_price`, `currency`, `observed_at`, `confidence`, `provenance`, `updated_at`.
 
 Primary key: `(product_id, chain_id, store_id, price_type)`.
+
+### `price_daily`
+
+Derived daily rollup over immutable `observations` for product charts, 52-week-low checks, and historic range reads. Raw observations remain authoritative; charts and 52-week-low reads must hit `price_daily` or `price_weekly` instead of scanning raw observations for long ranges.
+
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `currency`, `bucket_day`, `min_price`, `max_price`, `avg_price`, `last_price`, unit-price equivalents, `first_observed_at`, `last_observed_at`, `observation_count`, `source_observation_ids`, `provenance`.
+
+Indexes: `price_daily_product_chain_day_idx`, `price_daily_store_day_idx`, and `price_daily_domain_day_idx`.
+
+### `price_weekly`
+
+Derived weekly rollup over immutable `observations` for long-range market charts and price-history summaries. It uses ISO-style `date_trunc('week', observed_at)::date` buckets and keeps source observation ids so every aggregate remains traceable to raw facts.
+
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `currency`, `week_start`, `min_price`, `max_price`, `avg_price`, `last_price`, unit-price equivalents, `first_observed_at`, `last_observed_at`, `observation_count`, `source_observation_ids`, `provenance`.
+
+Indexes: `price_weekly_product_chain_week_idx`, `price_weekly_store_week_idx`, and `price_weekly_domain_week_idx`.
 
 ### `users`
 
@@ -207,6 +270,16 @@ Unique key: `(user_id, week_start)`.
 Legacy app repository basket lines.
 
 Key columns: `basket_id`, `product_id`, `quantity`, `created_at`.
+
+### `basket_import_review_items`
+
+Account-bound retailer basket import review rows for unmatched bookmarklet, browser extension, or copy/paste rows. These rows are private to `app_users` and stay out of `basket_items` until the signed-in shopper accepts a verified product match or dismisses the row.
+
+Key columns: `user_id`, `review_item_id`, `raw_name`, `quantity`, `reason`, `retailer_id`, `source_kind`, `captured_at`, `status`, `created_at`, `resolved_at`, `resolved_product_id`.
+
+Primary key: `(user_id, review_item_id)`.
+
+Indexes: `basket_import_review_items_open_idx` for account-scoped open queue reads and `basket_import_review_items_retailer_idx` for retailer/capture audits.
 
 ### `human_review_assignments`
 

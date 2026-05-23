@@ -38,6 +38,61 @@ describe('createMemoryRepository', () => {
     assert.deepEqual(await repo.getBasket('user-1'), [{ productId: 'coffee', quantity: 2 }]);
   });
 
+  it('persists account-bound basket import review rows and resolves only open rows', async () => {
+    const repo = createMemoryRepository();
+
+    await repo.upsertUser({ id: 'user-1', email: 'importer@example.com' });
+    await repo.upsertUser({ id: 'user-2', email: 'other@example.com' });
+
+    await repo.saveBasketImportReviewItems('user-1', [
+      {
+        reviewItemId: 'review-1',
+        rawName: 'Retailer-only bakery bun',
+        quantity: 3,
+        reason: 'No verified GroceryView product match.',
+        retailerId: 'willys',
+        sourceKind: 'bookmarklet',
+        capturedAt: '2026-05-22T09:35:00.000Z',
+        status: 'open',
+        createdAt: '2026-05-22T09:35:00.000Z'
+      }
+    ]);
+
+    assert.deepEqual(await repo.listOpenBasketImportReviewItems('user-1'), [
+      {
+        reviewItemId: 'review-1',
+        rawName: 'Retailer-only bakery bun',
+        quantity: 3,
+        reason: 'No verified GroceryView product match.',
+        retailerId: 'willys',
+        sourceKind: 'bookmarklet',
+        capturedAt: '2026-05-22T09:35:00.000Z',
+        status: 'open',
+        createdAt: '2026-05-22T09:35:00.000Z'
+      }
+    ]);
+    assert.deepEqual(await repo.listOpenBasketImportReviewItems('user-2'), []);
+
+    const resolved = await repo.resolveBasketImportReviewItem('user-1', 'review-1', {
+      status: 'accepted',
+      resolvedAt: '2026-05-22T09:36:00.000Z',
+      resolvedProductId: 'coffee',
+      quantity: 2
+    });
+
+    assert.equal(resolved.status, 'accepted');
+    assert.equal(resolved.resolvedProductId, 'coffee');
+    assert.equal(resolved.quantity, 2);
+    assert.deepEqual(await repo.listOpenBasketImportReviewItems('user-1'), []);
+    await assert.rejects(
+      repo.resolveBasketImportReviewItem('user-2', 'review-1', {
+        status: 'dismissed',
+        resolvedAt: '2026-05-22T09:37:00.000Z'
+      }),
+      /Basket import review item not found: review-1/
+    );
+  });
+
   it('upserts subscription entitlements by user for premium account enforcement', async () => {
     const repo = createMemoryRepository();
 
@@ -109,6 +164,18 @@ describe('createMemoryRepository', () => {
       status: 'in_progress'
     });
     await repo.saveHumanReviewAssignment({
+      id: 'assignment-review-commodity-map-1-curator-1',
+      reviewId: 'review-commodity-map-1',
+      subjectType: 'commodity_mapping',
+      subjectId: 'commodity-map-1',
+      priority: 'medium',
+      reason: 'Low-confidence loose produce mapping.',
+      assigneeId: 'curator-1',
+      assignedAt: '2026-05-19T10:10:00.000Z',
+      dueAt: '2026-05-19T16:10:00.000Z',
+      status: 'assigned'
+    });
+    await repo.saveHumanReviewAssignment({
       id: 'assignment-review-match-3-moderator-3',
       reviewId: 'review-match-3',
       subjectType: 'product_match',
@@ -123,6 +190,7 @@ describe('createMemoryRepository', () => {
 
     assert.deepEqual((await repo.listOpenHumanReviewAssignments()).map((assignment) => assignment.id), [
       'assignment-review-match-1-moderator-1',
+      'assignment-review-commodity-map-1-curator-1',
       'assignment-review-report-1-moderator-2'
     ]);
   });
@@ -605,7 +673,10 @@ describe('buildSourceRunHealthReport', () => {
         stuckRunning: 0,
         missingFinishedAt: 0,
         startedInFuture: 0,
-        finishedInFuture: 0
+        finishedInFuture: 0,
+        noFreshRuns: 0,
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
       },
       evidence: {
         total: 1,
@@ -668,7 +739,8 @@ describe('buildSourceRunHealthReport', () => {
       'source_run_failed:failed-run',
       'source_run_partial:partial-run',
       'source_run_stuck_running:running-run',
-      'source_run_stale:stale-run'
+      'source_run_stale:stale-run',
+      'source_run_no_fresh_success'
     ]);
     assert.deepEqual(report.runningRunIds, ['running-run']);
     assert.deepEqual(report.staleRunIds, ['stale-run']);
@@ -677,14 +749,17 @@ describe('buildSourceRunHealthReport', () => {
     assert.deepEqual(summarizeSourceRunHealthReport(report), {
       status: 'blocked',
       blockers: {
-        total: 4,
+        total: 5,
         failed: 1,
         partial: 1,
         stale: 1,
         stuckRunning: 1,
         missingFinishedAt: 0,
         startedInFuture: 0,
-        finishedInFuture: 0
+        finishedInFuture: 0,
+        noFreshRuns: 1,
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
       },
       evidence: {
         total: 0,
@@ -734,14 +809,17 @@ describe('buildSourceRunHealthReport', () => {
     assert.deepEqual(summarizeSourceRunHealthReport(report), {
       status: 'blocked',
       blockers: {
-        total: 3,
+        total: 4,
         failed: 0,
         partial: 0,
         stale: 0,
         stuckRunning: 0,
         missingFinishedAt: 1,
         startedInFuture: 1,
-        finishedInFuture: 1
+        finishedInFuture: 1,
+        noFreshRuns: 1,
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
       },
       evidence: {
         total: 0,
@@ -801,7 +879,10 @@ describe('buildSourceRunHealthReport', () => {
         stuckRunning: 0,
         missingFinishedAt: 0,
         startedInFuture: 0,
-        finishedInFuture: 0
+        finishedInFuture: 0,
+        noFreshRuns: 0,
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
       },
       evidence: {
         total: 1,
@@ -832,16 +913,19 @@ describe('buildSourceRunHealthReport', () => {
     assert.equal(result.runCount, 0);
     assert.deepEqual(result.filter, { limit: 100 });
     assert.deepEqual(result.summary, {
-      status: 'healthy',
+      status: 'blocked',
       blockers: {
-        total: 0,
+        total: 1,
         failed: 0,
         partial: 0,
         stale: 0,
         stuckRunning: 0,
         missingFinishedAt: 0,
         startedInFuture: 0,
-        finishedInFuture: 0
+        finishedInFuture: 0,
+        noFreshRuns: 1,
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
       },
       evidence: {
         total: 0,
@@ -849,6 +933,99 @@ describe('buildSourceRunHealthReport', () => {
       },
       running: 0,
       stale: 0
+    });
+    assert.deepEqual(result.report.blockers, ['source_run_no_fresh_success']);
+  });
+
+  it('blocks daily ingestion readiness until every required chain has a fresh successful source run', () => {
+    const report = buildSourceRunHealthReport({
+      now: '2026-05-20T08:30:00.000Z',
+      maxRunningMinutes: 30,
+      staleAfterMinutes: 24 * 60,
+      requiredFreshChainIds: ['ica', 'willys', 'coop'],
+      runs: [
+        {
+          sourceRunId: 'fresh-willys',
+          sourceType: 'official_api',
+          sourceName: 'Willys normalized products',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          finishedAt: '2026-05-20T08:05:00.000Z',
+          status: 'succeeded',
+          provenance: { chainId: 'willys', cadence: 'daily' }
+        },
+        {
+          sourceRunId: 'fresh-ica',
+          sourceType: 'retailer_page',
+          sourceName: 'ICA products',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          finishedAt: '2026-05-20T08:06:00.000Z',
+          status: 'succeeded',
+          provenance: { chainId: 'ica', cadence: 'daily' }
+        }
+      ]
+    });
+
+    assert.equal(report.status, 'blocked');
+    assert.deepEqual(report.evidence, ['source_run_succeeded:fresh-ica', 'source_run_succeeded:fresh-willys']);
+    assert.deepEqual(report.blockers, ['source_run_missing_fresh_chain:coop']);
+    assert.deepEqual(summarizeSourceRunHealthReport(report).blockers, {
+      total: 1,
+      failed: 0,
+      partial: 0,
+      stale: 0,
+      stuckRunning: 0,
+      missingFinishedAt: 0,
+      startedInFuture: 0,
+      finishedInFuture: 0,
+      noFreshRuns: 0,
+      missingFreshChains: 1,
+      insufficientAcceptedRows: 0
+    });
+  });
+
+  it('blocks daily ingestion readiness when a fresh chain run has too few accepted rows', () => {
+    const report = buildSourceRunHealthReport({
+      now: '2026-05-20T08:30:00.000Z',
+      maxRunningMinutes: 30,
+      staleAfterMinutes: 24 * 60,
+      requiredFreshChainIds: ['ica', 'willys'],
+      requiredAcceptedCountByChain: { ica: 10, willys: 10 },
+      runs: [
+        {
+          sourceRunId: 'fresh-willys',
+          sourceType: 'official_api',
+          sourceName: 'Willys normalized products',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          finishedAt: '2026-05-20T08:05:00.000Z',
+          status: 'succeeded',
+          provenance: { chainId: 'willys', cadence: 'daily', acceptedCount: 25 }
+        },
+        {
+          sourceRunId: 'fresh-ica-empty',
+          sourceType: 'retailer_page',
+          sourceName: 'ICA products',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          finishedAt: '2026-05-20T08:06:00.000Z',
+          status: 'succeeded',
+          provenance: { chainId: 'ica', cadence: 'daily', acceptedCount: 0 }
+        }
+      ]
+    });
+
+    assert.equal(report.status, 'blocked');
+    assert.deepEqual(report.blockers, ['source_run_insufficient_accepted_rows:ica:0/10']);
+    assert.deepEqual(summarizeSourceRunHealthReport(report).blockers, {
+      total: 1,
+      failed: 0,
+      partial: 0,
+      stale: 0,
+      stuckRunning: 0,
+      missingFinishedAt: 0,
+      startedInFuture: 0,
+      finishedInFuture: 0,
+      noFreshRuns: 0,
+      missingFreshChains: 0,
+      insufficientAcceptedRows: 1
     });
   });
 });

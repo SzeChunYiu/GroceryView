@@ -1,74 +1,110 @@
-import { AlertTriangle, ReceiptText, ShieldCheck, Users } from "lucide-react";
-import { householdMembers } from "@/components/sample-data";
+import { Card, Eyebrow, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { HouseholdPlanActions } from '@/components/household-plan-actions';
+import { formatPct, formatSek, shareableHouseholdListContract, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
 
-const householdStats = [
-  { label: "Monthly budget", value: "6 800 kr", detail: "Shared grocery target", icon: ReceiptText },
-  { label: "Active members", value: String(householdMembers.length), detail: "2 shoppers, 1 reviewer", icon: Users },
-  { label: "Diet alerts", value: "2", detail: "Nut and pork checks", icon: AlertTriangle },
-  { label: "Sharing policy", value: "Limited", detail: "Line totals only", icon: ShieldCheck },
+export function generateMetadata() {
+  return routeMetadata('/household');
+}
+
+const titles: Record<string, string> = {
+  'weekly-basket': 'Weekly basket planner',
+  watchlist: 'Watchlist alerts',
+  scanner: 'Receipt scanner',
+  household: 'Household profile',
+  account: 'Account and alerts',
+  'basket-ideas': 'Basket ideas',
+  'coupon-stacks': 'Coupon stacks',
+  deals: 'Deal radar',
+  'meal-planner': 'Meal planner',
+  'nutrition-value': 'Nutrition value',
+  'pantry-planner': 'Pantry planner',
+  'price-reports': 'Price reports',
+  'savings-dashboard': 'Savings dashboard',
+  'shopping-trips': 'Shopping trips',
+  privacy: 'Privacy controls'
+};
+
+const householdEvidence = [
+  {
+    label: 'Verified sources',
+    value: sourceCoverage.length.toLocaleString('sv-SE'),
+    detail: 'Only generated public source modules are used on this static route.'
+  },
+  {
+    label: 'Comparable chain rows',
+    value: topChainSpreads.length.toLocaleString('sv-SE'),
+    detail: 'Household planning can compare Willys/Hemköp spreads without private profiles.'
+  },
+  {
+    label: 'Private records rendered',
+    value: '0',
+    detail: 'Names, budgets, receipt queues, and dietary rules stay hidden until verified account data exists.'
+  }
 ];
 
-export default function HouseholdPage() {
+export default function FeaturePage() {
+  const route = 'household';
+  const planningRows = topChainSpreads.slice(0, 4);
+
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-6 py-8">
-      <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Household</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-zinc-950">Shared grocery controls</h1>
-          <p className="mt-4 max-w-2xl leading-7 text-zinc-600">
-            Coordinate budgets, dietary rules, and review duties without exposing payment details or private receipt images.
-          </p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {householdStats.map((stat) => {
-            const Icon = stat.icon;
+    <PageShell>
+      <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
+      <HouseholdPlanActions />
 
-            return (
-              <article className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm" key={stat.label}>
-                <div className="flex items-center justify-between gap-3">
-                  <Icon className="h-5 w-5 text-emerald-700" aria-hidden="true" />
-                  <p className="text-2xl font-semibold tabular-nums text-zinc-950">{stat.value}</p>
-                </div>
-                <p className="mt-3 text-sm font-semibold text-zinc-950">{stat.label}</p>
-                <p className="mt-1 text-sm text-zinc-500">{stat.detail}</p>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
-        <div className="grid gap-3 border-b border-zinc-200 bg-zinc-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 md:grid-cols-[0.9fr_0.7fr_0.6fr_1fr]">
-          <span>Member</span>
-          <span>Role</span>
-          <span>Budget</span>
-          <span>Dietary rules</span>
-        </div>
-        {householdMembers.map((member) => (
-          <article className="grid gap-3 border-b border-zinc-200 px-5 py-4 last:border-b-0 md:grid-cols-[0.9fr_0.7fr_0.6fr_1fr]" key={member.name}>
-            <p className="font-semibold text-zinc-950">{member.name}</p>
-            <p className="text-zinc-700">{member.role}</p>
-            <p className="font-semibold tabular-nums text-zinc-950">{member.budgetShare}%</p>
-            <p className="text-zinc-600">{member.dietaryTags}</p>
-          </article>
+      <section className="mt-6 grid gap-4 md:grid-cols-3">
+        {householdEvidence.map((item) => (
+          <Card key={item.label} className="p-4">
+            <p className="text-sm font-semibold text-slate-600">{item.label}</p>
+            <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">{item.value}</p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{item.detail}</p>
+          </Card>
         ))}
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <Panel title="Approval rule" value="Review over 400 kr" detail="Large receipts need owner approval before household totals update." />
-        <Panel title="Substitution guard" value="Diet first" detail="Smart swaps must satisfy member restrictions before price ranking." />
-        <Panel title="Export scope" value="Totals only" detail="Shared exports omit payment methods, precise locations, and raw images." />
-      </section>
-    </main>
-  );
-}
+      <Card className="mt-6">
+        <Eyebrow>Shareable household lists</Eyebrow>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">role-based permissions before any shared grocery list can edit account state</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+          {shareableHouseholdListContract.corePlanner} keeps shared lists account-bound: viewers can open an expiring list, editors must already be signed-in household members, and missing-price blockers stay visible to everyone. No anonymous household edits are allowed.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {shareableHouseholdListContract.roles.map((role) => (
+            <div key={role.role} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">{role.role}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">{role.label}</p>
+            </div>
+          ))}
+        </div>
+        <ul className="mt-4 grid gap-2 text-sm leading-6 text-slate-600 md:grid-cols-2">
+          {shareableHouseholdListContract.guardrails.map((guardrail) => <li key={guardrail}>• {guardrail}</li>)}
+        </ul>
+      </Card>
 
-function Panel({ title, value, detail }: { title: string; value: string; detail: string }) {
-  return (
-    <article className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-      <p className="text-sm text-zinc-500">{title}</p>
-      <p className="mt-2 text-xl font-semibold text-zinc-950">{value}</p>
-      <p className="mt-2 text-sm leading-6 text-zinc-600">{detail}</p>
-    </article>
+      <section className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <Card>
+          <Eyebrow>Household planning evidence</Eyebrow>
+          <h2 className="mt-2 text-2xl font-black tracking-tight">Verified price context without private rows</h2>
+          <div className="mt-5 divide-y divide-slate-200">
+            {planningRows.map((product) => (
+              <div className="grid gap-3 py-4 md:grid-cols-[1fr_auto_auto]" key={product.slug}>
+                <div>
+                  <p className="font-black text-slate-950">{product.name}</p>
+                  <p className="text-sm text-slate-600">{product.brand || 'Brand not reported'} · {product.subline || 'Size not reported'}</p>
+                </div>
+                <p className="font-black text-emerald-800">{formatSek(product.lowestPrice)}</p>
+                <p className="rounded-full bg-amber-100 px-3 py-1 text-sm font-black text-amber-950">{formatPct(product.spreadPct)} spread</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <TopSpreads limit={4} />
+      </section>
+
+      <div className="mt-6">
+        <SourceCoverage />
+      </div>
+    </PageShell>
   );
 }

@@ -58,7 +58,7 @@ export type NotificationSuppressionResult = {
 
 export type HumanReviewSlaAssignment = {
   reviewId: string;
-  subjectType: 'product_match' | 'community_report';
+  subjectType: 'product_match' | 'community_report' | 'commodity_mapping';
   priority: 'high' | 'medium' | 'low';
   assigneeId: string;
   dueAt: string;
@@ -90,6 +90,19 @@ export type DeliveryMessage = {
 
 export type NotificationProvider = {
   send(message: DeliveryMessage): Promise<string>;
+};
+
+export type NotificationProviderFetch = (url: string, init: RequestInit) => Promise<Response>;
+
+export type SendgridEmailProviderOptions = {
+  apiKey: string;
+  fromEmail: string;
+  fetch?: NotificationProviderFetch;
+};
+
+export type ExpoPushProviderOptions = {
+  accessToken?: string;
+  fetch?: NotificationProviderFetch;
 };
 
 export type NotificationProviders = Partial<Record<DeliveryChannel, NotificationProvider>>;
@@ -302,6 +315,130 @@ function buildMessage(notification: DeliveryNotification): DeliveryMessage {
       type: notification.type,
       priority: notification.priority,
       sendAt: notification.sendAt
+    }
+  };
+}
+
+
+function requireProviderSecret(value: string | undefined, name: string): string {
+  if (!value?.trim()) throw new Error(`${name} is required.`);
+  return value.trim();
+}
+
+function defaultFetch(): NotificationProviderFetch {
+  if (typeof fetch !== 'function') throw new Error('fetch is not available for notification provider delivery.');
+  return (url, init) => fetch(url, init);
+}
+
+function providerMetadataArgs(message: DeliveryMessage): Record<string, string> {
+  return {
+    type: message.metadata.type,
+    priority: message.metadata.priority,
+    sendAt: message.metadata.sendAt
+  };
+}
+
+function readProviderError(payload: unknown, fallback: string): string {
+  if (isRecord(payload)) {
+    const message = readString(payload, 'message') ?? readString(payload, 'error');
+    if (message) return message;
+    const errors = payload.errors;
+    if (Array.isArray(errors) && isRecord(errors[0])) {
+      const first = readString(errors[0], 'message') ?? readString(errors[0], 'error');
+      if (first) return first;
+    }
+  }
+  return fallback;
+}
+
+export function createSendgridEmailProvider(options: SendgridEmailProviderOptions): NotificationProvider {
+  const apiKey = requireProviderSecret(options.apiKey, 'SendGrid API key');
+  const fromEmail = requireProviderSecret(options.fromEmail, 'SendGrid from email');
+  const fetcher = options.fetch ?? defaultFetch();
+
+  return {
+    async send(message) {
+      const response = await fetcher('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${apiKey}`,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          personalizations: [
+            {
+              to: [{ email: message.recipient }],
+              custom_args: providerMetadataArgs(message)
+            }
+          ],
+          from: { email: fromEmail },
+          subject: message.title,
+          content: [{ type: 'text/plain', value: message.body }]
+        })
+      });
+
+      if (!response.ok) {
+        let payload: unknown = null;
+        try {
+          payload = await response.json();
+        } catch {
+          // Keep the fallback below if SendGrid returns a non-JSON error body.
+        }
+        throw new Error(`SendGrid delivery failed: ${readProviderError(payload, `${response.status} ${response.statusText}`.trim())}`);
+      }
+
+      return response.headers.get('x-message-id') ?? `sendgrid:${message.recipient}:${message.metadata.sendAt}`;
+    }
+  };
+}
+
+export function createExpoPushProvider(options: ExpoPushProviderOptions = {}): NotificationProvider {
+  const accessToken = options.accessToken?.trim();
+  const fetcher = options.fetch ?? defaultFetch();
+
+  return {
+    async send(message) {
+      const headers: Record<string, string> = {
+        accept: 'application/json',
+        'content-type': 'application/json'
+      };
+      if (accessToken) headers.authorization = `Bearer ${accessToken}`;
+
+      const response = await fetcher('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          to: message.recipient,
+          title: message.title,
+          body: message.body,
+          priority: message.metadata.priority === 'high' ? 'high' : 'default',
+          data: {
+            type: message.metadata.type,
+            sendAt: message.metadata.sendAt
+          }
+        })
+      });
+
+      let payload: unknown = null;
+      try {
+        payload = await response.json();
+      } catch {
+        // Expo normally returns JSON; keep fallback errors for non-JSON failures.
+      }
+
+      if (!response.ok) {
+        throw new Error(`Expo push delivery failed: ${readProviderError(payload, `${response.status} ${response.statusText}`.trim())}`);
+      }
+
+      const tickets = isRecord(payload) && Array.isArray(payload.data) ? payload.data : [];
+      const ticket = tickets.find(isRecord);
+      if (!ticket) throw new Error('Expo push delivery failed: missing ticket.');
+      if (ticket.status !== 'ok') {
+        const detailError = isRecord(ticket.details) ? readString(ticket.details, 'error') : undefined;
+        throw new Error(`Expo push rejected: ${detailError ?? readString(ticket, 'message') ?? 'unknown error'}`);
+      }
+
+      return readString(ticket, 'id') ?? `expo:${message.recipient}:${message.metadata.sendAt}`;
     }
   };
 }

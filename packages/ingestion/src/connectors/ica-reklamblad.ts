@@ -48,11 +48,21 @@ type IcaWeeklyOffer = {
 };
 
 export const ICA_REKLAMBLAD_OFFER_PAGE_URL = 'https://www.ica.se/erbjudanden/ica-focus-1004247/';
+export const DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS = [
+  ICA_REKLAMBLAD_OFFER_PAGE_URL,
+  'https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/',
+  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-solna-1003380/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-kungsholmen-1004599/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-faltoversten-1004228/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-sodermalm-1004222/',
+  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-bromma-1015001/'
+] as const;
 export const EMAGIN_PDF_API_BASE_URL = 'https://api.e-magin.se/api/pdf/';
 
 export type FetchIcaReklambladOffersOptions = {
   fetchImpl?: typeof fetch;
   sourceUrl?: string;
+  sourceUrls?: readonly string[];
   maxRows?: number;
   retrievedAt?: string;
 };
@@ -61,24 +71,34 @@ export async function fetchIcaReklambladOffers(
   options: FetchIcaReklambladOffersOptions = {}
 ): Promise<IcaReklambladOffer[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const sourceUrl = options.sourceUrl ?? ICA_REKLAMBLAD_OFFER_PAGE_URL;
+  const sourceUrls = options.sourceUrls ?? [options.sourceUrl ?? ICA_REKLAMBLAD_OFFER_PAGE_URL];
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
-  const response = await fetchImpl(sourceUrl, {
-    headers: {
-      accept: 'text/html,application/xhtml+xml',
-      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-    }
-  });
+  const maxRows = options.maxRows ?? 150;
+  const rows: IcaReklambladOffer[] = [];
 
-  if (!response.ok) {
-    throw new Error(`ICA reklamblad offer page request failed: ${response.status}`);
+  for (const sourceUrl of sourceUrls) {
+    const response = await fetchImpl(sourceUrl, {
+      headers: {
+        accept: 'text/html,application/xhtml+xml',
+        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`ICA reklamblad offer page request failed for ${sourceUrl}: ${response.status}`);
+    }
+
+    rows.push(...parseIcaReklambladOffers(await response.text(), {
+      sourceUrl,
+      retrievedAt,
+      maxRows: maxRows - rows.length
+    }));
+    if (rows.length >= maxRows) {
+      return rows;
+    }
   }
 
-  return parseIcaReklambladOffers(await response.text(), {
-    sourceUrl,
-    retrievedAt,
-    maxRows: options.maxRows ?? 75
-  });
+  return rows;
 }
 
 export function parseIcaReklambladOffers(
@@ -106,7 +126,7 @@ export function parseIcaReklambladOffers(
     }
     seenCodes.add(row.code);
     rows.push(row);
-    if (rows.length >= (context.maxRows ?? 75)) {
+    if (rows.length >= (context.maxRows ?? 150)) {
       return rows;
     }
   }

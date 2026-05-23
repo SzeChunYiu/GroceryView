@@ -3,12 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="GroceryView tracks Stockholm grocery prices like a market terminal." />
-    <title>GroceryView — TradingView for groceries</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <meta name="description" content="GroceryView renders verified grocery price, product, and store snapshots without fabricated placeholder data." />
+    <title>GroceryView — verified grocery data</title>
+    <style>
+      body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f5f1e8;color:#0f172a;font-family:Georgia,Cambria,serif}.card{max-width:760px;margin:24px;padding:32px;border:1px solid #d6d3c7;border-radius:28px;background:white;box-shadow:0 20px 60px rgba(15,23,42,.08)}p{font-size:18px;line-height:1.7}a{color:#065f46;font-weight:900}
+    </style>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/assets/main.js"></script>
+    <main class="card">
+      <p style="font-size:12px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:#065f46">GroceryView static entry</p>
+      <h1>Use the Next.js app for the redesigned verified interface.</h1>
+      <p>This fallback page intentionally contains no sample baskets, fake accounts, or placeholder prices. The live interface is generated from Axfood, OpenPrices, and OpenStreetMap snapshot modules.</p>
+      <p><a href="/">Open GroceryView</a></p>
+    </main>
   </body>
 </html>

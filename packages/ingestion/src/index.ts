@@ -1,14 +1,77 @@
 import { createHash } from 'node:crypto';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { dirname } from 'node:path';
+import {
+  createPgQueryExecutor,
+  createPostgresProductAliasRepository,
+  createPostgresSourceRecordWriter,
+  type PriceType as DbPriceType,
+  type QueryExecutor,
+  type PgLikeClient,
+  type SourceRunRecord
+} from '@groceryview/db';
+import { COMMODITIES, findCommodity, type Commodity } from '@groceryview/catalog';
+import {
+  fetchCityGrossProductsForAllStores,
+  type CityGrossProduct
+} from './connectors/citygross.js';
+import {
+  fetchCoopProductsForAllStores,
+  fetchCoopWeeklyDiscountsForAllStores,
+  type CoopStoreProduct,
+  type CoopWeeklyDiscount
+} from './connectors/coop.js';
+import {
+  fetchHemkopProductsForAllStores,
+  fetchHemkopWeeklyDiscountsForAllStores,
+  type HemkopStoreProduct,
+  type HemkopWeeklyDiscount
+} from './connectors/hemkop.js';
+import {
+  extractOpenFoodFactsBarcodeFromAxfoodImageUrl,
+  extractOpenFoodFactsBarcodeFromImageUrl,
+  fetchOpenFoodFactsExportProducts,
+  OPENFOODFACTS_EXPORT_URL,
+  type OpenFoodFactsProduct,
+  type OpenFoodFactsRetailerEnrichment
+} from './connectors/openfoodfacts.js';
+import {
+  DEFAULT_ICA_STORE_CONFIGS,
+  fetchIcaDefaultStoreProducts,
+  type IcaProduct,
+  type IcaStoreConfig
+} from './connectors/ica.js';
+import {
+  fetchLidlOffersForAllStores,
+  type LidlStoreOffer
+} from './connectors/lidl.js';
+import {
+  fetchOkq8FuelPrices,
+  OKQ8_FUEL_PRICES_URL,
+  type FuelGradeId,
+  type FuelPriceSourceKind,
+  type FuelPriceObservation
+} from './connectors/okq8-fuel.js';
+import {
+  fetchWillysProductsForAllStores,
+  fetchWillysWeeklyDiscountsForAllStores,
+  type WillysStoreProduct,
+  type WillysWeeklyDiscount
+} from './connectors/willys.js';
 
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/overpass.js';
+export * from './connectors/citygross.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
 export * from './connectors/ica-reklamblad.js';
+export * from './connectors/lidl.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
+export * from './connectors/okq8-fuel.js';
 export * from './connectors/willys.js';
 
 export type SourceType =
@@ -1524,6 +1587,456 @@ export async function fetchRetailerConnectorSnapshot(
   };
 }
 
+type ParsedPackageQuantity = {
+  packageSize: number;
+  packageUnit: string;
+};
+
+function parseNativePackageText(value: string): ParsedPackageQuantity {
+  const match = value.match(/(\d+(?:[,.]\d+)?)\s*(kg|g|gram|l|liter|ml|st|styck|pcs|piece|pack)\b/i);
+  if (!match) return { packageSize: 1, packageUnit: 'piece' };
+  const unit = match[2].toLowerCase();
+  const packageUnit = unit === 'st' || unit === 'styck' || unit === 'pack' ? 'piece' : unit === 'liter' ? 'l' : unit === 'gram' ? 'g' : unit;
+  return { packageSize: Number(match[1].replace(',', '.')), packageUnit };
+}
+
+function nativePriceFromText(value: string): number | undefined {
+  const match = value.match(/(\d+(?:[,.]\d+)?)/);
+  if (!match) return undefined;
+  const parsed = Number(match[1].replace(',', '.'));
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function dailyNativeNumberParam(url: URL, name: string): number | undefined {
+  const value = url.searchParams.get(name);
+  if (value === null || value.trim() === '') return undefined;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1) throw new Error(`${name} must be a positive integer.`);
+  return parsed;
+}
+
+function dailyNativeStringListParam(url: URL, name: string): string[] | undefined {
+  const value = url.searchParams.get(name);
+  if (value === null || value.trim() === '') return undefined;
+  return value.split(',').map((part) => part.trim()).filter(Boolean);
+}
+
+function validDailyBarcode(value: string | undefined): string | undefined {
+  const barcode = value?.trim();
+  return barcode && /^\d{8,14}$/.test(barcode) ? barcode : undefined;
+}
+
+function dailyProductIdForBarcode(prefix: string, fallback: string, barcode?: string): string {
+  const normalizedBarcode = validDailyBarcode(barcode);
+  return normalizedBarcode ? `ean-${stableKeyPart(normalizedBarcode)}` : `${prefix}-${stableKeyPart(fallback)}`;
+}
+
+function willysWeeklyDiscountToDailyItem(row: WillysWeeklyDiscount): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const regularPrice = nativePriceFromText(row.regularPriceText);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromAxfoodImageUrl(row.imageUrl));
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('willys', row.productCode || row.code, barcode),
+    categoryId: stableKeyPart(row.category || 'weekly-offers'),
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: regularPrice !== undefined && regularPrice > row.price ? regularPrice : undefined,
+    promoText: row.conditionText || row.priceText || undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function willysStoreProductToDailyItem(row: WillysStoreProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromAxfoodImageUrl(row.imageUrl));
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('willys', row.code, barcode),
+    categoryId: stableKeyPart(row.category || 'willys-products'),
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+
+function hemkopStoreProductToDailyItem(row: HemkopStoreProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromAxfoodImageUrl(row.imageUrl));
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('hemkop', row.code, barcode),
+    categoryId: stableKeyPart(row.category || 'hemkop-products'),
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const regularPrice = nativePriceFromText(row.regularPriceText);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromAxfoodImageUrl(row.imageUrl));
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('hemkop', row.productCode || row.code, barcode),
+    categoryId: stableKeyPart(row.category || 'weekly-offers'),
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: regularPrice !== undefined && regularPrice > row.price ? regularPrice : undefined,
+    promoText: row.conditionText || row.priceText || undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageSize);
+  const price = row.promoPrice ?? row.price;
+  if (price === null) throw new Error(`ICA product ${row.retailerProductId} had no current or promotion price.`);
+  const barcode = validDailyBarcode(extractOpenFoodFactsBarcodeFromImageUrl(row.imageUrl));
+  return {
+    storeId: row.storeAccountId,
+    retailerProductId: row.retailerProductId || row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('ica', row.productId || row.retailerProductId || row.code, barcode),
+    categoryId: stableKeyPart(row.categories[0] || 'ica-store-promotions'),
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price,
+    regularPrice: row.promoPrice !== null && row.price !== null && row.price > row.promoPrice ? row.price : undefined,
+    promoText: row.promotionDescription || undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(row.ean);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('coop', row.ean || row.code, barcode),
+    categoryId: 'weekly-offers',
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.offerPrice,
+    regularPrice: row.ordinaryPrice > row.offerPrice ? row.ordinaryPrice : undefined,
+    promoText: row.offerMechanicText || row.offerPriceText || undefined,
+    memberOnly: row.medMeraRequired,
+    validFrom: row.validFrom,
+    validUntil: row.validTo,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function coopStoreProductToDailyItem(row: CoopStoreProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(row.ean);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('coop', row.ean || row.code, barcode),
+    categoryId: stableKeyPart(row.category || 'coop-products'),
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.promotionPrice ?? row.price,
+    regularPrice: row.promotionPrice !== null && row.price > row.promotionPrice ? row.price : undefined,
+    promoText: row.promotionText || undefined,
+    memberOnly: row.medMeraRequired,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function lidlStoreOfferToDailyItem(row: LidlStoreOffer): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `lidl-${stableKeyPart(row.code)}`,
+    categoryId: stableKeyPart(row.category || 'lidl-public-offers'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: row.regularPrice !== null && row.regularPrice > row.price ? row.regularPrice : undefined,
+    promoText: row.promotionText || undefined,
+    memberOnly: row.memberOnly,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const barcode = validDailyBarcode(row.gtin);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode('citygross', row.gtin || row.code, barcode),
+    categoryId: stableKeyPart(row.category || 'city-gross-products'),
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: row.regularPrice !== null && row.regularPrice > row.price ? row.regularPrice : undefined,
+    promoText: row.regularPrice !== null && row.regularPrice > row.price ? 'City Gross discounted public price' : undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorParsedProduct {
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.observedAt,
+    chainId: row.chainId,
+    retailerProductId: row.productId,
+    rawName: row.gradeLabel,
+    canonicalName: row.gradeLabel,
+    productId: row.productId,
+    categoryId: 'fuel',
+    fuelGradeId: row.productId,
+    fuelSource: {
+      sourceKind: row.sourceKind,
+      fuelGradeId: row.productId,
+      originalPriceText: row.provenance.originalPriceText,
+      originalEffectiveDate: row.effectiveFrom
+    },
+    brand: row.operatorName,
+    packageSize: 1,
+    packageUnit: 'l',
+    price: row.pricePerLitre,
+    memberOnly: false,
+    validFrom: row.effectiveFrom,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function dailyNativeSnapshotResult(input: {
+  plan: RetailerConnectorRunPlan;
+  retrievedAt: string;
+  items: RetailerConnectorParsedProduct[];
+}): RetailerConnectorFetchResult {
+  const body = JSON.stringify({ items: input.items });
+  const contentHash = contentHashFor(body);
+  const refHash = contentHash.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
+  return {
+    statusCode: 200,
+    body,
+    contentType: 'application/json',
+    retrievedAt: input.retrievedAt,
+    sourceUrl: input.plan.provenance.sourceUrl,
+    rawSnapshotRef: `raw://daily-native/${stableKeyPart(input.plan.sourceRunId)}/${refHash}`,
+    contentHash
+  };
+}
+
+export async function fetchDailyConnectorSnapshot(
+  plan: RetailerConnectorRunPlan,
+  options: FetchRetailerConnectorSnapshotOptions = {}
+): Promise<RetailerConnectorFetchResult> {
+  const sourceUrl = plan.provenance.sourceUrl;
+  if (sourceUrl === GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchWillysWeeklyDiscountsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const maxStores = dailyNativeNumberParam(url, 'maxStores');
+    const stores: readonly IcaStoreConfig[] | undefined = maxStores
+      ? DEFAULT_ICA_STORE_CONFIGS.slice(0, maxStores)
+      : undefined;
+    const rows = await fetchIcaDefaultStoreProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      stores,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      maxPageSize: dailyNativeNumberParam(url, 'maxPageSize'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(icaProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchWillysProductsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysStoreProductToDailyItem) });
+  }
+
+
+  if (sourceUrl === GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchHemkopProductsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(hemkopStoreProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchHemkopWeeklyDiscountsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(hemkopWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCoopWeeklyDiscountsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      productQueries: dailyNativeStringListParam(url, 'productQueries'),
+      includeStoreDetails: url.searchParams.has('includeStoreDetails')
+        ? url.searchParams.get('includeStoreDetails') === 'true'
+        : undefined,
+      subscriptionKey: url.searchParams.get('subscriptionKey') ?? undefined,
+      storeApiSubscriptionKey: url.searchParams.get('storeApiSubscriptionKey') ?? undefined,
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(coopWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCoopProductsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      includeStoreDetails: url.searchParams.has('includeStoreDetails')
+        ? url.searchParams.get('includeStoreDetails') === 'true'
+        : undefined,
+      subscriptionKey: url.searchParams.get('subscriptionKey') ?? undefined,
+      storeApiSubscriptionKey: url.searchParams.get('storeApiSubscriptionKey') ?? undefined,
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(coopStoreProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchLidlOffersForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      offerPaths: dailyNativeStringListParam(url, 'paths'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lidlStoreOfferToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCityGrossProductsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(cityGrossProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL}?`)) {
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchOkq8FuelPrices({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      capturedAt: retrievedAt,
+      sourceUrl: OKQ8_FUEL_PRICES_URL
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(okq8FuelPriceToDailyItem) });
+  }
+
+  return await fetchRetailerConnectorSnapshot(plan, options);
+}
+
 export async function runRetailerConnector(input: RetailerConnectorRunInput): Promise<RetailerConnectorRunResult> {
   const plan = planRetailerConnectorRun(input);
   const baseResult = {
@@ -1625,6 +2138,18 @@ function optionalBoolean(record: Record<string, unknown>, key: string, path: str
   throw new Error(`${path}.${key} must be a boolean.`);
 }
 
+function optionalFuelSource(record: Record<string, unknown>, path: string): RetailerProductInput['fuelSource'] {
+  const value = record.fuelSource;
+  if (value === undefined || value === null) return undefined;
+  const source = recordFrom(value, `${path}.fuelSource`);
+  return {
+    sourceKind: requiredString(source, 'sourceKind', `${path}.fuelSource`) as FuelPriceSourceKind,
+    fuelGradeId: requiredString(source, 'fuelGradeId', `${path}.fuelSource`) as FuelGradeId,
+    originalPriceText: requiredString(source, 'originalPriceText', `${path}.fuelSource`),
+    originalEffectiveDate: optionalString(source, 'originalEffectiveDate', `${path}.fuelSource`)
+  };
+}
+
 export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnapshot): RetailerConnectorParsedProduct[] {
   let payload: unknown;
   try {
@@ -1640,12 +2165,19 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
     const path = `items[${index}]`;
     const record = recordFrom(item, path);
     return {
+      sourceType: optionalString(record, 'sourceType', path) as SourceType | undefined,
+      parserVersion: optionalString(record, 'parserVersion', path),
+      rawSnapshotRef: optionalString(record, 'rawSnapshotRef', path),
+      sourceRunId: optionalString(record, 'sourceRunId', path),
+      chainId: optionalString(record, 'chainId', path),
       storeId: optionalString(record, 'storeId', path),
       retailerProductId: optionalString(record, 'retailerProductId', path),
       rawName: requiredString(record, 'rawName', path),
       canonicalName: requiredString(record, 'canonicalName', path),
       productId: requiredString(record, 'productId', path),
       categoryId: requiredString(record, 'categoryId', path),
+      fuelGradeId: optionalString(record, 'fuelGradeId', path) as FuelGradeId | undefined,
+      fuelSource: optionalFuelSource(record, path),
       brand: optionalString(record, 'brand', path),
       packageSize: requiredNumber(record, 'packageSize', path),
       packageUnit: requiredString(record, 'packageUnit', path),
@@ -1653,6 +2185,8 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
       regularPrice: optionalNumber(record, 'regularPrice', path),
       promoText: optionalString(record, 'promoText', path),
       memberOnly: optionalBoolean(record, 'memberOnly', path),
+      validFrom: optionalString(record, 'validFrom', path),
+      validUntil: optionalString(record, 'validUntil', path),
       observedAt: optionalString(record, 'observedAt', path),
       sourceUrl: optionalString(record, 'sourceUrl', path)
     };
@@ -1819,13 +2353,29 @@ export type RetailerProductInput = {
   canonicalName: string;
   productId: string;
   categoryId: string;
+  barcode?: string;
+  productKind?: 'branded' | 'commodity';
+  commodityId?: string;
+  fuelGradeId?: FuelGradeId;
+  fuelSource?: {
+    sourceKind: FuelPriceSourceKind;
+    fuelGradeId: FuelGradeId;
+    originalPriceText: string;
+    originalEffectiveDate?: string;
+  };
   brand?: string;
+  variant?: string;
+  isOrganic?: boolean;
+  originCountry?: string;
+  soldByWeight?: boolean;
   packageSize: number;
   packageUnit: string;
   price: number;
   regularPrice?: number;
   promoText?: string;
   memberOnly?: boolean;
+  validFrom?: string;
+  validUntil?: string;
   sourceUrl?: string;
 };
 
@@ -1852,7 +2402,14 @@ export type IngestedProduct = {
   id: string;
   canonicalName: string;
   brand?: string;
+  barcode?: string;
   categoryId: string;
+  productKind: 'branded' | 'commodity';
+  commodityId?: string;
+  fuelGradeId?: FuelGradeId;
+  variant?: string;
+  isOrganic: boolean;
+  originCountry?: string;
   packageSize: number;
   packageUnit: string;
   comparableUnit: string;
@@ -1880,6 +2437,8 @@ export type IngestedPriceObservation = {
   memberPrice?: number;
   promoType?: string;
   priceType: PriceType;
+  validFrom?: string;
+  validUntil?: string;
   sourceType: SourceType;
   sourceUrl?: string;
   parserVersion: string;
@@ -1889,6 +2448,7 @@ export type IngestedPriceObservation = {
   confidenceScore: number;
   isOnlinePrice: boolean;
   isInstorePrice: boolean;
+  fuelSource?: RetailerProductInput['fuelSource'];
 };
 
 export type IngestedPromotionObservation = {
@@ -1900,6 +2460,8 @@ export type IngestedPromotionObservation = {
   promoText: string;
   memberOnly: boolean;
   priceType: PriceType;
+  validFrom?: string;
+  validUntil?: string;
   sourceType: SourceType;
   provenance: PriceProvenance;
   confidenceScore: number;
@@ -1921,6 +2483,9 @@ function validateInput(input: RetailerProductInput): void {
   if (!input.parserVersion.trim()) throw new Error('parserVersion is required.');
   if (!input.rawSnapshotRef.trim()) throw new Error('rawSnapshotRef is required.');
   if (Number.isNaN(Date.parse(input.observedAt))) throw new Error('observedAt must be an ISO date.');
+  if (input.validFrom !== undefined && Number.isNaN(Date.parse(input.validFrom))) throw new Error('validFrom must be an ISO date.');
+  if (input.validUntil !== undefined && Number.isNaN(Date.parse(input.validUntil))) throw new Error('validUntil must be an ISO date.');
+  if (input.originCountry !== undefined && !/^[a-z]{2}$/i.test(input.originCountry)) throw new Error('originCountry must be an ISO-3166 alpha-2 code.');
 }
 
 function priceTypeForSource(input: RetailerProductInput, hasPromotion: boolean): PriceType {
@@ -1935,9 +2500,65 @@ function priceTypeForSource(input: RetailerProductInput, hasPromotion: boolean):
   return 'estimated';
 }
 
+const normalizeSearchText = (value: string): string => value
+  .toLowerCase()
+  .normalize('NFD')
+  .replace(/\p{Diacritic}/gu, '')
+  .replace(/[^a-z0-9]+/g, ' ')
+  .trim();
+
+function commodityTerms(commodity: Commodity): string[] {
+  return [
+    commodity.slug.replace(/-/g, ' '),
+    commodity.nameSv,
+    commodity.nameEn,
+    ...(commodity.variants ?? [])
+  ].map(normalizeSearchText).filter(Boolean);
+}
+
+function categoryHintsMatch(input: RetailerProductInput, commodity: Commodity): boolean {
+  const category = normalizeSearchText(input.categoryId);
+  return commodity.categoryPath
+    .map(normalizeSearchText)
+    .some((hint) => hint.length > 0 && (category.includes(hint) || hint.includes(category)));
+}
+
+function resolveCommodity(input: RetailerProductInput): Commodity | null {
+  if (input.commodityId) {
+    const explicit = findCommodity(input.commodityId);
+    if (!explicit) throw new Error(`Unknown commodityId: ${input.commodityId}`);
+    return explicit;
+  }
+
+  const haystack = normalizeSearchText(`${input.rawName} ${input.canonicalName} ${input.categoryId}`);
+  return COMMODITIES.find((commodity) => {
+    const hasNameMatch = commodityTerms(commodity).some((term) => term.length > 0 && haystack.includes(term));
+    return hasNameMatch && (categoryHintsMatch(input, commodity) || input.soldByWeight === true || input.productKind === 'commodity');
+  }) ?? null;
+}
+
+function classifyRetailerProduct(input: RetailerProductInput): {
+  productKind: 'branded' | 'commodity';
+  commodityId?: string;
+  matchConfidence: number;
+} {
+  const sourceConfidence = confidenceForSource(input.sourceType);
+  const requiresCommodityResolution = input.productKind === 'commodity' || input.soldByWeight === true || input.commodityId !== undefined;
+  if (!requiresCommodityResolution) return { productKind: 'branded', matchConfidence: sourceConfidence };
+
+  const commodity = resolveCommodity(input);
+  if (!commodity) throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
+  return {
+    productKind: 'commodity',
+    commodityId: commodity.slug,
+    matchConfidence: Math.min(sourceConfidence, 0.68)
+  };
+}
+
 export function ingestRetailerProduct(input: RetailerProductInput): IngestionOutput {
   validateInput(input);
-  const confidence = confidenceForSource(input.sourceType);
+  const classification = classifyRetailerProduct(input);
+  const confidence = classification.matchConfidence;
   const normalized = normalizeUnitPrice(input);
   const hasPromotion = input.regularPrice !== undefined && input.regularPrice > input.price;
   const priceType = priceTypeForSource(input, hasPromotion);
@@ -1955,7 +2576,14 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       id: input.productId,
       canonicalName: input.canonicalName,
       brand: input.brand,
+      barcode: input.barcode,
       categoryId: input.categoryId,
+      productKind: classification.productKind,
+      commodityId: classification.commodityId,
+      fuelGradeId: input.fuelGradeId,
+      variant: input.variant,
+      isOrganic: input.isOrganic ?? (/\b(eko|ekologisk|organic)\b/i.test(input.rawName) || /\b(eko|ekologisk|organic)\b/i.test(input.canonicalName)),
+      originCountry: input.originCountry?.toUpperCase(),
       packageSize: input.packageSize,
       packageUnit: input.packageUnit,
       comparableUnit: normalized.comparableUnit
@@ -1980,6 +2608,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       promoPrice: hasPromotion ? input.price : undefined,
       promoType: hasPromotion ? 'discount' : undefined,
       priceType,
+      validFrom: input.validFrom,
+      validUntil: input.validUntil,
       sourceType: input.sourceType,
       sourceUrl: input.sourceUrl,
       parserVersion: input.parserVersion,
@@ -1988,7 +2618,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       provenance,
       confidenceScore: confidence,
       isOnlinePrice: input.sourceType === 'official_api' || input.sourceType === 'retailer_online_page',
-      isInstorePrice: input.sourceType === 'receipt_scan' || input.sourceType === 'shelf_photo' || input.sourceType === 'manual_user_report'
+      isInstorePrice: input.sourceType === 'receipt_scan' || input.sourceType === 'shelf_photo' || input.sourceType === 'manual_user_report',
+      fuelSource: input.fuelSource
     },
     promotionObservation: hasPromotion
       ? {
@@ -2000,6 +2631,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
           promoText: input.promoText ?? 'Promotion observed',
           memberOnly: input.memberOnly ?? false,
           priceType,
+          validFrom: input.validFrom,
+          validUntil: input.validUntil,
           sourceType: input.sourceType,
           provenance,
           confidenceScore: confidence
@@ -2024,4 +2657,1694 @@ export function planIngestionBatch(inputs: RetailerProductInput[]): IngestionBat
     }
   }
   return { accepted, rejected };
+}
+
+export type DailyIngestionStoreConfig = {
+  storeId: string;
+  name: string;
+  address: string;
+  city: string;
+  countryCode?: string;
+  district?: string;
+  latitude?: number;
+  longitude?: number;
+  storeType?: string;
+};
+
+export type DailyIngestionDomain = 'grocery' | 'fuel' | 'pharmacy';
+
+export type DailyIngestionConnectorConfig = Omit<RetailerConnectorPlanInput, 'requestedAt'> & {
+  requestedAt?: string;
+  domain?: DailyIngestionDomain;
+  stores?: DailyIngestionStoreConfig[];
+  requireStoreScopedPrices?: boolean;
+};
+
+export type DailyIngestionEnv = Partial<Record<
+  | 'DATABASE_URL'
+  | 'GROCERYVIEW_DAILY_CONNECTORS_JSON'
+  | 'GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE'
+  | 'GROCERYVIEW_DAILY_BLOCKER_LOG_PATH'
+  | 'GROCERYVIEW_DATABASE_URL'
+  | 'GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES'
+  | 'GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS'
+  | 'GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS'
+  | 'GROCERYVIEW_DAILY_MAX_CONNECTORS'
+  | 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS',
+  string
+>>;
+
+export type DailyIngestionEnvConfig = {
+  databaseUrl: string;
+  connectors: DailyIngestionConnectorConfig[];
+  runtimeOptions: DailyIngestionRuntimeOptions;
+  runner: {
+    maxConnectors?: number;
+    maxConcurrency?: number;
+    connectorStartDelayMs?: number;
+    connectorRetryAttempts?: number;
+    connectorRetryBaseDelayMs?: number;
+  };
+};
+
+export type DailyIngestionRunInput = {
+  executor: QueryExecutor;
+  requestedAt: string;
+  connectors: DailyIngestionConnectorConfig[];
+  fetchImpl?: typeof fetch;
+  /** Maximum number of connector fetch/parse/persist jobs to run at once. Defaults to one for conservative production DB sessions. */
+  maxConcurrency?: number;
+  /** Polite delay before a worker starts a connector after the first connector has been scheduled. */
+  connectorStartDelayMs?: number;
+  /** Number of extra attempts for transient connector fetch/parse failures before blocking the run. */
+  connectorRetryAttempts?: number;
+  /** Base delay between retries. Attempt N waits baseDelay * N. */
+  connectorRetryBaseDelayMs?: number;
+  /** File path for durable blocker diagnostics when a country-wide run is partial or blocked. */
+  blockerLogPath?: string;
+};
+
+export type DailyIngestionConnectorSummary = {
+  connectorId: string;
+  chainId: string;
+  status: 'succeeded' | 'partial' | 'blocked';
+  blockers: string[];
+  persistedRuns: number;
+  acceptedCount: number;
+  rejectedCount: number;
+  sourceRunIds: string[];
+  rawRecordIds: string[];
+  observationIds: string[];
+};
+
+export type DailyIngestionRunResult = {
+  status: 'succeeded' | 'partial' | 'blocked';
+  blockers: string[];
+  persistedRuns: number;
+  acceptedCount: number;
+  rejectedCount: number;
+  sourceRunIds: string[];
+  rawRecordIds: string[];
+  observationIds: string[];
+  chainSummaries: DailyIngestionConnectorSummary[];
+};
+
+type IdRow = { id: string };
+
+export const DEFAULT_DAILY_INGESTION_BLOCKER_LOG_PATH = 'codex-tasks/ingestion-blockers.txt';
+
+export type DailyIngestionRuntimeOptions = Required<Pick<
+  DailyIngestionRunInput,
+  'maxConcurrency' | 'connectorStartDelayMs' | 'connectorRetryAttempts' | 'connectorRetryBaseDelayMs'
+>> & {
+  blockerLogPath: string;
+};
+
+const dailyRequiredConnectorFields = [
+  'connectorId',
+  'chainId',
+  'sourceType',
+  'endpointUrl',
+  'parserVersion',
+  'robotsTxtStatus',
+  'legalReviewStatus',
+  'hasDataAgreement'
+] as const;
+
+export const requiredDailyIngestionChainIds = [
+  'ica',
+  'willys',
+  'coop',
+  'hemkop',
+  'lidl',
+  'city_gross'
+] as const;
+
+export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/willys/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/willys/products/all-stores';
+export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/hemkop/products/all-stores';
+export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/ica/store-promotions/default-stores';
+export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lidl/public-offers/all-stores';
+export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
+export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
+export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
+
+const requireForDailyIngestion = createRequire(import.meta.url);
+
+function parseDailyStoreConfigs(value: unknown, path: string): DailyIngestionStoreConfig[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) throw new Error(`${path} must be an array when provided.`);
+  return value.map((entry, index) => {
+    const storePath = `${path}[${index}]`;
+    if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) throw new Error(`${storePath} must be an object.`);
+    const record = entry as Record<string, unknown>;
+    for (const field of ['storeId', 'name', 'address', 'city']) {
+      if (typeof record[field] !== 'string' || !record[field].trim()) throw new Error(`${storePath}.${field} is required.`);
+    }
+    const optionalString = (field: string): string | undefined => {
+      const candidate = record[field];
+      if (candidate === undefined || candidate === null || candidate === '') return undefined;
+      if (typeof candidate !== 'string') throw new Error(`${storePath}.${field} must be a string.`);
+      return candidate.trim();
+    };
+    const optionalNumber = (field: string): number | undefined => {
+      const candidate = record[field];
+      if (candidate === undefined || candidate === null || candidate === '') return undefined;
+      const parsed = typeof candidate === 'number' ? candidate : Number(candidate);
+      if (!Number.isFinite(parsed)) throw new Error(`${storePath}.${field} must be a finite number.`);
+      return parsed;
+    };
+    return {
+      storeId: String(record.storeId).trim(),
+      name: String(record.name).trim(),
+      address: String(record.address).trim(),
+      city: String(record.city).trim(),
+      countryCode: optionalString('countryCode'),
+      district: optionalString('district'),
+      latitude: optionalNumber('latitude'),
+      longitude: optionalNumber('longitude'),
+      storeType: optionalString('storeType')
+    };
+  });
+}
+
+function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[] {
+  const parsed = JSON.parse(value) as unknown;
+  if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON must be a non-empty JSON array.');
+  const connectors = parsed.map((entry, index) => {
+    if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) {
+      throw new Error(`GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}] must be an object.`);
+    }
+    const record = entry as Record<string, unknown>;
+    for (const field of dailyRequiredConnectorFields) {
+      if (record[field] === undefined || record[field] === null || record[field] === '') {
+        throw new Error(`GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}].${field} is required.`);
+      }
+    }
+    return {
+      connectorId: String(record.connectorId),
+      requestedAt: typeof record.requestedAt === 'string' ? record.requestedAt : new Date().toISOString(),
+      chainId: String(record.chainId),
+      sourceType: record.sourceType as RetailerConnectorKind,
+      robotsTxtStatus: record.robotsTxtStatus as RobotsTxtStatus,
+      legalReviewStatus: record.legalReviewStatus as LegalReviewStatus,
+      hasDataAgreement: Boolean(record.hasDataAgreement),
+      endpointUrl: String(record.endpointUrl),
+      parserVersion: String(record.parserVersion),
+      domain: record.domain === undefined ? 'grocery' : record.domain as DailyIngestionDomain,
+      stores: parseDailyStoreConfigs(record.stores, `GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}].stores`),
+      requireStoreScopedPrices: record.requireStoreScopedPrices === undefined ? true : Boolean(record.requireStoreScopedPrices)
+    };
+  });
+  const configuredChains = new Set(connectors.map((connector) => normalizeDailySlug(connector.chainId)));
+  const missingChains = requiredDailyIngestionChainIds.filter((chainId) => !configuredChains.has(normalizeDailySlug(chainId)));
+  if (missingChains.length > 0) {
+    throw new Error(`GROCERYVIEW_DAILY_CONNECTORS_JSON is missing required daily chain connectors: ${missingChains.join(', ')}.`);
+  }
+  return connectors;
+}
+
+function dailyRunnerIntegerFromEnv(value: string | undefined, fallback?: number): number | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return fallback;
+  const parsed = Number(trimmed);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(0, Math.floor(parsed));
+}
+
+export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): DailyIngestionEnvConfig {
+  const databaseUrl = env.DATABASE_URL?.trim();
+  if (!databaseUrl) throw new Error('DATABASE_URL is required for daily ingestion.');
+  const connectorsJson = env.GROCERYVIEW_DAILY_CONNECTORS_JSON?.trim()
+    ?? (env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE?.trim() ? readFileSync(env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE.trim(), 'utf8') : undefined);
+  if (!connectorsJson) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE is required for daily ingestion.');
+  const parsedConnectors = parseDailyConnectorsJson(connectorsJson);
+  const maxConnectors = dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_MAX_CONNECTORS);
+  const runtimeOptions = {
+    maxConcurrency: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY, 1, 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'),
+    connectorStartDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'),
+    connectorRetryAttempts: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'),
+    connectorRetryBaseDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS, 250, 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'),
+    blockerLogPath: env.GROCERYVIEW_DAILY_BLOCKER_LOG_PATH?.trim() || DEFAULT_DAILY_INGESTION_BLOCKER_LOG_PATH
+  };
+  return {
+    databaseUrl,
+    connectors: maxConnectors && maxConnectors > 0 ? parsedConnectors.slice(0, maxConnectors) : parsedConnectors,
+    runtimeOptions,
+    runner: {
+      maxConnectors,
+      maxConcurrency: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY),
+      connectorStartDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS),
+      connectorRetryAttempts: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS),
+      connectorRetryBaseDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS)
+    }
+  };
+}
+
+function parseDailyEnvInteger(value: string | undefined, fallback: number, name: string): number {
+  if (value === undefined || value.trim() === '') return fallback;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 0) throw new Error(`${name} must be a non-negative integer.`);
+  return parsed;
+}
+
+export function buildDailyIngestionPostgresPoolConfig(databaseUrl: string): { connectionString: string; max: number } {
+  const parsed = new URL(databaseUrl);
+  if (parsed.hostname.endsWith('.pooler.supabase.com') && parsed.port === '6543') {
+    parsed.port = '5432';
+  }
+  return {
+    connectionString: parsed.toString(),
+    max: 1
+  };
+}
+
+function dbSourceTypeForConnector(sourceType: RetailerConnectorKind): SourceRunRecord['sourceType'] {
+  if (sourceType === 'official_api') return 'official_api';
+  if (sourceType === 'retailer_online_page') return 'retailer_page';
+  return 'weekly_leaflet';
+}
+
+function dbPriceTypeForIngested(priceType: PriceType): DbPriceType {
+  if (priceType === 'online' || priceType === 'member' || priceType === 'receipt' || priceType === 'estimated') return priceType;
+  if (priceType === 'flyer') return 'promotion';
+  if (priceType === 'in_store' || priceType === 'shelf_photo') return 'shelf';
+  return 'community';
+}
+
+function normalizeDailySlug(value: string): string {
+  const slug = value.trim().toLowerCase().replace(/_/g, '-').replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '');
+  if (!slug) throw new Error('Daily ingestion slug must be non-empty.');
+  return slug;
+}
+
+function dailyPayloadHash(payload: unknown): string {
+  return `sha256:${createHash('sha256').update(JSON.stringify(payload)).digest('hex')}`;
+}
+
+type BatchRawRecordIdRow = { ordinal: number; id: string };
+type BatchObservationIdRow = { id: string };
+type FuelPriceSourceIdRow = { id: string };
+type BatchProductIdRow = { slug: string; id: string };
+
+function chunkDailyRows<T>(rows: T[], size = 250): T[][] {
+  const chunks: T[][] = [];
+  for (let index = 0; index < rows.length; index += size) chunks.push(rows.slice(index, index + size));
+  return chunks;
+}
+
+function normalizeDailyDomain(domain: DailyIngestionDomain | undefined): DailyIngestionDomain {
+  return domain ?? 'grocery';
+}
+
+async function upsertDailyChain(executor: QueryExecutor, chainId: string, domain?: DailyIngestionDomain): Promise<string> {
+  const slug = normalizeDailySlug(chainId);
+  const rows = await executor.query<IdRow>(
+    `insert into chains(slug, name, country_code, domain)
+     values ($1, $2, 'SE', $3)
+     on conflict (slug) do update set name = excluded.name, domain = excluded.domain, updated_at = now()
+     returning id`,
+    [slug, slug, normalizeDailyDomain(domain)]
+  );
+  const id = rows[0]?.id;
+  if (!id) throw new Error(`Daily ingestion chain upsert did not return an id: ${chainId}`);
+  return id;
+}
+
+async function upsertDailyStore(executor: QueryExecutor, chainId: string, store: DailyIngestionStoreConfig, domain?: DailyIngestionDomain): Promise<string> {
+  const slug = normalizeDailySlug(store.storeId);
+  const rows = await executor.query<IdRow>(
+    `insert into stores(slug, chain_id, external_ref, name, address_line1, city, region, country_code, position, store_type, domain)
+     values (
+       $1, $2, $3, $4, $5, $6, $7, $8,
+       case
+         when $9::numeric is null or $10::numeric is null then null
+         else ST_SetSRID(ST_MakePoint($10::numeric, $9::numeric), 4326)::geography
+       end,
+       coalesce($11, 'supermarket'),
+       $12
+     )
+     on conflict (slug) do update set
+       chain_id = excluded.chain_id, external_ref = excluded.external_ref, name = excluded.name,
+       address_line1 = excluded.address_line1, city = excluded.city, region = excluded.region,
+       country_code = excluded.country_code, position = excluded.position,
+       store_type = excluded.store_type, domain = excluded.domain, updated_at = now()
+     returning id`,
+    [
+      slug,
+      chainId,
+      store.storeId,
+      store.name,
+      store.address,
+      store.city,
+      store.district ?? null,
+      store.countryCode ?? 'SE',
+      store.latitude ?? null,
+      store.longitude ?? null,
+      store.storeType ?? null,
+      normalizeDailyDomain(domain)
+    ]
+  );
+  const id = rows[0]?.id;
+  if (!id) throw new Error(`Daily ingestion store upsert did not return an id: ${store.storeId}`);
+  return id;
+}
+
+function validateStoreScopedConnectorOutput(config: DailyIngestionConnectorConfig, result: RetailerConnectorRunResult): string[] {
+  if (config.requireStoreScopedPrices === false) return [];
+  const configuredStores = new Set((config.stores ?? []).map((store) => normalizeDailySlug(store.storeId)));
+  const missingStoreProducts: string[] = [];
+  const unknownStores = new Set<string>();
+  for (const accepted of result.ingestion.accepted) {
+    const storeId = accepted.priceObservation.storeId;
+    if (!storeId?.trim()) {
+      missingStoreProducts.push(accepted.priceObservation.retailerProductId ?? accepted.product.id);
+      continue;
+    }
+    const normalizedStoreId = normalizeDailySlug(storeId);
+    if (!configuredStores.has(normalizedStoreId)) unknownStores.add(normalizedStoreId);
+  }
+  const blockers: string[] = [];
+  if (missingStoreProducts.length > 0) blockers.push(`${config.chainId}:missing_store_scoped_prices:${missingStoreProducts.slice(0, 10).join(',')}`);
+  if (unknownStores.size > 0) blockers.push(`${config.chainId}:unknown_store_ids:${[...unknownStores].sort().slice(0, 10).join(',')}`);
+  return blockers;
+}
+
+function validateConfiguredStoreObservationCoverage(config: DailyIngestionConnectorConfig, result: RetailerConnectorRunResult): string[] {
+  if (config.requireStoreScopedPrices === false || config.sourceType !== 'official_api') return [];
+  const configuredStores = (config.stores ?? []).map((store) => normalizeDailySlug(store.storeId));
+  if (configuredStores.length === 0) return [];
+  const observedStores = new Set(
+    result.ingestion.accepted
+      .map((accepted) => accepted.priceObservation.storeId?.trim())
+      .filter((storeId): storeId is string => Boolean(storeId))
+      .map((storeId) => normalizeDailySlug(storeId))
+  );
+  const missingStores = configuredStores.filter((storeId) => !observedStores.has(storeId));
+  return missingStores.length > 0
+    ? [`${config.chainId}:missing_configured_store_observations:${missingStores.slice(0, 10).join(',')}`]
+    : [];
+}
+
+async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProduct, domain?: DailyIngestionDomain): Promise<string> {
+  const rows = await executor.query<IdRow>(
+    `insert into products(
+       slug,
+       canonical_name,
+       brand,
+       barcode,
+       category_path,
+       package_size,
+       package_unit,
+       comparable_unit,
+       domain,
+       fuel_grade_id
+     ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+     on conflict (slug) do update set
+       canonical_name = excluded.canonical_name,
+       brand = excluded.brand,
+       barcode = excluded.barcode,
+       category_path = excluded.category_path,
+       package_size = excluded.package_size,
+       package_unit = excluded.package_unit,
+       comparable_unit = excluded.comparable_unit,
+       domain = excluded.domain,
+       fuel_grade_id = excluded.fuel_grade_id,
+       updated_at = now()
+     returning id`,
+    [
+      normalizeDailySlug(product.id),
+      product.canonicalName,
+      product.brand ?? null,
+      product.barcode ?? null,
+      product.categoryId ? [product.categoryId] : [],
+      product.packageSize,
+      product.packageUnit,
+      product.comparableUnit,
+      normalizeDailyDomain(domain),
+      product.fuelGradeId ?? null
+    ]
+  );
+  const id = rows[0]?.id;
+  if (!id) throw new Error(`Daily ingestion product upsert did not return an id: ${product.id}`);
+  return id;
+}
+
+
+async function upsertDailyProductBatch(executor: QueryExecutor, products: IngestedProduct[], domain?: DailyIngestionDomain): Promise<Map<string, string>> {
+  if (products.length === 0) return new Map();
+  const uniqueProducts = [...new Map(products.map((product) => [normalizeDailySlug(product.id), product])).values()];
+  const ids = new Map<string, string>();
+  for (const chunk of chunkDailyRows(uniqueProducts)) {
+    const rows = await executor.query<BatchProductIdRow>(
+      `with input as (
+         select *
+         from jsonb_to_recordset($1::jsonb) as x(
+           slug text,
+           canonical_name text,
+           brand text,
+           barcode text,
+           category_id text,
+           package_size numeric,
+           package_unit text,
+           comparable_unit text,
+           domain text,
+           fuel_grade_id text
+         )
+       ),
+       upserted as (
+         insert into products(
+           slug,
+           canonical_name,
+           brand,
+           barcode,
+           category_path,
+           package_size,
+           package_unit,
+           comparable_unit,
+           domain,
+           fuel_grade_id
+         )
+         select
+           slug,
+           canonical_name,
+           brand,
+           barcode,
+           case when category_id is null then '{}'::text[] else array[category_id] end,
+           package_size,
+           package_unit,
+           comparable_unit,
+           domain,
+           fuel_grade_id
+         from input
+         on conflict (slug) do update set
+           canonical_name = excluded.canonical_name,
+           brand = excluded.brand,
+           barcode = excluded.barcode,
+           category_path = excluded.category_path,
+           package_size = excluded.package_size,
+           package_unit = excluded.package_unit,
+           comparable_unit = excluded.comparable_unit,
+           domain = excluded.domain,
+           fuel_grade_id = excluded.fuel_grade_id,
+           updated_at = now()
+         returning slug, id
+       )
+       select slug, id from upserted`,
+      [JSON.stringify(chunk.map((product) => ({
+        slug: normalizeDailySlug(product.id),
+        canonical_name: product.canonicalName,
+        brand: product.brand ?? null,
+        barcode: product.barcode ?? null,
+        category_id: product.categoryId ?? null,
+        package_size: product.packageSize ?? null,
+        package_unit: product.packageUnit ?? null,
+        comparable_unit: product.comparableUnit,
+        domain: normalizeDailyDomain(domain),
+        fuel_grade_id: product.fuelGradeId ?? null
+      })))]
+    );
+    for (const row of rows) ids.set(row.slug, row.id);
+  }
+  return ids;
+}
+
+export type OpenFoodFactsMetadataPersistenceResult = {
+  status: 'persisted' | 'partial';
+  sourceRunId: string;
+  updatedProductIds: string[];
+  rawRecordIds: string[];
+  skippedNoDbMatchCount: number;
+};
+
+export type OpenFoodFactsDbProductCandidate = {
+  productId: string;
+  slug: string;
+  barcode: string;
+  canonicalName: string;
+  brand?: string;
+};
+
+export type OpenFoodFactsProductMetadataEnrichmentRunResult = OpenFoodFactsMetadataPersistenceResult & {
+  candidateBarcodeCount: number;
+  exportMatchCount: number;
+  enrichmentRowCount: number;
+  skippedExportNoMatchCount: number;
+  skippedNoNutritionCount: number;
+  sourceUrl: string;
+  retrievedAt: string;
+};
+
+type OpenFoodFactsDbProductCandidateRow = {
+  id: string;
+  slug: string;
+  barcode: string;
+  canonical_name: string;
+  brand: string | null;
+};
+
+function openFoodFactsNutritionPayload(row: OpenFoodFactsRetailerEnrichment): Record<string, unknown> {
+  return {
+    source: 'openfoodfacts',
+    barcode: row.barcode,
+    productUrl: row.productUrl,
+    sourceUrl: row.sourceUrl,
+    retrievedAt: row.retrievedAt,
+    nutriscoreGrade: row.nutriscoreGrade,
+    per100g: row.nutritionPer100g
+  };
+}
+
+function hashOpenFoodFactsMetadataPayload(row: OpenFoodFactsRetailerEnrichment): string {
+  return `sha256:${createHash('sha256').update(JSON.stringify({
+    source: 'openfoodfacts',
+    barcode: row.barcode,
+    sourceUrl: row.sourceUrl,
+    retrievedAt: row.retrievedAt,
+    nutritionPer100g: row.nutritionPer100g
+  })).digest('hex')}`;
+}
+
+function hasOpenFoodFactsMetadataNutrition(row: OpenFoodFactsProduct | OpenFoodFactsRetailerEnrichment): boolean {
+  return Object.values(row.nutritionPer100g).some((value) => value !== null);
+}
+
+function openFoodFactsProductToMetadataRow(row: OpenFoodFactsProduct): OpenFoodFactsRetailerEnrichment {
+  return {
+    barcode: row.code,
+    name: row.name,
+    brands: row.brands,
+    quantity: row.quantity,
+    categories: row.categories,
+    labels: row.labels,
+    nutriscoreGrade: row.nutriscoreGrade,
+    nutritionPer100g: row.nutritionPer100g,
+    imageUrl: row.imageUrl,
+    productUrl: row.productUrl,
+    sourceUrl: row.sourceUrl,
+    retrievedAt: row.retrievedAt,
+    retailerMatches: []
+  };
+}
+
+export async function listOpenFoodFactsDbProductCandidates(
+  executor: QueryExecutor,
+  options: { limit?: number } = {}
+): Promise<OpenFoodFactsDbProductCandidate[]> {
+  const limit = Math.min(Math.max(Math.floor(options.limit ?? 5000), 1), 50000);
+  const rows = await executor.query<OpenFoodFactsDbProductCandidateRow>(
+    `select id,
+            slug,
+            barcode,
+            canonical_name,
+            brand
+     from products
+     where barcode is not null
+       and barcode ~ '^[0-9]{8,14}$'
+     order by updated_at desc, slug asc
+     limit $1`,
+    [limit]
+  );
+  return rows.map((row) => ({
+    productId: row.id,
+    slug: row.slug,
+    barcode: row.barcode,
+    canonicalName: row.canonical_name,
+    brand: row.brand ?? undefined
+  }));
+}
+
+export async function persistOpenFoodFactsProductMetadata(
+  executor: QueryExecutor,
+  rows: readonly OpenFoodFactsRetailerEnrichment[],
+  options: { retrievedAt: string; sourceUrl?: string; candidateCount?: number }
+): Promise<OpenFoodFactsMetadataPersistenceResult> {
+  const sourceUrl = options.sourceUrl ?? OPENFOODFACTS_EXPORT_URL;
+  if (!Number.isFinite(Date.parse(options.retrievedAt))) throw new Error('retrievedAt must be an ISO date.');
+
+  const sourceWriter = createPostgresSourceRecordWriter(executor);
+  const sourceRun = await sourceWriter.createSourceRun({
+    sourceType: 'official_api',
+    sourceName: 'OpenFoodFacts barcode nutrition enrichment',
+    sourceUrl,
+    startedAt: options.retrievedAt,
+    status: 'running',
+    provenance: {
+      source: 'openfoodfacts',
+      sourceUrl,
+      retrievedAt: options.retrievedAt,
+      candidateCount: options.candidateCount ?? rows.length
+    }
+  });
+
+  const rawRecordIds: string[] = [];
+  const updatedProductIds: string[] = [];
+  let skippedNoDbMatchCount = 0;
+
+  for (const row of rows) {
+    const barcode = validDailyBarcode(row.barcode);
+    if (!barcode || !Object.values(row.nutritionPer100g).some((value) => value !== null)) {
+      continue;
+    }
+
+    const updated = await executor.query<IdRow>(
+      `update products
+       set nutrition = $2::jsonb,
+           image_url = coalesce(nullif($3, ''), image_url),
+           updated_at = now()
+       where barcode = $1
+       returning id`,
+      [barcode, JSON.stringify(openFoodFactsNutritionPayload(row)), row.imageUrl || null]
+    );
+    const productId = updated[0]?.id;
+    if (!productId) {
+      skippedNoDbMatchCount += 1;
+      continue;
+    }
+    updatedProductIds.push(productId);
+
+    const rawRecord = await sourceWriter.upsertRawRecord({
+      sourceRunId: sourceRun.sourceRunId,
+      recordType: 'product',
+      externalRef: barcode,
+      observedAt: row.retrievedAt,
+      payload: {
+        barcode,
+        name: row.name,
+        brands: row.brands,
+        quantity: row.quantity,
+        categories: row.categories,
+        labels: row.labels,
+        nutriscoreGrade: row.nutriscoreGrade,
+        nutritionPer100g: row.nutritionPer100g,
+        productUrl: row.productUrl,
+        imageUrl: row.imageUrl,
+        sourceUrl: row.sourceUrl
+      },
+      payloadHash: hashOpenFoodFactsMetadataPayload(row),
+      provenance: {
+        source: 'openfoodfacts',
+        sourceUrl: row.sourceUrl,
+        retrievedAt: row.retrievedAt,
+        matchKey: 'barcode',
+        barcode
+      }
+    });
+    rawRecordIds.push(rawRecord.rawRecordId);
+  }
+
+  await sourceWriter.finishSourceRun({
+    sourceRunId: sourceRun.sourceRunId,
+    status: skippedNoDbMatchCount > 0 ? 'partial' : 'succeeded',
+    finishedAt: options.retrievedAt
+  });
+
+  return {
+    status: skippedNoDbMatchCount > 0 ? 'partial' : 'persisted',
+    sourceRunId: sourceRun.sourceRunId,
+    updatedProductIds,
+    rawRecordIds,
+    skippedNoDbMatchCount
+  };
+}
+
+export async function runOpenFoodFactsProductMetadataEnrichment(input: {
+  executor: QueryExecutor;
+  retrievedAt: string;
+  fetchImpl?: typeof fetch;
+  maxDbBarcodes?: number;
+  sourceUrl?: string;
+}): Promise<OpenFoodFactsProductMetadataEnrichmentRunResult> {
+  if (!Number.isFinite(Date.parse(input.retrievedAt))) throw new Error('retrievedAt must be an ISO date.');
+  const sourceUrl = input.sourceUrl ?? OPENFOODFACTS_EXPORT_URL;
+  const candidates = await listOpenFoodFactsDbProductCandidates(input.executor, { limit: input.maxDbBarcodes });
+  if (candidates.length === 0) throw new Error('No DB products with valid barcodes were available for OpenFoodFacts enrichment.');
+
+  const products = await fetchOpenFoodFactsExportProducts({
+    codes: candidates.map((candidate) => candidate.barcode),
+    fetchImpl: input.fetchImpl,
+    maxRows: candidates.length,
+    retrievedAt: input.retrievedAt
+  });
+  const rows = products
+    .filter(hasOpenFoodFactsMetadataNutrition)
+    .map(openFoodFactsProductToMetadataRow);
+  const matchedBarcodes = new Set(products.map((row) => row.code));
+
+  const persisted = await persistOpenFoodFactsProductMetadata(input.executor, rows, {
+    retrievedAt: input.retrievedAt,
+    sourceUrl,
+    candidateCount: candidates.length
+  });
+
+  return {
+    ...persisted,
+    candidateBarcodeCount: candidates.length,
+    exportMatchCount: products.length,
+    enrichmentRowCount: rows.length,
+    skippedExportNoMatchCount: candidates.filter((candidate) => !matchedBarcodes.has(candidate.barcode)).length,
+    skippedNoNutritionCount: products.length - rows.length,
+    sourceUrl,
+    retrievedAt: input.retrievedAt
+  };
+}
+
+export async function runOpenFoodFactsProductMetadataEnrichmentFromEnv(env: DailyIngestionEnv = process.env): Promise<OpenFoodFactsProductMetadataEnrichmentRunResult> {
+  const databaseUrl = env.GROCERYVIEW_DATABASE_URL?.trim();
+  if (!databaseUrl) throw new Error('GROCERYVIEW_DATABASE_URL is required for OpenFoodFacts DB metadata enrichment.');
+  const maxDbBarcodes = env.GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES?.trim()
+    ? Number(env.GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES)
+    : undefined;
+  if (maxDbBarcodes !== undefined && (!Number.isFinite(maxDbBarcodes) || maxDbBarcodes <= 0)) {
+    throw new Error('GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES must be a positive number when provided.');
+  }
+
+  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void>; on?(event: 'error', listener: (error: unknown) => void): void } };
+  if (!pg.Pool) throw new Error('pg Pool export is not available.');
+  const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
+  try {
+    await pool.query('set default_transaction_read_only=off');
+    return await runOpenFoodFactsProductMetadataEnrichment({
+      executor: createPgQueryExecutor(pool),
+      retrievedAt: new Date().toISOString(),
+      maxDbBarcodes
+    });
+  } finally {
+    await pool.end();
+  }
+}
+
+async function upsertDailyAliasBatch(executor: QueryExecutor, aliases: Array<{
+  productId: string;
+  alias: string;
+  normalizedAlias: string;
+  sourceRef: string;
+  matchConfidence: number;
+}>): Promise<void> {
+  if (aliases.length === 0) return;
+  const uniqueAliases = [...new Map(aliases.map((alias) => [`${alias.normalizedAlias}:${alias.sourceRef}`, alias])).values()];
+  for (const chunk of chunkDailyRows(uniqueAliases)) {
+    await executor.query(
+      `with input as (
+         select *
+         from jsonb_to_recordset($1::jsonb) as x(
+           product_id uuid,
+           alias text,
+           normalized_alias text,
+           source_ref text,
+           match_confidence numeric
+         )
+       )
+       insert into aliases(
+         product_id,
+         alias,
+         normalized_alias,
+         source_type,
+         source_ref,
+         match_confidence,
+         reviewed_at
+       )
+       select product_id, alias, normalized_alias, 'retailer', source_ref, match_confidence, null
+       from input
+       on conflict (normalized_alias, source_type, source_ref) do update set
+         product_id = excluded.product_id,
+         alias = excluded.alias,
+         match_confidence = excluded.match_confidence,
+         reviewed_at = excluded.reviewed_at`,
+      [JSON.stringify(chunk.map((alias) => ({
+        product_id: alias.productId,
+        alias: alias.alias,
+        normalized_alias: alias.normalizedAlias,
+        source_ref: alias.sourceRef,
+        match_confidence: alias.matchConfidence
+      })))]
+    );
+  }
+}
+
+async function persistDailyConnectorOutput(input: {
+  executor: QueryExecutor;
+  config: DailyIngestionConnectorConfig;
+  result: RetailerConnectorRunResult;
+}): Promise<Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'>> {
+  const { executor, config, result } = input;
+  const domain = normalizeDailyDomain(config.domain);
+  await executor.query('set default_transaction_read_only=off');
+  const sourceWriter = createPostgresSourceRecordWriter(executor);
+  const storesBySlug = new Map((config.stores ?? []).map((store) => [normalizeDailySlug(store.storeId), store]));
+  const sourceRun = await sourceWriter.createSourceRun({
+    sourceType: dbSourceTypeForConnector(config.sourceType),
+    sourceName: config.connectorId,
+    sourceUrl: config.endpointUrl,
+    startedAt: config.requestedAt,
+    finishedAt: config.requestedAt,
+    status: 'running',
+    provenance: {
+      chainId: config.chainId,
+      cadence: 'daily',
+      connectorId: config.connectorId,
+      runKey: result.plan.runKey,
+      parserVersion: config.parserVersion,
+      acceptedCount: result.acceptedCount,
+      rejectedCount: result.rejectedCount,
+      domain
+    }
+  });
+
+  const rawRecordIds: string[] = [];
+  const observationIds: string[] = [];
+  const chainIdsBySlug = new Map<string, string>();
+  const storeIdsBySlug = new Map<string, string>();
+
+  async function getDailyChainId(chainId: string): Promise<string> {
+    const slug = normalizeDailySlug(chainId);
+    const cached = chainIdsBySlug.get(slug);
+    if (cached) return cached;
+    const id = await upsertDailyChain(executor, chainId, domain);
+    chainIdsBySlug.set(slug, id);
+    return id;
+  }
+
+  async function getDailyStoreId(chainDbId: string, store: DailyIngestionStoreConfig): Promise<string> {
+    const slug = normalizeDailySlug(store.storeId);
+    const cached = storeIdsBySlug.get(slug);
+    if (cached) return cached;
+    const id = await upsertDailyStore(executor, chainDbId, store, domain);
+    storeIdsBySlug.set(slug, id);
+    return id;
+  }
+
+
+  async function upsertRawRecordBatch(records: Array<{
+    ordinal: number;
+    recordType: string;
+    externalRef?: string;
+    observedAt?: string;
+    payload: unknown;
+    payloadHash: string;
+    provenance: Record<string, unknown>;
+  }>): Promise<Map<number, string>> {
+    if (records.length === 0) return new Map();
+    const ids = new Map<number, string>();
+    for (const chunk of chunkDailyRows(records)) {
+      const rows = await executor.query<BatchRawRecordIdRow>(
+      `with input as (
+         select *
+         from jsonb_to_recordset($2::jsonb) as x(
+           ordinal int,
+           record_type text,
+           external_ref text,
+           observed_at timestamptz,
+           payload jsonb,
+           payload_hash text,
+           provenance jsonb
+         )
+       ),
+       upserted as (
+         insert into raw_records(
+           source_run_id,
+           record_type,
+           external_ref,
+           observed_at,
+           payload,
+           payload_hash,
+           provenance
+         )
+         select $1, record_type, external_ref, observed_at, payload, payload_hash, provenance
+         from (
+           select distinct on (payload_hash)
+             record_type,
+             external_ref,
+             observed_at,
+             payload,
+             payload_hash,
+             provenance
+           from input
+           order by payload_hash, observed_at desc nulls last, ordinal desc
+         ) raw_input
+         on conflict (source_run_id, payload_hash) do update set
+           record_type = excluded.record_type,
+           external_ref = excluded.external_ref,
+           observed_at = excluded.observed_at,
+           payload = excluded.payload,
+           provenance = excluded.provenance
+         returning id, payload_hash
+       )
+       select input.ordinal, upserted.id
+       from input
+       join upserted on upserted.payload_hash = input.payload_hash
+       order by input.ordinal`,
+      [sourceRun.sourceRunId, JSON.stringify(chunk.map((record) => ({
+        ordinal: record.ordinal,
+        record_type: record.recordType,
+        external_ref: record.externalRef ?? null,
+        observed_at: record.observedAt ?? null,
+        payload: record.payload,
+        payload_hash: record.payloadHash,
+        provenance: record.provenance
+      })))]
+      );
+      for (const row of rows) ids.set(Number(row.ordinal), row.id);
+    }
+    return ids;
+  }
+
+  async function insertObservationBatch(observations: Array<{
+    productId: string;
+    chainId: string;
+    storeId?: string;
+    rawRecordId: string;
+    retailerProductRef?: string;
+    priceType: DbPriceType;
+    price: number;
+    regularPrice?: number;
+    unitPrice: number;
+    currency?: string;
+    quantity?: number;
+    quantityUnit?: string;
+    promotionText?: string;
+    promotionStartsOn?: string;
+    promotionEndsOn?: string;
+    memberRequired?: boolean;
+    observedAt: string;
+    validFrom?: string;
+    validUntil?: string;
+    confidence: number;
+    domain: DailyIngestionDomain;
+    provenance: Record<string, unknown>;
+  }>): Promise<string[]> {
+    if (observations.length === 0) return [];
+    const ids: string[] = [];
+    for (const chunk of chunkDailyRows(observations)) {
+      const rows = await executor.query<BatchObservationIdRow>(
+      `with input as (
+         select *
+         from jsonb_to_recordset($1::jsonb) as x(
+           product_id uuid,
+           chain_id uuid,
+           store_id uuid,
+           source_run_id uuid,
+           raw_record_id uuid,
+           retailer_product_ref text,
+           price_type text,
+           price numeric,
+           regular_price numeric,
+           unit_price numeric,
+           currency char(3),
+           quantity numeric,
+           quantity_unit text,
+           promotion_text text,
+           promotion_starts_on date,
+           promotion_ends_on date,
+           member_required boolean,
+           observed_at timestamptz,
+           valid_from timestamptz,
+           valid_until timestamptz,
+           confidence numeric,
+           domain text,
+           provenance jsonb
+         )
+       ),
+       inserted as (
+         insert into observations(
+           product_id,
+           chain_id,
+           store_id,
+           source_run_id,
+           raw_record_id,
+           retailer_product_ref,
+           price_type,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           quantity,
+           quantity_unit,
+           promotion_text,
+           promotion_starts_on,
+           promotion_ends_on,
+           member_required,
+           observed_at,
+           valid_from,
+           valid_until,
+           confidence,
+           domain,
+           provenance
+         )
+         select
+           product_id,
+           chain_id,
+           store_id,
+           source_run_id,
+           raw_record_id,
+           retailer_product_ref,
+           price_type,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           quantity,
+           quantity_unit,
+           promotion_text,
+           promotion_starts_on,
+           promotion_ends_on,
+           member_required,
+           observed_at,
+           valid_from,
+           valid_until,
+           confidence,
+           domain,
+           provenance
+         from input
+         returning id, product_id, chain_id, store_id, price_type, price, regular_price, unit_price, currency, observed_at, confidence, domain, provenance
+       ),
+       latest_upsert as (
+         insert into latest_prices(
+           product_id,
+           chain_id,
+           store_id,
+           price_type,
+           observation_id,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           observed_at,
+           confidence,
+           domain,
+           provenance
+         )
+         select
+           product_id,
+           chain_id,
+           store_id,
+           price_type,
+           id,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           observed_at,
+           confidence,
+           domain,
+           provenance
+         from (
+           select distinct on (product_id, chain_id, store_id, price_type)
+             product_id,
+             chain_id,
+             store_id,
+             price_type,
+             id,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             observed_at,
+             confidence,
+             domain,
+             provenance
+           from inserted
+           order by product_id, chain_id, store_id, price_type, observed_at desc, id desc
+         ) latest_input
+         on conflict (product_id, chain_id, store_id, price_type) do update set
+           observation_id = excluded.observation_id,
+           price = excluded.price,
+           regular_price = excluded.regular_price,
+           unit_price = excluded.unit_price,
+           currency = excluded.currency,
+           observed_at = excluded.observed_at,
+           confidence = excluded.confidence,
+           domain = excluded.domain,
+           provenance = excluded.provenance,
+           updated_at = now()
+         where latest_prices.observed_at <= excluded.observed_at
+         returning 1
+       )
+       select id from inserted`,
+      [JSON.stringify(chunk.map((observation) => ({
+        product_id: observation.productId,
+        chain_id: observation.chainId,
+        store_id: observation.storeId ?? null,
+        source_run_id: sourceRun.sourceRunId,
+        raw_record_id: observation.rawRecordId,
+        retailer_product_ref: observation.retailerProductRef ?? null,
+        price_type: observation.priceType,
+        price: observation.price,
+        regular_price: observation.regularPrice ?? null,
+        unit_price: observation.unitPrice,
+        currency: observation.currency ?? 'SEK',
+        quantity: observation.quantity ?? null,
+        quantity_unit: observation.quantityUnit ?? null,
+        promotion_text: observation.promotionText ?? null,
+        promotion_starts_on: observation.promotionStartsOn ?? null,
+        promotion_ends_on: observation.promotionEndsOn ?? null,
+        member_required: observation.memberRequired ?? false,
+        observed_at: observation.observedAt,
+        valid_from: observation.validFrom ?? null,
+        valid_until: observation.validUntil ?? null,
+        confidence: observation.confidence,
+        domain: observation.domain,
+        provenance: observation.provenance
+      })))]
+      );
+      ids.push(...rows.map((row) => row.id));
+    }
+    return ids;
+  }
+
+  async function insertFuelPriceSourceObservationLinks(links: Array<{
+    observationId: string;
+    fuelGradeId: FuelGradeId;
+    originalPriceText: string;
+    originalEffectiveDate?: string;
+  }>): Promise<void> {
+    if (links.length === 0) return;
+    const rows = await executor.query<FuelPriceSourceIdRow>(
+      `insert into fuel_price_sources(
+         source_kind,
+         operator_id,
+         operator_name,
+         source_url,
+         parser_version,
+         captured_at,
+         provenance
+       ) values ($1, $2, $3, $4, $5, $6, $7)
+       returning id`,
+      [
+        'operator_public_price_page',
+        normalizeDailySlug(config.chainId),
+        config.chainId.toUpperCase(),
+        config.endpointUrl,
+        config.parserVersion,
+        config.requestedAt ?? result.plan.provenance.capturedAt,
+        JSON.stringify({
+          chainId: config.chainId,
+          connectorId: config.connectorId,
+          sourceRunId: sourceRun.sourceRunId,
+          runKey: result.plan.runKey,
+          domain
+        })
+      ]
+    );
+    const sourceId = rows[0]?.id;
+    if (!sourceId) throw new Error(`Daily ingestion fuel source insert did not return an id: ${config.connectorId}`);
+
+    await executor.query(
+      `insert into fuel_price_source_observations(
+         source_id,
+         observation_id,
+         fuel_grade_id,
+         original_price_text,
+         original_effective_date
+       )
+       select
+         $1,
+         observation_id,
+         fuel_grade_id,
+         original_price_text,
+         original_effective_date
+       from jsonb_to_recordset($2::jsonb) as x(
+         observation_id uuid,
+         fuel_grade_id text,
+         original_price_text text,
+         original_effective_date date
+       )
+       on conflict (observation_id) do update set
+         source_id = excluded.source_id,
+         fuel_grade_id = excluded.fuel_grade_id,
+         original_price_text = excluded.original_price_text,
+         original_effective_date = excluded.original_effective_date`,
+      [sourceId, JSON.stringify(links.map((link) => ({
+        observation_id: link.observationId,
+        fuel_grade_id: link.fuelGradeId,
+        original_price_text: link.originalPriceText,
+        original_effective_date: link.originalEffectiveDate ?? null
+      })))]
+    );
+  }
+
+  try {
+    const configuredChainId = await getDailyChainId(config.chainId);
+    for (const store of config.stores ?? []) {
+      await getDailyStoreId(configuredChainId, store);
+    }
+
+    const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product), domain);
+    const aliasesToUpsert: Parameters<typeof upsertDailyAliasBatch>[1] = [];
+    for (const accepted of result.ingestion.accepted) {
+      const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
+      if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
+      aliasesToUpsert.push({
+        productId,
+        alias: accepted.alias.rawName,
+        normalizedAlias: accepted.alias.rawName.trim().toLowerCase().replace(/\s+/g, ' '),
+        sourceRef: result.plan.runKey,
+        matchConfidence: accepted.alias.matchConfidence
+      });
+    }
+    await upsertDailyAliasBatch(executor, aliasesToUpsert);
+
+  const rawRecordsToUpsert: Parameters<typeof upsertRawRecordBatch>[0] = [];
+  const observationsToInsert: Parameters<typeof insertObservationBatch>[0] = [];
+
+  for (const [ordinal, accepted] of result.ingestion.accepted.entries()) {
+    const chainId = await getDailyChainId(accepted.priceObservation.chainId);
+    const storeConfig = accepted.priceObservation.storeId ? storesBySlug.get(normalizeDailySlug(accepted.priceObservation.storeId)) : undefined;
+    const storeId = storeConfig ? await getDailyStoreId(chainId, storeConfig) : undefined;
+    const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
+    if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
+
+    const payload = {
+      chainId: config.chainId,
+      productId: accepted.product.id,
+      storeId: accepted.priceObservation.storeId,
+      priceType: accepted.priceObservation.priceType,
+      price: accepted.priceObservation.price,
+      observedAt: accepted.priceObservation.observedAt
+    };
+    const rawProvenance = {
+      sourceType: accepted.priceObservation.provenance.sourceType,
+      parserVersion: accepted.priceObservation.provenance.parserVersion,
+      rawSnapshotRef: accepted.priceObservation.provenance.rawSnapshotRef,
+      chainId: config.chainId,
+      cadence: 'daily',
+      connectorId: config.connectorId,
+      runKey: result.plan.runKey,
+      domain
+    };
+    rawRecordsToUpsert.push({
+      ordinal,
+      recordType: 'price',
+      externalRef: accepted.priceObservation.retailerProductId ?? accepted.product.id,
+      observedAt: accepted.priceObservation.observedAt,
+      payload,
+      payloadHash: dailyPayloadHash({
+        runKey: result.plan.runKey,
+        productId: accepted.product.id,
+        retailerProductId: accepted.priceObservation.retailerProductId ?? null,
+        storeId: accepted.priceObservation.storeId ?? null,
+        observedAt: accepted.priceObservation.observedAt,
+        price: accepted.priceObservation.price
+      }),
+      provenance: rawProvenance
+    });
+    observationsToInsert.push({
+      productId,
+      chainId,
+      storeId,
+      rawRecordId: '',
+      retailerProductRef: accepted.priceObservation.retailerProductId,
+      priceType: dbPriceTypeForIngested(accepted.priceObservation.priceType),
+      price: accepted.priceObservation.price,
+      regularPrice: accepted.priceObservation.regularPrice,
+      unitPrice: accepted.priceObservation.unitPrice,
+      currency: accepted.priceObservation.currency,
+      quantity: accepted.product.packageSize,
+      quantityUnit: accepted.product.packageUnit,
+      promotionText: accepted.promotionObservation?.promoText,
+      promotionStartsOn: accepted.promotionObservation?.validFrom?.slice(0, 10),
+      promotionEndsOn: accepted.promotionObservation?.validUntil?.slice(0, 10),
+      memberRequired: accepted.promotionObservation?.memberOnly ?? false,
+      observedAt: accepted.priceObservation.observedAt,
+      validFrom: accepted.priceObservation.validFrom,
+      validUntil: accepted.priceObservation.validUntil,
+      confidence: accepted.priceObservation.confidenceScore,
+      domain,
+      provenance: rawProvenance
+    });
+  }
+
+  const rawRecordIdsByOrdinal = await upsertRawRecordBatch(rawRecordsToUpsert);
+  for (let index = 0; index < observationsToInsert.length; index += 1) {
+    const rawRecordId = rawRecordIdsByOrdinal.get(index);
+    if (!rawRecordId) throw new Error(`Daily ingestion raw record batch did not return an id for accepted record ${index}`);
+    rawRecordIds.push(rawRecordId);
+    observationsToInsert[index]!.rawRecordId = rawRecordId;
+  }
+  const insertedObservationIds = await insertObservationBatch(observationsToInsert);
+  observationIds.push(...insertedObservationIds);
+
+  if (domain === 'fuel') {
+    await insertFuelPriceSourceObservationLinks(result.ingestion.accepted.flatMap((accepted, index) => {
+      const source = accepted.priceObservation.fuelSource;
+      const observationId = insertedObservationIds[index];
+      if (!source || !observationId) return [];
+      return [{
+        observationId,
+        fuelGradeId: source.fuelGradeId,
+        originalPriceText: source.originalPriceText,
+        originalEffectiveDate: source.originalEffectiveDate
+      }];
+    }));
+  }
+
+  await sourceWriter.finishSourceRun({
+    sourceRunId: sourceRun.sourceRunId,
+    finishedAt: config.requestedAt,
+    status: result.rejectedCount > 0 ? 'partial' : 'succeeded'
+  });
+
+    return {
+      sourceRunIds: [sourceRun.sourceRunId],
+      rawRecordIds,
+      observationIds,
+      acceptedCount: result.acceptedCount,
+      rejectedCount: result.rejectedCount
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await sourceWriter.finishSourceRun({
+      sourceRunId: sourceRun.sourceRunId,
+      finishedAt: config.requestedAt,
+      status: 'failed',
+      errorMessage: message
+    });
+    throw error;
+  }
+}
+
+type DailyConnectorRunPersistenceResult = Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'> & {
+  blockers: string[];
+  persistedRuns: number;
+};
+
+function writeDailyIngestionBlockerLog(path: string, result: DailyIngestionRunResult, requestedAt: string): void {
+  mkdirSync(dirname(path), { recursive: true });
+  const lines = [
+    '# Daily ingestion blockers',
+    '',
+    `requestedAt: ${requestedAt}`,
+    `status: ${result.status}`,
+    `persistedRuns: ${result.persistedRuns}`,
+    `acceptedCount: ${result.acceptedCount}`,
+    `rejectedCount: ${result.rejectedCount}`,
+    `sourceRunCount: ${result.sourceRunIds.length}`,
+    `rawRecordCount: ${result.rawRecordIds.length}`,
+    `observationCount: ${result.observationIds.length}`,
+    '',
+    'blockers:'
+  ];
+
+  if (result.blockers.length === 0) {
+    lines.push('- none');
+  } else {
+    lines.push(...result.blockers.map((blocker) => `- ${blocker}`));
+  }
+
+  writeFileSync(path, `${lines.join('\n')}\n`);
+}
+
+function normalizeDailyRunnerInteger(value: number | undefined, fallback: number): number {
+  if (value === undefined) return fallback;
+  if (!Number.isFinite(value)) return fallback;
+  return Math.max(0, Math.floor(value));
+}
+
+async function waitForDailyRunnerDelay(delayMs: number): Promise<void> {
+  if (delayMs <= 0) return;
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+}
+
+function isTransientDailyDatabaseError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /connection\s+(?:to database\s+)?closed|terminating connection|connection terminated|database system is not accepting connections|EDBHANDLEREXITED|ECONNRESET|ECONNREFUSED|econnrefused|EPIPE|timeout|Connection terminated unexpectedly/i.test(message);
+}
+
+export function createDailyIngestionQueryExecutor(
+  client: PgLikeClient,
+  options: { retryAttempts?: number; retryBaseDelayMs?: number } = {}
+): QueryExecutor {
+  const retryAttempts = normalizeDailyRunnerInteger(options.retryAttempts, 8);
+  const retryBaseDelayMs = normalizeDailyRunnerInteger(options.retryBaseDelayMs, 2000);
+  return {
+    async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
+      for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
+        try {
+          const result = await client.query(sql, params);
+          return result.rows as T[];
+        } catch (error) {
+          if (attempt >= retryAttempts || !isTransientDailyDatabaseError(error)) throw error;
+          process.stderr.write(`[daily-ingestion] retrying database query attempt=${attempt + 2}/${retryAttempts + 1}: ${error instanceof Error ? error.message : String(error)}
+`);
+          await waitForDailyRunnerDelay(retryBaseDelayMs * (attempt + 1));
+        }
+      }
+      throw new Error('Daily ingestion database query retry loop exhausted.');
+    }
+  };
+}
+
+async function runDailyIngestionConnector(input: {
+  executor: QueryExecutor;
+  requestedAt: string;
+  config: DailyIngestionConnectorConfig;
+  fetchImpl?: typeof fetch;
+  retryAttempts: number;
+  retryBaseDelayMs: number;
+}): Promise<DailyConnectorRunPersistenceResult> {
+  const { executor, config, requestedAt, fetchImpl, retryAttempts, retryBaseDelayMs } = input;
+  const runConfig = { ...config, requestedAt };
+
+  for (let attempt = 0; attempt <= retryAttempts; attempt += 1) {
+    if (attempt > 0) {
+      process.stderr.write(`[daily-ingestion] retrying ${config.connectorId} (${config.chainId}) attempt=${attempt + 1}/${retryAttempts + 1}\n`);
+      await waitForDailyRunnerDelay(retryBaseDelayMs * attempt);
+    }
+
+    process.stderr.write(`[daily-ingestion] starting ${config.connectorId} (${config.chainId}) attempt=${attempt + 1}/${retryAttempts + 1}\n`);
+    const result = await runRetailerConnector({
+      ...runConfig,
+      fetcher: (plan) => fetchDailyConnectorSnapshot(plan, {
+        retrievedAt: requestedAt,
+        rawSnapshotRefPrefix: 'raw://daily-ingestion',
+        fetchImpl,
+        headers: { accept: 'application/json' }
+      }),
+      parser: parseRetailerProductJsonSnapshot
+    });
+
+    process.stderr.write(`[daily-ingestion] fetched ${config.connectorId}: status=${result.status} accepted=${result.acceptedCount} rejected=${result.rejectedCount}\n`);
+
+    if (result.status === 'blocked') {
+      return {
+        blockers: result.requiredActions.map((action) => `${config.chainId}:${action}`),
+        persistedRuns: 0,
+        acceptedCount: 0,
+        rejectedCount: 0,
+        sourceRunIds: [],
+        rawRecordIds: [],
+        observationIds: []
+      };
+    }
+
+    if (result.status !== 'completed') {
+      if (attempt < retryAttempts) continue;
+      return {
+        blockers: [`${config.chainId}:connector_${result.status}`],
+        persistedRuns: 0,
+        acceptedCount: 0,
+        rejectedCount: 0,
+        sourceRunIds: [],
+        rawRecordIds: [],
+        observationIds: []
+      };
+    }
+
+    if (result.acceptedCount === 0) {
+      return {
+        blockers: [`${config.chainId}:no_accepted_products`],
+        persistedRuns: 0,
+        acceptedCount: 0,
+        rejectedCount: 0,
+        sourceRunIds: [],
+        rawRecordIds: [],
+        observationIds: []
+      };
+    }
+
+    const storeScopeBlockers = validateStoreScopedConnectorOutput(runConfig, result);
+    const storeCoverageBlockers = storeScopeBlockers.length === 0
+      ? validateConfiguredStoreObservationCoverage(runConfig, result)
+      : [];
+    const storeBlockers = [...storeScopeBlockers, ...storeCoverageBlockers];
+    if (storeBlockers.length > 0) {
+      return {
+        blockers: storeBlockers,
+        persistedRuns: 0,
+        acceptedCount: 0,
+        rejectedCount: 0,
+        sourceRunIds: [],
+        rawRecordIds: [],
+        observationIds: []
+      };
+    }
+
+    try {
+      const persisted = await persistDailyConnectorOutput({ executor, config: runConfig, result });
+      const blockers = persisted.rejectedCount > 0 ? [`${config.chainId}:rejected_products:${persisted.rejectedCount}`] : [];
+      process.stderr.write(`[daily-ingestion] persisted ${config.connectorId}: accepted=${persisted.acceptedCount} rejected=${persisted.rejectedCount} observations=${persisted.observationIds.length}\n`);
+      return {
+        ...persisted,
+        blockers,
+        persistedRuns: 1
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'unknown_error';
+      process.stderr.write(`[daily-ingestion] persistence failed ${config.connectorId}: ${message}\n`);
+      return {
+        blockers: [`${config.chainId}:persistence_failed:${message}`],
+        persistedRuns: 0,
+        acceptedCount: 0,
+        rejectedCount: 0,
+        sourceRunIds: [],
+        rawRecordIds: [],
+        observationIds: []
+      };
+    }
+  }
+
+  return {
+    blockers: [`${config.chainId}:connector_failed`],
+    persistedRuns: 0,
+    acceptedCount: 0,
+    rejectedCount: 0,
+    sourceRunIds: [],
+    rawRecordIds: [],
+    observationIds: []
+  };
+}
+
+export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<DailyIngestionRunResult> {
+  const maxConcurrency = Math.max(1, normalizeDailyRunnerInteger(input.maxConcurrency, 1));
+  const connectorStartDelayMs = normalizeDailyRunnerInteger(input.connectorStartDelayMs, 0);
+  const retryAttempts = normalizeDailyRunnerInteger(input.connectorRetryAttempts, 0);
+  const retryBaseDelayMs = normalizeDailyRunnerInteger(input.connectorRetryBaseDelayMs, 250);
+  const results = new Array<DailyConnectorRunPersistenceResult | undefined>(input.connectors.length);
+  let nextConnectorIndex = 0;
+  let nextConnectorStartAt = 0;
+  let connectorStartsScheduled = 0;
+
+  async function waitForConnectorStartSlot(): Promise<void> {
+    if (connectorStartDelayMs <= 0) return;
+
+    const now = Date.now();
+    const scheduledStartAt = connectorStartsScheduled === 0 ? now : Math.max(now, nextConnectorStartAt);
+    connectorStartsScheduled += 1;
+    nextConnectorStartAt = scheduledStartAt + connectorStartDelayMs;
+    await waitForDailyRunnerDelay(Math.max(0, scheduledStartAt - now));
+  }
+
+  async function worker(): Promise<void> {
+    while (nextConnectorIndex < input.connectors.length) {
+      const connectorIndex = nextConnectorIndex;
+      nextConnectorIndex += 1;
+      const config = input.connectors[connectorIndex];
+      if (!config) continue;
+      await waitForConnectorStartSlot();
+      results[connectorIndex] = await runDailyIngestionConnector({
+        executor: input.executor,
+        requestedAt: input.requestedAt,
+        config,
+        fetchImpl: input.fetchImpl,
+        retryAttempts,
+        retryBaseDelayMs
+      });
+    }
+  }
+
+  await Promise.all(Array.from({ length: Math.min(maxConcurrency, Math.max(1, input.connectors.length)) }, () => worker()));
+
+  const blockers: string[] = [];
+  const sourceRunIds: string[] = [];
+  const rawRecordIds: string[] = [];
+  const observationIds: string[] = [];
+  const chainSummaries: DailyIngestionConnectorSummary[] = [];
+  let persistedRuns = 0;
+  let acceptedCount = 0;
+  let rejectedCount = 0;
+
+  for (const [index, result] of results.entries()) {
+    if (!result) continue;
+    const config = input.connectors[index];
+    if (!config) continue;
+    blockers.push(...result.blockers);
+    persistedRuns += result.persistedRuns;
+    acceptedCount += result.acceptedCount;
+    rejectedCount += result.rejectedCount;
+    sourceRunIds.push(...result.sourceRunIds);
+    rawRecordIds.push(...result.rawRecordIds);
+    observationIds.push(...result.observationIds);
+    chainSummaries.push({
+      connectorId: config.connectorId,
+      chainId: config.chainId,
+      status: result.blockers.length === 0 ? 'succeeded' : result.persistedRuns > 0 ? 'partial' : 'blocked',
+      blockers: [...result.blockers],
+      persistedRuns: result.persistedRuns,
+      acceptedCount: result.acceptedCount,
+      rejectedCount: result.rejectedCount,
+      sourceRunIds: [...result.sourceRunIds],
+      rawRecordIds: [...result.rawRecordIds],
+      observationIds: [...result.observationIds]
+    });
+  }
+
+  const runResult: DailyIngestionRunResult = {
+    status: blockers.length === 0 ? 'succeeded' : persistedRuns > 0 ? 'partial' : 'blocked',
+    blockers,
+    persistedRuns,
+    acceptedCount,
+    rejectedCount,
+    sourceRunIds,
+    rawRecordIds,
+    observationIds,
+    chainSummaries
+  };
+
+  if (input.blockerLogPath?.trim()) {
+    writeDailyIngestionBlockerLog(input.blockerLogPath.trim(), runResult, input.requestedAt);
+  }
+
+  return runResult;
+}
+
+export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.env): Promise<DailyIngestionRunResult> {
+  const { databaseUrl, connectors, runtimeOptions } = buildDailyConnectorConfigsFromEnv(env);
+  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void>; on?(event: 'error', listener: (error: unknown) => void): void } };
+  if (!pg.Pool) throw new Error('pg Pool export is not available.');
+  const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
+  pool.on?.('error', (error: unknown) => {
+    process.stderr.write(`[daily-ingestion] database pool error: ${error instanceof Error ? error.message : String(error)}\n`);
+  });
+  const executor = createDailyIngestionQueryExecutor(pool, {
+    retryAttempts: env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS) : undefined,
+    retryBaseDelayMs: env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS) : undefined
+  });
+  try {
+    await executor.query('set default_transaction_read_only=off');
+    return await runDailyIngestion({
+      executor,
+      requestedAt: new Date().toISOString(),
+      connectors,
+      ...runtimeOptions
+    });
+  } finally {
+    await pool.end();
+  }
+}
+
+if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').href) {
+  runDailyIngestionFromEnv()
+    .then((result) => {
+      process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      if (result.status !== 'succeeded') process.exitCode = 1;
+    })
+    .catch((error) => {
+      process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+      process.exitCode = 1;
+    });
 }

@@ -1,113 +1,98 @@
-import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
+'use client';
+
+import Link from 'next/link';
+import { Activity, BarChart3, Database, Map, PackageSearch, Store, Tags } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { LanguagePreferenceSwitcher } from '@/components/language-preference-switcher';
 import {
-  BarChart3,
-  Bell,
-  Clock,
-  Database,
-  MapPin,
-  ReceiptText,
-  ScanSearch,
-  ShieldCheck,
-  ShoppingBasket,
-  Users,
-} from "lucide-react";
+  defaultLocale,
+  localeCookieName,
+  localeStorageKey,
+  localizedShellCopy,
+  normalizeLocale,
+  type SupportedLocale
+} from '@/lib/i18n';
 
-type NavItem = {
-  href: string;
-  icon: LucideIcon;
-  label: string;
-};
+const copyByLocale = Object.fromEntries(localizedShellCopy.map((copy) => [copy.locale, copy])) as Record<
+  SupportedLocale,
+  (typeof localizedShellCopy)[number]
+>;
+const fallbackCopy = copyByLocale[defaultLocale] ?? localizedShellCopy[0];
 
-type NavGroup = {
-  icon: LucideIcon;
-  items: NavItem[];
-  label: string;
-};
+function readPersistedLocale(): SupportedLocale {
+  const localStorageLocale = normalizeLocale(window.localStorage.getItem(localeStorageKey));
+  if (localStorageLocale) return localStorageLocale;
 
-const navGroups: NavGroup[] = [
-  {
-    label: "Markets",
-    icon: BarChart3,
-    items: [
-      { href: "/", label: "Overview", icon: BarChart3 },
-      { href: "/?view=chain-index", label: "Chain index", icon: Database },
-      { href: "/categories", label: "Categories", icon: ReceiptText },
-      { href: "/?view=heatmap", label: "Heatmap", icon: MapPin },
-      { href: "/?view=screener", label: "Screener", icon: ScanSearch },
-    ],
-  },
-  {
-    label: "Products",
-    icon: ShoppingBasket,
-    items: [
-      { href: "/products", label: "Browse", icon: ShoppingBasket },
-      { href: "/products?view=compare", label: "Compare", icon: BarChart3 },
-    ],
-  },
-  {
-    label: "Stores",
-    icon: MapPin,
-    items: [
-      { href: "/stores?view=map", label: "Map", icon: MapPin },
-      { href: "/stores", label: "Stores", icon: Database },
-    ],
-  },
-  {
-    label: "Personal",
-    icon: Users,
-    items: [
-      { href: "/account?view=savings", label: "Savings", icon: Bell },
-      { href: "/account?view=watchlist", label: "Watchlist", icon: ShieldCheck },
-      { href: "/weekly-basket", label: "Weekly basket", icon: ShoppingBasket },
-      { href: "/household?view=meal-planner", label: "Meal planner", icon: Clock },
-    ],
-  },
-];
+  const legacyLocalStorageLocale = normalizeLocale(window.localStorage.getItem('groceryview:locale'));
+  if (legacyLocalStorageLocale) return legacyLocalStorageLocale;
+
+  const cookieLocale = document.cookie
+    .split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${localeCookieName}=`))
+    ?.split('=')[1];
+
+  return normalizeLocale(cookieLocale) ?? defaultLocale;
+}
+
+function navItemsForLocale(locale: SupportedLocale) {
+  const copy = copyByLocale[locale] ?? fallbackCopy;
+  return [
+    { href: '/', label: copy.nav.overview, icon: BarChart3 },
+    { href: '/products', label: copy.nav.products, icon: PackageSearch },
+    { href: '/compare', label: copy.nav.compare, icon: Tags },
+    { href: '/meal-cost', label: copy.nav.mealCost, icon: Tags },
+    { href: '/catalogue-savings', label: copy.nav.savings, icon: Tags },
+    { href: '/chain-coverage', label: copy.nav.chain, icon: Tags },
+    { href: '/stores', label: copy.nav.stores, icon: Store },
+    { href: '/openprices-depth', label: copy.nav.openPrices, icon: Activity },
+    { href: '/map', label: copy.nav.map, icon: Map },
+    { href: '/categories', label: copy.nav.categories, icon: Database }
+  ];
+}
 
 export function AppNav() {
+  const [locale, setLocale] = useState<SupportedLocale>(defaultLocale);
+  const navItems = useMemo(() => navItemsForLocale(locale), [locale]);
+
+  useEffect(() => {
+    const persistedLocale = readPersistedLocale();
+    setLocale(persistedLocale);
+    document.documentElement.lang = persistedLocale;
+
+    function handleLocaleChanged(event: Event) {
+      const nextLocale = normalizeLocale((event as CustomEvent<{ locale?: string }>).detail?.locale);
+      if (nextLocale) setLocale(nextLocale);
+    }
+
+    window.addEventListener('groceryview:locale-changed', handleLocaleChanged);
+    return () => window.removeEventListener('groceryview:locale-changed', handleLocaleChanged);
+  }, []);
+
   return (
-    <header className="border-b border-zinc-200 bg-white">
-      <nav className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-3">
-        <Link className="text-base font-semibold tracking-tight text-zinc-950" href="/">
-          GroceryView
+    <header className="sticky top-0 z-20 border-b border-slate-200 bg-[#f5f1e8]/95 backdrop-blur">
+      <nav className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+        <Link className="group flex items-center gap-3" href="/">
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-800 text-lg font-black text-white shadow-sm">GV</span>
+          <span>
+            <span className="block text-lg font-black tracking-tight text-slate-950">GroceryView</span>
+            <span className="block text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Verified grocery intelligence</span>
+          </span>
         </Link>
-        <div className="hidden min-w-0 flex-1 items-center justify-end gap-1 lg:flex">
-          {navGroups.map((group) => {
-            const GroupIcon = group.icon;
-
-            return (
-              <div className="group relative" key={group.label}>
-                <button
-                  className="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-950 focus:bg-zinc-100 focus:text-zinc-950 focus:outline-none"
-                  type="button"
-                >
-                  <GroupIcon className="h-4 w-4" aria-hidden="true" />
-                  <span>{group.label}</span>
-                </button>
-                <div className="invisible absolute right-0 top-full z-20 mt-2 w-56 rounded-lg border border-zinc-200 bg-white p-1.5 opacity-0 shadow-lg shadow-zinc-900/10 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
-                  {group.items.map((item) => {
-                    const Icon = item.icon;
-
-                    return (
-                      <Link
-                        className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-950 focus:bg-zinc-100 focus:text-zinc-950 focus:outline-none"
-                        href={item.href}
-                        key={item.href}
-                      >
-                        <Icon className="h-4 w-4 text-zinc-500" aria-hidden="true" />
-                        <span>{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
+        <div className="flex flex-col gap-3 lg:items-end">
+          <LanguagePreferenceSwitcher />
+          <div className="flex gap-2 overflow-x-auto pb-1 lg:justify-end lg:pb-0">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900" href={item.href} key={item.href}>
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
         </div>
-        <Link className="rounded-lg bg-zinc-950 px-3 py-2 text-sm font-semibold text-white" href="/login">
-          Sign in
-        </Link>
       </nav>
     </header>
   );

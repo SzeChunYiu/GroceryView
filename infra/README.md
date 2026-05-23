@@ -20,6 +20,16 @@ The script starts the core services, waits for healthy Postgres, Redis, and MinI
 
 GitHub Actions also runs this smoke check in `Local infrastructure smoke` for pull requests that change local infrastructure files.
 
+## Production workflow configuration audit
+
+Production deploy and hosted-smoke workflows require both secrets and repository/environment variables. Before promoting a release, audit GitHub configuration with:
+
+```bash
+npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView --env production
+```
+
+The audit checks required secrets plus workflow variables such as `GROCERYVIEW_PRODUCTION_URL`, `GROCERYVIEW_TERMINAL_PRODUCT_ID`, and `GROCERYVIEW_SCANNER_USER_ID`. In GitHub Actions, `npm run ops:check-production-secrets -- --from-env` fails closed from injected `secrets.*` and `vars.*` values before deploy-time smokes run.
+
 ## Retailer connector smoke
 
 After a connector has approved legal/robots/data-agreement gates, build the ingestion package and run a real endpoint pull smoke without parsing or persisting product rows:
@@ -109,7 +119,7 @@ HOSTED_HTTP_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-http-smoke.json \
   infra/scripts/smoke-hosted-http.sh
 ```
 
-After the hosted database has migrations applied, run the token-protected PostgreSQL readiness smoke:
+After the hosted database has migrations applied, daily ingestion has populated source-run and catalog evidence, scan providers are configured, and object storage credentials are populated, run the token-protected production readiness smoke:
 
 ```bash
 GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
@@ -117,15 +127,36 @@ METRICS_TOKEN=replace-with-deployment-token \
   infra/scripts/smoke-hosted-readiness.sh
 ```
 
-The readiness smoke calls `/api/readiness/postgres` with `METRICS_TOKEN` and requires a `ready` response before the deployment can count as database-backed smoke evidence.
+The readiness smoke calls `/api/readiness/postgres`, `/api/readiness/source-runs`, `/api/readiness/catalog-coverage`, `/api/readiness/scanning`, `/api/readiness/scan-upload-cors`, `/api/readiness/scan-upload-storage`, and `/api/readiness/scan-upload-write` with `METRICS_TOKEN` and requires ready or complete responses before the deployment can count as database-backed, daily-ingestion, catalog-coverage, scanner-provider, scan-upload-CORS, scan-upload-storage, and scan-upload-write smoke evidence.
 
-Set `HOSTED_READINESS_SMOKE_OUTPUT_PATH` to save passed PostgreSQL readiness evidence as JSON for release records:
+Set `HOSTED_READINESS_SMOKE_OUTPUT_PATH` to save passed PostgreSQL, source-run, catalog-coverage, scan-provider, scan-upload-CORS, scan-upload-storage, and scan-upload-write readiness evidence as JSON for release records:
 
 ```bash
 GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
 METRICS_TOKEN=replace-with-deployment-token \
 HOSTED_READINESS_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-readiness-smoke.json \
   infra/scripts/smoke-hosted-readiness.sh
+```
+
+To prove an account-bound scanner upload path against the hosted API, provide a real signed-in scanner user id plus a short-lived bearer token and run the scanner upload smoke:
+
+```bash
+GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
+GROCERYVIEW_SCANNER_USER_ID=replace-with-user-id \
+GROCERYVIEW_SCANNER_BEARER_TOKEN=replace-with-session-token \
+  node infra/scripts/smoke-hosted-scanner-upload.mjs
+```
+
+The scanner upload smoke calls `/api/scans/upload-url?userId=${GROCERYVIEW_SCANNER_USER_ID}`, requires a ready private upload ticket, and performs the returned signed `PUT` with the ticket headers. It intentionally writes only safe evidence (`scan_upload_ticket_ready`, `scan_upload_put_succeeded`, and `scan_upload_private_payload_uri`) and never records the bearer token or signed upload URL. This proves hosted account-bound upload-ticket plus object-storage write behavior; it does not replace browser camera/device-capture evidence.
+
+Set `HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH` to save passed scanner upload evidence as JSON for release records:
+
+```bash
+GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
+GROCERYVIEW_SCANNER_USER_ID=replace-with-user-id \
+GROCERYVIEW_SCANNER_BEARER_TOKEN=replace-with-session-token \
+HOSTED_SCANNER_UPLOAD_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-scanner-upload-smoke.json \
+  node infra/scripts/smoke-hosted-scanner-upload.mjs
 ```
 
 ## Smoke environment overrides

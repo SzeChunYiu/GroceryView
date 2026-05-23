@@ -6,6 +6,25 @@ export const isoDateTimeSchema = z.string().datetime({ offset: true });
 export const priceTypeSchema = z.enum(['shelf', 'member', 'promotion', 'estimated']);
 export const confidenceSchema = z.enum(['high', 'medium', 'low', 'unverified']);
 export const sourceTypeSchema = z.enum(['retailer_api', 'retailer_page', 'receipt_scan', 'manual_review', 'seed_stub']);
+export const priceDomainSchema = z.enum(['grocery', 'fuel', 'pharmacy']);
+export const fuelGradeSchema = z.enum(['95', '98', 'diesel', 'hvo100', 'e85']);
+export const fuelPriceSourceSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('operator_public_price_page'),
+    operatorId: idSchema,
+    operatorName: idSchema,
+    sourceUrl: z.string().url(),
+    capturedAt: isoDateTimeSchema,
+    parserVersion: idSchema
+  }),
+  z.object({
+    kind: z.literal('crowd_station_report'),
+    reporterTrustTier: z.enum(['new', 'trusted', 'operator_verified']),
+    stationId: idSchema,
+    submittedAt: isoDateTimeSchema,
+    evidenceType: z.enum(['receipt', 'pump_photo', 'manual_entry'])
+  })
+]);
 
 export const provenanceSchema = z.object({
   sourceRunId: idSchema,
@@ -44,6 +63,7 @@ export const productSchema = z.object({
 
 export const priceObservationSchema = z.object({
   id: idSchema,
+  domain: priceDomainSchema.default('grocery'),
   productId: idSchema,
   storeId: idSchema,
   price: moneyAmountSchema,
@@ -61,6 +81,19 @@ export const priceObservationSchema = z.object({
       endsAt: isoDateTimeSchema.optional()
     })
     .optional()
+});
+
+export const fuelPriceObservationSchema = z.object({
+  id: idSchema,
+  domain: z.literal('fuel'),
+  productId: idSchema,
+  chainId: idSchema,
+  storeId: idSchema.optional(),
+  fuelGrade: fuelGradeSchema,
+  pricePerLitre: moneyAmountSchema,
+  observedAt: isoDateTimeSchema,
+  source: fuelPriceSourceSchema,
+  provenance: provenanceSchema
 });
 
 export const latestPriceSchema = priceObservationSchema.extend({
@@ -108,6 +141,8 @@ export const apiContractSchemas = {
   basket: basketSchema,
   basketItem: basketItemSchema,
   latestPrice: latestPriceSchema,
+  fuelPriceObservation: fuelPriceObservationSchema,
+  fuelPriceSource: fuelPriceSourceSchema,
   priceObservation: priceObservationSchema,
   product: productSchema,
   productPricesResponse: productPricesResponseSchema,
@@ -120,7 +155,11 @@ export type AlertDto = z.infer<typeof alertSchema>;
 export type BasketDto = z.infer<typeof basketSchema>;
 export type BasketItemDto = z.infer<typeof basketItemSchema>;
 export type Confidence = z.infer<typeof confidenceSchema>;
+export type FuelGrade = z.infer<typeof fuelGradeSchema>;
+export type FuelPriceObservationDto = z.infer<typeof fuelPriceObservationSchema>;
+export type FuelPriceSourceDto = z.infer<typeof fuelPriceSourceSchema>;
 export type LatestPriceDto = z.infer<typeof latestPriceSchema>;
+export type PriceDomain = z.infer<typeof priceDomainSchema>;
 export type PriceObservationDto = z.infer<typeof priceObservationSchema>;
 export type PriceType = z.infer<typeof priceTypeSchema>;
 export type ProductDto = z.infer<typeof productSchema>;
@@ -136,6 +175,7 @@ export const apiContractOpenApiComponents = {
     required: ['id', 'productId', 'storeId', 'price', 'priceType', 'confidence', 'observedAt', 'sourceType', 'provenance'],
     properties: {
       id: { type: 'string' },
+      domain: { type: 'string', enum: priceDomainSchema.options },
       productId: { type: 'string' },
       storeId: { type: 'string' },
       price: { $ref: '#/components/schemas/MoneyAmount' },
@@ -148,6 +188,49 @@ export const apiContractOpenApiComponents = {
       memberOnly: { type: 'boolean' },
       promotion: { $ref: '#/components/schemas/Promotion' }
     }
+  },
+  FuelPriceObservation: {
+    type: 'object',
+    required: ['id', 'domain', 'productId', 'chainId', 'fuelGrade', 'pricePerLitre', 'observedAt', 'source', 'provenance'],
+    properties: {
+      id: { type: 'string' },
+      domain: { type: 'string', enum: ['fuel'] },
+      productId: { type: 'string' },
+      chainId: { type: 'string' },
+      storeId: { type: 'string' },
+      fuelGrade: { type: 'string', enum: fuelGradeSchema.options },
+      pricePerLitre: { $ref: '#/components/schemas/MoneyAmount' },
+      observedAt: { type: 'string', format: 'date-time' },
+      source: { $ref: '#/components/schemas/FuelPriceSource' },
+      provenance: { $ref: '#/components/schemas/Provenance' }
+    }
+  },
+  FuelPriceSource: {
+    oneOf: [
+      {
+        type: 'object',
+        required: ['kind', 'operatorId', 'operatorName', 'sourceUrl', 'capturedAt', 'parserVersion'],
+        properties: {
+          kind: { type: 'string', enum: ['operator_public_price_page'] },
+          operatorId: { type: 'string' },
+          operatorName: { type: 'string' },
+          sourceUrl: { type: 'string', format: 'uri' },
+          capturedAt: { type: 'string', format: 'date-time' },
+          parserVersion: { type: 'string' }
+        }
+      },
+      {
+        type: 'object',
+        required: ['kind', 'reporterTrustTier', 'stationId', 'submittedAt', 'evidenceType'],
+        properties: {
+          kind: { type: 'string', enum: ['crowd_station_report'] },
+          reporterTrustTier: { type: 'string', enum: ['new', 'trusted', 'operator_verified'] },
+          stationId: { type: 'string' },
+          submittedAt: { type: 'string', format: 'date-time' },
+          evidenceType: { type: 'string', enum: ['receipt', 'pump_photo', 'manual_entry'] }
+        }
+      }
+    ]
   },
   Provenance: {
     type: 'object',

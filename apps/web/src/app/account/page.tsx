@@ -1,80 +1,125 @@
-import Link from "next/link";
-import { Bell, CheckCircle2, Clock, Mail, Smartphone } from "lucide-react";
-import { basketItems, formatSek } from "@/components/sample-data";
+import { AccountBillingActions } from '@/components/account-billing-actions';
+import { AccountMutationActions } from '@/components/account-mutation-actions';
+import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
+import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { routeMetadata } from '@/lib/seo';
+import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 
-const alertRules = [
-  { label: "Coffee drops below median", channel: "Push", threshold: "Under 52 kr", status: "Active" },
-  { label: "Butter rises above usual", channel: "Email", threshold: "Over 55 kr", status: "Active" },
-  { label: "Receipt needs review", channel: "Push", threshold: "Low confidence", status: "Paused" },
-];
-
-export default function AccountPage() {
-  const watchTotal = basketItems.slice(0, 3).reduce((sum, item) => sum + item.currentPrice, 0);
-
-  return (
-    <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-6 py-8">
-      <section className="grid gap-6 lg:grid-cols-[1fr_0.8fr] lg:items-end">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Account</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-zinc-950">Watchlists and alert rules</h1>
-          <p className="mt-4 max-w-2xl leading-7 text-zinc-600">
-            Tune the account-level signals that drive price alerts, receipt review reminders, and weekly basket notifications.
-          </p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <Metric icon={Bell} label="Rules" value={String(alertRules.length)} />
-          <Metric icon={Smartphone} label="Push" value="2" />
-          <Metric icon={Mail} label="Email" value="1" />
-        </div>
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Watchlist value</p>
-          <p className="mt-3 text-3xl font-semibold tabular-nums text-zinc-950">{formatSek(watchTotal)}</p>
-          <p className="mt-2 text-sm text-zinc-500">Current price across tracked staples</p>
-          <div className="mt-5 grid gap-3">
-            {basketItems.slice(0, 3).map((item) => (
-              <Link className="rounded-lg bg-zinc-50 p-3 transition hover:bg-zinc-100" href={`/products/${item.name.toLowerCase().replaceAll(" ", "-")}`} key={item.name}>
-                <div className="flex items-center justify-between gap-4">
-                  <span className="font-semibold text-zinc-950">{item.name}</span>
-                  <span className="tabular-nums text-zinc-700">{formatSek(item.currentPrice)}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
-          <div className="grid gap-3 border-b border-zinc-200 bg-zinc-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 md:grid-cols-[1fr_0.45fr_0.55fr_0.45fr]">
-            <span>Rule</span>
-            <span>Channel</span>
-            <span>Threshold</span>
-            <span>Status</span>
-          </div>
-          {alertRules.map((rule) => (
-            <article className="grid gap-3 border-b border-zinc-200 px-5 py-4 last:border-b-0 md:grid-cols-[1fr_0.45fr_0.55fr_0.45fr]" key={rule.label}>
-              <p className="font-semibold text-zinc-950">{rule.label}</p>
-              <p className="text-zinc-700">{rule.channel}</p>
-              <p className="text-zinc-700">{rule.threshold}</p>
-              <span className={`inline-flex w-fit items-center gap-2 rounded-lg px-2 py-1 text-sm font-semibold ${rule.status === "Active" ? "bg-emerald-50 text-emerald-800" : "bg-zinc-100 text-zinc-700"}`}>
-                {rule.status === "Active" ? <CheckCircle2 className="h-4 w-4" aria-hidden="true" /> : <Clock className="h-4 w-4" aria-hidden="true" />}
-                {rule.status}
-              </span>
-            </article>
-          ))}
-        </div>
-      </section>
-    </main>
-  );
+export function generateMetadata() {
+  return routeMetadata('/account');
 }
 
-function Metric({ icon: Icon, label, value }: { icon: typeof Bell; label: string; value: string }) {
+export default function AccountPage() {
   return (
-    <article className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-      <Icon className="h-5 w-5 text-emerald-700" aria-hidden="true" />
-      <p className="mt-3 text-sm text-zinc-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold tabular-nums text-zinc-950">{value}</p>
-    </article>
+    <PageShell>
+      <Eyebrow>Account shopping state</Eyebrow>
+      <h1 className="mt-2 text-4xl font-black tracking-tight">Saved baskets & favorite stores</h1>
+      <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
+        GroceryView now surfaces the real account API contract for saved shopping state while keeping private rows available to signed-in shoppers only. The public static build describes the production contract and stays closed when authenticated account records are absent.
+      </p>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Account-bound contract</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">{accountSavedShoppingContract.title}</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          Favorite stores are managed through <code className="rounded bg-white/80 px-1 py-0.5 text-emerald-900">{accountSavedShoppingContract.favoriteStoresEndpoint}</code> and removals use <code className="rounded bg-white/80 px-1 py-0.5 text-emerald-900">{accountSavedShoppingContract.favoriteStoreDeleteEndpoint}</code>. Saved recurring baskets persist to <code className="rounded bg-white/80 px-1 py-0.5 text-emerald-900">weekly_baskets</code> with line items in <code className="rounded bg-white/80 px-1 py-0.5 text-emerald-900">basket_items</code> so basket, alert, and digest features share account-owned state.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div>
+            <p className="font-black text-slate-950">Required inputs</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {accountSavedShoppingContract.requiredInputs.map((input) => <li key={input}>{input}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Shipped behavior</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {accountSavedShoppingContract.shippedBehaviors.map((behavior) => <li key={behavior}>{behavior}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Static snapshot remains closed</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {accountSavedShoppingContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
+            </ul>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">{savedBasketAutoReorderPlanner.persona}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Saved basket auto-reorder</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              The account page now turns a recurring saved basket into an auto-reorder planning checklist through <code className="rounded bg-white/80 px-1 py-0.5 text-sky-900">{savedBasketAutoReorderPlanner.corePlanner}</code> and <code className="rounded bg-white/80 px-1 py-0.5 text-sky-900">{savedBasketAutoReorderPlanner.endpoint}</code>. It still requires signed-in shopper confirmation, is not automatic purchase, and keeps missing-price blockers visible before any handoff can be prepared.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">autoReorderDecision</span>
+                <span className="mt-1 block text-lg font-black text-sky-900">{savedBasketAutoReorderPlanner.autoReorderDecision.label}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Current comparable</span>
+                <span className="mt-1 block text-2xl font-black text-sky-900">{formatSek(savedBasketAutoReorderPlanner.autoReorderDecision.comparableCurrentTotal)}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Missing-price blockers</span>
+                <span className="mt-1 block text-2xl font-black text-slate-950">{savedBasketAutoReorderPlanner.autoReorderDecision.missingPriceBlockerCount}</span>
+              </p>
+            </div>
+            <div className="mt-4 grid gap-3 text-sm font-semibold text-slate-700 sm:grid-cols-2">
+              {savedBasketAutoReorderPlanner.reviewLines.map((line) => (
+                <div className="rounded-2xl bg-white p-3 shadow-sm" key={line.productId}>
+                  <p className="font-black text-slate-950">{line.productName}</p>
+                  <p className="mt-1">{line.changeType} · current {formatSek(line.currentUnitPrice)} · previous {formatSek(line.previousUnitPrice)}</p>
+                  <p className="mt-1 text-xs font-bold text-sky-950">{line.recommendedAction}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-[1.5rem] border border-sky-100 bg-white p-4 shadow-sm">
+            <h3 className="text-lg font-black text-slate-950">Account guardrails</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-600">Auto-reorder stays a signed-in planning step, not a public static basket or retail purchase claim.</p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              {savedBasketAutoReorderPlanner.guardrails.map((guardrail) => (
+                <li className="rounded-2xl bg-sky-50 p-3" key={guardrail}>{guardrail}</li>
+              ))}
+            </ul>
+            <div className="mt-3 space-y-2">
+              {savedBasketAutoReorderPlanner.missingPriceBlockers.map((blocker) => (
+                <p className="rounded-2xl border border-sky-100 p-3 text-sm font-bold text-sky-950" key={blocker.productId}>{blocker.productName}: {blocker.blocker}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <AccountMutationActions />
+      <AccountBillingActions />
+      <AdDisclosureActions />
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <Card>
+          <Eyebrow>Favorite stores</Eyebrow>
+          <h2 className="mt-2 text-2xl font-black tracking-tight">Account routes, not anonymous preferences</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            The favorite stores surface is intentionally described as account-only: a production session supplies the userId, the selected store must come from verified GroceryView store records, and favorite stores can then drive watchlists, nearby comparisons, recurring digests, and basket trip-cost ranking.
+          </p>
+        </Card>
+        <Card>
+          <Eyebrow>Saved weekly baskets</Eyebrow>
+          <h2 className="mt-2 text-2xl font-black tracking-tight">weekly_baskets + basket_items</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            Saved templates stay in weekly_baskets while each product quantity stays in basket_items. This keeps the account record auditable, lets the server recompute prices from verified product rows, and avoids showing private basket lines in the static public snapshot.
+          </p>
+        </Card>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <TopSpreads limit={5} />
+        <SourceCoverage />
+      </div>
+    </PageShell>
   );
 }

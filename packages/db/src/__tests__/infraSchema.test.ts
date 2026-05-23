@@ -14,13 +14,14 @@ const sourceRunsOfficialApiMigration = readFileSync(join(repoRoot, 'infra/db/mig
 const receiptUploadsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/007_receipt_uploads.sql'), 'utf8').toLowerCase();
 const householdPlansMigration = readFileSync(join(repoRoot, 'infra/db/migrations/008_household_plans.sql'), 'utf8').toLowerCase();
 const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/009_retailer_source_policies.sql'), 'utf8').toLowerCase();
+const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/010_basket_import_reviews.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
-  .filter((entry) => entry.endsWith('.sql'))
+  .filter((entry) => entry.endsWith('.sql') && !entry.startsWith('._'))
   .sort()
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}`;
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}`;
 const sourcePolicyTables = ['retailer_source_policies'];
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
@@ -49,6 +50,7 @@ const repositoryTables = [
   'watchlist_items',
   'weekly_baskets',
   'basket_items',
+  'basket_import_review_items',
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
@@ -114,6 +116,39 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(latestPrices, /unique nulls not distinct \(product_id, chain_id, store_id, price_type\)/);
   });
 
+  it('materializes daily and weekly price rollups for chart and 52-week-low reads', () => {
+    for (const table of ['price_daily', 'price_weekly']) {
+      assert.match(allMigrations, new RegExp(`create table if not exists ${table}\\b`), `${table} table missing`);
+      assert.match(schemaDoc, new RegExp(`### \`${table}\``), `${table} missing from SCHEMA.md`);
+      assert.match(migrationVerifier, new RegExp(`\\b${table}\\b`), `${table} missing from migration verifier`);
+    }
+
+    assert.match(allMigrations, /date_trunc\('week', observed_at\)::date/);
+    assert.match(allMigrations, /min_price numeric\(12, 2\) not null/);
+    assert.match(allMigrations, /max_price numeric\(12, 2\) not null/);
+    assert.match(allMigrations, /avg_price numeric\(12, 4\) not null/);
+    assert.match(allMigrations, /last_price numeric\(12, 2\) not null/);
+    assert.match(allMigrations, /observation_count integer not null check \(observation_count > 0\)/);
+    assert.match(allMigrations, /price_daily_product_chain_day_idx/);
+    assert.match(allMigrations, /price_weekly_product_chain_week_idx/);
+    assert.match(schemaDoc, /charts and 52-week-low reads must hit `price_daily` or `price_weekly`/);
+  });
+
+  it('builds the observations time-series partition lane with monthly partitions and BRIN pruning', () => {
+    assert.match(allMigrations, /create table if not exists observations_v2\b[\s\S]*partition by range \(observed_at\)/);
+    assert.match(allMigrations, /create table if not exists observations_default partition of observations_v2 default/);
+    assert.match(allMigrations, /create or replace function ensure_observations_monthly_partition\(partition_month date\)/);
+    assert.match(allMigrations, /to_char\(partition_month, 'yyyy_mm'\)/);
+    assert.match(allMigrations, /for values from \(%l\) to \(%l\)/);
+    assert.match(allMigrations, /using brin \(observed_at\)/);
+    assert.match(allMigrations, /create_observations_partitions\(window_start date, months_ahead integer\)/);
+    assert.match(allMigrations, /drop_observations_partitions_before\(cutoff_month date\)/);
+    assert.match(migrationVerifier, /\bobservations_v2\b/);
+    assert.match(schemaDoc, /monthly range partitions/);
+    assert.match(schemaDoc, /BRIN/i);
+    assert.match(schemaDoc, /retention.*partition drop/);
+  });
+
   it('preserves provenance on source-derived tables', () => {
     for (const table of provenanceTables) {
       assert.match(tableDefinition(table), /\bprovenance\b/, `${table}.provenance missing`);
@@ -125,6 +160,37 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(sourceRunsOfficialApiMigration, /official_api/, 'official_api source run migration missing');
     assert.match(schemaDoc, /official public api/, 'official API source run docs missing');
     assert.match(schemaDoc, /open prices/, 'Open Prices persistence docs missing');
+  });
+
+  it('scopes catalog and price facts to supported price domains for future verticals', () => {
+    for (const table of ['chains', 'stores', 'products', 'observations', 'latest_prices']) {
+      assert.match(allMigrations, new RegExp(`alter table ${table} add column if not exists domain`), `${table}.domain migration missing`);
+      assert.match(allMigrations, new RegExp(`${table}_price_domain_check`), `${table} domain constraint missing`);
+      assert.match(schemaDoc, new RegExp(`### \`${table}\`[\\s\\S]*\\bdomain\\b`), `${table}.domain docs missing`);
+    }
+    assert.match(allMigrations, /domain in \('grocery', 'fuel', 'pharmacy'\)/);
+    assert.match(allMigrations, /default 'grocery'/);
+    assert.match(allMigrations, /observations_domain_observed_idx/);
+    assert.match(schemaDoc, /multi-vertical price domain model/);
+    assert.match(schemaDoc, /public routes must not render non-grocery prices until `observations\.domain`/);
+  });
+
+  it('models fuel grades and operator or crowd fuel source evidence', () => {
+    for (const table of ['fuel_grades', 'fuel_price_sources', 'fuel_price_source_observations']) {
+      assert.match(allMigrations, new RegExp(`create table if not exists ${table}\\b`), `${table} table missing`);
+      assert.match(schemaDoc, new RegExp(`### \`${table}\``), `${table} missing from SCHEMA.md`);
+      assert.match(migrationVerifier, new RegExp(`\\b${table}\\b`), `${table} missing from migration verifier`);
+    }
+    for (const grade of ['fuel-95-e10', 'fuel-98', 'fuel-diesel', 'fuel-hvo100', 'fuel-e85']) {
+      assert.match(allMigrations, new RegExp(grade), `${grade} missing from fuel grade catalog`);
+    }
+    assert.match(allMigrations, /operator_public_price_page/);
+    assert.match(allMigrations, /crowd_station_report/);
+    assert.match(allMigrations, /original_price_text text not null/);
+    assert.match(allMigrations, /alter table products add column if not exists fuel_grade_id/);
+    assert.match(allMigrations, /products_fuel_grade_domain_check/);
+    assert.match(schemaDoc, /fuel prices are always price per litre/);
+    assert.match(schemaDoc, /community_reporter_trust/);
   });
 
   it('persists retailer source policy decisions before ingestion fetches run', () => {
@@ -175,6 +241,10 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('watchlist_items'), /allowed_price_types text\[\] not null default array\['shelf'\]::text\[\]/);
     assert.match(repositoryTableDefinition('watchlist_items'), /allowed_price_types <@ array\['shelf', 'member', 'promotion', 'estimated'\]::text\[\]/);
     assert.match(tableDefinition('watchlists'), /allowed_price_types text\[\] not null default array\['shelf'\]::text\[\]/);
+    assert.match(repositoryTableDefinition('basket_import_review_items'), /user_id text not null references app_users\(id\) on delete cascade/);
+    assert.match(repositoryTableDefinition('basket_import_review_items'), /review_item_id text not null/);
+    assert.match(repositoryTableDefinition('basket_import_review_items'), /status text not null check \(status in \('open', 'accepted', 'dismissed'\)\)/);
+    assert.match(repositoryTableDefinition('basket_import_review_items'), /primary key \(user_id, review_item_id\)/);
     assert.match(repositoryTableDefinition('pantry_items'), /user_id text not null references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('pantry_items'), /category text not null check/);
     assert.match(repositoryTableDefinition('pantry_items'), /quantity numeric\(12, 3\) not null check \(quantity >= 0\)/);
@@ -198,6 +268,7 @@ describe('infra/db PostgreSQL schema contract', () => {
   it('indexes repository workflow lookups used by adapters and workers', () => {
     assert.match(repositoryMigration, /watchlist_items_user_idx on watchlist_items \(user_id, id\)/);
     assert.match(repositoryMigration, /weekly_baskets_user_week_idx on weekly_baskets \(user_id, week_start desc\)/);
+    assert.match(basketImportReviewsMigration, /basket_import_review_items_open_idx on basket_import_review_items \(user_id, status, created_at, review_item_id\)/);
     assert.match(repositoryMigration, /human_review_assignments_open_idx on human_review_assignments \(status, due_at, id\)/);
     assert.match(entitlementMigration, /subscription_entitlements_status_idx on subscription_entitlements \(status, updated_at desc\)/);
     assert.match(repositoryMigration, /notification_tasks_due_idx on notification_tasks \(status, send_at, id\)/);
@@ -228,5 +299,7 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(migrationVerifier, /required migration extensions ok/);
     assert.match(migrationVerifier, /postgres_ready_timeout_seconds/);
     assert.match(migrationVerifier, /seq 1 "\$postgres_ready_timeout_seconds"/);
+    assert.match(migrationVerifier, /migrations=\(\)/);
+    assert.doesNotMatch(migrationVerifier, /mapfile/);
   });
 });

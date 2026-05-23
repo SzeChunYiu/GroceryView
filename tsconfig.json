@@ -12,8 +12,21 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@groceryview/core": ["packages/core/src/index.ts"]
+      "@groceryview/api": ["packages/api/src/index.ts"],
+      "@groceryview/api-contracts": ["packages/api-contracts/src/index.ts"],
+      "@groceryview/auth": ["packages/auth/src/index.ts"],
+      "@groceryview/catalog": ["packages/catalog/src/index.ts"],
+      "@groceryview/core": ["packages/core/src/index.ts"],
+      "@groceryview/db": ["packages/db/src/index.ts"],
+      "@groceryview/ingestion": ["packages/ingestion/src/index.ts"],
+      "@groceryview/monetization": ["packages/monetization/src/index.ts"],
+      "@groceryview/notifications": ["packages/notifications/src/index.ts"],
+      "@groceryview/ops": ["packages/ops/src/index.ts"],
+      "@groceryview/scanning": ["packages/scanning/src/index.ts"],
+      "@groceryview/server": ["packages/server/src/index.ts"]
     }
   },
-  "include": ["apps/**/*.ts", "packages/**/*.ts"]
+  "include": ["apps/**/*.ts", "packages/**/*.ts"],
+  "comment": "apps/web is a bundled Next.js app: it uses moduleResolution:Bundler and is typechecked by `next build`. The root config uses NodeNext (correct for the backend packages + api/mobile), whose Node ESM semantics conflict with bundler resolution, so apps/web is excluded here.",
+  "exclude": ["apps/web/**"]
 }

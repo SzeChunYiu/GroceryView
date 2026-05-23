@@ -1,25 +1,33 @@
 {
   "name": "@groceryview/web",
   "version": "0.1.0",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
-    "build": "next build --webpack",
+    "build": "NODE_OPTIONS=--max-old-space-size=6144 next build --webpack",
     "dev": "next dev",
+    "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
+    "start": "next start",
     "test": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
+    "@groceryview/api": "0.1.0",
+    "@groceryview/catalog": "0.1.0",
     "@groceryview/core": "0.1.0",
     "@tanstack/react-query": "^5.90.11",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lightweight-charts": "^5.2.0",
     "lucide-react": "^0.561.0",
+    "maplibre-gl": "^4.7.1",
     "next": "^16.2.6",
+    "next-intl": "^4.12.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.15.1",
+    "@types/geojson": "^7946.0.16",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.23",

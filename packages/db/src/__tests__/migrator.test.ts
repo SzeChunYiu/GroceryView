@@ -106,6 +106,7 @@ describe('createMigrationPlan', () => {
     const plan = createMigrationPlan([
       { path: 'infra/db/migrations/010_indexes.sql', sql: 'create index products_name_idx on products(name);' },
       { path: 'infra/db/migrations/README.md', sql: 'ignore me' },
+      { path: 'infra/db/migrations/._001_extensions.sql', sql: 'macOS resource fork' },
       { path: 'infra/db/migrations/001_extensions.sql', sql: 'create extension if not exists postgis;' },
       { path: 'infra/db/migrations/002_init.sql', sql: 'create table chains(id uuid primary key);' }
     ]);

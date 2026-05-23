@@ -4,7 +4,10 @@ import {
   applyHumanReviewDecision,
   authorizeHumanReviewAction,
   classifyProductMatch,
+  compareCommodityUnitPrices,
   planCommunityReportAbuseControls,
+  planDietarySubstitutionAssistant,
+  planStockoutSubstitutionOptions,
   planHumanReviewAssignments,
   planHumanReviewQueue,
   recommendSmartSwaps,
@@ -92,6 +95,365 @@ describe('recommendSmartSwaps', () => {
   });
 });
 
+describe('planStockoutSubstitutionOptions', () => {
+  it('offers verified in-stock substitutes for missing basket lines without auto-accepting them', () => {
+    const plan = planStockoutSubstitutionOptions({
+      basketLine: {
+        basketLineId: 'line:milk',
+        productId: 'arla-milk',
+        productName: 'Arla Mellanmjölk 1l',
+        category: 'milk',
+        packageSize: 1,
+        packageUnit: 'l',
+        brandTier: 'national',
+        unitPrice: 16.9,
+        requestedQuantity: 2,
+        status: 'out_of_stock'
+      },
+      acceptableSubstitutionPolicy: {
+        allowPrivateLabel: true,
+        minimumConfidence: 'medium',
+        maxUnitPriceIncreasePercent: 10,
+        blockedCategories: ['baby_formula'],
+        dietaryTagsRequired: ['lactose_free']
+      },
+      candidates: [
+        {
+          productId: 'garant-lactose-free-milk',
+          productName: 'Garant Laktosfri Mellanmjölk 1l',
+          category: 'milk',
+          packageSize: 1,
+          packageUnit: 'l',
+          brandTier: 'standard_private_label',
+          unitPrice: 15.9,
+          inStock: true,
+          source: 'willys-storefront',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          dietaryTags: ['lactose_free']
+        },
+        {
+          productId: 'cheap-unknown-milk',
+          productName: 'Unknown milk 1l',
+          category: 'milk',
+          packageSize: 1,
+          packageUnit: 'l',
+          brandTier: 'budget_private_label',
+          unitPrice: 12.9,
+          inStock: false,
+          source: 'stale-cache',
+          observedAt: '2026-05-20T08:00:00.000Z',
+          dietaryTags: ['lactose_free']
+        },
+        {
+          productId: 'regular-milk',
+          productName: 'Regular milk 1l',
+          category: 'milk',
+          packageSize: 1,
+          packageUnit: 'l',
+          brandTier: 'national',
+          unitPrice: 14.9,
+          inStock: true,
+          source: 'coop-storefront',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          dietaryTags: []
+        }
+      ]
+    });
+
+    assert.equal(plan.status, 'substitution_options');
+    assert.equal(plan.lineStatus, 'out_of_stock');
+    assert.deepEqual(plan.options.map((option) => ({
+      productId: option.productId,
+      replacementAccepted: option.replacementAccepted,
+      confidence: option.confidence,
+      priceDeltaPercent: option.priceDeltaPercent
+    })), [
+      {
+        productId: 'garant-lactose-free-milk',
+        replacementAccepted: false,
+        confidence: 'high',
+        priceDeltaPercent: -5.92
+      }
+    ]);
+    assert.deepEqual(plan.rejectedCandidates.map((candidate) => candidate.reason), [
+      'Candidate is not verified in stock.',
+      'Candidate is missing required dietary evidence: lactose_free.'
+    ]);
+    assert.match(plan.guardrails.join(' '), /never auto-accepted/i);
+  });
+
+  it('fails closed when the basket line is already available or no verified substitute clears policy', () => {
+    const available = planStockoutSubstitutionOptions({
+      basketLine: {
+        basketLineId: 'line:pasta',
+        productId: 'pasta',
+        productName: 'Pasta',
+        category: 'pasta',
+        packageSize: 500,
+        packageUnit: 'g',
+        brandTier: 'national',
+        unitPrice: 20,
+        requestedQuantity: 1,
+        status: 'available'
+      },
+      candidates: []
+    });
+
+    assert.equal(available.status, 'not_needed');
+
+    const blocked = planStockoutSubstitutionOptions({
+      basketLine: {
+        basketLineId: 'line:formula',
+        productId: 'formula-a',
+        productName: 'Baby formula',
+        category: 'baby_formula',
+        packageSize: 1,
+        packageUnit: 'piece',
+        brandTier: 'national',
+        unitPrice: 120,
+        requestedQuantity: 1,
+        status: 'out_of_stock'
+      },
+      candidates: [
+        {
+          productId: 'formula-b',
+          productName: 'Other formula',
+          category: 'baby_formula',
+          packageSize: 1,
+          packageUnit: 'piece',
+          brandTier: 'national',
+          unitPrice: 100,
+          inStock: true,
+          source: 'retailer',
+          observedAt: '2026-05-22T08:00:00.000Z'
+        }
+      ]
+    });
+
+    assert.equal(blocked.status, 'blocked');
+    assert.deepEqual(blocked.options, []);
+    assert.equal(blocked.rejectedCandidates[0]?.reason, 'Category should not be auto-substituted.');
+  });
+});
+
+describe('planDietarySubstitutionAssistant', () => {
+  it('recommends verified dietary swaps while keeping shopper confirmation required', () => {
+    const plan = planDietarySubstitutionAssistant({
+      source: {
+        productId: 'arla-milk',
+        productName: 'Arla Mellanmjölk 1l',
+        category: 'milk',
+        packageSize: 1,
+        packageUnit: 'l',
+        unitPrice: 16.9,
+        dietaryTags: ['dairy'],
+        brandTier: 'national'
+      },
+      preference: {
+        profileId: 'profile-vegan-lactose-free',
+        requiredDietaryTags: ['vegan', 'lactose_free'],
+        blockedDietaryTags: ['dairy'],
+        allergenAvoidanceTags: ['almond'],
+        substitutionIntent: 'dairy_free',
+        maxUnitPriceIncreasePercent: 20
+      },
+      candidates: [
+        {
+          productId: 'oatly-1l',
+          productName: 'Oatly Havredryck 1l',
+          category: 'dairy_substitute',
+          packageSize: 1,
+          packageUnit: 'l',
+          unitPrice: 18.9,
+          dietaryTags: ['vegan', 'lactose_free'],
+          allergenTags: ['oat'],
+          evidenceSource: 'OpenFoodFacts label',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          brandTier: 'national'
+        },
+        {
+          productId: 'almond-1l',
+          productName: 'Almond drink 1l',
+          category: 'dairy_substitute',
+          packageSize: 1,
+          packageUnit: 'l',
+          unitPrice: 17.5,
+          dietaryTags: ['vegan', 'lactose_free'],
+          allergenTags: ['almond'],
+          evidenceSource: 'OpenFoodFacts label',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          brandTier: 'national'
+        },
+        {
+          productId: 'regular-lactose-free',
+          productName: 'Laktosfri mjölk 1l',
+          category: 'milk',
+          packageSize: 1,
+          packageUnit: 'l',
+          unitPrice: 15.9,
+          dietaryTags: ['lactose_free', 'dairy'],
+          allergenTags: [],
+          evidenceSource: 'retailer label',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          brandTier: 'standard_private_label'
+        }
+      ]
+    });
+
+    assert.equal(plan.status, 'recommendations');
+    assert.deepEqual(plan.recommendations.map((recommendation) => ({
+      productId: recommendation.productId,
+      confirmationRequired: recommendation.confirmationRequired,
+      dietaryTagsMatched: recommendation.dietaryTagsMatched,
+      unitPriceDeltaPercent: recommendation.unitPriceDeltaPercent
+    })), [
+      {
+        productId: 'oatly-1l',
+        confirmationRequired: true,
+        dietaryTagsMatched: ['vegan', 'lactose_free'],
+        unitPriceDeltaPercent: 11.83
+      }
+    ]);
+    assert.deepEqual(plan.blockedCandidates.map((candidate) => candidate.reason), [
+      'Candidate contains blocked allergen evidence: almond.',
+      'Candidate is missing required dietary evidence: vegan.'
+    ]);
+    assert.match(plan.guardrails.join(' '), /No dietary swap is auto-applied/i);
+  });
+
+  it('fails closed for medical diet sources and missing verified dietary evidence', () => {
+    const plan = planDietarySubstitutionAssistant({
+      source: {
+        productId: 'formula-a',
+        productName: 'Baby formula',
+        category: 'baby_formula',
+        packageSize: 1,
+        packageUnit: 'piece',
+        unitPrice: 120,
+        dietaryTags: ['medical_diet'],
+        brandTier: 'national'
+      },
+      preference: {
+        profileId: 'profile-medical',
+        requiredDietaryTags: ['hypoallergenic'],
+        blockedDietaryTags: [],
+        allergenAvoidanceTags: [],
+        substitutionIntent: 'medical',
+        maxUnitPriceIncreasePercent: 0
+      },
+      candidates: [
+        {
+          productId: 'formula-b',
+          productName: 'Other formula',
+          category: 'baby_formula',
+          packageSize: 1,
+          packageUnit: 'piece',
+          unitPrice: 100,
+          dietaryTags: ['hypoallergenic'],
+          allergenTags: [],
+          evidenceSource: 'retailer label',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          brandTier: 'national'
+        }
+      ]
+    });
+
+    assert.equal(plan.status, 'blocked');
+    assert.deepEqual(plan.recommendations, []);
+    assert.equal(plan.blockedCandidates[0]?.reason, 'Medical or infant diet categories require professional confirmation and cannot be suggested automatically.');
+  });
+});
+
+describe('compareCommodityUnitPrices', () => {
+  it('ranks confidence-cleared commodity prices by comparable unit and fails closed on non-matching evidence', () => {
+    const comparison = compareCommodityUnitPrices({
+      commodityId: 'tomato',
+      commodityName: 'Tomat',
+      comparableUnit: 'kg',
+      minimumConfidence: 0.6,
+      observations: [
+        {
+          productId: 'willys-kvisttomat',
+          productName: 'Kvisttomat Klass 1',
+          chainId: 'willys',
+          chainName: 'Willys',
+          commodityId: 'tomato',
+          unitPrice: 34.9,
+          comparableUnit: 'kg',
+          sourceConfidence: 0.82,
+          observedAt: '2026-05-21T09:00:00.000Z'
+        },
+        {
+          productId: 'hemkop-kvisttomat',
+          productName: 'Kvisttomat Klass 1',
+          chainId: 'hemkop',
+          chainName: 'Hemköp',
+          commodityId: 'tomato',
+          unitPrice: 39.9,
+          comparableUnit: 'kg',
+          sourceConfidence: 0.78,
+          observedAt: '2026-05-21T09:00:00.000Z'
+        },
+        {
+          productId: 'hemkop-premium-tomato',
+          productName: 'Premium tomat',
+          chainId: 'hemkop',
+          chainName: 'Hemköp',
+          commodityId: 'tomato',
+          unitPrice: 43.6,
+          comparableUnit: 'kg',
+          sourceConfidence: 0.86,
+          observedAt: '2026-05-21T09:00:00.000Z'
+        },
+        {
+          productId: 'coop-tomato',
+          productName: 'Tomat styck',
+          chainId: 'coop',
+          chainName: 'Coop',
+          commodityId: 'tomato',
+          unitPrice: 9.9,
+          comparableUnit: 'st',
+          sourceConfidence: 0.9,
+          observedAt: '2026-05-21T09:00:00.000Z'
+        },
+        {
+          productId: 'ica-tomato',
+          productName: 'Tomat',
+          chainId: 'ica',
+          chainName: 'ICA',
+          commodityId: 'tomato',
+          unitPrice: 33.9,
+          comparableUnit: 'kg',
+          sourceConfidence: 0.3,
+          observedAt: '2026-05-21T09:00:00.000Z'
+        }
+      ]
+    });
+
+    assert.equal(comparison.status, 'priced');
+    assert.equal(comparison.cheapestChain?.chainId, 'willys');
+    assert.equal(comparison.cheapestChain?.priceGapToNext, 5);
+    assert.deepEqual(comparison.rows.map((row) => ({
+      rank: row.rank,
+      chainId: row.chainId,
+      productId: row.productId,
+      unitPrice: row.unitPrice,
+      savingsVsNextPercent: row.savingsVsNextPercent
+    })), [
+      { rank: 1, chainId: 'willys', productId: 'willys-kvisttomat', unitPrice: 34.9, savingsVsNextPercent: 12.53 },
+      { rank: 2, chainId: 'hemkop', productId: 'hemkop-kvisttomat', unitPrice: 39.9, savingsVsNextPercent: 0 }
+    ]);
+    assert.deepEqual(comparison.coverage, {
+      chainCount: 2,
+      observationCount: 3,
+      rejectedObservationCount: 2,
+      comparableUnit: 'kg'
+    });
+    assert.match(comparison.confidenceLabel, /2 chains/);
+    assert.match(comparison.confidenceLabel, /commodity\/alias match/);
+  });
+});
+
 describe('planHumanReviewQueue', () => {
   it('prioritizes low-confidence product matches and community reports for human review', () => {
     const queue = planHumanReviewQueue({
@@ -121,6 +483,61 @@ describe('planHumanReviewQueue', () => {
         reason: 'Community report wrong_price for coffee has low confidence score 0.4.'
       }
     ]);
+  });
+
+  it('routes low-confidence commodity mappings into human_review_assignments while trusted maps stay hidden', () => {
+    const queue = planHumanReviewQueue({
+      productMatches: [],
+      communityReports: [],
+      commodityMappings: [
+        {
+          id: 'commodity-map-kvisttomat-willys',
+          commodityId: 'tomato',
+          commodityName: 'Tomat',
+          productId: 'willys-kvisttomat-losvikt',
+          productName: 'Kvisttomat lösvikt',
+          alias: 'Kvisttomat',
+          chainLabel: 'Willys Odenplan',
+          sourceConfidence: 0.52,
+          reporterId: 'reporter-produce-1',
+          createdAt: '2026-05-22T10:00:00.000Z',
+          evidence: ['chain_label:Willys Odenplan', 'unit_price:34.90 kr/kg', 'source:receipt_ocr']
+        },
+        {
+          id: 'commodity-map-banan-reviewed',
+          commodityId: 'banana',
+          commodityName: 'Banan',
+          productId: 'willys-banan-losvikt',
+          productName: 'Banan lösvikt',
+          alias: 'Banan',
+          chainLabel: 'Willys Odenplan',
+          sourceConfidence: 0.91,
+          createdAt: '2026-05-22T11:00:00.000Z',
+          evidence: ['chain_label:Willys Odenplan', 'unit_price:23.60 kr/kg']
+        }
+      ]
+    });
+
+    assert.deepEqual(queue, [
+      {
+        id: 'review-commodity-map-kvisttomat-willys',
+        subjectType: 'commodity_mapping',
+        subjectId: 'commodity-map-kvisttomat-willys',
+        priority: 'medium',
+        reason: 'Commodity mapping Kvisttomat → Tomat for willys-kvisttomat-losvikt has source confidence 0.52 and must be validated before shopper-facing coverage.'
+      }
+    ]);
+
+    const assignmentPlan = planHumanReviewAssignments({
+      assignedAt: '2026-05-22T12:00:00.000Z',
+      queue,
+      reviewers: [
+        { id: 'curator-produce-1', active: true, openAssignmentCount: 0, maxOpenAssignments: 3, specialties: ['commodity_mapping'] }
+      ]
+    });
+
+    assert.equal(assignmentPlan.assignments[0].subjectType, 'commodity_mapping');
+    assert.equal(assignmentPlan.assignments[0].assigneeId, 'curator-produce-1');
   });
 });
 
@@ -181,6 +598,36 @@ describe('applyHumanReviewDecision', () => {
         notes: 'Ask reporter for shelf photo.'
       }).writeback,
       { action: 'keep_in_review', subjectId: 'report-1', reviewedByHuman: false }
+    );
+  });
+
+  it('approves and rejects commodity mappings with explicit writeback actions', () => {
+    const item = {
+      id: 'review-commodity-map-kvisttomat-willys',
+      subjectType: 'commodity_mapping' as const,
+      subjectId: 'commodity-map-kvisttomat-willys',
+      priority: 'medium' as const,
+      reason: 'Low-confidence commodity alias.'
+    };
+
+    assert.deepEqual(
+      applyHumanReviewDecision({
+        item,
+        decision: 'approve',
+        reviewerId: 'curator-produce-1',
+        decidedAt: '2026-05-22T13:00:00.000Z'
+      }).writeback,
+      { action: 'approve_commodity_mapping', subjectId: 'commodity-map-kvisttomat-willys', reviewedByHuman: true }
+    );
+
+    assert.deepEqual(
+      applyHumanReviewDecision({
+        item,
+        decision: 'reject',
+        reviewerId: 'curator-produce-1',
+        decidedAt: '2026-05-22T13:05:00.000Z'
+      }).writeback,
+      { action: 'reject_commodity_mapping', subjectId: 'commodity-map-kvisttomat-willys', reviewedByHuman: true }
     );
   });
 });

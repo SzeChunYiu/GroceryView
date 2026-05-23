@@ -10,4 +10,10 @@ export class AlertsController {
   list() {
     return groceryApi.getWatchlist('demo').alerts;
   }
+
+  @Get('inbox')
+  @ApiOkResponse({ description: 'Demo user notification inbox queue' })
+  inbox() {
+    return { ...groceryApi.getNotificationInboxReport('demo'), demo: true };
+  }
 }

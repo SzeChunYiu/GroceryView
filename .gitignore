@@ -17,3 +17,7 @@ apps/*/dist-test/
 __pycache__/
 *.py[cod]
 *.egg-info/
+.vercel
+**/.next/
+**/.lighthouseci/
+supabase/.temp/

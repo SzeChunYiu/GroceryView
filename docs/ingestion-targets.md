@@ -7,7 +7,7 @@ Pick the highest unblocked P0/P1. Apply A1→A12 from the playbook. As soon as a
 | P | Target | Status | Per-branch? | Next action |
 |---|---|---|---|---|
 | **P0** | ICA Handla per-branch | 🟡 partial | **YES** — franchise stores, store-specific catalogs | Mobile-app mitmproxy capture (§A6) OR re-RE `handla.api.ica.se` schema (svendahlstrand/ica-api docs stale since Apr 2024). Yields ~75k per-branch obs (150 stores × 500 SKUs). |
-| **P0** | OSM nationwide stores | ⏳ pending | yes (location) | Overpass query for `area["name"="Sverige"]`, widen from Stockholm (1041) to all Sweden (~10k+). One curl, ship a refresh script. |
+| **P0** | OSM nationwide stores | ✅ shipped | yes (location) | Sweden-wide Overpass query and `apps/web/scripts/refresh-osm-stores.mjs` now regenerate the OSM store universe; keep monitoring row counts before production refreshes. |
 | **P0** | Coop product-search | 🟡 partial | partial (regional) | Inspect coop.se/handla DevTools; trace `api.coop.se/digital/<path>` (found in HTML). |
 | **P1** | Mathem catalog | 🟡 partial | per-postcode | buildId=`483b9ac11c96ee6d17bea0c10bff3cb4b3dbd207` (2026-05-20). Enumerate `/_next/data/<buildId>/sv-se/<route>.json` — try `kategori`, `varor`, `sortiment`, `produkt/<slug>`. |
 | **P1** | MatPiraten | ⏳ pending | unknown | matpiraten.se HTML scrape; small but real per-product prices. |
@@ -19,7 +19,7 @@ Pick the highest unblocked P0/P1. Apply A1→A12 from the playbook. As soon as a
 | **P2** | Matdax | ❌ blocked | n/a | WordPress site, no product endpoint; receipt scans only (future). |
 | **P2** | 7-Eleven Sweden | ⏳ pending | per-store unlikely | reitanonline.se for delivery. |
 | **P2** | Direkten / Pressbyrån | ❌ blocked | n/a | No online catalog known. |
-| **P3** | OpenFoodFacts widen | 🟡 partial | n/a | Widen from priced subset to all 25,059 Swedish products for metadata-only catalog. |
+| **P3** | OpenFoodFacts widen | 🟡 partial | n/a | Metadata-only product surface now ships a 1,214-row OpenPrices/OpenFoodFacts-backed slice via `apps/web/scripts/refresh-openfoodfacts-catalog.mjs`; live API reports ~25,090 Swedish products but repeated 503/page-cap behavior still blocks a durable all-products refresh. Next: switch to export/filter or other resilient bulk path before marking complete. |
 | **P3** | Konsumentverket reports | ⏳ pending | category-level | scb.se grocery price index; macro trend data. |
 | **P3** | Wayback Machine historical | ⏳ pending | per-snapshot | Walk web.archive.org snapshots of chain sites; build historical price series. |
 | **P3** | Pepesto unified API | ⏳ review | yes (commercial) | pepesto.com — paid; useful for cross-validation; review TOS first. |

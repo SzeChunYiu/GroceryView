@@ -1,6 +1,38 @@
-export type MobileMvpRouteId = 'today' | 'search' | 'product' | 'basket' | 'budget' | 'camera-placeholder' | 'notifications-placeholder';
+export type MobileMvpRouteId =
+  | 'today'
+  | 'stores'
+  | 'watchlist'
+  | 'search'
+  | 'product'
+  | 'product-terminal'
+  | 'basket'
+  | 'budget'
+  | 'barcode-scan'
+  | 'receipt-scan'
+  | 'profile'
+  | 'household'
+  | 'privacy'
+  | 'review-queue'
+  | 'camera-placeholder'
+  | 'notifications-placeholder';
 
-export type MobileMvpRoutePath = '/today' | '/search' | '/products/[id]' | '/basket' | '/budget' | '/scan/camera-placeholder' | '/profile/notifications-placeholder';
+export type MobileMvpRoutePath =
+  | '/today'
+  | '/stores'
+  | '/watchlist'
+  | '/search'
+  | '/products/[id]'
+  | '/products/[id]/terminal'
+  | '/basket'
+  | '/budget'
+  | '/scan/barcode'
+  | '/scan/receipt'
+  | '/profile'
+  | '/household'
+  | '/privacy'
+  | '/review-queue'
+  | '/scan/camera-placeholder'
+  | '/profile/notifications-placeholder';
 
 export type MobileRouteParam = {
   name: string;
@@ -13,10 +45,10 @@ export type MobileMvpRoute = {
   path: MobileMvpRoutePath;
   screen: string;
   title: string;
-  tab: 'today' | 'basket' | 'scan' | 'profile';
+  tab: 'today' | 'stores' | 'basket' | 'scan' | 'profile';
   params: MobileRouteParam[];
   requiresAuth: boolean;
-  preloadQueryIds: Array<'today' | 'search' | 'product' | 'basket' | 'budget'>;
+  preloadQueryIds: Array<'today' | 'stores' | 'watchlist' | 'search' | 'product' | 'productTerminal' | 'basket' | 'budget' | 'barcodeScan' | 'receiptReview' | 'reviewQueue'>;
   placeholderFor?: 'camera' | 'notifications';
 };
 
@@ -40,6 +72,26 @@ const routes: MobileMvpRoute[] = [
     preloadQueryIds: ['today', 'basket', 'budget']
   },
   {
+    id: 'stores',
+    path: '/stores',
+    screen: 'StoresScreen',
+    title: 'Stores',
+    tab: 'stores',
+    params: [{ name: 'selectedStoreId', required: false, source: 'query' }],
+    requiresAuth: true,
+    preloadQueryIds: ['stores', 'basket']
+  },
+  {
+    id: 'watchlist',
+    path: '/watchlist',
+    screen: 'WatchlistScreen',
+    title: 'Watchlist',
+    tab: 'today',
+    params: [],
+    requiresAuth: true,
+    preloadQueryIds: ['watchlist', 'product']
+  },
+  {
     id: 'search',
     path: '/search',
     screen: 'SearchScreen',
@@ -60,6 +112,16 @@ const routes: MobileMvpRoute[] = [
     preloadQueryIds: ['product']
   },
   {
+    id: 'product-terminal',
+    path: '/products/[id]/terminal',
+    screen: 'ProductPriceTerminalScreen',
+    title: 'Product terminal',
+    tab: 'today',
+    params: [{ name: 'id', required: true, source: 'path' }],
+    requiresAuth: true,
+    preloadQueryIds: ['product', 'productTerminal']
+  },
+  {
     id: 'basket',
     path: '/basket',
     screen: 'BasketScreen',
@@ -78,6 +140,66 @@ const routes: MobileMvpRoute[] = [
     params: [],
     requiresAuth: true,
     preloadQueryIds: ['budget', 'basket']
+  },
+  {
+    id: 'barcode-scan',
+    path: '/scan/barcode',
+    screen: 'BarcodeScanScreen',
+    title: 'Barcode scan',
+    tab: 'scan',
+    params: [{ name: 'code', required: false, source: 'query' }],
+    requiresAuth: true,
+    preloadQueryIds: ['barcodeScan', 'product']
+  },
+  {
+    id: 'receipt-scan',
+    path: '/scan/receipt',
+    screen: 'ReceiptScanScreen',
+    title: 'Receipt scan',
+    tab: 'scan',
+    params: [{ name: 'receiptId', required: false, source: 'query' }],
+    requiresAuth: true,
+    preloadQueryIds: ['receiptReview', 'budget', 'basket']
+  },
+  {
+    id: 'profile',
+    path: '/profile',
+    screen: 'ProfileScreen',
+    title: 'Profile',
+    tab: 'profile',
+    params: [],
+    requiresAuth: true,
+    preloadQueryIds: ['budget', 'basket']
+  },
+  {
+    id: 'household',
+    path: '/household',
+    screen: 'HouseholdScreen',
+    title: 'Household',
+    tab: 'profile',
+    params: [],
+    requiresAuth: true,
+    preloadQueryIds: ['basket', 'budget']
+  },
+  {
+    id: 'privacy',
+    path: '/privacy',
+    screen: 'PrivacyScreen',
+    title: 'Privacy',
+    tab: 'profile',
+    params: [],
+    requiresAuth: true,
+    preloadQueryIds: []
+  },
+  {
+    id: 'review-queue',
+    path: '/review-queue',
+    screen: 'HumanReviewQueueScreen',
+    title: 'Review queue',
+    tab: 'profile',
+    params: [],
+    requiresAuth: true,
+    preloadQueryIds: ['reviewQueue']
   },
   {
     id: 'camera-placeholder',

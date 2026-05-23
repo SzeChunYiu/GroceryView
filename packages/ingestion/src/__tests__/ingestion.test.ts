@@ -1,44 +1,112 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
+  buildCoopCategoryProductsUrl,
+  buildCoopCategoryTreeUrl,
   buildCoopSearchUrl,
+  buildCoopStoreInfoUrl,
+  buildCoopStoresUrl,
+  buildCityGrossProductsUrl,
+  buildCityGrossStoresUrl,
+  buildDailyConnectorConfigsFromEnv,
+  buildDailyIngestionPostgresPoolConfig,
+  createDailyIngestionQueryExecutor,
+  DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
+  DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
+  buildHemkopCategoryUrl,
   buildHemkopSearchUrl,
+  buildHemkopStoresUrl,
+  buildHemkopWeeklyDiscountsUrl,
   buildEmaginPdfUrl,
-  buildIcaHandlaUrl,
+  buildIcaStorePromotionsUrl,
+  buildLidlOfferPageUrl,
+  buildLidlStoreDetailPayloadUrl,
+  buildLidlStoresUrl,
   buildMatpriskollenStoreOffersUrl,
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
   buildOpenFoodFactsProductUrl,
+  buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
   confidenceForSource,
+  buildSwedishCountyFuelOverpassQuery,
+  buildSwedishCountyGroceryOverpassQuery,
+  buildWillysCategoryUrl,
   buildWillysSearchUrl,
+  buildWillysStoresUrl,
+  buildWillysWeeklyDiscountsUrl,
+  extractOpenFoodFactsBarcodeFromAxfoodImageUrl,
+  extractOpenFoodFactsBarcodeFromImageUrl,
   fetchOpenFoodFactsExportProducts,
+  fetchOpenFoodFactsExportRetailerEnrichments,
   fetchOpenFoodFactsProducts,
+  fetchOpenFoodFactsSwedenCatalog,
+  fetchOkq8FuelPrices,
+  fetchOpenFoodFactsRetailerEnrichments,
+  fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
+  fetchCityGrossProducts,
+  fetchCityGrossProductsForAllStores,
+  fetchCityGrossStores,
   fetchCoopPublicServiceAccess,
+  fetchCoopCategoryIds,
   fetchCoopProducts,
+  fetchCoopProductCatalog,
+  fetchCoopProductsForAllStores,
+  fetchCoopStores,
+  fetchCoopWeeklyDiscounts,
+  fetchCoopWeeklyDiscountsForAllStores,
+  fetchDailyConnectorSnapshot,
   fetchHemkopProducts,
+  fetchHemkopProductsForAllStores,
+  fetchHemkopStores,
+  fetchHemkopWeeklyDiscounts,
+  fetchHemkopWeeklyDiscountsForAllStores,
+  fetchIcaDefaultStoreProducts,
   fetchIcaProducts,
   fetchIcaReklambladOffers,
+  fetchLidlOffers,
+  fetchLidlOffersForAllStores,
+  fetchLidlStores,
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
   fetchWillysProducts,
+  fetchWillysProductsForAllStores,
+  fetchWillysStores,
+  fetchWillysWeeklyDiscounts,
+  fetchWillysWeeklyDiscountsForAllStores,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
+  GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
+  GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
+  GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
+  GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
+  GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+  GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
   normalizeUnitPrice,
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
   parseOpenPricesSnapshot,
+  parseOkq8FuelPricePage,
+  parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
+  persistOpenFoodFactsProductMetadata,
   planIngestionBatch,
   planOfferVisibilityBoundary,
   planRetailerConnectorRun,
@@ -47,9 +115,17 @@ import {
   offerVisibilityBoundaryPlans,
   OPENFOODFACTS_EXPORT_URL,
   OVERPASS_INTERPRETER_URL,
+  STOCKHOLM_FUEL_OVERPASS_QUERY,
+  STOCKHOLM_GROCERY_OVERPASS_QUERY,
+  SWEDEN_FUEL_OVERPASS_QUERY,
+  SWEDEN_GROCERY_OVERPASS_QUERY,
+  SWEDISH_COUNTY_ISO3166_2_CODES,
+  parseOverpassFuelStations,
   parseOverpassGroceryStores,
   retailerRobotsPolicyMatrix,
   runRetailerConnector,
+  runDailyIngestion,
+  runOpenFoodFactsProductMetadataEnrichment,
   stockholmStoreLocatorFixtures,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
@@ -58,6 +134,7 @@ import {
   validateScbPxWebQueryFixtures,
   validateStoreLocatorFixtures
 } from '../index.js';
+import type { QueryExecutor } from '@groceryview/db';
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
@@ -68,6 +145,77 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('OKQ8 fuel price connector', () => {
+  const okq8FuelHtml = `
+    <script>window.__APP_INIT_DATA__ = {"informationArea":[{"content":{"heading":"Drivmedel på station","itemsRow":[
+      {"title":"OKQ8 GoEasy 95 (Blyfri 95)","cells":[{"text":"18,89 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-22","links":[]}]},
+      {"title":"OKQ8 GoEasy 98 (Blyfri 98)","cells":[{"text":"20,49 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-22","links":[]}]},
+      {"title":"OKQ8 GoEasy Diesel","cells":[{"text":"21,34 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-21","links":[]}]},
+      {"title":"Neste MY Förnybar Diesel (HVO100)","cells":[{"text":"29,89 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-21","links":[]}]},
+      {"title":"Etanol E85","cells":[{"text":"15,84 kr","links":[]},{"text":"- 50 öre","links":[]},{"text":"2026-05-22","links":[]}]}
+    ]}}]}</script>`;
+
+  it('parses real per-grade operator prices as domain=fuel observations', () => {
+    const rows = parseOkq8FuelPricePage({
+      body: okq8FuelHtml,
+      capturedAt: '2026-05-23T08:35:34.000Z',
+      rawSnapshotRef: 'raw://okq8-fuel/test'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.domain, row.productId, row.pricePerLitre, row.unit]), [
+      ['fuel', 'fuel-95-e10', 18.89, 'l'],
+      ['fuel', 'fuel-98', 20.49, 'l'],
+      ['fuel', 'fuel-diesel', 21.34, 'l'],
+      ['fuel', 'fuel-hvo100', 29.89, 'l'],
+      ['fuel', 'fuel-e85', 15.84, 'l']
+    ]);
+    assert.equal(rows[0]?.sourceKind, 'operator_public_price_page');
+    assert.equal(rows[0]?.provenance.originalPriceText, '18,89 kr');
+  });
+
+  it('fetches and rejects blocked fuel source responses', async () => {
+    await assert.rejects(
+      fetchOkq8FuelPrices({
+        capturedAt: '2026-05-23T08:35:34.000Z',
+        fetchImpl: async () => new Response('captcha', { status: 403 })
+      }),
+      /blocked with HTTP 403/
+    );
+  });
+
+  it('adapts OKQ8 fuel rows into daily litre-priced fuel observations', async () => {
+    const snapshot = await fetchDailyConnectorSnapshot({
+      status: 'ready',
+      connectorId: 'okq8-fuel-prices',
+      chainId: 'okq8',
+      sourceType: 'retailer_online_page',
+      runKey: 'okq8:retailer-online-page:okq8-fuel-prices:2026-05-23',
+      sourceRunId: 'source-run:okq8:retailer-online-page:okq8-fuel-prices:2026-05-23',
+      provenance: {
+        sourceType: 'retailer_online_page',
+        sourceUrl: GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+        capturedAt: '2026-05-23T08:35:34.000Z',
+        parserVersion: 'okq8-fuel-prices-v1'
+      },
+      requiredActions: []
+    }, {
+      retrievedAt: '2026-05-23T08:35:34.000Z',
+      fetchImpl: async () => new Response(okq8FuelHtml, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+
+    const parsed = JSON.parse(snapshot.body) as { items: Array<{ chainId: string; productId: string; packageSize: number; packageUnit: string; price: number; sourceType: string; storeId?: string }> };
+    assert.deepEqual(parsed.items.map((row) => [row.chainId, row.productId, row.packageSize, row.packageUnit, row.price]), [
+      ['okq8', 'fuel-95-e10', 1, 'l', 18.89],
+      ['okq8', 'fuel-98', 1, 'l', 20.49],
+      ['okq8', 'fuel-diesel', 1, 'l', 21.34],
+      ['okq8', 'fuel-hvo100', 1, 'l', 29.89],
+      ['okq8', 'fuel-e85', 1, 'l', 15.84]
+    ]);
+    assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
+    assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
   });
 });
 
@@ -86,6 +234,18 @@ describe('fetchOpenFoodFactsProducts', () => {
           categories_tags: ['en:beverages', 'en:dairy-substitutes'],
           labels_tags: ['en:vegan'],
           nutriscore_grade: 'd',
+          nutriments: {
+            energy_100g: 180,
+            'energy-kcal_100g': 43,
+            fat_100g: 1.5,
+            'saturated-fat_100g': 0.2,
+            carbohydrates_100g: 6.5,
+            sugars_100g: 5.2,
+            fiber_100g: 0.8,
+            proteins_100g: 1,
+            salt_100g: 0.12,
+            sodium_100g: 0.048
+          },
           image_front_url: 'https://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg',
           url: 'https://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado'
         }
@@ -107,6 +267,18 @@ describe('fetchOpenFoodFactsProducts', () => {
       categories: ['en:beverages', 'en:dairy-substitutes'],
       labels: ['en:vegan'],
       nutriscoreGrade: 'd',
+      nutritionPer100g: {
+        energyKj: 180,
+        energyKcal: 43,
+        fat: 1.5,
+        saturatedFat: 0.2,
+        carbohydrates: 6.5,
+        sugars: 5.2,
+        fiber: 0.8,
+        proteins: 1,
+        salt: 0.12,
+        sodium: 0.048
+      },
       imageUrl: 'https://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg',
       productUrl: 'https://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado',
       sourceUrl: buildOpenFoodFactsProductUrl('7340083494406'),
@@ -115,11 +287,222 @@ describe('fetchOpenFoodFactsProducts', () => {
   });
 });
 
+describe('fetchOpenFoodFactsSwedenCatalog', () => {
+  it('can outwait a longer transient 503 burst from the public search API', async () => {
+    let attempts = 0;
+    const fetchImpl: typeof fetch = async () => {
+      attempts += 1;
+      if (attempts < 8) {
+        return new Response('temporary upstream outage', { status: 503 });
+      }
+
+      return new Response(JSON.stringify({
+        count: 1,
+        page: 1,
+        page_count: 1,
+        page_size: 1,
+        products: [{
+          code: '7311870010970',
+          product_name_sv: 'Bregott - Normalsaltat',
+          brands: 'Bregott',
+          quantity: '500 g'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const options = {
+      fetchImpl,
+      pageSize: 1,
+      requestRetryAttempts: 8,
+      requestRetryBaseDelayMs: 0,
+      retrievedAt: '2026-05-22T12:10:00.000Z'
+    };
+
+    const rows = await fetchOpenFoodFactsSwedenCatalog(options);
+
+    assert.equal(attempts, 8);
+    assert.deepEqual(rows.map((row) => row.code), ['7311870010970']);
+  });
+
+  it('paginates the public Sweden product metadata API without price claims', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = new URL(String(url)).searchParams.get('page');
+      return new Response(JSON.stringify({
+        count: 5,
+        page: Number(page),
+        page_count: 3,
+        page_size: 2,
+        products: page === '1'
+          ? [{
+              code: '7311870010970',
+              product_name_sv: 'Bregott - Normalsaltat',
+              brands: 'Bregott',
+              quantity: '500 g',
+              categories_tags: ['en:dairies', 'en:butters'],
+              labels_tags: ['en:svensk-gradde'],
+              nutriscore_grade: 'e',
+              image_front_url: 'https://images.openfoodfacts.org/images/products/731/187/001/0970/front_sv.27.400.jpg',
+              url: 'https://world.openfoodfacts.org/product/7311870010970/normalsaltat-bregott'
+            }, {
+              code: '7318690080008',
+              product_name: 'ICA Basic Pommes strips',
+              brands: 'ICA Basic',
+              quantity: '1 kg',
+              categories_tags: ['en:frozen-foods'],
+              labels_tags: [],
+              nutriscore_grade: 'unknown'
+            }]
+          : page === '2'
+            ? [{
+              code: '7318690514398',
+              product_name_sv: 'Glutenfritt Ljust Bröd',
+              brands: 'ICA',
+              quantity: '360 g',
+              categories_tags: ['en:breads'],
+              labels_tags: ['en:gluten-free'],
+              nutriscore_grade: 'c'
+            }, {
+              code: '7310865074034',
+              product_name_sv: 'Arla Mild Yoghurt Naturell',
+              brands: 'Arla',
+              quantity: '1 kg',
+              categories_tags: ['en:dairies'],
+              labels_tags: ['en:swedish-milk'],
+              nutriscore_grade: 'b'
+            }]
+            : [{
+              code: '7300205848329',
+              product_name_sv: 'Kungsörnen Vetemjöl',
+              brands: 'Kungsörnen',
+              quantity: '2 kg',
+              categories_tags: ['en:flours'],
+              labels_tags: ['en:made-in-sweden'],
+              nutriscore_grade: 'a'
+            }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOpenFoodFactsSwedenCatalog({
+      fetchImpl,
+      pageSize: 2,
+      retrievedAt: '2026-05-22T12:10:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildOpenFoodFactsSwedenSearchUrl(1, 2));
+    assert.equal(requestedUrls[1], buildOpenFoodFactsSwedenSearchUrl(2, 2));
+    assert.equal(requestedUrls[2], buildOpenFoodFactsSwedenSearchUrl(3, 2));
+    assert.deepEqual(rows.map((row) => row.code), ['7311870010970', '7318690080008', '7318690514398', '7310865074034', '7300205848329']);
+    assert.equal(rows[0].name, 'Bregott - Normalsaltat');
+    assert.deepEqual(rows[0].labels, ['en:svensk-gradde']);
+    assert.equal(rows[0].sourceUrl, buildOpenFoodFactsSwedenSearchUrl(1, 2));
+    assert.equal(rows[0].nutritionPer100g.energyKcal, null);
+  });
+
+  it('uses total count and page size rather than current-page count to stop pagination', async () => {
+    const requestedPages: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      const page = new URL(String(url)).searchParams.get('page') ?? '1';
+      requestedPages.push(page);
+      const productCount = page === '1' || page === '2' ? 100 : page === '3' ? 50 : 0;
+      const products = Array.from({ length: productCount }, (_, index) => ({
+        code: `${page}${String(index).padStart(2, '0')}`,
+        product_name_sv: `Svensk metadata ${page}-${index}`,
+        brands: 'OpenFoodFacts',
+        quantity: '1 st'
+      }));
+
+      return new Response(JSON.stringify({
+        count: 250,
+        page: Number(page),
+        page_count: products.length,
+        page_size: 100,
+        products
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOpenFoodFactsSwedenCatalog({
+      fetchImpl,
+      pageSize: 100,
+      retrievedAt: '2026-05-22T12:10:00.000Z'
+    });
+
+    assert.deepEqual(requestedPages, ['1', '2', '3']);
+    assert.equal(rows.length, 250);
+  });
+
+  it('can fetch remaining Sweden catalog pages concurrently after the first count page', async () => {
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const fetchImpl: typeof fetch = async (url) => {
+      const page = Number(new URL(String(url)).searchParams.get('page'));
+      inFlight += 1;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      if (page > 1) {
+        await new Promise((resolve) => setTimeout(resolve, 5));
+      }
+      inFlight -= 1;
+      return new Response(JSON.stringify({
+        count: 3,
+        page,
+        page_count: 1,
+        page_size: 1,
+        products: [{
+          code: `731000000000${page}`,
+          product_name_sv: `Produkt ${page}`,
+          brands: 'Concurrency Brand',
+          quantity: '1 st'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOpenFoodFactsSwedenCatalog({
+      concurrency: 2,
+      fetchImpl,
+      pageSize: 1,
+      retrievedAt: '2026-05-22T12:10:00.000Z'
+    });
+
+    assert.equal(maxInFlight, 2);
+    assert.deepEqual(rows.map((row) => row.code), ['7310000000001', '7310000000002', '7310000000003']);
+  });
+
+  it('reports successful page progress for long catalog refreshes', async () => {
+    const progress: Array<{ page: number; rows: number; totalPages: number }> = [];
+    const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({
+      count: 1,
+      page: 1,
+      page_count: 1,
+      page_size: 100,
+      products: [{
+        code: '7311870010970',
+        product_name_sv: 'Bregott - Normalsaltat',
+        brands: 'Bregott',
+        quantity: '500 g'
+      }]
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+
+    await fetchOpenFoodFactsSwedenCatalog({
+      fetchImpl,
+      onPage: (event) => progress.push({
+        page: event.page,
+        rows: event.rows,
+        totalPages: event.totalPages
+      }),
+      pageSize: 100,
+      retrievedAt: '2026-05-22T12:10:00.000Z'
+    });
+
+    assert.deepEqual(progress, [{ page: 1, rows: 1, totalPages: 1 }]);
+  });
+});
+
 describe('fetchOpenFoodFactsExportProducts', () => {
   it('streams real product rows from the official OpenFoodFacts TSV export', async () => {
     const tsv = [
-      'code\turl\tproduct_name\tquantity\tbrands\tcategories_tags\tlabels_tags\tnutriscore_grade\timage_url',
-      '7340083494406\thttps://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado\tHavredryck choklad\t1 l\tEldorado\ten:beverages,en:dairy-substitutes\ten:vegan\td\thttps://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg'
+      'code\turl\tproduct_name\tquantity\tbrands\tcategories_tags\tlabels_tags\tnutriscore_grade\tenergy_100g\tenergy-kcal_100g\tfat_100g\tsaturated-fat_100g\tcarbohydrates_100g\tsugars_100g\tfiber_100g\tproteins_100g\tsalt_100g\tsodium_100g\timage_url',
+      '7340083494406\thttps://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado\tHavredryck choklad\t1 l\tEldorado\ten:beverages,en:dairy-substitutes\ten:vegan\td\t180\t43\t1.5\t0.2\t6.5\t5.2\t0.8\t1\t0.12\t0.048\thttps://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg'
     ].join('\n');
     const requestedUrls: string[] = [];
     const fetchImpl: typeof fetch = async (url) => {
@@ -139,11 +522,261 @@ describe('fetchOpenFoodFactsExportProducts', () => {
     assert.equal(rows[0].code, '7340083494406');
     assert.equal(rows[0].name, 'Havredryck choklad');
     assert.deepEqual(rows[0].categories, ['en:beverages', 'en:dairy-substitutes']);
+    assert.equal(rows[0].nutritionPer100g.energyKcal, 43);
+    assert.equal(rows[0].nutritionPer100g.sugars, 5.2);
     assert.equal(rows[0].sourceUrl, `${OPENFOODFACTS_EXPORT_URL}#code=7340083494406`);
+  });
+
+  it('uses real OpenFoodFacts alternate export names when product_name is empty', async () => {
+    const tsv = [
+      'code\turl\tproduct_name\tabbreviated_product_name\tgeneric_name\tquantity\tbrands\tcategories_tags\tlabels_tags\tnutriscore_grade\tenergy_100g\tenergy-kcal_100g\tfat_100g\tsaturated-fat_100g\tcarbohydrates_100g\tsugars_100g\tfiber_100g\tproteins_100g\tsalt_100g\tsodium_100g\timage_url',
+      '7311071330525\thttps://world.openfoodfacts.org/product/7311071330525\t\t\tMörkt fullkornsbröd med lingon.\t500 g\tPågen\ten:breads\t\tunknown\t1112\t266\t4.1\t0.5\t44\t6.2\t6\t8.8\t0.95\t0.38\thttps://images.openfoodfacts.org/images/products/731/107/133/0525/front_sv.3.400.jpg'
+    ].join('\n');
+    const fetchImpl: typeof fetch = async () => new Response(gzipSync(tsv), {
+      status: 200,
+      headers: { 'content-type': 'application/gzip' }
+    });
+
+    const rows = await fetchOpenFoodFactsExportProducts({
+      codes: ['7311071330525'],
+      fetchImpl,
+      maxRows: 1,
+      retrievedAt: '2026-05-22T22:52:02.759Z'
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].name, 'Mörkt fullkornsbröd med lingon.');
+    assert.equal(rows[0].nutritionPer100g.proteins, 8.8);
+  });
+});
+
+describe('fetchOpenFoodFactsExportRetailerEnrichments', () => {
+  it('joins only retailer candidate barcodes from the export and skips nutrition-empty rows', async () => {
+    const tsv = [
+      'code\turl\tproduct_name\tquantity\tbrands\tcategories_tags\tlabels_tags\tnutriscore_grade\tenergy_100g\tenergy-kcal_100g\tfat_100g\tsaturated-fat_100g\tcarbohydrates_100g\tsugars_100g\tfiber_100g\tproteins_100g\tsalt_100g\tsodium_100g\timage_url',
+      '7310130003547\thttps://world.openfoodfacts.org/product/7310130003547/ideal-makaroner-kungsornen\tIdeal Makaroner\t750 g\tKungsörnen\ten:pastas\t\ta\t1509\t361\t2\t0.5\t72\t3\t3\t11\t0.01\t0.004\thttps://images.openfoodfacts.org/images/products/731/013/000/3547/front_sv.11.400.jpg',
+      '7310130000000\thttps://world.openfoodfacts.org/product/7310130000000/missing-nutrition\tMissing Nutrition\t1 kg\tTestbrand\ten:pastas\t\tunknown\t\t\t\t\t\t\t\t\t\t\t',
+      '7340083494406\thttps://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado\tHavredryck choklad\t1 l\tEldorado\ten:beverages\ten:vegan\td\t180\t43\t1.5\t0.2\t6.5\t5.2\t0.8\t1\t0.12\t0.048\thttps://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg'
+    ].join('\n');
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(gzipSync(tsv), { status: 200, headers: { 'content-type': 'application/gzip' } });
+    };
+
+    const rows = await fetchOpenFoodFactsExportRetailerEnrichments({
+      fetchImpl,
+      retrievedAt: '2026-05-22T09:54:39.728Z',
+      candidates: [
+        {
+          chain: 'citygross',
+          productCode: '100002667_ST',
+          name: 'Ideal Makaroner',
+          brand: 'Kungsörnen',
+          packageText: '750G',
+          barcode: '7310130003547',
+          sourceUrl: 'https://www.citygross.se/api/v1/Loop54/products?Q=pasta&skip=0&take=24&siteId=21',
+          retrievedAt: '2026-05-22T12:36:27.185Z'
+        },
+        {
+          chain: 'willys',
+          productCode: '101205621_ST',
+          name: 'Idealmakaroner Gammaldags',
+          brand: 'Kungsörnen',
+          packageText: 'KUNGSÖRNEN, 750g',
+          imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
+          sourceUrl: 'https://www.willys.se/search?q=makaroner',
+          retrievedAt: '2026-05-20T23:54:12.788Z'
+        },
+        {
+          chain: 'coop',
+          productCode: '7310130000000',
+          name: 'Missing Nutrition',
+          brand: 'Testbrand',
+          packageText: '1 kg',
+          barcode: '7310130000000',
+          sourceUrl: 'https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1',
+          retrievedAt: '2026-05-21T01:29:42.710Z'
+        },
+        {
+          chain: 'coop',
+          productCode: 'not-in-export',
+          name: 'No Match',
+          brand: '',
+          packageText: '',
+          barcode: '00000000',
+          sourceUrl: 'https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1',
+          retrievedAt: '2026-05-21T01:29:42.710Z'
+        }
+      ]
+    });
+
+    assert.deepEqual(requestedUrls, [OPENFOODFACTS_EXPORT_URL]);
+    assert.equal(extractOpenFoodFactsBarcodeFromImageUrl('https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000374.jpg'), '7310401000374');
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].barcode, '7310130003547');
+    assert.equal(rows[0].sourceUrl, `${OPENFOODFACTS_EXPORT_URL}#code=7310130003547`);
+    assert.equal(rows[0].nutritionPer100g.energyKcal, 361);
+    assert.deepEqual(rows[0].retailerMatches.map((match) => match.chain), ['citygross', 'willys']);
+    assert.deepEqual(rows[0].retailerMatches.map((match) => match.productCode), ['100002667_ST', '101205621_ST']);
+  });
+});
+
+describe('fetchOpenFoodFactsRetailerEnrichments', () => {
+  it('adds barcode nutrition only for matched OpenFoodFacts retailer candidates', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const code = String(url).includes('7310130003547') ? '7310130003547' : '';
+      const status = code ? 200 : 404;
+      return new Response(JSON.stringify(code ? {
+        status: 1,
+        product: {
+          code,
+          product_name_sv: 'Ideal Makaroner',
+          brands: 'Kungsörnen',
+          quantity: '750 g',
+          categories_tags: ['en:pastas'],
+          labels_tags: [],
+          nutriscore_grade: 'a',
+          nutriments: {
+            energy_100g: 1509,
+            'energy-kcal_100g': 361,
+            fat_100g: 2,
+            'saturated-fat_100g': 0.5,
+            carbohydrates_100g: 72,
+            sugars_100g: 3,
+            fiber_100g: 3,
+            proteins_100g: 11,
+            salt_100g: 0.01,
+            sodium_100g: 0.004
+          },
+          url: 'https://world.openfoodfacts.org/product/7310130003547/ideal-makaroner-kungsornen'
+        }
+      } : { status: 0 }), { status, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOpenFoodFactsRetailerEnrichments({
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:07.875Z',
+      candidates: [
+        {
+          chain: 'citygross',
+          productCode: '100002667_ST',
+          name: 'Ideal Makaroner',
+          brand: 'Kungsörnen',
+          packageText: '750G',
+          barcode: '7310130003547',
+          sourceUrl: 'https://www.citygross.se/api/v1/Loop54/products?Q=pasta&skip=0&take=24&siteId=21',
+          retrievedAt: '2026-05-22T12:36:27.185Z'
+        },
+        {
+          chain: 'willys',
+          productCode: '101205621_ST',
+          name: 'Idealmakaroner Gammaldags',
+          brand: 'Kungsörnen',
+          packageText: 'KUNGSÖRNEN, 750g',
+          imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
+          sourceUrl: 'https://www.willys.se/search?q=makaroner',
+          retrievedAt: '2026-05-20T23:54:12.788Z'
+        },
+        {
+          chain: 'hemkop',
+          productCode: '101205621_ST',
+          name: 'Idealmakaroner Gammaldags',
+          brand: 'Kungsörnen',
+          packageText: 'KUNGSÖRNEN, 750g',
+          imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
+          sourceUrl: 'https://www.hemkop.se/search?q=makaroner',
+          retrievedAt: '2026-05-21T00:41:39.516Z'
+        },
+        {
+          chain: 'coop',
+          productCode: 'missing',
+          name: 'Missing',
+          brand: '',
+          packageText: '',
+          barcode: '00000000',
+          sourceUrl: 'https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1',
+          retrievedAt: '2026-05-21T01:29:42.710Z'
+        }
+      ]
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildOpenFoodFactsProductUrl('7310130003547'),
+      buildOpenFoodFactsProductUrl('00000000')
+    ]);
+    assert.equal(extractOpenFoodFactsBarcodeFromAxfoodImageUrl('https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03'), '7310130003547');
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].barcode, '7310130003547');
+    assert.equal(rows[0].nutritionPer100g.energyKcal, 361);
+    assert.deepEqual(rows[0].retailerMatches.map((match) => match.chain), ['citygross', 'willys', 'hemkop']);
   });
 });
 
 describe('fetchCoopProducts', () => {
+  it('fetches Coop branch catalog metadata from the public store API', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildCoopStoresUrl()) {
+        return new Response(JSON.stringify({
+          stores: [
+            { ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', siteId: 1658, conceptName: 'Stora Coop' },
+            { ledgerAccountNumber: '252700', name: 'Stora Coop Bromma', siteId: 1443, conceptName: 'Stora Coop' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = String(url).includes('/252700') ? '252700' : '251300';
+      return new Response(JSON.stringify({
+        ledgerAccountNumber: storeId,
+        siteId: storeId === '252700' ? 1443 : 1658,
+        name: storeId === '252700' ? 'Stora Coop Bromma' : 'Stora Coop Boländerna',
+        concept: { name: 'Stora Coop' },
+        address: storeId === '252700' ? 'Ulvsundavägen 185' : 'Rapsgatan 1b',
+        city: storeId === '252700' ? 'Bromma' : 'Uppsala',
+        postalCode: storeId === '252700' ? '16867' : '75323',
+        latitude: storeId === '252700' ? 59.354 : 59.8456428,
+        longitude: storeId === '252700' ? 17.955 : 17.6954236,
+        services: storeId === '252700' ? ['ATG-ombud'] : ['Hämta – beställ och hämta i butiken'],
+        weeklyOffersLink: `https://dr.coop.se/butik/${storeId}`,
+        url: `/butiker-erbjudanden/coop/${storeId}/`
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopStores({
+      fetchImpl,
+      storeApiSubscriptionKey: 'public-store-test-key',
+      maxRows: 2,
+      retrievedAt: '2026-05-22T11:00:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopStoresUrl(),
+      buildCoopStoreInfoUrl('251300'),
+      buildCoopStoreInfoUrl('252700')
+    ]);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0], {
+      storeId: '251300',
+      siteId: '1658',
+      ledgerAccountNumber: '251300',
+      name: 'Stora Coop Boländerna',
+      conceptName: 'Stora Coop',
+      address: 'Rapsgatan 1b',
+      city: 'Uppsala',
+      postalCode: '75323',
+      latitude: 59.8456428,
+      longitude: 17.6954236,
+      weeklyOffersLink: 'https://dr.coop.se/butik/251300',
+      url: '/butiker-erbjudanden/coop/251300/',
+      supportsOnlineProductPrices: true,
+      sourceUrl: buildCoopStoresUrl(),
+      retrievedAt: '2026-05-22T11:00:00.000Z'
+    });
+  });
+
   it('fetches public Coop personalization rows with price provenance', async () => {
     const requestedUrls: string[] = [];
     let requestBody = '';
@@ -231,9 +864,545 @@ describe('fetchCoopProducts', () => {
       personalizationApiVersion: 'v1'
     });
   });
+
+  it('fetches Coop top-level category ids from the public Hybris category tree', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        nodes: [
+          { code: '16534', name: 'Frukt & grönsaker', children: [{ code: '32361', name: 'Grönsaker' }] },
+          { code: '6262', name: 'Mejeri & ägg', children: [] },
+          { code: '0001', children: [] }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopCategoryIds({
+      fetchImpl,
+      storeId: '251300',
+      subscriptionKey: 'coop-key'
+    });
+
+    assert.deepEqual(requestedUrls, [buildCoopCategoryTreeUrl('251300')]);
+    assert.deepEqual(rows, ['16534', '6262']);
+  });
+
+  it('fetches Coop full branch catalog pages by category id when no query list is supplied', async () => {
+    const requestedUrls: string[] = [];
+    const requestBodies: unknown[] = [];
+    const fetchImpl: typeof fetch = async (url, init) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildCoopCategoryTreeUrl('251300')) {
+        return new Response(JSON.stringify({
+          nodes: [
+            { code: '16534', name: 'Frukt & grönsaker' },
+            { code: '6262', name: 'Mejeri & ägg' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      requestBodies.push(JSON.parse(String(init?.body)));
+      const body = JSON.parse(String(init?.body));
+      const categoryId = body.attribute.value;
+      const skip = body.resultsOptions.skip;
+      return new Response(JSON.stringify({
+        results: {
+          count: categoryId === '16534' ? 2 : 1,
+          items: [{
+            id: categoryId === '16534' && skip === 0 ? '2317401100009' : '7310865005168',
+            ean: categoryId === '16534' && skip === 0 ? '2317401100009' : '7310865005168',
+            name: categoryId === '16534' && skip === 0 ? 'Banan Styck' : 'Svenskt Smör',
+            manufacturerName: categoryId === '16534' && skip === 0 ? 'Coop' : 'Arla',
+            packageSizeInformation: categoryId === '16534' && skip === 0 ? 'ca 180 g' : '500 g',
+            salesPriceData: { b2cPrice: categoryId === '16534' && skip === 0 ? 3.95 : 45 },
+            comparativePriceData: { b2cPrice: categoryId === '16534' && skip === 0 ? 21.94 : 90 },
+            comparativePriceText: 'kr/kg',
+            availableOnline: true,
+            navCategories: [{ name: categoryId === '16534' ? 'Frukt' : 'Smör', superCategories: [] }]
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopProductCatalog({
+      fetchImpl,
+      storeId: '251300',
+      subscriptionKey: 'coop-key',
+      maxRowsPerCategory: 1,
+      retrievedAt: '2026-05-23T09:00:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopCategoryTreeUrl('251300'),
+      buildCoopCategoryProductsUrl('251300'),
+      buildCoopCategoryProductsUrl('251300')
+    ]);
+    assert.deepEqual(requestBodies.map((body) => (body as { attribute: { name: string; value: string } }).attribute), [
+      { name: 'categoryIds', value: '16534' },
+      { name: 'categoryIds', value: '6262' }
+    ]);
+    assert.deepEqual(rows.map((row) => [row.code, row.name, row.price]), [
+      ['2317401100009', 'Banan Styck', 3.95],
+      ['7310865005168', 'Svenskt Smör', 45]
+    ]);
+  });
+});
+
+describe('fetchCoopWeeklyDiscounts', () => {
+  it('fetches Coop weekly discounts for multiple public flyer branches', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url, init) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/stores/')) {
+        const storeId = String(url).includes('/252700') ? '252700' : '251300';
+        const storeName = storeId === '252700' ? 'Stora Coop Bromma' : 'Stora Coop Boländerna';
+        const city = storeId === '252700' ? 'Bromma' : 'Uppsala';
+        const flyerUrl = storeId === '252700'
+          ? 'https://dr.coop.se/Butik/Stora-Coop-Bromma'
+          : 'https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna';
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: storeId,
+          name: storeName,
+          city,
+          flyers: [{
+            startDate: '2026-05-18T00:00:00',
+            stopDate: '2026-05-24T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: flyerUrl,
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: '7310865005168',
+            ean: '7310865005168',
+            name: 'Smör Normalsaltat',
+            manufacturerName: 'Svenskt Smör från Arla',
+            packageSizeInformation: '500g',
+            salesPriceData: { b2cPrice: 61.45 },
+            comparativePriceText: 'kr/kg',
+            onlinePromotions: [{
+              id: '016001_41099',
+              message: 'Medlemspris-Smör 45 kr/st-1 för 45:-',
+              priceData: { b2cPrice: 45 },
+              comparativePrice: { b2cPrice: 90 },
+              medMeraRequired: true
+            }]
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscounts({
+      storeIds: ['251300', '252700'],
+      productQueries: ['Svenskt smör Arla 500 g'],
+      fetchImpl,
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-22T09:05:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopStoreInfoUrl('251300'),
+      buildCoopSearchUrl('251300'),
+      buildCoopStoreInfoUrl('252700'),
+      buildCoopSearchUrl('252700')
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.storeName, row.region, row.code]), [
+      ['251300', 'Stora Coop Boländerna', 'Uppsala', '7310865005168'],
+      ['252700', 'Stora Coop Bromma', 'Bromma', '7310865005168']
+    ]);
+    assert.equal(rows[0]?.ordinaryPrice, 61.45);
+    assert.equal(rows[0]?.offerPrice, 45);
+    assert.equal(rows[1]?.flyerUrl, 'https://dr.coop.se/Butik/Stora-Coop-Bromma');
+  });
+
+  it('uses scoped flyer offer hints when the product API omits promotion objects', async () => {
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/stores/')) {
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: '105860',
+          name: 'Stora Coop Stadion',
+          city: 'Malmö',
+          flyers: [{
+            startDate: '2026-05-18T00:00:00',
+            stopDate: '2026-05-24T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: 'https://dr.coop.se/Butik/Stora-Coop-Stadion',
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: '2383471000006',
+            ean: '2383471000006',
+            name: 'Laxfilé',
+            manufacturerName: 'Harbour',
+            packageSizeInformation: '1450 gram/bit ungefärlig vikt',
+            salesPriceData: { b2cPrice: 269 },
+            comparativePriceText: 'kr/kg',
+            onlinePromotions: []
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscounts({
+      storeIds: ['105860'],
+      productQueries: ['Färsk laxfilé Harbour'],
+      flyerOfferHints: [{
+        query: 'Färsk laxfilé Harbour',
+        code: '2383471000006',
+        storeIds: ['105860'],
+        offerPrice: 149,
+        offerUnitPrice: 149,
+        offerUnitPriceText: '149.00 kr/kg',
+        offerMechanicText: 'Medlemspris-Färsk laxfilé-149:- /kg',
+        medMeraRequired: true
+      }],
+      fetchImpl,
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-22T16:55:10.087Z'
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.ordinaryPrice, 269);
+    assert.equal(rows[0]?.offerPrice, 149);
+    assert.equal(rows[0]?.promotionId, 'flyer:105860:2383471000006:2026-05-18');
+    assert.equal(rows[0]?.medMeraRequired, true);
+    assert.equal(rows[0]?.flyerUrl, 'https://dr.coop.se/Butik/Stora-Coop-Stadion');
+  });
+
+  it('parses Coop DR flyer PDF text into branch weekly offers', () => {
+    const rows = parseCoopDrPdfTextOffers([
+      'Kvistcocktailtomater',
+      'Spanien/Nederländerna/Marocko. Klass 1. 500 g.',
+      'Jfr-pris 29:80/kg.',
+      '14',
+      '90',
+      '/ask',
+      'Hushållsost',
+      'Arla. Fetthalt 17-26%. Välj mellan olika sorter. Ca 1100-2200 g.',
+      'Ord. pris från 116:41/kg.',
+      '69:-',
+      '/kg'
+    ].join('\n'), {
+      flyerUrl: 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden',
+      productSearchUrl: 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden',
+      sourceUrl: buildCoopStoreInfoUrl('216502'),
+      retrievedAt: '2026-05-23T01:45:00.000Z',
+      storeId: '216502',
+      storeName: 'X:-Tra Kirseberg',
+      region: 'Malmö',
+      validFrom: '2026-05-25T00:00:00',
+      validTo: '2026-05-31T23:59:59'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.name, row.offerPrice, row.offerUnitPriceText]), [
+      ['216502', 'Kvistcocktailtomater', 14.9, '/ask'],
+      ['216502', 'Hushållsost', 69, '/kg']
+    ]);
+    assert.equal(rows[0]?.packageText, 'Spanien/Nederländerna/Marocko. Klass 1. 500 g.');
+    assert.equal(rows[1]?.flyerUrl, 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden');
+  });
+
+  it('falls back to Coop DR flyer PDF text when a physical branch has no product API rows', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/stores/216502')) {
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: '216502',
+          name: 'X:-Tra Kirseberg',
+          city: 'Malmö',
+          flyers: [{
+            startDate: '2026-05-25T00:00:00',
+            stopDate: '2026-05-31T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden',
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url).startsWith('https://dr.coop.se/')) {
+        return new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { 'content-type': 'application/pdf' } });
+      }
+      return new Response(JSON.stringify({ results: { count: 0, items: [] } }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscounts({
+      storeIds: ['216502'],
+      productQueries: ['kaffe'],
+      fetchImpl,
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-23T01:45:00.000Z',
+      pdfTextExtractor: async () => [
+        'Kvistcocktailtomater',
+        'Spanien/Nederländerna/Marocko. Klass 1. 500 g.',
+        'Jfr-pris 29:80/kg.',
+        '14',
+        '90',
+        '/ask'
+      ].join('\n')
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopStoreInfoUrl('216502'),
+      buildCoopSearchUrl('216502'),
+      'https://dr.coop.se/Butik/216502/period/180853/erbjudanden'
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.name, row.offerPrice]), [
+      ['216502', 'Kvistcocktailtomater', 14.9]
+    ]);
+  });
+
+  it('tries the next Coop DR flyer PDF when the current flyer URL is an HTML placeholder', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/stores/216502')) {
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: '216502',
+          name: 'X:-Tra Kirseberg',
+          city: 'Malmö',
+          flyers: [{
+            startDate: '2026-05-18T00:00:00',
+            stopDate: '2026-05-24T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: 'https://dr.coop.se/Butik/X%3A-tra-Kirseberg',
+            isHemmaBilaga: false
+          }, {
+            startDate: '2026-05-25T00:00:00',
+            stopDate: '2026-05-31T23:59:59',
+            current: false,
+            pdfExists: true,
+            pdfUrl: 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden',
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url) === 'https://dr.coop.se/Butik/X%3A-tra-Kirseberg') {
+        return new Response('<html>DR-blad saknas</html>', { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+      if (String(url) === 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden') {
+        return new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { 'content-type': 'application/pdf' } });
+      }
+      return new Response(JSON.stringify({ results: { count: 0, items: [] } }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscounts({
+      storeIds: ['216502'],
+      productQueries: ['kaffe'],
+      fetchImpl,
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-23T01:45:00.000Z',
+      pdfTextExtractor: async () => [
+        'Kvistcocktailtomater',
+        '14',
+        '90',
+        '/ask'
+      ].join('\n')
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopStoreInfoUrl('216502'),
+      buildCoopSearchUrl('216502'),
+      'https://dr.coop.se/Butik/X%3A-tra-Kirseberg',
+      'https://dr.coop.se/Butik/216502/period/180853/erbjudanden'
+    ]);
+    assert.deepEqual(rows.map((row) => [row.name, row.offerPrice, row.flyerUrl]), [
+      ['Kvistcocktailtomater', 14.9, 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden']
+    ]);
+  });
+
+  it('parses Coop DR flyers where product names and prices are separate columns', () => {
+    const rows = parseCoopDrPdfTextOffers([
+      'GRILL',
+      'GLÄDJE',
+      'MAX 2 ST/HUSHÅLL.',
+      'Färsk kycklingbröstfilé',
+      'Sverige/Kronfågel.',
+      'Kyld. Ca 925 g.',
+      'Ätmogen avokado 3-pack',
+      'Chile/Peru/Coop.',
+      'Klass 1. 400 g. Jfr-pris 9:-/st.',
+      'VECKANS',
+      'SUPER-',
+      'KLIPP!',
+      '109k',
+      '/kg',
+      'MEDLEMSPRIS',
+      '2 FÖR',
+      '99k',
+      'cn_2621_mandag_mitt plugg_s1-4_sid 1'
+    ].join('\n'), {
+      flyerUrl: 'https://dr.coop.se/Butik/Coop-Krylbo',
+      productSearchUrl: 'https://dr.coop.se/Butik/Coop-Krylbo',
+      sourceUrl: buildCoopStoreInfoUrl('196183'),
+      retrievedAt: '2026-05-23T01:45:00.000Z',
+      storeId: '196183',
+      storeName: 'Coop Krylbo',
+      region: 'Krylbo',
+      validFrom: '2026-05-18T00:00:00',
+      validTo: '2026-05-24T23:59:59'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.name, row.offerPrice, row.offerUnitPriceText]), [
+      ['Färsk kycklingbröstfilé', 109, '/kg'],
+      ['Ätmogen avokado 3-pack', 99, '']
+    ]);
+  });
+
+  it('can expand Coop weekly discounts across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildCoopStoresUrl()) {
+        return new Response(JSON.stringify({
+          stores: [
+            { ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', conceptName: 'Stora Coop', address: 'Rapsgatan 1b', city: 'Uppsala' },
+            { ledgerAccountNumber: '252700', name: 'Stora Coop Bromma', conceptName: 'Stora Coop', address: 'Ulvsundavägen 185', city: 'Bromma' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url).includes('/stores/')) {
+        const storeId = String(url).includes('/252700') ? '252700' : '251300';
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: storeId,
+          name: storeId === '252700' ? 'Stora Coop Bromma' : 'Stora Coop Boländerna',
+          city: storeId === '252700' ? 'Bromma' : 'Uppsala',
+          flyers: [{
+            startDate: '2026-05-18T00:00:00',
+            stopDate: '2026-05-24T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: `https://dr.coop.se/butik/${storeId}`,
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: 'coop-catalog-promo',
+            ean: '7310865005168',
+            name: 'Smör Normalsaltat',
+            manufacturerName: 'Svenskt Smör från Arla',
+            packageSizeInformation: '500g',
+            salesPriceData: { b2cPrice: 61.45 },
+            onlinePromotions: [{ id: 'promo', message: 'Smör 45 kr/st', priceData: { b2cPrice: 45 } }]
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscountsForAllStores({
+      fetchImpl,
+      includeStoreDetails: false,
+      maxStores: 2,
+      productQueries: ['Svenskt smör Arla 500 g'],
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-22T09:05:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildCoopStoresUrl());
+    assert.deepEqual(new Set(requestedUrls.slice(1)), new Set([
+      buildCoopStoreInfoUrl('251300'),
+      buildCoopSearchUrl('251300'),
+      buildCoopStoreInfoUrl('252700'),
+      buildCoopSearchUrl('252700')
+    ]));
+    assert.deepEqual(rows.map((row) => row.storeId), ['251300', '252700']);
+  });
+
+  it('keeps Coop all-store weekly discounts when one branch request fails', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildCoopStoresUrl()) {
+        return new Response(JSON.stringify({
+          stores: [
+            { ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', conceptName: 'Stora Coop', address: 'Rapsgatan 1b', city: 'Uppsala' },
+            { ledgerAccountNumber: '176111', name: 'X:-Tra Hallsberg', conceptName: 'X:-Tra', address: 'Testgatan 1', city: 'Hallsberg' },
+            { ledgerAccountNumber: '252700', name: 'Stora Coop Bromma', conceptName: 'Stora Coop', address: 'Ulvsundavägen 185', city: 'Bromma' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url).includes('/stores/176111')) {
+        throw new TypeError('fetch failed');
+      }
+      if (String(url).includes('/stores/')) {
+        const storeId = String(url).includes('/252700') ? '252700' : '251300';
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: storeId,
+          name: storeId === '252700' ? 'Stora Coop Bromma' : 'Stora Coop Boländerna',
+          city: storeId === '252700' ? 'Bromma' : 'Uppsala',
+          flyers: [{
+            startDate: '2026-05-18T00:00:00',
+            stopDate: '2026-05-24T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: `https://dr.coop.se/butik/${storeId}`,
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: 'coop-catalog-promo',
+            ean: '7310865005168',
+            name: 'Smör Normalsaltat',
+            manufacturerName: 'Svenskt Smör från Arla',
+            packageSizeInformation: '500g',
+            salesPriceData: { b2cPrice: 61.45 },
+            onlinePromotions: [{ id: 'promo', message: 'Smör 45 kr/st', priceData: { b2cPrice: 45 } }]
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscountsForAllStores({
+      fetchImpl,
+      includeStoreDetails: false,
+      maxStores: 3,
+      productQueries: ['Svenskt smör Arla 500 g'],
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-22T09:05:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => row.storeId), ['251300', '252700']);
+    assert.ok(requestedUrls.includes(buildCoopStoreInfoUrl('176111')));
+  });
 });
 
 describe('fetchOverpassGroceryStores', () => {
+  it('ships a Sweden-wide query for the nationwide OSM store refresh', () => {
+    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-1"="SE/);
+    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /admin_level=2/);
+    assert.match(SWEDEN_GROCERY_OVERPASS_QUERY, /shop"~"\^\(supermarket\|convenience\|grocery\)\$/);
+    assert.doesNotMatch(SWEDEN_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
+    assert.match(STOCKHOLM_GROCERY_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
+    assert.equal(SWEDISH_COUNTY_ISO3166_2_CODES.length, 21);
+    assert.match(buildSwedishCountyGroceryOverpassQuery('SE-M'), /ISO3166-2"="SE-M/);
+    assert.match(buildSwedishCountyGroceryOverpassQuery('SE-M'), /admin_level=4/);
+  });
+
   it('posts a public Overpass query and preserves OSM store provenance', async () => {
     const requestedBodies: string[] = [];
     const fetchImpl: typeof fetch = async (url, init) => {
@@ -298,6 +1467,94 @@ describe('fetchOverpassGroceryStores', () => {
   });
 });
 
+
+describe('fetchOverpassFuelStations', () => {
+  it('ships a Sweden-wide amenity=fuel query for the fuel station refresh', () => {
+    assert.match(SWEDEN_FUEL_OVERPASS_QUERY, /ISO3166-1"="SE/);
+    assert.match(SWEDEN_FUEL_OVERPASS_QUERY, /admin_level=2/);
+    assert.match(SWEDEN_FUEL_OVERPASS_QUERY, /amenity"="fuel/);
+    assert.doesNotMatch(SWEDEN_FUEL_OVERPASS_QUERY, /shop"~"/);
+    assert.doesNotMatch(SWEDEN_FUEL_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
+    assert.match(STOCKHOLM_FUEL_OVERPASS_QUERY, /ISO3166-2"="SE-AB/);
+    assert.match(buildSwedishCountyFuelOverpassQuery('SE-M'), /ISO3166-2"="SE-M/);
+    assert.match(buildSwedishCountyFuelOverpassQuery('SE-M'), /admin_level=4/);
+  });
+
+  it('posts the public fuel station query and preserves OSM provenance without prices', async () => {
+    const requestedBodies: string[] = [];
+    const fetchImpl: typeof fetch = async (url, init) => {
+      assert.equal(String(url), OVERPASS_INTERPRETER_URL);
+      assert.equal(init?.method, 'POST');
+      requestedBodies.push(String(init?.body));
+      return new Response(JSON.stringify({
+        elements: [{
+          type: 'node',
+          id: 987654,
+          lat: 59.334,
+          lon: 18.031,
+          tags: {
+            amenity: 'fuel',
+            name: 'Circle K Norrmalm',
+            brand: 'Circle K',
+            operator: 'Circle K Sverige AB',
+            'addr:street': 'Sveavägen',
+            'addr:housenumber': '155',
+            'addr:postcode': '11346',
+            'addr:city': 'Stockholm',
+            opening_hours: '24/7',
+            website: 'https://www.circlek.se/',
+            phone: '+468000000',
+            'fuel:octane_95': 'yes',
+            'fuel:diesel': 'yes',
+            'fuel:e85': 'no',
+            'fuel:adblue': 'yes'
+          }
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOverpassFuelStations({
+      fetchImpl,
+      retrievedAt: '2026-05-23T08:00:00.000Z'
+    });
+
+    assert.match(requestedBodies[0], /amenity%22%3D%22fuel|amenity"="fuel/);
+    assert.deepEqual(rows, [{
+      osmType: 'node',
+      osmId: 987654,
+      name: 'Circle K Norrmalm',
+      brand: 'Circle K',
+      operator: 'Circle K Sverige AB',
+      latitude: 59.334,
+      longitude: 18.031,
+      street: 'Sveavägen',
+      houseNumber: '155',
+      postcode: '11346',
+      city: 'Stockholm',
+      openingHours: '24/7',
+      website: 'https://www.circlek.se/',
+      phone: '+468000000',
+      availableFuelGrades: ['95', 'diesel', 'adblue'],
+      sourceUrl: OVERPASS_INTERPRETER_URL,
+      retrievedAt: '2026-05-23T08:00:00.000Z'
+    }]);
+  });
+
+  it('drops fuel station elements without coordinates, names, or amenity=fuel', () => {
+    const rows = parseOverpassFuelStations({
+      elements: [
+        { type: 'node', id: 1, lat: 59, lon: 18, tags: { amenity: 'fuel', name: 'Valid station' } },
+        { type: 'node', id: 2, tags: { amenity: 'fuel', name: 'Missing coordinates' } },
+        { type: 'node', id: 3, lat: 59, lon: 18, tags: { amenity: 'fuel' } },
+        { type: 'node', id: 4, lat: 59, lon: 18, tags: { amenity: 'charging_station', name: 'Wrong amenity' } }
+      ]
+    }, '2026-05-23T08:00:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].name, 'Valid station');
+  });
+});
+
 describe('fetchHemkopProducts', () => {
   it('fetches public Hemkop search rows with price provenance', async () => {
     const requestedUrls: string[] = [];
@@ -325,10 +1582,11 @@ describe('fetchHemkopProducts', () => {
     const rows = await fetchHemkopProducts({
       queries: ['makaroner'],
       fetchImpl,
+      pageSize: 100,
       retrievedAt: '2026-05-21T00:45:00.000Z'
     });
 
-    assert.equal(requestedUrls[0], buildHemkopSearchUrl('makaroner'));
+    assert.equal(requestedUrls[0], buildHemkopSearchUrl('makaroner', 100, 0));
     assert.deepEqual(rows, [{
       code: '101205621_ST',
       name: 'Idealmakaroner Gammaldags',
@@ -343,9 +1601,41 @@ describe('fetchHemkopProducts', () => {
       labels: ['keyhole'],
       online: true,
       outOfStock: false,
-      sourceUrl: buildHemkopSearchUrl('makaroner'),
+      sourceUrl: buildHemkopSearchUrl('makaroner', 100, 0),
       retrievedAt: '2026-05-21T00:45:00.000Z'
     }]);
+  });
+
+  it('paginates Hemkop search rows until reported pages are exhausted', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = new URL(String(url)).searchParams.get('page');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 2, currentPage: Number(page) },
+        results: [{
+          code: `hemkop-product-${page}`,
+          name: `Hemkop product ${page}`,
+          priceValue: 10,
+          price: '10,00 kr'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopProducts({
+      queries: ['makaroner'],
+      maxRows: 10,
+      pageSize: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-21T00:45:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildHemkopSearchUrl('makaroner', 1, 0),
+      buildHemkopSearchUrl('makaroner', 1, 1)
+    ]);
+    assert.deepEqual(rows.map((row) => row.code), ['hemkop-product-0', 'hemkop-product-1']);
+    assert.equal(rows[1]?.sourceUrl, buildHemkopSearchUrl('makaroner', 1, 1));
   });
 
   it('deduplicates products across Hemkop search queries', async () => {
@@ -366,51 +1656,547 @@ describe('fetchHemkopProducts', () => {
 
     assert.equal(rows.length, 1);
   });
-});
 
-describe('fetchIcaProducts', () => {
-  it('fetches public ICA handla product cards with source provenance', async () => {
+  it('fans Hemkop branch product prices across the live store catalog', async () => {
     const requestedUrls: string[] = [];
-    const html = `
-      <a title="Pasta Gnocchi Färsk 400g ICA" href="/produkt/2118838" class="product-link" data-name="Pasta Gnocchi Färsk 400g ICA" data-index="24" data-categories="[&#34;Färdigmat &#38; Såser&#34;,&#34;Färsk pasta&#34;]" data-price="0">
-        <img src="https://assets.icanet.se/image/upload/cs_srgb/t_product_medium_v1/ul98v6ybpfgb1z7127y9.webp" alt="Pasta Gnocchi Färsk 400g ICA">
-      </a>`;
     const fetchImpl: typeof fetch = async (url) => {
       requestedUrls.push(String(url));
-      return new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: { line1: 'Masthuggstorget 3', town: 'Göteborg' } },
+          { storeId: '4798', name: 'Hemköp Bollnäs', address: { line1: 'Långgatan 10', town: 'Bollnäs' } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('store') ?? 'unknown';
+      return new Response(JSON.stringify({ results: [{
+        code: `hemkop-store-product-${storeId}`,
+        name: `Hemkop product ${storeId}`,
+        manufacturer: 'Hemköp',
+        productLine2: '500g',
+        googleAnalyticsCategory: 'Kaffe',
+        priceValue: 42,
+        price: '42,00 kr'
+      }] }), { status: 200, headers: { 'content-type': 'application/json' } });
     };
 
-    const rows = await fetchIcaProducts({
-      paths: ['/kategori/306'],
+    const rows = await fetchHemkopProductsForAllStores({
       fetchImpl,
-      retrievedAt: '2026-05-21T01:05:00.000Z'
+      queries: ['kaffe'],
+      maxStores: 2,
+      maxRowsPerStore: 1,
+      retrievedAt: '2026-05-23T02:20:00.000Z'
     });
 
-    assert.equal(requestedUrls[0], buildIcaHandlaUrl('/kategori/306'));
-    assert.deepEqual(rows, [{
-      code: '2118838',
-      name: 'Pasta Gnocchi Färsk 400g ICA',
-      brand: '',
-      categories: ['Färdigmat & Såser', 'Färsk pasta'],
-      imageUrl: 'https://assets.icanet.se/image/upload/cs_srgb/t_product_medium_v1/ul98v6ybpfgb1z7127y9.webp',
-      productUrl: 'https://handla.ica.se/produkt/2118838',
-      dataPrice: '0',
-      sourceUrl: buildIcaHandlaUrl('/kategori/306'),
-      retrievedAt: '2026-05-21T01:05:00.000Z'
+    assert.deepEqual(requestedUrls, [
+      buildHemkopStoresUrl({ online: true }),
+      buildHemkopSearchUrl('kaffe', 1, 0, '4003'),
+      buildHemkopSearchUrl('kaffe', 1, 0, '4798')
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.storeName, row.code]), [
+      ['4003', 'Hemköp Göteborg Masthuggstorget', 'hemkop-store-product-4003'],
+      ['4798', 'Hemköp Bollnäs', 'hemkop-store-product-4798']
+    ]);
+  });
+
+});
+
+describe('fetchHemkopWeeklyDiscounts', () => {
+  it('fetches Hemkop branch metadata from the public Axfood store API', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify([
+        {
+          storeId: '4798',
+          name: 'Hemköp Bollnäs',
+          address: {
+            line1: 'Långgatan 10',
+            town: 'Bollnäs',
+            postalCode: '821 43',
+            country: { isocode: 'SE' }
+          },
+          geoPoint: { latitude: 61.3461, longitude: 16.0543 },
+          onlineStore: true,
+          clickAndCollect: true,
+          flyerURL: 'https://hemkop.eo.se/hkp/4798.pdf'
+        }
+      ]), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const stores = await fetchHemkopStores({
+      fetchImpl,
+      online: true,
+      maxRows: 1,
+      retrievedAt: '2026-05-22T12:20:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildHemkopStoresUrl({ online: true })]);
+    assert.deepEqual(stores, [{
+      storeId: '4798',
+      name: 'Hemköp Bollnäs',
+      address: 'Långgatan 10',
+      city: 'Bollnäs',
+      postalCode: '821 43',
+      countryCode: 'SE',
+      latitude: 61.3461,
+      longitude: 16.0543,
+      onlineStore: true,
+      clickAndCollect: true,
+      flyerUrl: 'https://hemkop.eo.se/hkp/4798.pdf',
+      sourceUrl: buildHemkopStoresUrl({ online: true }),
+      retrievedAt: '2026-05-22T12:20:00.000Z'
     }]);
   });
 
-  it('deduplicates products across ICA handla pages', async () => {
-    const html = '<a title="Same product" href="/produkt/1" class="product-link" data-name="Same product" data-categories="[]" data-price="0"><img src="/image.webp"></a>';
-    const fetchImpl: typeof fetch = async () => new Response(html, { status: 200 });
+  it('can expand Hemkop weekly discounts across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: { line1: 'Masthuggstorget 3', town: 'Göteborg' } },
+          { storeId: '4798', name: 'Hemköp Bollnäs', address: { line1: 'Långgatan 10', town: 'Bollnäs' } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('q') ?? 'unknown';
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 1 },
+        results: [{
+          name: `Catalog Hemkop offer ${storeId}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: `hemkop-all-store-promo-${storeId}`,
+            mainProductCode: `hemkop-all-store-product-${storeId}`,
+            name: `Catalog Hemkop offer ${storeId}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopWeeklyDiscountsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      pageSize: 1,
+      retrievedAt: '2026-05-22T12:21:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildHemkopStoresUrl({ online: true }),
+      buildHemkopWeeklyDiscountsUrl('4003', 1, 0),
+      buildHemkopWeeklyDiscountsUrl('4798', 1, 0)
+    ]);
+    assert.deepEqual(rows.map((row) => row.storeId), ['4003', '4798']);
+  });
+
+  it('fetches public Hemkop Axfood weekly discount rows with promotion provenance', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          manufacturer: 'Arla',
+          name: 'Svenskt smör',
+          priceNoUnit: '62.41',
+          googleAnalyticsCategory: 'mejeri-ost-och-agg|smor',
+          displayVolume: '500g',
+          image: { url: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01' },
+          labels: ['swedish_flag'],
+          potentialPromotions: [{
+            code: '2500298172',
+            mainProductCode: '101017249_ST',
+            name: 'Svenskt smör',
+            brands: ['Arla'],
+            campaignType: 'LOYALTY',
+            promotionType: 'MixMatchPricePromotion',
+            price: 39.95,
+            cartLabel: '39,95 kr/st',
+            comparePrice: '79,90/kg',
+            savePrice: 'Spara 22,46 kr',
+            weightVolume: '500g',
+            conditionLabel: '',
+            redeemLimitLabel: 'Max 3 köp',
+            startDate: '18/05-2026',
+            endDate: '24/05-2026',
+            validUntil: 1779659999000
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopWeeklyDiscounts({
+      storeId: '4003',
+      maxRows: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildHemkopWeeklyDiscountsUrl('4003', 1));
+    assert.deepEqual(rows, [{
+      code: '2500298172',
+      productCode: '101017249_ST',
+      name: 'Svenskt smör',
+      brand: 'Arla',
+      storeId: '4003',
+      campaignType: 'LOYALTY',
+      promotionType: 'MixMatchPricePromotion',
+      price: 39.95,
+      priceText: '39,95 kr/st',
+      comparePriceText: '79,90/kg',
+      regularPriceText: '62.41',
+      savePriceText: 'Spara 22,46 kr',
+      packageText: '500g',
+      conditionText: '',
+      redeemLimitText: 'Max 3 köp',
+      startDate: '18/05-2026',
+      endDate: '24/05-2026',
+      validUntil: '2026-05-24T21:59:59.000Z',
+      category: 'mejeri-ost-och-agg|smor',
+      imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01',
+      labels: ['swedish_flag'],
+      sourceUrl: buildHemkopWeeklyDiscountsUrl('4003', 1),
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    }]);
+  });
+
+  it('paginates Hemkop Axfood weekly discounts until reported pages are exhausted', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = new URL(String(url)).searchParams.get('page');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 2, currentPage: Number(page) },
+        results: [{
+          manufacturer: 'Garant',
+          name: `Hemkop offer ${page}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: `hemkop-${page}`,
+            mainProductCode: `hemkop-product-${page}`,
+            name: `Hemkop offer ${page}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopWeeklyDiscounts({
+      storeId: '4003',
+      maxRows: 10,
+      pageSize: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildHemkopWeeklyDiscountsUrl('4003', 1, 0),
+      buildHemkopWeeklyDiscountsUrl('4003', 1, 1)
+    ]);
+    assert.deepEqual(rows.map((row) => row.code), ['hemkop-0', 'hemkop-1']);
+    assert.equal(rows[1]?.sourceUrl, buildHemkopWeeklyDiscountsUrl('4003', 1, 1));
+  });
+
+  it('keeps Hemkop weekly discount rows distinct by store when promotion codes repeat', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const storeId = new URL(String(url)).searchParams.get('q');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 1 },
+        results: [{
+          manufacturer: 'Garant',
+          name: `Shared Hemkop offer ${storeId}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: 'shared-hemkop-promo',
+            mainProductCode: 'shared-hemkop-product',
+            name: `Shared Hemkop offer ${storeId}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopWeeklyDiscounts({
+      storeIds: ['4003', '4127'],
+      maxRows: 10,
+      pageSize: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildHemkopWeeklyDiscountsUrl('4003', 1, 0),
+      buildHemkopWeeklyDiscountsUrl('4127', 1, 0)
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code]), [
+      ['4003', 'shared-hemkop-promo'],
+      ['4127', 'shared-hemkop-promo']
+    ]);
+  });
+
+  it('uses the configured Hemkop weekly store list by default', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const storeId = new URL(String(url)).searchParams.get('q');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 1 },
+        results: [{
+          name: `Default Hemkop offer ${storeId}`,
+          priceNoUnit: '20',
+          potentialPromotions: [{
+            code: `default-hemkop-promo-${storeId}`,
+            mainProductCode: `default-hemkop-product-${storeId}`,
+            name: `Default Hemkop offer ${storeId}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopWeeklyDiscounts({
+      pageSize: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS.map((storeId) =>
+      buildHemkopWeeklyDiscountsUrl(storeId, 1, 0)
+    ));
+    assert.deepEqual(rows.map((row) => row.storeId), [...DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS]);
+  });
+});
+
+describe('fetchIcaProducts', () => {
+  it('fetches ICA store-scoped promotion products with source provenance', async () => {
+    const requestedUrls: string[] = [];
+    const payload = {
+      productGroups: [{
+        type: 'ON_OFFER',
+        decoratedProducts: [{
+          productId: 'ff3ce59d-323e-42ae-b433-26953b77c7e7',
+          retailerProductId: '2077461',
+          name: 'Babyplommontomater 500g Klass 1 ICA',
+          brand: 'ICA',
+          packSizeDescription: '0.5kg',
+          countryOfOrigin: 'Marocko',
+          price: { amount: 37.9, currency: 'SEK' },
+          unitPrice: { price: { amount: 75.8, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promoPrice: { amount: 28, currency: 'SEK' },
+          promoUnitPrice: { price: { amount: 56, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: [{ description: '28 kr/st' }],
+          image: { src: 'https://handlaprivatkund.ica.se/images-v3/example/300x300.jpg' }
+        }]
+      }]
+    };
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return Response.json(payload);
+    };
 
     const rows = await fetchIcaProducts({
-      paths: ['/', '/kategori/1'],
       fetchImpl,
-      retrievedAt: '2026-05-21T01:05:00.000Z'
+      retrievedAt: '2026-05-22T08:28:14.000Z',
+      maxRows: 1
+    });
+
+    assert.equal(requestedUrls[0], buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1));
+    assert.deepEqual(rows, [{
+      code: '2077461',
+      productId: 'ff3ce59d-323e-42ae-b433-26953b77c7e7',
+      retailerProductId: '2077461',
+      name: 'Babyplommontomater 500g Klass 1 ICA',
+      brand: 'ICA',
+      categories: ['ON_OFFER'],
+      imageUrl: 'https://handlaprivatkund.ica.se/images-v3/example/300x300.jpg',
+      productUrl: 'https://handlaprivatkund.ica.se/stores/1004599/products/2077461/details',
+      packageSize: '0.5kg',
+      countryOfOrigin: 'Marocko',
+      price: 37.9,
+      priceCurrency: 'SEK',
+      unitPrice: 75.8,
+      unitPriceCurrency: 'SEK',
+      unitPriceUnit: 'fop.price.per.kg',
+      promoPrice: 28,
+      promoPriceCurrency: 'SEK',
+      promoUnitPrice: 56,
+      promoUnitPriceCurrency: 'SEK',
+      promoUnitPriceUnit: 'fop.price.per.kg',
+      promotionDescription: '28 kr/st',
+      storeAccountId: '1004599',
+      storeName: 'ICA Kvantum Kungsholmen',
+      regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d',
+      sourceUrl: buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1),
+      retrievedAt: '2026-05-22T08:28:14.000Z'
+    }]);
+  });
+
+  it('deduplicates repeated ICA store products', async () => {
+    const product = {
+      productId: 'product-1',
+      retailerProductId: 'retailer-1',
+      name: 'Same product',
+      price: { amount: 10, currency: 'SEK' }
+    };
+    const fetchImpl: typeof fetch = async () => Response.json({
+      productGroups: [
+        { type: 'ON_OFFER', decoratedProducts: [product] },
+        { type: 'ON_OFFER', decoratedProducts: [product] }
+      ]
+    });
+
+    const rows = await fetchIcaProducts({
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:28:14.000Z'
     });
 
     assert.equal(rows.length, 1);
+  });
+
+  it('fetches configured ICA store-scoped promotion batches', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const storeAccountId = String(url).includes('/stores/1004247/') ? '1004247' : '1004599';
+      return Response.json({
+        productGroups: [{
+          type: 'ON_OFFER',
+          decoratedProducts: [{
+            productId: `product-${storeAccountId}`,
+            retailerProductId: `retailer-${storeAccountId}`,
+            name: `Product ${storeAccountId}`,
+            price: { amount: 10, currency: 'SEK' }
+          }]
+        }]
+      });
+    };
+
+    const rows = await fetchIcaDefaultStoreProducts({
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:49:49.000Z',
+      maxRows: 1,
+      stores: [
+        {
+          storeAccountId: '1004599',
+          storeName: 'ICA Kvantum Kungsholmen',
+          regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+        },
+        {
+          storeAccountId: '1004247',
+          storeName: 'ICA Focus',
+          regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+        }
+      ]
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1),
+      buildIcaStorePromotionsUrl('1004247', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1)
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeAccountId, row.storeName, row.code]), [
+      ['1004599', 'ICA Kvantum Kungsholmen', 'retailer-1004599'],
+      ['1004247', 'ICA Focus', 'retailer-1004247']
+    ]);
+  });
+
+  it('limits ICA all-store promotion fetch concurrency so live branch coverage is not throttled', async () => {
+    let activeRequests = 0;
+    let maxActiveRequests = 0;
+    const stores = Array.from({ length: 12 }, (_, index) => ({
+      storeAccountId: `ica-store-${index}`,
+      storeName: `ICA Store ${index}`,
+      regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+    }));
+
+    const rows = await fetchIcaDefaultStoreProducts({
+      retrievedAt: '2026-05-22T08:49:49.000Z',
+      maxRows: 1,
+      stores,
+      fetchImpl: async (url) => {
+        activeRequests += 1;
+        maxActiveRequests = Math.max(maxActiveRequests, activeRequests);
+        await new Promise((resolve) => setTimeout(resolve, 1));
+        const storeAccountId = String(url).match(/\/stores\/([^/]+)\//)?.[1] ?? 'unknown';
+        activeRequests -= 1;
+        return Response.json({
+          productGroups: [{
+            type: 'ON_OFFER',
+            decoratedProducts: [{
+              productId: `product-${storeAccountId}`,
+              retailerProductId: `retailer-${storeAccountId}`,
+              name: `Product ${storeAccountId}`,
+              price: { amount: 10, currency: 'SEK' }
+            }]
+          }]
+        });
+      }
+    });
+
+    assert.equal(rows.length, stores.length);
+    assert.ok(maxActiveRequests <= 8, `expected at most 8 in-flight ICA store requests, saw ${maxActiveRequests}`);
+  });
+
+  it('retries transient ICA branch failures and fails closed if a configured branch stays missing', async () => {
+    const attempts = new Map<string, number>();
+    const rows = await fetchIcaDefaultStoreProducts({
+      retrievedAt: '2026-05-22T08:49:49.000Z',
+      maxRows: 1,
+      stores: [
+        {
+          storeAccountId: '1004599',
+          storeName: 'ICA Kvantum Kungsholmen',
+          regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+        },
+        {
+          storeAccountId: '1003654',
+          storeName: 'ICA Regional 500',
+          regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+        }
+      ],
+      fetchImpl: async (url) => {
+        const storeAccountId = String(url).match(/\/stores\/([^/]+)\//)?.[1] ?? 'unknown';
+        attempts.set(storeAccountId, (attempts.get(storeAccountId) ?? 0) + 1);
+        if (storeAccountId === '1003654' && attempts.get(storeAccountId) === 1) {
+          return new Response('temporary store failure', { status: 500 });
+        }
+        return Response.json({
+          productGroups: [{
+            type: 'ON_OFFER',
+            decoratedProducts: [{
+              productId: `product-${storeAccountId}`,
+              retailerProductId: `retailer-${storeAccountId}`,
+              name: `Product ${storeAccountId}`,
+              price: { amount: 10, currency: 'SEK' }
+            }]
+          }]
+        });
+      }
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeAccountId, row.code]), [
+      ['1004599', 'retailer-1004599'],
+      ['1003654', 'retailer-1003654']
+    ]);
+    assert.equal(attempts.get('1003654'), 2);
+
+    await assert.rejects(() => fetchIcaDefaultStoreProducts({
+      retrievedAt: '2026-05-22T08:49:49.000Z',
+      maxRows: 1,
+      stores: [{
+        storeAccountId: '1003654',
+        storeName: 'ICA Regional 500',
+        regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+      }],
+      fetchImpl: async () => new Response('permanent store failure', { status: 500 })
+    }), /ICA all-store promotion requests missing configured branches: 1003654/);
   });
 });
 
@@ -710,6 +2496,703 @@ describe('fetchMatpriskollenOffers', () => {
   });
 });
 
+describe('fetchCityGrossProducts', () => {
+  it('fetches City Gross public store metadata from PageData stores', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify([{
+        data: {
+          id: 3094,
+          type: 'StorePage',
+          storeName: 'Borås',
+          siteId: 21,
+          url: '/butiker/boras/',
+          storeLocation: { coordinates: '57.7141742,12.866981900000042' }
+        }
+      }]), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const stores = await fetchCityGrossStores({
+      fetchImpl,
+      maxRows: 1,
+      retrievedAt: '2026-05-22T12:40:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildCityGrossStoresUrl()]);
+    assert.deepEqual(stores, [{
+      storeId: '21',
+      name: 'Borås',
+      address: '',
+      city: 'Borås',
+      latitude: 57.7141742,
+      longitude: 12.866981900000042,
+      sourceUrl: buildCityGrossStoresUrl(),
+      url: 'https://www.citygross.se/butiker/boras/',
+      retrievedAt: '2026-05-22T12:40:00.000Z'
+    }]);
+  });
+
+  it('fetches City Gross public product prices for a branch', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        items: [{
+          id: '100001971_ST',
+          gtin: '24000124962',
+          name: 'Pear Halves In Juice',
+          brand: 'DEL MONTE',
+          category: 'Desserter & glasstillbehör',
+          descriptiveSize: '415/230G',
+          url: '/matvaror/skafferiet/del-monte-pear-halves-in-juice-p100001971_ST',
+          images: [{ url: '24000124962_C1N1.jpg' }],
+          productStoreDetails: {
+            prices: {
+              currentPrice: { price: 31.5, unit: 'PCE', comparativePrice: 136.96, comparativePriceUnit: 'KGM' },
+              ordinaryPrice: { price: 39.9, unit: 'PCE' }
+            },
+            hasDiscount: true
+          }
+        }],
+        totalCount: 1
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCityGrossProducts({
+      fetchImpl,
+      siteId: '21',
+      query: 'kaffe',
+      maxRows: 1,
+      retrievedAt: '2026-05-22T12:41:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 })]);
+    assert.deepEqual(rows, [{
+      code: '100001971_ST',
+      gtin: '24000124962',
+      name: 'Pear Halves In Juice',
+      brand: 'DEL MONTE',
+      category: 'Desserter & glasstillbehör',
+      packageText: '415/230G',
+      storeId: '21',
+      price: 31.5,
+      regularPrice: 39.9,
+      unitPrice: 136.96,
+      unitPriceUnit: 'KGM',
+      priceText: '31.50 SEK',
+      productUrl: 'https://www.citygross.se/matvaror/skafferiet/del-monte-pear-halves-in-juice-p100001971_ST',
+      imageUrl: 'https://www.citygross.se/images/24000124962_C1N1.jpg',
+      sourceUrl: buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 }),
+      retrievedAt: '2026-05-22T12:41:00.000Z'
+    }]);
+  });
+
+
+
+  it('paginates the City Gross branch catalog without a query when no row cap is set', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const skip = Number(new URL(String(url)).searchParams.get('skip') ?? '0');
+      const productId = skip === 0 ? 'citygross-full-1' : 'citygross-full-2';
+      return new Response(JSON.stringify({
+        items: [{
+          id: productId,
+          name: `Full catalog product ${skip}`,
+          brand: 'Garant',
+          category: 'Pantry',
+          descriptiveSize: '1 st',
+          productStoreDetails: {
+            prices: { currentPrice: { price: skip === 0 ? 10 : 11, unit: 'PCE' } }
+          }
+        }],
+        totalCount: 2
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCityGrossProducts({
+      fetchImpl,
+      siteId: '21',
+      pageSize: 1,
+      retrievedAt: '2026-05-22T12:41:30.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 0 }),
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 1 })
+    ]);
+    assert.deepEqual(rows.map((row) => [row.code, row.price]), [['citygross-full-1', 10], ['citygross-full-2', 11]]);
+  });
+
+  it('can expand City Gross product prices across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/PageData/stores')) {
+        return new Response(JSON.stringify([
+          { data: { storeName: 'Borås', siteId: 21, url: '/butiker/boras/', storeLocation: { coordinates: '57.7141742,12.8669819' } } },
+          { data: { storeName: 'Bromma', siteId: 22, url: '/butiker/bromma/', storeLocation: { coordinates: '59.351,17.946' } } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const siteId = new URL(String(url)).searchParams.get('siteId') ?? 'unknown';
+      return new Response(JSON.stringify({
+        items: [{
+          id: `citygross-product-${siteId}`,
+          name: `City Gross product ${siteId}`,
+          brand: 'Garant',
+          category: 'Pantry',
+          descriptiveSize: '500 g',
+          productStoreDetails: {
+            prices: { currentPrice: { price: siteId === '21' ? 10 : 11, unit: 'PCE' } }
+          }
+        }],
+        totalCount: 1
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCityGrossProductsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      maxRowsPerStore: 1,
+      queries: ['kaffe'],
+      retrievedAt: '2026-05-22T12:42:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCityGrossStoresUrl(),
+      buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 }),
+      buildCityGrossProductsUrl({ siteId: '22', query: 'kaffe', take: 1, skip: 0 })
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['21', 10], ['22', 11]]);
+  });
+});
+
+
+
+  it('expands City Gross all-store ingestion from full branch catalogs when no query cap is configured', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/PageData/stores')) {
+        return new Response(JSON.stringify([
+          { data: { storeName: 'Borås', siteId: 21, url: '/butiker/boras/', storeLocation: { coordinates: '57.7141742,12.8669819' } } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const skip = Number(new URL(String(url)).searchParams.get('skip') ?? '0');
+      return new Response(JSON.stringify({
+        items: [{
+          id: `citygross-full-${skip}`,
+          name: `City Gross full catalog ${skip}`,
+          brand: 'Garant',
+          category: 'Pantry',
+          descriptiveSize: '1 st',
+          productStoreDetails: {
+            prices: { currentPrice: { price: skip === 0 ? 10 : 11, unit: 'PCE' } }
+          }
+        }],
+        totalCount: 2
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCityGrossProductsForAllStores({
+      fetchImpl,
+      maxStores: 1,
+      pageSize: 1,
+      retrievedAt: '2026-05-22T12:42:30.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCityGrossStoresUrl(),
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 0 }),
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 1 })
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code, row.price]), [
+      ['21', 'citygross-full-0', 10],
+      ['21', 'citygross-full-1', 11]
+    ]);
+  });
+
+describe('fetchLidlStores', () => {
+  it('discovers Lidl public store detail pages and normalizes branch metadata', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildLidlStoresUrl()) {
+        return new Response(`
+          <a href="/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/">Alingsås</a>
+          <a href="/s/sv-SE/butiker/angered/traktorgatan-3/">Angered</a>
+        `, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+      if (String(url) === buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/')) {
+        return new Response('<meta name="description" content="Din Lidl-butik vid Vänersborgsvägen 21, 441 37 Alingsås Se öppettider"><a href="https://bing.com/maps/default.aspx?rtp=~pos.57.93452_12.54588_Alings%C3%A5s">Map</a>', { status: 200 });
+      }
+      return new Response('<meta name="description" content="Din Lidl-butik vid Traktorgatan 3, 424 65 Angered Se öppettider"><a href="https://bing.com/maps/default.aspx?rtp=~pos.57.79633_12.05174_Angered">Map</a>', { status: 200 });
+    };
+
+    const stores = await fetchLidlStores({
+      fetchImpl,
+      maxRows: 2,
+      retrievedAt: '2026-05-22T14:10:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildLidlStoresUrl(),
+      buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
+      buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/angered/traktorgatan-3/')
+    ]);
+    assert.deepEqual(stores[0], {
+      storeId: 'alingsas/vaenersborgsvaegen-21',
+      name: 'Lidl Alingsås Vänersborgsvägen 21',
+      address: 'Vänersborgsvägen 21',
+      city: 'Alingsås',
+      postalCode: '441 37',
+      countryCode: 'SE',
+      latitude: 57.93452,
+      longitude: 12.54588,
+      url: 'https://www.lidl.se/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/',
+      sourceUrl: buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
+      retrievedAt: '2026-05-22T14:10:00.000Z'
+    });
+  });
+});
+
+describe('fetchLidlOffers', () => {
+  it('extracts public Lidl product prices from embedded grid data', async () => {
+    const gridData = {
+      imageList_V1: [{ image: 'https://www.lidl.se/assets/watermelon.png' }],
+      regions: [1, 2, 3],
+      title: 'Grekisk vattenmelon',
+      regionsPrices: {
+        1: {
+          currentPrice: {
+            price: 14.9,
+            basePrice: { text: '/kg' },
+            startDate: '2026-05-05T11:22:50.499Z',
+            endDate: '2026-05-24T21:59:59Z',
+            currencyCode: 'SEK',
+            discount: { discountText: 'Superpris' }
+          }
+        }
+      },
+      price: { price: 14.9, basePrice: { text: '/kg' }, currencyCode: 'SEK' },
+      productId: 11029834,
+      canonicalUrl: '/p/grekisk-vattenmelon/p11029834',
+      keyfacts: { title: 'Grekisk vattenmelon' }
+    };
+    const html = `<div data-grid-data="${JSON.stringify(gridData).replaceAll('"', '&quot;')}"></div>`;
+    const fetchImpl: typeof fetch = async () => new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+
+    const rows = await fetchLidlOffers({
+      fetchImpl,
+      offerPaths: ['/c/veckans-frukt-groent/a10094676'],
+      retrievedAt: '2026-05-22T14:11:00.000Z'
+    });
+
+    assert.deepEqual(rows, [{
+      code: '11029834',
+      name: 'Grekisk vattenmelon',
+      brand: '',
+      packageText: '/kg',
+      category: 'lidl-public-offers',
+      price: 14.9,
+      regularPrice: null,
+      priceText: '14.90 SEK',
+      unitPriceText: '/kg',
+      promotionText: 'Superpris',
+      memberOnly: false,
+      regions: ['1', '2', '3'],
+      validFrom: '2026-05-05T11:22:50.499Z',
+      validTo: '2026-05-24T21:59:59Z',
+      productUrl: 'https://www.lidl.se/p/grekisk-vattenmelon/p11029834',
+      imageUrl: 'https://www.lidl.se/assets/watermelon.png',
+      sourceUrl: buildLidlOfferPageUrl('/c/veckans-frukt-groent/a10094676'),
+      retrievedAt: '2026-05-22T14:11:00.000Z'
+    }]);
+  });
+
+  it('fans public Lidl offers across discovered stores for daily materialization', async () => {
+    const requestedUrls: string[] = [];
+    const gridData = {
+      title: 'Röd paprika',
+      regions: [1],
+      productId: 11029717,
+      canonicalUrl: '/p/rod-paprika/p11029717',
+      currentLidlPlusPrice: { price: { price: 29.9 } },
+      regionsPrices: {
+        1: {
+          currentLidlPlusPrice: {
+            price: {
+              price: 29.9,
+              oldPrice: 44.9,
+              basePrice: { text: '/kg' },
+              currencyCode: 'SEK',
+              discount: { discountText: '-33%' }
+            },
+            lidlPlusText: 'Med Lidl Plus'
+          }
+        }
+      }
+    };
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildLidlStoresUrl()) {
+        return new Response('<a href="/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/">Alingsås</a>', { status: 200 });
+      }
+      if (String(url).includes('/butiker/')) {
+        return new Response('<meta name="description" content="Din Lidl-butik vid Vänersborgsvägen 21, 441 37 Alingsås Se öppettider"><a href="https://bing.com/maps/default.aspx?rtp=~pos.57.93452_12.54588_Alings%C3%A5s">Map</a>', { status: 200 });
+      }
+      return new Response(`<div data-grid-data="${JSON.stringify(gridData).replaceAll('"', '&quot;')}"></div>`, { status: 200 });
+    };
+
+    const rows = await fetchLidlOffersForAllStores({
+      fetchImpl,
+      maxStores: 1,
+      offerPaths: ['/c/lidl-plus-erbjudanden/a10094682'],
+      retrievedAt: '2026-05-22T14:12:00.000Z'
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].storeId, 'alingsas/vaenersborgsvaegen-21');
+    assert.equal(rows[0].price, 29.9);
+    assert.equal(rows[0].regularPrice, 44.9);
+    assert.equal(rows[0].memberOnly, true);
+    assert.deepEqual(requestedUrls, [
+      buildLidlStoresUrl(),
+      buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
+      buildLidlOfferPageUrl('/c/lidl-plus-erbjudanden/a10094682')
+    ]);
+  });
+});
+
+describe('fetchCoopProductsForAllStores', () => {
+  it('fans Coop branch product prices across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url, init) => {
+      requestedUrls.push(String(url));
+      if (String(url) === 'https://www.coop.se/handla/') {
+        return new Response([
+          'window.coopSettings={',
+          '"personalizationApiUrl":"https://external.api.coop.se/personalization",',
+          '"personalizationApiSubscriptionKey":"coop-key",',
+          '"personalizationApiVersion":"v1",',
+          '"storeApiUrl":"https://proxy.api.coop.se/external/store/",',
+          '"storeApiSubscriptionKey":"store-key"',
+          '};'
+        ].join(''), { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+      if (String(url).endsWith('/stores?api-version=v5')) {
+        return new Response(JSON.stringify({
+          stores: [
+            { ledgerAccountNumber: '251300' },
+            { ledgerAccountNumber: '016141' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url).includes('/stores/251300?')) {
+        return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323', services: ['ATG-ombud'] }), { status: 200 });
+      }
+      if (String(url).includes('/stores/016141?')) {
+        return new Response(JSON.stringify({ ledgerAccountNumber: '016141', name: 'Coop Stockholm', city: 'Stockholm', address: 'Sveavägen 1', postalCode: '11157', services: ['Hämta – beställ och hämta i butiken'] }), { status: 200 });
+      }
+      const body = JSON.parse(String(init?.body));
+      const storeId = new URL(String(url)).searchParams.get('store');
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: `coop-product-${storeId}`,
+            ean: `731000000${storeId}`,
+            name: `Coop kaffe ${storeId}`,
+            manufacturerName: 'Coop',
+            packageSizeInformation: body.query,
+            salesPriceData: { b2cPrice: storeId === '251300' ? 39.9 : 42.9 }
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopProductsForAllStores({
+      fetchImpl,
+      maxStores: 1,
+      queries: ['kaffe'],
+      maxRowsPerStore: 1,
+      retrievedAt: '2026-05-22T13:38:00.000Z'
+    });
+
+    assert.equal(rows.length, 1);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['016141', 42.9]]);
+    assert.deepEqual(requestedUrls.filter((url) => url.includes('/search/products?')), [
+      buildCoopSearchUrl('016141')
+    ]);
+  });
+
+  it('keeps Coop all-store ingestion moving when one branch product request fails', async () => {
+    const fetchImpl: typeof fetch = async (url, init) => {
+      if (String(url) === 'https://www.coop.se/handla/') {
+        return new Response([
+          'window.coopSettings={',
+          '"personalizationApiUrl":"https://external.api.coop.se/personalization",',
+          '"personalizationApiSubscriptionKey":"coop-key",',
+          '"personalizationApiVersion":"v1",',
+          '"storeApiUrl":"https://proxy.api.coop.se/external/store/",',
+          '"storeApiSubscriptionKey":"store-key"',
+          '};'
+        ].join(''), { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+      if (String(url).endsWith('/stores?api-version=v5')) {
+        return new Response(JSON.stringify({
+          stores: [
+            { ledgerAccountNumber: '251300' },
+            { ledgerAccountNumber: '016141' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url).includes('/stores/251300?')) {
+        return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323', services: ['Hämta – beställ och hämta i butiken'] }), { status: 200 });
+      }
+      if (String(url).includes('/stores/016141?')) {
+        return new Response(JSON.stringify({ ledgerAccountNumber: '016141', name: 'Coop Stockholm', city: 'Stockholm', address: 'Sveavägen 1', postalCode: '11157', services: ['Hämta – beställ och hämta i butiken'] }), { status: 200 });
+      }
+      const storeId = new URL(String(url)).searchParams.get('store');
+      if (storeId === '016141') throw new Error('simulated Coop branch timeout');
+      const body = JSON.parse(String(init?.body));
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: `coop-product-${storeId}`,
+            ean: `731000000${storeId}`,
+            name: `Coop kaffe ${storeId}`,
+            manufacturerName: 'Coop',
+            packageSizeInformation: body.query,
+            salesPriceData: { b2cPrice: 39.9 }
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopProductsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      queries: ['kaffe'],
+      maxRowsPerStore: 1,
+      retrievedAt: '2026-05-22T20:35:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['251300', 39.9]]);
+  });
+  it('fetches Hemkop full branch catalog pages from top-level category paths when no query list is supplied', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = Number(new URL(String(url)).searchParams.get('page') ?? '0');
+      return new Response(JSON.stringify({
+        results: [{
+          code: `hemkop-category-product-${page}`,
+          name: `Hemkop category product ${page}`,
+          manufacturer: 'Garant',
+          productLine2: '1 st',
+          priceValue: page === 0 ? 21.5 : 22.5,
+          price: page === 0 ? '21,50 kr' : '22,50 kr'
+        }],
+        pagination: { currentPage: page, numberOfPages: 2 }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopProducts({
+      fetchImpl,
+      categoryPaths: ['mejeri-ost-och-agg'],
+      storeId: '4003',
+      retrievedAt: '2026-05-23T08:12:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.code, row.price]), [
+      ['hemkop-category-product-0', 21.5],
+      ['hemkop-category-product-1', 22.5]
+    ]);
+    assert.deepEqual(requestedUrls, [
+      buildHemkopCategoryUrl('mejeri-ost-och-agg', 100, 0, '4003'),
+      buildHemkopCategoryUrl('mejeri-ost-och-agg', 100, 1, '4003')
+    ]);
+  });
+
+  it('expands Hemkop all-store ingestion from category catalogs when query sampling is not configured', async () => {
+    const requestedProductUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: { line1: 'Masthuggstorget 3', town: 'Göteborg', postalCode: '41327' }, onlineStore: true }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      requestedProductUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          code: 'hemkop-full-catalog-product',
+          name: 'Hemkop full catalog product',
+          manufacturer: 'Garant',
+          productLine2: '1 st',
+          priceValue: 29.9,
+          price: '29,90 kr'
+        }],
+        pagination: { currentPage: 0, numberOfPages: 1 }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopProductsForAllStores({
+      fetchImpl,
+      maxStores: 1,
+      categoryPaths: ['mejeri-ost-och-agg'],
+      retrievedAt: '2026-05-23T08:13:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code, row.price]), [['4003', 'hemkop-full-catalog-product', 29.9]]);
+    assert.deepEqual(requestedProductUrls, [buildHemkopCategoryUrl('mejeri-ost-och-agg', 100, 0, '4003')]);
+  });
+
+});
+
+describe('fetchWillysProductsForAllStores', () => {
+  it('fans Willys branch product prices across the live store catalog using the store search parameter', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '2149', name: 'Willys Alingsås Hagaplan', address: { line1: 'Hagaplan 1', town: 'Alingsås', postalCode: '44131' }, onlineStore: true },
+          { storeId: '2268', name: 'Willys Avesta', address: { line1: 'Köpmangatan 1', town: 'Avesta', postalCode: '77430' }, onlineStore: true }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('store');
+      return new Response(JSON.stringify({
+        results: [{
+          code: `willys-product-${storeId}`,
+          name: `Willys kaffe ${storeId}`,
+          manufacturer: 'Garant',
+          productLine2: '450 g',
+          priceValue: storeId === '2149' ? 70.88 : 71.9,
+          price: storeId === '2149' ? '70,88 kr' : '71,90 kr'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysProductsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      queries: ['kaffe'],
+      maxRowsPerStore: 1,
+      retrievedAt: '2026-05-22T13:39:00.000Z'
+    });
+
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['2149', 70.88], ['2268', 71.9]]);
+    assert.deepEqual(requestedUrls.filter((url) => url.includes('/search?')), [
+      buildWillysSearchUrl('kaffe', '2149'),
+      buildWillysSearchUrl('kaffe', '2268')
+    ]);
+  });
+
+  it('keeps Willys all-store ingestion moving when one branch product request fails', async () => {
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '2149', name: 'Willys Alingsås Hagaplan', address: { line1: 'Hagaplan 1', town: 'Alingsås', postalCode: '44131' }, onlineStore: true },
+          { storeId: '2268', name: 'Willys Avesta', address: { line1: 'Köpmangatan 1', town: 'Avesta', postalCode: '77430' }, onlineStore: true }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('store');
+      if (storeId === '2268') throw new Error('simulated Willys branch timeout');
+      return new Response(JSON.stringify({
+        results: [{
+          code: `willys-product-${storeId}`,
+          name: `Willys kaffe ${storeId}`,
+          manufacturer: 'Garant',
+          productLine2: '450 g',
+          priceValue: 70.88,
+          price: '70,88 kr'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysProductsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      queries: ['kaffe'],
+      maxRowsPerStore: 1,
+      retrievedAt: '2026-05-22T13:39:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['2149', 70.88]]);
+  });
+
+  it('fetches Willys full branch catalog pages from top-level category paths when no query list is supplied', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = Number(new URL(String(url)).searchParams.get('page') ?? '0');
+      return new Response(JSON.stringify({
+        results: [{
+          code: `willys-category-product-${page}`,
+          name: `Willys category product ${page}`,
+          manufacturer: 'Garant',
+          productLine2: '1 st',
+          priceValue: page === 0 ? 12.5 : 13.5,
+          price: page === 0 ? '12,50 kr' : '13,50 kr'
+        }],
+        pagination: { currentPage: page, numberOfPages: 2 }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysProducts({
+      fetchImpl,
+      categoryPaths: ['mejeri-ost-och-agg'],
+      storeId: '2110',
+      retrievedAt: '2026-05-23T08:10:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.code, row.price]), [
+      ['willys-category-product-0', 12.5],
+      ['willys-category-product-1', 13.5]
+    ]);
+    assert.deepEqual(requestedUrls, [
+      buildWillysCategoryUrl('mejeri-ost-och-agg', 100, 0, '2110'),
+      buildWillysCategoryUrl('mejeri-ost-och-agg', 100, 1, '2110')
+    ]);
+  });
+
+  it('expands Willys all-store ingestion from category catalogs when query sampling is not configured', async () => {
+    const requestedProductUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '2149', name: 'Willys Alingsås Hagaplan', address: { line1: 'Hagaplan 1', town: 'Alingsås', postalCode: '44131' }, onlineStore: true }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      requestedProductUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          code: 'willys-full-catalog-product',
+          name: 'Willys full catalog product',
+          manufacturer: 'Garant',
+          productLine2: '1 st',
+          priceValue: 19.9,
+          price: '19,90 kr'
+        }],
+        pagination: { currentPage: 0, numberOfPages: 1 }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysProductsForAllStores({
+      fetchImpl,
+      maxStores: 1,
+      categoryPaths: ['mejeri-ost-och-agg'],
+      retrievedAt: '2026-05-23T08:11:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code, row.price]), [['2149', 'willys-full-catalog-product', 19.9]]);
+    assert.deepEqual(requestedProductUrls, [buildWillysCategoryUrl('mejeri-ost-och-agg', 100, 0, '2149')]);
+  });
+
+});
+
 describe('fetchMatsparProducts', () => {
   it('fetches public Matspar page data rows with price provenance', async () => {
     const requestedUrls: string[] = [];
@@ -788,6 +3271,70 @@ describe('fetchMatsparProducts', () => {
 });
 
 describe('fetchWillysProducts', () => {
+  it('fetches Willys branch catalog metadata from the public store API', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify([
+        {
+          storeId: '2149',
+          name: 'Willys Alingsås Hagaplan',
+          address: {
+            line1: 'Hagaplan',
+            town: 'Alingsås',
+            postalCode: '441 34',
+            country: { isocode: 'SE' },
+            latitude: 57.9374,
+            longitude: 12.5333
+          },
+          geoPoint: { latitude: 57.9374, longitude: 12.5333 },
+          onlineStore: true,
+          clickAndCollect: true,
+          flyerURL: 'https://viewer.ipaper.io/willys/2149'
+        },
+        {
+          storeId: '2268',
+          name: 'Willys Avesta',
+          address: {
+            line1: 'Dalahästen, Get Johannas Väg',
+            town: 'Avesta',
+            postalCode: '774 61',
+            country: { isocode: 'SE' }
+          },
+          geoPoint: { latitude: 60.1528, longitude: 16.1969 },
+          onlineStore: true,
+          clickAndCollect: true,
+          flyerURL: 'https://viewer.ipaper.io/willys/2268'
+        }
+      ]), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysStores({
+      online: true,
+      fetchImpl,
+      maxRows: 2,
+      retrievedAt: '2026-05-22T10:45:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildWillysStoresUrl({ online: true })]);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0], {
+      storeId: '2149',
+      name: 'Willys Alingsås Hagaplan',
+      address: 'Hagaplan',
+      city: 'Alingsås',
+      postalCode: '441 34',
+      countryCode: 'SE',
+      latitude: 57.9374,
+      longitude: 12.5333,
+      onlineStore: true,
+      clickAndCollect: true,
+      flyerUrl: 'https://viewer.ipaper.io/willys/2149',
+      sourceUrl: buildWillysStoresUrl({ online: true }),
+      retrievedAt: '2026-05-22T10:45:00.000Z'
+    });
+  });
+
   it('fetches public Willys search rows with price provenance', async () => {
     const requestedUrls: string[] = [];
     const fetchImpl: typeof fetch = async (url) => {
@@ -857,6 +3404,273 @@ describe('fetchWillysProducts', () => {
   });
 });
 
+describe('fetchWillysWeeklyDiscounts', () => {
+  it('fetches public Willys Axfood weekly discount rows with promotion provenance', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          manufacturer: null,
+          name: 'Grön sparris 250g',
+          priceNoUnit: '34.9',
+          googleAnalyticsCategory: 'frukt-och-gront|gronsaker',
+          displayVolume: 'Styck',
+          image: { url: 'https://assets.axfood.se/image/upload/f_auto,t_200/07311042002680_C1N0_s01' },
+          labels: ['keyhole'],
+          potentialPromotions: [{
+            code: '2500306014',
+            mainProductCode: '100771309_ST',
+            name: 'Grön sparris 250g',
+            brands: null,
+            campaignType: 'LOYALTY',
+            promotionType: 'MixMatchPricePromotion',
+            price: 29.9,
+            cartLabel: '29,90/st ',
+            comparePrice: '119:60 kr/kg',
+            savePrice: 'Spara 5,00 kr',
+            weightVolume: 'Styck',
+            conditionLabel: null,
+            redeemLimitLabel: 'Max 5 köp',
+            startDate: '20/05-2026',
+            endDate: '24/05-2026',
+            validUntil: 1779659999000
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysWeeklyDiscounts({
+      storeId: '2110',
+      maxRows: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildWillysWeeklyDiscountsUrl('2110', 1));
+    assert.deepEqual(rows, [{
+      code: '2500306014',
+      productCode: '100771309_ST',
+      name: 'Grön sparris 250g',
+      brand: '',
+      storeId: '2110',
+      campaignType: 'LOYALTY',
+      promotionType: 'MixMatchPricePromotion',
+      price: 29.9,
+      priceText: '29,90/st',
+      comparePriceText: '119:60 kr/kg',
+      regularPriceText: '34.9',
+      savePriceText: 'Spara 5,00 kr',
+      packageText: 'Styck',
+      conditionText: '',
+      redeemLimitText: 'Max 5 köp',
+      startDate: '20/05-2026',
+      endDate: '24/05-2026',
+      validUntil: '2026-05-24T21:59:59.000Z',
+      category: 'frukt-och-gront|gronsaker',
+      imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07311042002680_C1N0_s01',
+      labels: ['keyhole'],
+      sourceUrl: buildWillysWeeklyDiscountsUrl('2110', 1),
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    }]);
+  });
+
+  it('paginates Willys Axfood weekly discounts until reported pages are exhausted', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = new URL(String(url)).searchParams.get('page');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 2, currentPage: Number(page) },
+        results: [{
+          manufacturer: 'Garant',
+          name: `Willys offer ${page}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: `willys-${page}`,
+            mainProductCode: `willys-product-${page}`,
+            name: `Willys offer ${page}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysWeeklyDiscounts({
+      storeId: '2110',
+      maxRows: 10,
+      pageSize: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildWillysWeeklyDiscountsUrl('2110', 1, 0),
+      buildWillysWeeklyDiscountsUrl('2110', 1, 1)
+    ]);
+    assert.deepEqual(rows.map((row) => row.code), ['willys-0', 'willys-1']);
+    assert.equal(rows[1]?.sourceUrl, buildWillysWeeklyDiscountsUrl('2110', 1, 1));
+  });
+
+  it('keeps Willys weekly discount rows distinct by store when promotion codes repeat', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const storeId = new URL(String(url)).searchParams.get('q');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 1 },
+        results: [{
+          manufacturer: 'Garant',
+          name: `Shared Willys offer ${storeId}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: 'shared-willys-promo',
+            mainProductCode: 'shared-willys-product',
+            name: `Shared Willys offer ${storeId}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysWeeklyDiscounts({
+      storeIds: ['2110', '2187'],
+      maxRows: 10,
+      pageSize: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildWillysWeeklyDiscountsUrl('2110', 1, 0),
+      buildWillysWeeklyDiscountsUrl('2187', 1, 0)
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code]), [
+      ['2110', 'shared-willys-promo'],
+      ['2187', 'shared-willys-promo']
+    ]);
+  });
+
+  it('can expand Willys weekly discounts across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '2110', name: 'Willys Kungsbacka Hede', address: { line1: 'Tölöleden 3', town: 'Kungsbacka' } },
+          { storeId: '2187', name: 'Willys Oskarshamn Snickeriet', address: { line1: 'Snickerivägen 1', town: 'Oskarshamn' } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('q') ?? 'unknown';
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 1 },
+        results: [{
+          name: `Catalog Willys offer ${storeId}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: `all-store-promo-${storeId}`,
+            mainProductCode: `all-store-product-${storeId}`,
+            name: `Catalog Willys offer ${storeId}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysWeeklyDiscountsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      pageSize: 1,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildWillysStoresUrl({ online: true }),
+      buildWillysWeeklyDiscountsUrl('2110', 1, 0),
+      buildWillysWeeklyDiscountsUrl('2187', 1, 0)
+    ]);
+    assert.deepEqual(rows.map((row) => row.storeId), ['2110', '2187']);
+  });
+
+
+
+  it('keeps Willys weekly all-store ingestion moving when one branch campaign request fails', async () => {
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '2110', name: 'Willys Kungsbacka Hede', address: { line1: 'Tölöleden 3', town: 'Kungsbacka' } },
+          { storeId: '2187', name: 'Willys Oskarshamn Snickeriet', address: { line1: 'Snickerivägen 1', town: 'Oskarshamn' } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('q') ?? 'unknown';
+      if (storeId === '2187') throw new Error('simulated Willys weekly timeout');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 1 },
+        results: [{
+          name: `Catalog Willys offer ${storeId}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: `all-store-promo-${storeId}`,
+            mainProductCode: `all-store-product-${storeId}`,
+            name: `Catalog Willys offer ${storeId}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysWeeklyDiscountsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      pageSize: 1,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code]), [['2110', 'all-store-promo-2110']]);
+  });
+
+  it('uses the configured Willys weekly store list by default', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const storeId = new URL(String(url)).searchParams.get('q');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 1 },
+        results: [{
+          name: `Default Willys offer ${storeId}`,
+          priceNoUnit: '20',
+          potentialPromotions: [{
+            code: `default-willys-promo-${storeId}`,
+            mainProductCode: `default-willys-product-${storeId}`,
+            name: `Default Willys offer ${storeId}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysWeeklyDiscounts({
+      pageSize: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS.map((storeId) =>
+      buildWillysWeeklyDiscountsUrl(storeId, 1, 0)
+    ));
+    assert.deepEqual(rows.map((row) => row.storeId), [...DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS]);
+  });
+});
+
 describe('normalizeUnitPrice', () => {
   it('normalizes package prices into comparable units', () => {
     assert.deepEqual(normalizeUnitPrice({ price: 49.9, packageSize: 450, packageUnit: 'g' }), { unitPrice: 110.8889, comparableUnit: 'kg' });
@@ -880,6 +3694,7 @@ describe('ingestRetailerProduct', () => {
       canonicalName: 'Zoégas Coffee 450g',
       productId: 'coffee-zoegas-450g',
       categoryId: 'coffee',
+      barcode: '7310130003547',
       brand: 'Zoégas',
       packageSize: 450,
       packageUnit: 'g',
@@ -891,6 +3706,7 @@ describe('ingestRetailerProduct', () => {
     });
 
     assert.equal(output.product.id, 'coffee-zoegas-450g');
+    assert.equal(output.product.barcode, '7310130003547');
     assert.equal(output.alias.matchConfidence, 0.85);
     assert.equal(output.priceObservation.unitPrice, 110.8889);
     assert.equal(output.priceObservation.confidenceScore, 0.85);
@@ -916,6 +3732,40 @@ describe('ingestRetailerProduct', () => {
       priceType: 'online',
       provenance: output.priceObservation.provenance
     });
+  });
+
+  it('classifies no-barcode sold-by-weight produce as a commodity with medium mapping confidence', () => {
+    const output = ingestRetailerProduct({
+      sourceType: 'retailer_online_page',
+      observedAt: '2026-05-22T09:00:00.000Z',
+      parserVersion: 'axfood-produce-v1',
+      rawSnapshotRef: 's3://groceryview-raw/willys/produce-2026-05-22.json',
+      sourceRunId: 'source-run-2026-05-22',
+      chainId: 'willys',
+      storeId: 'willys-odenplan',
+      retailerProductId: 'wil-kvisttomat-kg',
+      rawName: 'Kvisttomat lösvikt',
+      canonicalName: 'Kvisttomat lösvikt',
+      productId: 'willys-kvisttomat-kg',
+      categoryId: 'frukt-gront',
+      packageSize: 1,
+      packageUnit: 'kg',
+      price: 39.9,
+      sourceUrl: 'https://example.test/produce/tomato',
+      soldByWeight: true,
+      variant: 'vine',
+      isOrganic: false,
+      originCountry: 'SE'
+    });
+
+    assert.equal(output.product.productKind, 'commodity');
+    assert.equal(output.product.commodityId, 'tomato');
+    assert.equal(output.product.variant, 'vine');
+    assert.equal(output.product.isOrganic, false);
+    assert.equal(output.product.originCountry, 'SE');
+    assert.equal(output.alias.matchConfidence, 0.68);
+    assert.equal(output.priceObservation.confidenceScore, 0.68);
+    assert.equal(output.priceObservation.unitPrice, 39.9);
   });
 
   it('rejects records that cannot preserve parser and raw snapshot provenance', () => {
@@ -1680,5 +4530,1343 @@ describe('Open Prices real-data connector', () => {
       rawSnapshotRef: 'raw://open-prices/empty',
       contentHash: 'sha256:empty'
     }), /no usable SEK product price rows/);
+  });
+});
+
+class DailyIngestionExecutor implements QueryExecutor {
+  calls: Array<{ sql: string; params: unknown[] }> = [];
+  private sequence = 0;
+
+  async query<T>(sql: string, params: unknown[] = []) {
+    this.calls.push({ sql, params });
+    if (sql.trim().toLowerCase() === 'set default_transaction_read_only=off') return [] as T[];
+    if (sql.includes('insert into source_runs')) return [{ id: 'source-run-db-1' }] as T[];
+    if (sql.includes('update source_runs')) return [{ id: params[0] }] as T[];
+    if (sql.includes('from products') && sql.includes('barcode ~')) return [
+      { id: 'product-db-ean-7310130003547', slug: 'ean-7310130003547', barcode: '7310130003547', canonical_name: 'Ideal Makaroner', brand: 'Kungsörnen' },
+      { id: 'product-db-ean-7310130000000', slug: 'ean-7310130000000', barcode: '7310130000000', canonical_name: 'Missing Nutrition', brand: 'Testbrand' }
+    ] as T[];
+    if (sql.includes('update products') && params[0] === '7310130003547') return [{ id: 'product-db-ean-7310130003547' }] as T[];
+    if (sql.includes('update products')) return [] as T[];
+    if (sql.includes('insert into chains')) return [{ id: `chain-db-${++this.sequence}` }] as T[];
+    if (sql.includes('insert into stores')) return [{ id: `store-db-${++this.sequence}` }] as T[];
+    if (sql.includes('jsonb_to_recordset') && sql.includes('insert into products')) {
+      const products = JSON.parse(String(params[0])) as Array<{ slug: string }>;
+      return products.map((product) => ({ slug: product.slug, id: `product-db-${product.slug}` })) as T[];
+    }
+    if (sql.includes('insert into products')) return [{ id: `product-db-${++this.sequence}` }] as T[];
+    if (sql.includes('jsonb_to_recordset') && sql.includes('insert into aliases')) return [] as T[];
+    if (sql.includes('insert into aliases')) {
+      return [{
+        id: `alias-db-${++this.sequence}`,
+        product_id: params[0],
+        alias: params[1],
+        normalized_alias: params[2],
+        source_type: params[3],
+        source_ref: params[4],
+        match_confidence: params[5],
+        reviewed_at: params[6],
+        created_at: '2026-05-21T00:00:00.000Z'
+      }] as T[];
+    }
+    if (sql.includes('jsonb_to_recordset') && sql.includes('insert into raw_records')) {
+      const records = JSON.parse(String(params[1])) as Array<{ ordinal: number }>;
+      return records.map((record) => ({ ordinal: record.ordinal, id: `raw-db-${++this.sequence}` })) as T[];
+    }
+    if (sql.includes('jsonb_to_recordset') && sql.includes('insert into observations')) {
+      const observations = JSON.parse(String(params[0])) as unknown[];
+      return observations.map(() => ({ id: `observation-db-${++this.sequence}` })) as T[];
+    }
+    if (sql.includes('insert into fuel_price_sources')) return [{ id: `fuel-source-db-${++this.sequence}` }] as T[];
+    if (sql.includes('insert into fuel_price_source_observations')) return [] as T[];
+    if (sql.includes('insert into raw_records')) return [{ id: `raw-db-${++this.sequence}` }] as T[];
+    if (sql.includes('insert into observations')) return [{ id: `observation-db-${++this.sequence}` }] as T[];
+    if (sql.includes('insert into latest_prices')) return [] as T[];
+    throw new Error(`Unexpected SQL in daily ingestion test: ${sql}`);
+  }
+}
+
+function dailyConnectorFixture(chainId: string) {
+  return {
+    connectorId: `${chainId}-normalized-json`,
+    chainId,
+    sourceType: 'official_api' as const,
+    endpointUrl: `https://sources.example.test/${chainId}/products.json`,
+    parserVersion: 'normalized-json-v1',
+    robotsTxtStatus: 'not_applicable' as const,
+    legalReviewStatus: 'approved' as const,
+    hasDataAgreement: true
+  };
+}
+
+function firstBatchObservation(executor: DailyIngestionExecutor) {
+  const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+  const observations = JSON.parse(String(observationInsert?.params[0])) as Array<Record<string, unknown>>;
+  return observations[0] ?? {};
+}
+
+function firstBatchProduct(executor: DailyIngestionExecutor) {
+  const productInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into products'));
+  const products = JSON.parse(String(productInsert?.params[0])) as Array<Record<string, unknown>>;
+  return products[0] ?? {};
+}
+
+describe('persistOpenFoodFactsProductMetadata', () => {
+  it('updates existing DB products by barcode with real OpenFoodFacts nutrition provenance', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await persistOpenFoodFactsProductMetadata(executor, [{
+      barcode: '7310130003547',
+      name: 'Ideal Makaroner',
+      brands: 'Kungsörnen',
+      quantity: '750 g',
+      categories: ['en:pastas'],
+      labels: [],
+      nutriscoreGrade: 'a',
+      nutritionPer100g: {
+        energyKj: 1509,
+        energyKcal: 361,
+        fat: 2,
+        saturatedFat: 0.5,
+        carbohydrates: 72,
+        sugars: 3,
+        fiber: 3,
+        proteins: 11,
+        salt: 0.01,
+        sodium: 0.004
+      },
+      imageUrl: 'https://images.openfoodfacts.org/images/products/731/013/000/3547/front_sv.11.400.jpg',
+      productUrl: 'https://world.openfoodfacts.org/product/7310130003547/ideal-makaroner-kungsornen',
+      sourceUrl: `${OPENFOODFACTS_EXPORT_URL}#code=7310130003547`,
+      retrievedAt: '2026-05-22T20:18:16.369Z',
+      retailerMatches: []
+    }, {
+      barcode: '00000000',
+      name: 'No local DB product',
+      brands: 'OpenFoodFacts',
+      quantity: '',
+      categories: [],
+      labels: [],
+      nutriscoreGrade: 'unknown',
+      nutritionPer100g: {
+        energyKj: 1,
+        energyKcal: null,
+        fat: null,
+        saturatedFat: null,
+        carbohydrates: null,
+        sugars: null,
+        fiber: null,
+        proteins: null,
+        salt: null,
+        sodium: null
+      },
+      imageUrl: '',
+      productUrl: 'https://world.openfoodfacts.org/product/00000000/no-local-db-product',
+      sourceUrl: `${OPENFOODFACTS_EXPORT_URL}#code=00000000`,
+      retrievedAt: '2026-05-22T20:18:16.369Z',
+      retailerMatches: []
+    }], {
+      retrievedAt: '2026-05-22T20:18:16.369Z'
+    });
+
+    assert.equal(result.status, 'partial');
+    assert.deepEqual(result.updatedProductIds, ['product-db-ean-7310130003547']);
+    assert.equal(result.rawRecordIds.length, 1);
+    assert.equal(result.skippedNoDbMatchCount, 1);
+    const sourceRunInsert = executor.calls.find((call) => call.sql.includes('insert into source_runs'));
+    assert.equal(sourceRunInsert?.params[0], 'official_api');
+    assert.equal(sourceRunInsert?.params[1], 'OpenFoodFacts barcode nutrition enrichment');
+    const productUpdate = executor.calls.find((call) => call.sql.includes('update products'));
+    assert.equal(productUpdate?.params[0], '7310130003547');
+    assert.equal(JSON.parse(String(productUpdate?.params[1])).per100g.energyKcal, 361);
+    const rawRecordInsert = executor.calls.find((call) => call.sql.includes('insert into raw_records'));
+    assert.equal(rawRecordInsert?.params[1], 'product');
+    assert.equal(rawRecordInsert?.params[2], '7310130003547');
+  });
+});
+
+describe('runOpenFoodFactsProductMetadataEnrichment', () => {
+  it('reads DB barcodes, fetches export matches, and persists only rows with nutrition', async () => {
+    const executor = new DailyIngestionExecutor();
+    const tsv = [
+      'code\turl\tproduct_name\tquantity\tbrands\tcategories_tags\tlabels_tags\tnutriscore_grade\tenergy_100g\tenergy-kcal_100g\tfat_100g\tsaturated-fat_100g\tcarbohydrates_100g\tsugars_100g\tfiber_100g\tproteins_100g\tsalt_100g\tsodium_100g\timage_url',
+      '7310130003547\thttps://world.openfoodfacts.org/product/7310130003547/ideal-makaroner-kungsornen\tIdeal Makaroner\t750 g\tKungsörnen\ten:pastas\t\ta\t1509\t361\t2\t0.5\t72\t3\t3\t11\t0.01\t0.004\thttps://images.openfoodfacts.org/images/products/731/013/000/3547/front_sv.11.400.jpg',
+      '7310130000000\thttps://world.openfoodfacts.org/product/7310130000000/missing-nutrition\tMissing Nutrition\t1 kg\tTestbrand\ten:pastas\t\tunknown\t\t\t\t\t\t\t\t\t\t\t'
+    ].join('\n');
+    const fetchImpl: typeof fetch = async () => new Response(gzipSync(tsv), { status: 200, headers: { 'content-type': 'application/gzip' } });
+
+    const result = await runOpenFoodFactsProductMetadataEnrichment({
+      executor,
+      fetchImpl,
+      retrievedAt: '2026-05-22T20:18:16.369Z'
+    });
+
+    assert.equal(result.status, 'persisted');
+    assert.equal(result.candidateBarcodeCount, 2);
+    assert.equal(result.exportMatchCount, 2);
+    assert.equal(result.enrichmentRowCount, 1);
+    assert.equal(result.skippedNoNutritionCount, 1);
+    assert.equal(result.skippedExportNoMatchCount, 0);
+    assert.deepEqual(result.updatedProductIds, ['product-db-ean-7310130003547']);
+    const sourceRunInsert = executor.calls.find((call) => call.sql.includes('insert into source_runs'));
+    assert.equal(JSON.parse(String(sourceRunInsert?.params[6])).candidateCount, 2);
+  });
+});
+
+describe('daily ingestion runner', () => {
+  it('loads connector config from environment without exposing secrets', () => {
+    const configs = buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
+        dailyConnectorFixture('ica'),
+        dailyConnectorFixture('willys'),
+        dailyConnectorFixture('coop'),
+        dailyConnectorFixture('hemkop'),
+        dailyConnectorFixture('lidl'),
+        dailyConnectorFixture('city_gross')
+      ])
+    });
+
+    assert.equal(configs.databaseUrl, 'postgres://user:secret@example/groceryview');
+    assert.equal(configs.connectors.length, 6);
+    assert.equal(configs.connectors[0].chainId, 'ica');
+    assert.deepEqual(configs.runtimeOptions, {
+      maxConcurrency: 1,
+      connectorStartDelayMs: 0,
+      connectorRetryAttempts: 0,
+      connectorRetryBaseDelayMs: 250,
+      blockerLogPath: 'codex-tasks/ingestion-blockers.txt'
+    });
+  });
+
+  it('loads bounded runner options and the blocker log override from environment', () => {
+    const configs = buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_MAX_CONCURRENCY: '3',
+      GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: '125',
+      GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: '2',
+      GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: '500',
+      GROCERYVIEW_DAILY_BLOCKER_LOG_PATH: '/tmp/groceryview-ingestion-blockers.txt',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
+        dailyConnectorFixture('ica'),
+        dailyConnectorFixture('willys'),
+        dailyConnectorFixture('coop'),
+        dailyConnectorFixture('hemkop'),
+        dailyConnectorFixture('lidl'),
+        dailyConnectorFixture('city_gross')
+      ])
+    });
+
+    assert.deepEqual(configs.runtimeOptions, {
+      maxConcurrency: 3,
+      connectorStartDelayMs: 125,
+      connectorRetryAttempts: 2,
+      connectorRetryBaseDelayMs: 500,
+      blockerLogPath: '/tmp/groceryview-ingestion-blockers.txt'
+    });
+  });
+
+
+  it('loads connector config from a file path to avoid oversized process environments', () => {
+    const connectorPath = join(mkdtempSync(join(tmpdir(), 'groceryview-connectors-')), 'connectors.json');
+    writeFileSync(connectorPath, JSON.stringify([
+      dailyConnectorFixture('ica'),
+      dailyConnectorFixture('willys'),
+      dailyConnectorFixture('coop'),
+      dailyConnectorFixture('hemkop'),
+      dailyConnectorFixture('lidl'),
+      dailyConnectorFixture('city_gross')
+    ]));
+
+    const configs = buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE: connectorPath
+    });
+
+    assert.equal(configs.connectors.length, 6);
+    assert.equal(configs.connectors[5].chainId, 'city_gross');
+  });
+
+
+  it('loads bounded bulk ingestion runner limits from environment', () => {
+    const configs = buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
+        dailyConnectorFixture('ica'),
+        dailyConnectorFixture('willys'),
+        dailyConnectorFixture('coop'),
+        dailyConnectorFixture('hemkop'),
+        dailyConnectorFixture('lidl'),
+        dailyConnectorFixture('city_gross')
+      ]),
+      GROCERYVIEW_DAILY_MAX_CONNECTORS: '4',
+      GROCERYVIEW_DAILY_MAX_CONCURRENCY: '2',
+      GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: '125',
+      GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: '1',
+      GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: '250'
+    });
+
+    assert.equal(configs.connectors.length, 4);
+    assert.deepEqual(configs.runner, {
+      maxConnectors: 4,
+      maxConcurrency: 2,
+      connectorStartDelayMs: 125,
+      connectorRetryAttempts: 1,
+      connectorRetryBaseDelayMs: 250
+    });
+  });
+
+  it('forces the production daily ingestion database session into write mode', () => {
+    assert.deepEqual(
+      buildDailyIngestionPostgresPoolConfig('postgres://user:secret@example/groceryview'),
+      {
+        connectionString: 'postgres://user:secret@example/groceryview',
+        max: 1
+      }
+    );
+  });
+
+  it('uses Supabase session pooler mode for long daily ingestion writes', () => {
+    assert.deepEqual(
+      buildDailyIngestionPostgresPoolConfig('postgres://postgres.ref:secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres'),
+      {
+        connectionString: 'postgres://postgres.ref:secret@aws-1-eu-north-1.pooler.supabase.com:5432/postgres',
+        max: 1
+      }
+    );
+  });
+
+  it('retries transient production database disconnects while writing daily ingestion batches', async () => {
+    const calls: Array<{ text: string; values: unknown[] }> = [];
+    let attempts = 0;
+    const client = {
+      async query(text: string, values: unknown[]) {
+        calls.push({ text, values });
+        attempts += 1;
+        if (attempts === 1) throw new Error('terminating connection due to administrator command');
+        return { rows: [{ id: 'row-1' }] };
+      }
+    };
+
+    const executor = createDailyIngestionQueryExecutor(client, { retryAttempts: 1, retryBaseDelayMs: 0 });
+    const rows = await executor.query<{ id: string }>('select id from products where id = $1', ['product-1']);
+
+    assert.deepEqual(rows, [{ id: 'row-1' }]);
+    assert.equal(calls.length, 2);
+  });
+
+  it('treats pooler handler exits as retryable daily ingestion DB errors', async () => {
+    let attempts = 0;
+    const client = {
+      async query() {
+        attempts += 1;
+        if (attempts < 3) throw new Error('(EDBHANDLEREXITED) connection to database closed. Check logs for more information');
+        return { rows: [{ id: 'row-after-pooler-reconnect' }] };
+      }
+    };
+
+    const executor = createDailyIngestionQueryExecutor(client, { retryAttempts: 2, retryBaseDelayMs: 0 });
+    const rows = await executor.query<{ id: string }>('set default_transaction_read_only=off');
+
+    assert.deepEqual(rows, [{ id: 'row-after-pooler-reconnect' }]);
+    assert.equal(attempts, 3);
+  });
+
+  it('waits through transient database not-accepting-connections startup windows', async () => {
+    let attempts = 0;
+    const client = {
+      async query() {
+        attempts += 1;
+        if (attempts < 4) throw new Error('the database system is not accepting connections');
+        return { rows: [{ id: 'row-after-db-accepts-connections' }] };
+      }
+    };
+
+    const executor = createDailyIngestionQueryExecutor(client, { retryAttempts: 3, retryBaseDelayMs: 0 });
+    const rows = await executor.query<{ id: string }>('set default_transaction_read_only=off');
+
+    assert.deepEqual(rows, [{ id: 'row-after-db-accepts-connections' }]);
+    assert.equal(attempts, 4);
+  });
+
+  it('retries Supabase pooler econnrefused startup errors', async () => {
+    let attempts = 0;
+    const client = {
+      async query() {
+        attempts += 1;
+        if (attempts < 3) throw new Error('Failed to connect to database: {:error, :econnrefused}');
+        return { rows: [{ id: 'row-after-pooler-accepts-connections' }] };
+      }
+    };
+
+    const executor = createDailyIngestionQueryExecutor(client, { retryAttempts: 2, retryBaseDelayMs: 0 });
+    const rows = await executor.query<{ id: string }>('set default_transaction_read_only=off');
+
+    assert.deepEqual(rows, [{ id: 'row-after-pooler-accepts-connections' }]);
+    assert.equal(attempts, 3);
+  });
+
+  it('fails closed when daily connector config omits any required chain', () => {
+    assert.throws(() => buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
+        dailyConnectorFixture('ica'),
+        dailyConnectorFixture('willys')
+      ])
+    }), /missing required daily chain connectors: coop, hemkop, lidl, city_gross/);
+  });
+
+  it('persists successful daily connector runs as source runs, raw records, and observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' }]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [{
+          storeId: 'willys-odenplan',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Zoégas Skånerost 450g',
+          canonicalName: 'Zoégas Coffee 450g',
+          productId: 'zoegas-coffee-450g',
+          categoryId: 'coffee',
+          brand: 'Zoégas',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9,
+          regularPrice: 69.9,
+          promoText: 'Veckans erbjudande'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.persistedRuns, 1);
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.observationIds.length, 1);
+    const writeModeIndex = executor.calls.findIndex((call) => call.sql.trim().toLowerCase() === 'set default_transaction_read_only=off');
+    const sourceRunInsert = executor.calls.find((call) => call.sql.includes('insert into source_runs'));
+    const sourceRunInsertIndex = executor.calls.findIndex((call) => call.sql.includes('insert into source_runs'));
+    assert.ok(writeModeIndex >= 0, 'daily persistence should reassert write mode before connector writes');
+    assert.ok(writeModeIndex < sourceRunInsertIndex, 'write mode must be reasserted before source_run persistence');
+    assert.equal(sourceRunInsert?.params[0], 'official_api');
+    assert.equal(sourceRunInsert?.params[1], 'willys-normalized-json');
+    assert.deepEqual(JSON.parse(String(sourceRunInsert?.params[6])), {
+      chainId: 'willys',
+      cadence: 'daily',
+      connectorId: 'willys-normalized-json',
+      runKey: 'willys:official-api:willys-normalized-json:2026-05-21',
+      parserVersion: 'normalized-json-v1',
+      acceptedCount: 1,
+      rejectedCount: 0,
+      domain: 'grocery'
+    });
+    assert.equal(executor.calls.some((call) => call.sql.includes('insert into raw_records')), true);
+    const rawRecordInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into raw_records'));
+    const rawRows = JSON.parse(String(rawRecordInsert?.params[1])) as Array<{ payload: Record<string, unknown> }>;
+    assert.equal('product' in rawRows[0]!.payload, false);
+    assert.deepEqual(Object.keys(rawRows[0]!.payload).sort(), [
+      'chainId',
+      'observedAt',
+      'price',
+      'priceType',
+      'productId',
+      'storeId'
+    ]);
+    assert.equal(executor.calls.some((call) => call.sql.includes('insert into observations')), true);
+    const storeInsert = executor.calls.find((call) => call.sql.includes('insert into stores'));
+    assert.equal(storeInsert?.params[0], 'willys-odenplan');
+    const latestPriceInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
+    const observationRows = JSON.parse(String(latestPriceInsert?.params[0])) as Array<{ store_id: string; domain: string }>;
+    assert.equal(observationRows[0]?.store_id, 'store-db-2');
+    assert.equal(observationRows[0]?.domain, 'grocery');
+  });
+
+  it('reuses daily chain, store, and product ids while persisting a connector batch', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-zoegas-450-a',
+            rawName: 'Zoégas Skånerost 450g',
+            canonicalName: 'Zoégas Coffee 450g',
+            productId: 'zoegas-coffee-450g',
+            categoryId: 'coffee',
+            brand: 'Zoégas',
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 49.9
+          },
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-zoegas-450-b',
+            rawName: 'Zoégas Skånerost 450g',
+            canonicalName: 'Zoégas Coffee 450g',
+            productId: 'zoegas-coffee-450g',
+            categoryId: 'coffee',
+            brand: 'Zoégas',
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 48.9
+          }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.acceptedCount, 2);
+    assert.equal(executor.calls.filter((call) => call.sql.includes('insert into chains')).length, 1);
+    assert.equal(executor.calls.filter((call) => call.sql.includes('insert into stores')).length, 1);
+    assert.equal(executor.calls.filter((call) => call.sql.includes('insert into products')).length, 1);
+    assert.equal(executor.calls.filter((call) => call.sql.includes('insert into aliases')).length, 1);
+  });
+
+  it('upserts every configured daily store before writing partial store-scoped observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-weekly-normalized-json',
+          chainId: 'willys',
+          sourceType: 'flyer_campaign',
+          endpointUrl: 'https://sources.example.test/willys/weekly.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [
+            { storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' },
+            { storeId: '2149', name: 'Willys Alingsås Hagaplan', address: 'Hagaplan 1', city: 'Alingsås' }
+          ]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [{
+          storeId: '2110',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Zoégas Skånerost 450g',
+          canonicalName: 'Zoégas Coffee 450g',
+          productId: 'zoegas-coffee-450g',
+          categoryId: 'coffee',
+          brand: 'Zoégas',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.observationIds.length, 1);
+    const storeInserts = executor.calls.filter((call) => call.sql.includes('insert into stores'));
+    assert.deepEqual(storeInserts.map((call) => call.params[0]), ['2110', '2149']);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+  });
+
+  it('materializes native Willys all-store weekly offers into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T12:00:00.000Z',
+      connectors: [{
+        connectorId: 'willys-weekly-all-stores',
+        chainId: 'willys',
+        sourceType: 'flyer_campaign',
+        endpointUrl: GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
+        parserVersion: 'willys-weekly-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/axfood/rest/store')) {
+          return new Response(JSON.stringify([
+            { storeId: '2110', name: 'Willys Kungsbacka Hede', address: { line1: 'Tölöleden 3', town: 'Kungsbacka' } }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({
+          pagination: { numberOfPages: 1 },
+          results: [{
+            name: 'Smör Normalsaltat',
+            manufacturer: 'Arla',
+            googleAnalyticsCategory: 'Dairy',
+            displayVolume: '500g',
+            priceNoUnit: '61.45',
+            potentialPromotions: [{
+              code: 'willys-promo-2110',
+              mainProductCode: '7310865005168',
+              name: 'Smör Normalsaltat',
+              brands: ['Arla'],
+              price: 45,
+              cartLabel: '45 kr/st',
+              conditionLabel: 'Max 2 köp/hushåll'
+            }]
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildWillysStoresUrl({ online: true }),
+      buildWillysWeeklyDiscountsUrl('2110', 100, 0)
+    ]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 45);
+    assert.equal(observation.promotion_text, 'Max 2 köp/hushåll');
+  });
+
+  it('materializes native ICA store promotion prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T14:30:00.000Z',
+      connectors: [{
+        connectorId: 'ica-store-promotions-default-stores',
+        chainId: 'ica',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL}?maxStores=1&maxRows=1`,
+        parserVersion: 'ica-store-promotions-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '1004599', name: 'ICA Kvantum Kungsholmen', address: 'ICA Kvantum Kungsholmen', city: 'Stockholm' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(JSON.stringify({
+          productGroups: [{
+            type: 'Kaffe',
+            decoratedProducts: [{
+              productId: 'ica-coffee-product',
+              retailerProductId: 'ica-retailer-coffee',
+              name: 'Bryggkaffe Mellanrost',
+              brand: 'ICA',
+              image: { src: 'https://assets.ica.se/coffee.png' },
+              packSizeDescription: '450 g',
+              price: { amount: 59.9, currency: 'SEK' },
+              promoPrice: { amount: 44.9, currency: 'SEK' },
+              unitPrice: { price: { amount: 133.11, currency: 'SEK' }, unit: 'kg' },
+              promotions: [{ description: 'Veckans pris' }]
+            }]
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(requestedUrls.length, 1);
+    assert.equal(new URL(requestedUrls[0]).pathname, '/stores/1004599/api/product-listing-pages/v1/pages/promotions');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 44.9);
+    assert.equal(observation.regular_price, 59.9);
+  });
+
+  it('materializes native Willys all-store branch product prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T13:45:00.000Z',
+      connectors: [{
+        connectorId: 'willys-products-all-stores',
+        chainId: 'willys',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL}?queries=kaffe&maxStores=1&maxRowsPerStore=1`,
+        parserVersion: 'willys-products-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '2149', name: 'Willys Alingsås Hagaplan', address: 'Hagaplan 1', city: 'Alingsås' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/axfood/rest/store')) {
+          return new Response(JSON.stringify([
+            { storeId: '2149', name: 'Willys Alingsås Hagaplan', address: { line1: 'Hagaplan 1', town: 'Alingsås' }, onlineStore: true }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({ results: [{
+          code: '101261204_ST',
+          name: 'Bryggkaffe Mellanrost',
+          manufacturer: 'Gevalia',
+          productLine2: '450g',
+          priceValue: 70.88,
+          price: '70,88 kr',
+          comparePrice: '157,51 kr/kg',
+          googleAnalyticsCategory: 'Kaffe'
+        }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildWillysStoresUrl({ online: true }),
+      buildWillysSearchUrl('kaffe', '2149')
+    ]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 70.88);
+  });
+
+  it('materializes native Coop all-store branch product prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T13:46:00.000Z',
+      connectors: [{
+        connectorId: 'coop-products-all-stores',
+        chainId: 'coop',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL}?queries=kaffe&maxStores=1&maxRowsPerStore=1`,
+        parserVersion: 'coop-products-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '251300', name: 'Stora Coop Boländerna', address: 'Rapsgatan 1', city: 'Uppsala' }]
+      }],
+      fetchImpl: async (url, init) => {
+        requestedUrls.push(String(url));
+        if (String(url) === 'https://www.coop.se/handla/') {
+          return new Response('"personalizationApiUrl":"https://external.api.coop.se/personalization","personalizationApiSubscriptionKey":"coop-key","personalizationApiVersion":"v1","storeApiUrl":"https://proxy.api.coop.se/external/store/","storeApiSubscriptionKey":"store-key"', { status: 200 });
+        }
+        if (String(url).endsWith('/stores?api-version=v5')) {
+          return new Response(JSON.stringify({ stores: [{ ledgerAccountNumber: '251300' }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (String(url).includes('/stores/251300?')) {
+          return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323', services: ['Hämta – beställ och hämta i butiken'] }), { status: 200 });
+        }
+        assert.equal(JSON.parse(String(init?.body)).query, 'kaffe');
+        return new Response(JSON.stringify({ results: { items: [{
+          id: '7340191174276',
+          ean: '7340191174276',
+          name: 'Kaffefilter Vit 1x4 100-pack',
+          manufacturerName: 'Coop',
+          packageSizeInformation: '100-pack',
+          salesPriceData: { b2cPrice: 19.5 }
+        }] } }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls.filter((url) => !url.includes('handla')), [
+      buildCoopStoresUrl(),
+      buildCoopStoreInfoUrl('251300'),
+      buildCoopSearchUrl('251300')
+    ]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 19.5);
+  });
+
+
+  it('materializes native Hemkop all-store branch product prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T13:47:00.000Z',
+      connectors: [{
+        connectorId: 'hemkop-products-all-stores',
+        chainId: 'hemkop',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL}?queries=kaffe&maxStores=1&maxRowsPerStore=1`,
+        parserVersion: 'hemkop-products-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: 'Masthuggstorget 3', city: 'Göteborg' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/axfood/rest/store')) {
+          return new Response(JSON.stringify([
+            { storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: { line1: 'Masthuggstorget 3', town: 'Göteborg' }, onlineStore: true }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({ results: [{
+          code: '101205621_ST',
+          name: 'Idealmakaroner Gammaldags',
+          manufacturer: 'Kungsörnen',
+          productLine2: '750g',
+          googleAnalyticsCategory: 'Skafferi',
+          priceValue: 14.14,
+          price: '14,14 kr'
+        }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildHemkopStoresUrl({ online: true }),
+      buildHemkopSearchUrl('kaffe', 1, 0, '4003')
+    ]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 14.14);
+  });
+
+  it('materializes native Hemkop all-store weekly offers into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T12:03:00.000Z',
+      connectors: [{
+        connectorId: 'hemkop-weekly-all-stores',
+        chainId: 'hemkop',
+        sourceType: 'flyer_campaign',
+        endpointUrl: GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
+        parserVersion: 'hemkop-weekly-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: 'Masthuggstorget 3', city: 'Göteborg' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/axfood/rest/store')) {
+          return new Response(JSON.stringify([
+            { storeId: '4003', name: 'Hemköp Göteborg Masthuggstorget', address: { line1: 'Masthuggstorget 3', town: 'Göteborg' } }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({
+          pagination: { numberOfPages: 1 },
+          results: [{
+            name: 'Svenskt smör',
+            manufacturer: 'Arla',
+            googleAnalyticsCategory: 'Dairy',
+            displayVolume: '500g',
+            priceNoUnit: '62.41',
+            potentialPromotions: [{
+              code: 'hemkop-promo-4003',
+              mainProductCode: '101017249_ST',
+              name: 'Svenskt smör',
+              brands: ['Arla'],
+              price: 39.95,
+              cartLabel: '39,95 kr/st',
+              redeemLimitLabel: 'Max 3 köp'
+            }]
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildHemkopStoresUrl({ online: true }),
+      buildHemkopWeeklyDiscountsUrl('4003', 100, 0)
+    ]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 39.95);
+    assert.equal(observation.promotion_text, '39,95 kr/st');
+  });
+
+  it('materializes native Coop all-store weekly offers into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T12:05:00.000Z',
+      connectors: [{
+        connectorId: 'coop-weekly-all-stores',
+        chainId: 'coop',
+        sourceType: 'flyer_campaign',
+        endpointUrl: `${GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL}?subscriptionKey=public-test-key&storeApiSubscriptionKey=public-store-test-key&productQueries=Svenskt%20sm%C3%B6r%20Arla%20500%20g`,
+        parserVersion: 'coop-weekly-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '251300', name: 'Stora Coop Boländerna', address: 'Rapsgatan 1b', city: 'Uppsala' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url) === buildCoopStoresUrl()) {
+          return new Response(JSON.stringify({
+            stores: [{ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', conceptName: 'Stora Coop' }]
+          }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (String(url).includes('/stores/251300')) {
+          return new Response(JSON.stringify({
+            ledgerAccountNumber: '251300',
+            name: 'Stora Coop Boländerna',
+            address: 'Rapsgatan 1b',
+            city: 'Uppsala',
+            flyers: [{ startDate: '2026-05-18T00:00:00', stopDate: '2026-05-24T23:59:59', current: true, pdfExists: true, pdfUrl: 'https://dr.coop.se/butik/251300' }]
+          }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({
+          results: {
+            items: [{
+              id: 'coop-catalog-promo',
+              ean: '7310865005168',
+              name: 'Smör Normalsaltat',
+              manufacturerName: 'Arla',
+              packageSizeInformation: '500g',
+              salesPriceData: { b2cPrice: 61.45 },
+              onlinePromotions: [{ id: 'promo', message: 'Smör 45 kr/st', priceData: { b2cPrice: 45 }, medMeraRequired: true }]
+            }]
+          }
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildCoopStoresUrl(),
+      buildCoopStoreInfoUrl('251300'),
+      buildCoopStoreInfoUrl('251300'),
+      buildCoopSearchUrl('251300')
+    ]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 45);
+    assert.equal(observation.member_required, true);
+    assert.equal(observation.promotion_starts_on, '2026-05-18');
+    assert.equal(observation.promotion_ends_on, '2026-05-24');
+    assert.equal(observation.valid_from, '2026-05-18T00:00:00');
+    assert.equal(observation.valid_until, '2026-05-24T23:59:59');
+  });
+
+  it('materializes native City Gross all-store public product prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T12:45:00.000Z',
+      connectors: [{
+        connectorId: 'city-gross-public-products-all-stores',
+        chainId: 'city_gross',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL}?queries=kaffe&maxStores=1&maxRowsPerStore=1`,
+        parserVersion: 'citygross-products-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '21', name: 'City Gross Borås', address: 'City Gross Borås', city: 'Borås' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/PageData/stores')) {
+          return new Response(JSON.stringify([
+            { data: { storeName: 'City Gross Borås', siteId: 21, url: '/butiker/boras/', storeLocation: { coordinates: '57.7141742,12.8669819' } } }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({
+          items: [{
+            id: '100001971_ST',
+            gtin: '24000124962',
+            name: 'Pear Halves In Juice',
+            brand: 'DEL MONTE',
+            category: 'Desserter',
+            descriptiveSize: '415/230G',
+            productStoreDetails: {
+              prices: {
+                currentPrice: { price: 31.5, unit: 'PCE', comparativePrice: 136.96, comparativePriceUnit: 'KGM' },
+                ordinaryPrice: { price: 39.9, unit: 'PCE' }
+              },
+              hasDiscount: true
+            }
+          }],
+          totalCount: 1
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildCityGrossStoresUrl(),
+      buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 })
+    ]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 31.5);
+    assert.equal(observation.regular_price, 39.9);
+  });
+
+  it('materializes native OKQ8 fuel prices into domain=fuel litre observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T08:35:34.000Z',
+      connectors: [{
+        connectorId: 'okq8-fuel-prices',
+        chainId: 'okq8',
+        domain: 'fuel',
+        sourceType: 'retailer_online_page',
+        endpointUrl: GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+        parserVersion: 'okq8-fuel-prices-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(`
+          <script>window.__APP_INIT_DATA__ = {"informationArea":[{"content":{"heading":"Drivmedel på station","itemsRow":[
+            {"title":"OKQ8 GoEasy 95 (Blyfri 95)","cells":[{"text":"18,89 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-22","links":[]}]},
+            {"title":"OKQ8 GoEasy 98 (Blyfri 98)","cells":[{"text":"20,49 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-22","links":[]}]},
+            {"title":"OKQ8 GoEasy Diesel","cells":[{"text":"21,34 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-21","links":[]}]},
+            {"title":"Neste MY Förnybar Diesel (HVO100)","cells":[{"text":"29,89 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-21","links":[]}]},
+            {"title":"Etanol E85","cells":[{"text":"15,84 kr","links":[]},{"text":"- 50 öre","links":[]},{"text":"2026-05-22","links":[]}]}
+          ]}}]}</script>
+        `, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 5);
+    assert.deepEqual(requestedUrls, [GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL]);
+    assert.equal(executor.calls.some((call) => call.sql.includes('insert into stores')), false);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.domain, 'fuel');
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 18.89);
+    assert.equal(observation.unit_price, 18.89);
+    assert.equal(observation.quantity, 1);
+    assert.equal(observation.quantity_unit, 'l');
+    assert.equal(firstBatchProduct(executor).fuel_grade_id, 'fuel-95-e10');
+    const fuelSourceInsert = executor.calls.find((call) => call.sql.includes('insert into fuel_price_sources'));
+    assert.deepEqual(fuelSourceInsert?.params.slice(0, 5), [
+      'operator_public_price_page',
+      'okq8',
+      'OKQ8',
+      GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+      'okq8-fuel-prices-v1'
+    ]);
+    const fuelSourceLink = executor.calls.find((call) => call.sql.includes('insert into fuel_price_source_observations'));
+    const linkedRows = JSON.parse(String(fuelSourceLink?.params[1])) as Array<{ fuel_grade_id: string; original_price_text: string; original_effective_date: string }>;
+    assert.deepEqual(linkedRows[0], {
+      fuel_grade_id: 'fuel-95-e10',
+      observation_id: 'observation-db-7',
+      original_price_text: '18,89 kr',
+      original_effective_date: '2026-05-22'
+    });
+  });
+
+  it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const gridData = {
+      title: 'Grekisk vattenmelon',
+      regions: [1],
+      productId: 11029834,
+      canonicalUrl: '/p/grekisk-vattenmelon/p11029834',
+      regionsPrices: {
+        1: {
+          currentPrice: {
+            price: 14.9,
+            basePrice: { text: '/kg' },
+            currencyCode: 'SEK',
+            discount: { discountText: 'Superpris' }
+          }
+        }
+      }
+    };
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T14:13:00.000Z',
+      connectors: [{
+        connectorId: 'lidl-public-offers-all-stores',
+        chainId: 'lidl',
+        sourceType: 'retailer_online_page',
+        endpointUrl: `${GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL}?paths=/c/veckans-frukt-groent/a10094676&maxStores=1`,
+        parserVersion: 'lidl-public-offers-native-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: 'alingsas/vaenersborgsvaegen-21', name: 'Lidl Alingsås Vänersborgsvägen 21', address: 'Vänersborgsvägen 21', city: 'Alingsås' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url) === buildLidlStoresUrl()) {
+          return new Response('<a href="/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/">Alingsås</a>', { status: 200 });
+        }
+        if (String(url).includes('/butiker/')) {
+          return new Response('<meta name="description" content="Din Lidl-butik vid Vänersborgsvägen 21, 441 37 Alingsås Se öppettider"><a href="https://bing.com/maps/default.aspx?rtp=~pos.57.93452_12.54588_Alings%C3%A5s">Map</a>', { status: 200 });
+        }
+        return new Response(`<div data-grid-data="${JSON.stringify(gridData).replaceAll('"', '&quot;')}"></div>`, { status: 200 });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildLidlStoresUrl(),
+      buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
+      buildLidlOfferPageUrl('/c/veckans-frukt-groent/a10094676')
+    ]);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 14.9);
+  });
+
+  it('runs daily connectors with bounded concurrency and retries transient fetch failures before DB persistence', async () => {
+    const executor = new DailyIngestionExecutor();
+    const active = { count: 0, max: 0 };
+    const attempts = new Map<string, number>();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T16:30:00.000Z',
+      maxConcurrency: 2,
+      connectorRetryAttempts: 1,
+      connectorRetryBaseDelayMs: 0,
+      connectors: ['ica', 'willys', 'coop'].map((chainId) => ({
+        ...dailyConnectorFixture(chainId),
+        requireStoreScopedPrices: false
+      })),
+      fetchImpl: async (url) => {
+        const chainId = String(url).split('/').at(-2) ?? 'unknown';
+        attempts.set(chainId, (attempts.get(chainId) ?? 0) + 1);
+        if (chainId === 'ica' && attempts.get(chainId) === 1) throw new Error('temporary upstream 503');
+        active.count += 1;
+        active.max = Math.max(active.max, active.count);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        active.count -= 1;
+        return new Response(JSON.stringify({
+          items: [{
+            retailerProductId: `${chainId}-coffee`,
+            rawName: `${chainId} Coffee 450g`,
+            canonicalName: `${chainId} Coffee 450g`,
+            productId: `${chainId}-coffee-450g`,
+            categoryId: 'coffee',
+            brand: chainId.toUpperCase(),
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 49.9
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.persistedRuns, 3);
+    assert.equal(result.acceptedCount, 3);
+    assert.equal(result.blockers.length, 0);
+    assert.deepEqual(result.chainSummaries.map((summary) => ({
+      connectorId: summary.connectorId,
+      chainId: summary.chainId,
+      status: summary.status,
+      persistedRuns: summary.persistedRuns,
+      acceptedCount: summary.acceptedCount,
+      observationCount: summary.observationIds.length
+    })), [
+      { connectorId: 'ica-normalized-json', chainId: 'ica', status: 'succeeded', persistedRuns: 1, acceptedCount: 1, observationCount: 1 },
+      { connectorId: 'willys-normalized-json', chainId: 'willys', status: 'succeeded', persistedRuns: 1, acceptedCount: 1, observationCount: 1 },
+      { connectorId: 'coop-normalized-json', chainId: 'coop', status: 'succeeded', persistedRuns: 1, acceptedCount: 1, observationCount: 1 }
+    ]);
+    assert.equal(attempts.get('ica'), 2);
+    assert.equal(active.max, 2);
+  });
+
+  it('fails closed before persistence when store-scoped prices omit configured branch metadata', async () => {
+    const executor = new DailyIngestionExecutor();
+    const blockerLogPath = join(mkdtempSync(join(tmpdir(), 'groceryview-blockers-')), 'ingestion-blockers.txt');
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      blockerLogPath,
+      connectors: [{
+        connectorId: 'willys-normalized-json',
+        chainId: 'willys',
+        sourceType: 'official_api',
+        endpointUrl: 'https://sources.example.test/willys/products.json',
+        parserVersion: 'normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' }]
+      }],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [{
+          storeId: 'willys-unknown-branch',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Zoégas Skånerost 450g',
+          canonicalName: 'Zoégas Coffee 450g',
+          productId: 'zoegas-coffee-450g',
+          categoryId: 'coffee',
+          brand: 'Zoégas',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'blocked');
+    assert.deepEqual(result.blockers, ['willys:unknown_store_ids:willys-unknown-branch']);
+    assert.equal(executor.calls.length, 0);
+    const blockerLog = readFileSync(blockerLogPath, 'utf8');
+    assert.match(blockerLog, /status: blocked/);
+    assert.match(blockerLog, /- willys:unknown_store_ids:willys-unknown-branch/);
+  });
+
+  it('fails closed before persistence when official product connectors skip a configured branch', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [{
+        connectorId: 'willys-products-all-stores',
+        chainId: 'willys',
+        sourceType: 'official_api',
+        endpointUrl: 'https://sources.example.test/willys/products.json',
+        parserVersion: 'normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [
+          { storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' },
+          { storeId: 'willys-skanstull', name: 'Willys Skanstull', address: 'Skanstull', city: 'Stockholm' }
+        ]
+      }],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [{
+          storeId: 'willys-odenplan',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Zoégas Skånerost 450g',
+          canonicalName: 'Zoégas Coffee 450g',
+          productId: 'zoegas-coffee-450g',
+          categoryId: 'coffee',
+          brand: 'Zoégas',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'blocked');
+    assert.deepEqual(result.blockers, ['willys:missing_configured_store_observations:willys-skanstull']);
+    assert.equal(executor.calls.length, 0);
+  });
+
+  it('marks the source run failed when daily observation persistence aborts after run creation', async () => {
+    class FailingObservationExecutor extends DailyIngestionExecutor {
+      async query<T>(sql: string, params: unknown[] = []) {
+        if (sql.includes('jsonb_to_recordset') && sql.includes('insert into observations')) {
+          this.calls.push({ sql, params });
+          throw new Error('observation write failed');
+        }
+        return super.query<T>(sql, params);
+      }
+    }
+
+    const executor = new FailingObservationExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [{
+        connectorId: 'willys-normalized-json',
+        chainId: 'willys',
+        sourceType: 'official_api',
+        endpointUrl: 'https://sources.example.test/willys/products.json',
+        parserVersion: 'normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' }]
+      }],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [{
+          storeId: 'willys-odenplan',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Zoégas Skånerost 450g',
+          canonicalName: 'Zoégas Coffee 450g',
+          productId: 'zoegas-coffee-450g',
+          categoryId: 'coffee',
+          brand: 'Zoégas',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'blocked');
+    assert.deepEqual(result.blockers, ['willys:persistence_failed:observation write failed']);
+    const sourceRunUpdate = executor.calls.find((call) => call.sql.includes('update source_runs'));
+    assert.ok(sourceRunUpdate, 'source run must be marked terminal after persistence failure');
+    assert.equal(sourceRunUpdate.params[2], 'failed');
+    assert.match(String(sourceRunUpdate.params[3]), /observation write failed/);
+    assert.ok(
+      executor.calls.findIndex((call) => call.sql.includes('insert into observations')) <
+      executor.calls.findIndex((call) => call.sql.includes('update source_runs')),
+      'source run failure update should happen after the aborted observation write'
+    );
+  });
+
+  it('fails closed before persistence when a required daily connector is blocked', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'ica-page',
+          chainId: 'ica',
+          sourceType: 'retailer_online_page',
+          endpointUrl: 'https://sources.example.test/ica/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'unknown',
+          legalReviewStatus: 'pending',
+          hasDataAgreement: false
+        }
+      ],
+      fetchImpl: async () => { throw new Error('fetch should not run for blocked connector'); }
+    });
+
+    assert.equal(result.status, 'blocked');
+    assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
+    assert.equal(executor.calls.length, 0);
   });
 });

@@ -34,7 +34,7 @@ type MatsparPageProduct = {
   w_prices?: Record<string, unknown>;
 };
 
-export const MATSPAR_SEARCH_BASE_URL = 'https://www.matspar.se/kategori/';
+export const MATSPAR_SEARCH_BASE_URL = 'https://www.matspar.se/kategori';
 
 export const DEFAULT_MATSPAR_SEARCH_QUERIES = [
   'makaroner',
@@ -51,8 +51,24 @@ export const DEFAULT_MATSPAR_SEARCH_QUERIES = [
   'banan',
   'kyckling',
   'ketchup',
-  'havregryn'
+  'havregryn',
+  'juice',
+  'flingor',
+  'mjol',
+  'olja',
+  'tomat',
+  'fisk',
+  'kottfars',
+  'korv',
+  'glass',
+  'choklad',
+  'frukt',
+  'gronsaker',
+  'godis',
+  'soppa',
+  'tacos'
 ] as const;
+export const DEFAULT_MATSPAR_MAX_ROWS = 1200;
 
 export type FetchMatsparProductsOptions = {
   fetchImpl?: typeof fetch;
@@ -70,7 +86,7 @@ export function buildMatsparSearchUrl(query: string): string {
 export async function fetchMatsparProducts(options: FetchMatsparProductsOptions = {}): Promise<MatsparProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const queries = options.queries ?? DEFAULT_MATSPAR_SEARCH_QUERIES;
-  const maxRows = options.maxRows ?? 75;
+  const maxRows = options.maxRows ?? DEFAULT_MATSPAR_MAX_ROWS;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: MatsparProduct[] = [];
   const seenCodes = new Set<string>();

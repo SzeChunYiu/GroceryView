@@ -38,7 +38,10 @@ export function migrationVersionFromPath(path: string): string {
 
 export function createMigrationPlan(files: SqlMigrationFile[]): Migration[] {
   const migrations = files
-    .filter((file) => file.path.endsWith('.sql'))
+    .filter((file) => {
+      const filename = file.path.split(/[\\/]/).filter(Boolean).at(-1) ?? '';
+      return filename.endsWith('.sql') && !filename.startsWith('._');
+    })
     .sort((a, b) => a.path.localeCompare(b.path))
     .map((file) => ({
       version: migrationVersionFromPath(file.path),
@@ -241,6 +244,29 @@ export type BasketRecord = {
   quantity: number;
 };
 
+export type BasketImportReviewStatus = 'open' | 'accepted' | 'dismissed';
+
+export type BasketImportReviewRecord = {
+  reviewItemId: string;
+  rawName: string;
+  quantity: number;
+  reason: string;
+  retailerId: string;
+  sourceKind: 'bookmarklet' | 'browser_extension' | 'copy_paste';
+  capturedAt: string;
+  status: BasketImportReviewStatus;
+  createdAt: string;
+  resolvedAt?: string;
+  resolvedProductId?: string;
+};
+
+export type BasketImportReviewResolution = {
+  status: Exclude<BasketImportReviewStatus, 'open'>;
+  resolvedAt: string;
+  resolvedProductId?: string;
+  quantity?: number;
+};
+
 export type PantryItemRecord = {
   id: string;
   userId: string;
@@ -368,6 +394,15 @@ export type StoreCatalogListFilter = {
   limit?: number;
 };
 
+export type CatalogProductCoverageRecord = {
+  id: string;
+  categoryId: string;
+  observedChainIds: string[];
+  observedStoreIds: string[];
+  observedPriceTypes: string[];
+  observedStorePriceTypes: string[];
+};
+
 export type ProductAliasSourceType = 'retailer' | 'receipt' | 'community' | 'import' | 'manual';
 
 export type ProductAliasRecord = {
@@ -404,6 +439,7 @@ export type PostgresCatalogReader = {
   listProducts(filter?: ProductCatalogListFilter): Promise<ProductCatalogRecord[]>;
   getStoreBySlug(slug: string): Promise<StoreCatalogRecord | null>;
   listStores(filter?: StoreCatalogListFilter): Promise<StoreCatalogRecord[]>;
+  listProductCoverageRows(filter?: { limit?: number }): Promise<CatalogProductCoverageRecord[]>;
 };
 
 export type PostgresProductAliasRepository = {
@@ -415,6 +451,7 @@ export type PriceObservationRecord = {
   productId: string;
   chainId: string;
   storeId?: string;
+  domain?: 'grocery' | 'fuel' | 'pharmacy';
   sourceRunId?: string;
   rawRecordId?: string;
   retailerProductRef?: string;
@@ -438,6 +475,7 @@ export type PriceObservationRecord = {
 
 export type PriceObservationWriteResult = {
   observationId: string;
+  status?: 'unchanged';
 };
 
 export type PostgresPriceObservationWriter = {
@@ -478,6 +516,31 @@ export type LatestPriceRecord = {
 export type PostgresPriceReader = {
   listLatestPricesForProduct(productId: string): Promise<LatestPriceRecord[]>;
   listPriceObservationHistory(filter: PriceObservationHistoryFilter): Promise<PriceObservationHistoryRecord[]>;
+};
+
+export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
+  productSlug: string;
+  canonicalName: string;
+  brand?: string;
+  categoryPath: string[];
+  packageSize?: number;
+  packageUnit?: string;
+  comparableUnit: string;
+  chainSlug: string;
+  chainName: string;
+  storeSlug?: string;
+  storeExternalRef?: string;
+  storeName?: string;
+  city?: string;
+};
+
+export type SiteLatestPriceSnapshotFilter = {
+  minConfidence?: number;
+  limit?: number;
+};
+
+export type PostgresSiteSnapshotReader = {
+  listLatestPriceSnapshotRows(filter?: SiteLatestPriceSnapshotFilter): Promise<SiteLatestPriceSnapshotRow[]>;
 };
 
 export type SourceRunRecord = {
@@ -521,6 +584,8 @@ export type SourceRunHealthInput = {
   now: string;
   maxRunningMinutes: number;
   staleAfterMinutes: number;
+  requiredFreshChainIds?: readonly string[];
+  requiredAcceptedCountByChain?: Readonly<Record<string, number>>;
   runs: SourceRunReadRecord[];
 };
 
@@ -555,6 +620,9 @@ export type SourceRunHealthSummary = {
     missingFinishedAt: number;
     startedInFuture: number;
     finishedInFuture: number;
+    noFreshRuns: number;
+    missingFreshChains: number;
+    insufficientAcceptedRows: number;
   };
   evidence: {
     total: number;
@@ -751,7 +819,7 @@ export type AlertRuleRecord = {
 export type HumanReviewAssignmentRecord = {
   id: string;
   reviewId: string;
-  subjectType: 'product_match' | 'community_report';
+  subjectType: 'product_match' | 'community_report' | 'commodity_mapping';
   subjectId: string;
   priority: 'high' | 'medium' | 'low';
   reason: string;
@@ -773,6 +841,9 @@ export type GroceryViewRepository = {
   getWatchlist(userId: string): Promise<WatchlistRecord[]>;
   addBasketItem(userId: string, item: BasketRecord): Promise<void>;
   getBasket(userId: string): Promise<BasketRecord[]>;
+  saveBasketImportReviewItems(userId: string, items: BasketImportReviewRecord[]): Promise<void>;
+  listOpenBasketImportReviewItems(userId: string): Promise<BasketImportReviewRecord[]>;
+  resolveBasketImportReviewItem(userId: string, reviewItemId: string, resolution: BasketImportReviewResolution): Promise<BasketImportReviewRecord>;
   upsertPantryItem(item: PantryItemRecord): Promise<void>;
   listPantryItems(userId: string): Promise<PantryItemRecord[]>;
   upsertReceiptUpload(upload: ReceiptUploadRecord): Promise<void>;
@@ -847,6 +918,8 @@ export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceR
   const evidence: string[] = [];
   const runningRunIds: string[] = [];
   const staleRunIds: string[] = [];
+  const freshSuccessfulChainIds = new Set<string>();
+  const freshSuccessfulAcceptedCountByChain = new Map<string, number>();
   let latestSuccessfulRunId: string | undefined;
   let latestSuccessfulFinishedAt: string | undefined;
   let latestSuccessfulFinishedAtMs = Number.NEGATIVE_INFINITY;
@@ -890,7 +963,33 @@ export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceR
 
     if (run.status === 'failed') blockers.push(`source_run_failed:${run.sourceRunId}`);
     if (run.status === 'partial') blockers.push(`source_run_partial:${run.sourceRunId}`);
-    if (run.status === 'succeeded' && ageMinutes <= input.staleAfterMinutes) evidence.push(`source_run_succeeded:${run.sourceRunId}`);
+    if (run.status === 'succeeded' && ageMinutes <= input.staleAfterMinutes) {
+      evidence.push(`source_run_succeeded:${run.sourceRunId}`);
+      const chainId = run.provenance.chainId;
+      if (typeof chainId === 'string' && chainId.trim()) {
+        freshSuccessfulChainIds.add(chainId);
+        const acceptedCount = run.provenance.acceptedCount;
+        if (typeof acceptedCount === 'number' && Number.isFinite(acceptedCount)) {
+          freshSuccessfulAcceptedCountByChain.set(
+            chainId,
+            Math.max(freshSuccessfulAcceptedCountByChain.get(chainId) ?? 0, acceptedCount)
+          );
+        }
+      }
+    }
+  }
+
+  if (evidence.length === 0) blockers.push('source_run_no_fresh_success');
+
+  for (const chainId of [...(input.requiredFreshChainIds ?? [])].sort()) {
+    if (!freshSuccessfulChainIds.has(chainId)) blockers.push(`source_run_missing_fresh_chain:${chainId}`);
+  }
+
+  for (const [chainId, minimumAcceptedCount] of Object.entries(input.requiredAcceptedCountByChain ?? {}).sort(([a], [b]) => a.localeCompare(b))) {
+    if (!Number.isFinite(minimumAcceptedCount) || minimumAcceptedCount < 1) throw new Error(`requiredAcceptedCountByChain.${chainId} must be positive.`);
+    if (!freshSuccessfulChainIds.has(chainId)) continue;
+    const acceptedCount = freshSuccessfulAcceptedCountByChain.get(chainId) ?? 0;
+    if (acceptedCount < minimumAcceptedCount) blockers.push(`source_run_insufficient_accepted_rows:${chainId}:${acceptedCount}/${minimumAcceptedCount}`);
   }
 
   return {
@@ -914,7 +1013,10 @@ export function summarizeSourceRunHealthReport(report: SourceRunHealthReport): S
       stuckRunning: 0,
       missingFinishedAt: 0,
       startedInFuture: 0,
-      finishedInFuture: 0
+        finishedInFuture: 0,
+        noFreshRuns: 0,
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
     },
     evidence: {
       total: report.evidence.length,
@@ -934,6 +1036,9 @@ export function summarizeSourceRunHealthReport(report: SourceRunHealthReport): S
     if (blocker.startsWith('source_run_missing_finished_at:')) summary.blockers.missingFinishedAt += 1;
     if (blocker.startsWith('source_run_started_in_future:')) summary.blockers.startedInFuture += 1;
     if (blocker.startsWith('source_run_finished_in_future:')) summary.blockers.finishedInFuture += 1;
+    if (blocker === 'source_run_no_fresh_success') summary.blockers.noFreshRuns += 1;
+    if (blocker.startsWith('source_run_missing_fresh_chain:')) summary.blockers.missingFreshChains += 1;
+    if (blocker.startsWith('source_run_insufficient_accepted_rows:')) summary.blockers.insufficientAcceptedRows += 1;
   }
 
   for (const evidence of report.evidence) {
@@ -953,6 +1058,8 @@ export async function checkSourceRunHealth(input: CheckSourceRunHealthInput): Pr
     now: input.now,
     maxRunningMinutes: input.maxRunningMinutes,
     staleAfterMinutes: input.staleAfterMinutes,
+    requiredFreshChainIds: input.requiredFreshChainIds,
+    requiredAcceptedCountByChain: input.requiredAcceptedCountByChain,
     runs
   });
   return {
@@ -992,6 +1099,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const subscriptionEntitlements = new Map<string, SubscriptionEntitlementRecord>();
   const watchlists = new Map<string, WatchlistRecord[]>();
   const baskets = new Map<string, BasketRecord[]>();
+  const basketImportReviewItems = new Map<string, BasketImportReviewRecord[]>();
   const pantryItems = new Map<string, PantryItemRecord>();
   const receiptUploads = new Map<string, ReceiptUploadRecord>();
   const householdPlans = new Map<string, HouseholdPlanRecord>();
@@ -1059,6 +1167,38 @@ export function createMemoryRepository(): GroceryViewRepository {
     async getBasket(userId) {
       requireUser(users, userId);
       return (baskets.get(userId) ?? []).map((item) => ({ ...item }));
+    },
+
+    async saveBasketImportReviewItems(userId, items) {
+      requireUser(users, userId);
+      basketImportReviewItems.set(userId, [
+        ...(basketImportReviewItems.get(userId) ?? []),
+        ...items.map((item) => ({ ...item }))
+      ]);
+    },
+
+    async listOpenBasketImportReviewItems(userId) {
+      requireUser(users, userId);
+      return (basketImportReviewItems.get(userId) ?? [])
+        .filter((item) => item.status === 'open')
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.reviewItemId.localeCompare(b.reviewItemId))
+        .map((item) => ({ ...item }));
+    },
+
+    async resolveBasketImportReviewItem(userId, reviewItemId, resolution) {
+      requireUser(users, userId);
+      const items = basketImportReviewItems.get(userId) ?? [];
+      const index = items.findIndex((item) => item.reviewItemId === reviewItemId && item.status === 'open');
+      if (index === -1) throw new Error(`Basket import review item not found: ${reviewItemId}`);
+      const resolved = {
+        ...items[index]!,
+        status: resolution.status,
+        resolvedAt: resolution.resolvedAt,
+        ...(resolution.resolvedProductId ? { resolvedProductId: resolution.resolvedProductId } : {}),
+        ...(resolution.quantity === undefined ? {} : { quantity: resolution.quantity })
+      };
+      basketImportReviewItems.set(userId, items.map((item, itemIndex) => itemIndex === index ? resolved : item));
+      return { ...resolved };
     },
 
     async upsertPantryItem(item) {
@@ -1336,6 +1476,23 @@ type LatestPriceRow = {
   confidence: string | number;
   provenance: Record<string, unknown> | string | null;
 };
+
+
+type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
+  product_slug: string;
+  canonical_name: string;
+  brand: string | null;
+  category_path: string[] | string | null;
+  package_size: string | number | null;
+  package_unit: string | null;
+  comparable_unit: string;
+  chain_slug: string;
+  chain_name: string;
+  store_slug: string | null;
+  store_external_ref: string | null;
+  store_name: string | null;
+  city: string | null;
+};
 type PriceObservationHistoryRow = {
   id: string;
   product_id: string;
@@ -1422,6 +1579,14 @@ type StoreCatalogRow = {
   created_at: string | Date;
   updated_at: string | Date;
 };
+type CatalogProductCoverageRow = {
+  product_id: string;
+  category_id: string | null;
+  observed_chain_ids: string[] | null;
+  observed_store_ids: string[] | null;
+  observed_price_types: string[] | null;
+  observed_store_price_types: string[] | null;
+};
 type ProductAliasRow = {
   id: string;
   product_id: string;
@@ -1432,6 +1597,19 @@ type ProductAliasRow = {
   match_confidence: string | number;
   reviewed_at: string | Date | null;
   created_at: string | Date;
+};
+type BasketImportReviewRow = {
+  review_item_id: string;
+  raw_name: string;
+  quantity: string | number;
+  reason: string;
+  retailer_id: string;
+  source_kind: BasketImportReviewRecord['sourceKind'];
+  captured_at: string | Date;
+  status: BasketImportReviewStatus;
+  created_at: string | Date;
+  resolved_at: string | Date | null;
+  resolved_product_id: string | null;
 };
 
 function asIso(value: string | Date): string {
@@ -1458,6 +1636,60 @@ function mapLatestPrice(row: LatestPriceRow): LatestPriceRecord {
     observedAt: asIso(row.observed_at),
     confidence: Number(row.confidence),
     provenance: asRecord(row.provenance)
+  };
+}
+
+function samePriceValue(left: string | number | null, right: number | null | undefined): boolean {
+  if (left === null || right === null || right === undefined) return left === null && (right === null || right === undefined);
+  return Math.abs(Number(left) - Number(right)) < 0.000001;
+}
+
+function sameLatestPriceKey(row: LatestPriceRow, observation: PriceObservationRecord): boolean {
+  return row.product_id === observation.productId &&
+    row.chain_id === observation.chainId &&
+    (row.store_id ?? null) === (observation.storeId ?? null) &&
+    row.price_type === observation.priceType;
+}
+
+function latestPriceIsUnchanged(row: LatestPriceRow, observation: PriceObservationRecord): boolean {
+  if (!sameLatestPriceKey(row, observation)) return false;
+  if (Date.parse(asIso(row.observed_at)) > Date.parse(observation.observedAt)) return false;
+  return samePriceValue(row.price, observation.price) &&
+    samePriceValue(row.regular_price, observation.regularPrice ?? null) &&
+    samePriceValue(row.unit_price, observation.unitPrice) &&
+    row.currency === (observation.currency ?? 'SEK');
+}
+
+
+function asStringArray(value: string[] | string | null): string[] {
+  if (Array.isArray(value)) return value;
+  if (!value) return [];
+  const parsed = JSON.parse(value) as unknown;
+  return Array.isArray(parsed) ? parsed.map(String) : [];
+}
+
+function optionalNumberFromDb(value: string | number | null): number | undefined {
+  if (value === null) return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): SiteLatestPriceSnapshotRow {
+  return {
+    ...mapLatestPrice(row),
+    productSlug: row.product_slug,
+    canonicalName: row.canonical_name,
+    ...(row.brand ? { brand: row.brand } : {}),
+    categoryPath: asStringArray(row.category_path),
+    ...(optionalNumberFromDb(row.package_size) === undefined ? {} : { packageSize: optionalNumberFromDb(row.package_size) }),
+    ...(row.package_unit ? { packageUnit: row.package_unit } : {}),
+    comparableUnit: row.comparable_unit,
+    chainSlug: row.chain_slug,
+    chainName: row.chain_name,
+    ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
+    ...(row.store_external_ref ? { storeExternalRef: row.store_external_ref } : {}),
+    ...(row.store_name ? { storeName: row.store_name } : {}),
+    ...(row.city ? { city: row.city } : {})
   };
 }
 
@@ -1566,6 +1798,17 @@ function mapStoreCatalog(row: StoreCatalogRow): StoreCatalogRecord {
   };
 }
 
+function mapCatalogProductCoverage(row: CatalogProductCoverageRow): CatalogProductCoverageRecord {
+  return {
+    id: row.product_id,
+    categoryId: row.category_id ?? 'uncategorized',
+    observedChainIds: [...(row.observed_chain_ids ?? [])].sort(),
+    observedStoreIds: [...(row.observed_store_ids ?? [])].sort(),
+    observedPriceTypes: [...(row.observed_price_types ?? [])].sort(),
+    observedStorePriceTypes: [...(row.observed_store_price_types ?? [])].sort()
+  };
+}
+
 function mapProductAlias(row: ProductAliasRow): ProductAliasRecord {
   return {
     aliasId: row.id,
@@ -1577,6 +1820,22 @@ function mapProductAlias(row: ProductAliasRow): ProductAliasRecord {
     matchConfidence: Number(row.match_confidence),
     ...(row.reviewed_at ? { reviewedAt: asIso(row.reviewed_at) } : {}),
     createdAt: asIso(row.created_at)
+  };
+}
+
+function mapBasketImportReview(row: BasketImportReviewRow): BasketImportReviewRecord {
+  return {
+    reviewItemId: row.review_item_id,
+    rawName: row.raw_name,
+    quantity: Number(row.quantity),
+    reason: row.reason,
+    retailerId: row.retailer_id,
+    sourceKind: row.source_kind,
+    capturedAt: asIso(row.captured_at),
+    status: row.status,
+    createdAt: asIso(row.created_at),
+    ...(row.resolved_at ? { resolvedAt: asIso(row.resolved_at) } : {}),
+    ...(row.resolved_product_id ? { resolvedProductId: row.resolved_product_id } : {})
   };
 }
 
@@ -1871,6 +2130,68 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         [userId]
       );
       return rows.map((row) => ({ productId: row.product_id, quantity: Number(row.quantity) }));
+    },
+
+    async saveBasketImportReviewItems(userId, items) {
+      for (const item of items) {
+        await executor.query(
+          `insert into basket_import_review_items(
+             user_id, review_item_id, raw_name, quantity, reason, retailer_id, source_kind, captured_at, status, created_at, resolved_at, resolved_product_id
+           ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+           on conflict (user_id, review_item_id) do update set
+             raw_name = excluded.raw_name,
+             quantity = excluded.quantity,
+             reason = excluded.reason,
+             retailer_id = excluded.retailer_id,
+             source_kind = excluded.source_kind,
+             captured_at = excluded.captured_at,
+             status = excluded.status,
+             created_at = excluded.created_at,
+             resolved_at = excluded.resolved_at,
+             resolved_product_id = excluded.resolved_product_id`,
+          [
+            userId,
+            item.reviewItemId,
+            item.rawName,
+            item.quantity,
+            item.reason,
+            item.retailerId,
+            item.sourceKind,
+            item.capturedAt,
+            item.status,
+            item.createdAt,
+            item.resolvedAt ?? null,
+            item.resolvedProductId ?? null
+          ]
+        );
+      }
+    },
+
+    async listOpenBasketImportReviewItems(userId) {
+      const rows = await executor.query<BasketImportReviewRow>(
+        `select review_item_id, raw_name, quantity, reason, retailer_id, source_kind, captured_at, status, created_at, resolved_at, resolved_product_id
+         from basket_import_review_items
+         where user_id = $1 and status = 'open'
+         order by created_at, review_item_id`,
+        [userId]
+      );
+      return rows.map(mapBasketImportReview);
+    },
+
+    async resolveBasketImportReviewItem(userId, reviewItemId, resolution) {
+      const rows = await executor.query<BasketImportReviewRow>(
+        `update basket_import_review_items
+         set status = $3,
+             resolved_at = $4,
+             resolved_product_id = $5,
+             quantity = coalesce($6, quantity)
+         where user_id = $1 and review_item_id = $2 and status = 'open'
+         returning review_item_id, raw_name, quantity, reason, retailer_id, source_kind, captured_at, status, created_at, resolved_at, resolved_product_id`,
+        [userId, reviewItemId, resolution.status, resolution.resolvedAt, resolution.resolvedProductId ?? null, resolution.quantity ?? null]
+      );
+      const row = rows[0];
+      if (!row) throw new Error(`Basket import review item not found: ${reviewItemId}`);
+      return mapBasketImportReview(row);
     },
 
     async upsertPantryItem(item) {
@@ -2734,6 +3055,39 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
         [filter.search ?? null, filter.chainSlug ?? null, filter.city ?? null, limit]
       );
       return rows.map(mapStoreCatalog);
+    },
+
+    async listProductCoverageRows(filter = {}) {
+      const limit = Math.min(Math.max(filter.limit ?? 5000, 1), 50_000);
+      const rows = await executor.query<CatalogProductCoverageRow>(
+        `select products.id as product_id,
+                coalesce(products.category_path[1], 'uncategorized') as category_id,
+                coalesce(array_agg(distinct replace(chains.slug, '-', '_')) filter (where chains.slug is not null), '{}') as observed_chain_ids,
+                coalesce(
+                  array_agg(distinct coalesce(stores.external_ref, stores.slug, latest_prices.store_id::text))
+                    filter (where latest_prices.store_id is not null),
+                  '{}'
+                ) as observed_store_ids,
+                coalesce(
+                  array_agg(distinct latest_prices.price_type)
+                    filter (where latest_prices.price_type is not null),
+                  '{}'
+                ) as observed_price_types,
+                coalesce(
+                  array_agg(distinct coalesce(stores.external_ref, stores.slug, latest_prices.store_id::text) || ':' || latest_prices.price_type)
+                    filter (where latest_prices.store_id is not null and latest_prices.price_type is not null),
+                  '{}'
+                ) as observed_store_price_types
+         from products
+         left join latest_prices on latest_prices.product_id = products.id
+         left join chains on chains.id = latest_prices.chain_id
+         left join stores on stores.id = latest_prices.store_id
+         group by products.id, products.category_path
+         order by products.id
+         limit $1`,
+        [limit]
+      );
+      return rows.map(mapCatalogProductCoverage);
     }
   };
 }
@@ -2816,6 +3170,33 @@ export type PostgresIntegrationProbe = {
   }>;
 };
 
+export type TimescaleDbEvaluationProbe = {
+  timescaleExtensionAvailable: boolean;
+  hypertables: string[];
+  compressionPolicies: string[];
+  retentionPolicies: string[];
+  fallbackTables: string[];
+  fallbackFunctions: string[];
+};
+
+export type TimescaleDbEvaluationReport = {
+  status: 'timescale_ready' | 'fallback_ready' | 'blocked';
+  blockers: string[];
+  timescaleGaps: string[];
+  evidence: string[];
+  recommendation: string;
+  summary: string;
+};
+
+export const TIMESCALEDB_EVALUATION_HYPERTABLES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_RETENTION_POLICIES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_FALLBACK_TABLES = ['observations_v2', 'price_daily', 'price_weekly'] as const;
+export const TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS = [
+  'create_observations_partitions',
+  'drop_observations_partitions_before'
+] as const;
+
 export type PostgresRepositoryProbe = {
   name: string;
   run(executor: QueryExecutor): Promise<void>;
@@ -2844,17 +3225,24 @@ export type CheckPostgresRepositoryIntegrationReadinessInput = Omit<CollectPostg
 export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'chains',
   'products',
+  'fuel_grades',
   'source_runs',
   'raw_records',
   'retailer_source_policies',
+  'fuel_price_sources',
+  'fuel_price_source_observations',
   'observations',
+  'observations_v2',
   'latest_prices',
+  'price_daily',
+  'price_weekly',
   'app_users',
   'favorite_stores',
   'user_preferences',
   'watchlist_items',
   'weekly_baskets',
   'basket_items',
+  'basket_import_review_items',
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
@@ -2881,7 +3269,13 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '006_source_runs_official_api',
   '007_receipt_uploads',
   '008_household_plans',
-  '009_retailer_source_policies'
+  '009_retailer_source_policies',
+  '010_basket_import_reviews',
+  '010_commodity_taxonomy',
+  '011_multi_vertical_domains',
+  '012_price_rollups',
+  '013_observations_partitioning',
+  '014_fuel_price_sources'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -2898,6 +3292,7 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
   const receiptId = `postgres-probe-receipt-${safeId}`;
   const receiptItemId = `postgres-probe-receipt-item-${safeId}`;
   const householdId = `postgres-probe-household-${safeId}`;
+  const basketImportReviewId = `postgres-probe-basket-import-review-${safeId}`;
   const providerSubscriptionId = `postgres-probe-subscription-${safeId}`;
   const storeId = `postgres-probe-store-${safeId}`;
   const groceryProductId = `postgres-probe-grocery-${safeId}`;
@@ -2957,6 +3352,31 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
         assertProbe(favoriteStoreIds.includes(storeId), 'favorite store probe row was not readable');
         assertProbe(watchlist.some((item) => item.productId === groceryProductId), 'watchlist probe row was not readable');
         assertProbe(basket.some((item) => item.productId === groceryProductId && item.quantity === 2), 'basket probe row was not readable');
+      }
+    },
+    {
+      name: 'basket_import_review_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.upsertUser({ id: userId, email: `${userId}@example.invalid` });
+        await repository.saveBasketImportReviewItems(userId, [{
+          reviewItemId: basketImportReviewId,
+          rawName: 'Postgres Probe Unmatched Retailer Row',
+          quantity: 1,
+          reason: 'PostgreSQL integration smoke probe.',
+          retailerId: 'willys',
+          sourceKind: 'bookmarklet',
+          capturedAt: input.now,
+          status: 'open',
+          createdAt: input.now
+        }]);
+        const openItems = await repository.listOpenBasketImportReviewItems(userId);
+        assertProbe(openItems.some((item) => item.reviewItemId === basketImportReviewId && item.status === 'open'), 'basket import review probe row was not readable');
+        const resolved = await repository.resolveBasketImportReviewItem(userId, basketImportReviewId, {
+          status: 'dismissed',
+          resolvedAt: input.now
+        });
+        assertProbe(resolved.status === 'dismissed', 'basket import review probe row was not resolvable');
       }
     },
     {
@@ -3329,11 +3749,44 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
   return {
     async recordPriceObservation(observation) {
       const provenanceJson = JSON.stringify(observation.provenance);
+      const latestRows = await executor.query<LatestPriceRow>(
+        `select product_id,
+                chain_id,
+                store_id,
+                price_type,
+                observation_id,
+                price,
+                regular_price,
+                unit_price,
+                currency,
+                observed_at,
+                confidence,
+                provenance
+         from latest_prices
+         where product_id = $1
+           and chain_id = $2
+           and store_id is not distinct from $3::uuid
+           and price_type = $4
+         order by observed_at desc
+         limit 1`,
+        [
+          observation.productId,
+          observation.chainId,
+          observation.storeId ?? null,
+          observation.priceType
+        ]
+      );
+      const latestRow = latestRows.find((row) => sameLatestPriceKey(row, observation)) ?? latestRows[0];
+      if (latestRow && latestPriceIsUnchanged(latestRow, observation)) {
+        return { observationId: latestRow.observation_id, status: 'unchanged' };
+      }
+
       const rows = await executor.query<ObservationIdRow>(
         `insert into observations(
            product_id,
            chain_id,
            store_id,
+           domain,
            source_run_id,
            raw_record_id,
            retailer_product_ref,
@@ -3355,13 +3808,14 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            provenance
          ) values (
            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22::jsonb
+           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23::jsonb
          )
          returning id`,
         [
           observation.productId,
           observation.chainId,
           observation.storeId ?? null,
+          observation.domain ?? 'grocery',
           observation.sourceRunId ?? null,
           observation.rawRecordId ?? null,
           observation.retailerProductRef ?? null,
@@ -3377,7 +3831,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.promotionEndsOn ?? null,
           observation.memberRequired ?? false,
           observation.observedAt,
-          observation.validFrom ?? null,
+          observation.validFrom ?? observation.observedAt,
           observation.validUntil ?? null,
           observation.confidence,
           provenanceJson
@@ -3391,6 +3845,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            product_id,
            chain_id,
            store_id,
+           domain,
            price_type,
            observation_id,
            price,
@@ -3400,7 +3855,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            observed_at,
            confidence,
            provenance
-         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::jsonb)
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::jsonb)
          on conflict (product_id, chain_id, store_id, price_type) do update set
            observation_id = excluded.observation_id,
            price = excluded.price,
@@ -3409,6 +3864,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            currency = excluded.currency,
            observed_at = excluded.observed_at,
            confidence = excluded.confidence,
+           domain = excluded.domain,
            provenance = excluded.provenance,
            updated_at = now()
          where latest_prices.observed_at <= excluded.observed_at`,
@@ -3416,6 +3872,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.productId,
           observation.chainId,
           observation.storeId ?? null,
+          observation.domain ?? 'grocery',
           observation.priceType,
           observationId,
           observation.price,
@@ -3429,6 +3886,51 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
       );
 
       return { observationId };
+    }
+  };
+}
+
+export function createPostgresSiteSnapshotReader(executor: QueryExecutor): PostgresSiteSnapshotReader {
+  return {
+    async listLatestPriceSnapshotRows(filter = {}) {
+      const minConfidence = Math.min(Math.max(filter.minConfidence ?? 0, 0), 1);
+      const limit = Math.min(Math.max(filter.limit ?? 1000, 1), 10000);
+      const rows = await executor.query<SiteLatestPriceSnapshotRowSql>(
+        `select latest_prices.product_id,
+                products.slug as product_slug,
+                products.canonical_name,
+                products.brand,
+                products.category_path,
+                products.package_size,
+                products.package_unit,
+                products.comparable_unit,
+                latest_prices.chain_id,
+                chains.slug as chain_slug,
+                chains.name as chain_name,
+                latest_prices.store_id,
+                stores.slug as store_slug,
+                stores.external_ref as store_external_ref,
+                stores.name as store_name,
+                stores.city,
+                latest_prices.price_type,
+                latest_prices.observation_id,
+                latest_prices.price,
+                latest_prices.regular_price,
+                latest_prices.unit_price,
+                latest_prices.currency,
+                latest_prices.observed_at,
+                latest_prices.confidence,
+                latest_prices.provenance
+         from latest_prices
+         join products on products.id = latest_prices.product_id
+         join chains on chains.id = latest_prices.chain_id
+         left join stores on stores.id = latest_prices.store_id
+         where latest_prices.confidence >= $1
+         order by latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
+         limit $2`,
+        [minConfidence, limit]
+      );
+      return rows.map(mapSiteLatestPriceSnapshotRow);
     }
   };
 }
@@ -3587,6 +4089,137 @@ export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrati
     evidence,
     summary: blockers.length === 0 ? 'PostgreSQL integration contract is ready.' : 'PostgreSQL integration contract is blocked.'
   };
+}
+
+export function buildTimescaleDbEvaluationReport(input: TimescaleDbEvaluationProbe): TimescaleDbEvaluationReport {
+  const hypertables = new Set(input.hypertables);
+  const compressionPolicies = new Set(input.compressionPolicies);
+  const retentionPolicies = new Set(input.retentionPolicies);
+  const fallbackTables = new Set(input.fallbackTables);
+  const fallbackFunctions = new Set(input.fallbackFunctions);
+  const timescaleGaps: string[] = [];
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+
+  if (input.timescaleExtensionAvailable) {
+    evidence.push('timescaledb_extension:available');
+  } else {
+    timescaleGaps.push('timescaledb_extension_not_installed');
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_HYPERTABLES) {
+    if (hypertables.has(table)) evidence.push(`hypertable:${table}`);
+    else timescaleGaps.push(`missing_hypertable:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES) {
+    if (compressionPolicies.has(table)) evidence.push(`compression_policy:${table}`);
+    else timescaleGaps.push(`missing_compression_policy:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_RETENTION_POLICIES) {
+    if (retentionPolicies.has(table)) evidence.push(`retention_policy:${table}`);
+    else timescaleGaps.push(`missing_retention_policy:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_FALLBACK_TABLES) {
+    if (fallbackTables.has(table)) evidence.push(`fallback_table:${table}`);
+    else blockers.push(`missing_fallback_table:${table}`);
+  }
+
+  for (const routine of TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS) {
+    if (fallbackFunctions.has(routine)) evidence.push(`fallback_function:${routine}`);
+    else blockers.push(`missing_fallback_function:${routine}`);
+  }
+
+  if (timescaleGaps.length === 0) {
+    return {
+      status: 'timescale_ready',
+      blockers,
+      timescaleGaps: [],
+      evidence,
+      recommendation: 'TimescaleDB is ready for observations_v2 hypertable compression and retention policies.',
+      summary: blockers.length === 0 ? 'TimescaleDB evaluation is ready.' : 'TimescaleDB evaluation is blocked by missing fallback evidence.'
+    };
+  }
+
+  if (blockers.length === 0) {
+    return {
+      status: 'fallback_ready',
+      blockers: [],
+      timescaleGaps,
+      evidence,
+      recommendation: 'Use declarative monthly partitions, BRIN pruning, price_daily/price_weekly rollups, and partition-drop retention until TimescaleDB is installed.',
+      summary: 'TimescaleDB is not fully configured; the declarative partition fallback is ready.'
+    };
+  }
+
+  return {
+    status: 'blocked',
+    blockers,
+    timescaleGaps,
+    evidence,
+    recommendation: 'Block price-tape scale claims until either TimescaleDB policies or the declarative partition fallback are fully present.',
+    summary: 'TimescaleDB evaluation is blocked.'
+  };
+}
+
+export async function collectTimescaleDbEvaluationProbe(executor: QueryExecutor): Promise<TimescaleDbEvaluationProbe> {
+  const extensionRows = await executor.query<{ installed_version: string | null }>(
+    "select installed_version from pg_available_extensions where name = 'timescaledb'"
+  );
+  const timescaleExtensionAvailable = Boolean(extensionRows[0]?.installed_version);
+  const fallbackTableRows = await executor.query<{ table_name: string }>(
+    'select table_name from information_schema.tables where table_schema = current_schema() and table_name = any($1)',
+    [[...TIMESCALEDB_EVALUATION_FALLBACK_TABLES]]
+  );
+  const fallbackFunctionRows = await executor.query<{ routine_name: string }>(
+    'select routine_name from information_schema.routines where routine_schema = current_schema() and routine_name = any($1)',
+    [[...TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS]]
+  );
+
+  const probe: TimescaleDbEvaluationProbe = {
+    timescaleExtensionAvailable,
+    hypertables: [],
+    compressionPolicies: [],
+    retentionPolicies: [],
+    fallbackTables: fallbackTableRows.map((row) => row.table_name),
+    fallbackFunctions: fallbackFunctionRows.map((row) => row.routine_name)
+  };
+
+  if (!timescaleExtensionAvailable) return probe;
+
+  try {
+    const hypertableRows = await executor.query<{ hypertable_name: string }>(
+      'select hypertable_name from timescaledb_information.hypertables where hypertable_name = any($1)',
+      [[...TIMESCALEDB_EVALUATION_HYPERTABLES]]
+    );
+    probe.hypertables = hypertableRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.hypertables = [];
+  }
+
+  try {
+    const compressionRows = await executor.query<{ hypertable_name: string }>(
+      "select hypertable_name from timescaledb_information.jobs where proc_name = 'policy_compression' and hypertable_name = any($1)",
+      [[...TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES]]
+    );
+    probe.compressionPolicies = compressionRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.compressionPolicies = [];
+  }
+
+  try {
+    const retentionRows = await executor.query<{ hypertable_name: string }>(
+      "select hypertable_name from timescaledb_information.jobs where proc_name = 'policy_retention' and hypertable_name = any($1)",
+      [[...TIMESCALEDB_EVALUATION_RETENTION_POLICIES]]
+    );
+    probe.retentionPolicies = retentionRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.retentionPolicies = [];
+  }
+
+  return probe;
 }
 
 export function summarizePostgresIntegrationReadinessReport(

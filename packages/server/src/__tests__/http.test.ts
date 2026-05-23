@@ -1,7 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
-import { createGroceryViewApi } from '@groceryview/api';
+import { createGroceryViewApi, type BasketImportReviewItem } from '@groceryview/api';
+import { createSessionToken } from '@groceryview/auth';
 import { createHttpHandler } from '../index.js';
 
 async function json(response: Response) {
@@ -10,6 +11,11 @@ async function json(response: Response) {
 
 function signBillingWebhookBody(body: string, secret: string): string {
   return `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
+}
+
+function signStripeWebhookBody(body: string, secret: string, timestamp: number): string {
+  const signature = createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex');
+  return `t=${timestamp},v1=${signature}`;
 }
 
 describe('createHttpHandler', () => {
@@ -114,6 +120,14 @@ describe('createHttpHandler', () => {
 
   it('serves market, store, product, and index GET endpoints as JSON', async () => {
     const handle = createHttpHandler();
+
+    const openApi = await handle(new Request('http://localhost/api/openapi.json'));
+    assert.equal(openApi.status, 200);
+    const openApiBody = await json(openApi) as { openapi: string; paths: Record<string, unknown> };
+    assert.equal(openApiBody.openapi, '3.1.0');
+    assert.ok(openApiBody.paths['/api/products/{id}/terminal']);
+    assert.ok(openApiBody.paths['/api/products/{id}/history']);
+    assert.ok(openApiBody.paths['/api/nutrition/value']);
 
     const market = await handle(new Request('http://localhost/api/market/overview'));
     assert.equal(market.status, 200);
@@ -294,6 +308,126 @@ describe('createHttpHandler', () => {
       ['butter', 'willys-odenplan']
     ]);
 
+    const flyerOffers = await handle(new Request('http://localhost/api/deals/flyer-offers?chain=willys&asOf=2026-05-20T12:00:00.000Z'));
+    assert.equal(flyerOffers.status, 503);
+    assert.deepEqual(await json(flyerOffers), { error: 'Flyer offers provider is not configured.' });
+
+    const discounts = await handle(new Request('http://localhost/api/deals/discounts?chain=willys&asOf=2026-05-20T12:00:00.000Z'));
+    assert.equal(discounts.status, 503);
+    assert.deepEqual(await json(discounts), { error: 'Discounts provider is not configured.' });
+
+    const storeFlyerOffers = await handle(new Request('http://localhost/api/stores/lidl-sveavagen/flyer-offers?asOf=2026-05-20T12:00:00.000Z'));
+    assert.equal(storeFlyerOffers.status, 503);
+    assert.deepEqual(await json(storeFlyerOffers), { error: 'Store flyer offers provider is not configured.' });
+
+    const storeDiscounts = await handle(new Request('http://localhost/api/stores/lidl-sveavagen/discounts?asOf=2026-05-20T12:00:00.000Z'));
+    assert.equal(storeDiscounts.status, 503);
+    assert.deepEqual(await json(storeDiscounts), { error: 'Store discounts provider is not configured.' });
+
+    const storeDealSummary = await handle(new Request('http://localhost/api/stores/willys-odenplan/deal-summary'));
+    assert.equal(storeDealSummary.status, 200);
+    const storeDealSummaryBody = await json(storeDealSummary) as {
+      storeId: string;
+      dealCount: number;
+      buyVerdictCount: number;
+      averageDealScore: number;
+      topDeal: { productId: string; dealScore: number };
+      categories: Array<{ category: string; dealCount: number; averageDealScore: number; topProductId: string; topDealScore: number }>;
+      guardrails: string[];
+    };
+    assert.equal(storeDealSummaryBody.storeId, 'willys-odenplan');
+    assert.equal(storeDealSummaryBody.dealCount, 4);
+    assert.equal(storeDealSummaryBody.buyVerdictCount, 1);
+    assert.equal(storeDealSummaryBody.averageDealScore, 67);
+    assert.deepEqual(storeDealSummaryBody.topDeal, {
+      productId: 'coffee',
+      ticker: 'ZOEGAS-COFFEE-450G',
+      productName: 'Zoégas Coffee 450g',
+      category: 'coffee',
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      price: 49.9,
+      dealScore: 82,
+      band: { label: 'Good deal', verdict: 'Buy' },
+      unitPrice: '110.89 SEK/kg'
+    });
+    assert.deepEqual(storeDealSummaryBody.categories, [
+      { category: 'coffee', dealCount: 1, averageDealScore: 82, topProductId: 'coffee', topDealScore: 82 },
+      { category: 'dairy', dealCount: 3, averageDealScore: 62, topProductId: 'private-label-milk', topDealScore: 73 }
+    ]);
+    assert.match(storeDealSummaryBody.guardrails[0] ?? '', /verified in-store deal rows/i);
+
+    const storeCoverage = await handle(new Request('http://localhost/api/stores/lidl-sveavagen/price-coverage'));
+    assert.equal(storeCoverage.status, 200);
+    const storeCoverageBody = await json(storeCoverage) as {
+      storeId: string;
+      productCount: number;
+      pricedProductCount: number;
+      coveragePercent: number;
+      totalKnownPrice: number;
+      missingProductIds: string[];
+      lines: Array<{ productId: string; price: number | null; priceLabel: string }>;
+      guardrails: string[];
+    };
+    assert.equal(storeCoverageBody.storeId, 'lidl-sveavagen');
+    assert.equal(storeCoverageBody.productCount, 4);
+    assert.equal(storeCoverageBody.pricedProductCount, 2);
+    assert.equal(storeCoverageBody.coveragePercent, 50);
+    assert.equal(storeCoverageBody.totalKnownPrice, 73.8);
+    assert.deepEqual(storeCoverageBody.missingProductIds, ['private-label-milk', 'butter']);
+    assert.deepEqual(storeCoverageBody.lines.map((line) => [line.productId, line.price, line.priceLabel]), [
+      ['coffee', 59.9, 'verified_shelf'],
+      ['milk', 13.9, 'verified_shelf'],
+      ['private-label-milk', null, 'missing_price'],
+      ['butter', null, 'missing_price']
+    ]);
+    assert.match(storeCoverageBody.guardrails[0] ?? '', /verified shelf prices/i);
+
+    const categoryCoverage = await handle(new Request('http://localhost/api/stores/lidl-sveavagen/category-coverage'));
+    assert.equal(categoryCoverage.status, 200);
+    const categoryCoverageBody = await json(categoryCoverage) as {
+      storeId: string;
+      categoryCount: number;
+      fullyPricedCategoryCount: number;
+      categories: Array<{
+        category: string;
+        productCount: number;
+        pricedProductCount: number;
+        coveragePercent: number;
+        totalKnownPrice: number;
+        missingProductIds: string[];
+        bestDealProductId: string | null;
+        bestDealScore: number | null;
+      }>;
+      guardrails: string[];
+    };
+    assert.equal(categoryCoverageBody.storeId, 'lidl-sveavagen');
+    assert.equal(categoryCoverageBody.categoryCount, 2);
+    assert.equal(categoryCoverageBody.fullyPricedCategoryCount, 1);
+    assert.deepEqual(categoryCoverageBody.categories, [
+      {
+        category: 'coffee',
+        productCount: 1,
+        pricedProductCount: 1,
+        coveragePercent: 100,
+        totalKnownPrice: 59.9,
+        missingProductIds: [],
+        bestDealProductId: 'coffee',
+        bestDealScore: 82
+      },
+      {
+        category: 'dairy',
+        productCount: 3,
+        pricedProductCount: 1,
+        coveragePercent: 33.3,
+        totalKnownPrice: 13.9,
+        missingProductIds: ['private-label-milk', 'butter'],
+        bestDealProductId: 'milk',
+        bestDealScore: 73
+      }
+    ]);
+    assert.match(categoryCoverageBody.guardrails[0] ?? '', /verified store-price rows/i);
+
     const product = await handle(new Request('http://localhost/api/products/coffee'));
     assert.equal(product.status, 200);
     assert.equal((await json(product) as { ticker: string }).ticker, 'ZOEGAS-COFFEE-450G');
@@ -343,6 +477,82 @@ describe('createHttpHandler', () => {
     ]);
     assert.match(priceSpreadBody.guardrails[0] ?? '', /verified store quotes/i);
 
+    const cheapestNow = await handle(new Request('http://localhost/api/products/coffee/cheapest-now'));
+    assert.equal(cheapestNow.status, 200);
+    assert.deepEqual(await json(cheapestNow), {
+      productId: 'coffee',
+      productName: 'Zoégas Coffee 450g',
+      category: 'coffee',
+      currency: 'SEK',
+      cheapest: {
+        chain: 'willys',
+        storeId: 'willys-odenplan',
+        storeName: 'Willys Odenplan',
+        packagePrice: 49.9,
+        comparableUnitPrice: 110.89,
+        comparableUnit: 'kg'
+      },
+      chainPrices: [
+        {
+          chain: 'willys',
+          storeId: 'willys-odenplan',
+          storeName: 'Willys Odenplan',
+          packagePrice: 49.9,
+          comparableUnitPrice: 110.89,
+          comparableUnit: 'kg'
+        },
+        {
+          chain: 'lidl',
+          storeId: 'lidl-sveavagen',
+          storeName: 'Lidl Sveavägen',
+          packagePrice: 59.9,
+          comparableUnitPrice: 133.11,
+          comparableUnit: 'kg'
+        },
+        {
+          chain: 'coop',
+          storeId: 'coop-odenplan',
+          storeName: 'Coop Odenplan',
+          packagePrice: 64.9,
+          comparableUnitPrice: 144.22,
+          comparableUnit: 'kg'
+        }
+      ],
+      chainCount: 3,
+      observedPriceCount: 3,
+      lastObservedAt: '2026-05-19T00:00:00.000Z',
+      guardrails: [
+        'Cheapest-now compares only current observed prices for this exact product.',
+        'Each chain contributes at most its cheapest currently observed store row.',
+        'Missing chains stay absent instead of being estimated from other chains or products.'
+      ]
+    });
+
+    const storeSavings = await handle(new Request('http://localhost/api/products/coffee/store-savings'));
+    assert.equal(storeSavings.status, 200);
+    const storeSavingsBody = await json(storeSavings) as {
+      productId: string;
+      sampleSize: number;
+      bestStoreId: string;
+      highestStoreId: string;
+      maxSavings: number;
+      maxSavingsPercent: number;
+      rows: Array<{ storeId: string; rank: number; savingsVsHighest: number; priceLabel: string }>;
+      guardrails: string[];
+    };
+    assert.equal(storeSavingsBody.productId, 'coffee');
+    assert.equal(storeSavingsBody.sampleSize, 3);
+    assert.equal(storeSavingsBody.bestStoreId, 'willys-odenplan');
+    assert.equal(storeSavingsBody.highestStoreId, 'coop-odenplan');
+    assert.equal(storeSavingsBody.maxSavings, 15);
+    assert.equal(storeSavingsBody.maxSavingsPercent, 23.1);
+    assert.deepEqual(storeSavingsBody.rows.map((row) => [row.storeId, row.rank, row.savingsVsHighest, row.priceLabel]), [
+      ['willys-odenplan', 1, 15, 'best_savings'],
+      ['lidl-sveavagen', 2, 5, 'saves_vs_highest'],
+      ['coop-odenplan', 3, 0, 'highest_price']
+    ]);
+    assert.match(storeSavingsBody.guardrails[0] ?? '', /verified quotes/i);
+
     const terminal = await handle(new Request('http://localhost/api/products/coffee/terminal?asOf=2026-05-19T00:00:00.000Z'));
     assert.equal(terminal.status, 200);
     const terminalBody = await json(terminal) as {
@@ -361,6 +571,55 @@ describe('createHttpHandler', () => {
     assert.equal(terminalBody.chart.series[0].id, 'willys-odenplan:shelf');
     assert.deepEqual(terminalBody.chart.series[0].points.map((point) => point.value), [69.9, 59.9, 49.9]);
     assert.equal(terminalBody.historySummary.isNewLow, true);
+
+    const historySummary = await handle(new Request('http://localhost/api/products/coffee/history-summary'));
+    assert.equal(historySummary.status, 200);
+    const historySummaryBody = await json(historySummary) as {
+      productId: string;
+      trend: string;
+      summary: { latestPrice: number; previousPrice: number; changeFromPrevious: number; lowestPrice: number; highestPrice: number; isNewLow: boolean; observedCount: number; latestObservedAt: string };
+      guardrails: string[];
+    };
+    assert.equal(historySummaryBody.productId, 'coffee');
+    assert.equal(historySummaryBody.trend, 'new_low');
+    assert.deepEqual(historySummaryBody.summary, {
+      latestPrice: 49.9,
+      previousPrice: 59.9,
+      changeFromPrevious: -10,
+      lowestPrice: 49.9,
+      highestPrice: 69.9,
+      isNewLow: true,
+      observedCount: 3,
+      latestObservedAt: '2026-05-19T00:00:00.000Z'
+    });
+    assert.match(historySummaryBody.guardrails[0] ?? '', /recorded product history/i);
+
+    const historyConfidence = await handle(new Request('http://localhost/api/products/coffee/history-confidence'));
+    assert.equal(historyConfidence.status, 200);
+    const historyConfidenceBody = await json(historyConfidence) as {
+      productId: string;
+      disclosure: {
+        rangeDays: number;
+        observationCount: number;
+        confidenceState: string;
+        headlineCopy: string;
+        canClaimLowestInWindow: boolean;
+        legalCopyMode: string;
+        sourceTypesIncluded: string[];
+        sourceTypesMissing: string[];
+      };
+      guardrails: string[];
+    };
+    assert.equal(historyConfidenceBody.productId, 'coffee');
+    assert.equal(historyConfidenceBody.disclosure.rangeDays, 90);
+    assert.equal(historyConfidenceBody.disclosure.observationCount, 3);
+    assert.equal(historyConfidenceBody.disclosure.confidenceState, 'limited_history');
+    assert.equal(historyConfidenceBody.disclosure.headlineCopy, 'Limited history');
+    assert.equal(historyConfidenceBody.disclosure.canClaimLowestInWindow, false);
+    assert.equal(historyConfidenceBody.disclosure.legalCopyMode, 'observed_low_only');
+    assert.deepEqual(historyConfidenceBody.disclosure.sourceTypesIncluded, ['shelf']);
+    assert.deepEqual(historyConfidenceBody.disclosure.sourceTypesMissing, []);
+    assert.match(historyConfidenceBody.guardrails[0] ?? '', /lowest-price claim/i);
 
     const equivalents = await handle(new Request('http://localhost/api/products/milk/equivalents'));
     assert.equal(equivalents.status, 200);
@@ -437,6 +696,59 @@ describe('createHttpHandler', () => {
     assert.equal((await json(index) as { label: string }).label, 'Stockholm Grocery Index');
   });
 
+  it('caches hot public API endpoints through an injected response cache', async () => {
+    const entries = new Map<string, string>();
+    const writes: Array<{ key: string; ttlSeconds: number }> = [];
+    const handle = createHttpHandler(undefined, {
+      apiResponseCache: {
+        get: async (key: string) => entries.get(key) ?? null,
+        set: async (key: string, value: string, options: { ttlSeconds: number }) => {
+          writes.push({ key, ttlSeconds: options.ttlSeconds });
+          entries.set(key, value);
+        }
+      }
+    } as any);
+
+    const first = await handle(new Request('http://localhost/api/market/overview'));
+    assert.equal(first.status, 200);
+    assert.equal(first.headers.get('x-groceryview-cache'), 'miss');
+    const firstBody = await json(first);
+    assert.equal(writes.length, 1);
+    assert.match(writes[0]?.key ?? '', /^hot-endpoint:v1:\/api\/market\/overview/);
+    assert.equal(writes[0]?.ttlSeconds, 60);
+
+    const second = await handle(new Request('http://localhost/api/market/overview'));
+    assert.equal(second.status, 200);
+    assert.equal(second.headers.get('x-groceryview-cache'), 'hit');
+    assert.deepEqual(await json(second), firstBody);
+  });
+
+  it('returns cursor-paginated product search envelopes for public search', async () => {
+    const handle = createHttpHandler();
+
+    const first = await handle(new Request('http://localhost/api/products/search?q=&limit=2'));
+    assert.equal(first.status, 200);
+    const firstBody = await json(first) as {
+      items: Array<{ id: string }>;
+      pagination: { limit: number; nextCursor: string | null; hasMore: boolean; source: string };
+      guardrails: string[];
+    };
+    assert.deepEqual(firstBody.items.map((product) => product.id), ['coffee', 'milk']);
+    assert.equal(firstBody.pagination.limit, 2);
+    assert.equal(firstBody.pagination.hasMore, true);
+    assert.match(firstBody.pagination.nextCursor ?? '', /^[A-Za-z0-9_-]+$/);
+    assert.match(firstBody.pagination.source, /cursor pagination/i);
+    assert.match(firstBody.guardrails.join(' '), /No offset page numbers/i);
+
+    const second = await handle(new Request(`http://localhost/api/products/search?q=&limit=2&cursor=${firstBody.pagination.nextCursor}`));
+    assert.equal(second.status, 200);
+    const secondBody = await json(second) as { items: Array<{ id: string }>; pagination: { limit: number; nextCursor: string | null; hasMore: boolean } };
+    assert.deepEqual(secondBody.items.map((product) => product.id), ['private-label-milk', 'butter']);
+    assert.equal(secondBody.pagination.limit, 2);
+    assert.equal(secondBody.pagination.hasMore, false);
+    assert.equal(secondBody.pagination.nextCursor, null);
+  });
+
   it('returns product not found for unknown product child resources', async () => {
     const handle = createHttpHandler();
 
@@ -452,13 +764,29 @@ describe('createHttpHandler', () => {
     assert.equal(history.status, 404);
     assert.deepEqual(await json(history), { error: 'Product not found.' });
 
+    const historySummary = await handle(new Request('http://localhost/api/products/missing-product/history-summary'));
+    assert.equal(historySummary.status, 404);
+    assert.deepEqual(await json(historySummary), { error: 'Product not found.' });
+
+    const historyConfidence = await handle(new Request('http://localhost/api/products/missing-product/history-confidence'));
+    assert.equal(historyConfidence.status, 404);
+    assert.deepEqual(await json(historyConfidence), { error: 'Product not found.' });
+
     const terminal = await handle(new Request('http://localhost/api/products/missing-product/terminal'));
     assert.equal(terminal.status, 404);
     assert.deepEqual(await json(terminal), { error: 'Product not found.' });
 
+    const cheapestNow = await handle(new Request('http://localhost/api/products/missing-product/cheapest-now'));
+    assert.equal(cheapestNow.status, 404);
+    assert.deepEqual(await json(cheapestNow), { error: 'Product not found.' });
+
     const priceSpread = await handle(new Request('http://localhost/api/products/missing-product/price-spread'));
     assert.equal(priceSpread.status, 404);
     assert.deepEqual(await json(priceSpread), { error: 'Product not found.' });
+
+    const storeSavings = await handle(new Request('http://localhost/api/products/missing-product/store-savings'));
+    assert.equal(storeSavings.status, 404);
+    assert.deepEqual(await json(storeSavings), { error: 'Product not found.' });
 
     const dealScore = await handle(new Request('http://localhost/api/products/missing-product/deal-score'));
     assert.equal(dealScore.status, 404);
@@ -467,6 +795,26 @@ describe('createHttpHandler', () => {
     const equivalents = await handle(new Request('http://localhost/api/products/missing-product/equivalents'));
     assert.equal(equivalents.status, 404);
     assert.deepEqual(await json(equivalents), { error: 'Product not found.' });
+
+    const storeCoverage = await handle(new Request('http://localhost/api/stores/missing-store/price-coverage'));
+    assert.equal(storeCoverage.status, 404);
+    assert.deepEqual(await json(storeCoverage), { error: 'Store not found.' });
+
+    const dealSummary = await handle(new Request('http://localhost/api/stores/missing-store/deal-summary'));
+    assert.equal(dealSummary.status, 404);
+    assert.deepEqual(await json(dealSummary), { error: 'Store not found.' });
+
+    const flyerOffers = await handle(new Request('http://localhost/api/stores/missing-store/flyer-offers'));
+    assert.equal(flyerOffers.status, 503);
+    assert.deepEqual(await json(flyerOffers), { error: 'Store flyer offers provider is not configured.' });
+
+    const discounts = await handle(new Request('http://localhost/api/stores/missing-store/discounts'));
+    assert.equal(discounts.status, 503);
+    assert.deepEqual(await json(discounts), { error: 'Store discounts provider is not configured.' });
+
+    const categoryCoverage = await handle(new Request('http://localhost/api/stores/missing-store/category-coverage'));
+    assert.equal(categoryCoverage.status, 404);
+    assert.deepEqual(await json(categoryCoverage), { error: 'Store not found.' });
   });
 
   it('mutates favorite stores, watchlist, basket, and budget through proposal routes', async () => {
@@ -528,6 +876,17 @@ describe('createHttpHandler', () => {
     assert.deepEqual(watchlist.items[0]?.allowedPriceTypes, ['shelf']);
     assert.equal(watchlist.alerts.length, 2);
 
+    const priceAlerts = await handle(new Request('http://localhost/api/watchlist/price-alerts?userId=user-1'));
+    assert.equal(priceAlerts.status, 503);
+    assert.deepEqual(await json(priceAlerts), { error: 'Watchlist price-alert provider is not configured.' });
+
+    const updatedPriceAlerts = await handle(new Request('http://localhost/api/watchlist/price-alerts?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ productId: 'coffee', targetPrice: 50, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] })
+    }));
+    assert.equal(updatedPriceAlerts.status, 503);
+    assert.deepEqual(await json(updatedPriceAlerts), { error: 'Watchlist price-alert writer is not configured.' });
+
     const comparison = await json(await handle(new Request('http://localhost/api/basket/compare?userId=user-1', { method: 'POST' }))) as { cheapestByProduct: { total: number } };
     assert.equal(comparison.cheapestByProduct.total, 99.8);
 
@@ -549,6 +908,140 @@ describe('createHttpHandler', () => {
       lineTotal: assignment.lineTotal,
       priceLabel: assignment.priceLabel
     })), [{ productId: 'coffee', lineTotal: 99.8, priceLabel: 'verified_shelf' }]);
+
+
+
+    const handoff = await json(await handle(new Request('http://localhost/api/basket/handoff/willys?userId=user-1'))) as {
+      userId: string;
+      retailerId: string;
+      primaryAction: { actionType: string; status: string };
+      actions: Array<{ actionType: string; status: string; lineCount: number }>;
+      unsupportedReasons: string[];
+      guardrails: string[];
+    };
+    assert.equal(handoff.userId, 'user-1');
+    assert.equal(handoff.retailerId, 'willys');
+    assert.deepEqual(handoff.primaryAction, {
+      actionType: 'copy_list',
+      status: 'ready',
+      label: 'Copy list',
+      lineCount: 1,
+      productIds: ['coffee'],
+      urlCount: 1,
+      requiresRetailerConfirmation: true,
+      reason: 'Copy list is ready for all basket lines.'
+    });
+    assert.deepEqual(handoff.actions.map((action) => ({ actionType: action.actionType, status: action.status, lineCount: action.lineCount })), [
+      { actionType: 'copy_list', status: 'ready', lineCount: 1 },
+      { actionType: 'product_deep_links', status: 'ready', lineCount: 1 },
+      { actionType: 'retailer_app_search', status: 'manual_review', lineCount: 1 },
+      { actionType: 'basket_transfer', status: 'unsupported', lineCount: 0 }
+    ]);
+    assert.match(handoff.unsupportedReasons[1] ?? '', /cannot claim purchase completion/i);
+    assert.match(handoff.guardrails[0], /not checkout confirmation/i);
+
+    const transfer = await json(await handle(new Request('http://localhost/api/basket/transfer/willys?userId=user-1'))) as {
+      userId: string;
+      retailerId: string;
+      status: string;
+      canAttemptTransfer: boolean;
+      blockedReasons: string[];
+      guardrails: string[];
+    };
+    assert.equal(transfer.userId, 'user-1');
+    assert.equal(transfer.retailerId, 'willys');
+    assert.equal(transfer.status, 'blocked');
+    assert.equal(transfer.canAttemptTransfer, false);
+    assert.match(transfer.blockedReasons[0] ?? '', /not verified as supported/);
+    assert.match(transfer.guardrails[0] ?? '', /verified retailer capability/);
+
+
+    const importExport = await handle(new Request('http://localhost/api/basket/import-export?userId=user-import', {
+      method: 'POST',
+      body: JSON.stringify({
+        source: { sourceKind: 'bookmarklet', retailerId: 'willys', origin: 'https://www.willys.se', capturedAt: '2026-05-22T09:35:00.000Z', consentGranted: true },
+        capturedLines: [
+          { rawName: 'Zoégas Coffee 450g', productId: 'coffee', quantity: 1, productUrl: 'https://www.willys.se/produkt/coffee' },
+          { rawName: 'Arla Milk 1L', quantity: 2 },
+          { rawName: 'Retailer-only bakery bun', quantity: 3 }
+        ]
+      })
+    }));
+    assert.equal(importExport.status, 201);
+    const importExportBody = await json(importExport) as {
+      userId: string;
+      status: string;
+      importedItemCount: number;
+      reviewItemCount: number;
+      acceptedItems: Array<{ productId: string; quantity: number }>;
+      reviewItems: Array<{ rawName: string }>;
+      guardrails: string[];
+    };
+    assert.equal(importExportBody.userId, 'user-import');
+    assert.equal(importExportBody.status, 'needs_review');
+    assert.equal(importExportBody.importedItemCount, 2);
+    assert.equal(importExportBody.reviewItemCount, 1);
+    assert.deepEqual(importExportBody.acceptedItems.map((item) => [item.productId, item.quantity]), [['coffee', 1], ['milk', 2]]);
+    assert.equal(importExportBody.reviewItems[0]?.rawName, 'Retailer-only bakery bun');
+    assert.match(importExportBody.guardrails[0] ?? '', /explicit shopper consent/i);
+    const importedBasket = await json(await handle(new Request('http://localhost/api/basket/current?userId=user-import'))) as { items: Array<{ productId: string; quantity: number }> };
+    assert.deepEqual(importedBasket.items, [{ productId: 'coffee', quantity: 1 }, { productId: 'milk', quantity: 2 }]);
+
+    const importReview = await json(await handle(new Request('http://localhost/api/basket/import-review?userId=user-import'))) as {
+      userId: string;
+      openItemCount: number;
+      items: Array<{ reviewItemId: string; rawName: string; status: string }>;
+      guardrails: string[];
+    };
+    assert.equal(importReview.userId, 'user-import');
+    assert.equal(importReview.openItemCount, 1);
+    assert.equal(importReview.items[0]?.rawName, 'Retailer-only bakery bun');
+    assert.match(importReview.guardrails[0] ?? '', /account-bound/i);
+
+    const importReviewDecision = await handle(new Request(`http://localhost/api/basket/import-review/${encodeURIComponent(importReview.items[0]!.reviewItemId)}/decisions?userId=user-import`, {
+      method: 'POST',
+      body: JSON.stringify({ decision: 'accept_as_product', productId: 'coffee', quantity: 3 })
+    }));
+    assert.equal(importReviewDecision.status, 200);
+    const importReviewDecisionBody = await json(importReviewDecision) as { status: string; resolvedProductId: string };
+    assert.equal(importReviewDecisionBody.status, 'accepted');
+    assert.equal(importReviewDecisionBody.resolvedProductId, 'coffee');
+    assert.equal((await json(await handle(new Request('http://localhost/api/basket/import-review?userId=user-import'))) as { openItemCount: number }).openItemCount, 0);
+
+    const slots = await json(await handle(new Request('http://localhost/api/basket/fulfillment-slots/willys/willys-odenplan?userId=user-1'))) as {
+      userId: string;
+      status: string;
+      availableSlotCount: number;
+      availableSlots: Array<{ slotId: string; mode: string; fee: number }>;
+      guardrails: string[];
+    };
+    assert.equal(slots.userId, 'user-1');
+    assert.equal(slots.status, 'evidence_available');
+    assert.equal(slots.availableSlotCount, 1);
+    assert.deepEqual(slots.availableSlots.map((slot) => [slot.slotId, slot.mode, slot.fee]), [['willys-pickup-tomorrow-0900', 'pickup', 0]]);
+    assert.match(slots.guardrails[0], /not retailer reservations/i);
+
+    const tripCost = await json(await handle(new Request('http://localhost/api/basket/trip-cost?userId=user-1&travelMode=car&valueOfTimePerHour=120&carCostPerKm=3.5&splitTripPenalty=15'))) as {
+      userId: string;
+      bestOption?: { strategyId: string; pricedBasketTotal: number; travelCost: number; effectiveTotal: number; storeIds: string[] };
+      guardrails: string[];
+    };
+    assert.equal(tripCost.userId, 'user-1');
+    assert.deepEqual(tripCost.bestOption, {
+      strategyId: 'all_at_one_store',
+      label: 'All at one store',
+      basketTotal: 99.8,
+      storeIds: ['willys-odenplan'],
+      distanceKm: 0.5,
+      durationMinutes: 5.29,
+      missingProductIds: [],
+      pricedBasketTotal: 99.8,
+      travelCost: 12.33,
+      effectiveTotal: 112.13,
+      complete: true,
+      warnings: []
+    });
+    assert.match(tripCost.guardrails[2], /not retailer checkout or delivery confirmations/i);
 
     const localOffers = await json(await handle(new Request('http://localhost/api/basket/local-offers?userId=user-1&asOf=2026-05-20T12:00:00.000Z'))) as {
       storeIds: string[];
@@ -586,6 +1079,33 @@ describe('createHttpHandler', () => {
       savingsVsBaseline: 20
     });
     assert.match(localOffers.guardrails[0], /favorite stores/);
+
+    const recurringDigest = await json(await handle(new Request('http://localhost/api/basket/recurring-digest?userId=user-1&templateId=weekly-basics&templateName=Weekly%20basics&cadence=weekly&asOf=2026-05-22T08:00:00.000Z'))) as {
+      templateId: string;
+      lineCount: number;
+      comparableDelta: number;
+      lines: Array<{ productId: string; changeType: string; currentStoreName?: string }>;
+      guardrails: string[];
+    };
+    assert.equal(recurringDigest.templateId, 'weekly-basics');
+    assert.equal(recurringDigest.lineCount, 1);
+    assert.equal(recurringDigest.comparableDelta, -20);
+    assert.deepEqual(recurringDigest.lines, [{
+      productId: 'coffee',
+      productName: 'Zoégas Coffee 450g',
+      quantity: 2,
+      currentUnitPrice: 49.9,
+      previousUnitPrice: 59.9,
+      currentLineTotal: 99.8,
+      previousLineTotal: 119.8,
+      lineDelta: -20,
+      lineDeltaPercent: -16.69,
+      currentStoreName: 'Willys Odenplan',
+      confidence: 0.9,
+      changeType: 'price_down',
+      recommendedAction: 'Keep in recurring basket; current verified price is lower than the previous shop.'
+    }]);
+    assert.match(recurringDigest.guardrails[0], /both current and previous verified prices/);
 
     const storeQuote = await json(await handle(new Request('http://localhost/api/basket/stores/willys-odenplan/quote?userId=user-1'))) as {
       storeId: string;
@@ -969,6 +1489,233 @@ describe('createHttpHandler', () => {
     assert.deepEqual(missing.enforcementReasons, ['missing_subscription_entitlement']);
   });
 
+  it('creates account-bound billing checkout sessions through the configured provider', async () => {
+    const createdRequests: unknown[] = [];
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'checkout-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'checkout-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      },
+      billingCheckoutPriceIds: { premium_yearly: 'price_yearly_123' },
+      billingCheckoutProvider: {
+        async createCheckoutSession(request) {
+          createdRequests.push(request);
+          return {
+            sessionId: 'cs_test_account_bound',
+            checkoutUrl: 'https://checkout.stripe.example/session/cs_test_account_bound'
+          };
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/checkout-sessions?userId=user-1', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({ plan: 'premium_yearly' })
+    }));
+
+    assert.equal(response.status, 201);
+    assert.deepEqual(await json(response), {
+      provider: 'stripe_compatible',
+      sessionId: 'cs_test_account_bound',
+      checkoutUrl: 'https://checkout.stripe.example/session/cs_test_account_bound',
+      plan: 'premium_yearly'
+    });
+    assert.deepEqual(createdRequests, [{
+      customerReference: 'user-1',
+      priceId: 'price_yearly_123',
+      successUrl: 'https://groceryview.example/account?checkout=success&plan=premium_yearly',
+      cancelUrl: 'https://groceryview.example/account?checkout=cancel&plan=premium_yearly',
+      metadata: { plan: 'premium_yearly' }
+    }]);
+    assert.equal(JSON.stringify(createdRequests).includes('checkout-secret'), false);
+  });
+
+  it('fails billing checkout sessions closed without provider configuration', async () => {
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'checkout-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'checkout-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/checkout-sessions?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ plan: 'premium_monthly' })
+    }));
+
+    assert.equal(response.status, 503);
+    assert.deepEqual(await json(response), {
+      error: 'Subscription checkout requires configured billing provider and price id.'
+    });
+  });
+
+  it('creates account-bound billing portal sessions from persisted provider customers', async () => {
+    const createdRequests: unknown[] = [];
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'portal-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'portal-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      },
+      now: new Date('2026-05-22T00:00:00.000Z'),
+      subscriptionEntitlementRepository: {
+        async getSubscriptionEntitlement(userId) {
+          if (userId !== 'user-1') return null;
+          return {
+            userId,
+            tier: 'premium',
+            plan: 'premium_monthly',
+            status: 'active',
+            currentPeriodEndsAt: '2026-06-22T00:00:00.000Z',
+            provider: 'stripe_compatible',
+            providerCustomerId: 'cus_portal_123',
+            providerSubscriptionId: 'sub_portal_123',
+            updatedAt: '2026-05-22T00:00:00.000Z'
+          };
+        }
+      },
+      billingPortalProvider: {
+        async createPortalSession(request) {
+          createdRequests.push(request);
+          return {
+            sessionId: 'bps_test_account_bound',
+            portalUrl: 'https://billing.stripe.example/session/bps_test_account_bound'
+          };
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/portal-sessions?userId=user-1', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'content-type': 'application/json'
+      }
+    }));
+
+    assert.equal(response.status, 201);
+    assert.deepEqual(await json(response), {
+      provider: 'stripe_compatible',
+      sessionId: 'bps_test_account_bound',
+      portalUrl: 'https://billing.stripe.example/session/bps_test_account_bound'
+    });
+    assert.deepEqual(createdRequests, [{
+      customerReference: 'cus_portal_123',
+      returnUrl: 'https://groceryview.example/account?billing=return'
+    }]);
+  });
+
+  it('fails billing portal sessions closed without provider customer evidence', async () => {
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'portal-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'portal-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      },
+      subscriptionEntitlementRepository: {
+        async getSubscriptionEntitlement(userId) {
+          return {
+            userId,
+            tier: 'premium',
+            plan: 'premium_monthly',
+            status: 'active',
+            currentPeriodEndsAt: '2026-06-22T00:00:00.000Z',
+            provider: 'stripe_compatible',
+            updatedAt: '2026-05-22T00:00:00.000Z'
+          };
+        }
+      },
+      billingPortalProvider: {
+        async createPortalSession() {
+          throw new Error('should not call provider without customer evidence');
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/portal-sessions?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` }
+    }));
+
+    assert.equal(response.status, 503);
+    assert.deepEqual(await json(response), {
+      error: 'Billing portal requires an active provider customer for this account.'
+    });
+  });
+
+  it('uses the runtime repository for account-bound basket import review persistence when configured', async () => {
+    const api = createGroceryViewApi();
+    const savedRows: Array<{ userId: string; items: Array<{ reviewItemId: string; rawName: string; status: string }> }> = [];
+    const openRows = new Map<string, BasketImportReviewItem[]>();
+    const handle = createHttpHandler(api, {
+      basketImportReviewRepository: {
+        async saveBasketImportReviewItems(userId, items) {
+          savedRows.push({ userId, items: items.map((item) => ({ reviewItemId: item.reviewItemId, rawName: item.rawName, status: item.status })) });
+          openRows.set(userId, items.map((item) => ({ ...item })));
+        },
+        async listOpenBasketImportReviewItems(userId) {
+          return openRows.get(userId)?.filter((item) => item.status === 'open') ?? [];
+        },
+        async resolveBasketImportReviewItem(userId, reviewItemId, resolution) {
+          const items = openRows.get(userId) ?? [];
+          const index = items.findIndex((item) => item.reviewItemId === reviewItemId && item.status === 'open');
+          if (index === -1) throw new Error(`Basket import review item not found: ${reviewItemId}`);
+          const resolved = {
+            ...items[index]!,
+            status: resolution.status,
+            resolvedAt: resolution.resolvedAt,
+            ...(resolution.resolvedProductId ? { resolvedProductId: resolution.resolvedProductId } : {}),
+            ...(resolution.quantity === undefined ? {} : { quantity: resolution.quantity })
+          };
+          openRows.set(userId, items.map((item, itemIndex) => itemIndex === index ? resolved : item));
+          return resolved;
+        }
+      }
+    });
+
+    await handle(new Request('http://localhost/api/basket/import-export?userId=user-db-import', {
+      method: 'POST',
+      body: JSON.stringify({
+        source: { sourceKind: 'bookmarklet', retailerId: 'willys', origin: 'https://www.willys.se', capturedAt: '2026-05-22T09:35:00.000Z', consentGranted: true },
+        capturedLines: [
+          { rawName: 'Retailer-only bakery bun', quantity: 3 }
+        ]
+      })
+    }));
+
+    assert.equal(savedRows[0]?.userId, 'user-db-import');
+    assert.equal(savedRows[0]?.items[0]?.rawName, 'Retailer-only bakery bun');
+    const queue = await json(await handle(new Request('http://localhost/api/basket/import-review?userId=user-db-import'))) as {
+      openItemCount: number;
+      items: Array<{ reviewItemId: string; rawName: string }>;
+    };
+    assert.equal(queue.openItemCount, 1);
+    assert.equal(queue.items[0]?.rawName, 'Retailer-only bakery bun');
+
+    const decision = await handle(new Request(`http://localhost/api/basket/import-review/${encodeURIComponent(queue.items[0]!.reviewItemId)}/decisions?userId=user-db-import`, {
+      method: 'POST',
+      body: JSON.stringify({ decision: 'dismiss' })
+    }));
+    assert.equal(decision.status, 200);
+    assert.equal((await json(decision) as { status: string }).status, 'dismissed');
+    assert.equal((await json(await handle(new Request('http://localhost/api/basket/import-review?userId=user-db-import'))) as { openItemCount: number }).openItemCount, 0);
+  });
+
   it('accepts signed billing subscription events and persists entitlement mutations', async () => {
     const persisted: unknown[] = [];
     const secret = 'billing-webhook-secret';
@@ -1077,6 +1824,98 @@ describe('createHttpHandler', () => {
         updatedAt: '2026-05-20T12:00:00.000Z'
       }
     ]);
+  });
+
+  it('accepts provider-native Stripe signatures for Stripe-compatible subscription webhooks', async () => {
+    const persisted: unknown[] = [];
+    const secret = 'whsec_provider_native';
+    const body = JSON.stringify({
+      id: 'evt_stripe_native_signature_1',
+      type: 'customer.subscription.updated',
+      created: 1779278400,
+      data: {
+        object: {
+          id: 'sub_provider_native_1',
+          customer: 'cus_provider_native_1',
+          status: 'active',
+          current_period_end: 1810771200,
+          metadata: { userId: 'user-stripe-native' },
+          items: { data: [{ price: { id: 'price_monthly_native' } }] }
+        }
+      }
+    });
+    const handle = createHttpHandler(undefined, {
+      billingWebhookSecret: secret,
+      billingPriceIdPlanMap: { price_monthly_native: 'premium_monthly' },
+      now: new Date('2026-05-20T12:00:00.000Z'),
+      billingSubscriptionSink: {
+        async upsertSubscriptionEntitlement(entitlement) {
+          persisted.push(entitlement);
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'stripe-signature': signStripeWebhookBody(body, secret, 1779278400) },
+      body
+    }));
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await json(response), {
+      accepted: true,
+      persisted: true,
+      userId: 'user-stripe-native',
+      status: 'active'
+    });
+    assert.deepEqual(persisted, [{
+      userId: 'user-stripe-native',
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'active',
+      currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      providerCustomerId: 'cus_provider_native_1',
+      providerSubscriptionId: 'sub_provider_native_1',
+      updatedAt: '2026-05-20T12:00:00.000Z'
+    }]);
+  });
+
+  it('rejects stale provider-native Stripe billing webhook signatures', async () => {
+    const persisted: unknown[] = [];
+    const secret = 'whsec_provider_native';
+    const body = JSON.stringify({
+      id: 'evt_stale_stripe_native_signature_1',
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          id: 'sub_stale_provider_native_1',
+          customer: 'cus_stale_provider_native_1',
+          status: 'active',
+          metadata: { userId: 'user-stripe-native' },
+          items: { data: [{ price: { id: 'price_monthly_native' } }] }
+        }
+      }
+    });
+    const handle = createHttpHandler(undefined, {
+      billingWebhookSecret: secret,
+      billingPriceIdPlanMap: { price_monthly_native: 'premium_monthly' },
+      now: new Date('2026-05-20T12:10:01.000Z'),
+      billingSubscriptionSink: {
+        async upsertSubscriptionEntitlement(entitlement) {
+          persisted.push(entitlement);
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'stripe-signature': signStripeWebhookBody(body, secret, 1779278400) },
+      body
+    }));
+
+    assert.equal(response.status, 401);
+    assert.deepEqual(persisted, []);
   });
 
   it('fails billing subscription events closed without configured secret, valid signature, and sink', async () => {

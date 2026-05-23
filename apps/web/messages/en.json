@@ -1,0 +1,24 @@
+{
+  "nav": {
+    "overview": "Overview",
+    "products": "Products",
+    "compare": "Compare",
+    "mealCost": "Meal cost",
+    "savings": "Savings",
+    "chain": "Chains",
+    "stores": "Stores",
+    "openPrices": "OpenPrices",
+    "map": "Map",
+    "categories": "Categories"
+  },
+  "home": {
+    "eyebrow": "Swedish grocery price terminal",
+    "headline": "Verified grocery prices with clear sources.",
+    "body": "GroceryView renders only source-backed price rows. Missing evidence is labelled as a blocker instead of being filled in."
+  },
+  "language": {
+    "label": "Language",
+    "persisted": "The language preference is stored locally and in the NEXT_LOCALE cookie.",
+    "guardrail": "Arabic and Somali stay blocked until reviewed translations are available."
+  }
+}

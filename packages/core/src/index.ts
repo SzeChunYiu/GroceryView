@@ -62,6 +62,9 @@ export type HistoricalDealScore = {
 const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
 const roundMoney = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
 const formatSek = (value: number): string => `${value.toFixed(2)} SEK`;
+function requireNonBlank(value: string, fieldName: string): void {
+  if (!value.trim()) throw new Error(`${fieldName} is required.`);
+}
 const storeNameFromId = (storeId: string): string =>
   storeId
     .split('-')
@@ -270,6 +273,7 @@ export type BasketInputItem = {
 
 export type BasketComparisonInput = {
   favoriteStoreIds: string[];
+  enabledMemberStoreIds?: string[];
   items: BasketInputItem[];
 };
 
@@ -320,6 +324,8 @@ export type BasketAssignment = {
   quantity: number;
   unitPrice: number;
   lineTotal: number;
+  priceType: WatchlistPriceType;
+  memberSavings?: number;
 };
 
 export type BasketStrategy = {
@@ -341,6 +347,9 @@ export type BasketComparisonResult = {
   savingsVsBestSingleStore: number;
   splitStoreCount: number;
   missingProductIds: string[];
+  memberSavingsTotal: number;
+  memberPriceStoreIds: string[];
+  excludedMemberPriceProductIds: string[];
 };
 
 export type StoreBasketCoverage = {
@@ -357,6 +366,617 @@ export type StoreBasketCoverageSummary = {
   bestCoverage?: StoreBasketCoverage;
   fullCoverageStoreIds: string[];
 };
+
+
+export type BasketTripCostTravelMode = 'walk' | 'bike' | 'transit' | 'car' | 'delivery';
+
+export type BasketTripCostOptionInput = {
+  strategyId: string;
+  label: string;
+  basketTotal: number | null;
+  storeIds: string[];
+  distanceKm?: number;
+  durationMinutes?: number;
+  deliveryFee?: number;
+  missingProductIds?: string[];
+};
+
+export type BasketTripCostInput = {
+  currency: 'SEK';
+  travelMode: BasketTripCostTravelMode;
+  options: BasketTripCostOptionInput[];
+  valueOfTimePerHour?: number;
+  carCostPerKm?: number;
+  transitFare?: number;
+  splitTripPenalty?: number;
+};
+
+export type BasketTripCostOption = BasketTripCostOptionInput & {
+  pricedBasketTotal: number | null;
+  travelCost: number;
+  effectiveTotal: number | null;
+  complete: boolean;
+  warnings: string[];
+};
+
+export type BasketTripCostPlan = {
+  currency: 'SEK';
+  travelMode: BasketTripCostTravelMode;
+  bestOption?: BasketTripCostOption;
+  options: BasketTripCostOption[];
+  guardrails: string[];
+};
+
+
+
+
+export type BasketFulfillmentMode = 'pickup' | 'delivery';
+export type BasketFulfillmentAccess = 'official_api' | 'manual_evidence' | 'stub_only' | 'blocked';
+
+export type BasketFulfillmentSlotEvidenceSource = {
+  access: BasketFulfillmentAccess;
+  evidenceUrl?: string;
+  capturedAt: string;
+  shopperConsent: boolean;
+};
+
+export type BasketFulfillmentSlotInput = {
+  slotId: string;
+  mode: BasketFulfillmentMode;
+  startsAt: string;
+  endsAt: string;
+  fee: number;
+  currency: 'SEK';
+  available: boolean;
+};
+
+export type BasketFulfillmentSlotsInput = {
+  retailerId: string;
+  retailerName: string;
+  storeId: string;
+  storeName: string;
+  asOf: string;
+  basketProductIds: string[];
+  source: BasketFulfillmentSlotEvidenceSource;
+  slots: BasketFulfillmentSlotInput[];
+};
+
+export type BasketFulfillmentSlotsPlan = {
+  retailerId: string;
+  retailerName: string;
+  storeId: string;
+  storeName: string;
+  asOf: string;
+  status: 'evidence_available' | 'manual_review' | 'blocked';
+  availableSlotCount: number;
+  availableSlots: BasketFulfillmentSlotInput[];
+  blockedReasons: string[];
+  guardrails: string[];
+};
+
+const fulfillmentSlotGuardrails = [
+  'Fulfillment slots are evidence snapshots, not retailer reservations.',
+  'Delivery or pickup availability must be re-confirmed inside the retailer checkout.',
+  'GroceryView cannot claim checkout completion, delivery booking, or inventory reservation from slot evidence.'
+];
+
+export function planBasketFulfillmentSlots(input: BasketFulfillmentSlotsInput): BasketFulfillmentSlotsPlan {
+  requireNonBlank(input.retailerId, 'retailerId');
+  requireNonBlank(input.retailerName, 'retailerName');
+  requireNonBlank(input.storeId, 'storeId');
+  requireNonBlank(input.storeName, 'storeName');
+  requireNonBlank(input.asOf, 'asOf');
+  requireNonBlank(input.source.capturedAt, 'capturedAt');
+  const blockedReasons: string[] = [];
+  if (!input.source.shopperConsent) blockedReasons.push('Shopper consent is required before using retailer checkout slot evidence.');
+  if (input.source.access === 'blocked' || input.source.access === 'stub_only') blockedReasons.push(`${input.retailerName} fulfillment slot access is ${input.source.access}.`);
+  for (const productId of input.basketProductIds) requireNonBlank(productId, 'basketProductIds.productId');
+
+  const slots = input.slots.map((slot) => {
+    requireNonBlank(slot.slotId, 'slotId');
+    requireNonBlank(slot.startsAt, 'startsAt');
+    requireNonBlank(slot.endsAt, 'endsAt');
+    if (slot.fee < 0) throw new Error('fee must be non-negative.');
+    if (!slot.available) blockedReasons.push(`${slot.slotId} is currently unavailable.`);
+    return slot;
+  });
+  const availableSlots = slots.filter((slot) => slot.available);
+  const status = blockedReasons.some((reason) => /consent|required|blocked|stub_only/.test(reason))
+    ? 'blocked'
+    : availableSlots.length > 0 ? 'evidence_available' : 'manual_review';
+  return {
+    retailerId: input.retailerId,
+    retailerName: input.retailerName,
+    storeId: input.storeId,
+    storeName: input.storeName,
+    asOf: input.asOf,
+    status,
+    availableSlotCount: availableSlots.length,
+    availableSlots,
+    blockedReasons,
+    guardrails: fulfillmentSlotGuardrails
+  };
+}
+
+export type BasketImportExportSourceKind = 'bookmarklet' | 'browser_extension' | 'copy_paste';
+
+export type BasketImportExportSource = {
+  sourceKind: BasketImportExportSourceKind;
+  retailerId: string;
+  origin: string;
+  capturedAt: string;
+  consentGranted: boolean;
+};
+
+export type BasketImportExportCapturedLine = {
+  rawName: string;
+  quantity: number;
+  productId?: string;
+  productUrl?: string;
+};
+
+export type BasketImportExportKnownProduct = {
+  productId: string;
+  productName: string;
+  aliases?: string[];
+};
+
+export type BasketImportExportInput = {
+  source: BasketImportExportSource;
+  capturedLines: BasketImportExportCapturedLine[];
+  knownProducts: BasketImportExportKnownProduct[];
+};
+
+export type BasketImportExportAcceptedItem = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  matchSource: 'product_id' | 'alias';
+  productUrl?: string;
+};
+
+export type BasketImportExportReviewItem = {
+  rawName: string;
+  quantity: number;
+  reason: string;
+};
+
+export type BasketImportExportPlan = {
+  status: 'ready' | 'needs_review' | 'blocked';
+  source: BasketImportExportSource;
+  acceptedItems: BasketImportExportAcceptedItem[];
+  reviewItems: BasketImportExportReviewItem[];
+  exportText: string;
+  guardrails: string[];
+};
+
+function normalizeImportName(value: string): string {
+  return value.trim().toLocaleLowerCase('sv-SE').replace(/\s+/g, ' ');
+}
+
+export function planBasketImportExport(input: BasketImportExportInput): BasketImportExportPlan {
+  requireNonBlank(input.source.retailerId, 'retailerId');
+  requireNonBlank(input.source.origin, 'origin');
+  requireNonBlank(input.source.capturedAt, 'capturedAt');
+  const guardrails = [
+    'Bookmarklet and extension imports require explicit shopper consent before reading retailer page content.',
+    'Only matched GroceryView product ids can update the account basket automatically.',
+    'Unmatched retailer rows stay in review and are never silently added as verified products.'
+  ];
+  if (!input.source.consentGranted) {
+    return { status: 'blocked', source: input.source, acceptedItems: [], reviewItems: [], exportText: '', guardrails };
+  }
+
+  const byId = new Map(input.knownProducts.map((product) => [product.productId, product]));
+  const byAlias = new Map<string, BasketImportExportKnownProduct>();
+  for (const product of input.knownProducts) {
+    requireNonBlank(product.productId, 'knownProducts.productId');
+    requireNonBlank(product.productName, 'knownProducts.productName');
+    byAlias.set(normalizeImportName(product.productName), product);
+    for (const alias of product.aliases ?? []) byAlias.set(normalizeImportName(alias), product);
+  }
+
+  const acceptedItems: BasketImportExportAcceptedItem[] = [];
+  const reviewItems: BasketImportExportReviewItem[] = [];
+  for (const line of input.capturedLines) {
+    requireNonBlank(line.rawName, 'rawName');
+    if (!Number.isInteger(line.quantity) || line.quantity <= 0 || line.quantity > 99) throw new Error('quantity must be an integer between 1 and 99.');
+    const productById = line.productId ? byId.get(line.productId) : undefined;
+    const productByAlias = byAlias.get(normalizeImportName(line.rawName));
+    const product = productById ?? productByAlias;
+    if (!product) {
+      reviewItems.push({ rawName: line.rawName, quantity: line.quantity, reason: 'No verified GroceryView product match for retailer row.' });
+      continue;
+    }
+    acceptedItems.push({
+      productId: product.productId,
+      productName: product.productName,
+      quantity: line.quantity,
+      matchSource: productById ? 'product_id' : 'alias',
+      ...(line.productUrl ? { productUrl: line.productUrl } : {})
+    });
+  }
+
+  return {
+    status: reviewItems.length > 0 ? 'needs_review' : 'ready',
+    source: input.source,
+    acceptedItems,
+    reviewItems,
+    exportText: acceptedItems.map((item) => `${item.quantity} × ${item.productName}`).join('\n'),
+    guardrails
+  };
+}
+
+export type RetailerHandoffSupportLevel = 'supported' | 'manual' | 'unsupported';
+
+export type RetailerHandoffSupport = {
+  productDeepLinks: RetailerHandoffSupportLevel;
+  basketTransfer: RetailerHandoffSupportLevel;
+  copyList: RetailerHandoffSupportLevel;
+  retailerAppSearch: RetailerHandoffSupportLevel;
+  checkoutConfirmation: RetailerHandoffSupportLevel;
+};
+
+export type RetailerHandoffLineInput = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  productUrl?: string;
+  matched: boolean;
+};
+
+export type RetailerHandoffInput = {
+  retailerId: string;
+  retailerName: string;
+  basketId: string;
+  lines: RetailerHandoffLineInput[];
+  support: RetailerHandoffSupport;
+};
+
+export type RetailerHandoffActionType = 'basket_transfer' | 'product_deep_links' | 'copy_list' | 'retailer_app_search';
+export type RetailerHandoffActionStatus = 'ready' | 'partial' | 'manual_review' | 'unsupported';
+
+export type RetailerHandoffAction = {
+  actionType: RetailerHandoffActionType;
+  status: RetailerHandoffActionStatus;
+  label: string;
+  lineCount: number;
+  productIds: string[];
+  urlCount: number;
+  requiresRetailerConfirmation: boolean;
+  reason: string;
+};
+
+export type RetailerHandoffPlan = {
+  retailerId: string;
+  retailerName: string;
+  basketId: string;
+  primaryAction: RetailerHandoffAction;
+  actions: RetailerHandoffAction[];
+  unsupportedReasons: string[];
+  guardrails: string[];
+};
+
+export type RetailerDeepLinkEvidence = {
+  productId: string;
+  productName: string;
+  productUrl?: string;
+  matched: boolean;
+  httpStatus?: number;
+  canonicalProductId?: string;
+  lastCheckedAt?: string;
+};
+
+export type RetailerDeepLinkQuality = 'verified' | 'unchecked' | 'broken' | 'mismatch' | 'missing';
+
+export type RetailerDeepLinkQualityRow = {
+  productId: string;
+  productName: string;
+  productUrl: string | null;
+  quality: RetailerDeepLinkQuality;
+  reason: string;
+  lastCheckedAt: string | null;
+};
+
+export type RetailerDeepLinkQualityReport = {
+  retailerId: string;
+  retailerName: string;
+  asOf: string;
+  status: 'ready' | 'limited' | 'blocked';
+  readyLinkCount: number;
+  brokenLinkCount: number;
+  unmatchedLineCount: number;
+  rows: RetailerDeepLinkQualityRow[];
+  guardrails: string[];
+};
+
+export type RetailerBasketTransferInput = RetailerHandoffInput & {
+  transferEndpoint?: string;
+  signedPayload?: string;
+  shopperSessionPresent: boolean;
+};
+
+export type RetailerBasketTransferSession = {
+  retailerId: string;
+  retailerName: string;
+  basketId: string;
+  status: 'ready' | 'blocked' | 'manual_review';
+  canAttemptTransfer: boolean;
+  transferLineCount: number;
+  endpoint: string | null;
+  productIds: string[];
+  blockedReasons: string[];
+  requiresRetailerConfirmation: boolean;
+  guardrails: string[];
+};
+
+export function planRetailerBasketTransferSession(input: RetailerBasketTransferInput): RetailerBasketTransferSession {
+  requireNonBlank(input.retailerId, 'retailerId');
+  requireNonBlank(input.retailerName, 'retailerName');
+  requireNonBlank(input.basketId, 'basketId');
+  const blockedReasons: string[] = [];
+  if (input.support.basketTransfer !== 'supported') {
+    blockedReasons.push(`${input.retailerName} basket transfer is not verified as supported.`);
+  }
+  if (!input.shopperSessionPresent) {
+    blockedReasons.push('A signed-in shopper retailer session is required before transfer can be attempted.');
+  }
+  if (!input.transferEndpoint?.trim()) {
+    blockedReasons.push('A verified retailer transfer endpoint is required.');
+  }
+  if (!input.signedPayload?.trim()) {
+    blockedReasons.push('A signed transfer payload is required.');
+  }
+
+  const transferableLines = input.lines.filter((line) => {
+    requireNonBlank(line.productId, 'productId');
+    requireNonBlank(line.productName, 'productName');
+    if (!Number.isInteger(line.quantity) || line.quantity <= 0) throw new Error('quantity must be a positive integer.');
+    return line.matched && Boolean(line.productUrl);
+  });
+  if (transferableLines.length !== input.lines.length) {
+    blockedReasons.push('Every basket line needs a verified retailer product match and product URL before transfer.');
+  }
+
+  const status = blockedReasons.length > 0 ? 'blocked' : 'ready';
+  return {
+    retailerId: input.retailerId,
+    retailerName: input.retailerName,
+    basketId: input.basketId,
+    status,
+    canAttemptTransfer: status === 'ready',
+    transferLineCount: status === 'ready' ? transferableLines.length : 0,
+    endpoint: status === 'ready' ? input.transferEndpoint!.trim() : null,
+    productIds: status === 'ready' ? transferableLines.map((line) => line.productId) : [],
+    blockedReasons,
+    requiresRetailerConfirmation: true,
+    guardrails: [
+      'Basket transfer requires a verified retailer capability, endpoint, and signed payload.',
+      'Every transferred line must use a verified GroceryView product match and retailer product URL.',
+      'A transfer attempt is not checkout confirmation, payment, delivery booking, or inventory reservation.'
+    ]
+  };
+}
+
+export function planRetailerHandoff(input: RetailerHandoffInput): RetailerHandoffPlan {
+  requireNonBlank(input.retailerId, 'retailerId');
+  requireNonBlank(input.retailerName, 'retailerName');
+  requireNonBlank(input.basketId, 'basketId');
+  const lines = input.lines.map((line) => {
+    requireNonBlank(line.productId, 'productId');
+    requireNonBlank(line.productName, 'productName');
+    if (!Number.isInteger(line.quantity) || line.quantity <= 0) throw new Error('quantity must be a positive integer.');
+    return line;
+  });
+  const matchedLines = lines.filter((line) => line.matched);
+  const linkedLines = matchedLines.filter((line) => Boolean(line.productUrl));
+  const allProductIds = lines.map((line) => line.productId);
+
+  const action = (
+    actionType: RetailerHandoffActionType,
+    support: RetailerHandoffSupportLevel,
+    readyLines: RetailerHandoffLineInput[],
+    label: string,
+    manualReason: string,
+    unsupportedReason: string
+  ): RetailerHandoffAction => {
+    if (support === 'unsupported') {
+      return { actionType, status: 'unsupported', label, lineCount: 0, productIds: [], urlCount: 0, requiresRetailerConfirmation: true, reason: unsupportedReason };
+    }
+    if (support === 'manual') {
+      return { actionType, status: 'manual_review', label, lineCount: lines.length, productIds: allProductIds, urlCount: 0, requiresRetailerConfirmation: true, reason: manualReason };
+    }
+    const status: RetailerHandoffActionStatus = readyLines.length === lines.length ? 'ready' : readyLines.length > 0 ? 'partial' : 'manual_review';
+    return {
+      actionType,
+      status,
+      label,
+      lineCount: readyLines.length,
+      productIds: readyLines.map((line) => line.productId),
+      urlCount: readyLines.filter((line) => Boolean(line.productUrl)).length,
+      requiresRetailerConfirmation: true,
+      reason: status === 'ready' ? `${label} is ready for all basket lines.` : `${label} needs shopper review for unmatched or unlinked basket lines.`
+    };
+  };
+
+  const actions: RetailerHandoffAction[] = [
+    action('copy_list', input.support.copyList, lines, 'Copy list', 'Copy the list into the retailer app manually.', `${input.retailerName} copy-list handoff is not supported.`),
+    action('product_deep_links', input.support.productDeepLinks, linkedLines, 'Product deep links', 'Open product searches manually in the retailer app.', `${input.retailerName} product deep links are not supported.`),
+    action('retailer_app_search', input.support.retailerAppSearch, lines, 'Retailer app search', 'Search each item in the retailer app and confirm matches.', `${input.retailerName} app search handoff is not supported.`),
+    action('basket_transfer', input.support.basketTransfer, matchedLines, 'Basket transfer', 'Transfer requires retailer-side confirmation before GroceryView can call it complete.', `${input.retailerName} does not currently support verified basket transfer.`)
+  ];
+
+  const priority: RetailerHandoffActionStatus[] = ['ready', 'partial', 'manual_review', 'unsupported'];
+  const primaryAction = [...actions].sort((a, b) => priority.indexOf(a.status) - priority.indexOf(b.status))[0] ?? actions[0]!;
+  const unsupportedReasons = actions
+    .filter((item) => item.status === 'unsupported' && item.actionType === 'basket_transfer')
+    .map((item) => item.reason);
+  if (input.support.checkoutConfirmation === 'unsupported') {
+    unsupportedReasons.push('Checkout confirmation is not available, so GroceryView cannot claim purchase completion.');
+  }
+
+  return {
+    retailerId: input.retailerId,
+    retailerName: input.retailerName,
+    basketId: input.basketId,
+    primaryAction,
+    actions,
+    unsupportedReasons,
+    guardrails: [
+      'Retailer handoff is an action aid, not checkout confirmation.',
+      'Unsupported basket transfer falls back to copyable lists and product deep links.',
+      'Missing product links remain visible and require shopper review before retailer handoff.'
+    ]
+  };
+}
+
+export function scoreRetailerDeepLinkQuality(input: {
+  retailerId: string;
+  retailerName: string;
+  asOf: string;
+  links: RetailerDeepLinkEvidence[];
+}): RetailerDeepLinkQualityReport {
+  requireNonBlank(input.retailerId, 'retailerId');
+  requireNonBlank(input.retailerName, 'retailerName');
+  requireNonBlank(input.asOf, 'asOf');
+
+  const rows = input.links.map((link): RetailerDeepLinkQualityRow => {
+    requireNonBlank(link.productId, 'productId');
+    requireNonBlank(link.productName, 'productName');
+
+    if (!link.matched || !link.productUrl?.trim()) {
+      return {
+        productId: link.productId,
+        productName: link.productName,
+        productUrl: link.productUrl?.trim() || null,
+        quality: 'missing',
+        reason: 'No verified retailer product URL is available for this basket line.',
+        lastCheckedAt: link.lastCheckedAt ?? null
+      };
+    }
+
+    if (link.canonicalProductId && link.canonicalProductId !== link.productId) {
+      return {
+        productId: link.productId,
+        productName: link.productName,
+        productUrl: link.productUrl.trim(),
+        quality: 'mismatch',
+        reason: 'Retailer canonical product id does not match the GroceryView product id.',
+        lastCheckedAt: link.lastCheckedAt ?? null
+      };
+    }
+
+    if (typeof link.httpStatus === 'number' && (link.httpStatus < 200 || link.httpStatus >= 400)) {
+      return {
+        productId: link.productId,
+        productName: link.productName,
+        productUrl: link.productUrl.trim(),
+        quality: 'broken',
+        reason: `Retailer link returned HTTP ${link.httpStatus}.`,
+        lastCheckedAt: link.lastCheckedAt ?? null
+      };
+    }
+
+    if (link.httpStatus === 200 && link.canonicalProductId === link.productId) {
+      return {
+        productId: link.productId,
+        productName: link.productName,
+        productUrl: link.productUrl.trim(),
+        quality: 'verified',
+        reason: 'Retailer URL resolved and canonical product evidence matches.',
+        lastCheckedAt: link.lastCheckedAt ?? null
+      };
+    }
+
+    return {
+      productId: link.productId,
+      productName: link.productName,
+      productUrl: link.productUrl.trim(),
+      quality: 'unchecked',
+      reason: 'Retailer URL is present but has not been recently verified with HTTP and canonical product evidence.',
+      lastCheckedAt: link.lastCheckedAt ?? null
+    };
+  });
+
+  const readyLinkCount = rows.filter((row) => row.quality === 'verified').length;
+  const brokenLinkCount = rows.filter((row) => row.quality === 'broken' || row.quality === 'mismatch').length;
+  const unmatchedLineCount = rows.filter((row) => row.quality === 'missing').length;
+  const status = readyLinkCount === rows.length && rows.length > 0 ? 'ready' : readyLinkCount > 0 && brokenLinkCount === 0 ? 'limited' : brokenLinkCount > 0 && readyLinkCount === 0 ? 'blocked' : 'limited';
+
+  return {
+    retailerId: input.retailerId,
+    retailerName: input.retailerName,
+    asOf: input.asOf,
+    status,
+    readyLinkCount,
+    brokenLinkCount,
+    unmatchedLineCount,
+    rows,
+    guardrails: [
+      'Deep-link quality measures whether GroceryView can send a shopper to a retailer product page, not checkout confirmation.',
+      'Broken, mismatched, or missing links must fall back to retailer app search or copy-list handoff.',
+      'Canonical product evidence is required before a link can be labeled verified.'
+    ]
+  };
+}
+
+export function planBasketTripCost(input: BasketTripCostInput): BasketTripCostPlan {
+  const valueOfTimePerHour = input.valueOfTimePerHour ?? 0;
+  const carCostPerKm = input.carCostPerKm ?? 0;
+  const transitFare = input.transitFare ?? 0;
+  const splitTripPenalty = input.splitTripPenalty ?? 0;
+  if (valueOfTimePerHour < 0 || carCostPerKm < 0 || transitFare < 0 || splitTripPenalty < 0) {
+    throw new Error('Travel cost parameters must be non-negative.');
+  }
+
+  const options = input.options.map((option): BasketTripCostOption => {
+    requireNonBlank(option.strategyId, 'strategyId');
+    requireNonBlank(option.label, 'label');
+    if (option.basketTotal !== null && option.basketTotal < 0) throw new Error('basketTotal must be non-negative or null.');
+    if (option.distanceKm !== undefined && option.distanceKm < 0) throw new Error('distanceKm must be non-negative.');
+    if (option.durationMinutes !== undefined && option.durationMinutes < 0) throw new Error('durationMinutes must be non-negative.');
+    if (option.deliveryFee !== undefined && option.deliveryFee < 0) throw new Error('deliveryFee must be non-negative.');
+
+    const distanceCost = input.travelMode === 'car' ? (option.distanceKm ?? 0) * carCostPerKm : 0;
+    const timeCost = ((option.durationMinutes ?? 0) / 60) * valueOfTimePerHour;
+    const modeCost = input.travelMode === 'transit' ? transitFare : input.travelMode === 'delivery' ? (option.deliveryFee ?? 0) : 0;
+    const splitCost = option.storeIds.length > 1 ? splitTripPenalty : 0;
+    const travelCost = roundMoney(distanceCost + timeCost + modeCost + splitCost);
+    const missingProductIds = option.missingProductIds ?? [];
+    const complete = option.basketTotal !== null && missingProductIds.length === 0;
+    const warnings: string[] = [];
+    if (missingProductIds.length > 0) warnings.push(`Missing verified prices for: ${missingProductIds.join(', ')}.`);
+    if (option.basketTotal === null) warnings.push('Basket total is unavailable because at least one required line is not priced.');
+    if (splitCost > 0) warnings.push(`Split shop adds ${formatSek(splitCost)} handling/time penalty.`);
+
+    return {
+      ...option,
+      missingProductIds,
+      pricedBasketTotal: option.basketTotal,
+      travelCost,
+      effectiveTotal: complete ? roundMoney((option.basketTotal ?? 0) + travelCost) : null,
+      complete,
+      warnings
+    };
+  }).sort((a, b) => {
+    if (a.complete !== b.complete) return a.complete ? -1 : 1;
+    if (a.effectiveTotal !== null && b.effectiveTotal !== null && a.effectiveTotal !== b.effectiveTotal) return a.effectiveTotal - b.effectiveTotal;
+    if (a.pricedBasketTotal !== null && b.pricedBasketTotal !== null && a.pricedBasketTotal !== b.pricedBasketTotal) return a.pricedBasketTotal - b.pricedBasketTotal;
+    return a.label.localeCompare(b.label);
+  });
+
+  return {
+    currency: input.currency,
+    travelMode: input.travelMode,
+    bestOption: options.find((option) => option.complete),
+    options,
+    guardrails: [
+      'Trip cost is shown separately from verified shelf totals.',
+      'Options with missing product prices are not ranked as complete even when travel looks cheap.',
+      'Travel estimates are planning aids, not retailer checkout or delivery confirmations.'
+    ]
+  };
+}
 
 export type LocalOfferSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
 
@@ -420,20 +1040,119 @@ export type LocalOfferBasketSummary = {
   baselineTotal?: number;
 };
 
+export type RecurringBasketCadence = 'weekly' | 'biweekly' | 'monthly';
+
+export type RecurringBasketLineInput = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  currentUnitPrice?: number | null;
+  previousUnitPrice?: number | null;
+  currentStoreName?: string;
+  previousStoreName?: string;
+  substituteProductName?: string;
+  confidence?: number;
+};
+
+export type RecurringBasketChangeType =
+  | 'price_up'
+  | 'price_down'
+  | 'new_item'
+  | 'missing_current_price'
+  | 'substitute_available'
+  | 'unchanged';
+
+export type RecurringBasketDigestLine = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  currentUnitPrice: number | null;
+  previousUnitPrice: number | null;
+  currentLineTotal: number | null;
+  previousLineTotal: number | null;
+  lineDelta: number | null;
+  lineDeltaPercent: number | null;
+  currentStoreName?: string;
+  previousStoreName?: string;
+  substituteProductName?: string;
+  confidence: number;
+  changeType: RecurringBasketChangeType;
+  recommendedAction: string;
+};
+
+export type RecurringBasketChangeSummary = {
+  priceUp: number;
+  priceDown: number;
+  newItem: number;
+  missingCurrentPrice: number;
+  substituteAvailable: number;
+  unchanged: number;
+};
+
+export type RecurringBasketDigestInput = {
+  templateId: string;
+  templateName: string;
+  cadence: RecurringBasketCadence;
+  asOf: string;
+  lastPurchasedAt?: string;
+  lines: RecurringBasketLineInput[];
+};
+
+export type RecurringBasketDigest = {
+  templateId: string;
+  templateName: string;
+  cadence: RecurringBasketCadence;
+  asOf: string;
+  lastPurchasedAt?: string;
+  lineCount: number;
+  comparableCurrentTotal: number;
+  comparablePreviousTotal: number;
+  comparableDelta: number;
+  comparableDeltaPercent: number;
+  missingCurrentPriceProductIds: string[];
+  changeSummary: RecurringBasketChangeSummary;
+  headline: string;
+  lines: RecurringBasketDigestLine[];
+  guardrails: string[];
+};
+
 export function compareBasketStrategies(input: BasketComparisonInput): BasketComparisonResult {
   const favoriteSet = new Set(input.favoriteStoreIds);
+  const enabledMemberSet = new Set(input.enabledMemberStoreIds ?? []);
   const missingProductIds: string[] = [];
+  const excludedMemberPriceProductIds = new Set<string>();
   const assignments: BasketAssignment[] = [];
   const storeTotals = new Map<string, SingleStoreOption>();
+  const memberPriceStoreIds = new Set<string>();
+  let memberSavingsTotal = 0;
 
   for (const item of input.items) {
-    const eligiblePrices = item.prices.filter((price) => favoriteSet.has(price.storeId));
+    const favoritePrices = item.prices.filter((price) => favoriteSet.has(price.storeId));
+    const eligiblePrices = favoritePrices.filter((price) => {
+      if (price.priceType !== 'member') return true;
+      const isEnabled = enabledMemberSet.has(price.storeId);
+      if (!isEnabled) excludedMemberPriceProductIds.add(`${item.productId}@${price.storeId}`);
+      return isEnabled;
+    });
     if (eligiblePrices.length === 0) {
       missingProductIds.push(item.productId);
       continue;
     }
 
+    const bestEligibleByStore = new Map<string, StorePrice>();
     for (const price of eligiblePrices) {
+      const current = bestEligibleByStore.get(price.storeId);
+      if (!current || price.price < current.price) bestEligibleByStore.set(price.storeId, price);
+    }
+
+    const shelfBaselineByStore = new Map<string, StorePrice>();
+    for (const price of favoritePrices) {
+      if (price.priceType === 'member') continue;
+      const current = shelfBaselineByStore.get(price.storeId);
+      if (!current || price.price < current.price) shelfBaselineByStore.set(price.storeId, price);
+    }
+
+    for (const price of bestEligibleByStore.values()) {
       const current = storeTotals.get(price.storeId) ?? {
         storeId: price.storeId,
         storeName: price.storeName,
@@ -445,16 +1164,27 @@ export function compareBasketStrategies(input: BasketComparisonInput): BasketCom
       storeTotals.set(price.storeId, current);
     }
 
-    const cheapest = eligiblePrices.reduce((best, candidate) =>
+    const cheapest = [...bestEligibleByStore.values()].reduce((best, candidate) =>
       candidate.price < best.price ? candidate : best
     );
+    const priceType = cheapest.priceType ?? 'shelf';
+    const shelfBaseline = shelfBaselineByStore.get(cheapest.storeId);
+    const memberSavings = priceType === 'member' && shelfBaseline && shelfBaseline.price > cheapest.price
+      ? roundMoney((shelfBaseline.price - cheapest.price) * item.quantity)
+      : undefined;
+    if (priceType === 'member') {
+      memberPriceStoreIds.add(cheapest.storeId);
+      memberSavingsTotal = roundMoney(memberSavingsTotal + (memberSavings ?? 0));
+    }
     assignments.push({
       productId: item.productId,
       storeId: cheapest.storeId,
       storeName: cheapest.storeName,
       quantity: item.quantity,
       unitPrice: cheapest.price,
-      lineTotal: roundMoney(cheapest.price * item.quantity)
+      lineTotal: roundMoney(cheapest.price * item.quantity),
+      priceType,
+      memberSavings
     });
   }
 
@@ -471,7 +1201,10 @@ export function compareBasketStrategies(input: BasketComparisonInput): BasketCom
     bestSingleStore,
     savingsVsBestSingleStore: bestSingleStore ? roundMoney(bestSingleStore.total - cheapestByProduct.total) : 0,
     splitStoreCount: new Set(assignments.map((assignment) => assignment.storeId)).size,
-    missingProductIds
+    missingProductIds,
+    memberSavingsTotal,
+    memberPriceStoreIds: [...memberPriceStoreIds].sort(),
+    excludedMemberPriceProductIds: [...excludedMemberPriceProductIds]
   };
 }
 
@@ -692,6 +1425,137 @@ export function summarizeLocalOfferBasket(input: LocalOfferBasketInput): LocalOf
     stores,
     bestStore: stores[0],
     baselineTotal
+  };
+}
+
+function recurringBasketLineAction(line: {
+  changeType: RecurringBasketChangeType;
+  substituteProductName?: string;
+}): string {
+  if (line.changeType === 'missing_current_price') return 'Do not auto-buy; current verified price is missing.';
+  if (line.changeType === 'new_item') return 'Review once before adding to the recurring basket baseline.';
+  if (line.changeType === 'substitute_available') return `Review suggested substitute before checkout: ${line.substituteProductName}.`;
+  if (line.changeType === 'price_up') return 'Review price increase and compare against substitutes before checkout.';
+  if (line.changeType === 'price_down') return 'Keep in recurring basket; current verified price is lower than the previous shop.';
+  return 'Keep in recurring basket; price is effectively unchanged.';
+}
+
+export function planRecurringBasketDigest(input: RecurringBasketDigestInput): RecurringBasketDigest {
+  requireNonBlank(input.templateId, 'templateId');
+  requireNonBlank(input.templateName, 'templateName');
+  if (Number.isNaN(Date.parse(input.asOf))) throw new Error('asOf must be an ISO date.');
+  if (input.lastPurchasedAt !== undefined && Number.isNaN(Date.parse(input.lastPurchasedAt))) {
+    throw new Error('lastPurchasedAt must be an ISO date.');
+  }
+
+  const changeSummary: RecurringBasketChangeSummary = {
+    priceUp: 0,
+    priceDown: 0,
+    newItem: 0,
+    missingCurrentPrice: 0,
+    substituteAvailable: 0,
+    unchanged: 0
+  };
+  const missingCurrentPriceProductIds: string[] = [];
+  let comparableCurrentTotal = 0;
+  let comparablePreviousTotal = 0;
+
+  const lines = input.lines.map((line): RecurringBasketDigestLine => {
+    requireNonBlank(line.productId, 'productId');
+    requireNonBlank(line.productName, 'productName');
+    if (!Number.isInteger(line.quantity) || line.quantity <= 0) throw new Error('quantity must be a positive integer.');
+    if (line.currentUnitPrice !== undefined && line.currentUnitPrice !== null && line.currentUnitPrice < 0) {
+      throw new Error('currentUnitPrice must be non-negative.');
+    }
+    if (line.previousUnitPrice !== undefined && line.previousUnitPrice !== null && line.previousUnitPrice < 0) {
+      throw new Error('previousUnitPrice must be non-negative.');
+    }
+
+    const currentUnitPrice = line.currentUnitPrice ?? null;
+    const previousUnitPrice = line.previousUnitPrice ?? null;
+    const currentLineTotal = currentUnitPrice === null ? null : roundMoney(currentUnitPrice * line.quantity);
+    const previousLineTotal = previousUnitPrice === null ? null : roundMoney(previousUnitPrice * line.quantity);
+    const lineDelta = currentLineTotal === null || previousLineTotal === null
+      ? null
+      : roundMoney(currentLineTotal - previousLineTotal);
+    const lineDeltaPercent = lineDelta === null || previousLineTotal === null || previousLineTotal === 0
+      ? null
+      : roundMoney((lineDelta / previousLineTotal) * 100);
+
+    let changeType: RecurringBasketChangeType = 'unchanged';
+    if (currentLineTotal === null) {
+      changeType = 'missing_current_price';
+      missingCurrentPriceProductIds.push(line.productId);
+    } else if (previousLineTotal === null) {
+      changeType = 'new_item';
+    } else if (line.substituteProductName && lineDelta !== null && lineDelta > 0.5) {
+      changeType = 'substitute_available';
+    } else if (lineDelta !== null && lineDelta > 0.5) {
+      changeType = 'price_up';
+    } else if (lineDelta !== null && lineDelta < -0.5) {
+      changeType = 'price_down';
+    }
+
+    if (currentLineTotal !== null && previousLineTotal !== null) {
+      comparableCurrentTotal = roundMoney(comparableCurrentTotal + currentLineTotal);
+      comparablePreviousTotal = roundMoney(comparablePreviousTotal + previousLineTotal);
+    }
+
+    if (lineDelta !== null && lineDelta > 0.5) changeSummary.priceUp += 1;
+    if (changeType === 'price_down') changeSummary.priceDown += 1;
+    if (changeType === 'new_item') changeSummary.newItem += 1;
+    if (changeType === 'missing_current_price') changeSummary.missingCurrentPrice += 1;
+    if (changeType === 'substitute_available') changeSummary.substituteAvailable += 1;
+    if (changeType === 'unchanged') changeSummary.unchanged += 1;
+
+    return {
+      productId: line.productId,
+      productName: line.productName,
+      quantity: line.quantity,
+      currentUnitPrice,
+      previousUnitPrice,
+      currentLineTotal,
+      previousLineTotal,
+      lineDelta,
+      lineDeltaPercent,
+      ...(line.currentStoreName ? { currentStoreName: line.currentStoreName } : {}),
+      ...(line.previousStoreName ? { previousStoreName: line.previousStoreName } : {}),
+      ...(line.substituteProductName ? { substituteProductName: line.substituteProductName } : {}),
+      confidence: clamp(line.confidence ?? 1, 0, 1),
+      changeType,
+      recommendedAction: recurringBasketLineAction({ changeType, substituteProductName: line.substituteProductName })
+    };
+  });
+
+  const comparableDelta = roundMoney(comparableCurrentTotal - comparablePreviousTotal);
+  const comparableDeltaPercent = comparablePreviousTotal === 0
+    ? 0
+    : roundMoney((comparableDelta / comparablePreviousTotal) * 100);
+  const direction = comparableDelta <= 0 ? 'lower' : 'higher';
+  const headline = comparablePreviousTotal === 0
+    ? `${input.templateName} is ready for its first recurring basket baseline.`
+    : `${input.templateName} is ${Math.abs(comparableDeltaPercent).toFixed(2)}% ${direction} than the previous shop on comparable lines.`;
+
+  return {
+    templateId: input.templateId,
+    templateName: input.templateName,
+    cadence: input.cadence,
+    asOf: input.asOf,
+    ...(input.lastPurchasedAt ? { lastPurchasedAt: input.lastPurchasedAt } : {}),
+    lineCount: input.lines.length,
+    comparableCurrentTotal: roundMoney(comparableCurrentTotal),
+    comparablePreviousTotal: roundMoney(comparablePreviousTotal),
+    comparableDelta,
+    comparableDeltaPercent,
+    missingCurrentPriceProductIds,
+    changeSummary,
+    headline,
+    lines,
+    guardrails: [
+      'Only lines with both current and previous verified prices are included in comparable totals.',
+      'Suggested substitutes require user confirmation and never rewrite a saved recurring basket automatically.',
+      'Missing current prices block automatic checkout handoff and remain visible in the digest.'
+    ]
   };
 }
 
@@ -1829,6 +2693,513 @@ export function recommendSmartSwaps(input: SmartSwapInput): SmartSwapRecommendat
   return recommendations.sort((a, b) => b.savingsPercent - a.savingsPercent);
 }
 
+export type StockoutBasketLineStatus = 'available' | 'out_of_stock' | 'missing_price' | 'retailer_unavailable';
+
+export type StockoutBasketLine = {
+  basketLineId: string;
+  productId: string;
+  productName: string;
+  category: string;
+  packageSize: number;
+  packageUnit: string;
+  brandTier: BrandTier;
+  unitPrice: number;
+  requestedQuantity: number;
+  status: StockoutBasketLineStatus;
+};
+
+export type StockoutSubstitutionPolicy = {
+  allowPrivateLabel?: boolean;
+  minimumConfidence?: MatchConfidence;
+  maxUnitPriceIncreasePercent?: number;
+  blockedCategories?: string[];
+  dietaryTagsRequired?: string[];
+};
+
+export type StockoutSubstitutionCandidate = {
+  productId: string;
+  productName: string;
+  category: string;
+  packageSize: number;
+  packageUnit: string;
+  brandTier: BrandTier;
+  unitPrice: number;
+  inStock: boolean;
+  source: string;
+  observedAt: string;
+  dietaryTags?: string[];
+};
+
+export type StockoutSubstitutionOption = {
+  productId: string;
+  productName: string;
+  lineTotal: number;
+  unitPrice: number;
+  priceDeltaPercent: number;
+  confidence: MatchConfidence;
+  qualityRisk: QualityRisk;
+  reason: string;
+  source: string;
+  observedAt: string;
+  replacementAccepted: false;
+};
+
+export type RejectedStockoutSubstitutionCandidate = {
+  productId: string;
+  reason: string;
+};
+
+export type StockoutSubstitutionPlan = {
+  status: 'not_needed' | 'substitution_options' | 'blocked';
+  basketLineId: string;
+  lineStatus: StockoutBasketLineStatus;
+  options: StockoutSubstitutionOption[];
+  rejectedCandidates: RejectedStockoutSubstitutionCandidate[];
+  guardrails: string[];
+};
+
+const matchConfidenceOrder: Record<MatchConfidence, number> = {
+  low: 0,
+  'medium-low': 1,
+  medium: 2,
+  high: 3
+};
+
+function confidenceClearsMinimum(confidence: MatchConfidence, minimum: MatchConfidence): boolean {
+  return matchConfidenceOrder[confidence] >= matchConfidenceOrder[minimum];
+}
+
+function candidateAsMatchInput(candidate: StockoutSubstitutionCandidate): ProductMatchInput {
+  return {
+    id: candidate.productId,
+    brand: candidate.productName,
+    category: candidate.category,
+    packageSize: candidate.packageSize,
+    packageUnit: candidate.packageUnit,
+    brandTier: candidate.brandTier,
+    unitPrice: candidate.unitPrice
+  };
+}
+
+export function planStockoutSubstitutionOptions(input: {
+  basketLine: StockoutBasketLine;
+  candidates: StockoutSubstitutionCandidate[];
+  acceptableSubstitutionPolicy?: StockoutSubstitutionPolicy;
+}): StockoutSubstitutionPlan {
+  const { basketLine } = input;
+  const policy = input.acceptableSubstitutionPolicy ?? {};
+  const rejectedCandidates: RejectedStockoutSubstitutionCandidate[] = [];
+  const guardrails = [
+    'Substitution options are never auto-accepted; the shopper must confirm before a basket line changes.',
+    'Only verified in-stock candidate rows with comparable package evidence can be offered.',
+    'Dietary and blocked-category policies fail closed before price savings are considered.'
+  ];
+
+  if (basketLine.status === 'available') {
+    return {
+      status: 'not_needed',
+      basketLineId: basketLine.basketLineId,
+      lineStatus: basketLine.status,
+      options: [],
+      rejectedCandidates: [],
+      guardrails
+    };
+  }
+
+  const blockedCategories = new Set(policy.blockedCategories ?? []);
+  const dietaryTagsRequired = policy.dietaryTagsRequired ?? [];
+  const minimumConfidence = policy.minimumConfidence ?? 'medium-low';
+  const maxUnitPriceIncreasePercent = policy.maxUnitPriceIncreasePercent ?? 0;
+
+  const sourceMatchInput: ProductMatchInput = {
+    id: basketLine.productId,
+    brand: basketLine.productName,
+    category: basketLine.category,
+    packageSize: basketLine.packageSize,
+    packageUnit: basketLine.packageUnit,
+    brandTier: basketLine.brandTier,
+    unitPrice: basketLine.unitPrice
+  };
+
+  const options: StockoutSubstitutionOption[] = [];
+
+  for (const candidate of input.candidates) {
+    if (!candidate.inStock) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: 'Candidate is not verified in stock.' });
+      continue;
+    }
+    if (blockedCategories.has(candidate.category)) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: 'Candidate category is blocked by shopper policy.' });
+      continue;
+    }
+    if (!policy.allowPrivateLabel && isPrivateLabel(candidate.brandTier)) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: 'Private-label substitutions are not allowed by shopper policy.' });
+      continue;
+    }
+    const candidateTags = new Set(candidate.dietaryTags ?? []);
+    const missingDietaryTags = dietaryTagsRequired.filter((tag) => !candidateTags.has(tag));
+    if (missingDietaryTags.length > 0) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: `Candidate is missing required dietary evidence: ${missingDietaryTags.join(', ')}.` });
+      continue;
+    }
+
+    const match = classifyProductMatch({ source: sourceMatchInput, candidate: candidateAsMatchInput(candidate) });
+    if (match.mode === 'not_recommended') {
+      rejectedCandidates.push({ productId: candidate.productId, reason: match.reason });
+      continue;
+    }
+    if (!confidenceClearsMinimum(match.confidence, minimumConfidence)) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: `Match confidence ${match.confidence} is below required ${minimumConfidence}.` });
+      continue;
+    }
+
+    const priceDeltaPercent = Math.round(((candidate.unitPrice - basketLine.unitPrice) / basketLine.unitPrice) * 10000) / 100;
+    if (priceDeltaPercent > maxUnitPriceIncreasePercent) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: `Unit price increase ${priceDeltaPercent}% exceeds policy limit ${maxUnitPriceIncreasePercent}%.` });
+      continue;
+    }
+
+    options.push({
+      productId: candidate.productId,
+      productName: candidate.productName,
+      unitPrice: candidate.unitPrice,
+      lineTotal: Math.round(candidate.unitPrice * basketLine.requestedQuantity * 100) / 100,
+      priceDeltaPercent,
+      confidence: match.confidence,
+      qualityRisk: match.qualityRisk,
+      reason: match.reason,
+      source: candidate.source,
+      observedAt: candidate.observedAt,
+      replacementAccepted: false
+    });
+  }
+
+  return {
+    status: options.length > 0 ? 'substitution_options' : 'blocked',
+    basketLineId: basketLine.basketLineId,
+    lineStatus: basketLine.status,
+    options: options.sort((a, b) => a.unitPrice - b.unitPrice || matchConfidenceOrder[b.confidence] - matchConfidenceOrder[a.confidence]),
+    rejectedCandidates,
+    guardrails
+  };
+}
+
+export type DietarySubstitutionIntent = 'dairy_free' | 'gluten_free' | 'vegan' | 'halal' | 'kosher' | 'medical' | 'general';
+
+export type DietarySubstitutionProduct = {
+  productId: string;
+  productName: string;
+  category: string;
+  packageSize: number;
+  packageUnit: string;
+  unitPrice: number;
+  dietaryTags: string[];
+  brandTier: BrandTier;
+};
+
+export type DietarySubstitutionCandidate = DietarySubstitutionProduct & {
+  allergenTags?: string[];
+  evidenceSource: string;
+  observedAt: string;
+};
+
+export type DietarySubstitutionPreference = {
+  profileId: string;
+  requiredDietaryTags: string[];
+  blockedDietaryTags: string[];
+  allergenAvoidanceTags: string[];
+  substitutionIntent: DietarySubstitutionIntent;
+  maxUnitPriceIncreasePercent: number;
+};
+
+export type DietarySubstitutionRecommendation = {
+  productId: string;
+  productName: string;
+  category: string;
+  unitPrice: number;
+  unitPriceDeltaPercent: number;
+  dietaryTagsMatched: string[];
+  evidenceSource: string;
+  observedAt: string;
+  confidence: MatchConfidence;
+  confirmationRequired: true;
+  reason: string;
+};
+
+export type BlockedDietarySubstitutionCandidate = {
+  productId: string;
+  reason: string;
+};
+
+export type DietarySubstitutionAssistantPlan = {
+  status: 'recommendations' | 'blocked';
+  profileId: string;
+  substitutionIntent: DietarySubstitutionIntent;
+  recommendations: DietarySubstitutionRecommendation[];
+  blockedCandidates: BlockedDietarySubstitutionCandidate[];
+  guardrails: string[];
+};
+
+const medicalDietCategories = new Set(['baby_formula', 'medical_diet', 'clinical_nutrition']);
+
+const dietaryEquivalentCategories: Partial<Record<DietarySubstitutionIntent, Record<string, string[]>>> = {
+  dairy_free: {
+    milk: ['milk', 'dairy_substitute', 'beverages'],
+    yogurt: ['yogurt', 'dairy_substitute'],
+    butter: ['butter', 'plant_based_spread']
+  },
+  vegan: {
+    milk: ['dairy_substitute', 'beverages'],
+    meat: ['plant_based_protein'],
+    yogurt: ['dairy_substitute']
+  },
+  gluten_free: {
+    pasta: ['pasta', 'gluten_free_pasta'],
+    bread: ['bread', 'gluten_free_bread']
+  }
+};
+
+function categoriesCompatibleForDietarySubstitution(source: DietarySubstitutionProduct, candidate: DietarySubstitutionCandidate, intent: DietarySubstitutionIntent): boolean {
+  if (source.category === candidate.category) return true;
+  return dietaryEquivalentCategories[intent]?.[source.category]?.includes(candidate.category) ?? false;
+}
+
+export function planDietarySubstitutionAssistant(input: {
+  source: DietarySubstitutionProduct;
+  preference: DietarySubstitutionPreference;
+  candidates: DietarySubstitutionCandidate[];
+}): DietarySubstitutionAssistantPlan {
+  requireNonBlank(input.preference.profileId, 'profileId');
+  requireNonBlank(input.source.productId, 'productId');
+  requireNonBlank(input.source.productName, 'productName');
+  if (input.preference.maxUnitPriceIncreasePercent < 0) throw new Error('maxUnitPriceIncreasePercent must be non-negative.');
+
+  const guardrails = [
+    'No dietary swap is auto-applied; the shopper must confirm every replacement.',
+    'Required dietary evidence and allergen avoidance rules fail closed before savings are considered.',
+    'Medical and infant diet substitutions require professional confirmation and are blocked from automatic recommendations.'
+  ];
+  const blockedCandidates: BlockedDietarySubstitutionCandidate[] = [];
+
+  if (medicalDietCategories.has(input.source.category) || input.preference.substitutionIntent === 'medical') {
+    return {
+      status: 'blocked',
+      profileId: input.preference.profileId,
+      substitutionIntent: input.preference.substitutionIntent,
+      recommendations: [],
+      blockedCandidates: input.candidates.map((candidate) => ({
+        productId: candidate.productId,
+        reason: 'Medical or infant diet categories require professional confirmation and cannot be suggested automatically.'
+      })),
+      guardrails
+    };
+  }
+
+  const requiredDietaryTags = input.preference.requiredDietaryTags;
+  const blockedDietaryTags = new Set(input.preference.blockedDietaryTags);
+  const allergenAvoidanceTags = new Set(input.preference.allergenAvoidanceTags);
+  const recommendations: DietarySubstitutionRecommendation[] = [];
+
+  for (const candidate of input.candidates) {
+    requireNonBlank(candidate.productId, 'candidate.productId');
+    requireNonBlank(candidate.productName, 'candidate.productName');
+    requireNonBlank(candidate.evidenceSource, 'candidate.evidenceSource');
+
+    const candidateDietaryTags = new Set(candidate.dietaryTags);
+    const candidateAllergenTags = new Set(candidate.allergenTags ?? []);
+    const missingDietaryTags = requiredDietaryTags.filter((tag) => !candidateDietaryTags.has(tag));
+    if (missingDietaryTags.length > 0) {
+      blockedCandidates.push({ productId: candidate.productId, reason: `Candidate is missing required dietary evidence: ${missingDietaryTags.join(', ')}.` });
+      continue;
+    }
+    const blockedTags = candidate.dietaryTags.filter((tag) => blockedDietaryTags.has(tag));
+    if (blockedTags.length > 0) {
+      blockedCandidates.push({ productId: candidate.productId, reason: `Candidate contains blocked dietary evidence: ${blockedTags.join(', ')}.` });
+      continue;
+    }
+    const blockedAllergens = [...candidateAllergenTags].filter((tag) => allergenAvoidanceTags.has(tag));
+    if (blockedAllergens.length > 0) {
+      blockedCandidates.push({ productId: candidate.productId, reason: `Candidate contains blocked allergen evidence: ${blockedAllergens.join(', ')}.` });
+      continue;
+    }
+    if (!categoriesCompatibleForDietarySubstitution(input.source, candidate, input.preference.substitutionIntent)) {
+      blockedCandidates.push({ productId: candidate.productId, reason: 'Candidate category is not compatible with the requested dietary substitution intent.' });
+      continue;
+    }
+    if (input.source.packageUnit.toLowerCase() !== candidate.packageUnit.toLowerCase() || Math.abs(input.source.packageSize - candidate.packageSize) > Math.max(1, input.source.packageSize * 0.1)) {
+      blockedCandidates.push({ productId: candidate.productId, reason: 'Candidate package size is not comparable for dietary substitution.' });
+      continue;
+    }
+
+    const unitPriceDeltaPercent = Math.round(((candidate.unitPrice - input.source.unitPrice) / input.source.unitPrice) * 10000) / 100;
+    if (unitPriceDeltaPercent > input.preference.maxUnitPriceIncreasePercent) {
+      blockedCandidates.push({ productId: candidate.productId, reason: `Unit price increase ${unitPriceDeltaPercent}% exceeds dietary preference limit ${input.preference.maxUnitPriceIncreasePercent}%.` });
+      continue;
+    }
+
+    recommendations.push({
+      productId: candidate.productId,
+      productName: candidate.productName,
+      category: candidate.category,
+      unitPrice: candidate.unitPrice,
+      unitPriceDeltaPercent,
+      dietaryTagsMatched: requiredDietaryTags.filter((tag) => candidateDietaryTags.has(tag)),
+      evidenceSource: candidate.evidenceSource,
+      observedAt: candidate.observedAt,
+      confidence: sourceAndCandidateShareCategory(input.source, candidate) ? 'high' : 'medium',
+      confirmationRequired: true,
+      reason: sourceAndCandidateShareCategory(input.source, candidate)
+        ? 'Same category and required dietary evidence match.'
+        : 'Dietary substitution intent allows this verified cross-category replacement.'
+    });
+  }
+
+  return {
+    status: recommendations.length > 0 ? 'recommendations' : 'blocked',
+    profileId: input.preference.profileId,
+    substitutionIntent: input.preference.substitutionIntent,
+    recommendations: recommendations.sort((a, b) => a.unitPriceDeltaPercent - b.unitPriceDeltaPercent || b.confidence.localeCompare(a.confidence)),
+    blockedCandidates,
+    guardrails
+  };
+}
+
+function sourceAndCandidateShareCategory(source: DietarySubstitutionProduct, candidate: DietarySubstitutionCandidate): boolean {
+  return source.category === candidate.category;
+}
+
+export type ComparableCommodityUnit = 'kg' | 'l' | 'st';
+
+export type CommodityPriceObservation = {
+  commodityId: string;
+  commodityName?: string;
+  productId: string;
+  productName: string;
+  chainId: string;
+  chainName?: string;
+  unitPrice: number;
+  comparableUnit: ComparableCommodityUnit;
+  sourceConfidence: number;
+  observedAt?: string;
+  variant?: string;
+  isOrganic?: boolean;
+  originCountry?: string;
+};
+
+export type CommodityComparisonRow = {
+  rank: number;
+  commodityId: string;
+  commodityName: string;
+  productId: string;
+  productName: string;
+  chainId: string;
+  chainName: string;
+  unitPrice: number;
+  comparableUnit: ComparableCommodityUnit;
+  sourceConfidence: number;
+  observedAt?: string;
+  variant?: string;
+  isOrganic?: boolean;
+  originCountry?: string;
+  priceGapToNext: number;
+  savingsVsNextPercent: number;
+};
+
+export type CommodityComparison = {
+  status: 'priced' | 'insufficient_coverage';
+  commodityId: string;
+  commodityName: string;
+  comparableUnit: ComparableCommodityUnit;
+  rows: CommodityComparisonRow[];
+  cheapestChain: CommodityComparisonRow | null;
+  coverage: {
+    chainCount: number;
+    observationCount: number;
+    rejectedObservationCount: number;
+    comparableUnit: ComparableCommodityUnit;
+  };
+  confidenceLabel: string;
+};
+
+export function compareCommodityUnitPrices(input: {
+  commodityId: string;
+  commodityName: string;
+  comparableUnit: ComparableCommodityUnit;
+  observations: CommodityPriceObservation[];
+  minimumConfidence?: number;
+}): CommodityComparison {
+  const minimumConfidence = input.minimumConfidence ?? 0.6;
+  const accepted = input.observations.filter((observation) =>
+    observation.commodityId === input.commodityId &&
+    observation.comparableUnit === input.comparableUnit &&
+    Number.isFinite(observation.unitPrice) &&
+    observation.unitPrice > 0 &&
+    clamp(observation.sourceConfidence, 0, 1) >= minimumConfidence
+  );
+  const rejectedObservationCount = input.observations.length - accepted.length;
+  const bestByChain = new Map<string, CommodityPriceObservation>();
+
+  for (const observation of accepted) {
+    const current = bestByChain.get(observation.chainId);
+    if (
+      !current ||
+      observation.unitPrice < current.unitPrice ||
+      (observation.unitPrice === current.unitPrice && observation.sourceConfidence > current.sourceConfidence) ||
+      (observation.unitPrice === current.unitPrice && observation.sourceConfidence === current.sourceConfidence && observation.productName.localeCompare(current.productName) < 0)
+    ) {
+      bestByChain.set(observation.chainId, observation);
+    }
+  }
+
+  const ranked = [...bestByChain.values()]
+    .sort((left, right) => left.unitPrice - right.unitPrice || right.sourceConfidence - left.sourceConfidence || left.chainId.localeCompare(right.chainId))
+    .map((observation, index, observations): CommodityComparisonRow => {
+      const next = observations[index + 1];
+      const priceGapToNext = next ? roundMoney(next.unitPrice - observation.unitPrice) : 0;
+      const savingsVsNextPercent = next && next.unitPrice > 0 ? roundMoney((priceGapToNext / next.unitPrice) * 100) : 0;
+      return {
+        rank: index + 1,
+        commodityId: input.commodityId,
+        commodityName: input.commodityName,
+        productId: observation.productId,
+        productName: observation.productName,
+        chainId: observation.chainId,
+        chainName: observation.chainName ?? storeNameFromId(observation.chainId),
+        unitPrice: roundMoney(observation.unitPrice),
+        comparableUnit: input.comparableUnit,
+        sourceConfidence: roundMoney(clamp(observation.sourceConfidence, 0, 1)),
+        observedAt: observation.observedAt,
+        variant: observation.variant,
+        isOrganic: observation.isOrganic,
+        originCountry: observation.originCountry,
+        priceGapToNext,
+        savingsVsNextPercent
+      };
+    });
+
+  const averageConfidence = accepted.length === 0 ? 0 : accepted.reduce((sum, observation) => sum + clamp(observation.sourceConfidence, 0, 1), 0) / accepted.length;
+  const status: CommodityComparison['status'] = ranked.length >= 2 ? 'priced' : 'insufficient_coverage';
+  const confidenceLabel = status === 'priced'
+    ? `${ranked.length} chains, ${accepted.length} confidence-cleared commodity/alias match rows; average source confidence ${roundMoney(averageConfidence * 100)}%.`
+    : `${accepted.length} confidence-cleared commodity/alias match rows, but fewer than two chains share ${input.comparableUnit} evidence.`;
+
+  return {
+    status,
+    commodityId: input.commodityId,
+    commodityName: input.commodityName,
+    comparableUnit: input.comparableUnit,
+    rows: ranked,
+    cheapestChain: ranked[0] ?? null,
+    coverage: {
+      chainCount: ranked.length,
+      observationCount: accepted.length,
+      rejectedObservationCount,
+      comparableUnit: input.comparableUnit
+    },
+    confidenceLabel
+  };
+}
+
 export type ProductMatchReviewCandidate = {
   id: string;
   sourceProductId: string;
@@ -1849,6 +3220,20 @@ export type CommunityReportReviewCandidate = {
   createdAt: string;
 };
 
+export type CommodityMappingReviewCandidate = {
+  id: string;
+  commodityId: string;
+  commodityName: string;
+  productId: string;
+  productName: string;
+  alias: string;
+  chainLabel: string;
+  sourceConfidence: number;
+  createdAt: string;
+  reporterId?: string;
+  evidence: string[];
+};
+
 export type CommunityReporterActivity = {
   reporterId: string;
   reportsLast24Hours: number;
@@ -1865,7 +3250,7 @@ export type CommunityReportAbuseControl = {
 
 export type HumanReviewQueueItem = {
   id: string;
-  subjectType: 'product_match' | 'community_report';
+  subjectType: 'product_match' | 'community_report' | 'commodity_mapping';
   subjectId: string;
   priority: 'high' | 'medium' | 'low';
   reason: string;
@@ -1874,7 +3259,14 @@ export type HumanReviewQueueItem = {
 export type HumanReviewDecision = 'approve' | 'reject' | 'needs_more_info';
 
 export type HumanReviewWriteback = {
-  action: 'approve_product_match' | 'reject_product_match' | 'accept_community_report' | 'dismiss_community_report' | 'keep_in_review';
+  action:
+    | 'approve_product_match'
+    | 'reject_product_match'
+    | 'accept_community_report'
+    | 'dismiss_community_report'
+    | 'approve_commodity_mapping'
+    | 'reject_commodity_mapping'
+    | 'keep_in_review';
   subjectId: string;
   reviewedByHuman: boolean;
 };
@@ -1946,6 +3338,7 @@ export type HumanReviewAuthorization = {
 export function planHumanReviewQueue(input: {
   productMatches: ProductMatchReviewCandidate[];
   communityReports: CommunityReportReviewCandidate[];
+  commodityMappings?: CommodityMappingReviewCandidate[];
 }): HumanReviewQueueItem[] {
   const queue: HumanReviewQueueItem[] = [];
 
@@ -1968,6 +3361,18 @@ export function planHumanReviewQueue(input: {
       subjectId: report.id,
       priority: report.confidenceScore < 0.3 ? 'high' : 'medium',
       reason: `Community report ${report.reportType} for ${report.productId} has low confidence score ${report.confidenceScore}.`
+    });
+  }
+
+  for (const mapping of input.commodityMappings ?? []) {
+    const sourceConfidence = roundMoney(clamp(mapping.sourceConfidence, 0, 1));
+    if (sourceConfidence >= 0.75) continue;
+    queue.push({
+      id: `review-${mapping.id}`,
+      subjectType: 'commodity_mapping',
+      subjectId: mapping.id,
+      priority: sourceConfidence < 0.45 ? 'high' : 'medium',
+      reason: `Commodity mapping ${mapping.alias} → ${mapping.commodityName} for ${mapping.productId} has source confidence ${sourceConfidence} and must be validated before shopper-facing coverage.`
     });
   }
 
@@ -2171,6 +3576,14 @@ function writebackFor(item: HumanReviewQueueItem, decision: HumanReviewDecision)
   if (item.subjectType === 'product_match') {
     return {
       action: decision === 'approve' ? 'approve_product_match' : 'reject_product_match',
+      subjectId: item.subjectId,
+      reviewedByHuman: true
+    };
+  }
+
+  if (item.subjectType === 'commodity_mapping') {
+    return {
+      action: decision === 'approve' ? 'approve_commodity_mapping' : 'reject_commodity_mapping',
       subjectId: item.subjectId,
       reviewedByHuman: true
     };
@@ -2393,6 +3806,77 @@ export function summarizeHousehold(snapshot: HouseholdSnapshot, priceByProductId
       itemCount: snapshot.basketItems.filter((item) => item.addedBy === member.userId).length
     })),
     sharedFavoriteStoreIds: [...snapshot.sharedFavoriteStoreIds]
+  };
+}
+
+
+export type ShareableHouseholdListRole = 'viewer' | 'editor';
+
+export type ShareableHouseholdListRecipient = {
+  userId?: string;
+  email?: string;
+  role: ShareableHouseholdListRole;
+};
+
+export type ShareableHouseholdListPermission = {
+  recipient: string;
+  role: ShareableHouseholdListRole;
+  canEdit: boolean;
+  reason: string;
+};
+
+export type ShareableHouseholdListPlan = {
+  householdId: string;
+  householdName: string;
+  requesterUserId: string;
+  canShare: boolean;
+  itemCount: number;
+  memberCount: number;
+  shareTokenRequired: boolean;
+  expiresAt: string | null;
+  permissions: ShareableHouseholdListPermission[];
+  blockers: string[];
+  guardrails: string[];
+};
+
+export function planShareableHouseholdList(snapshot: HouseholdSnapshot, input: {
+  requesterUserId: string;
+  recipients: ShareableHouseholdListRecipient[];
+  expiresAt?: string;
+}): ShareableHouseholdListPlan {
+  const memberIds = new Set(snapshot.members.map((member) => member.userId));
+  const blockers: string[] = [];
+  if (!memberIds.has(input.requesterUserId)) blockers.push('requester_not_household_member');
+  if (input.recipients.some((recipient) => !recipient.userId && recipient.role === 'editor')) blockers.push('external_invite_cannot_edit');
+
+  const permissions = input.recipients.map<ShareableHouseholdListPermission>((recipient) => {
+    const recipientId = recipient.userId ?? recipient.email ?? 'unknown-recipient';
+    const isHouseholdMember = !!recipient.userId && memberIds.has(recipient.userId);
+    const canEdit = recipient.role === 'editor' && isHouseholdMember;
+    return {
+      recipient: recipientId,
+      role: recipient.role,
+      canEdit,
+      reason: canEdit ? 'household_member_editor' : recipient.role === 'editor' ? 'external_or_unknown_view_only' : 'viewer_permission'
+    };
+  });
+
+  return {
+    householdId: snapshot.id,
+    householdName: snapshot.name,
+    requesterUserId: input.requesterUserId,
+    canShare: blockers.length === 0,
+    itemCount: snapshot.basketItems.length,
+    memberCount: snapshot.members.length,
+    shareTokenRequired: true,
+    expiresAt: input.expiresAt ?? null,
+    permissions,
+    blockers,
+    guardrails: [
+      'No anonymous household edits: requester identity must match a signed-in household member before sharing.',
+      'External invite links are view-only until the recipient signs in and joins the household.',
+      'Shared lists expose product ids, quantities, and store preferences only after an expiring share token is minted server-side.'
+    ]
   };
 }
 
@@ -2649,6 +4133,189 @@ export function suggestDealBasedMeals(input: { deals: MealDeal[]; maxMealCost: n
       reason: 'Uses high-scoring current deals across protein, pantry, and vegetables.'
     }
   ];
+}
+
+export type MealCostOffer = {
+  chainId: string;
+  storeName: string;
+  productId: string;
+  productName: string;
+  packageQuantity: number;
+  packageUnit: string;
+  packagePrice: number;
+  confidence: number;
+  source: string;
+};
+
+export type MealCostIngredient = {
+  ingredientId: string;
+  label: string;
+  quantityNeeded: number;
+  unit: string;
+  offers: MealCostOffer[];
+};
+
+export type MealCostBreakdownRow = {
+  ingredientId: string;
+  label: string;
+  quantityNeeded: number;
+  unit: string;
+  selectedProductId: string;
+  productName: string;
+  chainId: string;
+  storeName: string;
+  packageQuantity: number;
+  packageUnit: string;
+  packagePrice: number;
+  ingredientCost: number;
+  confidence: number;
+  source: string;
+};
+
+export type MealCostChainOption = {
+  chainId: string;
+  storeNames: string[];
+  coveredIngredients: number;
+  ingredientCount: number;
+  coverageShare: number;
+  totalCost: number;
+  costPerServing: number;
+  averageConfidence: number;
+  eligible: boolean;
+};
+
+export type MealCostBreakdown = {
+  mealId: string;
+  title: string;
+  servings: number;
+  status: 'priced' | 'insufficient_coverage';
+  totalCost: number;
+  costPerServing: number;
+  cheapestChain: MealCostChainOption | null;
+  breakdown: MealCostBreakdownRow[];
+  chainOptions: MealCostChainOption[];
+  coverage: {
+    ingredientCount: number;
+    matchedIngredients: number;
+    offerCount: number;
+    eligibleChainCount: number;
+    minimumConfidence: number;
+  };
+  confidenceLabel: string;
+  blockedReason?: string;
+};
+
+function ingredientOfferCost(ingredient: MealCostIngredient, offer: MealCostOffer): number | null {
+  if (ingredient.unit !== offer.packageUnit) return null;
+  if (offer.packageQuantity <= 0 || offer.packagePrice < 0 || ingredient.quantityNeeded <= 0) return null;
+  return roundMoney((ingredient.quantityNeeded / offer.packageQuantity) * offer.packagePrice);
+}
+
+function mealCostRowFor(ingredient: MealCostIngredient, offer: MealCostOffer): MealCostBreakdownRow | null {
+  const ingredientCost = ingredientOfferCost(ingredient, offer);
+  if (ingredientCost === null) return null;
+  return {
+    ingredientId: ingredient.ingredientId,
+    label: ingredient.label,
+    quantityNeeded: ingredient.quantityNeeded,
+    unit: ingredient.unit,
+    selectedProductId: offer.productId,
+    productName: offer.productName,
+    chainId: offer.chainId,
+    storeName: offer.storeName,
+    packageQuantity: offer.packageQuantity,
+    packageUnit: offer.packageUnit,
+    packagePrice: offer.packagePrice,
+    ingredientCost,
+    confidence: offer.confidence,
+    source: offer.source
+  };
+}
+
+function bestMealCostRowForChain(ingredient: MealCostIngredient, chainId: string, minimumConfidence: number): MealCostBreakdownRow | null {
+  return ingredient.offers
+    .filter((offer) => offer.chainId === chainId && offer.confidence >= minimumConfidence)
+    .map((offer) => mealCostRowFor(ingredient, offer))
+    .filter((row): row is MealCostBreakdownRow => row !== null)
+    .sort((a, b) => a.ingredientCost - b.ingredientCost || b.confidence - a.confidence || a.productName.localeCompare(b.productName))[0] ?? null;
+}
+
+export function calculateMealCostBreakdown(input: {
+  mealId: string;
+  title: string;
+  servings: number;
+  ingredients: MealCostIngredient[];
+  minimumConfidence?: number;
+}): MealCostBreakdown {
+  if (!input.mealId.trim()) throw new Error('mealId is required.');
+  if (!input.title.trim()) throw new Error('title is required.');
+  if (input.servings <= 0) throw new Error('servings must be positive.');
+  const minimumConfidence = input.minimumConfidence ?? 0.5;
+  if (minimumConfidence < 0 || minimumConfidence > 1) throw new Error('minimumConfidence must be between 0 and 1.');
+  for (const ingredient of input.ingredients) {
+    if (!ingredient.ingredientId.trim()) throw new Error('ingredientId is required.');
+    if (!ingredient.label.trim()) throw new Error(`label is required for ${ingredient.ingredientId}.`);
+    if (ingredient.quantityNeeded <= 0) throw new Error(`quantityNeeded must be positive for ${ingredient.ingredientId}.`);
+  }
+
+  const chainIds = [...new Set(input.ingredients.flatMap((ingredient) => ingredient.offers.map((offer) => offer.chainId)))].sort();
+  const chainRows = new Map<string, MealCostBreakdownRow[]>();
+  const chainOptions = chainIds.map((chainId): MealCostChainOption => {
+    const rows = input.ingredients
+      .map((ingredient) => bestMealCostRowForChain(ingredient, chainId, minimumConfidence))
+      .filter((row): row is MealCostBreakdownRow => row !== null);
+    chainRows.set(chainId, rows);
+    const totalCost = roundMoney(rows.reduce((sum, row) => sum + row.ingredientCost, 0));
+    const averageConfidence = rows.length === 0 ? 0 : Math.round((rows.reduce((sum, row) => sum + row.confidence, 0) / rows.length) * 100) / 100;
+    return {
+      chainId,
+      storeNames: [...new Set(rows.map((row) => row.storeName))].sort(),
+      coveredIngredients: rows.length,
+      ingredientCount: input.ingredients.length,
+      coverageShare: input.ingredients.length === 0 ? 0 : Math.round((rows.length / input.ingredients.length) * 100) / 100,
+      totalCost,
+      costPerServing: roundMoney(totalCost / input.servings),
+      averageConfidence,
+      eligible: rows.length === input.ingredients.length && input.ingredients.length > 0
+    };
+  }).sort((a, b) => {
+    if (a.eligible !== b.eligible) return a.eligible ? -1 : 1;
+    return a.totalCost - b.totalCost || b.averageConfidence - a.averageConfidence || a.chainId.localeCompare(b.chainId);
+  });
+
+  const cheapestChain = chainOptions.find((option) => option.eligible) ?? null;
+  const breakdown = cheapestChain ? (chainRows.get(cheapestChain.chainId) ?? []) : [];
+  const matchedIngredients = new Set(
+    input.ingredients
+      .filter((ingredient) => chainIds.some((chainId) => bestMealCostRowForChain(ingredient, chainId, minimumConfidence) !== null))
+      .map((ingredient) => ingredient.ingredientId)
+  ).size;
+  const offerCount = input.ingredients.reduce((sum, ingredient) => sum + ingredient.offers.filter((offer) => offer.confidence >= minimumConfidence && ingredientOfferCost(ingredient, offer) !== null).length, 0);
+  const status: MealCostBreakdown['status'] = cheapestChain ? 'priced' : 'insufficient_coverage';
+  const averageConfidencePct = cheapestChain ? Math.round(cheapestChain.averageConfidence * 100) : 0;
+
+  return {
+    mealId: input.mealId,
+    title: input.title,
+    servings: input.servings,
+    status,
+    totalCost: cheapestChain?.totalCost ?? 0,
+    costPerServing: cheapestChain?.costPerServing ?? 0,
+    cheapestChain,
+    breakdown,
+    chainOptions,
+    coverage: {
+      ingredientCount: input.ingredients.length,
+      matchedIngredients,
+      offerCount,
+      eligibleChainCount: chainOptions.filter((option) => option.eligible).length,
+      minimumConfidence
+    },
+    confidenceLabel: cheapestChain
+      ? `${matchedIngredients}/${input.ingredients.length} ingredients priced from real ingredient offer rows; ${chainOptions.filter((option) => option.eligible).length} eligible chains; average confidence ${averageConfidencePct}%.`
+      : `${matchedIngredients}/${input.ingredients.length} ingredients have real ingredient offer rows, but no single chain covers the full recipe.`,
+    ...(cheapestChain ? {} : { blockedReason: 'No single chain has confidence-cleared offers for every ingredient, so the meal cost stays withheld.' })
+  };
 }
 
 export type ExpiryDealReport = {
@@ -2938,6 +4605,8 @@ export type PersonalInflationContribution = {
   confidence: 'high' | 'medium' | 'low';
 };
 
+export type PersonalInflationConfidence = 'high' | 'medium' | 'low';
+
 export type PersonalInflationSummary = {
   baseDate: string;
   currentDate: string;
@@ -2945,7 +4614,7 @@ export type PersonalInflationSummary = {
   changeAmount: number;
   baseSpend: number;
   currentSpend: number;
-  confidence: string;
+  confidence: PersonalInflationConfidence;
   itemContributions: PersonalInflationContribution[];
   categoryContributions: { category: string; changePercent: number; spend: number }[];
   missingProductIds: string[];
@@ -2962,7 +4631,7 @@ function personalInflationConfidenceRank(c: 'high' | 'medium' | 'low'): number {
   return c === 'high' ? 3 : c === 'medium' ? 2 : 1;
 }
 
-function summarizeInflationChange(changePercent: number): string {
+function summarizeInflationChange(changePercent: number): PersonalInflationConfidence {
   if (changePercent > 5) return 'high';
   if (changePercent > 2) return 'medium';
   return 'low';
@@ -3028,4 +4697,159 @@ export function calculatePersonalGroceryInflation(input: PersonalInflationInput)
     categoryContributions,
     missingProductIds
   };
+}
+
+// ── Chain price index ────────────────────────────────────────────────────────
+// Cross-chain "how expensive is this chain" index on a 100-centred scale where
+// 100 = the market median for a category. Designed to stay comparable even when
+// chains carry different products and coverage is sparse — the explicit ask of
+// "for chains we don't have full price information, design a way to do similar":
+//   1. caller normalises to unit price (SEK per comparable unit),
+//   2. per category the market reference = median unit price across ALL chains,
+//      and each chain's category median is expressed as a ratio to it (so a chain
+//      is only ever judged against the market for the categories it actually
+//      carries — no cross-chain product matching needed),
+//   3. thin cells are shrunk toward 1.0 (market) by pseudo-observations, so a
+//      single observation can't swing the index,
+//   4. categories aggregate via a market-size-weighted GEOMETRIC mean (symmetric
+//      to up/down moves),
+//   5. coverage + confidence are reported per cell and overall, and low-coverage
+//      cells are flagged `estimated` so the UI can mark modelled values honestly.
+// Matched-basket refinement (EAN / fuzzy product matching) can layer on top later
+// for the categories where it's available, raising confidence without changing
+// the scale.
+
+export type ChainPriceObservation = {
+  chainId: string;
+  category: string;
+  unitPrice: number; // SEK per comparable unit (kg / l / pcs)
+};
+
+export type ChainCategoryIndex = {
+  category: string;
+  index: number; // 100 = market median for the category
+  observations: number;
+  marketReference: number; // market median unit price for the category
+  confidence: 'high' | 'medium' | 'low';
+  estimated: boolean; // true when coverage is below the confident threshold
+};
+
+export type ChainPriceIndex = {
+  chainId: string;
+  overallIndex: number; // 100 = market-median basket
+  observations: number;
+  categoriesCovered: number;
+  confidence: 'high' | 'medium' | 'low';
+  byCategory: ChainCategoryIndex[];
+};
+
+export type ChainPriceIndexSummary = {
+  chains: ChainPriceIndex[]; // sorted cheapest (lowest index) first
+  categories: string[]; // every category present in the market
+  marketReferenceByCategory: Record<string, number>;
+  generatedFrom: number; // total observations used
+};
+
+const CHAIN_INDEX_SHRINKAGE_PRIOR = 4; // pseudo-observations pulling a cell toward the market
+const CHAIN_INDEX_MIN_CONFIDENT = 4; // observations before a cell is "measured" not "estimated"
+
+function weightedGeometricMean(values: number[], weights: number[]): number {
+  let weightSum = 0;
+  let logSum = 0;
+  for (let i = 0; i < values.length; i += 1) {
+    const value = values[i];
+    if (!Number.isFinite(value) || value <= 0) continue;
+    const weight = weights[i] ?? 1;
+    logSum += weight * Math.log(value);
+    weightSum += weight;
+  }
+  if (weightSum === 0) return 0;
+  return Math.exp(logSum / weightSum);
+}
+
+export function calculateChainPriceIndex(observations: ChainPriceObservation[]): ChainPriceIndexSummary {
+  const usable = observations.filter(
+    (o) => Number.isFinite(o.unitPrice) && o.unitPrice > 0 && Boolean(o.chainId) && Boolean(o.category)
+  );
+  if (usable.length === 0) {
+    return { chains: [], categories: [], marketReferenceByCategory: {}, generatedFrom: 0 };
+  }
+
+  // Market reference (median unit price) + size per category, across all chains.
+  const marketByCategory = new Map<string, number[]>();
+  for (const o of usable) {
+    const arr = marketByCategory.get(o.category) ?? [];
+    arr.push(o.unitPrice);
+    marketByCategory.set(o.category, arr);
+  }
+  const marketReferenceByCategory: Record<string, number> = {};
+  const marketCategorySize: Record<string, number> = {};
+  for (const [category, prices] of marketByCategory) {
+    marketReferenceByCategory[category] = median(prices);
+    marketCategorySize[category] = prices.length;
+  }
+  const categories = [...marketByCategory.keys()].sort((a, b) => a.localeCompare(b));
+
+  // Group observations by chain.
+  const byChain = new Map<string, ChainPriceObservation[]>();
+  for (const o of usable) {
+    const arr = byChain.get(o.chainId) ?? [];
+    arr.push(o);
+    byChain.set(o.chainId, arr);
+  }
+
+  const chains: ChainPriceIndex[] = [];
+  for (const [chainId, rows] of byChain) {
+    const chainByCategory = new Map<string, number[]>();
+    for (const r of rows) {
+      const arr = chainByCategory.get(r.category) ?? [];
+      arr.push(r.unitPrice);
+      chainByCategory.set(r.category, arr);
+    }
+
+    const byCategory: ChainCategoryIndex[] = [];
+    const ratios: number[] = [];
+    const weights: number[] = [];
+    for (const [category, prices] of chainByCategory) {
+      const reference = marketReferenceByCategory[category];
+      if (!reference || reference <= 0) continue;
+      const n = prices.length;
+      const rawRatio = median(prices) / reference;
+      // Shrink toward the market (1.0) by CHAIN_INDEX_SHRINKAGE_PRIOR pseudo-obs.
+      const adjustedRatio = (n * rawRatio + CHAIN_INDEX_SHRINKAGE_PRIOR) / (n + CHAIN_INDEX_SHRINKAGE_PRIOR);
+      byCategory.push({
+        category,
+        index: roundMoney(adjustedRatio * 100),
+        observations: n,
+        marketReference: roundMoney(reference),
+        confidence: n >= 12 ? 'high' : n >= CHAIN_INDEX_MIN_CONFIDENT ? 'medium' : 'low',
+        estimated: n < CHAIN_INDEX_MIN_CONFIDENT
+      });
+      ratios.push(adjustedRatio);
+      weights.push(marketCategorySize[category] ?? 1);
+    }
+
+    byCategory.sort((a, b) => a.category.localeCompare(b.category));
+    const overall = roundMoney(weightedGeometricMean(ratios, weights) * 100) || 100;
+    const totalObs = rows.length;
+    const confidence =
+      totalObs >= 30 && byCategory.length >= 4
+        ? 'high'
+        : totalObs >= 10 && byCategory.length >= 2
+          ? 'medium'
+          : 'low';
+
+    chains.push({
+      chainId,
+      overallIndex: overall,
+      observations: totalObs,
+      categoriesCovered: byCategory.length,
+      confidence,
+      byCategory
+    });
+  }
+
+  chains.sort((a, b) => a.overallIndex - b.overallIndex);
+
+  return { chains, categories, marketReferenceByCategory, generatedFrom: usable.length };
 }

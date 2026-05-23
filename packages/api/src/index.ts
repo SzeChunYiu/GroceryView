@@ -2,22 +2,47 @@ import {
   buildPriceChartSeries,
   buildExpiryDealRadar,
   buildWatchlistAlerts,
+  calculateBrandTierIndices,
+  calculateChainPriceIndex,
   calculateDealScore,
   calculateFixedBasketIndex,
   compareBasketStrategies,
+  planBasketFulfillmentSlots,
+  planBasketImportExport,
+  planBasketTripCost,
+  planRetailerBasketTransferSession,
+  planRetailerHandoff,
   createHouseholdState,
   rankNutritionPerKrona,
   planPantryReplenishment,
+  planRecurringBasketDigest,
   reviewReceiptScan,
   scoreBand,
   searchProducts,
   summarizeBudget,
+  summarizePriceHistoryConfidence,
   summarizePriceHistory,
   summarizeHousehold,
   summarizeLocalOfferBasket,
   suggestDealBasedMeals,
   type BasketComparisonResult,
+  type BasketImportExportCapturedLine,
+  type BasketImportExportPlan,
+  type BasketImportExportReviewItem,
+  type BasketImportExportSource,
+  type BasketFulfillmentSlotsPlan,
+  type BasketFulfillmentSlotInput,
+  type BasketTripCostPlan,
+  type BasketTripCostTravelMode,
+  type RetailerBasketTransferSession,
+  type RetailerHandoffPlan,
+  type RetailerHandoffSupport,
+  type BrandTierIndexSummary,
+  type BrandTierPriceObservation,
+  type BrandTier,
   type BudgetSummary,
+  type ChainPriceIndexSummary,
+  type ChainPriceObservation,
   type ExpiryDealRadar,
   type ExpiryDealReport,
   type LocalOfferBasketSummary,
@@ -25,7 +50,10 @@ import {
   type MealSuggestion,
   type PriceChartAdapterResult,
   type PriceChartObservation,
+  type PriceHistoryConfidenceDisclosure,
   type PriceHistorySummary,
+  type RecurringBasketCadence,
+  type RecurringBasketDigest,
   type ReceiptReview,
   type HouseholdBasketItem,
   type HouseholdMember,
@@ -78,6 +106,201 @@ export type ProductDetail = SearchableProduct & {
     discountDepthPercent: number;
     sourceConfidence: number;
   };
+};
+
+
+
+export type BasketFulfillmentSlotsReport = BasketFulfillmentSlotsPlan & {
+  userId: string;
+  basketItemCount: number;
+};
+
+export type BasketImportExportRequest = {
+  source: BasketImportExportSource;
+  capturedLines: BasketImportExportCapturedLine[];
+};
+
+export type BasketImportExportReport = BasketImportExportPlan & {
+  userId: string;
+  importedItemCount: number;
+  reviewItemCount: number;
+  basketItemCount: number;
+};
+
+export type BasketImportReviewStatus = 'open' | 'accepted' | 'dismissed';
+
+export type BasketImportReviewItem = BasketImportExportReviewItem & {
+  reviewItemId: string;
+  retailerId: string;
+  sourceKind: BasketImportExportSource['sourceKind'];
+  capturedAt: string;
+  status: BasketImportReviewStatus;
+  createdAt: string;
+  resolvedAt?: string;
+  resolvedProductId?: string;
+};
+
+export type BasketImportReviewQueue = {
+  userId: string;
+  openItemCount: number;
+  items: BasketImportReviewItem[];
+  guardrails: string[];
+};
+
+export type BasketImportReviewDecisionRequest = {
+  decision: 'accept_as_product' | 'dismiss';
+  productId?: string;
+  quantity?: number;
+};
+
+export type ProductCheapestNowChainPrice = {
+  chain: string;
+  storeId: string;
+  storeName: string;
+  packagePrice: number;
+  comparableUnitPrice: number;
+  comparableUnit: string;
+};
+
+export type ProductCheapestNow = {
+  productId: string;
+  productName: string;
+  category: string;
+  currency: 'SEK';
+  cheapest: ProductCheapestNowChainPrice | null;
+  chainPrices: ProductCheapestNowChainPrice[];
+  chainCount: number;
+  observedPriceCount: number;
+  lastObservedAt: string | null;
+  guardrails: string[];
+};
+
+export type ProductLatestPriceConfidence = 'high' | 'medium' | 'low';
+
+export type ProductLatestPriceInput = {
+  observationId?: string;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  storeSlug?: string;
+  storeName?: string;
+  chainSlug?: string;
+  chainName?: string;
+  price?: number;
+  unitPrice?: number;
+  currency?: string;
+  priceType?: ProductPriceHistoryPriceType;
+  confidence?: number;
+  observedAt?: string;
+  provenance?: Record<string, unknown>;
+};
+
+export type ProductLatestPrice = {
+  observationId: string;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  storeId: string;
+  storeName: string;
+  chain: string;
+  chainName: string;
+  price: number;
+  unitPrice: number;
+  currency: 'SEK';
+  priceType: ProductPriceHistoryPriceType;
+  confidence: ProductLatestPriceConfidence;
+  confidenceScore: number;
+  observedAt: string;
+  sourceType: string;
+  provenance: Record<string, unknown>;
+};
+
+export type ProductCheapestNowPriceRow = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+  categoryPath: string[];
+  comparableUnit: string;
+  price?: number;
+  unitPrice?: number;
+  currency?: string;
+  observedAt?: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeSlug?: string;
+  storeName?: string;
+};
+
+export const productCheapestNowEndpoint = {
+  method: 'GET',
+  controllerPath: 'products/:productId',
+  actionPath: 'cheapest-now',
+  path: '/products/:productId/cheapest-now',
+  pathParams: ['productId']
+} as const;
+
+export type CategoryPriceIndex = {
+  id: string;
+  category: string;
+  label: string;
+  value: number;
+  movementPercent: number;
+  productCount: number;
+  baseDate: string;
+  currentDate: string;
+};
+
+export type CategoryPriceIndexSummary = {
+  currency: 'SEK';
+  indices: CategoryPriceIndex[];
+  generatedFrom: number;
+  guardrails: string[];
+};
+
+export type BrandPriceIndexSummary = BrandTierIndexSummary & {
+  currency: 'SEK';
+  generatedFrom: number;
+  guardrails: string[];
+};
+
+export const realChainPriceIndicesEndpoint = {
+  method: 'GET',
+  controllerPath: 'indices',
+  actionPath: 'chains',
+  path: '/indices/chains'
+} as const;
+
+export const realCategoryPriceIndicesEndpoint = {
+  method: 'GET',
+  controllerPath: 'indices',
+  actionPath: 'categories',
+  path: '/indices/categories'
+} as const;
+
+export const realBrandPriceIndicesEndpoint = {
+  method: 'GET',
+  controllerPath: 'indices',
+  actionPath: 'brands',
+  path: '/indices/brands'
+} as const;
+
+export type RealPriceIndexRow = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+  categoryPath: string[];
+  chainSlug?: string;
+  brand?: string;
+  privateLabelOwner?: string;
+  baseUnitPrice?: number;
+  currentUnitPrice?: number;
+  baseObservedAt?: string;
+  currentObservedAt?: string;
+};
+
+export type RealChainPriceIndexSummary = ChainPriceIndexSummary & {
+  currency: 'SEK';
+  guardrails: string[];
 };
 
 export type CanonicalPriceType =
@@ -280,6 +503,39 @@ export type LocalOfferBasketReport = LocalOfferBasketSummary & {
   guardrails: string[];
 };
 
+export type RecurringBasketDigestRequest = {
+  templateId: string;
+  templateName: string;
+  cadence: RecurringBasketCadence;
+  asOf: string;
+  lastPurchasedAt?: string;
+};
+
+
+export type BasketTripCostRequest = {
+  travelMode: BasketTripCostTravelMode;
+  valueOfTimePerHour?: number;
+  carCostPerKm?: number;
+  transitFare?: number;
+  splitTripPenalty?: number;
+};
+
+export type BasketTripCostReport = BasketTripCostPlan & {
+  userId: string;
+  itemCount: number;
+  favoriteStoreIds: string[];
+};
+
+export type RetailerHandoffReport = RetailerHandoffPlan & {
+  userId: string;
+  itemCount: number;
+};
+
+export type RetailerBasketTransferSessionReport = RetailerBasketTransferSession & {
+  userId: string;
+  itemCount: number;
+};
+
 export type StoreBasketQuoteLine = {
   productId: string;
   productName: string;
@@ -301,6 +557,51 @@ export type StoreBasketQuote = {
   lines: StoreBasketQuoteLine[];
   missingProductIds: string[];
   warnings: string[];
+};
+
+export type StorePriceCoverageLine = {
+  productId: string;
+  productName: string;
+  category: string;
+  price: number | null;
+  unitPrice: string;
+  priceLabel: 'verified_shelf' | 'missing_price';
+  dealScore: number;
+  band: ReturnType<typeof scoreBand>;
+};
+
+export type StorePriceCoverageReport = {
+  storeId: string;
+  storeName: string;
+  currency: 'SEK';
+  productCount: number;
+  pricedProductCount: number;
+  coveragePercent: number;
+  totalKnownPrice: number;
+  missingProductIds: string[];
+  lines: StorePriceCoverageLine[];
+  guardrails: string[];
+};
+
+export type StoreCategoryCoverageRow = {
+  category: string;
+  productCount: number;
+  pricedProductCount: number;
+  coveragePercent: number;
+  totalKnownPrice: number;
+  missingProductIds: string[];
+  bestDealProductId: string | null;
+  bestDealScore: number | null;
+};
+
+export type StoreCategoryCoverageReport = {
+  storeId: string;
+  storeName: string;
+  currency: 'SEK';
+  categoryCount: number;
+  fullyPricedCategoryCount: number;
+  categories: StoreCategoryCoverageRow[];
+  guardrails: string[];
 };
 
 export type ProductEquivalent = {
@@ -406,6 +707,142 @@ export type ProductPriceSpreadReport = {
   guardrails: string[];
 };
 
+export type ProductHistorySummaryReport = {
+  productId: string;
+  ticker: string;
+  productName: string;
+  summary: PriceHistorySummary;
+  trend: 'new_low' | 'down' | 'up' | 'flat';
+  guardrails: string[];
+};
+
+export type ProductHistoryConfidenceReport = {
+  productId: string;
+  ticker: string;
+  productName: string;
+  disclosure: PriceHistoryConfidenceDisclosure;
+  guardrails: string[];
+};
+
+export type ProductPriceHistoryPriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
+
+export const productPriceHistoryPriceTypes = ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated'] as const satisfies readonly ProductPriceHistoryPriceType[];
+
+export type ProductPriceHistoryObservationInput = {
+  observationId: string;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  chainId: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeId?: string;
+  storeSlug?: string;
+  storeName?: string;
+  sourceRunId?: string;
+  rawRecordId?: string;
+  retailerProductRef?: string;
+  priceType: ProductPriceHistoryPriceType;
+  price: number;
+  regularPrice?: number;
+  unitPrice: number;
+  currency: 'SEK';
+  quantity?: number;
+  quantityUnit?: string;
+  promotionText?: string;
+  promotionStartsOn?: string;
+  promotionEndsOn?: string;
+  memberRequired: boolean;
+  observedAt: string;
+  validFrom?: string;
+  validUntil?: string;
+  confidence: number;
+  provenance: Record<string, unknown>;
+};
+
+export type ProductPriceHistoryProductInput = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+};
+
+export type ProductPriceHistoryAppliedFilters = {
+  priceType?: ProductPriceHistoryPriceType;
+  chain?: string;
+  store?: string;
+  sourceRun?: string;
+  minConfidence?: number;
+  observedFrom?: string;
+  observedTo?: string;
+  limit?: number;
+};
+
+export const productPriceHistoryEndpoint = {
+  method: 'GET',
+  controllerPath: 'products/:productId',
+  actionPath: 'price-history',
+  path: '/products/:productId/price-history',
+  queryParams: ['priceType', 'chain', 'store', 'sourceRun', 'minConfidence', 'from', 'to', 'limit']
+} as const;
+
+export type ProductPriceHistoryPoint = ProductPriceHistoryObservationInput;
+
+export type ProductPriceHistoryEvidenceTable = 'products' | 'observations' | 'chains' | 'stores';
+
+export type ProductPriceHistoryEvidence = {
+  observationCount: number;
+  sourceTables: ProductPriceHistoryEvidenceTable[];
+};
+
+export type ProductPriceHistoryReportOptions = {
+  sourceTables?: readonly ProductPriceHistoryEvidenceTable[];
+};
+
+export type ProductPriceHistoryReport = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+  currency: 'SEK';
+  filters: ProductPriceHistoryAppliedFilters;
+  pointCount: number;
+  observedFrom: string | null;
+  observedTo: string | null;
+  priceTypes: ProductPriceHistoryPriceType[];
+  points: ProductPriceHistoryPoint[];
+  summary: PriceHistorySummary | null;
+  evidence: ProductPriceHistoryEvidence;
+  guardrails: string[];
+};
+
+export type ProductStoreSavingsRow = {
+  storeId: string;
+  storeName: string;
+  price: number;
+  rank: number;
+  savingsVsHighest: number;
+  savingsVsHighestPercent: number;
+  priceLabel: 'best_savings' | 'saves_vs_highest' | 'highest_price';
+};
+
+export type ProductStoreSavingsReport = {
+  productId: string;
+  ticker: string;
+  productName: string;
+  currency: 'SEK';
+  sampleSize: number;
+  bestStoreId: string | null;
+  bestStoreName: string | null;
+  bestPrice: number | null;
+  highestStoreId: string | null;
+  highestStoreName: string | null;
+  highestPrice: number | null;
+  maxSavings: number;
+  maxSavingsPercent: number;
+  rows: ProductStoreSavingsRow[];
+  customerRead: string;
+  guardrails: string[];
+};
+
 export type MarketMover = {
   productId: string;
   ticker: string;
@@ -451,9 +888,139 @@ export type StoreDeal = {
   unitPrice: string;
 };
 
+export type StoreDealSummaryCategory = {
+  category: string;
+  dealCount: number;
+  averageDealScore: number;
+  topProductId: string;
+  topDealScore: number;
+};
+
+export type StoreDealSummaryReport = {
+  storeId: string;
+  storeName: string;
+  dealCount: number;
+  buyVerdictCount: number;
+  averageDealScore: number;
+  topDeal: StoreDeal | null;
+  categories: StoreDealSummaryCategory[];
+  guardrails: string[];
+};
+
+export type FlyerOfferPriceType = 'flyer' | 'member_flyer';
+
+export type FlyerOffer = {
+  offerId: string;
+  flyerId: string;
+  chain: string;
+  storeId: string;
+  storeName: string;
+  branchDistrict: string;
+  productId: string;
+  productName: string;
+  category: string;
+  regularPrice: number;
+  offerPrice: number;
+  savings: number;
+  discountPercent: number;
+  currency: 'SEK';
+  priceType: FlyerOfferPriceType;
+  validFrom: string;
+  validThrough: string;
+  observedAt: string;
+  sourceType: 'weekly_flyer';
+  sourceUrl: string;
+  sourceRunId: string;
+  confidence: number;
+  dealScore: number;
+  band: ReturnType<typeof scoreBand>;
+};
+
+export type FlyerOfferObservationInput = {
+  observationId: string;
+  sourceRunId?: string;
+  rawRecordId?: string;
+  priceType: 'promotion' | 'member';
+  price: number;
+  regularPrice: number;
+  currency: 'SEK';
+  promotionText?: string;
+  promotionStartsOn?: string;
+  promotionEndsOn?: string;
+  memberRequired: boolean;
+  observedAt: string;
+  validFrom?: string;
+  validUntil?: string;
+  confidence: number;
+  provenance: Record<string, unknown>;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  categoryPath: string[];
+  chainId: string;
+  chainSlug: string;
+  chainName: string;
+  storeId: string;
+  storeSlug: string;
+  storeName: string;
+  storeCity?: string;
+};
+
+export type FlyerOfferStoreSummary = {
+  storeId: string;
+  storeName: string;
+  chain: string;
+  offerCount: number;
+  totalOneEachSavings: number;
+  topOfferId: string;
+  topDealScore: number;
+};
+
+export type FlyerOfferReport = {
+  asOf: string;
+  filters: {
+    storeId?: string;
+    chain?: string;
+    category?: string;
+    productId?: string;
+  };
+  offerCount: number;
+  stores: FlyerOfferStoreSummary[];
+  offers: FlyerOffer[];
+  guardrails: string[];
+};
+
+export type StoreFlyerOfferReport = {
+  storeId: string;
+  storeName: string;
+  chain: string;
+  asOf: string;
+  offerCount: number;
+  categoryCount: number;
+  totalOneEachSavings: number;
+  bestOffer: FlyerOffer | null;
+  offers: FlyerOffer[];
+  guardrails: string[];
+};
+
 export type BasketItemRequest = {
   productId: string;
   quantity: number;
+};
+
+export type WatchlistPriceAlertRequest = {
+  productId: string;
+  targetPrice: number;
+  favoriteStoresOnly?: boolean;
+  allowedPriceTypes?: WatchlistPriceType[];
+};
+
+export type WatchlistPriceAlertReport = {
+  userId: string;
+  trackedItemCount: number;
+  alertCount: number;
+  alerts: WatchlistAlert[];
+  guardrails: string[];
 };
 
 export type UserBudgetPatch = {
@@ -617,11 +1184,496 @@ export type NotificationInboxReport = {
   guardrails: string[];
 };
 
+export type RealCatalogPriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
+
+export type RealCatalogSearchPriceRow = {
+  productId: string;
+  slug: string;
+  canonicalName: string;
+  brand?: string;
+  categoryPath: string[];
+  packageSize?: number;
+  packageUnit?: string;
+  comparableUnit: string;
+  imageUrl?: string;
+  observationId?: string;
+  price?: number;
+  unitPrice?: number;
+  currency?: string;
+  priceType?: RealCatalogPriceType;
+  confidence?: number;
+  observedAt?: string;
+  chainId?: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeId?: string;
+  storeSlug?: string;
+  storeName?: string;
+};
+
+export type FacetedProductSearchFilters = {
+  query?: string;
+  categories?: string[];
+  brands?: string[];
+  chains?: string[];
+  stores?: string[];
+  priceTypes?: RealCatalogPriceType[];
+  minPrice?: number;
+  maxPrice?: number;
+  limit?: number;
+};
+
+export const facetedProductSearchEndpoint = {
+  method: 'GET',
+  controllerPath: 'products',
+  actionPath: 'search/faceted',
+  path: '/products/search/faceted',
+  queryParams: ['q', 'category', 'brand', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'limit']
+} as const;
+
+export type FacetedProductSearchResult = {
+  query: string;
+  filters: Required<Pick<FacetedProductSearchFilters, 'categories' | 'brands' | 'chains' | 'stores' | 'priceTypes'>> & {
+    minPrice: number | null;
+    maxPrice: number | null;
+    limit: number;
+  };
+  count: number;
+  products: Array<{
+    productId: string;
+    slug: string;
+    canonicalName: string;
+    brand: string | null;
+    categoryPath: string[];
+    packageSize: number | null;
+    packageUnit: string | null;
+    comparableUnit: string;
+    imageUrl: string | null;
+    cheapestPrice: number | null;
+    currency: string;
+    currentPrices: Array<{
+      observationId: string;
+      price: number;
+      unitPrice: number;
+      currency: string;
+      priceType: RealCatalogPriceType;
+      confidence: number;
+      observedAt: string;
+      chainId: string;
+      chainSlug: string;
+      chainName: string;
+      storeId: string | null;
+      storeSlug: string | null;
+      storeName: string | null;
+    }>;
+  }>;
+  facets: {
+    categories: Array<{ value: string; count: number }>;
+    brands: Array<{ value: string; count: number }>;
+    chains: Array<{ value: string; label: string; count: number }>;
+    stores: Array<{ value: string; label: string; count: number }>;
+    priceTypes: Array<{ value: RealCatalogPriceType; count: number }>;
+    priceRange: { min: number | null; max: number | null };
+  };
+  evidence: {
+    pricedProductCount: number;
+    latestPriceCount: number;
+    sourceTables: ['products', 'latest_prices', 'chains', 'stores'];
+  };
+};
+
+export type RealBasketCompareItem = {
+  productId: string;
+  quantity: number;
+};
+
+export const basketCompareEndpoint = {
+  method: 'POST',
+  controllerPath: '',
+  actionPath: 'baskets/compare',
+  path: '/baskets/compare',
+  bodyFields: ['items', 'storeSlugs']
+} as const;
+
+export const savedBasketCompareEndpoint = {
+  method: 'GET',
+  controllerPath: '',
+  actionPath: 'users/:userId/basket/compare',
+  path: '/users/:userId/basket/compare',
+  pathParams: ['userId'],
+  queryParams: ['stores']
+} as const;
+
+export type RealBasketCompareInput = {
+  userId?: string;
+  items: RealBasketCompareItem[];
+  selectedStoreSlugs?: string[];
+  latestPrices: RealCatalogSearchPriceRow[];
+  basketSource?: 'request_body' | 'weekly_baskets';
+};
+
+export type RealBasketCompareEvidenceTable = 'weekly_baskets' | 'basket_items' | 'products' | 'latest_prices' | 'stores';
+
+export type RealBasketCompareResult = {
+  userId: string | null;
+  currency: 'SEK';
+  itemCount: number;
+  selectedStoreSlugs: string[];
+  strategies: Array<{
+    id: 'cheapest_across_selected' | 'all_at_one_store';
+    label: string;
+    total: number | null;
+    storeCount: number;
+    assignments: Array<{
+      productId: string;
+      slug: string;
+      productName: string;
+      quantity: number;
+      storeSlug: string | null;
+      storeName: string | null;
+      unitPrice: number | null;
+      lineTotal: number | null;
+      priceLabel: 'verified_latest_price' | 'missing_price';
+      observationId?: string;
+      observedAt?: string;
+      confidence?: number;
+    }>;
+    missingProductIds: string[];
+    warnings: string[];
+  }>;
+  missingProductIds: string[];
+  evidence: {
+    basketSource: 'request_body' | 'weekly_baskets';
+    latestPriceCount: number;
+    sourceTables: RealBasketCompareEvidenceTable[];
+  };
+};
+
+function normalizedList(values: readonly string[] | undefined): string[] {
+  return [...new Set((values ?? []).map((value) => value.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+function increment(map: Map<string, number>, key: string): void {
+  map.set(key, (map.get(key) ?? 0) + 1);
+}
+
+function sortedFacet(map: Map<string, number>): Array<{ value: string; count: number }> {
+  return [...map.entries()]
+    .map(([value, count]) => ({ value, count }))
+    .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
+}
+
+function money(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+export function buildFacetedProductSearch(input: {
+  rows: RealCatalogSearchPriceRow[];
+  filters?: FacetedProductSearchFilters;
+}): FacetedProductSearchResult {
+  const filters = input.filters ?? {};
+  const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
+  const productMap = new Map<string, FacetedProductSearchResult['products'][number]>();
+  const categoryFacet = new Map<string, number>();
+  const brandFacet = new Map<string, number>();
+  const chainFacet = new Map<string, { label: string; count: number }>();
+  const storeFacet = new Map<string, { label: string; count: number }>();
+  const priceTypeFacet = new Map<RealCatalogPriceType, number>();
+  let minPrice: number | null = null;
+  let maxPrice: number | null = null;
+  let latestPriceCount = 0;
+
+  for (const row of input.rows) {
+    let product = productMap.get(row.productId);
+    if (!product) {
+      product = {
+        productId: row.productId,
+        slug: row.slug,
+        canonicalName: row.canonicalName,
+        brand: row.brand ?? null,
+        categoryPath: [...row.categoryPath],
+        packageSize: row.packageSize ?? null,
+        packageUnit: row.packageUnit ?? null,
+        comparableUnit: row.comparableUnit,
+        imageUrl: row.imageUrl ?? null,
+        cheapestPrice: null,
+        currency: row.currency ?? 'SEK',
+        currentPrices: []
+      };
+      productMap.set(row.productId, product);
+      for (const category of row.categoryPath) increment(categoryFacet, category);
+      if (row.brand) increment(brandFacet, row.brand);
+    }
+
+    if (
+      row.observationId &&
+      typeof row.price === 'number' &&
+      typeof row.unitPrice === 'number' &&
+      row.priceType &&
+      row.confidence !== undefined &&
+      row.observedAt &&
+      row.chainId &&
+      row.chainSlug &&
+      row.chainName
+    ) {
+      latestPriceCount += 1;
+      product.cheapestPrice = product.cheapestPrice === null ? row.price : Math.min(product.cheapestPrice, row.price);
+      minPrice = minPrice === null ? row.price : Math.min(minPrice, row.price);
+      maxPrice = maxPrice === null ? row.price : Math.max(maxPrice, row.price);
+      product.currentPrices.push({
+        observationId: row.observationId,
+        price: row.price,
+        unitPrice: row.unitPrice,
+        currency: row.currency ?? 'SEK',
+        priceType: row.priceType,
+        confidence: row.confidence,
+        observedAt: row.observedAt,
+        chainId: row.chainId,
+        chainSlug: row.chainSlug,
+        chainName: row.chainName,
+        storeId: row.storeId ?? null,
+        storeSlug: row.storeSlug ?? null,
+        storeName: row.storeName ?? null
+      });
+      const chain = chainFacet.get(row.chainSlug) ?? { label: row.chainName, count: 0 };
+      chain.count += 1;
+      chainFacet.set(row.chainSlug, chain);
+      if (row.storeSlug && row.storeName) {
+        const store = storeFacet.get(row.storeSlug) ?? { label: row.storeName, count: 0 };
+        store.count += 1;
+        storeFacet.set(row.storeSlug, store);
+      }
+      increment(priceTypeFacet, row.priceType);
+    }
+  }
+
+  const products = [...productMap.values()]
+    .map((product) => ({
+      ...product,
+      currentPrices: product.currentPrices.sort((a, b) => a.price - b.price || b.observedAt.localeCompare(a.observedAt))
+    }))
+    .sort((a, b) => {
+      if (a.cheapestPrice === null && b.cheapestPrice !== null) return 1;
+      if (a.cheapestPrice !== null && b.cheapestPrice === null) return -1;
+      if (a.cheapestPrice !== null && b.cheapestPrice !== null && a.cheapestPrice !== b.cheapestPrice) return a.cheapestPrice - b.cheapestPrice;
+      return a.canonicalName.localeCompare(b.canonicalName);
+    })
+    .slice(0, limit);
+
+  return {
+    query: filters.query?.trim() ?? '',
+    filters: {
+      categories: normalizedList(filters.categories),
+      brands: normalizedList(filters.brands),
+      chains: normalizedList(filters.chains),
+      stores: normalizedList(filters.stores),
+      priceTypes: [...(filters.priceTypes ?? [])].sort((a, b) => a.localeCompare(b)),
+      minPrice: filters.minPrice ?? null,
+      maxPrice: filters.maxPrice ?? null,
+      limit
+    },
+    count: products.length,
+    products,
+    facets: {
+      categories: sortedFacet(categoryFacet),
+      brands: sortedFacet(brandFacet),
+      chains: [...chainFacet.entries()]
+        .map(([value, facet]) => ({ value, label: facet.label, count: facet.count }))
+        .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label)),
+      stores: [...storeFacet.entries()]
+        .map(([value, facet]) => ({ value, label: facet.label, count: facet.count }))
+        .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label)),
+      priceTypes: [...priceTypeFacet.entries()]
+        .map(([value, count]) => ({ value, count }))
+        .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value)),
+      priceRange: { min: minPrice, max: maxPrice }
+    },
+    evidence: {
+      pricedProductCount: products.filter((product) => product.currentPrices.length > 0).length,
+      latestPriceCount,
+      sourceTables: ['products', 'latest_prices', 'chains', 'stores']
+    }
+  };
+}
+
+export function buildRealBasketComparison(input: RealBasketCompareInput): RealBasketCompareResult {
+  const selectedStoreSlugs = normalizedList(input.selectedStoreSlugs);
+  const basketSource = input.basketSource ?? 'request_body';
+  const items = input.items.map((item) => ({ ...item, productId: item.productId.trim() }));
+  const itemOrder = new Map(items.map((item, index) => [item.productId, index]));
+  const rowsByProduct = new Map<string, RealCatalogSearchPriceRow[]>();
+  const productNames = new Map<string, { slug: string; canonicalName: string }>();
+
+  for (const row of input.latestPrices) {
+    if (!itemOrder.has(row.productId)) continue;
+    productNames.set(row.productId, { slug: row.slug, canonicalName: row.canonicalName });
+    if (selectedStoreSlugs.length > 0 && (!row.storeSlug || !selectedStoreSlugs.includes(row.storeSlug))) continue;
+    if (!row.observationId || typeof row.price !== 'number') continue;
+    const rows = rowsByProduct.get(row.productId) ?? [];
+    rows.push(row);
+    rowsByProduct.set(row.productId, rows);
+  }
+
+  const missingProductIds = items.filter((item) => !rowsByProduct.has(item.productId)).map((item) => item.productId);
+  const cheapestAssignments = items.map((item) => {
+    const product = productNames.get(item.productId);
+    const prices = [...(rowsByProduct.get(item.productId) ?? [])].sort(
+      (a, b) => (a.price ?? Number.POSITIVE_INFINITY) - (b.price ?? Number.POSITIVE_INFINITY) || (a.storeName ?? '').localeCompare(b.storeName ?? '')
+    );
+    const best = prices[0];
+    return {
+      productId: item.productId,
+      slug: product?.slug ?? item.productId,
+      productName: product?.canonicalName ?? item.productId,
+      quantity: item.quantity,
+      storeSlug: best?.storeSlug ?? null,
+      storeName: best?.storeName ?? null,
+      unitPrice: best?.price ?? null,
+      lineTotal: best?.price === undefined ? null : money(best.price * item.quantity),
+      priceLabel: best ? ('verified_latest_price' as const) : ('missing_price' as const),
+      ...(best?.observationId ? { observationId: best.observationId } : {}),
+      ...(best?.observedAt ? { observedAt: best.observedAt } : {}),
+      ...(best?.confidence !== undefined ? { confidence: best.confidence } : {})
+    };
+  });
+
+  const storeSlugs = selectedStoreSlugs.length > 0 ? selectedStoreSlugs : normalizedList(input.latestPrices.map((row) => row.storeSlug ?? ''));
+  const singleStoreQuotes = storeSlugs
+    .map((storeSlug) => {
+      const assignments = items.map((item) => {
+        const product = productNames.get(item.productId);
+        const best = [...(rowsByProduct.get(item.productId) ?? [])]
+          .filter((row) => row.storeSlug === storeSlug)
+          .sort((a, b) => (a.price ?? Number.POSITIVE_INFINITY) - (b.price ?? Number.POSITIVE_INFINITY))[0];
+        return {
+          productId: item.productId,
+          slug: product?.slug ?? item.productId,
+          productName: product?.canonicalName ?? item.productId,
+          quantity: item.quantity,
+          storeSlug: best?.storeSlug ?? storeSlug,
+          storeName: best?.storeName ?? null,
+          unitPrice: best?.price ?? null,
+          lineTotal: best?.price === undefined ? null : money(best.price * item.quantity),
+          priceLabel: best ? ('verified_latest_price' as const) : ('missing_price' as const),
+          ...(best?.observationId ? { observationId: best.observationId } : {}),
+          ...(best?.observedAt ? { observedAt: best.observedAt } : {}),
+          ...(best?.confidence !== undefined ? { confidence: best.confidence } : {})
+        };
+      });
+      return {
+        storeSlug,
+        assignments,
+        missingProductIds: assignments.filter((assignment) => assignment.priceLabel === 'missing_price').map((assignment) => assignment.productId),
+        pricedItemCount: assignments.filter((assignment) => assignment.lineTotal !== null).length,
+        knownTotal: money(assignments.reduce((sum, assignment) => sum + (assignment.lineTotal ?? 0), 0)),
+        total: assignments.every((assignment) => assignment.lineTotal !== null)
+          ? money(assignments.reduce((sum, assignment) => sum + (assignment.lineTotal ?? 0), 0))
+          : null
+      };
+    })
+    .sort(
+      (a, b) =>
+        Number(b.total !== null) - Number(a.total !== null) ||
+        b.pricedItemCount - a.pricedItemCount ||
+        a.knownTotal - b.knownTotal ||
+        a.storeSlug.localeCompare(b.storeSlug)
+    );
+
+  const cheapestTotal = cheapestAssignments.every((assignment) => assignment.lineTotal !== null)
+    ? money(cheapestAssignments.reduce((sum, assignment) => sum + (assignment.lineTotal ?? 0), 0))
+    : null;
+  const bestSingleStore = singleStoreQuotes[0];
+
+  return {
+    userId: input.userId ?? null,
+    currency: 'SEK',
+    itemCount: items.length,
+    selectedStoreSlugs,
+    strategies: [
+      {
+        id: 'cheapest_across_selected',
+        label: 'Cheapest across selected stores',
+        total: cheapestTotal,
+        storeCount: new Set(cheapestAssignments.map((assignment) => assignment.storeSlug).filter(Boolean)).size,
+        assignments: cheapestAssignments,
+        missingProductIds,
+        warnings:
+          missingProductIds.length === 0
+            ? ['Basket totals use persisted latest_prices rows only.']
+            : ['Some basket items are missing persisted latest_prices rows for the selected stores.']
+      },
+      {
+        id: 'all_at_one_store',
+        label: 'Best single store',
+        total: bestSingleStore?.total ?? null,
+        storeCount: bestSingleStore ? 1 : 0,
+        assignments: bestSingleStore?.assignments ?? [],
+        missingProductIds: bestSingleStore?.missingProductIds ?? items.map((item) => item.productId),
+        warnings:
+          bestSingleStore && bestSingleStore.missingProductIds.length === 0
+            ? ['Single-store quote uses persisted latest_prices rows only.']
+            : ['No selected store has persisted prices for every basket item; priced lines are shown without estimating missing prices.']
+      }
+    ],
+    missingProductIds,
+    evidence: {
+      basketSource,
+      latestPriceCount: input.latestPrices.filter((row) => row.observationId).length,
+      sourceTables:
+        basketSource === 'weekly_baskets'
+          ? ['weekly_baskets', 'basket_items', 'products', 'latest_prices', 'stores']
+          : ['products', 'latest_prices', 'stores']
+    }
+  };
+}
+
 const stores: Store[] = [
   { id: 'willys-odenplan', name: 'Willys Odenplan', chain: 'willys', district: 'Odenplan', address: 'Odenplan, Stockholm', confidence: 'high' },
   { id: 'lidl-sveavagen', name: 'Lidl Sveavägen', chain: 'lidl', district: 'Norrmalm', address: 'Sveavägen, Stockholm', confidence: 'medium' },
   { id: 'coop-odenplan', name: 'Coop Odenplan', chain: 'coop', district: 'Odenplan', address: 'Odenplan, Stockholm', confidence: 'medium' }
 ];
+
+
+const storeTravelProfiles: Record<string, { distanceKm: number; durationMinutes: number }> = {
+  'willys-odenplan': { distanceKm: 0.5, durationMinutes: 5.29 },
+  'lidl-sveavagen': { distanceKm: 0.8, durationMinutes: 7 },
+  'coop-odenplan': { distanceKm: 0.4, durationMinutes: 4 }
+};
+
+const retailerHandoffSupport: Record<string, { retailerName: string; support: RetailerHandoffSupport; productUrlBase?: string }> = {
+  willys: {
+    retailerName: 'Willys',
+    productUrlBase: 'https://www.willys.se/sok?q=',
+    support: {
+      productDeepLinks: 'supported',
+      basketTransfer: 'unsupported',
+      copyList: 'supported',
+      retailerAppSearch: 'manual',
+      checkoutConfirmation: 'unsupported'
+    }
+  },
+  coop: {
+    retailerName: 'Coop',
+    productUrlBase: 'https://www.coop.se/sok/?q=',
+    support: {
+      productDeepLinks: 'supported',
+      basketTransfer: 'unsupported',
+      copyList: 'supported',
+      retailerAppSearch: 'manual',
+      checkoutConfirmation: 'unsupported'
+    }
+  },
+  lidl: {
+    retailerName: 'Lidl',
+    support: {
+      productDeepLinks: 'manual',
+      basketTransfer: 'unsupported',
+      copyList: 'supported',
+      retailerAppSearch: 'manual',
+      checkoutConfirmation: 'unsupported'
+    }
+  }
+};
 
 const products: ProductDetail[] = [
   {
@@ -818,19 +1870,68 @@ const loyaltyOffers: LoyaltyOffer[] = [
   }
 ];
 
-const index = calculateFixedBasketIndex({
-  id: 'stockholm-grocery-index',
-  label: 'Stockholm Grocery Index',
-  baseDate: '2026-01-01',
-  currentDate: '2026-05-19',
-  components: [
-    { productId: 'coffee', baseUnitPrice: 100, currentUnitPrice: 91.6, weight: 1 },
-    { productId: 'dairy', baseUnitPrice: 100, currentUnitPrice: 108.4, weight: 1 },
-    { productId: 'protein', baseUnitPrice: 100, currentUnitPrice: 102.1, weight: 1 },
-    { productId: 'budget-basket', baseUnitPrice: 100, currentUnitPrice: 96.8, weight: 1 },
-    { productId: 'private-label', baseUnitPrice: 100, currentUnitPrice: 94.2, weight: 1 }
-  ]
-});
+const flyerOfferRows = [
+  {
+    offerId: 'flyer-willys-odenplan-coffee-2026w21',
+    flyerId: 'willys-stockholm-2026w21',
+    storeId: 'willys-odenplan',
+    productId: 'coffee',
+    regularPrice: 64.9,
+    offerPrice: 49.9,
+    priceType: 'flyer' as const,
+    validFrom: '2026-05-19T00:00:00.000Z',
+    validThrough: '2026-05-25T21:59:59.000Z',
+    observedAt: '2026-05-19T06:30:00.000Z',
+    sourceUrl: 'https://www.willys.se/erbjudanden/stockholm/vecka-21',
+    sourceRunId: 'source-run-willys-flyer-2026-05-19',
+    confidence: 0.92
+  },
+  {
+    offerId: 'flyer-willys-odenplan-private-label-milk-2026w21',
+    flyerId: 'willys-stockholm-2026w21',
+    storeId: 'willys-odenplan',
+    productId: 'private-label-milk',
+    regularPrice: 19.9,
+    offerPrice: 12.9,
+    priceType: 'member_flyer' as const,
+    validFrom: '2026-05-19T00:00:00.000Z',
+    validThrough: '2026-05-25T21:59:59.000Z',
+    observedAt: '2026-05-19T06:30:00.000Z',
+    sourceUrl: 'https://www.willys.se/erbjudanden/stockholm/vecka-21',
+    sourceRunId: 'source-run-willys-flyer-2026-05-19',
+    confidence: 0.88
+  },
+  {
+    offerId: 'flyer-lidl-sveavagen-milk-2026w21',
+    flyerId: 'lidl-stockholm-2026w21',
+    storeId: 'lidl-sveavagen',
+    productId: 'milk',
+    regularPrice: 16.9,
+    offerPrice: 13.9,
+    priceType: 'flyer' as const,
+    validFrom: '2026-05-19T00:00:00.000Z',
+    validThrough: '2026-05-25T20:59:59.000Z',
+    observedAt: '2026-05-19T05:45:00.000Z',
+    sourceUrl: 'https://www.lidl.se/c/erbjudanden-stockholm/s10025521',
+    sourceRunId: 'source-run-lidl-flyer-2026-05-19',
+    confidence: 0.9
+  },
+  {
+    offerId: 'flyer-coop-odenplan-butter-2026w21',
+    flyerId: 'coop-stockholm-2026w21',
+    storeId: 'coop-odenplan',
+    productId: 'butter',
+    regularPrice: 59.9,
+    offerPrice: 54.9,
+    priceType: 'flyer' as const,
+    validFrom: '2026-05-19T00:00:00.000Z',
+    validThrough: '2026-05-25T21:59:59.000Z',
+    observedAt: '2026-05-19T07:10:00.000Z',
+    sourceUrl: 'https://www.coop.se/butiker-erbjudanden/coop/coop-odenplan/',
+    sourceRunId: 'source-run-coop-flyer-2026-05-19',
+    confidence: 0.84
+  }
+];
 
 function requireNonEmptyId(value: string, label: string) {
   if (value.trim().length === 0) {
@@ -975,6 +2076,442 @@ function roundPercent(value: number): number {
 
 function roundPrice(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+function storeForId(storeId: string): Store | undefined {
+  return stores.find((store) => store.id === storeId);
+}
+
+function sortedHistory(product: ProductDetail) {
+  return [...product.history].sort((left, right) => Date.parse(left.date) - Date.parse(right.date));
+}
+
+function latestObservedAt(product: ProductDetail): string | null {
+  const latest = sortedHistory(product).at(-1);
+  return latest ? toIsoObservedAt(latest.date) : null;
+}
+
+function indexComponentFor(product: ProductDetail) {
+  const history = sortedHistory(product).filter((point) => Number.isFinite(point.price) && point.price > 0);
+  const first = history[0];
+  const current = bestPriceFor(product);
+  if (!first || !current) return null;
+  return {
+    productId: product.id,
+    baseUnitPrice: first.price,
+    currentUnitPrice: current.price,
+    weight: 1
+  };
+}
+
+function indexBaseDate(productsForIndex: ProductDetail[]): string {
+  return productsForIndex
+    .flatMap((product) => sortedHistory(product).map((point) => point.date))
+    .sort()[0] ?? 'unavailable';
+}
+
+function indexCurrentDate(productsForIndex: ProductDetail[]): string {
+  return productsForIndex
+    .flatMap((product) => sortedHistory(product).map((point) => point.date))
+    .sort()
+    .at(-1) ?? 'unavailable';
+}
+
+function buildStockholmGroceryIndex() {
+  const components = products
+    .map(indexComponentFor)
+    .filter((component): component is NonNullable<ReturnType<typeof indexComponentFor>> => component !== null);
+
+  return calculateFixedBasketIndex({
+    id: 'stockholm-grocery-index',
+    label: 'Stockholm Grocery Index',
+    baseDate: indexBaseDate(products),
+    currentDate: indexCurrentDate(products),
+    components
+  });
+}
+
+function comparableUnitBasis(product: ProductDetail): { quantity: number; unit: string } {
+  const match = product.unitPrice.match(/^(\d+(?:\.\d+)?)\s+SEK\/(.+)$/);
+  const referencePrice = product.currentPrices[0]?.price;
+  if (!match || referencePrice === undefined || referencePrice <= 0) {
+    return { quantity: 1, unit: 'package' };
+  }
+
+  const referenceUnitPrice = Number(match[1]);
+  if (!Number.isFinite(referenceUnitPrice) || referenceUnitPrice <= 0) {
+    return { quantity: 1, unit: 'package' };
+  }
+
+  return { quantity: referencePrice / referenceUnitPrice, unit: match[2]! };
+}
+
+function comparableUnitPrice(product: ProductDetail, packagePrice: number): number {
+  const { quantity } = comparableUnitBasis(product);
+  return roundPrice(packagePrice / quantity);
+}
+
+function cheapestByChain(product: ProductDetail): ProductCheapestNowChainPrice[] {
+  const byChain = new Map<string, ProductCheapestNowChainPrice>();
+  const { unit } = comparableUnitBasis(product);
+  for (const price of product.currentPrices) {
+    const store = storeForId(price.storeId);
+    if (!store) continue;
+    const row: ProductCheapestNowChainPrice = {
+      chain: store.chain,
+      storeId: price.storeId,
+      storeName: price.storeName,
+      packagePrice: roundPrice(price.price),
+      comparableUnitPrice: comparableUnitPrice(product, price.price),
+      comparableUnit: unit
+    };
+    const current = byChain.get(store.chain);
+    if (!current || row.packagePrice < current.packagePrice || (row.packagePrice === current.packagePrice && row.storeName.localeCompare(current.storeName) < 0)) {
+      byChain.set(store.chain, row);
+    }
+  }
+  return [...byChain.values()].sort((left, right) => left.packagePrice - right.packagePrice || left.chain.localeCompare(right.chain));
+}
+
+function confidenceLabel(confidence: number): ProductLatestPriceConfidence {
+  if (confidence >= 0.9) return 'high';
+  if (confidence >= 0.75) return 'medium';
+  return 'low';
+}
+
+export function buildProductLatestPrices(rows: ProductLatestPriceInput[]): ProductLatestPrice[] {
+  return rows.flatMap((row): ProductLatestPrice[] => {
+    if (
+      !row.observationId ||
+      !row.storeSlug ||
+      !row.storeName ||
+      !row.chainSlug ||
+      !row.chainName ||
+      row.price === undefined ||
+      row.unitPrice === undefined ||
+      !row.priceType ||
+      row.confidence === undefined ||
+      !row.observedAt
+    ) {
+      return [];
+    }
+    const provenance = row.provenance ?? {};
+    return [{
+      observationId: row.observationId,
+      productId: row.productSlug,
+      productSlug: row.productSlug,
+      productName: row.productName,
+      storeId: row.storeSlug,
+      storeName: row.storeName,
+      chain: row.chainSlug,
+      chainName: row.chainName,
+      price: roundPrice(row.price),
+      unitPrice: roundPrice(row.unitPrice),
+      currency: 'SEK',
+      priceType: row.priceType,
+      confidence: confidenceLabel(row.confidence),
+      confidenceScore: row.confidence,
+      observedAt: row.observedAt,
+      sourceType: typeof provenance.sourceType === 'string' ? provenance.sourceType : 'latest_prices',
+      provenance
+    }];
+  }).sort((left, right) => left.price - right.price || left.storeName.localeCompare(right.storeName) || left.priceType.localeCompare(right.priceType));
+}
+
+export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]): ProductCheapestNow | null {
+  const product = rows[0];
+  if (!product) return null;
+
+  const byChain = new Map<string, ProductCheapestNowChainPrice>();
+  const observedAtValues: string[] = [];
+  let observedPriceCount = 0;
+
+  for (const row of rows) {
+    if (
+      row.price === undefined ||
+      row.unitPrice === undefined ||
+      !Number.isFinite(row.price) ||
+      !Number.isFinite(row.unitPrice) ||
+      row.price <= 0 ||
+      row.unitPrice <= 0 ||
+      !row.chainSlug ||
+      !row.storeSlug ||
+      !row.storeName
+    ) {
+      continue;
+    }
+
+    observedPriceCount += 1;
+    if (row.observedAt) observedAtValues.push(row.observedAt);
+    const candidate: ProductCheapestNowChainPrice = {
+      chain: row.chainSlug,
+      storeId: row.storeSlug,
+      storeName: row.storeName,
+      packagePrice: roundPrice(row.price),
+      comparableUnitPrice: roundPrice(row.unitPrice),
+      comparableUnit: row.comparableUnit
+    };
+    const current = byChain.get(row.chainSlug);
+    if (
+      !current ||
+      candidate.packagePrice < current.packagePrice ||
+      (candidate.packagePrice === current.packagePrice && candidate.storeName.localeCompare(current.storeName) < 0)
+    ) {
+      byChain.set(row.chainSlug, candidate);
+    }
+  }
+
+  const chainPrices = [...byChain.values()].sort((left, right) => left.packagePrice - right.packagePrice || left.chain.localeCompare(right.chain));
+
+  return {
+    productId: product.productId,
+    productName: product.productName,
+    category: product.categoryPath[0] ?? 'uncategorized',
+    currency: 'SEK',
+    cheapest: chainPrices[0] ?? null,
+    chainPrices,
+    chainCount: chainPrices.length,
+    observedPriceCount,
+    lastObservedAt: observedAtValues.sort().at(-1) ?? null,
+    guardrails: [
+      'Cheapest-now rows are calculated only from persisted latest_prices observations for the requested product.',
+      'Rows with missing or non-positive package/unit prices are excluded instead of treated as current offers.',
+      'Each chain contributes at most one current lowest package price, preserving the store that supplied it.',
+      'No missing chain or product prices are filled with synthetic estimates.'
+    ]
+  };
+}
+
+function topCategory(categoryPath: string[]): string {
+  return categoryPath.find((part) => part.trim().length > 0) ?? 'uncategorized';
+}
+
+function productBrandTier(row: Pick<RealPriceIndexRow, 'brand' | 'privateLabelOwner'>): BrandTier {
+  if (row.privateLabelOwner?.trim()) return 'standard_private_label';
+  return 'national';
+}
+
+function realIndexComponentRows(rows: RealPriceIndexRow[]): Array<RealPriceIndexRow & { baseUnitPrice: number; currentUnitPrice: number }> {
+  return rows.filter((row): row is RealPriceIndexRow & { baseUnitPrice: number; currentUnitPrice: number } => {
+    const currentUnitPrice = row.currentUnitPrice;
+    const baseUnitPrice = row.baseUnitPrice;
+    return currentUnitPrice !== undefined &&
+      Number.isFinite(currentUnitPrice) &&
+      currentUnitPrice > 0 &&
+      baseUnitPrice !== undefined &&
+      Number.isFinite(baseUnitPrice) &&
+      baseUnitPrice > 0;
+  });
+}
+
+function realChainIndexRows(rows: RealPriceIndexRow[]): Array<RealPriceIndexRow & { chainSlug: string; currentUnitPrice: number }> {
+  const byProductChain = new Map<string, RealPriceIndexRow & { chainSlug: string; currentUnitPrice: number }>();
+  for (const row of rows) {
+    const currentUnitPrice = row.currentUnitPrice;
+    if (!row.chainSlug || currentUnitPrice === undefined || !Number.isFinite(currentUnitPrice) || currentUnitPrice <= 0) continue;
+    const key = `${row.productId}:${row.chainSlug}`;
+    const current = byProductChain.get(key);
+    if (
+      !current ||
+      currentUnitPrice < current.currentUnitPrice ||
+      (currentUnitPrice === current.currentUnitPrice && (row.currentObservedAt ?? '') > (current.currentObservedAt ?? ''))
+    ) {
+      byProductChain.set(key, { ...row, chainSlug: row.chainSlug, currentUnitPrice });
+    }
+  }
+  return [...byProductChain.values()];
+}
+
+function earliestIso(values: Array<string | undefined>): string {
+  return values.filter((value): value is string => Boolean(value)).sort()[0] ?? 'unknown';
+}
+
+function latestIso(values: Array<string | undefined>): string {
+  return values.filter((value): value is string => Boolean(value)).sort().at(-1) ?? 'unknown';
+}
+
+export function buildRealChainPriceIndices(rows: RealPriceIndexRow[]): RealChainPriceIndexSummary {
+  const observations: ChainPriceObservation[] = realChainIndexRows(rows).map((row) => ({
+    chainId: row.chainSlug,
+    category: topCategory(row.categoryPath),
+    unitPrice: row.currentUnitPrice
+  }));
+
+  return {
+    ...calculateChainPriceIndex(observations),
+    currency: 'SEK',
+    guardrails: [
+      'Chain indices are calculated from persisted latest_prices rows only, using one cheapest current product price per chain.',
+      'Unit prices are compared inside observed product categories before chain-level aggregation.',
+      'No missing chain/category cells are filled with synthetic product prices.'
+    ]
+  };
+}
+
+export function buildRealCategoryPriceIndices(rows: RealPriceIndexRow[]): CategoryPriceIndexSummary {
+  const byCategory = new Map<string, Array<RealPriceIndexRow & { baseUnitPrice: number; currentUnitPrice: number }>>();
+  for (const row of realIndexComponentRows(rows)) {
+    const category = topCategory(row.categoryPath);
+    const current = byCategory.get(category) ?? [];
+    current.push(row);
+    byCategory.set(category, current);
+  }
+
+  const indices = [...byCategory.entries()].flatMap(([category, categoryRows]) => {
+    const index = calculateFixedBasketIndex({
+      id: `${category}-category-price-index`,
+      label: `${category[0]?.toUpperCase() ?? ''}${category.slice(1)} Price Index`,
+      baseDate: earliestIso(categoryRows.map((row) => row.baseObservedAt)),
+      currentDate: latestIso(categoryRows.map((row) => row.currentObservedAt)),
+      components: categoryRows.map((row) => ({
+        productId: row.productSlug || row.productId,
+        baseUnitPrice: row.baseUnitPrice,
+        currentUnitPrice: row.currentUnitPrice,
+        weight: 1
+      }))
+    });
+
+    return [{
+      id: index.id,
+      category,
+      label: index.label,
+      value: index.value,
+      movementPercent: index.movementPercent,
+      productCount: index.components.length,
+      baseDate: index.baseDate,
+      currentDate: index.currentDate
+    }];
+  }).sort((left, right) => left.value - right.value || left.category.localeCompare(right.category));
+
+  return {
+    currency: 'SEK',
+    indices,
+    generatedFrom: indices.reduce((sum, row) => sum + row.productCount, 0),
+    guardrails: [
+      'Category indices use earliest persisted observations as the base and current latest_prices as the current value.',
+      'Products without both a base observation and a current latest price are excluded instead of estimated.',
+      'Each observed product contributes equal weight within its category until basket weights are explicitly stored.'
+    ]
+  };
+}
+
+export function buildRealBrandPriceIndices(rows: RealPriceIndexRow[]): BrandPriceIndexSummary {
+  const componentRows = realIndexComponentRows(rows);
+  if (componentRows.length === 0) {
+    return {
+      indices: [],
+      privateLabelSavingsPercent: 0,
+      highestSavingsCategories: [],
+      premiumGapPercent: 0,
+      currency: 'SEK',
+      generatedFrom: 0,
+      guardrails: [
+        'Brand indices require products with both persisted historical observations and current latest_prices.',
+        'No brand-tier prices are backfilled when persisted rows are missing.'
+      ]
+    };
+  }
+
+  const observations: BrandTierPriceObservation[] = componentRows.map((row) => ({
+    brandTier: productBrandTier(row),
+    category: topCategory(row.categoryPath),
+    baseUnitPrice: row.baseUnitPrice,
+    currentUnitPrice: row.currentUnitPrice
+  }));
+  const summary = calculateBrandTierIndices(observations);
+
+  return {
+    ...summary,
+    currency: 'SEK',
+    generatedFrom: observations.length,
+    guardrails: [
+      'Brand indices are derived from product brand/private-label metadata plus persisted price observations.',
+      'Private-label rows are identified only by stored private_label_owner values.',
+      'No missing brand tiers are backfilled with estimated prices.'
+    ]
+  };
+}
+
+function chainIndexObservations(): ChainPriceObservation[] {
+  return products.flatMap((product) =>
+    product.currentPrices.flatMap((price) => {
+      const store = storeForId(price.storeId);
+      if (!store) return [];
+      return [{
+        chainId: store.chain,
+        category: product.category,
+        unitPrice: comparableUnitPrice(product, price.price)
+      }];
+    })
+  );
+}
+
+function buildCategoryPriceIndices(): CategoryPriceIndexSummary {
+  const byCategory = new Map<string, ProductDetail[]>();
+  for (const product of products) {
+    const current = byCategory.get(product.category) ?? [];
+    current.push(product);
+    byCategory.set(product.category, current);
+  }
+
+  const indices = [...byCategory.entries()].flatMap(([category, categoryProducts]) => {
+    const components = categoryProducts
+      .map(indexComponentFor)
+      .filter((component): component is NonNullable<ReturnType<typeof indexComponentFor>> => component !== null);
+    if (components.length === 0) return [];
+    const index = calculateFixedBasketIndex({
+      id: `${category}-category-price-index`,
+      label: `${category[0]?.toUpperCase() ?? ''}${category.slice(1)} Price Index`,
+      baseDate: indexBaseDate(categoryProducts),
+      currentDate: indexCurrentDate(categoryProducts),
+      components
+    });
+    return [{
+      id: index.id,
+      category,
+      label: index.label,
+      value: index.value,
+      movementPercent: index.movementPercent,
+      productCount: components.length,
+      baseDate: index.baseDate,
+      currentDate: index.currentDate
+    }];
+  }).sort((left, right) => left.value - right.value || left.category.localeCompare(right.category));
+
+  return {
+    currency: 'SEK',
+    indices,
+    generatedFrom: indices.reduce((sum, row) => sum + row.productCount, 0),
+    guardrails: [
+      'Category indices are calculated from recorded product history and current observed store prices.',
+      'Sparse categories remain product-count labeled instead of being expanded with synthetic rows.',
+      'Current category values use the cheapest currently observed store price for each product.'
+    ]
+  };
+}
+
+function buildBrandPriceIndices(): BrandPriceIndexSummary {
+  const observations = products.flatMap((product): BrandTierPriceObservation[] => {
+    const component = indexComponentFor(product);
+    if (!component) return [];
+    return [{
+      brandTier: product.brandTier,
+      category: product.id,
+      baseUnitPrice: component.baseUnitPrice,
+      currentUnitPrice: component.currentUnitPrice
+    }];
+  });
+  const summary = calculateBrandTierIndices(observations);
+  return {
+    ...summary,
+    currency: 'SEK',
+    generatedFrom: observations.length,
+    guardrails: [
+      'Brand indices are derived from product-level history and current observed store prices.',
+      'Private-label savings are only reported where a comparable national-brand product exists in the same component key.',
+      'No missing brand tiers are backfilled with estimated prices.'
+    ]
+  };
 }
 
 function range52WeekFrom(history: Array<{ price: number }>, bestPrice: StorePrice | null): { low: number; high: number } | null {
@@ -1146,6 +2683,201 @@ function productPriceSpreadFor(product: ProductDetail): ProductPriceSpreadReport
       'Price spread compares only current verified store quotes for the selected product.',
       'Spread rankings do not change Deal Score or basket routing without the product-specific price evidence.',
       'Missing stores stay out of the spread sample until a current quote is verified.'
+    ]
+  };
+}
+
+function productHistorySummaryFor(product: ProductDetail): ProductHistorySummaryReport | null {
+  if (product.history.length === 0) return null;
+  const summary = summarizePriceHistory(product.history.map((point) => ({ observedAt: toIsoObservedAt(point.date), price: point.price })));
+  const trend = summary.isNewLow
+    ? 'new_low'
+    : summary.changeFromPrevious < 0
+      ? 'down'
+      : summary.changeFromPrevious > 0
+        ? 'up'
+        : 'flat';
+
+  return {
+    productId: product.id,
+    ticker: product.ticker,
+    productName: product.name,
+    summary,
+    trend,
+    guardrails: [
+      'History summaries use recorded product history points only.',
+      'New-low signals compare the latest observation against earlier observed prices.',
+      'Missing history stays explicit instead of inferring movement from current store quotes.'
+    ]
+  };
+}
+
+function productHistoryConfidenceFor(product: ProductDetail): ProductHistoryConfidenceReport {
+  const history = [...product.history].sort((left, right) => Date.parse(toIsoObservedAt(left.date)) - Date.parse(toIsoObservedAt(right.date)));
+  const disclosure = summarizePriceHistoryConfidence({
+    rangeDays: 90,
+    firstObservedAt: history[0] ? toIsoObservedAt(history[0].date) : undefined,
+    lastObservedAt: history.at(-1) ? toIsoObservedAt(history.at(-1)!.date) : undefined,
+    observationCount: history.length,
+    sourceTypesIncluded: history.some((point) => point.verified) ? ['shelf'] : ['estimated'],
+    expectedSourceTypes: ['shelf'],
+    hasEstimatedPoints: history.some((point) => !point.verified)
+  });
+
+  return {
+    productId: product.id,
+    ticker: product.ticker,
+    productName: product.name,
+    disclosure,
+    guardrails: [
+      'History confidence explains whether a lowest-price claim can be used.',
+      'Estimated history points block deal-alert confidence until confirmed by a source.',
+      'Sparse or short windows stay labeled instead of implying a complete price history.'
+    ]
+  };
+}
+
+function assertFinitePriceHistoryNumber(value: number, field: string): void {
+  if (!Number.isFinite(value) || value < 0) throw new Error(`Invalid product price history ${field}.`);
+}
+
+function assertIsoDate(value: string, field: string): void {
+  if (Number.isNaN(Date.parse(value))) throw new Error(`Invalid product price history ${field}.`);
+}
+
+const defaultProductPriceHistorySourceTables = ['products', 'observations', 'chains', 'stores'] as const satisfies readonly ProductPriceHistoryEvidenceTable[];
+
+function productPriceHistorySourceTables(options: ProductPriceHistoryReportOptions): ProductPriceHistoryEvidenceTable[] {
+  return [...(options.sourceTables ?? defaultProductPriceHistorySourceTables)];
+}
+
+export function buildProductPriceHistoryReport(
+  observations: readonly ProductPriceHistoryObservationInput[],
+  filters: ProductPriceHistoryAppliedFilters = {},
+  options: ProductPriceHistoryReportOptions = {}
+): ProductPriceHistoryReport | null {
+  if (observations.length === 0) return null;
+  const productId = observations[0]!.productId;
+  const productSlug = observations[0]!.productSlug;
+  const productName = observations[0]!.productName;
+
+  const points = observations.map((observation) => {
+    if (observation.productId !== productId) throw new Error('Product price history observations must belong to one product.');
+    if (observation.productSlug !== productSlug) throw new Error('Product price history observations must use one product slug.');
+    assertFinitePriceHistoryNumber(observation.price, 'price');
+    assertFinitePriceHistoryNumber(observation.unitPrice, 'unitPrice');
+    assertFinitePriceHistoryNumber(observation.confidence, 'confidence');
+    if (observation.regularPrice !== undefined) assertFinitePriceHistoryNumber(observation.regularPrice, 'regularPrice');
+    if (observation.quantity !== undefined) assertFinitePriceHistoryNumber(observation.quantity, 'quantity');
+    assertIsoDate(observation.observedAt, 'observedAt');
+    if (observation.validFrom) assertIsoDate(observation.validFrom, 'validFrom');
+    if (observation.validUntil) assertIsoDate(observation.validUntil, 'validUntil');
+    return observation;
+  }).sort((left, right) => {
+    const observedDelta = Date.parse(left.observedAt) - Date.parse(right.observedAt);
+    return observedDelta === 0 ? left.observationId.localeCompare(right.observationId) : observedDelta;
+  });
+
+  return {
+    productId,
+    productSlug,
+    productName,
+    currency: 'SEK',
+    filters,
+    pointCount: points.length,
+    observedFrom: points[0]?.observedAt ?? null,
+    observedTo: points.at(-1)?.observedAt ?? null,
+    priceTypes: [...new Set(points.map((point) => point.priceType))].sort(),
+    points,
+    summary: summarizePriceHistory(points.map((point) => ({ observedAt: point.observedAt, price: point.price }))),
+    evidence: {
+      observationCount: points.length,
+      sourceTables: productPriceHistorySourceTables(options)
+    },
+    guardrails: [
+      'Price history is built only from persisted observation rows for the selected product.',
+      'Member, promotion, estimated, receipt, and community rows remain explicitly labeled in the series.',
+      'Provenance identifiers stay attached so UI and audit flows can trace each point back to ingestion evidence.'
+    ]
+  };
+}
+
+export function buildEmptyProductPriceHistoryReport(
+  product: ProductPriceHistoryProductInput,
+  filters: ProductPriceHistoryAppliedFilters = {},
+  options: ProductPriceHistoryReportOptions = {}
+): ProductPriceHistoryReport {
+  return {
+    productId: product.productId,
+    productSlug: product.productSlug,
+    productName: product.productName,
+    currency: 'SEK',
+    filters,
+    pointCount: 0,
+    observedFrom: null,
+    observedTo: null,
+    priceTypes: [],
+    points: [],
+    summary: null,
+    evidence: {
+      observationCount: 0,
+      sourceTables: productPriceHistorySourceTables(options)
+    },
+    guardrails: [
+      'Price history is built only from persisted observation rows for the selected product.',
+      'No observations are returned when ingestion has not produced rows for the selected filters.',
+      'Missing history stays explicit instead of inferring movement from current store quotes.'
+    ]
+  };
+}
+
+function productStoreSavingsFor(product: ProductDetail): ProductStoreSavingsReport {
+  const sortedPrices = sortPricesByValue(product.currentPrices);
+  const bestPrice = sortedPrices[0] ?? null;
+  const highestPrice = sortedPrices.at(-1) ?? null;
+  const maxSavings = bestPrice && highestPrice ? roundPrice(highestPrice.price - bestPrice.price) : 0;
+  const maxSavingsPercent = highestPrice && highestPrice.price > 0 ? roundPercent((maxSavings / highestPrice.price) * 100) : 0;
+  const rows = sortedPrices.map((price, index) => {
+    const savingsVsHighest = highestPrice ? roundPrice(highestPrice.price - price.price) : 0;
+    const priceLabel = index === 0
+      ? 'best_savings' as const
+      : savingsVsHighest > 0
+        ? 'saves_vs_highest' as const
+        : 'highest_price' as const;
+
+    return {
+      storeId: price.storeId,
+      storeName: price.storeName,
+      price: price.price,
+      rank: index + 1,
+      savingsVsHighest,
+      savingsVsHighestPercent: highestPrice && highestPrice.price > 0 ? roundPercent((savingsVsHighest / highestPrice.price) * 100) : 0,
+      priceLabel
+    };
+  });
+
+  return {
+    productId: product.id,
+    ticker: product.ticker,
+    productName: product.name,
+    currency: 'SEK',
+    sampleSize: rows.length,
+    bestStoreId: bestPrice?.storeId ?? null,
+    bestStoreName: bestPrice?.storeName ?? null,
+    bestPrice: bestPrice?.price ?? null,
+    highestStoreId: highestPrice?.storeId ?? null,
+    highestStoreName: highestPrice?.storeName ?? null,
+    highestPrice: highestPrice?.price ?? null,
+    maxSavings,
+    maxSavingsPercent,
+    rows,
+    customerRead: bestPrice && highestPrice
+      ? `Choosing ${bestPrice.storeName} saves up to ${maxSavings.toFixed(2)} SEK versus ${highestPrice.storeName} for ${product.name}.`
+      : `${product.name} has no verified store savings sample yet.`,
+    guardrails: [
+      'Store savings compare only current verified quotes for the selected product.',
+      'Savings rows do not hide the highest verified price from the comparison.',
+      'Missing stores stay out of the savings sample until a current quote is verified.'
     ]
   };
 }
@@ -1376,6 +3108,54 @@ function localOffersForBasket(userItems: BasketItemRequest[], storeIds: string[]
     });
 }
 
+function previousRecurringUnitPrice(product: ProductDetail): number | null {
+  const verifiedHistory = [...product.history]
+    .filter((point) => point.verified)
+    .sort((left, right) => left.date.localeCompare(right.date));
+  return verifiedHistory.at(-2)?.price ?? verifiedHistory.at(-1)?.price ?? null;
+}
+
+function recurringSubstituteName(product: ProductDetail, currentUnitPrice: number | null): string | undefined {
+  if (currentUnitPrice === null) return undefined;
+  const candidate = products
+    .filter((other) =>
+      other.id !== product.id &&
+      other.category === product.category &&
+      other.brandTier.includes('private_label') &&
+      comparableUnit(other) === comparableUnit(product)
+    )
+    .flatMap((other) => other.currentPrices.map((price) => ({ product: other, price })))
+    .filter((candidate) => candidate.price.price < currentUnitPrice)
+    .sort((left, right) => left.price.price - right.price.price || left.product.name.localeCompare(right.product.name))[0];
+  return candidate?.product.name;
+}
+
+function buildRecurringBasketDigest(
+  userId: string,
+  userItems: BasketItemRequest[],
+  request: RecurringBasketDigestRequest
+): RecurringBasketDigest {
+  requireNonEmptyId(userId, 'userId');
+  return planRecurringBasketDigest({
+    ...request,
+    lines: userItems.map((item) => {
+      const product = products.find((candidate) => candidate.id === item.productId);
+      if (!product) throw new Error(`Unknown productId: ${item.productId}`);
+      const currentPrice = bestPriceFor(product);
+      return {
+        productId: product.id,
+        productName: product.name,
+        quantity: item.quantity,
+        currentUnitPrice: currentPrice?.price ?? null,
+        previousUnitPrice: previousRecurringUnitPrice(product),
+        ...(currentPrice?.storeName ? { currentStoreName: currentPrice.storeName } : {}),
+        substituteProductName: recurringSubstituteName(product, currentPrice?.price ?? null),
+        confidence: product.dealSignals.sourceConfidence
+      };
+    })
+  });
+}
+
 function productName(productId: string): string {
   return products.find((product) => product.id === productId)?.name ?? productId;
 }
@@ -1464,6 +3244,111 @@ function privateLabelStrategy(
     missingProductIds,
     estimatedProductIds: [],
     warnings: strategyWarnings(missingProductIds, [])
+  };
+}
+
+
+function travelProfileForStores(storeIds: string[]): { distanceKm: number; durationMinutes: number } {
+  return storeIds.reduce((total, storeId) => {
+    const profile = storeTravelProfiles[storeId];
+    if (!profile) return total;
+    return {
+      distanceKm: roundPrice(total.distanceKm + profile.distanceKm),
+      durationMinutes: roundPrice(total.durationMinutes + profile.durationMinutes)
+    };
+  }, { distanceKm: 0, durationMinutes: 0 });
+}
+
+function strategyStoreIds(strategy: BasketComparisonReportStrategy): string[] {
+  return [...new Set(strategy.assignments.map((assignment) => assignment.storeId))].sort();
+}
+
+
+function productUrlForRetailer(product: ProductDetail, retailerId: string): string | undefined {
+  const support = retailerHandoffSupport[retailerId];
+  if (!support?.productUrlBase) return undefined;
+  return `${support.productUrlBase}${encodeURIComponent(product.name)}`;
+}
+
+function buildRetailerHandoffReport(userId: string, retailerId: string, userItems: BasketItemRequest[]): RetailerHandoffReport {
+  requireNonEmptyId(userId, 'userId');
+  const support = retailerHandoffSupport[retailerId];
+  if (!support) throw new Error(`Unsupported retailerId: ${retailerId}`);
+  const plan = planRetailerHandoff({
+    retailerId,
+    retailerName: support.retailerName,
+    basketId: `${userId}:current-basket`,
+    support: support.support,
+    lines: userItems.map((item) => {
+      const product = products.find((candidate) => candidate.id === item.productId);
+      return {
+        productId: item.productId,
+        productName: product?.name ?? item.productId,
+        quantity: item.quantity,
+        matched: Boolean(product?.availableChains.includes(retailerId)),
+        ...(product ? { productUrl: productUrlForRetailer(product, retailerId) } : {})
+      };
+    })
+  });
+  return { ...plan, userId, itemCount: userItems.length };
+}
+
+function buildRetailerBasketTransferSession(userId: string, retailerId: string, userItems: BasketItemRequest[]): RetailerBasketTransferSessionReport {
+  requireNonEmptyId(userId, 'userId');
+  const support = retailerHandoffSupport[retailerId];
+  if (!support) throw new Error(`Unsupported retailerId: ${retailerId}`);
+  const plan = planRetailerBasketTransferSession({
+    retailerId,
+    retailerName: support.retailerName,
+    basketId: `${userId}:current-basket`,
+    support: support.support,
+    shopperSessionPresent: true,
+    transferEndpoint: undefined,
+    signedPayload: undefined,
+    lines: userItems.map((item) => {
+      const product = products.find((candidate) => candidate.id === item.productId);
+      return {
+        productId: item.productId,
+        productName: product?.name ?? item.productId,
+        quantity: item.quantity,
+        matched: Boolean(product?.availableChains.includes(retailerId)),
+        ...(product ? { productUrl: productUrlForRetailer(product, retailerId) } : {})
+      };
+    })
+  });
+  return { ...plan, userId, itemCount: userItems.length };
+}
+
+function buildBasketTripCostReport(userId: string, favoriteStoreIds: string[], userItems: BasketItemRequest[], request: BasketTripCostRequest): BasketTripCostReport {
+  requireNonEmptyId(userId, 'userId');
+  const comparisonStoreIds = favoriteStoreIds.length > 0 ? favoriteStoreIds : stores.map((store) => store.id);
+  const comparison = buildBasketComparisonReport(userId, comparisonStoreIds, userItems);
+  const plan = planBasketTripCost({
+    currency: 'SEK',
+    travelMode: request.travelMode,
+    valueOfTimePerHour: request.valueOfTimePerHour,
+    carCostPerKm: request.carCostPerKm,
+    transitFare: request.transitFare,
+    splitTripPenalty: request.splitTripPenalty,
+    options: comparison.strategies.map((strategy) => {
+      const storeIds = strategyStoreIds(strategy);
+      const travel = travelProfileForStores(storeIds);
+      return {
+        strategyId: strategy.id,
+        label: strategy.label,
+        basketTotal: strategy.total,
+        storeIds,
+        distanceKm: travel.distanceKm,
+        durationMinutes: travel.durationMinutes,
+        missingProductIds: strategy.missingProductIds
+      };
+    })
+  });
+  return {
+    ...plan,
+    userId,
+    itemCount: comparison.itemCount,
+    favoriteStoreIds
   };
 }
 
@@ -1588,6 +3473,81 @@ function buildStoreBasketQuote(userId: string, storeId: string, userItems: Baske
   };
 }
 
+function buildStorePriceCoverage(storeId: string): StorePriceCoverageReport {
+  requireKnownStore(storeId);
+  const store = stores.find((candidate) => candidate.id === storeId);
+  if (!store) throw new Error(`Unknown storeId: ${storeId}`);
+
+  const lines = products.map((product): StorePriceCoverageLine => {
+    const price = product.currentPrices.find((candidate) => candidate.storeId === storeId);
+    return {
+      productId: product.id,
+      productName: product.name,
+      category: product.category,
+      price: price?.price ?? null,
+      unitPrice: product.unitPrice,
+      priceLabel: price ? 'verified_shelf' : 'missing_price',
+      dealScore: product.dealScore,
+      band: scoreBand(product.dealScore)
+    };
+  });
+  const pricedLines = lines.filter((line) => line.price !== null);
+
+  return {
+    storeId,
+    storeName: store.name,
+    currency: 'SEK',
+    productCount: lines.length,
+    pricedProductCount: pricedLines.length,
+    coveragePercent: roundPercent((pricedLines.length / lines.length) * 100),
+    totalKnownPrice: roundPrice(pricedLines.reduce((sum, line) => sum + (line.price ?? 0), 0)),
+    missingProductIds: lines.filter((line) => line.price === null).map((line) => line.productId),
+    lines,
+    guardrails: [
+      'Store coverage counts only products with current verified shelf prices at the selected store.',
+      'Missing products stay visible instead of being priced from another store.',
+      'Coverage can guide store-page merchandising but does not change Deal Score or basket routing.'
+    ]
+  };
+}
+
+function buildStoreCategoryCoverage(storeId: string): StoreCategoryCoverageReport {
+  const coverage = buildStorePriceCoverage(storeId);
+  const grouped = new Map<string, StorePriceCoverageLine[]>();
+  for (const line of coverage.lines) {
+    grouped.set(line.category, [...(grouped.get(line.category) ?? []), line]);
+  }
+
+  const categories = [...grouped.entries()].map(([category, lines]): StoreCategoryCoverageRow => {
+    const pricedLines = lines.filter((line) => line.price !== null);
+    const bestDeal = [...pricedLines].sort((left, right) => right.dealScore - left.dealScore || left.productName.localeCompare(right.productName))[0];
+    return {
+      category,
+      productCount: lines.length,
+      pricedProductCount: pricedLines.length,
+      coveragePercent: roundPercent((pricedLines.length / lines.length) * 100),
+      totalKnownPrice: roundPrice(pricedLines.reduce((sum, line) => sum + (line.price ?? 0), 0)),
+      missingProductIds: lines.filter((line) => line.price === null).map((line) => line.productId),
+      bestDealProductId: bestDeal?.productId ?? null,
+      bestDealScore: bestDeal?.dealScore ?? null
+    };
+  }).sort((left, right) => left.category.localeCompare(right.category));
+
+  return {
+    storeId: coverage.storeId,
+    storeName: coverage.storeName,
+    currency: coverage.currency,
+    categoryCount: categories.length,
+    fullyPricedCategoryCount: categories.filter((category) => category.coveragePercent === 100).length,
+    categories,
+    guardrails: [
+      'Category coverage is grouped from the same verified store-price rows as product coverage.',
+      'Missing products remain listed by category so store pages do not imply complete coverage.',
+      'Category rollups can prioritize data collection but do not fill missing prices from other stores.'
+    ]
+  };
+}
+
 function storeDealsFor(storeId: string): StoreDeal[] {
   requireKnownStore(storeId);
   return products
@@ -1610,6 +3570,296 @@ function storeDealsFor(storeId: string): StoreDeal[] {
     .sort((left, right) => right.dealScore - left.dealScore || left.price - right.price || left.productName.localeCompare(right.productName));
 }
 
+function storeDealSummaryFor(storeId: string): StoreDealSummaryReport {
+  const deals = storeDealsFor(storeId);
+  const store = stores.find((candidate) => candidate.id === storeId);
+  if (!store) throw new Error(`Unknown storeId: ${storeId}`);
+  const grouped = new Map<string, StoreDeal[]>();
+  for (const deal of deals) {
+    grouped.set(deal.category, [...(grouped.get(deal.category) ?? []), deal]);
+  }
+
+  return {
+    storeId,
+    storeName: store.name,
+    dealCount: deals.length,
+    buyVerdictCount: deals.filter((deal) => deal.band.verdict === 'Buy').length,
+    averageDealScore: deals.length > 0
+      ? roundPercent(deals.reduce((sum, deal) => sum + deal.dealScore, 0) / deals.length)
+      : 0,
+    topDeal: deals[0] ?? null,
+    categories: [...grouped.entries()].map(([category, rows]) => {
+      const topDeal = [...rows].sort((left, right) => right.dealScore - left.dealScore || left.price - right.price || left.productName.localeCompare(right.productName))[0]!;
+      return {
+        category,
+        dealCount: rows.length,
+        averageDealScore: roundPercent(rows.reduce((sum, deal) => sum + deal.dealScore, 0) / rows.length),
+        topProductId: topDeal.productId,
+        topDealScore: topDeal.dealScore
+      };
+    }).sort((left, right) => right.averageDealScore - left.averageDealScore || left.category.localeCompare(right.category)),
+    guardrails: [
+      'Store deal summaries are derived from verified in-store deal rows only.',
+      'Average Deal Score is informational and does not hide lower-scoring products.',
+      'Category leaders summarize current rows but cannot fill missing store prices.'
+    ]
+  };
+}
+
+function flyerOfferFromRow(row: (typeof flyerOfferRows)[number]): FlyerOffer {
+  const product = products.find((candidate) => candidate.id === row.productId);
+  const store = stores.find((candidate) => candidate.id === row.storeId);
+  if (!product) throw new Error(`Unknown productId: ${row.productId}`);
+  if (!store) throw new Error(`Unknown storeId: ${row.storeId}`);
+  const savings = roundPrice(row.regularPrice - row.offerPrice);
+  return {
+    offerId: row.offerId,
+    flyerId: row.flyerId,
+    chain: store.chain,
+    storeId: store.id,
+    storeName: store.name,
+    branchDistrict: store.district,
+    productId: product.id,
+    productName: product.name,
+    category: product.category,
+    regularPrice: row.regularPrice,
+    offerPrice: row.offerPrice,
+    savings,
+    discountPercent: row.regularPrice > 0 ? roundPercent((savings / row.regularPrice) * 100) : 0,
+    currency: 'SEK',
+    priceType: row.priceType,
+    validFrom: row.validFrom,
+    validThrough: row.validThrough,
+    observedAt: row.observedAt,
+    sourceType: 'weekly_flyer',
+    sourceUrl: row.sourceUrl,
+    sourceRunId: row.sourceRunId,
+    confidence: row.confidence,
+    dealScore: product.dealScore,
+    band: scoreBand(product.dealScore)
+  };
+}
+
+function flyerOfferFromObservation(row: FlyerOfferObservationInput): FlyerOffer {
+  const savings = roundPrice(row.regularPrice - row.price);
+  const discountPercent = row.regularPrice > 0 ? roundPercent((savings / row.regularPrice) * 100) : 0;
+  const dealScore = calculateDealScore({
+    currentCityPercentile: Math.max(0, 100 - discountPercent * 3),
+    knownPromoHistoryPercentile: Math.max(0, 100 - discountPercent * 2),
+    equivalentUnitPricePercentile: Math.max(0, 100 - discountPercent * 2.5),
+    discountDepthPercent: discountPercent,
+    sourceConfidence: row.confidence
+  });
+  return {
+    offerId: row.observationId,
+    flyerId: row.sourceRunId ?? row.rawRecordId ?? row.observationId,
+    chain: row.chainSlug,
+    storeId: row.storeSlug,
+    storeName: row.storeName,
+    branchDistrict: row.storeCity ?? row.chainName,
+    productId: row.productSlug,
+    productName: row.productName,
+    category: row.categoryPath[0] ?? 'uncategorized',
+    regularPrice: row.regularPrice,
+    offerPrice: row.price,
+    savings,
+    discountPercent,
+    currency: row.currency,
+    priceType: row.memberRequired || row.priceType === 'member' ? 'member_flyer' : 'flyer',
+    validFrom: row.validFrom ?? row.promotionStartsOn ?? row.observedAt,
+    validThrough: row.validUntil ?? row.promotionEndsOn ?? row.observedAt,
+    observedAt: row.observedAt,
+    sourceType: 'weekly_flyer',
+    sourceUrl: typeof row.provenance.sourceUrl === 'string' ? row.provenance.sourceUrl : '',
+    sourceRunId: row.sourceRunId ?? '',
+    confidence: row.confidence,
+    dealScore,
+    band: scoreBand(dealScore)
+  };
+}
+
+function activeFlyerOffers(asOf: string): FlyerOffer[] {
+  const asOfMs = Date.parse(requireIsoTimestamp(asOf, 'asOf'));
+  return flyerOfferRows
+    .map(flyerOfferFromRow)
+    .filter((offer) => Date.parse(offer.validFrom) <= asOfMs && asOfMs <= Date.parse(offer.validThrough));
+}
+
+function buildFlyerOfferReportFromOffers(asOf: string, options: {
+  storeId?: string;
+  chain?: string;
+  category?: string;
+  productId?: string;
+}, sourceOffers: FlyerOffer[]): FlyerOfferReport {
+  const chain = options.chain?.trim().toLowerCase();
+  const category = options.category?.trim().toLowerCase();
+  const offers = sourceOffers
+    .filter((offer) => !options.storeId || offer.storeId === options.storeId)
+    .filter((offer) => !chain || offer.chain === chain)
+    .filter((offer) => !category || offer.category.toLowerCase() === category)
+    .filter((offer) => !options.productId || offer.productId === options.productId)
+    .sort((left, right) =>
+      right.dealScore - left.dealScore ||
+      right.discountPercent - left.discountPercent ||
+      left.storeName.localeCompare(right.storeName) ||
+      left.productName.localeCompare(right.productName)
+    );
+  const storesById = new Map<string, FlyerOffer[]>();
+  for (const offer of offers) {
+    storesById.set(offer.storeId, [...(storesById.get(offer.storeId) ?? []), offer]);
+  }
+  const storesSummary = [...storesById.entries()].map(([storeId, storeOffers]) => {
+    const topOffer = storeOffers[0]!;
+    return {
+      storeId,
+      storeName: topOffer.storeName,
+      chain: topOffer.chain,
+      offerCount: storeOffers.length,
+      totalOneEachSavings: roundPrice(storeOffers.reduce((sum, offer) => sum + offer.savings, 0)),
+      topOfferId: topOffer.offerId,
+      topDealScore: topOffer.dealScore
+    };
+  }).sort((left, right) =>
+    right.topDealScore - left.topDealScore ||
+    right.totalOneEachSavings - left.totalOneEachSavings ||
+    left.storeName.localeCompare(right.storeName)
+  );
+
+  return {
+    asOf,
+    filters: {
+      ...(options.storeId ? { storeId: options.storeId } : {}),
+      ...(chain ? { chain } : {}),
+      ...(category ? { category } : {}),
+      ...(options.productId ? { productId: options.productId } : {})
+    },
+    offerCount: offers.length,
+    stores: storesSummary,
+    offers,
+    guardrails: [
+      'Flyer offers are active only inside their captured validity window.',
+      'Branch-level offers stay tied to a store, source run, and flyer URL before they can drive shopper action.',
+      'Member flyer prices remain labeled and never overwrite public shelf price history.'
+    ]
+  };
+}
+
+export function buildFlyerOfferReport(input: {
+  observations: FlyerOfferObservationInput[];
+  asOf: string;
+  filters?: {
+    storeId?: string;
+    chain?: string;
+    category?: string;
+    productId?: string;
+  };
+}): FlyerOfferReport {
+  const asOf = requireIsoTimestamp(input.asOf, 'asOf');
+  const asOfMs = Date.parse(asOf);
+  const offers = input.observations
+    .filter((row) => row.price < row.regularPrice)
+    .map(flyerOfferFromObservation)
+    .filter((offer) => Date.parse(offer.validFrom) <= asOfMs && asOfMs <= Date.parse(offer.validThrough));
+  return buildFlyerOfferReportFromOffers(asOf, input.filters ?? {}, offers);
+}
+
+function flyerOfferReport(options: {
+  asOf?: string;
+  storeId?: string;
+  chain?: string;
+  category?: string;
+  productId?: string;
+} = {}): FlyerOfferReport {
+  const asOf = options.asOf ?? '2026-05-20T12:00:00.000Z';
+  if (options.storeId) requireKnownStore(options.storeId);
+  if (options.productId) requireKnownProduct(options.productId);
+  return buildFlyerOfferReportFromOffers(asOf, options, activeFlyerOffers(asOf));
+}
+
+
+
+const fulfillmentSlotEvidence: Record<string, BasketFulfillmentSlotInput[]> = {
+  'willys-odenplan': [
+    { slotId: 'willys-pickup-tomorrow-0900', mode: 'pickup', startsAt: '2026-05-23T09:00:00.000Z', endsAt: '2026-05-23T10:00:00.000Z', fee: 0, currency: 'SEK', available: true },
+    { slotId: 'willys-delivery-tomorrow-1800', mode: 'delivery', startsAt: '2026-05-23T18:00:00.000Z', endsAt: '2026-05-23T20:00:00.000Z', fee: 59, currency: 'SEK', available: false }
+  ]
+};
+
+function buildBasketFulfillmentSlotsReport(userId: string, retailerId: string, storeId: string, basketItems: BasketItemRequest[]): BasketFulfillmentSlotsReport {
+  requireNonEmptyId(userId, 'userId');
+  requireKnownStore(storeId);
+  const store = stores.find((candidate) => candidate.id === storeId)!;
+  const plan = planBasketFulfillmentSlots({
+    retailerId,
+    retailerName: retailerId.charAt(0).toUpperCase() + retailerId.slice(1),
+    storeId,
+    storeName: store.name,
+    asOf: '2026-05-22T09:45:00.000Z',
+    basketProductIds: basketItems.map((item) => item.productId),
+    source: { access: 'manual_evidence', evidenceUrl: `https://www.${retailerId}.se/checkout/slots`, capturedAt: '2026-05-22T09:40:00.000Z', shopperConsent: true },
+    slots: fulfillmentSlotEvidence[storeId] ?? []
+  });
+  return { userId, basketItemCount: basketItems.length, ...plan };
+}
+
+function basketImportKnownProducts() {
+  return products.map((product) => ({
+    productId: product.id,
+    productName: product.name,
+    aliases: [product.name, product.ticker]
+  }));
+}
+
+export const basketImportReviewGuardrails = [
+  'Retailer basket review rows are account-bound and never visible across signed-in users.',
+  'Unmatched retailer rows stay out of the basket until a signed-in shopper accepts a verified GroceryView product match.',
+  'Dismissed retailer rows remain auditable and are not silently converted into products.'
+];
+
+function basketImportReviewId(userId: string, source: BasketImportExportSource, rawName: string, index: number): string {
+  const slug = rawName
+    .toLocaleLowerCase('sv-SE')
+    .replace(/[^a-z0-9åäö]+/gi, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48) || 'retailer-row';
+  return `basket-import-review-${userId}-${source.retailerId}-${Date.parse(source.capturedAt)}-${index}-${slug}`;
+}
+
+export function createBasketImportReviewItems(
+  userId: string,
+  source: BasketImportExportSource,
+  reviewItems: BasketImportExportReviewItem[],
+  existingCount = 0
+): BasketImportReviewItem[] {
+  return reviewItems.map((item, index): BasketImportReviewItem => ({
+    ...item,
+    reviewItemId: basketImportReviewId(userId, source, item.rawName, existingCount + index),
+    retailerId: source.retailerId,
+    sourceKind: source.sourceKind,
+    capturedAt: source.capturedAt,
+    status: 'open',
+    createdAt: source.capturedAt
+  }));
+}
+
+function storeFlyerOfferReport(storeId: string, asOf?: string): StoreFlyerOfferReport {
+  requireKnownStore(storeId);
+  const store = stores.find((candidate) => candidate.id === storeId)!;
+  const report = flyerOfferReport({ storeId, asOf });
+  return {
+    storeId,
+    storeName: store.name,
+    chain: store.chain,
+    asOf: report.asOf,
+    offerCount: report.offerCount,
+    categoryCount: new Set(report.offers.map((offer) => offer.category)).size,
+    totalOneEachSavings: roundPrice(report.offers.reduce((sum, offer) => sum + offer.savings, 0)),
+    bestOffer: report.offers[0] ?? null,
+    offers: report.offers,
+    guardrails: report.guardrails
+  };
+}
+
 export function createGroceryViewApi() {
   const favoriteStores = new Map<string, Set<string>>();
   const watchlists = new Map<string, WatchlistItem[]>();
@@ -1618,6 +3868,7 @@ export function createGroceryViewApi() {
   const categoryBudgets = new Map<string, CategoryBudgetPatch[]>();
   const subscriptionEntitlements = new Map<string, SubscriptionEntitlementSnapshot>();
   const householdPlans = new Map<string, HouseholdPlan>();
+  const basketImportReviews = new Map<string, BasketImportReviewItem[]>();
 
   const productSnapshots = () =>
     products.map((product) => {
@@ -1657,7 +3908,7 @@ export function createGroceryViewApi() {
             band: scoreBand(product.dealScore)
           };
         });
-      return { city: 'Stockholm', indices: [index], movers, topDeals };
+      return { city: 'Stockholm', indices: [buildStockholmGroceryIndex()], movers, topDeals };
     },
 
     getNutritionValueReport(metric: NutritionMetric = 'protein'): NutritionValueReport {
@@ -1946,6 +4197,26 @@ export function createGroceryViewApi() {
       return storeDealsFor(storeId);
     },
 
+    getStoreDealSummary(storeId: string): StoreDealSummaryReport {
+      return storeDealSummaryFor(storeId);
+    },
+
+    getFlyerOffers(options: { asOf?: string; storeId?: string; chain?: string; category?: string; productId?: string } = {}): FlyerOfferReport {
+      return flyerOfferReport(options);
+    },
+
+    getStoreFlyerOffers(storeId: string, options: { asOf?: string } = {}): StoreFlyerOfferReport {
+      return storeFlyerOfferReport(storeId, options.asOf);
+    },
+
+    getStorePriceCoverage(storeId: string): StorePriceCoverageReport {
+      return buildStorePriceCoverage(storeId);
+    },
+
+    getStoreCategoryCoverage(storeId: string): StoreCategoryCoverageReport {
+      return buildStoreCategoryCoverage(storeId);
+    },
+
     searchProducts(query: string) {
       return searchProducts(products, query);
     },
@@ -1960,8 +4231,42 @@ export function createGroceryViewApi() {
       return sortPricesByValue(this.getProduct(id)?.currentPrices ?? []);
     },
 
+    getProductCheapestNow(id: string): ProductCheapestNow | null {
+      const product = this.getProduct(id);
+      if (!product) return null;
+      const chainPrices = cheapestByChain(product);
+      return {
+        productId: product.id,
+        productName: product.name,
+        category: product.category,
+        currency: 'SEK',
+        cheapest: chainPrices[0] ?? null,
+        chainPrices,
+        chainCount: chainPrices.length,
+        observedPriceCount: product.currentPrices.length,
+        lastObservedAt: latestObservedAt(product),
+        guardrails: [
+          'Cheapest-now compares only current observed prices for this exact product.',
+          'Each chain contributes at most its cheapest currently observed store row.',
+          'Missing chains stay absent instead of being estimated from other chains or products.'
+        ]
+      };
+    },
+
     getProductHistory(id: string) {
       return this.getProduct(id)?.history ?? [];
+    },
+
+    getProductHistorySummary(id: string): ProductHistorySummaryReport | null {
+      const product = this.getProduct(id);
+      if (!product) return null;
+      return productHistorySummaryFor(product);
+    },
+
+    getProductHistoryConfidence(id: string): ProductHistoryConfidenceReport | null {
+      const product = this.getProduct(id);
+      if (!product) return null;
+      return productHistoryConfidenceFor(product);
     },
 
     getProductPriceTerminal(id: string, options: { asOf?: string } = {}): ProductPriceTerminalReport | null {
@@ -1974,6 +4279,12 @@ export function createGroceryViewApi() {
       const product = this.getProduct(id);
       if (!product) return null;
       return productPriceSpreadFor(product);
+    },
+
+    getProductStoreSavings(id: string): ProductStoreSavingsReport | null {
+      const product = this.getProduct(id);
+      if (!product) return null;
+      return productStoreSavingsFor(product);
     },
 
     getDealScore(productId: string, options: { distanceKm?: number } = {}): DealScoreReport | null {
@@ -2112,6 +4423,44 @@ export function createGroceryViewApi() {
       return { items, alerts: buildWatchlistAlerts({ watchlist: items, products: productSnapshots(), favoriteStoreIds }) };
     },
 
+    addWatchlistPriceAlert(userId: string, alert: WatchlistPriceAlertRequest): WatchlistPriceAlertReport {
+      requireNonEmptyId(userId, 'userId');
+      requireKnownProduct(alert.productId);
+      requirePositiveFinite(alert.targetPrice, 'targetPrice');
+      requireAllowedPriceTypes(alert.allowedPriceTypes);
+      const current = watchlists.get(userId) ?? [];
+      const existingIndex = current.findIndex((item) => item.productId === alert.productId);
+      const nextItem: WatchlistItem = {
+        ...(existingIndex >= 0 ? current[existingIndex]! : { productId: alert.productId }),
+        productId: alert.productId,
+        targetPrice: alert.targetPrice,
+        favoriteStoresOnly: alert.favoriteStoresOnly ?? current[existingIndex]?.favoriteStoresOnly ?? true,
+        ...(alert.allowedPriceTypes === undefined ? {} : { allowedPriceTypes: alert.allowedPriceTypes })
+      };
+      const next = existingIndex >= 0
+        ? current.map((item, index) => index === existingIndex ? nextItem : item)
+        : [...current, nextItem];
+      watchlists.set(userId, next);
+      return this.getWatchlistPriceAlerts(userId);
+    },
+
+    getWatchlistPriceAlerts(userId: string): WatchlistPriceAlertReport {
+      requireNonEmptyId(userId, 'userId');
+      const watchlist = this.getWatchlist(userId);
+      const alerts = watchlist.alerts.filter((alert) => alert.type === 'target_price');
+      return {
+        userId,
+        trackedItemCount: watchlist.items.filter((item) => item.targetPrice !== undefined).length,
+        alertCount: alerts.length,
+        alerts,
+        guardrails: [
+          'Price alerts require a user-defined target price and current eligible price evidence.',
+          'Favorite-store and allowed-price-type filters are applied before an alert is emitted.',
+          'Estimated prices are excluded unless the watcher explicitly allows estimated price types.'
+        ]
+      };
+    },
+
     addBasketItem(userId: string, item: BasketItemRequest) {
       requireNonEmptyId(userId, 'userId');
       requireKnownProduct(item.productId);
@@ -2170,6 +4519,83 @@ export function createGroceryViewApi() {
       return buildBasketComparisonReport(userId, favoriteStoreIds, baskets.get(userId) ?? []);
     },
 
+
+    getBasketFulfillmentSlots(userId: string, retailerId: string, storeId: string): BasketFulfillmentSlotsReport {
+      return buildBasketFulfillmentSlotsReport(userId, retailerId, storeId, baskets.get(userId) ?? []);
+    },
+
+    getBasketTripCostReport(userId: string, request: BasketTripCostRequest): BasketTripCostReport {
+      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
+      return buildBasketTripCostReport(userId, favoriteStoreIds, baskets.get(userId) ?? [], request);
+    },
+
+
+    getRetailerHandoffPlan(userId: string, retailerId: string): RetailerHandoffReport {
+      return buildRetailerHandoffReport(userId, retailerId, baskets.get(userId) ?? []);
+    },
+
+    getRetailerBasketTransferSession(userId: string, retailerId: string): RetailerBasketTransferSessionReport {
+      return buildRetailerBasketTransferSession(userId, retailerId, baskets.get(userId) ?? []);
+    },
+
+    importBasketFromRetailerPage(userId: string, request: BasketImportExportRequest): BasketImportExportReport {
+      requireNonEmptyId(userId, 'userId');
+      const plan = planBasketImportExport({
+        source: request.source,
+        capturedLines: request.capturedLines,
+        knownProducts: basketImportKnownProducts()
+      });
+      for (const item of plan.acceptedItems) this.addBasketItem(userId, { productId: item.productId, quantity: item.quantity });
+      if (plan.reviewItems.length > 0) {
+        const existing = basketImportReviews.get(userId) ?? [];
+        const created = createBasketImportReviewItems(userId, plan.source, plan.reviewItems, existing.length);
+        basketImportReviews.set(userId, [...existing, ...created]);
+      }
+      return {
+        userId,
+        ...plan,
+        importedItemCount: plan.acceptedItems.length,
+        reviewItemCount: plan.reviewItems.length,
+        basketItemCount: (baskets.get(userId) ?? []).length
+      };
+    },
+
+    getBasketImportReviewQueue(userId: string): BasketImportReviewQueue {
+      requireNonEmptyId(userId, 'userId');
+      const items = basketImportReviews.get(userId) ?? [];
+      const openItems = items.filter((item) => item.status === 'open');
+      return {
+        userId,
+        openItemCount: openItems.length,
+        items: openItems,
+        guardrails: basketImportReviewGuardrails
+      };
+    },
+
+    resolveBasketImportReviewItem(userId: string, reviewItemId: string, request: BasketImportReviewDecisionRequest): BasketImportReviewItem {
+      requireNonEmptyId(userId, 'userId');
+      requireNonEmptyId(reviewItemId, 'reviewItemId');
+      const items = basketImportReviews.get(userId) ?? [];
+      const index = items.findIndex((item) => item.reviewItemId === reviewItemId && item.status === 'open');
+      if (index === -1) throw new Error(`Basket import review item not found: ${reviewItemId}`);
+      const item = items[index]!;
+      if (request.decision === 'accept_as_product') {
+        if (!request.productId) throw new Error('productId is required when accepting an import review item.');
+        requireKnownProduct(request.productId);
+        const quantity = request.quantity ?? item.quantity;
+        this.addBasketItem(userId, { productId: request.productId, quantity });
+        const resolved = { ...item, quantity, status: 'accepted' as const, resolvedAt: new Date(Date.parse(item.capturedAt) + 1).toISOString(), resolvedProductId: request.productId };
+        basketImportReviews.set(userId, items.map((candidate, candidateIndex) => candidateIndex === index ? resolved : candidate));
+        return resolved;
+      }
+      if (request.decision === 'dismiss') {
+        const resolved = { ...item, status: 'dismissed' as const, resolvedAt: new Date(Date.parse(item.capturedAt) + 1).toISOString() };
+        basketImportReviews.set(userId, items.map((candidate, candidateIndex) => candidateIndex === index ? resolved : candidate));
+        return resolved;
+      }
+      throw new Error('decision must be accept_as_product or dismiss.');
+    },
+
     getLocalOfferBasketReport(userId: string, asOf = '2026-05-20T12:00:00.000Z'): LocalOfferBasketReport {
       requireNonEmptyId(userId, 'userId');
       const userItems = baskets.get(userId) ?? [];
@@ -2195,6 +4621,10 @@ export function createGroceryViewApi() {
       };
     },
 
+    getRecurringBasketDigest(userId: string, request: RecurringBasketDigestRequest): RecurringBasketDigest {
+      return buildRecurringBasketDigest(userId, baskets.get(userId) ?? [], request);
+    },
+
     quoteBasketAtStore(userId: string, storeId: string): StoreBasketQuote {
       requireNonEmptyId(userId, 'userId');
       return buildStoreBasketQuote(userId, storeId, baskets.get(userId) ?? []);
@@ -2213,7 +4643,13 @@ export function createGroceryViewApi() {
 
     getBudgetSummary(userId: string): BudgetSummary {
       const budget = budgets.get(userId) ?? { weeklyBudget: 0, monthlyBudget: 0 };
-      return summarizeBudget({ ...budget, estimatedBasketTotal: this.compareBasket(userId).cheapestByProduct.total, receiptTotalsThisWeek: [], receiptTotalsThisMonth: [] });
+      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
+      const comparisonStoreIds = favoriteStoreIds.length > 0 ? favoriteStoreIds : stores.map((store) => store.id);
+      const comparison = compareBasketStrategies({
+        favoriteStoreIds: comparisonStoreIds,
+        items: basketInputItems(baskets.get(userId) ?? [])
+      });
+      return summarizeBudget({ ...budget, estimatedBasketTotal: comparison.cheapestByProduct.total, receiptTotalsThisWeek: [], receiptTotalsThisMonth: [] });
     },
 
     updateCategoryBudgets(userId: string, patches: CategoryBudgetPatch[]) {
@@ -2296,11 +4732,24 @@ export function createGroceryViewApi() {
       });
     },
 
+    getChainPriceIndices(): ChainPriceIndexSummary {
+      return calculateChainPriceIndex(chainIndexObservations());
+    },
+
+    getCategoryPriceIndices(): CategoryPriceIndexSummary {
+      return buildCategoryPriceIndices();
+    },
+
+    getBrandPriceIndices(): BrandPriceIndexSummary {
+      return buildBrandPriceIndices();
+    },
+
     getIndices() {
-      return [index];
+      return [buildStockholmGroceryIndex()];
     },
 
     getIndex(id: string) {
+      const index = buildStockholmGroceryIndex();
       return id === index.id ? index : null;
     }
   };
