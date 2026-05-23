@@ -70,6 +70,7 @@ describe('buildOpenApiDocument', () => {
       '/api/products/{id}/terminal',
       '/api/readiness/catalog-coverage',
       '/api/readiness/postgres',
+      '/api/readiness/scan-upload-cors',
       '/api/readiness/scan-upload-storage',
       '/api/readiness/scanning',
       '/api/readiness/source-runs',
@@ -150,6 +151,8 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/readiness/scanning'].get?.summary ?? '', /scan provider/i);
     assert.deepEqual(doc.paths['/api/readiness/scan-upload-storage'].get?.security, [{ metricsToken: [] }]);
     assert.match(doc.paths['/api/readiness/scan-upload-storage'].get?.summary ?? '', /scan upload storage/i);
+    assert.deepEqual(doc.paths['/api/readiness/scan-upload-cors'].get?.security, [{ metricsToken: [] }]);
+    assert.match(doc.paths['/api/readiness/scan-upload-cors'].get?.summary ?? '', /scan upload CORS/i);
     assert.deepEqual(doc.paths['/api/workers/notifications/run'].post?.security, [{ metricsToken: [] }]);
     assert.match(doc.paths['/api/workers/notifications/run'].post?.summary ?? '', /notification worker/i);
     assert.deepEqual(doc.paths['/api/notifications/suppression-events'].post?.security, [{ webhookSignature: [] }]);

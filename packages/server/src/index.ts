@@ -150,6 +150,7 @@ export type AuthOptions = {
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
   scanProviderReadinessProvider?: () => Promise<ScanProviderReadinessReport>;
   scanUploadStorageReadinessProvider?: () => Promise<ScanUploadStorageReadinessReport>;
+  scanUploadCorsReadinessProvider?: () => Promise<ScanUploadCorsReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
@@ -226,6 +227,7 @@ export type RuntimeHandlerOptions = {
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
   scanProviderReadinessProvider?: () => Promise<ScanProviderReadinessReport>;
   scanUploadStorageReadinessProvider?: () => Promise<ScanUploadStorageReadinessReport>;
+  scanUploadCorsReadinessProvider?: () => Promise<ScanUploadCorsReadinessReport>;
   flyerOffersProvider?: (query: FlyerOffersProviderQuery) => Promise<FlyerOfferReport>;
   storeFlyerOffersProvider?: (storeId: string, query: StoreFlyerOffersProviderQuery) => Promise<StoreFlyerOfferReport | null>;
   watchlistPriceAlertsProvider?: (userId: string) => Promise<WatchlistPriceAlertReport>;
@@ -233,6 +235,7 @@ export type RuntimeHandlerOptions = {
   pgPoolFactory?: RuntimePgPoolFactory;
   notificationProviderFetch?: NotificationProviderFetch;
   scanProviderFetch?: typeof fetch;
+  scanUploadCorsFetch?: typeof fetch;
 };
 
 export type FlyerOffersProviderQuery = {
@@ -1188,6 +1191,14 @@ export type ScanUploadStorageReadinessReport = {
   summary: string;
 };
 
+export type ScanUploadCorsReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  warnings: string[];
+  summary: string;
+};
+
 function scanUploadStorageReadinessFailureResponse(): ScanUploadStorageReadinessReport {
   return {
     status: 'blocked',
@@ -1195,6 +1206,16 @@ function scanUploadStorageReadinessFailureResponse(): ScanUploadStorageReadiness
     evidence: [],
     warnings: [],
     summary: 'Scan upload storage readiness is blocked.'
+  };
+}
+
+function scanUploadCorsReadinessFailureResponse(): ScanUploadCorsReadinessReport {
+  return {
+    status: 'blocked',
+    blockers: ['scan_upload_cors_readiness_probe_failed'],
+    evidence: [],
+    warnings: [],
+    summary: 'Scan upload CORS readiness is blocked.'
   };
 }
 
@@ -1251,6 +1272,95 @@ export async function buildScanUploadStorageReadinessReport(input: {
     evidence,
     warnings,
     summary: blockers.length === 0 ? 'Scan upload storage is ready.' : 'Scan upload storage readiness is blocked.'
+  };
+}
+
+function headerListIncludes(value: string | null, expected: string): boolean {
+  if (!value) return false;
+  return value
+    .split(',')
+    .map((entry) => entry.trim().toLowerCase())
+    .includes(expected.toLowerCase());
+}
+
+function corsOriginAllowed(value: string | null, expectedOrigin: string): boolean {
+  if (!value) return false;
+  return value === '*' || value.split(',').map((entry) => entry.trim()).includes(expectedOrigin);
+}
+
+export async function buildScanUploadCorsReadinessReport(input: {
+  storage?: ScanUploadStorage | undefined;
+  origin?: string | undefined;
+  fetch?: typeof fetch | undefined;
+  now?: Date;
+}): Promise<ScanUploadCorsReadinessReport> {
+  const evidence: string[] = [];
+  const blockers: string[] = [];
+  const warnings: string[] = [];
+
+  if (!input.storage) blockers.push('scan_upload_storage_not_configured');
+  if (!input.origin?.trim()) {
+    blockers.push('scan_upload_cors_origin_not_configured');
+  } else {
+    evidence.push('scan_upload_cors_origin_configured');
+  }
+  if (blockers.length > 0) {
+    return {
+      status: 'blocked',
+      blockers,
+      evidence,
+      warnings,
+      summary: 'Scan upload CORS readiness is blocked.'
+    };
+  }
+
+  const result = await prepareScanUploadTicket({
+    request: {
+      scanId: 'readiness-scan-upload-cors',
+      kind: 'receipt',
+      contentType: 'image/jpeg',
+      byteLength: 1,
+      requestedAt: (input.now ?? new Date()).toISOString()
+    },
+    storage: input.storage
+  });
+  if (result.status !== 'ready') {
+    blockers.push('scan_upload_storage_ticket_not_created');
+  } else {
+    const response = await (input.fetch ?? fetch)(result.ticket.uploadUrl, {
+      method: 'OPTIONS',
+      headers: new Headers({
+        origin: input.origin!,
+        'access-control-request-method': 'PUT',
+        'access-control-request-headers': 'content-type'
+      })
+    });
+    if (!response.ok) blockers.push('scan_upload_cors_preflight_failed');
+    else evidence.push('scan_upload_cors_preflight_passed');
+
+    if (corsOriginAllowed(response.headers.get('access-control-allow-origin'), input.origin!)) {
+      evidence.push('scan_upload_cors_allows_origin');
+    } else {
+      blockers.push('scan_upload_cors_origin_not_allowed');
+    }
+    if (headerListIncludes(response.headers.get('access-control-allow-methods'), 'PUT')) {
+      evidence.push('scan_upload_cors_allows_put');
+    } else {
+      blockers.push('scan_upload_cors_put_not_allowed');
+    }
+    if (headerListIncludes(response.headers.get('access-control-allow-headers'), 'content-type')) {
+      evidence.push('scan_upload_cors_allows_content_type');
+    } else {
+      blockers.push('scan_upload_cors_content_type_header_not_allowed');
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    warnings,
+    summary: blockers.length === 0 ? 'Scan upload CORS is ready.' : 'Scan upload CORS readiness is blocked.'
   };
 }
 
@@ -1783,6 +1893,21 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
         } catch {
           return jsonResponse(scanUploadStorageReadinessFailureResponse(), { status: 503 });
+        }
+      }
+
+      if (method === 'GET' && path === '/api/readiness/scan-upload-cors') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Scan upload CORS readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid scan upload CORS readiness token is required.');
+        }
+        if (!authOptions.scanUploadCorsReadinessProvider) return errorResponse(503, 'Scan upload CORS readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.scanUploadCorsReadinessProvider();
+          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(scanUploadCorsReadinessFailureResponse(), { status: 503 });
         }
       }
 
@@ -2697,6 +2822,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/readiness/source-runs': { get: metricsOperation('Check source run freshness and terminal status without exposing source secrets.') },
       '/api/readiness/catalog-coverage': { get: metricsOperation('Check product, chain, store, and product-store catalog coverage without exposing database secrets.') },
       '/api/readiness/scanning': { get: metricsOperation('Check scan provider configuration and health evidence without exposing provider secrets.') },
+      '/api/readiness/scan-upload-cors': { get: metricsOperation('Check scan upload CORS preflight behavior without exposing signed upload URL secrets.') },
       '/api/readiness/scan-upload-storage': { get: metricsOperation('Check scan upload storage ticket creation without exposing object-storage secrets.') },
       '/api/workers/notifications/run': { post: metricsOperation('Run the configured notification worker cycle for cron execution.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
@@ -3008,6 +3134,12 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     scanProviderReadinessProvider: options.scanProviderReadinessProvider ?? (() => buildRuntimeScanProviderReadinessReport(config, options)),
     scanUploadStorageReadinessProvider: options.scanUploadStorageReadinessProvider ?? (() => buildScanUploadStorageReadinessReport({
       storage: scanUploadStorage,
+      now: options.now
+    })),
+    scanUploadCorsReadinessProvider: options.scanUploadCorsReadinessProvider ?? (() => buildScanUploadCorsReadinessReport({
+      storage: scanUploadStorage,
+      origin: config.publicWebUrl,
+      fetch: options.scanUploadCorsFetch,
       now: options.now
     })),
     flyerOffersProvider: options.flyerOffersProvider,

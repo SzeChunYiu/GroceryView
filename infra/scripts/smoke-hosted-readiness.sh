@@ -50,19 +50,23 @@ check_readiness_endpoint() {
 
 postgres_endpoint="${GROCERYVIEW_SERVER_URL%/}/api/readiness/postgres"
 scan_endpoint="${GROCERYVIEW_SERVER_URL%/}/api/readiness/scanning"
+scan_upload_cors_endpoint="${GROCERYVIEW_SERVER_URL%/}/api/readiness/scan-upload-cors"
 scan_upload_storage_endpoint="${GROCERYVIEW_SERVER_URL%/}/api/readiness/scan-upload-storage"
 
 check_readiness_endpoint "PostgreSQL" "$postgres_endpoint"
 check_readiness_endpoint "scan provider" "$scan_endpoint"
+check_readiness_endpoint "scan upload CORS" "$scan_upload_cors_endpoint"
 check_readiness_endpoint "scan upload storage" "$scan_upload_storage_endpoint"
 
 if [ -n "$HOSTED_READINESS_SMOKE_OUTPUT_PATH" ]; then
   mkdir -p "$(dirname "$HOSTED_READINESS_SMOKE_OUTPUT_PATH")"
   HOSTED_POSTGRES_READINESS_SMOKE_ENDPOINT="$postgres_endpoint"
   HOSTED_SCAN_READINESS_SMOKE_ENDPOINT="$scan_endpoint"
+  HOSTED_SCAN_UPLOAD_CORS_READINESS_SMOKE_ENDPOINT="$scan_upload_cors_endpoint"
   HOSTED_SCAN_UPLOAD_STORAGE_READINESS_SMOKE_ENDPOINT="$scan_upload_storage_endpoint"
   export HOSTED_POSTGRES_READINESS_SMOKE_ENDPOINT
   export HOSTED_SCAN_READINESS_SMOKE_ENDPOINT
+  export HOSTED_SCAN_UPLOAD_CORS_READINESS_SMOKE_ENDPOINT
   export HOSTED_SCAN_UPLOAD_STORAGE_READINESS_SMOKE_ENDPOINT
   export HOSTED_READINESS_SMOKE_OUTPUT_PATH
 
@@ -74,6 +78,7 @@ const payload = {
   endpoints: {
     postgres: process.env.HOSTED_POSTGRES_READINESS_SMOKE_ENDPOINT,
     scanning: process.env.HOSTED_SCAN_READINESS_SMOKE_ENDPOINT,
+    scanUploadCors: process.env.HOSTED_SCAN_UPLOAD_CORS_READINESS_SMOKE_ENDPOINT,
     scanUploadStorage: process.env.HOSTED_SCAN_UPLOAD_STORAGE_READINESS_SMOKE_ENDPOINT
   },
   checkedAt: new Date().toISOString()
