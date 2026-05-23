@@ -64,7 +64,7 @@ jobs:
         with:
           name: groceryview-production-config-preflight
           path: /tmp/production-config-preflight.json
-          if-no-files-found: ignore
+          if-no-files-found: error
           retention-days: 14
 
       - name: Install
@@ -376,12 +376,33 @@ jobs:
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
         run: |
           set -euo pipefail
-          test -n "${GROCERYVIEW_SERVER_URL:-}"
-          test -n "${METRICS_TOKEN:-}"
-          curl -fsS \
-            -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
-            "${GROCERYVIEW_SERVER_URL%/}/api/readiness/postgres" \
-            >/tmp/postgres-readiness.json
+          postgres_readiness_status=0
+          if [ -z "${GROCERYVIEW_SERVER_URL:-}" ] || [ -z "${METRICS_TOKEN:-}" ]; then
+            node <<'NODE' >/tmp/postgres-readiness.json
+          const required = ['GROCERYVIEW_SERVER_URL', 'METRICS_TOKEN'];
+          const missing = required.filter((name) => !process.env[name]);
+          console.log(JSON.stringify({
+            status: 'blocked',
+            blocker: 'postgres_readiness_config_missing',
+            missing
+          }, null, 2));
+          NODE
+          else
+            curl -fsS \
+              -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
+              "${GROCERYVIEW_SERVER_URL%/}/api/readiness/postgres" \
+              >/tmp/postgres-readiness.json || postgres_readiness_status=$?
+          fi
+          if [ ! -s /tmp/postgres-readiness.json ]; then
+            cat > /tmp/postgres-readiness.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "postgres_readiness_diagnostic_missing",
+            "exitCode": ${postgres_readiness_status}
+          }
+          EOF
+          fi
+          cat /tmp/postgres-readiness.json
           node <<'NODE'
           const { existsSync } = require('node:fs');
           const readiness = require('/tmp/postgres-readiness.json');
@@ -423,12 +444,33 @@ jobs:
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
         run: |
           set -euo pipefail
-          test -n "${GROCERYVIEW_SERVER_URL:-}"
-          test -n "${METRICS_TOKEN:-}"
-          curl -fsS \
-            -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
-            "${GROCERYVIEW_SERVER_URL%/}/api/readiness/source-runs" \
-            >/tmp/source-run-readiness.json
+          source_run_readiness_status=0
+          if [ -z "${GROCERYVIEW_SERVER_URL:-}" ] || [ -z "${METRICS_TOKEN:-}" ]; then
+            node <<'NODE' >/tmp/source-run-readiness.json
+          const required = ['GROCERYVIEW_SERVER_URL', 'METRICS_TOKEN'];
+          const missing = required.filter((name) => !process.env[name]);
+          console.log(JSON.stringify({
+            status: 'blocked',
+            blocker: 'source_run_readiness_config_missing',
+            missing
+          }, null, 2));
+          NODE
+          else
+            curl -fsS \
+              -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
+              "${GROCERYVIEW_SERVER_URL%/}/api/readiness/source-runs" \
+              >/tmp/source-run-readiness.json || source_run_readiness_status=$?
+          fi
+          if [ ! -s /tmp/source-run-readiness.json ]; then
+            cat > /tmp/source-run-readiness.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "source_run_readiness_diagnostic_missing",
+            "exitCode": ${source_run_readiness_status}
+          }
+          EOF
+          fi
+          cat /tmp/source-run-readiness.json
           node <<'NODE'
           const body = require('/tmp/source-run-readiness.json');
           const requiredMissingChainBlockers = [
@@ -469,12 +511,33 @@ jobs:
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
         run: |
           set -euo pipefail
-          test -n "${GROCERYVIEW_SERVER_URL:-}"
-          test -n "${METRICS_TOKEN:-}"
-          curl -fsS \
-            -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
-            "${GROCERYVIEW_SERVER_URL%/}/api/readiness/catalog-coverage" \
-            >/tmp/catalog-coverage-readiness.json
+          catalog_coverage_readiness_status=0
+          if [ -z "${GROCERYVIEW_SERVER_URL:-}" ] || [ -z "${METRICS_TOKEN:-}" ]; then
+            node <<'NODE' >/tmp/catalog-coverage-readiness.json
+          const required = ['GROCERYVIEW_SERVER_URL', 'METRICS_TOKEN'];
+          const missing = required.filter((name) => !process.env[name]);
+          console.log(JSON.stringify({
+            status: 'blocked',
+            blocker: 'catalog_coverage_readiness_config_missing',
+            missing
+          }, null, 2));
+          NODE
+          else
+            curl -fsS \
+              -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
+              "${GROCERYVIEW_SERVER_URL%/}/api/readiness/catalog-coverage" \
+              >/tmp/catalog-coverage-readiness.json || catalog_coverage_readiness_status=$?
+          fi
+          if [ ! -s /tmp/catalog-coverage-readiness.json ]; then
+            cat > /tmp/catalog-coverage-readiness.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "catalog_coverage_readiness_diagnostic_missing",
+            "exitCode": ${catalog_coverage_readiness_status}
+          }
+          EOF
+          fi
+          cat /tmp/catalog-coverage-readiness.json
           node <<'NODE'
           const body = require('/tmp/catalog-coverage-readiness.json');
           const missingDimensions = {
@@ -505,5 +568,5 @@ jobs:
             /tmp/postgres-readiness.json
             /tmp/source-run-readiness.json
             /tmp/catalog-coverage-readiness.json
-          if-no-files-found: ignore
+          if-no-files-found: error
           retention-days: 14
