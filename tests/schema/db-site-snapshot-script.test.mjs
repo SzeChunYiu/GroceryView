@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -510,6 +511,62 @@ describe('DB-backed site snapshot export script', () => {
         modulePath,
         cacheTtlSeconds: 60
       }), artifact);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('bypasses a partial CLI cache, attempts the Postgres reader, and preserves stale outputs', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'db-site-snapshot-partial-cache-'));
+    try {
+      const outputPath = join(dir, 'snapshot.json');
+      const modulePath = join(dir, 'db-site-products.ts');
+      const missingChainObservationsModulePath = join(dir, 'db-site-chain-observations.ts');
+      const staleModuleText = '// stale generated product module that must not be overwritten after a failed DB read\n';
+      const artifact = buildDbSiteSnapshotArtifact({
+        generatedAt: new Date().toISOString(),
+        requiredChains: ['willys'],
+        rows: [{
+          productId: 'product-1',
+          productSlug: 'bryggkaffe-450g',
+          canonicalName: 'Bryggkaffe mellanrost 450 g',
+          categoryPath: ['Pantry', 'Coffee'],
+          comparableUnit: 'kg',
+          chainId: 'chain-1',
+          chainSlug: 'willys',
+          chainName: 'Willys',
+          priceType: 'online',
+          observationId: 'observation-fresh',
+          price: 44.9,
+          unitPrice: 99.7778,
+          currency: 'SEK',
+          observedAt: new Date().toISOString(),
+          confidence: 0.88
+        }]
+      });
+      writeFileSync(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
+      writeFileSync(modulePath, staleModuleText);
+
+      const result = spawnSync(process.execPath, [new URL('../../scripts/ingestion/export-db-site-snapshot.mjs', import.meta.url).pathname], {
+        cwd: new URL('../..', import.meta.url).pathname,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          NODE_ENV: 'test',
+          DATABASE_URL: 'postgres://groceryview:groceryview@127.0.0.1:1/groceryview',
+          GROCERYVIEW_DB_SITE_SNAPSHOT_PATH: outputPath,
+          GROCERYVIEW_DB_SITE_SNAPSHOT_MODULE_PATH: modulePath,
+          GROCERYVIEW_DB_SITE_SNAPSHOT_CHAIN_OBSERVATIONS_MODULE_PATH: missingChainObservationsModulePath,
+          GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS: 'willys',
+          GROCERYVIEW_DB_SITE_SNAPSHOT_CACHE_TTL_SECONDS: '3600'
+        }
+      });
+
+      assert.notEqual(result.status, 0);
+      assert.match(result.stderr, /(ECONNREFUSED|connect ECONNREFUSED|Unable to connect|Connection refused)/);
+      assert.equal(readFileSync(outputPath, 'utf8'), `${JSON.stringify(artifact, null, 2)}\n`);
+      assert.equal(readFileSync(modulePath, 'utf8'), staleModuleText);
+      assert.equal(existsSync(missingChainObservationsModulePath), false);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
