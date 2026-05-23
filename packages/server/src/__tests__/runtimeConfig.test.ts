@@ -82,7 +82,10 @@ class RecordingPgPool {
           'household_members',
           'household_basket_items',
           'household_watchlist_items',
-          'household_favorite_stores'
+          'household_favorite_stores',
+          'fuel_grades',
+          'fuel_price_sources',
+          'fuel_price_source_observations'
         ].map((table_name) => ({ table_name }))
       };
     }
@@ -102,7 +105,8 @@ class RecordingPgPool {
           '010_commodity_taxonomy',
           '011_multi_vertical_domains',
           '012_price_rollups',
-          '013_observations_partitioning'
+          '013_observations_partitioning',
+          '014_fuel_price_sources'
         ].map((version) => ({ version }))
       };
     }
@@ -1442,6 +1446,7 @@ describe('runtime config', () => {
       assert.equal(body.evidence.includes('migration:008_household_plans'), true);
       assert.equal(body.evidence.includes('migration:012_price_rollups'), true);
       assert.equal(body.evidence.includes('migration:013_observations_partitioning'), true);
+      assert.equal(body.evidence.includes('migration:014_fuel_price_sources'), true);
       assert.equal(JSON.stringify(body).includes('runtime-password'), false);
     } finally {
       await service.close();
