@@ -254,8 +254,34 @@ const chainDisplayNames: Record<string, string> = {
   hemkop: 'Hemköp'
 };
 
+export const commonDietaryFilterOptions = [
+  {
+    value: 'glutenfree',
+    label: 'Gluten-free',
+    evidenceLabels: ['glutenfree', 'crossed_ax'],
+    evidenceKeywords: ['glutenfri', 'glutenfritt', 'glutenfria', 'gluten-free']
+  },
+  {
+    value: 'laktosfree',
+    label: 'Lactose-free',
+    evidenceLabels: ['laktosfree'],
+    evidenceKeywords: ['laktosfri', 'laktosfritt', 'låg laktos', 'lactose-free']
+  },
+  {
+    value: 'vegan',
+    label: 'Vegan',
+    evidenceLabels: ['vegan', 'vegetarian'],
+    evidenceKeywords: ['vegan', 'vegansk', 'veganska']
+  }
+] as const;
+
+type CommonDietaryFilterValue = typeof commonDietaryFilterOptions[number]['value'];
+
 function readableLabel(label: string) {
+  const dietaryOption = commonDietaryFilterOptions.find((option) => option.value === label);
+  if (dietaryOption) return dietaryOption.label;
   const known: Record<string, string> = {
+    crossed_ax: 'Gluten-free',
     ecological: 'Ekologisk',
     eu_ecological: 'EU-ekologisk',
     fairtrade: 'Fairtrade',
@@ -275,6 +301,21 @@ function sortedCountFacets(counts: Map<string, number>) {
     .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, 'sv'));
 }
 
+function dietaryLabelsForProduct(product: (typeof axfoodProducts)[number]): CommonDietaryFilterValue[] {
+  const labels = new Set(product.labels.map((label) => label.toLocaleLowerCase('sv-SE')));
+  const evidenceText = `${product.name} ${product.brand} ${product.subline} ${product.category}`.toLocaleLowerCase('sv-SE');
+  return commonDietaryFilterOptions
+    .filter((option) => (
+      option.evidenceLabels.some((label) => labels.has(label))
+      || option.evidenceKeywords.some((keyword) => evidenceText.includes(keyword))
+    ))
+    .map((option) => option.value);
+}
+
+function productLabelsWithDietaryEvidence(product: (typeof axfoodProducts)[number]): string[] {
+  return [...new Set([...product.labels, ...dietaryLabelsForProduct(product)])].sort((left, right) => left.localeCompare(right, 'sv'));
+}
+
 export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.flatMap((product) => {
   const packageAmount = unitAmountFromPackage(product.subline);
   return chainPriceRows(product).flatMap((priceRow) => {
@@ -288,7 +329,7 @@ export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.fla
       canonicalName: product.name,
       brand: product.brand,
       categoryPath: [labelFromSlug(product.category)],
-      labels: product.labels,
+      labels: productLabelsWithDietaryEvidence(product),
       ...(packageAmount ? { packageSize: packageAmount.amount, packageUnit: packageAmount.unit } : {}),
       comparableUnit,
       ...(product.image ? { imageUrl: product.image } : {}),
@@ -318,6 +359,7 @@ export type ProductSearchUrlParams = {
   q?: SearchParamValue;
   category?: SearchParamValue;
   label?: SearchParamValue;
+  dietary?: SearchParamValue;
   chain?: SearchParamValue;
   minPrice?: SearchParamValue;
   maxPrice?: SearchParamValue;
@@ -333,6 +375,13 @@ function firstSearchValue(value: SearchParamValue): string {
 function listSearchValues(value: SearchParamValue): string[] {
   const rawValues = Array.isArray(value) ? value : value ? [value] : [];
   return [...new Set(rawValues.flatMap((item) => item.split(',')).map((item) => item.trim()).filter(Boolean))];
+}
+
+function dietarySearchValues(value: SearchParamValue): CommonDietaryFilterValue[] {
+  const requested = new Set(listSearchValues(value).map((item) => item.toLocaleLowerCase('sv-SE')));
+  return commonDietaryFilterOptions
+    .filter((option) => requested.has(option.value))
+    .map((option) => option.value);
 }
 
 function numericSearchValue(value: SearchParamValue): number | undefined {
@@ -378,7 +427,9 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
 export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}) {
   const query = firstSearchValue(searchParams.q);
   const categories = listSearchValues(searchParams.category);
-  const labels = listSearchValues(searchParams.label);
+  const labelFilters = listSearchValues(searchParams.label);
+  const dietaryLabels = dietarySearchValues(searchParams.dietary);
+  const labels = [...new Set([...labelFilters, ...dietaryLabels])];
   const chains = listSearchValues(searchParams.chain);
   const minPrice = numericSearchValue(searchParams.minPrice);
   const maxPrice = numericSearchValue(searchParams.maxPrice);
@@ -390,7 +441,11 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const activeFilters = [
     query ? `q=${query}` : null,
     ...categories.map((category) => `category=${category}`),
-    ...labels.map((label) => `label=${readableLabel(label)}`),
+    ...labelFilters.map((label) => `label=${readableLabel(label)}`),
+    ...dietaryLabels.map((dietaryLabel) => {
+      const dietaryFilterLabel = commonDietaryFilterOptions.find((option) => option.value === dietaryLabel)?.label ?? readableLabel(dietaryLabel);
+      return `dietary=${dietaryFilterLabel}`;
+    }),
     ...chains.map((chain) => `chain=${chainDisplayNames[chain] ?? chain}`),
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
@@ -404,6 +459,16 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     categoryFacets: searchResult.facets.categories.slice(0, 6),
     chainFacets: searchResult.facets.chains,
     labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
+    labelFilters,
+    dietaryFilters: commonDietaryFilterOptions.map((option) => {
+      const facet = searchResult.facets.labels.find((candidate) => candidate.value === option.value);
+      return {
+        ...option,
+        checked: dietaryLabels.includes(option.value),
+        count: facet?.count ?? 0,
+        evidenceSummary: option.evidenceLabels.join(' + ')
+      };
+    }),
     priceRange: searchResult.facets.priceRange,
     inStockOnly: {
       label: 'In-stock / priced rows only',
