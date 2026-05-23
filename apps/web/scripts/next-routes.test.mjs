@@ -1097,19 +1097,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
-  it('surfaces a deal screener on deals using ranked visible deal rows', async () => {
-    const route = await read('src/app/deals/page.tsx');
-    const demo = await read('src/lib/demo-data.ts');
+  it('surfaces a deal screener on screener using ranked visible deal rows', async () => {
+    const route = await read('src/app/screener/page.tsx');
 
-    assert.match(demo, /dealScreener/);
-    assert.match(demo, /rankDealOpportunities/);
-    assert.match(demo, /sourceConfidence/);
-    assert.match(route, /dealScreener/);
-    assert.match(route, /Deal screener/);
-    assert.match(route, /minimumScore/);
-    assert.match(route, /categoryFilter/);
-    assert.match(route, /visible ranked deal rows/);
+    assert.match(route, /priceDropMoversBoard/);
+    assert.match(route, /categoryDealLeaders/);
+    assert.match(route, /topChainSpreads/);
+    assert.match(route, /biggest drop/i);
+    assert.match(route, /Cheapest per kg/i);
+    assert.match(route, /Widest spread/i);
+    assert.match(route, /sortValues/);
     assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
+  it('moves deal screener navigation on deals to the dedicated screener route', async () => {
+    const deals = await read('src/app/deals/page.tsx');
+    assert.match(deals, /href="\/screener"/);
+    assert.match(deals, /Open ranked screener/);
   });
 
   it('surfaces offer expiry reminders from real Matpriskollen validity windows', async () => {
