@@ -88,6 +88,9 @@ import {
   fetchWillysStores,
   fetchWillysWeeklyDiscounts,
   fetchWillysWeeklyDiscountsForAllStores,
+  findPharmacyEanMatches,
+  parseApohemProducts,
+  parseApotekHjartatProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -6097,6 +6100,122 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.store_id, null);
     assert.equal(observation.price, 49);
     assert.equal(observation.regular_price, 59);
+  });
+
+  it('parses Apohem and Apotek Hjartat page fixtures with public EAN provenance only', () => {
+    const retrievedAt = '2026-05-23T08:40:34.000Z';
+    const apohemSourceUrl = 'https://www.apohem.se/receptfritt';
+    const apotekHjartatSourceUrl = 'https://www.apotekhjartat.se/search?q=pamol';
+    const sharedEan = '7046260976108';
+    const apohemRows = parseApohemProducts(`
+      <script>window.CURRENT_PAGE = {"listing":{"products":[
+        {
+          "url":"/vark-feber/varktabletter/alvedon-tabletter-500-mg-paracetamol-20-st",
+          "displayName":"Alvedon tabletter 20 st",
+          "brandName":"Alvedon",
+          "code":"apohem-alvedon",
+          "variationCode":"apohem-alvedon-20",
+          "variationEAN":"70 46260-976108",
+          "price":{"current":{"inclVat":"49,90","vatPercent":"12"},"previous":{"inclVat":"59,90"}},
+          "images":[{"url":"/globalassets/alvedon.png"}],
+          "stock":{"status":"in_stock"},
+          "isotc":true,
+          "isPrescriptionProduct":false
+        },
+        {
+          "url":"/receptbelagt/prescription-only",
+          "displayName":"Prescription only 10 st",
+          "brandName":"Guarded",
+          "code":"apohem-prescription",
+          "variationEAN":"1234567890123",
+          "price":{"current":{"inclVat":99,"vatPercent":12}},
+          "isotc":false,
+          "isPrescriptionProduct":true
+        }
+      ]}};</script>
+    `, apohemSourceUrl, retrievedAt);
+    const apotekInitialData = JSON.stringify({
+      search: {
+        products: [{
+          url: '/produkt/alvedon-500mg-20-tabletter/',
+          productName: 'Alvedon 500 mg 20 tabletter',
+          sku: 'hjartat-alvedon-20',
+          gtin: sharedEan,
+          price: { current: { inclVat: 52.5, vatPercent: 12 } },
+          storePrice: '64,50',
+          images: [{ url: '/assets/alvedon-hjartat.png' }],
+          variant: { stockStatus: 'buyable' },
+          brands: [{ title: 'Alvedon' }],
+          isBuyableWithoutPrescription: true,
+          belongsToPrescriptionProductGroup: false,
+          isOtcMedicine: true,
+          trackingProductInformation: {
+            brand: 'Fallback brand',
+            category: 'Vark och feber',
+            ean: sharedEan,
+            stockStatus: 'in_stock'
+          }
+        }, {
+          url: '/produkt/receptbelagt/',
+          productName: 'Prescription only',
+          sku: 'hjartat-prescription',
+          gtin: '1234567890123',
+          price: { current: { inclVat: 88, vatPercent: 12 } },
+          isBuyableWithoutPrescription: false,
+          belongsToPrescriptionProductGroup: true
+        }]
+      }
+    });
+    const apotekRows = parseApotekHjartatProducts(
+      `<script>window.INITIAL_DATA = JSON.parse('${apotekInitialData}');</script>`,
+      apotekHjartatSourceUrl,
+      retrievedAt
+    );
+
+    assert.equal(apohemRows.length, 1);
+    assert.equal(apotekRows.length, 1);
+    assert.deepEqual(apohemRows[0], {
+      chain: 'apohem',
+      code: 'apohem-alvedon-20',
+      ean: sharedEan,
+      name: 'Alvedon tabletter 20 st',
+      brand: 'Alvedon',
+      category: 'otc',
+      price: 49.9,
+      priceText: '49.90 SEK',
+      originalPrice: 59.9,
+      originalPriceText: '59.90 SEK',
+      vatPercent: 12,
+      stockStatus: 'in_stock',
+      productUrl: 'https://www.apohem.se/vark-feber/varktabletter/alvedon-tabletter-500-mg-paracetamol-20-st',
+      imageUrl: 'https://www.apohem.se/globalassets/alvedon.png',
+      isOtc: true,
+      sourceUrl: apohemSourceUrl,
+      retrievedAt
+    });
+    assert.deepEqual(apotekRows[0], {
+      chain: 'apotek-hjartat',
+      code: 'hjartat-alvedon-20',
+      ean: sharedEan,
+      name: 'Alvedon 500 mg 20 tabletter',
+      brand: 'Alvedon',
+      category: 'otc',
+      price: 52.5,
+      priceText: '52.50 SEK',
+      originalPrice: 64.5,
+      originalPriceText: '64.50 SEK',
+      vatPercent: 12,
+      stockStatus: 'buyable',
+      productUrl: 'https://www.apotekhjartat.se/produkt/alvedon-500mg-20-tabletter/',
+      imageUrl: 'https://www.apotekhjartat.se/assets/alvedon-hjartat.png',
+      isOtc: true,
+      sourceUrl: apotekHjartatSourceUrl,
+      retrievedAt
+    });
+    assert.deepEqual(findPharmacyEanMatches([...apohemRows, ...apotekRows]).map((row) => row.sourceUrl), [
+      apohemSourceUrl,
+      apotekHjartatSourceUrl
+    ]);
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
