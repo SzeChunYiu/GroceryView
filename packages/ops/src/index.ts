@@ -1,5 +1,182 @@
 export type GateStatus = 'pass' | 'fail' | 'not_run';
 
+export type NorwayCoverageReadinessStage = 'demo' | 'production';
+
+export type NorwayCoverageThresholds = {
+  chains: number;
+  cities: number;
+  stores: number;
+  products: number;
+  categories: number;
+  sourceCount: number;
+  maxFreshnessDays: number;
+};
+
+export const norwayCoverageThresholds: Record<NorwayCoverageReadinessStage, NorwayCoverageThresholds> = {
+  demo: {
+    chains: 2,
+    cities: 2,
+    stores: 20,
+    products: 200,
+    categories: 8,
+    sourceCount: 1,
+    maxFreshnessDays: 14
+  },
+  production: {
+    chains: 4,
+    cities: 5,
+    stores: 100,
+    products: 2000,
+    categories: 16,
+    sourceCount: 2,
+    maxFreshnessDays: 3
+  }
+};
+
+export type NorwayCoverageReadinessInput = {
+  chains: string[];
+  cities: string[];
+  storeCount: number;
+  productCount: number;
+  categories: string[];
+  sourceIds: string[];
+  latestObservedAt?: string | null;
+  generatedAt?: string;
+};
+
+export type NorwayCoverageReadinessGate = {
+  name: keyof NorwayCoverageThresholds;
+  current: number;
+  demoRequired: number;
+  productionRequired: number;
+  demoPass: boolean;
+  productionPass: boolean;
+};
+
+export type NorwayCoverageReadinessReport = {
+  market: 'NO';
+  currency: 'NOK';
+  status: 'blocked' | 'demo_ready' | 'production_ready';
+  publicClaimsAllowed: boolean;
+  demoReady: boolean;
+  productionReady: boolean;
+  metrics: {
+    chainCount: number;
+    cityCount: number;
+    storeCount: number;
+    productCount: number;
+    categoryCount: number;
+    sourceCount: number;
+    freshnessDays: number | null;
+  };
+  gates: NorwayCoverageReadinessGate[];
+  blockers: string[];
+  guardrails: string[];
+  summary: string;
+};
+
+export const emptyNorwayCoverageReadinessInput: NorwayCoverageReadinessInput = {
+  chains: [],
+  cities: [],
+  storeCount: 0,
+  productCount: 0,
+  categories: [],
+  sourceIds: [],
+  latestObservedAt: null
+};
+
+function uniqueNonEmpty(values: string[]): string[] {
+  return [...new Set(values.map((value) => value.trim()).filter(Boolean))].sort((left, right) => left.localeCompare(right));
+}
+
+function daysSince(value: string | null | undefined, asOf: string): number | null {
+  if (!value) return null;
+  const observed = new Date(value);
+  const now = new Date(asOf);
+  if (Number.isNaN(observed.valueOf()) || Number.isNaN(now.valueOf())) return null;
+  return Math.max(0, Math.ceil((now.valueOf() - observed.valueOf()) / 86_400_000));
+}
+
+function freshnessScore(freshnessDays: number | null): number {
+  return freshnessDays === null ? 999_999 : freshnessDays;
+}
+
+export function buildNorwayCoverageReadinessReport(
+  input: NorwayCoverageReadinessInput,
+  options: { asOf?: string } = {}
+): NorwayCoverageReadinessReport {
+  const chains = uniqueNonEmpty(input.chains);
+  const cities = uniqueNonEmpty(input.cities);
+  const categories = uniqueNonEmpty(input.categories);
+  const sourceIds = uniqueNonEmpty(input.sourceIds);
+  const asOf = options.asOf ?? input.generatedAt ?? new Date().toISOString();
+  const freshnessDays = daysSince(input.latestObservedAt, asOf);
+  const metrics = {
+    chainCount: chains.length,
+    cityCount: cities.length,
+    storeCount: Math.max(0, input.storeCount),
+    productCount: Math.max(0, input.productCount),
+    categoryCount: categories.length,
+    sourceCount: sourceIds.length,
+    freshnessDays
+  };
+
+  const currentByGate: Record<keyof NorwayCoverageThresholds, number> = {
+    chains: metrics.chainCount,
+    cities: metrics.cityCount,
+    stores: metrics.storeCount,
+    products: metrics.productCount,
+    categories: metrics.categoryCount,
+    sourceCount: metrics.sourceCount,
+    maxFreshnessDays: freshnessScore(metrics.freshnessDays)
+  };
+
+  const gates = (Object.keys(norwayCoverageThresholds.demo) as Array<keyof NorwayCoverageThresholds>).map((name) => {
+    const current = currentByGate[name];
+    const demoRequired = norwayCoverageThresholds.demo[name];
+    const productionRequired = norwayCoverageThresholds.production[name];
+    const isFreshnessGate = name === 'maxFreshnessDays';
+    return {
+      name,
+      current,
+      demoRequired,
+      productionRequired,
+      demoPass: isFreshnessGate ? current <= demoRequired : current >= demoRequired,
+      productionPass: isFreshnessGate ? current <= productionRequired : current >= productionRequired
+    };
+  });
+
+  const demoReady = gates.every((gate) => gate.demoPass);
+  const productionReady = gates.every((gate) => gate.productionPass);
+  const blockers = gates
+    .filter((gate) => !gate.productionPass)
+    .map((gate) => `norway_${gate.name}_below_production_minimum:${gate.current}/${gate.productionRequired}`);
+  if (!demoReady) blockers.unshift('norway_market_not_demo_ready');
+  if (metrics.freshnessDays === null) blockers.push('norway_freshness_evidence_missing');
+
+  return {
+    market: 'NO',
+    currency: 'NOK',
+    status: productionReady ? 'production_ready' : demoReady ? 'demo_ready' : 'blocked',
+    publicClaimsAllowed: productionReady,
+    demoReady,
+    productionReady,
+    metrics,
+    gates,
+    blockers,
+    guardrails: [
+      'Norway public price claims stay disabled until production readiness passes.',
+      'Demo readiness is an operator-only gate; it does not authorize shopper-facing cheapest-chain claims.',
+      'Freshness is measured from the newest observed Norway price/source row and fails closed when absent.'
+    ],
+    summary: productionReady
+      ? 'Norway coverage meets production launch thresholds.'
+      : demoReady
+        ? 'Norway coverage is demo-ready for operators but still blocked for public claims.'
+        : 'Norway coverage is blocked until chain, store, product, source, and freshness minimums pass.'
+  };
+}
+
 export type LocalSmokeEnvOverride = {
   name: string;
   defaultValue: string;
