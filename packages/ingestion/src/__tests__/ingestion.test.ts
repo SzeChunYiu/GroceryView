@@ -98,6 +98,7 @@ import {
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+  GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   ingestRetailerProduct,
@@ -5093,6 +5094,36 @@ describe('daily ingestion runner', () => {
     });
   });
 
+  it('accepts optional pharmacy daily connector config without weakening required grocery chains', () => {
+    const configs = buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
+        dailyConnectorFixture('ica'),
+        dailyConnectorFixture('willys'),
+        dailyConnectorFixture('coop'),
+        dailyConnectorFixture('hemkop'),
+        dailyConnectorFixture('lidl'),
+        dailyConnectorFixture('city_gross'),
+        {
+          connectorId: 'pharmacy-public-products',
+          chainId: 'pharmacy',
+          domain: 'pharmacy',
+          sourceType: 'retailer_online_page',
+          endpointUrl: GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
+          parserVersion: 'pharmacy-public-products-v1',
+          robotsTxtStatus: 'allow',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: false,
+          requireStoreScopedPrices: false
+        }
+      ])
+    });
+
+    assert.equal(configs.connectors.length, 7);
+    assert.equal(configs.connectors[6].domain, 'pharmacy');
+    assert.equal(configs.connectors[6].requireStoreScopedPrices, false);
+  });
+
 
   it('loads connector config from a file path to avoid oversized process environments', () => {
     const connectorPath = join(mkdtempSync(join(tmpdir(), 'groceryview-connectors-')), 'connectors.json');
@@ -5928,6 +5959,78 @@ describe('daily ingestion runner', () => {
       original_price_text: '18,89 kr',
       original_effective_date: '2026-05-22'
     });
+  });
+
+  it('materializes public pharmacy products as domain=pharmacy observations without prescription rows', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const apotekHjartatUrl = 'https://www.apotekhjartat.se/search?q=pamol';
+    const endpointUrl = `${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?sourcePaths=/receptfritt&apotekHjartatUrls=${encodeURIComponent(apotekHjartatUrl)}`;
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T08:40:34.000Z',
+      connectors: [{
+        connectorId: 'pharmacy-public-products',
+        chainId: 'pharmacy',
+        domain: 'pharmacy',
+        sourceType: 'retailer_online_page',
+        endpointUrl,
+        parserVersion: 'pharmacy-public-products-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).startsWith('https://www.apohem.se/')) {
+          return new Response(`
+            <script>window.CURRENT_PAGE = {"products":[
+              {
+                "url":"/vark-feber/varktabletter/alvedon-tabletter-500-mg-paracetamol-20-st",
+                "displayName":"Alvedon tabletter 20 st",
+                "brandName":"Alvedon",
+                "code":"apohem-alvedon-20",
+                "variationEAN":"7046260976108",
+                "price":{"current":{"inclVat":49,"vatPercent":12},"previous":{"inclVat":59}},
+                "images":[{"url":"/globalassets/alvedon.png"}],
+                "stock":{"status":"in_stock"},
+                "isotc":true,
+                "isPrescriptionProduct":false
+              },
+              {
+                "url":"/receptbelagt/prescription-only",
+                "displayName":"Prescription only 10 st",
+                "brandName":"Guarded",
+                "code":"apohem-prescription",
+                "variationEAN":"1234567890123",
+                "price":{"current":{"inclVat":99,"vatPercent":12}},
+                "isotc":false,
+                "isPrescriptionProduct":true
+              }
+            ]};</script>
+          `, { status: 200, headers: { 'content-type': 'text/html' } });
+        }
+        return new Response(`<script>window.INITIAL_DATA = JSON.parse('{"products":[]}');</script>`, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, ['https://www.apohem.se/receptfritt', apotekHjartatUrl]);
+    assert.equal(executor.calls.some((call) => call.sql.includes('insert into stores')), false);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.domain, 'pharmacy');
+    assert.equal(product.barcode, '7046260976108');
+    assert.equal(product.category_id, 'pharmacy-otc');
+    assert.equal(product.package_size, 20);
+    assert.equal(product.package_unit, 'piece');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.domain, 'pharmacy');
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 49);
+    assert.equal(observation.regular_price, 59);
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {

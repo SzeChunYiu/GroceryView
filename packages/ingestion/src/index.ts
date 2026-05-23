@@ -46,6 +46,12 @@ import {
   type IcaStoreConfig
 } from './connectors/ica.js';
 import {
+  fetchPharmacyProducts,
+  type ApohemProduct,
+  DEFAULT_APOHEM_SOURCE_PATHS,
+  DEFAULT_APOTEK_HJARTAT_SEARCH_URLS
+} from './connectors/apohem.js';
+import {
   fetchLidlOffersForAllStores,
   type LidlStoreOffer
 } from './connectors/lidl.js';
@@ -1873,6 +1879,29 @@ function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorP
   };
 }
 
+function pharmacyProductToDailyItem(row: ApohemProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.name);
+  const barcode = validDailyBarcode(row.ean);
+  return {
+    chainId: row.chain,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: dailyProductIdForBarcode(row.chain, row.ean || row.code, barcode),
+    categoryId: `pharmacy-${stableKeyPart(row.category)}`,
+    barcode,
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: row.originalPrice !== null && row.originalPrice > row.price ? row.originalPrice : undefined,
+    promoText: row.originalPrice !== null && row.originalPrice > row.price ? 'Public pharmacy discounted price' : undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 function dailyNativeSnapshotResult(input: {
   plan: RetailerConnectorRunPlan;
   retrievedAt: string;
@@ -2057,6 +2086,19 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(okq8FuelPriceToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchPharmacyProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      sourcePaths: dailyNativeStringListParam(url, 'sourcePaths') ?? DEFAULT_APOHEM_SOURCE_PATHS,
+      apotekHjartatUrls: dailyNativeStringListParam(url, 'apotekHjartatUrls') ?? DEFAULT_APOTEK_HJARTAT_SEARCH_URLS,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(pharmacyProductToDailyItem) });
+  }
+
   return await fetchRetailerConnectorSnapshot(plan, options);
 }
 
@@ -2199,6 +2241,7 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
       canonicalName: requiredString(record, 'canonicalName', path),
       productId: requiredString(record, 'productId', path),
       categoryId: requiredString(record, 'categoryId', path),
+      barcode: optionalString(record, 'barcode', path),
       fuelGradeId: optionalString(record, 'fuelGradeId', path) as FuelGradeId | undefined,
       fuelSource: optionalFuelSource(record, path),
       brand: optionalString(record, 'brand', path),
@@ -2824,6 +2867,7 @@ export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview:/
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
+export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 
 const requireForDailyIngestion = createRequire(import.meta.url);
 
