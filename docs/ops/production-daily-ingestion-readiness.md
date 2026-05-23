@@ -94,7 +94,7 @@ npm run --silent ops:daily-connectors > /tmp/groceryview-daily-connectors.json
 ```
 
 Use this emitted JSON only for local `ops:validate-production-env` checks or one-off operator debugging when the workflow is not available.
-The daily workflow also exports this store enumeration before connector and target validation, fails closed with `store_enumeration_missing_chain:<chain>` or `store_enumeration_empty_chain:<chain>` if any required chain is absent or empty, and uploads the JSON as the `groceryview-daily-connector-stores` artifact for operator evidence.
+The daily workflow also exports this store enumeration before connector and target validation, fails closed with `store_enumeration_missing_chain:<chain>` or `store_enumeration_empty_chain:<chain>` if any required chain is absent or empty, and always attempts to upload the JSON as the `groceryview-daily-connector-stores` artifact for operator evidence.
 
 
 ## Bounded bulk ingestion controls
@@ -162,7 +162,7 @@ gh run list --workflow daily-ingestion.yml --repo SzeChunYiu/GroceryView --limit
 The workflow must pass these gates in order:
 
 1. DB and ingestion package tests
-2. live store enumeration and `groceryview-daily-connector-stores` artifact upload
+2. live store enumeration and always-attempted `groceryview-daily-connector-stores` artifact upload for success or failure diagnostics
 3. production ingestion configuration validator and always-attempted `groceryview-production-ingestion-config` artifact upload with `production-env-validation.json`, `groceryview-catalog-targets.json`, and `groceryview-daily-connectors.json` for success or failure diagnostics
 4. configured daily ingestion runner; its `chainSummaries` must include every required chain, every summary must be `succeeded`, every official product connector must emit at least one observation for every configured branch in `stores[]`, every required chain must emit at least one observation id, and the workflow always attempts to upload `groceryview-daily-ingestion-result` for success or failure diagnostics
 5. DB-backed site snapshot export and `groceryview-db-site-snapshot` artifact upload with `groceryview-db-site-snapshot.json` and `db-site-snapshot-result.json`
@@ -197,5 +197,5 @@ Do not treat the system as production-ready until all are true:
 
 - `npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView` reports `ready`.
 - `npm run ops:validate-production-env` reports `ready` in the deployment environment.
-- the latest `daily-ingestion.yml` run passes and includes the always-attempted `groceryview-production-ingestion-config`, `groceryview-daily-ingestion-result`, `groceryview-db-site-snapshot`, and `groceryview-deployed-readiness` artifacts.
+- the latest `daily-ingestion.yml` run passes and includes the always-attempted `groceryview-daily-connector-stores`, `groceryview-production-ingestion-config`, `groceryview-daily-ingestion-result`, `groceryview-db-site-snapshot`, and `groceryview-deployed-readiness` artifacts.
 - `/api/readiness/postgres`, `/api/readiness/source-runs`, and `/api/readiness/catalog-coverage` all return healthy/complete responses with HTTP 200; source-run readiness has zero blockers, zero missing fresh chains, zero insufficient accepted-row blockers, at least six succeeded evidence entries, and a latest successful finish timestamp; and catalog coverage has no missing dimension, product-store-pair, or store-price-type gaps.
