@@ -30,6 +30,8 @@ export type WillysWeeklyDiscount = {
   name: string;
   brand: string;
   storeId: string;
+  storeName: string;
+  city: string;
   campaignType: string;
   promotionType: string;
   price: number;
@@ -748,13 +750,20 @@ export async function fetchWillysWeeklyDiscountsForAllStores(
     storeRetryAttempts: options.storeRetryAttempts,
     storeRetryBaseDelayMs: options.storeRetryBaseDelayMs,
     failOnStoreFailure: options.failOnStoreFailure,
-    task: async (store) => await fetchWillysWeeklyDiscounts({
+    task: async (store) => {
+      const discounts = await fetchWillysWeeklyDiscounts({
         fetchImpl: options.fetchImpl,
         storeIds: [store.storeId],
         maxRows: perStoreMaxRows,
         pageSize: options.pageSize,
         retrievedAt: options.retrievedAt
-      })
+      });
+      return discounts.map((discount) => ({
+        ...discount,
+        storeName: store.name,
+        city: store.city
+      }));
+    }
   });
   if (options.maxRows && rows.length >= options.maxRows) return rows.slice(0, options.maxRows);
   if (rows.length === 0 && failures.length > 0) throw new Error(`Willys all-store weekly discount requests returned no usable branch products: ${failures[0]!.storeId}:${failures[0]!.error}`);
@@ -841,6 +850,8 @@ export function normalizeWillysWeeklyDiscount(
     name,
     brand: firstString(promotion.brands) || text(product.manufacturer),
     storeId,
+    storeName: '',
+    city: '',
     campaignType: text(promotion.campaignType),
     promotionType: text(promotion.promotionType),
     price,
