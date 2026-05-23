@@ -2051,6 +2051,10 @@ describe('fetchHemkopWeeklyDiscounts', () => {
       buildHemkopWeeklyDiscountsUrl('4798', 1, 0)
     ]);
     assert.deepEqual(rows.map((row) => row.storeId), ['4003', '4798']);
+    assert.deepEqual(rows.map((row) => [row.storeName, row.city]), [
+      ['Hemköp Göteborg Masthuggstorget', 'Göteborg'],
+      ['Hemköp Bollnäs', 'Bollnäs']
+    ]);
   });
 
   it('fetches public Hemkop Axfood weekly discount rows with promotion provenance', async () => {
@@ -2102,6 +2106,8 @@ describe('fetchHemkopWeeklyDiscounts', () => {
       name: 'Svenskt smör',
       brand: 'Arla',
       storeId: '4003',
+      storeName: '',
+      city: '',
       campaignType: 'LOYALTY',
       promotionType: 'MixMatchPricePromotion',
       price: 39.95,
@@ -3716,6 +3722,8 @@ describe('fetchWillysWeeklyDiscounts', () => {
       name: 'Grön sparris 250g',
       brand: '',
       storeId: '2110',
+      storeName: '',
+      city: '',
       campaignType: 'LOYALTY',
       promotionType: 'MixMatchPricePromotion',
       price: 29.9,
@@ -3858,6 +3866,10 @@ describe('fetchWillysWeeklyDiscounts', () => {
       buildWillysWeeklyDiscountsUrl('2187', 1, 0)
     ]);
     assert.deepEqual(rows.map((row) => row.storeId), ['2110', '2187']);
+    assert.deepEqual(rows.map((row) => [row.storeName, row.city]), [
+      ['Willys Kungsbacka Hede', 'Kungsbacka'],
+      ['Willys Oskarshamn Snickeriet', 'Oskarshamn']
+    ]);
   });
 
 
