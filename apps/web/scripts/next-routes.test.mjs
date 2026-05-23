@@ -268,6 +268,12 @@ describe('verified-data UI', () => {
     assert.match(account, /favorite stores/);
     assert.match(account, /weekly_baskets/);
     assert.match(account, /basket_items/);
+    assert.match(account, /planAccountDeletion/);
+    assert.match(account, /accountDeletionPlan/);
+    assert.match(account, /Deletion plan requires owner confirmation/);
+    assert.match(account, /Destructive action gated/);
+    assert.match(account, /Type DELETE ACCOUNT/);
+    assert.match(account, /reauthenticates/);
     assert.match(server, /favorite-stores/);
     assert.match(schema, /create table if not exists weekly_baskets/);
     assert.match(schema, /create table if not exists basket_items/);
