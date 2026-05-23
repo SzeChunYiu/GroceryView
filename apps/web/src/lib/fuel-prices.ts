@@ -1,3 +1,5 @@
+import { buildWatchlistAlerts, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+
 export type VerifiedFuelPriceObservation = {
   id: string;
   domain: 'fuel';
@@ -137,3 +139,99 @@ export const verifiedFuelPriceObservations: VerifiedFuelPriceObservation[] = [
 export function formatFuelPrice(value: number): string {
   return `${value.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr/l`;
 }
+
+const fuelOperatorStoreId = 'okq8-operator-price-page';
+
+const fuelAlertTargets = [
+  {
+    id: '95-e10-under-19',
+    name: '95 E10 alert',
+    productId: 'fuel-95-e10',
+    targetPricePerLitre: 19,
+    targetLabel: 'target 19 kr/l'
+  },
+  {
+    id: 'e85-under-16',
+    name: 'E85 alert',
+    productId: 'fuel-e85',
+    targetPricePerLitre: 16,
+    targetLabel: 'target 16 kr/l'
+  },
+  {
+    id: 'diesel-under-20',
+    name: 'Diesel watch',
+    productId: 'fuel-diesel',
+    targetPricePerLitre: 20,
+    targetLabel: 'target 20 kr/l'
+  }
+] as const;
+
+const fuelWatchlist: WatchlistItem[] = fuelAlertTargets.map((target) => ({
+  productId: target.productId,
+  targetPrice: target.targetPricePerLitre,
+  favoriteStoresOnly: false,
+  allowedPriceTypes: ['shelf']
+}));
+
+const fuelWatchlistProducts: WatchlistProductSnapshot[] = verifiedFuelPriceObservations.map((row) => ({
+  productId: row.productId,
+  productName: row.label,
+  bestPrice: row.pricePerLitre,
+  bestStoreId: fuelOperatorStoreId,
+  bestPriceType: 'shelf',
+  prices: [
+    {
+      storeId: fuelOperatorStoreId,
+      storeName: row.operatorName,
+      price: row.pricePerLitre,
+      priceType: 'shelf'
+    }
+  ],
+  dealScore: 0,
+  isNew52WeekLow: false
+}));
+
+const rawFuelAlerts = buildWatchlistAlerts({
+  watchlist: fuelWatchlist,
+  products: fuelWatchlistProducts,
+  favoriteStoreIds: []
+});
+
+export const fuelPriceTargetAlerts = {
+  title: 'Fuel target price alerts',
+  source: verifiedFuelPriceSource.name,
+  operatorStoreId: fuelOperatorStoreId,
+  targetCount: fuelAlertTargets.length,
+  alertCount: rawFuelAlerts.length,
+  targets: fuelAlertTargets.map((target) => {
+    const observation = verifiedFuelPriceObservations.find((row) => row.productId === target.productId)!;
+    return {
+      ...target,
+      label: observation.label,
+      observedPricePerLitre: observation.pricePerLitre,
+      observedPriceLabel: formatFuelPrice(observation.pricePerLitre),
+      targetPriceLabel: formatFuelPrice(target.targetPricePerLitre),
+      isTriggered: observation.pricePerLitre <= target.targetPricePerLitre,
+      observedAt: observation.observedAt,
+      sourceUrl: observation.sourceUrl
+    };
+  }),
+  alerts: rawFuelAlerts.map((alert) => {
+    const target = fuelAlertTargets.find((candidate) => candidate.productId === alert.productId)!;
+    const observation = verifiedFuelPriceObservations.find((row) => row.productId === alert.productId)!;
+    return {
+      ...alert,
+      alertName: target.name,
+      targetLabel: target.targetLabel,
+      observedPriceLabel: formatFuelPrice(observation.pricePerLitre),
+      operatorName: observation.operatorName,
+      sourceUrl: observation.sourceUrl,
+      evidence: `${observation.sourceType} · captured ${verifiedFuelPriceSource.capturedAt.slice(0, 10)}`
+    };
+  }),
+  guardrails: [
+    'Alerts use buildWatchlistAlerts against verified domain=fuel operator rows.',
+    'No station-level fuel alert: OKQ8 company price rows do not identify a specific pump, address, or nearest-station offer.',
+    'Crowd station reports remain schema-ready but are not rendered until trusted reporter evidence lands.'
+  ]
+} as const;
