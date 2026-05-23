@@ -1,5 +1,5 @@
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
+import { buildPriceChartSeries, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
@@ -118,6 +118,83 @@ function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
     storeId: 'openprices-community'
   }));
 }
+
+const compareOverlayProducts = [...pricedProducts]
+  .filter((product) => product.observations.length >= 4)
+  .sort((left, right) => {
+    const observationDelta = right.observationCount - left.observationCount;
+    if (observationDelta !== 0) return observationDelta;
+    return right.lastObservedAt.localeCompare(left.lastObservedAt);
+  })
+  .slice(0, 2);
+
+function compareOverlayObservationsFor(product: (typeof pricedProducts)[number]): PriceChartObservation[] {
+  return product.observations
+    .filter((observation) => observation.date && Number.isFinite(observation.price))
+    .map((observation) => ({
+      observedAt: `${observation.date}T00:00:00.000Z`,
+      price: observation.price,
+      storeId: `openprices-${product.slug}`,
+      storeName: product.name,
+      sourceType: 'online',
+      confidence: product.observationCount >= 8 ? 0.78 : 0.62,
+      provenanceLabel: `${snapshot.openPricesSource} · barcode ${product.code}`,
+      markerType: 'source_warning',
+      markerLabel: product.brands || product.name
+    }));
+}
+
+const compareOverlayChartSeries = buildPriceChartSeries({
+  observations: compareOverlayProducts.flatMap(compareOverlayObservationsFor),
+  asOf: '2026-05-22T00:00:00.000Z',
+  rangeDays: 365,
+  markerLimitPerSeries: 3
+});
+
+export const compareOverlayChart = {
+  title: 'Compare-overlay chart',
+  subtitle: 'Two product tickers overlaid from the OpenPrices dated observation tape.',
+  windowStart: compareOverlayChartSeries.windowStart,
+  windowEnd: compareOverlayChartSeries.windowEnd,
+  overlayProducts: compareOverlayProducts.map((product) => ({
+    slug: product.slug,
+    name: product.name,
+    brand: product.brands || 'Brand not reported',
+    observationCount: product.observationCount,
+    lastObservedAt: product.lastObservedAt,
+    source: snapshot.openPricesSource
+  })),
+  overlaySeries: compareOverlayChartSeries.series.map((series) => {
+    const points = [...series.points].sort((left, right) => Date.parse(left.time) - Date.parse(right.time));
+    const firstPoint = points[0];
+    const latestPoint = points.at(-1);
+    const prices = points.map((point) => point.value);
+    const lowPrice = prices.length ? Math.min(...prices) : null;
+    const highPrice = prices.length ? Math.max(...prices) : null;
+    const movementPercent = firstPoint && latestPoint && firstPoint.value > 0
+      ? ((latestPoint.value - firstPoint.value) / firstPoint.value) * 100
+      : 0;
+
+    return {
+      id: series.id,
+      productSlug: series.storeId.replace(/^openprices-/, ''),
+      productName: series.storeName,
+      sourceType: series.sourceType,
+      lineStyle: series.lineStyle,
+      pointCount: points.length,
+      latestPrice: latestPoint?.value ?? null,
+      movementPercent,
+      lowPrice,
+      highPrice,
+      provenanceLabel: latestPoint?.provenanceLabel ?? snapshot.openPricesSource,
+      markerCount: series.markers.length,
+      sparklinePoints: points.slice(-8)
+    };
+  }),
+  coverageLabel: `${compareOverlayChartSeries.series.length} price tapes · ${compareOverlayProducts.reduce((sum, product) => sum + product.observationCount, 0)} source observations considered`,
+  confidenceLabel: 'OpenPrices online observations only; shelf, flyer, and member-price sources are not mixed into this overlay.',
+  guardrail: 'No forecast: the overlay only plots dated observed SEK prices and withholds missing source classes rather than filling gaps.'
+};
 
 export const matchedChainProducts = axfoodProducts.filter((product) => product.inChains.length > 1 && product.lowestPrice > 0);
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
