@@ -1,4 +1,17 @@
 User-agent: *
 Allow: /
+Allow: /products
+Allow: /products/
+Allow: /categories
+Allow: /categories/
+Disallow: /account
+Disallow: /account/
+Disallow: /login
+Disallow: /api
+Disallow: /api/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /users
+Disallow: /users/
 
 Sitemap: /sitemap.xml
