@@ -141,7 +141,7 @@ Write policy: daily ingestion uses change-only writes. Before inserting a new im
 
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
-Indexes: product/time, store/time, price type/time, and provenance GIN.
+Indexes: product/time, store/time, price type/time, provenance GIN, and `observations_connector_idempotency_idx` for exact connector replay idempotency without updating stored history.
 
 ### `observations_v2`
 

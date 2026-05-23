@@ -3304,7 +3304,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '011_multi_vertical_domains',
   '012_price_rollups',
   '013_observations_partitioning',
-  '014_fuel_price_sources'
+  '014_fuel_price_sources',
+  '016_observation_connector_idempotency'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -3649,6 +3650,42 @@ type BatchObservationIdRow = { ordinal: string | number; id: string };
 type SourceRunIdRow = { id: string };
 type RawRecordIdRow = { id: string };
 
+async function findExistingObservationId(executor: QueryExecutor, observation: PriceObservationRecord): Promise<string | undefined> {
+  const rows = await executor.query<ObservationIdRow>(
+    `select id
+     from observations
+     where product_id = $1
+       and chain_id = $2
+       and store_id is not distinct from $3
+       and domain = $4
+       and retailer_product_ref is not distinct from $5
+       and price_type = $6
+       and observed_at = $7
+       and price = $8
+       and unit_price = $9
+       and currency = $10
+       and confidence = $11
+       and provenance = $12::jsonb
+     order by id
+     limit 1`,
+    [
+      observation.productId,
+      observation.chainId,
+      observation.storeId ?? null,
+      observation.domain ?? 'grocery',
+      observation.retailerProductRef ?? null,
+      observation.priceType,
+      observation.observedAt,
+      observation.price,
+      observation.unitPrice,
+      observation.currency ?? 'SEK',
+      observation.confidence,
+      JSON.stringify(observation.provenance)
+    ]
+  );
+  return rows[0]?.id;
+}
+
 export function createPostgresSourceRecordWriter(executor: QueryExecutor): PostgresSourceRecordWriter {
   return {
     async createSourceRun(sourceRun) {
@@ -3779,38 +3816,6 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
   return {
     async recordPriceObservation(observation) {
       const provenanceJson = JSON.stringify(observation.provenance);
-      const latestRows = await executor.query<LatestPriceRow>(
-        `select product_id,
-                chain_id,
-                store_id,
-                price_type,
-                observation_id,
-                price,
-                regular_price,
-                unit_price,
-                currency,
-                observed_at,
-                confidence,
-                provenance
-         from latest_prices
-         where product_id = $1
-           and chain_id = $2
-           and store_id is not distinct from $3::uuid
-           and price_type = $4
-         order by observed_at desc
-         limit 1`,
-        [
-          observation.productId,
-          observation.chainId,
-          observation.storeId ?? null,
-          observation.priceType
-        ]
-      );
-      const latestRow = latestRows.find((row) => sameLatestPriceKey(row, observation)) ?? latestRows[0];
-      if (latestRow && latestPriceIsUnchanged(latestRow, observation)) {
-        return { observationId: latestRow.observation_id, status: 'unchanged' };
-      }
-
       const rows = await executor.query<ObservationIdRow>(
         `insert into observations(
            product_id,
@@ -3840,6 +3845,20 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
            $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23::jsonb
          )
+         on conflict (
+           product_id,
+           chain_id,
+           store_id,
+           domain,
+           retailer_product_ref,
+           price_type,
+           observed_at,
+           price,
+           unit_price,
+           currency,
+           confidence,
+           provenance
+         ) do nothing
          returning id`,
         [
           observation.productId,
@@ -3867,7 +3886,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           provenanceJson
         ]
       );
-      const observationId = rows[0]?.id;
+      const observationId = rows[0]?.id ?? (await findExistingObservationId(executor, observation));
       if (!observationId) throw new Error('Price observation insert did not return an id');
 
       await executor.query(
