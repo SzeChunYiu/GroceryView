@@ -527,6 +527,7 @@ export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
   productSlug: string;
   canonicalName: string;
   brand?: string;
+  imageUrl?: string;
   categoryPath: string[];
   packageSize?: number;
   packageUnit?: string;
@@ -537,6 +538,13 @@ export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
   storeExternalRef?: string;
   storeName?: string;
   city?: string;
+  promotionText?: string;
+  promotionStartsOn?: string;
+  promotionEndsOn?: string;
+  memberRequired: boolean;
+  validFrom?: string;
+  validUntil?: string;
+  retailerProductRef?: string;
 };
 
 export type SiteLatestPriceSnapshotFilter = {
@@ -1487,6 +1495,7 @@ type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
   product_slug: string;
   canonical_name: string;
   brand: string | null;
+  image_url: string | null;
   category_path: string[] | string | null;
   package_size: string | number | null;
   package_unit: string | null;
@@ -1497,6 +1506,13 @@ type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
   store_external_ref: string | null;
   store_name: string | null;
   city: string | null;
+  promotion_text: string | null;
+  promotion_starts_on: string | Date | null;
+  promotion_ends_on: string | Date | null;
+  member_required: boolean;
+  valid_from: string | Date | null;
+  valid_until: string | Date | null;
+  retailer_product_ref: string | null;
 };
 type PriceObservationHistoryRow = {
   id: string;
@@ -1685,6 +1701,7 @@ function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): Site
     productSlug: row.product_slug,
     canonicalName: row.canonical_name,
     ...(row.brand ? { brand: row.brand } : {}),
+    ...(row.image_url ? { imageUrl: row.image_url } : {}),
     categoryPath: asStringArray(row.category_path),
     ...(optionalNumberFromDb(row.package_size) === undefined ? {} : { packageSize: optionalNumberFromDb(row.package_size) }),
     ...(row.package_unit ? { packageUnit: row.package_unit } : {}),
@@ -1694,7 +1711,14 @@ function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): Site
     ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
     ...(row.store_external_ref ? { storeExternalRef: row.store_external_ref } : {}),
     ...(row.store_name ? { storeName: row.store_name } : {}),
-    ...(row.city ? { city: row.city } : {})
+    ...(row.city ? { city: row.city } : {}),
+    ...(row.promotion_text ? { promotionText: row.promotion_text } : {}),
+    ...(row.promotion_starts_on ? { promotionStartsOn: asIso(row.promotion_starts_on) } : {}),
+    ...(row.promotion_ends_on ? { promotionEndsOn: asIso(row.promotion_ends_on) } : {}),
+    memberRequired: row.member_required,
+    ...(row.valid_from ? { validFrom: asIso(row.valid_from) } : {}),
+    ...(row.valid_until ? { validUntil: asIso(row.valid_until) } : {}),
+    ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {})
   };
 }
 
@@ -4165,12 +4189,13 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
   return {
     async listLatestPriceSnapshotRows(filter = {}) {
       const minConfidence = Math.min(Math.max(filter.minConfidence ?? 0, 0), 1);
-      const limit = Math.min(Math.max(filter.limit ?? 1000, 1), 10000);
+      const limit = Math.min(Math.max(filter.limit ?? 10000, 1), 10000);
       const rows = await executor.query<SiteLatestPriceSnapshotRowSql>(
         `select latest_prices.product_id,
                 products.slug as product_slug,
                 products.canonical_name,
                 products.brand,
+                products.image_url,
                 products.category_path,
                 products.package_size,
                 products.package_unit,
@@ -4191,12 +4216,21 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
                 latest_prices.currency,
                 latest_prices.observed_at,
                 latest_prices.confidence,
-                latest_prices.provenance
+                observations.promotion_text,
+                observations.promotion_starts_on,
+                observations.promotion_ends_on,
+                observations.member_required,
+                observations.valid_from,
+                observations.valid_until,
+                observations.retailer_product_ref,
+                coalesce(observations.provenance, latest_prices.provenance) as provenance
          from latest_prices
+         join observations on observations.id = latest_prices.observation_id
          join products on products.id = latest_prices.product_id
          join chains on chains.id = latest_prices.chain_id
          left join stores on stores.id = latest_prices.store_id
          where latest_prices.confidence >= $1
+           and latest_prices.domain = 'grocery'
          order by latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
          limit $2`,
         [minConfidence, limit]

@@ -50,6 +50,17 @@ jobs:
         run: npm run ops:check-production-secrets -- --from-env
       - name: Run tests
         run: npm test
+      - name: Export DB-backed site snapshot
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_PATH: /tmp/groceryview-db-site-snapshot.json
+          GROCERYVIEW_DB_SITE_SNAPSHOT_MODULE_PATH: apps/web/src/lib/generated/db-site-products.ts
+          GROCERYVIEW_DB_SITE_SNAPSHOT_CHAIN_OBSERVATIONS_MODULE_PATH: apps/web/src/lib/generated/db-site-chain-observations.ts
+          GROCERYVIEW_DB_SITE_SNAPSHOT_INGESTED_OVERRIDES_MODULE_PATH: apps/web/src/lib/generated/db-site-ingested-overrides.ts
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}"
+          npm run --silent ingest:export-db-snapshot
       - name: Build workspaces
         run: npm run build
       - name: Typecheck

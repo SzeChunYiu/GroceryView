@@ -4,12 +4,22 @@ import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, 
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
 import { icaStorePromotionSourceSummary } from './ingested/ica-source-summary';
-import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
-import { mathemProducts, mathemSource } from './ingested/mathem';
+import { icaReklambladOffers as staticIcaReklambladOffers, icaReklambladSource as staticIcaReklambladSource } from './ingested/ica-reklamblad';
+import { mathemProducts as staticMathemProducts, mathemSource as staticMathemSource } from './ingested/mathem';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
-import { lidlStoreOffers, lidlSource } from './ingested/lidl';
-import { matpriskollenOffers } from './ingested/matpriskollen';
+import { lidlStoreOffers as staticLidlStoreOffers, lidlSource as staticLidlSource } from './ingested/lidl';
+import { matpriskollenOffers as staticMatpriskollenOffers } from './ingested/matpriskollen';
 import { verifiedFuelPriceObservations, verifiedFuelPriceSource } from './fuel-prices';
+import {
+  dbSiteIcaReklambladOffers,
+  dbSiteIcaReklambladSource,
+  dbSiteLidlSource,
+  dbSiteLidlStoreOffers,
+  dbSiteMathemProducts,
+  dbSiteMathemSource,
+  dbSiteMatpriskollenOffers,
+  dbSiteMatpriskollenSource
+} from './generated/db-site-ingested-overrides';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { osmStores } from './osm-stores';
 import {
@@ -20,6 +30,14 @@ import {
   formatLocalizedUnitPrice,
   supportedCurrencies
 } from './i18n';
+
+const icaReklambladOffers = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladOffers : staticIcaReklambladOffers;
+const icaReklambladSource = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladSource : staticIcaReklambladSource;
+const mathemProducts = dbSiteMathemProducts.length > 0 ? dbSiteMathemProducts : staticMathemProducts;
+const mathemSource = dbSiteMathemProducts.length > 0 ? dbSiteMathemSource : staticMathemSource;
+const lidlStoreOffers = dbSiteLidlStoreOffers.length > 0 ? dbSiteLidlStoreOffers : staticLidlStoreOffers;
+const lidlSource = dbSiteLidlStoreOffers.length > 0 ? dbSiteLidlSource : staticLidlSource;
+const matpriskollenOffers = dbSiteMatpriskollenOffers.length > 0 ? dbSiteMatpriskollenOffers : staticMatpriskollenOffers;
 
 export const snapshot = {
   retrievedLabel: '20-21 May 2026',
