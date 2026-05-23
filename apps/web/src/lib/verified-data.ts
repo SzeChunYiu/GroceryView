@@ -1625,6 +1625,17 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
   };
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);
+export const productBrandFilterOptions = [...new Set(
+  adaptiveProductCards
+    .map((card) => card.brand.trim())
+    .filter((brand) => brand.length > 0 && brand !== 'Brand not reported')
+)]
+  .sort((left, right) => left.localeCompare(right, 'sv'))
+  .map((brand) => ({
+    value: brand,
+    label: brand,
+    productCount: adaptiveProductCards.filter((card) => card.brand === brand).length
+  }));
 
 const localeFormattingSampleCard = adaptiveProductCards.find((card) => card.unitSortPrice !== null) ?? adaptiveProductCards[0];
 const localeFormattingSampleDate = freshestOpenPrices[0]?.lastObservedAt ?? null;
