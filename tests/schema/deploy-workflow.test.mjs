@@ -26,6 +26,11 @@ describe('deploy workflow', () => {
     assert.match(workflow, /npx\s+--yes\s+vercel@latest\s+pull\s+--yes\s+--environment=production\s+--token\s+"\$VERCEL_TOKEN"/);
     assert.match(workflow, /npx\s+--yes\s+vercel@latest\s+build\s+--prod\s+--token\s+"\$VERCEL_TOKEN"/);
     assert.match(workflow, /npx\s+--yes\s+vercel@latest\s+deploy\s+--prebuilt\s+--prod\s+--token\s+"\$VERCEL_TOKEN"/);
+    assert.match(workflow, /infra\/scripts\/smoke-hosted-http\.sh/);
+    assert.match(workflow, /infra\/scripts\/smoke-hosted-readiness\.sh/);
+    assert.match(workflow, /HOSTED_HTTP_SMOKE_OUTPUT_PATH:\s*artifacts\/deploy-hosted-http-smoke\.json/);
+    assert.match(workflow, /HOSTED_READINESS_SMOKE_OUTPUT_PATH:\s*artifacts\/deploy-hosted-readiness-smoke\.json/);
+    assert.match(workflow, /actions\/upload-artifact@v4/);
     assert.doesNotMatch(workflow, /Provider-specific deploy command intentionally not wired/);
   });
 });
