@@ -40,7 +40,10 @@ if [ ! -d "$MIGRATIONS_DIR" ]; then
   exit 1
 fi
 
-mapfile -t MIGRATIONS < <(find "$MIGRATIONS_DIR" -maxdepth 1 -type f -name '*.sql' | sort)
+MIGRATIONS=()
+while IFS= read -r migration; do
+  MIGRATIONS+=("$migration")
+done < <(find "$MIGRATIONS_DIR" -maxdepth 1 -type f -name '*.sql' ! -name '._*.sql' | sort)
 if [ "${#MIGRATIONS[@]}" -eq 0 ]; then
   echo "no SQL migrations found in $MIGRATIONS_DIR" >&2
   exit 1
@@ -55,6 +58,7 @@ REQUIRED_TABLES=(
   raw_records
   retailer_source_policies
   observations
+  observations_v2
   latest_prices
   price_daily
   price_weekly
@@ -323,7 +327,10 @@ fi
 echo "receipt upload constraints ok"
 
 if [ -d "$SEEDS_DIR" ]; then
-  mapfile -t SEEDS < <(find "$SEEDS_DIR" -maxdepth 1 -type f -name '*.sql' | sort)
+  SEEDS=()
+  while IFS= read -r seed; do
+    SEEDS+=("$seed")
+  done < <(find "$SEEDS_DIR" -maxdepth 1 -type f -name '*.sql' ! -name '._*.sql' | sort)
 else
   SEEDS=()
 fi
