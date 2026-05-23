@@ -1862,6 +1862,12 @@ ${seo}`;
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
+  it('adds an ICA locator entry point from the store directory', async () => {
+    const route = await read('src/app/stores/page.tsx');
+    assert.match(route, /href="\/stores\/ica"/);
+    assert.match(route, /ICA chain locator/);
+  });
+
   it('surfaces real store price percentiles from branch-scoped Lidl observations when matched', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/stores/[slug]/page.tsx');
