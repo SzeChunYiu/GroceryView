@@ -1619,10 +1619,11 @@ describe('createPostgresPriceObservationWriter', () => {
 
     assert.match(executor.calls[1]!.sql, /insert into observations/);
     assert.match(executor.calls[1]!.sql, /returning id/);
-    assert.deepEqual(executor.calls[1]!.params.slice(0, 11), [
+    assert.deepEqual(executor.calls[1]!.params.slice(0, 12), [
       'product-1',
       'chain-1',
       'store-1',
+      'grocery',
       'run-1',
       'raw-1',
       'retailer-1',
@@ -1632,7 +1633,7 @@ describe('createPostgresPriceObservationWriter', () => {
       110.8889,
       'SEK'
     ]);
-    assert.equal(executor.calls[1]!.params[21], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
+    assert.equal(executor.calls[1]!.params[22], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
 
     assert.match(executor.calls[2]!.sql, /insert into latest_prices/);
     assert.match(executor.calls[2]!.sql, /on conflict \(product_id, chain_id, store_id, price_type\) do update/);
@@ -1641,6 +1642,7 @@ describe('createPostgresPriceObservationWriter', () => {
       'product-1',
       'chain-1',
       'store-1',
+      'grocery',
       'promotion',
       'observation-1',
       49.9,

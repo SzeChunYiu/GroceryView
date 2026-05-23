@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
@@ -48,6 +48,7 @@ import {
   fetchOpenFoodFactsExportRetailerEnrichments,
   fetchOpenFoodFactsProducts,
   fetchOpenFoodFactsSwedenCatalog,
+  fetchOkq8FuelPrices,
   fetchOpenFoodFactsRetailerEnrichments,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
@@ -100,6 +101,7 @@ import {
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
   parseOpenPricesSnapshot,
+  parseOkq8FuelPricePage,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
@@ -141,6 +143,45 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('OKQ8 fuel price connector', () => {
+  const okq8FuelHtml = `
+    <script>window.__APP_INIT_DATA__ = {"informationArea":[{"content":{"heading":"Drivmedel på station","itemsRow":[
+      {"title":"OKQ8 GoEasy 95 (Blyfri 95)","cells":[{"text":"18,89 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-22","links":[]}]},
+      {"title":"OKQ8 GoEasy 98 (Blyfri 98)","cells":[{"text":"20,49 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-22","links":[]}]},
+      {"title":"OKQ8 GoEasy Diesel","cells":[{"text":"21,34 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-21","links":[]}]},
+      {"title":"Neste MY Förnybar Diesel (HVO100)","cells":[{"text":"29,89 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-21","links":[]}]},
+      {"title":"Etanol E85","cells":[{"text":"15,84 kr","links":[]},{"text":"- 50 öre","links":[]},{"text":"2026-05-22","links":[]}]}
+    ]}}]}</script>`;
+
+  it('parses real per-grade operator prices as domain=fuel observations', () => {
+    const rows = parseOkq8FuelPricePage({
+      body: okq8FuelHtml,
+      capturedAt: '2026-05-23T08:35:34.000Z',
+      rawSnapshotRef: 'raw://okq8-fuel/test'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.domain, row.productId, row.pricePerLitre, row.unit]), [
+      ['fuel', 'fuel-95-e10', 18.89, 'l'],
+      ['fuel', 'fuel-98', 20.49, 'l'],
+      ['fuel', 'fuel-diesel', 21.34, 'l'],
+      ['fuel', 'fuel-hvo100', 29.89, 'l'],
+      ['fuel', 'fuel-e85', 15.84, 'l']
+    ]);
+    assert.equal(rows[0]?.sourceKind, 'operator_public_price_page');
+    assert.equal(rows[0]?.provenance.originalPriceText, '18,89 kr');
+  });
+
+  it('fetches and rejects blocked fuel source responses', async () => {
+    await assert.rejects(
+      fetchOkq8FuelPrices({
+        capturedAt: '2026-05-23T08:35:34.000Z',
+        fetchImpl: async () => new Response('captcha', { status: 403 })
+      }),
+      /blocked with HTTP 403/
+    );
   });
 });
 
@@ -4646,6 +4687,40 @@ describe('daily ingestion runner', () => {
     assert.equal(configs.databaseUrl, 'postgres://user:secret@example/groceryview');
     assert.equal(configs.connectors.length, 6);
     assert.equal(configs.connectors[0].chainId, 'ica');
+    assert.deepEqual(configs.runtimeOptions, {
+      maxConcurrency: 1,
+      connectorStartDelayMs: 0,
+      connectorRetryAttempts: 0,
+      connectorRetryBaseDelayMs: 250,
+      blockerLogPath: 'codex-tasks/ingestion-blockers.txt'
+    });
+  });
+
+  it('loads bounded runner options and the blocker log override from environment', () => {
+    const configs = buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_MAX_CONCURRENCY: '3',
+      GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: '125',
+      GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: '2',
+      GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: '500',
+      GROCERYVIEW_DAILY_BLOCKER_LOG_PATH: '/tmp/groceryview-ingestion-blockers.txt',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
+        dailyConnectorFixture('ica'),
+        dailyConnectorFixture('willys'),
+        dailyConnectorFixture('coop'),
+        dailyConnectorFixture('hemkop'),
+        dailyConnectorFixture('lidl'),
+        dailyConnectorFixture('city_gross')
+      ])
+    });
+
+    assert.deepEqual(configs.runtimeOptions, {
+      maxConcurrency: 3,
+      connectorStartDelayMs: 125,
+      connectorRetryAttempts: 2,
+      connectorRetryBaseDelayMs: 500,
+      blockerLogPath: '/tmp/groceryview-ingestion-blockers.txt'
+    });
   });
 
 
@@ -4852,7 +4927,8 @@ describe('daily ingestion runner', () => {
       runKey: 'willys:official-api:willys-normalized-json:2026-05-21',
       parserVersion: 'normalized-json-v1',
       acceptedCount: 1,
-      rejectedCount: 0
+      rejectedCount: 0,
+      domain: 'grocery'
     });
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into raw_records')), true);
     const rawRecordInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into raw_records'));
@@ -4870,8 +4946,9 @@ describe('daily ingestion runner', () => {
     const storeInsert = executor.calls.find((call) => call.sql.includes('insert into stores'));
     assert.equal(storeInsert?.params[0], 'willys-odenplan');
     const latestPriceInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
-    const observationRows = JSON.parse(String(latestPriceInsert?.params[0])) as Array<{ store_id: string }>;
+    const observationRows = JSON.parse(String(latestPriceInsert?.params[0])) as Array<{ store_id: string; domain: string }>;
     assert.equal(observationRows[0]?.store_id, 'store-db-2');
+    assert.equal(observationRows[0]?.domain, 'grocery');
   });
 
   it('reuses daily chain, store, and product ids while persisting a connector batch', async () => {
@@ -5483,9 +5560,11 @@ describe('daily ingestion runner', () => {
 
   it('fails closed before persistence when store-scoped prices omit configured branch metadata', async () => {
     const executor = new DailyIngestionExecutor();
+    const blockerLogPath = join(mkdtempSync(join(tmpdir(), 'groceryview-blockers-')), 'ingestion-blockers.txt');
     const result = await runDailyIngestion({
       executor,
       requestedAt: '2026-05-21T03:17:00.000Z',
+      blockerLogPath,
       connectors: [{
         connectorId: 'willys-normalized-json',
         chainId: 'willys',
@@ -5516,6 +5595,9 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['willys:unknown_store_ids:willys-unknown-branch']);
     assert.equal(executor.calls.length, 0);
+    const blockerLog = readFileSync(blockerLogPath, 'utf8');
+    assert.match(blockerLog, /status: blocked/);
+    assert.match(blockerLog, /- willys:unknown_store_ids:willys-unknown-branch/);
   });
 
   it('fails closed before persistence when official product connectors skip a configured branch', async () => {

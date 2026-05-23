@@ -4605,6 +4605,8 @@ export type PersonalInflationContribution = {
   confidence: 'high' | 'medium' | 'low';
 };
 
+export type PersonalInflationConfidence = 'high' | 'medium' | 'low';
+
 export type PersonalInflationSummary = {
   baseDate: string;
   currentDate: string;
@@ -4612,7 +4614,7 @@ export type PersonalInflationSummary = {
   changeAmount: number;
   baseSpend: number;
   currentSpend: number;
-  confidence: string;
+  confidence: PersonalInflationConfidence;
   itemContributions: PersonalInflationContribution[];
   categoryContributions: { category: string; changePercent: number; spend: number }[];
   missingProductIds: string[];
@@ -4629,7 +4631,7 @@ function personalInflationConfidenceRank(c: 'high' | 'medium' | 'low'): number {
   return c === 'high' ? 3 : c === 'medium' ? 2 : 1;
 }
 
-function summarizeInflationChange(changePercent: number): string {
+function summarizeInflationChange(changePercent: number): PersonalInflationConfidence {
   if (changePercent > 5) return 'high';
   if (changePercent > 2) return 'medium';
   return 'low';

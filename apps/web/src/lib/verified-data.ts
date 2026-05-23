@@ -8,6 +8,7 @@ import { mathemProducts, mathemSource } from './ingested/mathem';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
 import { lidlStoreOffers, lidlSource } from './ingested/lidl';
 import { matpriskollenOffers } from './ingested/matpriskollen';
+import { verifiedFuelPriceObservations, verifiedFuelPriceSource } from './fuel-prices';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { osmStores } from './osm-stores';
 import {
@@ -406,17 +407,28 @@ export const multiVerticalDomainFoundation = SUPPORTED_PRICE_DOMAINS.map((domain
   observationsTable: domain.observationsTable,
   seedItems: domain.seedItems,
   seedItemCount: domain.seedItems.length,
-  priceObservationsAvailable: domain.slug === 'grocery' ? groceryObservationCount : 0,
-  confidence: domain.slug === 'grocery' ? 'active verified grocery rows' : 'foundation only',
+  priceObservationsAvailable: domain.slug === 'grocery'
+    ? groceryObservationCount
+    : domain.slug === 'fuel'
+      ? verifiedFuelPriceObservations.length
+      : 0,
+  confidence: domain.slug === 'grocery'
+    ? 'active verified grocery rows'
+    : domain.slug === 'fuel'
+      ? 'operator-sourced fuel rows'
+      : 'foundation only',
   priceClaim: domain.priceClaim,
   claimBoundary: domain.slug === 'grocery'
     ? 'Grocery can render verified price observations with source confidence.'
-    : 'No non-grocery prices are rendered until connector observations land.',
+    : domain.slug === 'fuel'
+      ? 'Fuel renders only source-backed operator observations; no crowd rows are shown yet.'
+      : 'No non-grocery prices are rendered until connector observations land.',
   migrationFields: ['chains.domain', 'stores.domain', 'products.domain', 'observations.domain', 'latest_prices.domain'],
   schemaDefault: "domain default 'grocery'",
   guardrails: [
     "Existing GroceryView rows default to domain='grocery'.",
     'Fuel and pharmacy routes may show supported item and location models, but must not show prices before domain-scoped observations exist.',
+    'Fuel price rows must carry domain=fuel, price per litre, grade id, and operator or trusted crowd provenance.',
     'Non-grocery matching remains domain-scoped: fuel grades are not compared to grocery EANs, and pharmacy OTC rows exclude prescription claims.'
   ]
 }));
@@ -2428,6 +2440,14 @@ export const sourceCoverage = [
     caveat: 'Metadata-only product catalog; GroceryView prices are not inferred from these rows.'
   },
   {
+    name: 'OKQ8 fuel operator prices',
+    source: verifiedFuelPriceSource.sourceUrl,
+    rows: verifiedFuelPriceObservations.length,
+    coverage: `${new Set(verifiedFuelPriceObservations.map((row) => row.grade)).size} fuel grades`,
+    freshness: verifiedFuelPriceObservations.map((row) => row.effectiveFrom).sort().at(-1) ?? 'Not reported',
+    caveat: verifiedFuelPriceSource.caveat
+  },
+  {
     name: 'Sweden store directory',
     source: snapshot.osmSource,
     rows: osmStores.length,
@@ -2441,17 +2461,20 @@ function sourceKindFor(name: string) {
   if (name === 'Axfood chain price snapshot') return 'axfood';
   if (name === 'OpenPrices SEK observations') return 'openprices';
   if (name === 'OpenFoodFacts metadata catalog') return 'openfoodfacts';
+  if (name === 'OKQ8 fuel operator prices') return 'fuel';
   return 'osm';
 }
 
 function sourceRouteFor(name: string) {
   if (name === 'Sweden store directory') return '/stores';
+  if (name === 'OKQ8 fuel operator prices') return '/fuel';
   if (name === 'OpenPrices SEK observations' || name === 'OpenFoodFacts metadata catalog') return '/products';
   return '/compare';
 }
 
 function confidenceBadgeFor(name: string) {
   if (name === 'Axfood chain price snapshot') return 'chain-wide catalogue confidence';
+  if (name === 'OKQ8 fuel operator prices') return 'operator-page confidence';
   if (name === 'OpenPrices SEK observations') return 'community-observed confidence';
   if (name === 'OpenFoodFacts metadata catalog') return 'metadata-only confidence';
   return 'location-directory confidence';
@@ -2474,6 +2497,8 @@ export const sourceReadinessMatrix = sourceCoverage.map((source) => {
   const primaryRoute =
     source.name === 'Sweden store directory'
       ? '/stores'
+      : source.name === 'OKQ8 fuel operator prices'
+        ? '/fuel'
       : source.name === 'OpenPrices SEK observations' || source.name === 'OpenFoodFacts metadata catalog'
         ? '/products'
         : '/compare';

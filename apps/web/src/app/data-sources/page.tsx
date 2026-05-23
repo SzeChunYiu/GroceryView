@@ -42,7 +42,7 @@ export default function DataSourcesPage() {
           <div>
             <h2 className="text-2xl font-black tracking-tight">Multi-vertical domain foundation</h2>
             <p className="mt-2 text-sm leading-6 text-slate-700">
-              GroceryView now scopes chains, stores, products, and observations by domain so fuel and pharmacy can reuse the terminal model later without mixing evidence. Non-grocery prices stay at zero until domain-scoped observations exist.
+              GroceryView scopes chains, stores, products, and observations by domain so fuel and pharmacy can reuse the terminal model without mixing evidence. Fuel now renders only operator-sourced domain rows; pharmacy remains price-empty until OTC observations exist.
             </p>
           </div>
           <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-indigo-900 shadow-sm">domain default 'grocery'</p>

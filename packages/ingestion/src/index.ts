@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { dirname } from 'node:path';
 import {
   createPgQueryExecutor,
   createPostgresProductAliasRepository,
@@ -63,6 +64,7 @@ export * from './connectors/lidl.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
+export * from './connectors/okq8-fuel.js';
 export * from './connectors/willys.js';
 
 export type SourceType =
@@ -2595,8 +2597,11 @@ export type DailyIngestionStoreConfig = {
   storeType?: string;
 };
 
+export type DailyIngestionDomain = 'grocery' | 'fuel' | 'pharmacy';
+
 export type DailyIngestionConnectorConfig = Omit<RetailerConnectorPlanInput, 'requestedAt'> & {
   requestedAt?: string;
+  domain?: DailyIngestionDomain;
   stores?: DailyIngestionStoreConfig[];
   requireStoreScopedPrices?: boolean;
 };
@@ -2605,6 +2610,11 @@ export type DailyIngestionEnv = Partial<Record<
   | 'DATABASE_URL'
   | 'GROCERYVIEW_DAILY_CONNECTORS_JSON'
   | 'GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE'
+  | 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'
+  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'
+  | 'GROCERYVIEW_DAILY_BLOCKER_LOG_PATH'
   | 'GROCERYVIEW_DATABASE_URL'
   | 'GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES'
   | 'GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS'
@@ -2620,6 +2630,7 @@ export type DailyIngestionEnv = Partial<Record<
 export type DailyIngestionEnvConfig = {
   databaseUrl: string;
   connectors: DailyIngestionConnectorConfig[];
+  runtimeOptions: DailyIngestionRuntimeOptions;
   runner: {
     maxConnectors?: number;
     maxConcurrency?: number;
@@ -2642,6 +2653,8 @@ export type DailyIngestionRunInput = {
   connectorRetryAttempts?: number;
   /** Base delay between retries. Attempt N waits baseDelay * N. */
   connectorRetryBaseDelayMs?: number;
+  /** File path for durable blocker diagnostics when a country-wide run is partial or blocked. */
+  blockerLogPath?: string;
 };
 
 export type DailyIngestionConnectorSummary = {
@@ -2670,6 +2683,15 @@ export type DailyIngestionRunResult = {
 };
 
 type IdRow = { id: string };
+
+export const DEFAULT_DAILY_INGESTION_BLOCKER_LOG_PATH = 'codex-tasks/ingestion-blockers.txt';
+
+export type DailyIngestionRuntimeOptions = Required<Pick<
+  DailyIngestionRunInput,
+  'maxConcurrency' | 'connectorStartDelayMs' | 'connectorRetryAttempts' | 'connectorRetryBaseDelayMs'
+>> & {
+  blockerLogPath: string;
+};
 
 const dailyRequiredConnectorFields = [
   'connectorId',
@@ -2763,6 +2785,7 @@ function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[
       hasDataAgreement: Boolean(record.hasDataAgreement),
       endpointUrl: String(record.endpointUrl),
       parserVersion: String(record.parserVersion),
+      domain: record.domain === undefined ? 'grocery' : record.domain as DailyIngestionDomain,
       stores: parseDailyStoreConfigs(record.stores, `GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}].stores`),
       requireStoreScopedPrices: record.requireStoreScopedPrices === undefined ? true : Boolean(record.requireStoreScopedPrices)
     };
@@ -2791,9 +2814,17 @@ export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): Daily
   if (!connectorsJson) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE is required for daily ingestion.');
   const parsedConnectors = parseDailyConnectorsJson(connectorsJson);
   const maxConnectors = dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_MAX_CONNECTORS);
+  const runtimeOptions = {
+    maxConcurrency: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY, 1, 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'),
+    connectorStartDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'),
+    connectorRetryAttempts: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'),
+    connectorRetryBaseDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS, 250, 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'),
+    blockerLogPath: env.GROCERYVIEW_DAILY_BLOCKER_LOG_PATH?.trim() || DEFAULT_DAILY_INGESTION_BLOCKER_LOG_PATH
+  };
   return {
     databaseUrl,
     connectors: maxConnectors && maxConnectors > 0 ? parsedConnectors.slice(0, maxConnectors) : parsedConnectors,
+    runtimeOptions,
     runner: {
       maxConnectors,
       maxConcurrency: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY),
@@ -2802,6 +2833,13 @@ export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): Daily
       connectorRetryBaseDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS)
     }
   };
+}
+
+function parseDailyEnvInteger(value: string | undefined, fallback: number, name: string): number {
+  if (value === undefined || value.trim() === '') return fallback;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 0) throw new Error(`${name} must be a non-negative integer.`);
+  return parsed;
 }
 
 export function buildDailyIngestionPostgresPoolConfig(databaseUrl: string): { connectionString: string; max: number } {
@@ -2848,37 +2886,42 @@ function chunkDailyRows<T>(rows: T[], size = 250): T[][] {
   return chunks;
 }
 
-async function upsertDailyChain(executor: QueryExecutor, chainId: string): Promise<string> {
+function normalizeDailyDomain(domain: DailyIngestionDomain | undefined): DailyIngestionDomain {
+  return domain ?? 'grocery';
+}
+
+async function upsertDailyChain(executor: QueryExecutor, chainId: string, domain?: DailyIngestionDomain): Promise<string> {
   const slug = normalizeDailySlug(chainId);
   const rows = await executor.query<IdRow>(
-    `insert into chains(slug, name, country_code)
-     values ($1, $2, 'SE')
-     on conflict (slug) do update set name = excluded.name, updated_at = now()
+    `insert into chains(slug, name, country_code, domain)
+     values ($1, $2, 'SE', $3)
+     on conflict (slug) do update set name = excluded.name, domain = excluded.domain, updated_at = now()
      returning id`,
-    [slug, slug]
+    [slug, slug, normalizeDailyDomain(domain)]
   );
   const id = rows[0]?.id;
   if (!id) throw new Error(`Daily ingestion chain upsert did not return an id: ${chainId}`);
   return id;
 }
 
-async function upsertDailyStore(executor: QueryExecutor, chainId: string, store: DailyIngestionStoreConfig): Promise<string> {
+async function upsertDailyStore(executor: QueryExecutor, chainId: string, store: DailyIngestionStoreConfig, domain?: DailyIngestionDomain): Promise<string> {
   const slug = normalizeDailySlug(store.storeId);
   const rows = await executor.query<IdRow>(
-    `insert into stores(slug, chain_id, external_ref, name, address_line1, city, region, country_code, position, store_type)
+    `insert into stores(slug, chain_id, external_ref, name, address_line1, city, region, country_code, position, store_type, domain)
      values (
        $1, $2, $3, $4, $5, $6, $7, $8,
        case
          when $9::numeric is null or $10::numeric is null then null
          else ST_SetSRID(ST_MakePoint($10::numeric, $9::numeric), 4326)::geography
        end,
-       coalesce($11, 'supermarket')
+       coalesce($11, 'supermarket'),
+       $12
      )
      on conflict (slug) do update set
        chain_id = excluded.chain_id, external_ref = excluded.external_ref, name = excluded.name,
        address_line1 = excluded.address_line1, city = excluded.city, region = excluded.region,
        country_code = excluded.country_code, position = excluded.position,
-       store_type = excluded.store_type, updated_at = now()
+       store_type = excluded.store_type, domain = excluded.domain, updated_at = now()
      returning id`,
     [
       slug,
@@ -2891,7 +2934,8 @@ async function upsertDailyStore(executor: QueryExecutor, chainId: string, store:
       store.countryCode ?? 'SE',
       store.latitude ?? null,
       store.longitude ?? null,
-      store.storeType ?? null
+      store.storeType ?? null,
+      normalizeDailyDomain(domain)
     ]
   );
   const id = rows[0]?.id;
@@ -2935,7 +2979,7 @@ function validateConfiguredStoreObservationCoverage(config: DailyIngestionConnec
     : [];
 }
 
-async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProduct): Promise<string> {
+async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProduct, domain?: DailyIngestionDomain): Promise<string> {
   const rows = await executor.query<IdRow>(
     `insert into products(
        slug,
@@ -2945,8 +2989,9 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
        category_path,
        package_size,
        package_unit,
-       comparable_unit
-     ) values ($1, $2, $3, $4, $5, $6, $7, $8)
+       comparable_unit,
+       domain
+     ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      on conflict (slug) do update set
        canonical_name = excluded.canonical_name,
        brand = excluded.brand,
@@ -2955,6 +3000,7 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
        package_size = excluded.package_size,
        package_unit = excluded.package_unit,
        comparable_unit = excluded.comparable_unit,
+       domain = excluded.domain,
        updated_at = now()
      returning id`,
     [
@@ -2965,7 +3011,8 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
       product.categoryId ? [product.categoryId] : [],
       product.packageSize,
       product.packageUnit,
-      product.comparableUnit
+      product.comparableUnit,
+      normalizeDailyDomain(domain)
     ]
   );
   const id = rows[0]?.id;
@@ -2974,7 +3021,7 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
 }
 
 
-async function upsertDailyProductBatch(executor: QueryExecutor, products: IngestedProduct[]): Promise<Map<string, string>> {
+async function upsertDailyProductBatch(executor: QueryExecutor, products: IngestedProduct[], domain?: DailyIngestionDomain): Promise<Map<string, string>> {
   if (products.length === 0) return new Map();
   const uniqueProducts = [...new Map(products.map((product) => [normalizeDailySlug(product.id), product])).values()];
   const ids = new Map<string, string>();
@@ -2990,7 +3037,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            category_id text,
            package_size numeric,
            package_unit text,
-           comparable_unit text
+           comparable_unit text,
+           domain text
          )
        ),
        upserted as (
@@ -3002,7 +3050,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            category_path,
            package_size,
            package_unit,
-           comparable_unit
+           comparable_unit,
+           domain
          )
          select
            slug,
@@ -3012,7 +3061,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            case when category_id is null then '{}'::text[] else array[category_id] end,
            package_size,
            package_unit,
-           comparable_unit
+           comparable_unit,
+           domain
          from input
          on conflict (slug) do update set
            canonical_name = excluded.canonical_name,
@@ -3022,6 +3072,7 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
            package_size = excluded.package_size,
            package_unit = excluded.package_unit,
            comparable_unit = excluded.comparable_unit,
+           domain = excluded.domain,
            updated_at = now()
          returning slug, id
        )
@@ -3034,7 +3085,8 @@ async function upsertDailyProductBatch(executor: QueryExecutor, products: Ingest
         category_id: product.categoryId ?? null,
         package_size: product.packageSize ?? null,
         package_unit: product.packageUnit ?? null,
-        comparable_unit: product.comparableUnit
+        comparable_unit: product.comparableUnit,
+        domain: normalizeDailyDomain(domain)
       })))]
     );
     for (const row of rows) ids.set(row.slug, row.id);
@@ -3361,6 +3413,7 @@ async function persistDailyConnectorOutput(input: {
   result: RetailerConnectorRunResult;
 }): Promise<Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'>> {
   const { executor, config, result } = input;
+  const domain = normalizeDailyDomain(config.domain);
   await executor.query('set default_transaction_read_only=off');
   const sourceWriter = createPostgresSourceRecordWriter(executor);
   const storesBySlug = new Map((config.stores ?? []).map((store) => [normalizeDailySlug(store.storeId), store]));
@@ -3378,7 +3431,8 @@ async function persistDailyConnectorOutput(input: {
       runKey: result.plan.runKey,
       parserVersion: config.parserVersion,
       acceptedCount: result.acceptedCount,
-      rejectedCount: result.rejectedCount
+      rejectedCount: result.rejectedCount,
+      domain
     }
   });
 
@@ -3391,7 +3445,7 @@ async function persistDailyConnectorOutput(input: {
     const slug = normalizeDailySlug(chainId);
     const cached = chainIdsBySlug.get(slug);
     if (cached) return cached;
-    const id = await upsertDailyChain(executor, chainId);
+    const id = await upsertDailyChain(executor, chainId, domain);
     chainIdsBySlug.set(slug, id);
     return id;
   }
@@ -3400,7 +3454,7 @@ async function persistDailyConnectorOutput(input: {
     const slug = normalizeDailySlug(store.storeId);
     const cached = storeIdsBySlug.get(slug);
     if (cached) return cached;
-    const id = await upsertDailyStore(executor, chainId, store);
+    const id = await upsertDailyStore(executor, chainId, store, domain);
     storeIdsBySlug.set(slug, id);
     return id;
   }
@@ -3501,6 +3555,7 @@ async function persistDailyConnectorOutput(input: {
     validFrom?: string;
     validUntil?: string;
     confidence: number;
+    domain: DailyIngestionDomain;
     provenance: Record<string, unknown>;
   }>): Promise<string[]> {
     if (observations.length === 0) return [];
@@ -3531,6 +3586,7 @@ async function persistDailyConnectorOutput(input: {
            valid_from timestamptz,
            valid_until timestamptz,
            confidence numeric,
+           domain text,
            provenance jsonb
          )
        ),
@@ -3557,6 +3613,7 @@ async function persistDailyConnectorOutput(input: {
            valid_from,
            valid_until,
            confidence,
+           domain,
            provenance
          )
          select
@@ -3581,9 +3638,10 @@ async function persistDailyConnectorOutput(input: {
            valid_from,
            valid_until,
            confidence,
+           domain,
            provenance
          from input
-         returning id, product_id, chain_id, store_id, price_type, price, regular_price, unit_price, currency, observed_at, confidence, provenance
+         returning id, product_id, chain_id, store_id, price_type, price, regular_price, unit_price, currency, observed_at, confidence, domain, provenance
        ),
        latest_upsert as (
          insert into latest_prices(
@@ -3598,6 +3656,7 @@ async function persistDailyConnectorOutput(input: {
            currency,
            observed_at,
            confidence,
+           domain,
            provenance
          )
          select
@@ -3612,6 +3671,7 @@ async function persistDailyConnectorOutput(input: {
            currency,
            observed_at,
            confidence,
+           domain,
            provenance
          from (
            select distinct on (product_id, chain_id, store_id, price_type)
@@ -3626,6 +3686,7 @@ async function persistDailyConnectorOutput(input: {
              currency,
              observed_at,
              confidence,
+             domain,
              provenance
            from inserted
            order by product_id, chain_id, store_id, price_type, observed_at desc, id desc
@@ -3638,6 +3699,7 @@ async function persistDailyConnectorOutput(input: {
            currency = excluded.currency,
            observed_at = excluded.observed_at,
            confidence = excluded.confidence,
+           domain = excluded.domain,
            provenance = excluded.provenance,
            updated_at = now()
          where latest_prices.observed_at <= excluded.observed_at
@@ -3666,6 +3728,7 @@ async function persistDailyConnectorOutput(input: {
         valid_from: observation.validFrom ?? null,
         valid_until: observation.validUntil ?? null,
         confidence: observation.confidence,
+        domain: observation.domain,
         provenance: observation.provenance
       })))]
       );
@@ -3675,7 +3738,7 @@ async function persistDailyConnectorOutput(input: {
   }
 
   try {
-    const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product));
+    const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product), domain);
     const aliasesToUpsert: Parameters<typeof upsertDailyAliasBatch>[1] = [];
     for (const accepted of result.ingestion.accepted) {
       const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
@@ -3715,7 +3778,8 @@ async function persistDailyConnectorOutput(input: {
       chainId: config.chainId,
       cadence: 'daily',
       connectorId: config.connectorId,
-      runKey: result.plan.runKey
+      runKey: result.plan.runKey,
+      domain
     };
     rawRecordsToUpsert.push({
       ordinal,
@@ -3754,6 +3818,7 @@ async function persistDailyConnectorOutput(input: {
       validFrom: accepted.priceObservation.validFrom,
       validUntil: accepted.priceObservation.validUntil,
       confidence: accepted.priceObservation.confidenceScore,
+      domain,
       provenance: rawProvenance
     });
   }
@@ -3796,6 +3861,32 @@ type DailyConnectorRunPersistenceResult = Pick<DailyIngestionRunResult, 'sourceR
   blockers: string[];
   persistedRuns: number;
 };
+
+function writeDailyIngestionBlockerLog(path: string, result: DailyIngestionRunResult, requestedAt: string): void {
+  mkdirSync(dirname(path), { recursive: true });
+  const lines = [
+    '# Daily ingestion blockers',
+    '',
+    `requestedAt: ${requestedAt}`,
+    `status: ${result.status}`,
+    `persistedRuns: ${result.persistedRuns}`,
+    `acceptedCount: ${result.acceptedCount}`,
+    `rejectedCount: ${result.rejectedCount}`,
+    `sourceRunCount: ${result.sourceRunIds.length}`,
+    `rawRecordCount: ${result.rawRecordIds.length}`,
+    `observationCount: ${result.observationIds.length}`,
+    '',
+    'blockers:'
+  ];
+
+  if (result.blockers.length === 0) {
+    lines.push('- none');
+  } else {
+    lines.push(...result.blockers.map((blocker) => `- ${blocker}`));
+  }
+
+  writeFileSync(path, `${lines.join('\n')}\n`);
+}
 
 function normalizeDailyRunnerInteger(value: number | undefined, fallback: number): number {
   if (value === undefined) return fallback;
@@ -3964,14 +4055,26 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
   const retryBaseDelayMs = normalizeDailyRunnerInteger(input.connectorRetryBaseDelayMs, 250);
   const results = new Array<DailyConnectorRunPersistenceResult | undefined>(input.connectors.length);
   let nextConnectorIndex = 0;
+  let nextConnectorStartAt = 0;
+  let connectorStartsScheduled = 0;
+
+  async function waitForConnectorStartSlot(): Promise<void> {
+    if (connectorStartDelayMs <= 0) return;
+
+    const now = Date.now();
+    const scheduledStartAt = connectorStartsScheduled === 0 ? now : Math.max(now, nextConnectorStartAt);
+    connectorStartsScheduled += 1;
+    nextConnectorStartAt = scheduledStartAt + connectorStartDelayMs;
+    await waitForDailyRunnerDelay(Math.max(0, scheduledStartAt - now));
+  }
 
   async function worker(): Promise<void> {
     while (nextConnectorIndex < input.connectors.length) {
       const connectorIndex = nextConnectorIndex;
       nextConnectorIndex += 1;
-      if (connectorIndex > 0) await waitForDailyRunnerDelay(connectorStartDelayMs);
       const config = input.connectors[connectorIndex];
       if (!config) continue;
+      await waitForConnectorStartSlot();
       results[connectorIndex] = await runDailyIngestionConnector({
         executor: input.executor,
         requestedAt: input.requestedAt,
@@ -4019,7 +4122,7 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
     });
   }
 
-  return {
+  const runResult: DailyIngestionRunResult = {
     status: blockers.length === 0 ? 'succeeded' : persistedRuns > 0 ? 'partial' : 'blocked',
     blockers,
     persistedRuns,
@@ -4030,10 +4133,16 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
     observationIds,
     chainSummaries
   };
+
+  if (input.blockerLogPath?.trim()) {
+    writeDailyIngestionBlockerLog(input.blockerLogPath.trim(), runResult, input.requestedAt);
+  }
+
+  return runResult;
 }
 
 export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.env): Promise<DailyIngestionRunResult> {
-  const { databaseUrl, connectors, runner } = buildDailyConnectorConfigsFromEnv(env);
+  const { databaseUrl, connectors, runtimeOptions } = buildDailyConnectorConfigsFromEnv(env);
   const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void>; on?(event: 'error', listener: (error: unknown) => void): void } };
   if (!pg.Pool) throw new Error('pg Pool export is not available.');
   const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
@@ -4050,10 +4159,7 @@ export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.
       executor,
       requestedAt: new Date().toISOString(),
       connectors,
-      maxConcurrency: runner.maxConcurrency,
-      connectorStartDelayMs: runner.connectorStartDelayMs,
-      connectorRetryAttempts: runner.connectorRetryAttempts,
-      connectorRetryBaseDelayMs: runner.connectorRetryBaseDelayMs
+      ...runtimeOptions
     });
   } finally {
     await pool.end();

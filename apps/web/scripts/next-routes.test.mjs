@@ -502,7 +502,7 @@ describe('verified-data UI', () => {
 
 
 
-  it('surfaces the fuel OSM station connector without rendering fuel prices', async () => {
+  it('surfaces the fuel OSM station connector alongside operator fuel prices', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const fuelRoute = await read('src/app/fuel/page.tsx');
     const overpass = await read('../../packages/ingestion/src/connectors/overpass.ts');
@@ -515,9 +515,11 @@ describe('verified-data UI', () => {
     assert.match(fuelRoute, /fuelStationSourceCoverage/);
     assert.match(fuelRoute, /OSM fuel station source/);
     assert.match(fuelRoute, /amenity=fuel/);
-    assert.match(fuelRoute, /No fuel price observations yet/);
-    assert.match(fuelRoute, /must not render pump prices/);
-    assert.doesNotMatch(fuelRoute, /currentPrice|unitPrice|price SEK|kr\/l/);
+    assert.match(fuelRoute, /verifiedFuelPriceObservations/);
+    assert.match(fuelRoute, /Fuel prices by grade/);
+    assert.match(fuelRoute, /price per litre/);
+    assert.match(fuelRoute, /operator domain=fuel observations/);
+    assert.doesNotMatch(fuelRoute, /currentPrice|price SEK/);
   });
 
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
@@ -1321,6 +1323,7 @@ describe('verified-data UI', () => {
     assert.match(source, /personalGroceryInflation/);
     assert.match(source, /inflationPercent/);
     assert.match(source, /itemContributions/);
+    assert.match(source, /ConfidenceBadge/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
@@ -2776,14 +2779,14 @@ ${seo}`;
 
     assert.match(verified, /multiVerticalDomainFoundation/);
     assert.match(verified, /SUPPORTED_PRICE_DOMAINS/);
-    assert.match(verified, /priceObservationsAvailable: domain\.slug === 'grocery' \? groceryObservationCount : 0/);
-    assert.match(verified, /No non-grocery prices are rendered until connector observations land/);
+    assert.match(verified, /verifiedFuelPriceObservations/);
+    assert.match(verified, /operator-sourced fuel rows/);
     assert.match(dataSources, /multiVerticalDomainFoundation\.map/);
     assert.match(dataSources, /Multi-vertical domain foundation/);
 
-    assert.match(fuelRoute, /domainSlug="fuel"/);
-    assert.match(fuelRoute, /No fuel price observations yet/);
-    assert.match(fuelRoute, /fuel\/pharmacy domain model/);
+    assert.match(fuelRoute, /verifiedFuelPriceObservations/);
+    assert.match(fuelRoute, /Fuel prices by grade/);
+    assert.match(fuelRoute, /row\.sourceType/);
     assert.match(pharmacyRoute, /domainSlug="pharmacy"/);
     assert.match(pharmacyRoute, /No pharmacy price observations yet/);
     assert.match(pharmacyRoute, /OTC/);

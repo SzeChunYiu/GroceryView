@@ -451,6 +451,7 @@ export type PriceObservationRecord = {
   productId: string;
   chainId: string;
   storeId?: string;
+  domain?: 'grocery' | 'fuel' | 'pharmacy';
   sourceRunId?: string;
   rawRecordId?: string;
   retailerProductRef?: string;
@@ -3754,6 +3755,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            product_id,
            chain_id,
            store_id,
+           domain,
            source_run_id,
            raw_record_id,
            retailer_product_ref,
@@ -3775,13 +3777,14 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            provenance
          ) values (
            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22::jsonb
+           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23::jsonb
          )
          returning id`,
         [
           observation.productId,
           observation.chainId,
           observation.storeId ?? null,
+          observation.domain ?? 'grocery',
           observation.sourceRunId ?? null,
           observation.rawRecordId ?? null,
           observation.retailerProductRef ?? null,
@@ -3811,6 +3814,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            product_id,
            chain_id,
            store_id,
+           domain,
            price_type,
            observation_id,
            price,
@@ -3820,7 +3824,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            observed_at,
            confidence,
            provenance
-         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::jsonb)
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::jsonb)
          on conflict (product_id, chain_id, store_id, price_type) do update set
            observation_id = excluded.observation_id,
            price = excluded.price,
@@ -3829,6 +3833,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            currency = excluded.currency,
            observed_at = excluded.observed_at,
            confidence = excluded.confidence,
+           domain = excluded.domain,
            provenance = excluded.provenance,
            updated_at = now()
          where latest_prices.observed_at <= excluded.observed_at`,
@@ -3836,6 +3841,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.productId,
           observation.chainId,
           observation.storeId ?? null,
+          observation.domain ?? 'grocery',
           observation.priceType,
           observationId,
           observation.price,

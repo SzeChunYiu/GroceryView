@@ -43,19 +43,18 @@ export const SUPPORTED_PRICE_DOMAINS: PriceDomain[] = [
     label: 'Fuel',
     route: '/fuel',
     defaultCurrency: 'SEK',
-    status: 'foundation',
+    status: 'active',
     itemMatchStrategy: 'Fuel grade instead of EAN: 95 E10/E5, 98, Diesel, HVO100, E85, and AdBlue',
-    locationStrategy: 'Fuel stations from OSM amenity=fuel via fetchOverpassFuelStations plus future operator/crowd price reports',
+    locationStrategy: 'Fuel stations from OSM amenity=fuel via fetchOverpassFuelStations plus operator price pages and trusted crowd price reports',
     observationsTable: 'observations',
-    priceClaim: 'Fuel routes can explain supported grades, station matching, and readiness.',
-    priceClaimBoundary: 'No fuel price is rendered until a connector or trusted crowd report writes domain=fuel observations.',
+    priceClaim: 'Fuel routes can render domain=fuel observations with price per litre and grade-level source provenance.',
+    priceClaimBoundary: 'Fuel prices render only from operator public price pages or trusted crowd reports; no unsupported grade or station price is inferred.',
     seedItems: [
       { id: 'fuel-95-e10', label: '95 E10 / E5 petrol', comparableUnit: 'l', matchKey: 'fuel_grade' },
       { id: 'fuel-98', label: '98 petrol', comparableUnit: 'l', matchKey: 'fuel_grade' },
       { id: 'fuel-diesel', label: 'Diesel', comparableUnit: 'l', matchKey: 'fuel_grade' },
       { id: 'fuel-hvo100', label: 'HVO100', comparableUnit: 'l', matchKey: 'fuel_grade' },
-      { id: 'fuel-e85', label: 'E85', comparableUnit: 'l', matchKey: 'fuel_grade' },
-      { id: 'fuel-adblue', label: 'AdBlue', comparableUnit: 'l', matchKey: 'fuel_grade' }
+      { id: 'fuel-e85', label: 'E85', comparableUnit: 'l', matchKey: 'fuel_grade' }
     ]
   },
   {

@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { planPantryReplenishment } from '@groceryview/core';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { pantryReplenishmentPlan } from '@/lib/demo-data';
+import { pantryReplenishmentInput, pantryReplenishmentPlan } from '@/lib/demo-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -12,7 +14,11 @@ function formatSek(value: number) {
 }
 
 export default function PantryPlannerPage() {
-  const { plan, replenishment, expiringSoonProductIds, coverage } = pantryReplenishmentPlan;
+  const plan = planPantryReplenishment(pantryReplenishmentInput);
+  const { coverage } = pantryReplenishmentPlan;
+  const { replenishment, expiringSoonProductIds } = plan;
+  const coverageConfidence = coverage.confidence as 'high' | 'medium' | 'low';
+
   return (
     <PageShell>
       <Eyebrow>Pantry replenishment</Eyebrow>
@@ -34,7 +40,9 @@ export default function PantryPlannerPage() {
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Confidence</p>
-          <p className="mt-2 text-5xl font-black capitalize text-slate-950">{coverage.confidence}</p>
+          <div className="mt-4">
+            <ConfidenceBadge level={coverageConfidence} label={`${coverage.confidence} confidence`} sampleSize={coverage.visiblePantryItems} />
+          </div>
           <p className="mt-3 font-semibold text-slate-700">{coverage.caveat}</p>
         </Card>
       </div>
