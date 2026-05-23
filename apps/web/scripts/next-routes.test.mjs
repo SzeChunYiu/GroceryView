@@ -827,28 +827,22 @@ describe('verified-data UI', () => {
 
 
 
-  it('surfaces watchlist alerts and notification planning using the real core outputs', async () => {
+  it('surfaces watchlist alerts and notification planning using verified core outputs', async () => {
     const source = await read('src/app/watchlist/page.tsx');
-    assert.match(source, /watchlistAlertBoard/);
     assert.match(source, /buildWatchlistAlerts/);
     assert.match(source, /planNotifications/);
     assert.match(source, /plannedNotifications/);
+    assert.match(source, /watchlistAlerts/);
+    assert.match(source, /watchlistAlertInputs/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
-  it('surfaces watchlist sparklines from real price chart series output', async () => {
+  it('surfaces watchlist alert confidence and coverage as planning-ready facts', async () => {
     const route = await read('src/app/watchlist/page.tsx');
-    const demo = await read('src/lib/demo-data.ts');
 
-    assert.match(demo, /watchlistSparklineBoard/);
-    assert.match(demo, /buildPriceChartSeries/);
-    assert.match(demo, /rangeDays: 90/);
-    assert.match(demo, /provenanceLabel/);
-    assert.match(route, /watchlistSparklineBoard/);
-    assert.match(route, /Watchlist sparklines/);
-    assert.match(route, /sparklinePoints/);
-    assert.match(route, /priceChartSeries/);
-    assert.match(route, /coverageLabel/);
+    assert.match(route, /coverageConfidence/);
+    assert.match(route, /confidenceForCoverage/);
+    assert.match(route, /ConfidenceBadge/);
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
