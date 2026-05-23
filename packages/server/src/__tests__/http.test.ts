@@ -357,6 +357,13 @@ describe('createHttpHandler', () => {
       ['coffee', -16.7, 0, 3]
     ]);
 
+    const categories = await handle(new Request('http://localhost/api/categories'));
+    assert.equal(categories.status, 200);
+    assert.deepEqual(await json(categories), [
+      { id: 'coffee', name: 'Coffee', slug: 'coffee', parentId: null, itemCount: 1 },
+      { id: 'dairy', name: 'Dairy', slug: 'dairy', parentId: null, itemCount: 3 }
+    ]);
+
     const stores = await handle(new Request('http://localhost/api/stores'));
     assert.equal(stores.status, 200);
     assert.equal((await json(stores) as Array<{ id: string }>)[0].id, 'willys-odenplan');

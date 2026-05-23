@@ -459,6 +459,7 @@ describe('GroceryView API app', () => {
 
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.equal(docs.body.info.title, 'GroceryView API');
+    assert.ok(docs.body.paths['/categories']);
     assert.ok(docs.body.paths['/categories/{category}/market']);
     assert.ok(docs.body.paths['/users/demo/account/subscription-access']);
     assert.ok(docs.body.paths['/users/demo/account/subscription-entitlement']);
@@ -630,6 +631,15 @@ describe('GroceryView API app', () => {
       ['lidl', 'Lidl', '/retailers/lidl.svg', 'https://www.lidl.se/'],
       ['willys', 'Willys', '/retailers/willys.svg', 'https://www.willys.se/']
     ]);
+
+    const categories = await request(app.getHttpServer()).get('/categories').expect(200);
+    assert.deepEqual(categories.body, [
+      { id: 'coffee', name: 'Coffee', slug: 'coffee', parentId: null, itemCount: 1 },
+      { id: 'dairy', name: 'Dairy', slug: 'dairy', parentId: null, itemCount: 3 }
+    ]);
+
+    const invalidCategories = await request(app.getHttpServer()).get('/categories?unexpected=true').expect(400);
+    assert.match(invalidCategories.body.message, /unexpected query parameter/i);
 
     await request(app.getHttpServer()).get('/products/coffee').expect(200);
     await request(app.getHttpServer()).get('/stores/willys-odenplan').expect(200);
