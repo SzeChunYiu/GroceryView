@@ -28,8 +28,11 @@ npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView
 
 ## Generate coverage targets from the live DB
 
-Run this only after the production database has chains, stores, products, and latest
-prices loaded far enough to represent the desired target universe.
+Run this only after the production database has chains and products, and after
+`GROCERYVIEW_DAILY_CONNECTORS_JSON` has been generated from the live branch
+catalogs. The store target universe comes from connector `stores[]` when present,
+so unpriced branches remain readiness blockers instead of disappearing from the
+target set.
 
 ```bash
 DATABASE_URL="$DATABASE_URL" npm run ops:catalog-coverage-targets \

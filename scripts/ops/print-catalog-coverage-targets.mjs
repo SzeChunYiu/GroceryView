@@ -31,7 +31,7 @@ function connectorStoreIdsFromEnv() {
   if (!raw.trim()) return undefined;
   const connectors = JSON.parse(raw);
   if (!Array.isArray(connectors)) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON must be an array when provided.');
-  return new Set(connectors.flatMap((connector) =>
+  return uniqueSorted(connectors.flatMap((connector) =>
     Array.isArray(connector?.stores)
       ? connector.stores.map((store) => typeof store?.storeId === 'string' ? store.storeId.trim() : '').filter(Boolean)
       : []
@@ -42,8 +42,9 @@ export function buildCatalogCoverageTargets(rows, options = {}) {
   const targetProducts = uniqueSorted(rows.products.map((row) => row.id));
   const targetCategories = uniqueSorted(rows.products.map((row) => row.category_id ?? 'uncategorized'));
   const connectorStoreIds = options.connectorStoreIds;
-  const targetStores = uniqueSorted(rows.stores.map(connectorAddressableStoreRef)
-    .filter((storeId) => !connectorStoreIds || connectorStoreIds.has(storeId)));
+  const targetStores = connectorStoreIds && connectorStoreIds.length > 0
+    ? uniqueSorted(connectorStoreIds)
+    : uniqueSorted(rows.stores.map(connectorAddressableStoreRef));
   const observedChains = uniqueSorted(rows.chains.map((row) => normalizeChainId(row.id)));
   const missingRequiredChains = requiredDailyChainIds.filter((chainId) => !observedChains.includes(chainId));
   if (missingRequiredChains.length > 0) {
@@ -70,7 +71,6 @@ async function readCatalogRows(databaseUrl) {
     const stores = await client.query(`
       select distinct stores.slug, stores.external_ref, stores.id
       from stores
-      join latest_prices on latest_prices.store_id = stores.id
       order by stores.slug
     `);
     const chains = await client.query('select slug as id from chains order by slug');
@@ -102,7 +102,7 @@ async function main() {
           { id: 'daily-coop-odenplan', slug: 'coop-odenplan', external_ref: 'coop-odenplan' }
         ];
     const connectorStoreIds = process.argv.includes('--self-test-current-connectors')
-      ? new Set(['216502'])
+      ? ['216502', '999999']
       : undefined;
     const targets = buildCatalogCoverageTargets({
       products: [{ id: 'coffee', category_id: 'coffee' }, { id: 'milk', category_id: 'dairy' }],

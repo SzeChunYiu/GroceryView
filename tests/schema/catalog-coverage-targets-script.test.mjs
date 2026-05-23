@@ -11,7 +11,8 @@ describe('catalog coverage target export script', () => {
   it('exports production coverage target JSON from live catalog tables', () => {
     assert.match(script, /DATABASE_URL is required/);
     assert.match(script, /from products order by id/);
-    assert.match(script, /join latest_prices on latest_prices.store_id = stores.id/);
+    assert.match(script, /from stores/);
+    assert.doesNotMatch(script, /join latest_prices on latest_prices.store_id = stores.id/);
     assert.match(script, /from chains order by slug/);
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
       assert.match(script, new RegExp(`['"]${chain}['"]`));
@@ -28,6 +29,7 @@ describe('catalog coverage target export script', () => {
     assert.deepEqual(targets.targetProducts, ['coffee', 'milk']);
     assert.deepEqual(targets.targetStores, ['coop-odenplan', 'willys-odenplan']);
     assert.doesNotMatch(script, /select id from stores order by id/);
+    assert.doesNotMatch(script, /latest_prices\.store_id/);
     assert.equal(targets.requireEveryProductInEveryStore, false);
     assert.deepEqual(targets.targetPriceTypes, ['online']);
     assert.equal(targets.requireEveryStorePriceType, true);
@@ -39,10 +41,10 @@ describe('catalog coverage target export script', () => {
     assert.deepEqual(targets.targetStores, ['1004599', '184900', '216502']);
   });
 
-  it('can intersect observed target stores with the current daily connector store list', () => {
+  it('uses the current daily connector store universe even for branches without latest prices yet', () => {
     const output = execFileSync(process.execPath, [scriptPath.pathname, '--self-test-store-external-refs', '--self-test-current-connectors'], { encoding: 'utf8' });
     const targets = JSON.parse(output);
-    assert.deepEqual(targets.targetStores, ['216502']);
+    assert.deepEqual(targets.targetStores, ['216502', '999999']);
     assert.equal(targets.requireEveryProductInEveryStore, false);
     assert.deepEqual(targets.targetPriceTypes, ['online']);
     assert.equal(targets.requireEveryStorePriceType, true);
