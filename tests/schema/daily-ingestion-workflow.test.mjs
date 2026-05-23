@@ -125,6 +125,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_PATH:\s*\/tmp\/groceryview-db-site-snapshot\.json/);
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE:\s*\$\{\{ vars\.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE \|\| '0\.5' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT:\s*\$\{\{ vars\.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT \|\| '50000' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS:\s*\$\{\{ vars\.GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS \|\| '36' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS:\s*\$\{\{ vars\.GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS \|\| 'ica,willys,coop,hemkop,lidl,city_gross' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE:\s*\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /body\.status !== 'passed'/);
@@ -134,6 +135,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /missingRequiredProductSlugs/);
     assert.match(workflow, /missingRequiredStorePriceTypes/);
     assert.match(workflow, /missingRequiredCategorySlugs/);
+    assert.match(workflow, /staleObservationCount/);
     assert.match(workflow, /name:\s*groceryview-db-site-snapshot/);
     assert.match(workflow, /path:\s*\/tmp\/groceryview-db-site-snapshot\.json/);
     assert.match(workflow, /missingProductStorePairs/);

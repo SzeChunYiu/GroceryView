@@ -340,6 +340,60 @@ describe('DB-backed site snapshot export script', () => {
     assert.deepEqual(artifact.coverage.missingRequiredProductSlugs, []);
   });
 
+  it('fails closed when snapshot latest-price evidence is older than the allowed age', () => {
+    assert.throws(() => buildDbSiteSnapshotArtifact({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      requiredChains: ['willys'],
+      maxObservedAgeHours: 24,
+      rows: [{
+        productId: 'product-1',
+        productSlug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        categoryPath: ['Pantry', 'Coffee'],
+        comparableUnit: 'kg',
+        chainId: 'chain-1',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        priceType: 'online',
+        observationId: 'observation-stale',
+        price: 44.9,
+        unitPrice: 99.7778,
+        currency: 'SEK',
+        observedAt: '2026-05-20T09:00:00.000Z',
+        confidence: 0.88
+      }]
+    }), /db_site_snapshot_stale_observations:observation-stale/);
+  });
+
+  it('records freshness coverage when latest-price evidence is within the allowed age', () => {
+    const artifact = buildDbSiteSnapshotArtifact({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      requiredChains: ['willys'],
+      maxObservedAgeHours: 72,
+      rows: [{
+        productId: 'product-1',
+        productSlug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        categoryPath: ['Pantry', 'Coffee'],
+        comparableUnit: 'kg',
+        chainId: 'chain-1',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        priceType: 'online',
+        observationId: 'observation-fresh',
+        price: 44.9,
+        unitPrice: 99.7778,
+        currency: 'SEK',
+        observedAt: '2026-05-22T09:00:00.000Z',
+        confidence: 0.88
+      }]
+    });
+
+    assert.equal(artifact.coverage.maxObservedAgeHours, 72);
+    assert.equal(artifact.coverage.staleObservationCount, 0);
+    assert.deepEqual(artifact.coverage.staleObservationIds, []);
+  });
+
   it('fails closed when the database reader returns no latest price rows', () => {
     assert.throws(() => buildDbSiteSnapshotArtifact({ generatedAt: '2026-05-22T21:20:00.000Z', rows: [] }), /No latest price rows available/);
   });

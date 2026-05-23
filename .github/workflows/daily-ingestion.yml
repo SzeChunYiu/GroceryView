@@ -211,6 +211,7 @@ jobs:
           GROCERYVIEW_DB_SITE_SNAPSHOT_PATH: /tmp/groceryview-db-site-snapshot.json
           GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE || '0.5' }}
           GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT || '50000' }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS || '36' }}
           GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS || 'ica,willys,coop,hemkop,lidl,city_gross' }}
           GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE: /tmp/groceryview-catalog-targets.json
         run: |
@@ -220,7 +221,7 @@ jobs:
             >/tmp/db-site-snapshot-result.json
           node <<'NODE'
           const body = require('/tmp/db-site-snapshot-result.json');
-          if (body.status !== 'passed' || body.coverage?.observations < 1 || (body.coverage?.missingRequiredChains?.length ?? 0) > 0 || (body.coverage?.missingRequiredStoreExternalRefs?.length ?? 0) > 0 || (body.coverage?.missingRequiredProductSlugs?.length ?? 0) > 0 || (body.coverage?.missingRequiredStorePriceTypes?.length ?? 0) > 0 || (body.coverage?.missingRequiredCategorySlugs?.length ?? 0) > 0) {
+          if (body.status !== 'passed' || body.coverage?.observations < 1 || (body.coverage?.missingRequiredChains?.length ?? 0) > 0 || (body.coverage?.missingRequiredStoreExternalRefs?.length ?? 0) > 0 || (body.coverage?.missingRequiredProductSlugs?.length ?? 0) > 0 || (body.coverage?.missingRequiredStorePriceTypes?.length ?? 0) > 0 || (body.coverage?.missingRequiredCategorySlugs?.length ?? 0) > 0 || (body.coverage?.staleObservationCount ?? 0) > 0) {
             console.error(JSON.stringify(body));
             process.exit(1);
           }

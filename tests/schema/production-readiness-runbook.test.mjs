@@ -60,17 +60,20 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /groceryview-db-site-snapshot/);
     assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE/);
     assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT/);
+    assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS/);
     assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS/);
     assert.match(runbook, /db_site_snapshot_missing_required_chains/);
     assert.match(runbook, /db_site_snapshot_missing_required_stores/);
     assert.match(runbook, /db_site_snapshot_missing_required_products/);
     assert.match(runbook, /db_site_snapshot_missing_required_store_price_types/);
     assert.match(runbook, /db_site_snapshot_missing_required_categories/);
+    assert.match(runbook, /db_site_snapshot_stale_observations/);
     assert.match(runbook, /missingRequiredChains/);
     assert.match(runbook, /missingRequiredStoreExternalRefs/);
     assert.match(runbook, /missingRequiredProductSlugs/);
     assert.match(runbook, /missingRequiredStorePriceTypes/);
     assert.match(runbook, /missingRequiredCategorySlugs/);
+    assert.match(runbook, /staleObservationCount/);
   });
 
 });
