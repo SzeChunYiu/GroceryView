@@ -2440,7 +2440,11 @@ ${seo}`;
 
     assert.match(privacy, /Integritetspolicy/);
     assert.match(privacy, /Privacy policy/);
+    assert.match(privacy, /buildPrivacyExport/);
+    assert.match(privacy, /privacyExportContract/);
     assert.match(privacy, /Export my data/);
+    assert.match(privacy, /Core export contract/);
+    assert.match(privacy, /privacyExportContract\.sections/);
     assert.match(privacy, /Delete my account/);
     assert.match(privacy, /receipt/i);
     assert.match(privacy, /retention/i);
