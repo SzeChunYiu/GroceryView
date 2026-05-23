@@ -1755,6 +1755,26 @@ ${seo}`;
     assert.match(homeMetadataSource, /gated feature readiness/);
   });
 
+  it('mounts a glassmorphic mobile bottom navigation in the shared page shell', async () => {
+    const bottomNav = await read('src/components/bottom-nav.tsx');
+    const dataUi = await read('src/components/data-ui.tsx');
+
+    assert.match(bottomNav, /export function BottomNav/);
+    assert.match(bottomNav, /Primary mobile navigation/);
+    assert.match(bottomNav, /fixed inset-x-3 bottom-3/);
+    assert.match(bottomNav, /backdrop-blur-xl/);
+    assert.match(bottomNav, /lg:hidden/);
+    assert.match(bottomNav, /Markets/);
+    assert.match(bottomNav, /Search/);
+    assert.match(bottomNav, /Map/);
+    assert.match(bottomNav, /Watchlist/);
+    assert.match(bottomNav, /Me/);
+    assert.match(dataUi, /import \{ BottomNav \} from '\.\/bottom-nav'/);
+    assert.match(dataUi, /pb-20/);
+    assert.match(dataUi, /lg:pb-6/);
+    assert.match(dataUi, /<BottomNav \/>/);
+  });
+
   it('colors map store markers by chain index and highlights the cheapest nearby chain', async () => {
     const route = await read('src/app/map/page.tsx');
     assert.match(route, /calculateChainPriceIndex/);
