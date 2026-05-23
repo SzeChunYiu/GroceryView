@@ -11,7 +11,7 @@ jobs:
   validate-db-cutover:
     name: Validate replacement DATABASE_URL
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v5
 
@@ -58,4 +58,162 @@ jobs:
           name: groceryview-db-cutover-validation
           path: /tmp/db-cutover-validation.json
           if-no-files-found: error
+          retention-days: 14
+
+      - name: Apply replacement DB migrations
+        env:
+          DATABASE_URL: ${{ secrets.REPLACEMENT_DATABASE_URL || secrets.CANDIDATE_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}"
+          migration_status=0
+          npm run --silent ops:apply-db-migrations >/tmp/replacement-db-migrations.json || migration_status=$?
+          if [ ! -s /tmp/replacement-db-migrations.json ]; then
+            cat > /tmp/replacement-db-migrations.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_db_migrations_diagnostic_missing",
+            "exitCode": ${migration_status}
+          }
+          EOF
+          fi
+          cat /tmp/replacement-db-migrations.json
+          node -e "const body=require('/tmp/replacement-db-migrations.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+          exit "${migration_status}"
+
+      - name: Upload replacement DB migrations evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-replacement-db-migrations
+          path: /tmp/replacement-db-migrations.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Run replacement DB all-store ingestion validation
+        env:
+          DATABASE_URL: ${{ secrets.REPLACEMENT_DATABASE_URL || secrets.CANDIDATE_DATABASE_URL }}
+          GROCERYVIEW_DAILY_MAX_CONCURRENCY: ${{ vars.GROCERYVIEW_CUTOVER_DAILY_MAX_CONCURRENCY || '2' }}
+          GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: ${{ vars.GROCERYVIEW_CUTOVER_DAILY_CONNECTOR_START_DELAY_MS || '250' }}
+          GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_CUTOVER_DAILY_CONNECTOR_RETRY_ATTEMPTS || '1' }}
+          GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_CUTOVER_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS || '500' }}
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}"
+          npm run --silent ops:daily-connectors >/tmp/replacement-daily-connectors.json
+          GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/replacement-daily-connectors.json \
+            npm run --silent ops:catalog-coverage-targets -- --from-current-connectors \
+            >/tmp/replacement-catalog-targets.json
+          ingestion_status=0
+          GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/replacement-daily-connectors.json \
+            node packages/ingestion/dist/index.js \
+            >/tmp/replacement-daily-ingestion-result.json || ingestion_status=$?
+          if [ ! -s /tmp/replacement-daily-ingestion-result.json ]; then
+            cat > /tmp/replacement-daily-ingestion-result.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_daily_ingestion_result_diagnostic_missing",
+            "exitCode": ${ingestion_status}
+          }
+          EOF
+          fi
+          cat /tmp/replacement-daily-ingestion-result.json
+          node <<'NODE'
+          const body = require('/tmp/replacement-daily-ingestion-result.json');
+          const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+          const summaries = body.chainSummaries ?? [];
+          const byChain = new Map(summaries.map((summary) => [summary.chainId, summary]));
+          for (const chain of requiredChains) {
+            const summary = byChain.get(chain);
+            if (!summary) {
+              console.error(`replacement_daily_ingestion_missing_chain_summary:${chain}`);
+              process.exit(1);
+            }
+            if (summary.status !== 'succeeded') {
+              console.error(`replacement_daily_ingestion_chain_not_succeeded:${chain}:${summary.status}`);
+              process.exit(1);
+            }
+            if ((summary.observationCount ?? 0) < 1) {
+              console.error(`replacement_daily_ingestion_chain_without_observations:${chain}`);
+              process.exit(1);
+            }
+          }
+          if (body.status !== 'succeeded') {
+            console.error(JSON.stringify(body));
+            process.exit(1);
+          }
+          NODE
+          exit "${ingestion_status}"
+
+      - name: Upload replacement DB ingestion evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-replacement-db-ingestion
+          path: |
+            /tmp/replacement-daily-connectors.json
+            /tmp/replacement-catalog-targets.json
+            /tmp/replacement-daily-ingestion-result.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Export replacement DB-backed site snapshot
+        env:
+          DATABASE_URL: ${{ secrets.REPLACEMENT_DATABASE_URL || secrets.CANDIDATE_DATABASE_URL }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_PATH: /tmp/replacement-db-site-snapshot.json
+          GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE: ${{ vars.GROCERYVIEW_CUTOVER_DB_SITE_SNAPSHOT_MIN_CONFIDENCE || '0.5' }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT: ${{ vars.GROCERYVIEW_CUTOVER_DB_SITE_SNAPSHOT_LIMIT || '50000' }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS: ${{ vars.GROCERYVIEW_CUTOVER_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS || '36' }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS: ${{ vars.GROCERYVIEW_CUTOVER_DB_SITE_SNAPSHOT_REQUIRED_CHAINS || 'ica,willys,coop,hemkop,lidl,city_gross' }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE: /tmp/replacement-catalog-targets.json
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}"
+          snapshot_status=0
+          npm run --silent ingest:export-db-snapshot >/tmp/replacement-db-site-snapshot-result.json || snapshot_status=$?
+          if [ ! -s /tmp/replacement-db-site-snapshot-result.json ]; then
+            cat > /tmp/replacement-db-site-snapshot-result.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "replacement_db_site_snapshot_result_diagnostic_missing",
+            "exitCode": ${snapshot_status}
+          }
+          EOF
+          fi
+          cat /tmp/replacement-db-site-snapshot-result.json
+          node <<'NODE'
+          const body = require('/tmp/replacement-db-site-snapshot-result.json');
+          const coverage = body.coverage ?? {};
+          if (body.status !== 'passed') {
+            console.error(JSON.stringify(body));
+            process.exit(1);
+          }
+          if ((coverage.observations ?? 0) < 1) {
+            console.error('replacement_db_site_snapshot_without_observations');
+            process.exit(1);
+          }
+          for (const key of [
+            'missingRequiredChains',
+            'missingRequiredStoreExternalRefs',
+            'missingRequiredProductSlugs',
+            'missingRequiredStorePriceTypes',
+            'missingRequiredCategorySlugs'
+          ]) {
+            if ((coverage[key] ?? []).length > 0) {
+              console.error(`replacement_db_site_snapshot_${key}`);
+              process.exit(1);
+            }
+          }
+          NODE
+          exit "${snapshot_status}"
+
+      - name: Upload replacement DB snapshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-replacement-db-site-snapshot
+          path: |
+            /tmp/replacement-db-site-snapshot.json
+            /tmp/replacement-db-site-snapshot-result.json
+          if-no-files-found: ignore
           retention-days: 14
