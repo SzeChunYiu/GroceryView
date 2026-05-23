@@ -148,6 +148,73 @@ npm run --silent ingest:export-db-snapshot
 The exporter fails closed with `No latest price rows available` when the database
 reader returns no public latest-price rows, and with `db_site_snapshot_missing_required_chains:<chains>` when `postgres.latest_prices` lacks a public latest-price row for any required launch chain, and with `db_site_snapshot_missing_required_stores:<stores>` when the snapshot lacks latest-price evidence for any target store external ref exported in the catalog coverage targets, with `db_site_snapshot_missing_required_products:<products>` when any target product lacks latest-price evidence, with `db_site_snapshot_missing_required_store_price_types:<store:price-type>` when any target store lacks a required latest-price type, with `db_site_snapshot_missing_required_categories:<categories>` when any target category lacks latest-price evidence, and with `db_site_snapshot_stale_observations:<observation-ids>` when any exported latest-price row is older than `GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS`. The artifact summarizes product, chain, store, observation, `requiredChains`, `missingRequiredChains`, `requiredStoreExternalRefs`, `missingRequiredStoreExternalRefs`, `requiredProductSlugs`, `missingRequiredProductSlugs`, `requiredPriceTypes`, `missingRequiredStorePriceTypes`, `requiredCategorySlugs`, `missingRequiredCategorySlugs`, `maxObservedAgeHours`, and `staleObservationCount` coverage and carries only the normalized public row plus provenance; it does not include raw private payloads. The daily ingestion workflow exports this snapshot after the ingestion write succeeds, checks that the artifact status is `passed` with at least one observation, zero missing required chains, zero missing required stores, zero missing required products, zero missing store price-type pairs, and zero missing required categories, and zero stale observations, and uploads it and the `db-site-snapshot-result.json` command summary as the `groceryview-db-site-snapshot` artifact. Operators can tune the workflow export with `GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE`, `GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT`, `GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS`, `GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS`, and `GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE`.
 
+
+## Replacement DB cutover validation
+
+Use this path when the current production `DATABASE_URL` is unhealthy, not
+accepting writes, or blocked by provider recovery. Do **not** update the
+production `DATABASE_URL` secret until the replacement database has passed the
+full cutover validation workflow.
+
+Required candidate secret, exactly one of:
+
+- `REPLACEMENT_DATABASE_URL`
+- `CANDIDATE_DATABASE_URL`
+
+The candidate must be a distinct writable database URL. The validator rejects a
+candidate that matches the current production `DATABASE_URL` after credentials
+are stripped, and it redacts all connection strings in artifacts.
+
+Manual trigger:
+
+```bash
+gh workflow run db-cutover-validation.yml --repo SzeChunYiu/GroceryView --ref main
+gh run list --workflow db-cutover-validation.yml --repo SzeChunYiu/GroceryView --limit 5
+```
+
+The workflow is `.github/workflows/db-cutover-validation.yml` and must pass these
+gates before a production cutover is allowed:
+
+1. `ops:validate-db-cutover` proves the replacement DB accepts write-mode and
+   `select 1` connectivity.
+2. `ops:apply-db-migrations` applies the canonical schema to the replacement DB
+   and uploads `groceryview-replacement-db-migrations`.
+3. the generated all-chain daily connector config is run against the replacement
+   DB; `chainSummaries` must include `ica`, `willys`, `coop`, `hemkop`, `lidl`,
+   and `city_gross`, every summary must be `succeeded`, and every required chain
+   must have at least one persisted observation.
+4. `ingest:export-db-snapshot` exports a replacement DB-backed site snapshot with
+   all required chains, stores, products, categories, and price types covered.
+5. artifacts `groceryview-db-cutover-validation`,
+   `groceryview-replacement-db-migrations`, `groceryview-replacement-db-ingestion`,
+   and `groceryview-replacement-db-site-snapshot` are available for review.
+
+Expected replacement DB blockers:
+
+- `replacement_database_url_missing`: neither `REPLACEMENT_DATABASE_URL` nor
+  `CANDIDATE_DATABASE_URL` is configured. Create a distinct writable database,
+  store its connection string as one of those repository secrets, and rerun the
+  cutover workflow.
+- `replacement_database_url_matches_current_database_url`: the candidate is the
+  current production DB, so it is not a safe cutover target.
+- `replacement_database_not_writable`: the candidate exists but does not prove
+  write-mode connectivity.
+- `replacement_db_migrations_diagnostic_missing`: migration application failed
+  before producing its normal JSON evidence.
+- `replacement_daily_ingestion_missing_chain_summary:<chain>`: the all-store
+  replacement ingestion run did not report a required chain.
+- `replacement_daily_ingestion_chain_not_succeeded:<chain>:<status>`: a required
+  chain did not complete successfully on the replacement DB.
+- `replacement_daily_ingestion_chain_without_observations:<chain>`: a required
+  chain completed without persisted latest-price observations.
+- `replacement_db_site_snapshot_without_observations`: the replacement DB-backed
+  site snapshot found no latest-price observations.
+
+Only after this workflow passes should operators copy the already-validated
+candidate value into the production `DATABASE_URL` secret, rerun the production
+Daily ingestion readiness workflow, and require the normal deployed readiness
+artifacts to pass.
+
 ## Trigger and monitor the daily gate
 
 The scheduled workflow is `.github/workflows/daily-ingestion.yml`.
