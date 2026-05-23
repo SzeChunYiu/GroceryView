@@ -795,6 +795,22 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces watchlist sparklines from real price chart series output', async () => {
+    const route = await read('src/app/watchlist/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+
+    assert.match(demo, /watchlistSparklineBoard/);
+    assert.match(demo, /buildPriceChartSeries/);
+    assert.match(demo, /rangeDays: 90/);
+    assert.match(demo, /provenanceLabel/);
+    assert.match(route, /watchlistSparklineBoard/);
+    assert.match(route, /Watchlist sparklines/);
+    assert.match(route, /sparklinePoints/);
+    assert.match(route, /priceChartSeries/);
+    assert.match(route, /coverageLabel/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
 
   it('ships signed-in notification inbox controls without anonymous delivery state', async () => {
     const route = await read('src/app/watchlist/page.tsx');

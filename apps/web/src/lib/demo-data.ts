@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 
 export const products = [
   {
@@ -2249,6 +2249,58 @@ export const watchlistAlertBoard = {
     caveat: 'Alerts use visible price rows and allowed price-type filters; rows without the requested price type are excluded instead of estimated.'
   }
 };
+
+const watchlistSparklineObservations: Record<string, PriceChartObservation[]> = {
+  'zoegas-coffee-450g': [
+    { observedAt: '2026-03-05T09:00:00.000Z', price: 62.9, storeId: 'willys-odenplan', storeName: 'Willys Odenplan', sourceType: 'shelf', confidence: 0.9, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-03-28T09:00:00.000Z', price: 59.9, storeId: 'willys-odenplan', storeName: 'Willys Odenplan', sourceType: 'shelf', confidence: 0.9, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-04-20T09:00:00.000Z', price: 54.9, storeId: 'willys-odenplan', storeName: 'Willys Odenplan', sourceType: 'member', confidence: 0.86, provenanceLabel: 'visible member-promo row', markerType: 'member', markerLabel: 'Member' },
+    { observedAt: '2026-05-20T09:00:00.000Z', price: 49.9, storeId: 'willys-odenplan', storeName: 'Willys Odenplan', sourceType: 'member', confidence: 0.86, provenanceLabel: 'visible member-promo row', markerType: 'new_low', markerLabel: 'New low' }
+  ],
+  'pagen-lingongrova-500g': [
+    { observedAt: '2026-03-05T09:00:00.000Z', price: 41.9, storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', sourceType: 'shelf', confidence: 0.82, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-03-28T09:00:00.000Z', price: 39.9, storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', sourceType: 'shelf', confidence: 0.82, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-04-20T09:00:00.000Z', price: 36.9, storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', sourceType: 'member', confidence: 0.78, provenanceLabel: 'visible member-promo row', markerType: 'member', markerLabel: 'Member' },
+    { observedAt: '2026-05-20T09:00:00.000Z', price: 33.9, storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', sourceType: 'member', confidence: 0.78, provenanceLabel: 'visible member-promo row' }
+  ],
+  'bravo-apelsinjuice-1l': [
+    { observedAt: '2026-03-05T09:00:00.000Z', price: 27.9, storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', sourceType: 'shelf', confidence: 0.82, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-03-28T09:00:00.000Z', price: 26.9, storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', sourceType: 'shelf', confidence: 0.82, provenanceLabel: 'visible shelf row' },
+    { observedAt: '2026-04-20T09:00:00.000Z', price: 24.9, storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', sourceType: 'member', confidence: 0.74, provenanceLabel: 'visible member-promo row', markerType: 'member', markerLabel: 'Member' },
+    { observedAt: '2026-05-20T09:00:00.000Z', price: 22.9, storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', sourceType: 'member', confidence: 0.74, provenanceLabel: 'visible member-promo row' }
+  ]
+};
+
+export const watchlistSparklineBoard = watchlistAlertInputs.products
+  .filter((product) => watchlistSparklineObservations[product.productId])
+  .map((product) => {
+    const priceChartSeries = buildPriceChartSeries({
+      observations: watchlistSparklineObservations[product.productId] ?? [],
+      asOf: '2026-05-22T10:00:00.000Z',
+      rangeDays: 90,
+      markerLimitPerSeries: 4
+    });
+    const sparklinePoints = priceChartSeries.series
+      .flatMap((series) => series.points)
+      .sort((a, b) => Date.parse(a.time) - Date.parse(b.time));
+    const firstPoint = sparklinePoints[0];
+    const lastPoint = sparklinePoints.at(-1);
+    const movementPercent = firstPoint && lastPoint && firstPoint.value > 0
+      ? Math.round(((lastPoint.value - firstPoint.value) / firstPoint.value) * 1000) / 10
+      : 0;
+
+    return {
+      productId: product.productId,
+      productName: product.productName,
+      priceChartSeries,
+      sparklinePoints,
+      latestPrice: lastPoint?.value ?? product.bestPrice,
+      movementPercent,
+      coverageLabel: `${sparklinePoints.length} real observed points · ${priceChartSeries.windowStart?.slice(0, 10)} to ${priceChartSeries.windowEnd?.slice(0, 10)}`,
+      provenanceLabel: sparklinePoints.at(-1)?.provenanceLabel ?? product.source,
+      confidence: sparklinePoints.length >= 4 ? 'medium' : 'limited'
+    };
+  });
 
 const weeklyDigestBestDeals = dealOpportunityRail.slice(0, 3);
 const weeklyWatchlistDigestChannelDefault = planGroceryAlertChannelDefault('weekly_watchlist_digest');
