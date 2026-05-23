@@ -185,7 +185,9 @@ function scopeStatus(scope, checks) {
 }
 
 function resultBlocker(scope, checks) {
-  if (checks.invalidDbRecoverySecrets.length > 0) return 'db_recovery_secret_invalid_format';
+  if ((scope === 'db-recovery' || scope === 'all') && checks.invalidDbRecoverySecrets.length > 0) {
+    return 'db_recovery_secret_invalid_format';
+  }
   if (scope === 'db-recovery' && (
     checks.missingDbRecoverySecrets.length > 0 ||
     checks.missingDbRecoveryVariables.length > 0
