@@ -1481,6 +1481,20 @@ ${seo}`;
     assert.match(route, /chain-index proxy/);
   });
 
+  it('surfaces a cheapest-branch-near-me highlight from branch-level evidence', async () => {
+    const route = await read('src/app/map/page.tsx');
+
+    assert.match(route, /storePricePercentileRanks/);
+    assert.match(route, /cheapestBranchNearMe/);
+    assert.match(route, /Cheapest branch near me/);
+    assert.match(route, /branch-level evidence/);
+    assert.match(route, /per-branch Lidl offer observations/);
+    assert.match(route, /cheaperThanNationalLabel/);
+    assert.match(route, /coverageLabel/);
+    assert.match(route, /No private location/);
+    assert.doesNotMatch(route, /Math\.random/);
+  });
+
   it('surfaces a fail-closed regional price statistics gate on the map', async () => {
     const route = await read('src/app/map/page.tsx');
 
