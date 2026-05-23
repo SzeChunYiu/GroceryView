@@ -145,7 +145,7 @@ The workflow must pass these gates in order:
 1. DB and ingestion package tests
 2. live store enumeration and `groceryview-daily-connector-stores` artifact upload
 3. production ingestion configuration validator
-4. configured daily ingestion runner; its `chainSummaries` must include every required chain, every summary must be `succeeded`, and every required chain must emit at least one observation id before the workflow uploads `groceryview-daily-ingestion-result`
+4. configured daily ingestion runner; its `chainSummaries` must include every required chain, every summary must be `succeeded`, every official product connector must emit at least one observation for every configured branch in `stores[]`, and every required chain must emit at least one observation id before the workflow uploads `groceryview-daily-ingestion-result`
 5. DB-backed site snapshot export and `groceryview-db-site-snapshot` artifact upload
 6. `/api/readiness/postgres`
 7. `/api/readiness/source-runs`
@@ -158,6 +158,7 @@ The workflow must pass these gates in order:
 - `daily_ingestion_missing_chain_summary:<chain>`: the daily runner JSON did not include a `chainSummaries` entry for a required chain.
 - `daily_ingestion_chain_not_succeeded:<chain>`: at least one connector summary for that required chain did not finish with `status: succeeded`.
 - `daily_ingestion_chain_without_observations:<chain>`: the required chain ran but produced no persisted observation ids in the daily runner result.
+- `<chain>:missing_configured_store_observations:<stores>`: an official product connector fetched accepted rows but at least one configured branch in `stores[]` produced no observations, so the run stops before writing a partial branch-product snapshot.
 - `source_run_missing_fresh_chain:<chain>`: no fresh successful daily source run for that chain.
 - `source_run_insufficient_accepted_rows:<chain>:<count>/<min>`: source run completed but accepted too few rows.
 - `missing_store_scoped_prices:<products>`: connector output had accepted products without a branch/store id.

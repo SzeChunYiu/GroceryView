@@ -5212,6 +5212,46 @@ describe('daily ingestion runner', () => {
     assert.equal(executor.calls.length, 0);
   });
 
+  it('fails closed before persistence when official product connectors skip a configured branch', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [{
+        connectorId: 'willys-products-all-stores',
+        chainId: 'willys',
+        sourceType: 'official_api',
+        endpointUrl: 'https://sources.example.test/willys/products.json',
+        parserVersion: 'normalized-json-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [
+          { storeId: 'willys-odenplan', name: 'Willys Odenplan', address: 'Odenplan', city: 'Stockholm' },
+          { storeId: 'willys-skanstull', name: 'Willys Skanstull', address: 'Skanstull', city: 'Stockholm' }
+        ]
+      }],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [{
+          storeId: 'willys-odenplan',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Zoégas Skånerost 450g',
+          canonicalName: 'Zoégas Coffee 450g',
+          productId: 'zoegas-coffee-450g',
+          categoryId: 'coffee',
+          brand: 'Zoégas',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'blocked');
+    assert.deepEqual(result.blockers, ['willys:missing_configured_store_observations:willys-skanstull']);
+    assert.equal(executor.calls.length, 0);
+  });
+
   it('fails closed before persistence when a required daily connector is blocked', async () => {
     const executor = new DailyIngestionExecutor();
     const result = await runDailyIngestion({
