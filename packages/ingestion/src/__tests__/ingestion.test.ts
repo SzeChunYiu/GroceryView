@@ -4402,6 +4402,16 @@ describe('daily ingestion runner', () => {
     );
   });
 
+  it('uses Supabase session pooler mode for long daily ingestion writes', () => {
+    assert.deepEqual(
+      buildDailyIngestionPostgresPoolConfig('postgres://postgres.ref:secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres'),
+      {
+        connectionString: 'postgres://postgres.ref:secret@aws-1-eu-north-1.pooler.supabase.com:5432/postgres',
+        max: 1
+      }
+    );
+  });
+
   it('retries transient production database disconnects while writing daily ingestion batches', async () => {
     const calls: Array<{ text: string; values: unknown[] }> = [];
     let attempts = 0;

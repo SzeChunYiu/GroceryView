@@ -2791,8 +2791,12 @@ export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): Daily
 }
 
 export function buildDailyIngestionPostgresPoolConfig(databaseUrl: string): { connectionString: string; max: number } {
+  const parsed = new URL(databaseUrl);
+  if (parsed.hostname.endsWith('.pooler.supabase.com') && parsed.port === '6543') {
+    parsed.port = '5432';
+  }
   return {
-    connectionString: databaseUrl,
+    connectionString: parsed.toString(),
     max: 1
   };
 }
