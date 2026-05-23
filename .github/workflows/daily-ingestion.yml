@@ -162,6 +162,15 @@ jobs:
           test -n "${DATABASE_URL:-}"
           connectivity_status=0
           npm run --silent ops:check-daily-db-connectivity >/tmp/daily-db-connectivity.json || connectivity_status=$?
+          if [ ! -s /tmp/daily-db-connectivity.json ]; then
+            cat > /tmp/daily-db-connectivity.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "daily_db_connectivity_diagnostic_missing",
+            "exitCode": ${connectivity_status}
+          }
+          EOF
+          fi
           cat /tmp/daily-db-connectivity.json
           node -e "const body=require('/tmp/daily-db-connectivity.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
           exit "${connectivity_status}"
@@ -172,7 +181,7 @@ jobs:
         with:
           name: groceryview-daily-db-connectivity
           path: /tmp/daily-db-connectivity.json
-          if-no-files-found: ignore
+          if-no-files-found: error
           retention-days: 14
 
       - name: Apply production DB migrations
