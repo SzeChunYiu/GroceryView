@@ -52,6 +52,8 @@ describe('daily ingestion workflow', () => {
       'store enumeration must prove branch metadata before connector and target validation'
     );
     assert.match(workflow, /npm run --silent ops:daily-connector-stores >\/tmp\/daily-connector-stores\.json/);
+    assert.match(workflow, /store_enumeration_status=\$\?/);
+    assert.match(workflow, /store_enumeration_diagnostic_missing/);
     assert.match(workflow, /body\.storesByChain\?\.\[chain\]/);
     assert.match(workflow, /store_enumeration_missing_chain/);
     assert.match(workflow, /store_enumeration_empty_chain/);
@@ -59,9 +61,15 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /name:\s*groceryview-daily-connector-stores/);
     assert.match(workflow, /path:\s*\/tmp\/daily-connector-stores\.json/);
     assert.match(workflow, /npm run --silent ops:daily-connectors >\/tmp\/groceryview-daily-connectors\.json/);
+    assert.match(workflow, /daily_connectors_status=\$\?/);
+    assert.match(workflow, /daily_connectors_diagnostic_missing/);
     assert.match(workflow, /CATALOG_COVERAGE_TARGETS_JSON_FILE=\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /ops:catalog-coverage-targets\s+--\s+--from-current-connectors >\/tmp\/groceryview-catalog-targets\.json/);
+    assert.match(workflow, /catalog_targets_status=\$\?/);
+    assert.match(workflow, /catalog_targets_diagnostic_missing/);
     assert.match(workflow, /ops:validate-production-env\s+--\s+--scope\s+daily-ingestion/);
+    assert.match(workflow, /production_env_validation_status=\$\?/);
+    assert.match(workflow, /production_env_validation_diagnostic_missing/);
     assert.match(workflow, /name: Check production DB write connectivity/);
     assert.ok(
       workflow.indexOf('name: Validate production ingestion configuration') < workflow.indexOf('name: Check production DB write connectivity'),
@@ -152,6 +160,8 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS:\s*\$\{\{ vars\.GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS \|\| '36' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS:\s*\$\{\{ vars\.GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS \|\| 'ica,willys,coop,hemkop,lidl,city_gross' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE:\s*\/tmp\/groceryview-catalog-targets\.json/);
+    assert.match(workflow, /db_site_snapshot_result_diagnostic_missing/);
+    assert.match(workflow, /snapshot_status=\$\?/);
     assert.match(workflow, /body\.status !== 'passed'/);
     assert.match(workflow, /body\.coverage\?\.observations < 1/);
     assert.match(workflow, /missingRequiredChains/);

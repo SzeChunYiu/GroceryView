@@ -2603,6 +2603,28 @@ ${seo}`;
     assert.match(route, /origin_country/);
   });
 
+  it('surfaces commodity mapping curator review through human review assignments', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/data-sources/page.tsx');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(verified, /commodityMappingReviewPlan/);
+    assert.match(verified, /planHumanReviewQueue/);
+    assert.match(verified, /planHumanReviewAssignments/);
+    assert.match(verified, /planCommunityReportAbuseControls/);
+    assert.match(verified, /human_review_assignments/);
+    assert.match(verified, /community_reporter_trust/);
+    assert.match(route, /commodityMappingReviewPlan/);
+    assert.match(route, /Commodity mapping curator review/);
+    assert.match(route, /human_review_assignments/);
+    assert.match(route, /community_reporter_trust/);
+    assert.match(route, /reviewWritebacks/);
+    assert.match(shell, /homepageCommodityMappingReview/);
+    assert.match(shell, /Commodity mapping review/);
+    assert.match(shell, /data-commodity-mapping-review/);
+    assert.doesNotMatch(`${route}\n${shell}`, /Math\.random|Date\.now|NoVerifiedData/);
+  });
+
   it('surfaces public price and nutrition API documentation on the data sources route', async () => {
     const server = await read('../../packages/server/src/index.ts');
     const route = await read('src/app/data-sources/page.tsx');
@@ -2766,13 +2788,34 @@ ${seo}`;
     assert.match(fuelRoute, /Fuel prices by grade/);
     assert.match(fuelRoute, /row\.sourceType/);
     assert.match(pharmacyRoute, /domainSlug="pharmacy"/);
-    assert.match(pharmacyRoute, /No pharmacy price observations yet/);
+    assert.match(pharmacyRoute, /No domain=pharmacy connector observations yet/);
     assert.match(pharmacyRoute, /OTC/);
     assert.match(seo, /\/fuel/);
     assert.match(seo, /\/pharmacy/);
     assert.doesNotMatch(fuelRoute, /@\/lib\/demo-data/);
     assert.doesNotMatch(pharmacyRoute, /@\/components\/sample-data/);
   });
+
+  it('surfaces OTC pharmacy price evidence from public observations without medical or prescription claims', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const pharmacyRoute = await read('src/app/pharmacy/page.tsx');
+    const marketShell = await read('src/components/market-shell.tsx');
+
+    assert.match(verified, /export const pharmacyOtcEvidenceBoard/);
+    assert.match(verified, /pharmacyCategoryNeedles/);
+    assert.match(verified, /OpenPrices \+ OpenBeautyFacts/);
+    assert.match(verified, /not a pharmacy-chain comparison/i);
+    assert.match(pharmacyRoute, /pharmacyOtcEvidenceBoard/);
+    assert.match(pharmacyRoute, /OTC price evidence from public observations/);
+    assert.match(pharmacyRoute, /pharmacyOtcEvidenceBoard\.rows\.map/);
+    assert.match(pharmacyRoute, /No prescription medicine/);
+    assert.match(pharmacyRoute, /not a pharmacy-chain comparison/i);
+    assert.match(marketShell, /pharmacyOtcEvidenceBoard/);
+    assert.match(marketShell, /data-pharmacy-otc-evidence/);
+    assert.match(marketShell, /href="\/pharmacy"/);
+    assert.doesNotMatch(pharmacyRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
 
   it('ships next-intl language preference switching with persisted locale and Accept-Language detection', async () => {
     const packageJson = await read('package.json');

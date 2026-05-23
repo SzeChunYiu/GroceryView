@@ -78,7 +78,18 @@ jobs:
       - name: Export live store enumeration
         run: |
           set -euo pipefail
-          npm run --silent ops:daily-connector-stores >/tmp/daily-connector-stores.json
+          store_enumeration_status=0
+          npm run --silent ops:daily-connector-stores >/tmp/daily-connector-stores.json || store_enumeration_status=$?
+          if [ ! -s /tmp/daily-connector-stores.json ]; then
+            cat > /tmp/daily-connector-stores.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "store_enumeration_diagnostic_missing",
+            "exitCode": ${store_enumeration_status}
+          }
+          EOF
+          fi
+          cat /tmp/daily-connector-stores.json
           node <<'NODE'
           const body = require('/tmp/daily-connector-stores.json');
           const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
@@ -116,13 +127,52 @@ jobs:
           GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: ${{ vars.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN || secrets.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN }}
         run: |
           set -euo pipefail
-          npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json
+          daily_connectors_status=0
+          npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json || daily_connectors_status=$?
+          if [ ! -s /tmp/groceryview-daily-connectors.json ]; then
+            cat > /tmp/groceryview-daily-connectors.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "daily_connectors_diagnostic_missing",
+            "exitCode": ${daily_connectors_status}
+          }
+          EOF
+          fi
+          cat /tmp/groceryview-daily-connectors.json
+          if [ "${daily_connectors_status}" -ne 0 ]; then
+            exit "${daily_connectors_status}"
+          fi
+          catalog_targets_status=0
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
-            npm run --silent ops:catalog-coverage-targets -- --from-current-connectors >/tmp/groceryview-catalog-targets.json
+            npm run --silent ops:catalog-coverage-targets -- --from-current-connectors >/tmp/groceryview-catalog-targets.json || catalog_targets_status=$?
+          if [ ! -s /tmp/groceryview-catalog-targets.json ]; then
+            cat > /tmp/groceryview-catalog-targets.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "catalog_targets_diagnostic_missing",
+            "exitCode": ${catalog_targets_status}
+          }
+          EOF
+          fi
+          cat /tmp/groceryview-catalog-targets.json
+          if [ "${catalog_targets_status}" -ne 0 ]; then
+            exit "${catalog_targets_status}"
+          fi
+          production_env_validation_status=0
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
           CATALOG_COVERAGE_TARGETS_JSON_FILE=/tmp/groceryview-catalog-targets.json \
             npm run --silent ops:validate-production-env -- --scope daily-ingestion \
-            >/tmp/production-env-validation.json
+            >/tmp/production-env-validation.json || production_env_validation_status=$?
+          if [ ! -s /tmp/production-env-validation.json ]; then
+            cat > /tmp/production-env-validation.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "production_env_validation_diagnostic_missing",
+            "exitCode": ${production_env_validation_status}
+          }
+          EOF
+          fi
+          cat /tmp/production-env-validation.json
           node <<'NODE'
           const body = require('/tmp/production-env-validation.json');
           const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
@@ -300,8 +350,19 @@ jobs:
         run: |
           set -euo pipefail
           test -n "${DATABASE_URL:-}"
+          snapshot_status=0
           npm run --silent ingest:export-db-snapshot \
-            >/tmp/db-site-snapshot-result.json
+            >/tmp/db-site-snapshot-result.json || snapshot_status=$?
+          if [ ! -s /tmp/db-site-snapshot-result.json ]; then
+            cat > /tmp/db-site-snapshot-result.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "db_site_snapshot_result_diagnostic_missing",
+            "exitCode": ${snapshot_status}
+          }
+          EOF
+          fi
+          cat /tmp/db-site-snapshot-result.json
           node <<'NODE'
           const body = require('/tmp/db-site-snapshot-result.json');
           if (body.status !== 'passed' || body.coverage?.observations < 1 || (body.coverage?.missingRequiredChains?.length ?? 0) > 0 || (body.coverage?.missingRequiredStoreExternalRefs?.length ?? 0) > 0 || (body.coverage?.missingRequiredProductSlugs?.length ?? 0) > 0 || (body.coverage?.missingRequiredStorePriceTypes?.length ?? 0) > 0 || (body.coverage?.missingRequiredCategorySlugs?.length ?? 0) > 0 || (body.coverage?.staleObservationCount ?? 0) > 0) {
