@@ -245,7 +245,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: groceryview-db-site-snapshot
-          path: /tmp/groceryview-db-site-snapshot.json
+          path: |
+            /tmp/groceryview-db-site-snapshot.json
+            /tmp/db-site-snapshot-result.json
           if-no-files-found: error
           retention-days: 14
 
