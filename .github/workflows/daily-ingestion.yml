@@ -287,7 +287,30 @@ jobs:
           test -n "${DATABASE_URL:-}"
           npm run build -w @groceryview/db
           npm run build -w @groceryview/ingestion
-          npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json
+          daily_ingestion_connectors_status=0
+          npm run --silent ops:daily-connectors >/tmp/groceryview-daily-connectors.json || daily_ingestion_connectors_status=$?
+          if [ "${daily_ingestion_connectors_status}" -ne 0 ] || [ ! -s /tmp/groceryview-daily-connectors.json ]; then
+            cat > /tmp/daily-ingestion-result.json <<EOF
+          {
+            "status": "failed",
+            "blocker": "daily_ingestion_connectors_diagnostic_missing",
+            "exitCode": ${daily_ingestion_connectors_status}
+          }
+          EOF
+            mkdir -p codex-tasks
+            {
+              echo "# Daily ingestion blockers"
+              echo
+              echo "status: failed"
+              echo "blockers:"
+              echo "- daily_ingestion_connectors_diagnostic_missing"
+            } > codex-tasks/ingestion-blockers.txt
+            cat /tmp/daily-ingestion-result.json
+            if [ "${daily_ingestion_connectors_status}" -ne 0 ]; then
+              exit "${daily_ingestion_connectors_status}"
+            fi
+            exit 1
+          fi
           ingestion_status=0
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
             node packages/ingestion/dist/index.js \
