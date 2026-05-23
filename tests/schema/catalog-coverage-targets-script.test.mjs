@@ -10,11 +10,12 @@ const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.ur
 describe('catalog coverage target export script', () => {
   it('exports production coverage target JSON from live catalog tables', () => {
     assert.match(script, /DATABASE_URL is required/);
-    assert.match(script, /from products order by id/);
+    assert.match(script, /from products limit \$1/);
     assert.match(script, /from stores/);
     assert.doesNotMatch(script, /join latest_prices on latest_prices.store_id = stores.id/);
     assert.match(script, /from chains order by slug/);
     assert.match(script, /retrying catalog target DB read/);
+    assert.match(script, /CATALOG_COVERAGE_TARGET_PRODUCT_LIMIT/);
     assert.match(script, /terminating connection/);
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
       assert.match(script, new RegExp(`['"]${chain}['"]`));
