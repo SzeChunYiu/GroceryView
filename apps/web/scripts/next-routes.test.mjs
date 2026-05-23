@@ -1107,6 +1107,17 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a dedicated near-expiry deal radar page with confidence-backed core output', async () => {
+    const source = await read('src/app/expiry-deals/page.tsx');
+    assert.match(source, /buildExpiryDealRadar/);
+    assert.match(source, /expiryDealRadarReports/);
+    assert.match(source, /ConfidenceBadge/);
+    assert.match(source, /radarScore/);
+    assert.match(source, /staleReportIds/);
+    assert.match(source, /near-expiry/i);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces a deal screener landing card on the deals route with dedicated /screener navigation', async () => {
     const route = await read('src/app/deals/page.tsx');
     assert.match(route, /Deal screener/);
