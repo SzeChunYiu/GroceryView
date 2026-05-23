@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 13:45 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 14:36 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -12,8 +12,8 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 ## 🟢 Live
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
-- **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **215**
+- **Visible on homepage:** ~**24** store pages, ~**35** product pages
+- **Shipped `feat:`/`wire:` PRs to date:** **211**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,6 +42,10 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1342 feat(web): add account deletion plan
+- #1328 feat(web): add index methodology page
+- #1324 wire: surface ICA store promotion source imports
+- #1323 feat(ingest): add all-store daily batch runner
 - #1319 feat(ingest): add ICA Tomelilla store prices
 - #1314 feat(fuel): prices
 - #1317 feat(ingest): add Coop branch weekly discounts
@@ -53,15 +57,25 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1291 feat: wire pantry planner replenishment
 - #1289 feat(fuel): prices
 - #1280 feat(fuel): prices
-- #1276 feat(web): surface pharmacy OTC evidence
-- #1271 feat(fuel): prices
-- #1258 feat(fuel): prices
-- #1265 feat(web): surface commodity mapping curator review
 
 ## 🔄 In progress (open PRs)
 
-- #1322 Pass variable-backed runtime values to deploy audit
-- #1321 docs(readme): refresh live status board
+- #1348 lunarc/feat product cross chain table
+- #1347 feat(ingest): expand Axfood weekly flyer discounts
+- #1346 feat(web): add cookies disclosure page
+- #1345 feat(web): add index symbol route
+- #1344 feat(web): wire meal planner deal suggestions
+- #1341 Surface store percentile confidence
+- #1338 feat(fuel): stations
+- #1337 feat(domain): multi-vertical tag + vertical routes
+- #1336 feat(pharmacy): apohem
+- #1334 feat(web): wire watchlist alert planning
+- #1333 feat(fuel): prices
+- #1332 feat(ingest): expand ICA Tierp store promotions
+- #1331 feat(ingest): deepen live grocery data sources
+- #1330 lunarc/feat bottom nav
+- #1329 feat(web): rank nutrition value with confidence
+- #1326 feat(web): wire pantry replenishment planner
 - #1310 feat(ingest): add Coop branch weekly discounts
 - #1309 feat(ingest): deepen real grocery source rows
 - #1306 feat(ingest): expand Coop weekly branch discounts
@@ -69,8 +83,7 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1304 feat(ingest): add ICA Tierp promotions
 - #1298 feat(ingest): deepen Matspar Matpriskollen Lidl ICA rows
 - #1283 feat(web): add verified deal screener
-- #1262 fix(db): make connector observation upserts append-only
-- #1261 feat(web): nav groups (WIP from LUNARC fleet)
+- #1261 feat(web): group desktop navigation
 - #1260 feat(web): dark mode (WIP from LUNARC fleet)
 
 ## 📋 To-do (from GOAL.md backlog)
