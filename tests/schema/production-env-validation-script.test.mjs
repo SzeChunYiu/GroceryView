@@ -46,7 +46,7 @@ describe('production env value validation script', () => {
       connectorStoreCoverageCount: 6,
       coverageProductCount: 2,
       coverageStoreCount: 6,
-      coveragePriceTypes: ['shelf']
+      coveragePriceTypes: ['online']
     });
   });
 
@@ -60,7 +60,7 @@ describe('production env value validation script', () => {
       connectorStoreCoverageCount: 6,
       coverageProductCount: 1,
       coverageStoreCount: 6,
-      coveragePriceTypes: ['shelf']
+      coveragePriceTypes: ['online']
     });
   });
 
@@ -98,7 +98,7 @@ describe('production env value validation script', () => {
         targetCategories: ['coffee'],
         targetChains: chains,
         targetStores: chains.map((chainId) => `${chainId}-odenplan`),
-        targetPriceTypes: ['shelf'],
+        targetPriceTypes: ['online'],
         requireEveryProductInEveryStore: false,
         requireEveryStorePriceType: true
       })
@@ -142,7 +142,7 @@ describe('production env value validation script', () => {
         targetCategories: ['coffee'],
         targetChains: chains,
         targetStores: ['willys-unknown-branch'],
-        targetPriceTypes: ['shelf'],
+        targetPriceTypes: ['online'],
         requireEveryProductInEveryStore: false,
         requireEveryStorePriceType: true
       })
@@ -152,7 +152,7 @@ describe('production env value validation script', () => {
     assert.match(result.stderr, /targetStores missing from connector stores: willys-unknown-branch/);
   });
 
-  it('fails closed when catalog targets do not require shelf price coverage for every target store', () => {
+  it('fails closed when catalog targets do not require branch product price coverage for every target store', () => {
     const chains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
     const baseEnv = {
       AUTH_SECRET: 'test-auth-secret',
