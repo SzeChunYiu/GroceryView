@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -7,12 +8,84 @@ export function generateMetadata() {
   return routeMetadata('/compare');
 }
 
-export default function ComparePage() {
+type SearchParams = {
+  products?: string | string[];
+};
+
+export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
+  const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
+  const productsParam = resolvedSearchParams.products;
+  const comparison = buildChainComparisonTable(productsParam);
+
   return (
     <PageShell>
       <Eyebrow>Willys vs Hemköp</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Comparable chain prices</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Rows appear only when the same Axfood product code is present in both chain catalogues. Savings are not shown across unmatched products.</p>
+      <Card className="mt-6 overflow-hidden border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-sky-50">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">?products=id1,id2</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Chain comparison table</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Enter product slugs or retailer product ids in the query string to compare side-by-side prices across ICA, Willys, and Coop.
+              The table uses packages/db snapshot rows when production exports are present and marks missing chain rows explicitly.
+            </p>
+          </div>
+          <Link className="rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white shadow-sm" href="/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st">
+            Try sample products
+          </Link>
+        </div>
+        <div className="mt-5 overflow-x-auto rounded-3xl border border-emerald-100 bg-white shadow-sm">
+          <table className="min-w-full border-collapse text-left text-sm">
+            <caption className="sr-only">Side-by-side product prices across ICA, Willys, and Coop</caption>
+            <thead className="bg-slate-950 text-white">
+              <tr>
+                <th className="px-4 py-3 font-black">Product</th>
+                {COMPARE_CHAIN_ORDER.map((chain) => (
+                  <th className="px-4 py-3 font-black" key={chain.id}>{chain.label}</th>
+                ))}
+                <th className="px-4 py-3 font-black">Best chain</th>
+              </tr>
+            </thead>
+            <tbody>
+              {comparison.products.length === 0 ? (
+                <tr>
+                  <td className="px-4 py-5 font-semibold text-slate-600" colSpan={COMPARE_CHAIN_ORDER.length + 2}>
+                    Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
+                  </td>
+                </tr>
+              ) : null}
+              {comparison.products.map((product) => (
+                <tr className="border-t border-slate-100 align-top" key={product.productSlug}>
+                  <th className="px-4 py-4 font-black text-slate-950">
+                    <Link className="underline decoration-emerald-300 underline-offset-4" href={`/products/${product.productSlug}`}>{product.productName}</Link>
+                    <span className="mt-1 block text-xs font-semibold text-slate-500">{product.brand || 'Brand not reported'} · {product.packageLabel}</span>
+                  </th>
+                  {product.cells.map((cell) => (
+                    <td className="px-4 py-4" key={`${product.productSlug}-${cell.chainId}`}>
+                      <p className={cell.status === 'priced' ? 'font-black text-emerald-900' : 'font-black text-slate-400'}>{cell.priceText}</p>
+                      <p className="mt-1 text-xs font-semibold text-slate-500">{cell.unitLabel}</p>
+                    </td>
+                  ))}
+                  <td className="px-4 py-4">
+                    <p className="rounded-2xl bg-emerald-50 px-3 py-2 font-black text-emerald-950">{product.bestChainName}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">{product.bestPriceText}</p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {comparison.missingProductIds.length > 0 ? (
+          <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-bold text-amber-950">
+            Missing product ids: {comparison.missingProductIds.join(', ')}. The compare route does not infer products from names.
+          </p>
+        ) : null}
+        <p className="mt-3 text-xs font-semibold text-slate-500">
+          Source: {comparison.sourceLabel}{comparison.generatedAt ? ` · generated ${comparison.generatedAt}` : ''}.
+        </p>
+      </Card>
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
