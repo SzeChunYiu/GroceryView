@@ -6,6 +6,7 @@
     "build": "NODE_OPTIONS=--max-old-space-size=6144 next build --webpack",
     "dev": "next dev",
     "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
+    "perf:lighthouse:preview": "lhci autorun --config=./lighthouserc.preview.cjs",
     "start": "next start",
     "test": "node --test scripts/*.test.mjs"
   },
