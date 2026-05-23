@@ -123,8 +123,9 @@ function validateConnectorStoreCoverage(connectorStoreIds, targetStores) {
 export function validateProductionEnv(env, options = {}) {
   const scope = options.scope === 'daily-ingestion' ? 'daily-ingestion' : 'production';
   const requiredNames = scope === 'daily-ingestion' ? requiredDailyIngestionEnvNames : requiredEnvNames;
-  const missingEnv = requiredNames.filter((name) => !env[name]?.trim());
-  if (!env.GROCERYVIEW_DAILY_CONNECTORS_JSON?.trim() && !env.GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE?.trim()) {
+  const hasValueOrFile = (name) => Boolean(env[name]?.trim() || env[`${name}_FILE`]?.trim());
+  const missingEnv = requiredNames.filter((name) => !hasValueOrFile(name));
+  if (!hasValueOrFile('GROCERYVIEW_DAILY_CONNECTORS_JSON')) {
     missingEnv.push('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE');
   }
   if (missingEnv.length > 0) throw new Error(`Missing required env: ${missingEnv.join(', ')}`);
