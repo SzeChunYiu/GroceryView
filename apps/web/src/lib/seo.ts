@@ -93,8 +93,8 @@ export const routeMetadataCatalog = {
     description: 'Find expiry deals, single-portion deals, lunchbox deals, and trusted deal opportunities from visible source-backed rows.'
   },
   '/fuel': {
-    title: 'Fuel price terminal foundation | GroceryView',
-    description: 'Preview the domain-scoped fuel station and fuel-grade price model without rendering non-grocery prices before verified observations exist.'
+    title: 'Fuel prices by grade | GroceryView',
+    description: 'View source-backed fuel observations by grade with price per litre, domain=fuel modeling, and operator provenance.'
   },
   '/household': {
     title: 'Household grocery planning gate | GroceryView',

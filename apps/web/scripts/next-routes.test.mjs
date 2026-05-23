@@ -2324,14 +2324,14 @@ ${seo}`;
 
     assert.match(verified, /multiVerticalDomainFoundation/);
     assert.match(verified, /SUPPORTED_PRICE_DOMAINS/);
-    assert.match(verified, /priceObservationsAvailable: domain\.slug === 'grocery' \? groceryObservationCount : 0/);
-    assert.match(verified, /No non-grocery prices are rendered until connector observations land/);
+    assert.match(verified, /verifiedFuelPriceObservations/);
+    assert.match(verified, /operator-sourced fuel rows/);
     assert.match(dataSources, /multiVerticalDomainFoundation\.map/);
     assert.match(dataSources, /Multi-vertical domain foundation/);
 
-    assert.match(fuelRoute, /domainSlug="fuel"/);
-    assert.match(fuelRoute, /No fuel price observations yet/);
-    assert.match(fuelRoute, /fuel\/pharmacy domain model/);
+    assert.match(fuelRoute, /verifiedFuelPriceObservations/);
+    assert.match(fuelRoute, /Fuel prices by grade/);
+    assert.match(fuelRoute, /row\.sourceType/);
     assert.match(pharmacyRoute, /domainSlug="pharmacy"/);
     assert.match(pharmacyRoute, /No pharmacy price observations yet/);
     assert.match(pharmacyRoute, /OTC/);
