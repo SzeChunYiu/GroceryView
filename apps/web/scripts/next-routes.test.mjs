@@ -2697,10 +2697,15 @@ ${seo}`;
     assert.match(robots, /MetadataRoute\.Robots/);
     assert.match(robots, /https:\/\/grocery-web-mu\.vercel\.app\/sitemap\.xml/);
     assert.match(robots, /userAgent: '\*'/);
-    assert.match(robots, /allow: '\/'/);
+    assert.match(robots, /allow: \[/);
+    assert.match(robots, /\/products/);
+    assert.match(robots, /\/categories/);
     assert.match(robots, /disallow: \[/);
     assert.match(robots, /\/account/);
     assert.match(robots, /\/login/);
+    assert.match(robots, /\/api/);
+    assert.match(robots, /\/admin/);
+    assert.match(robots, /\/users/);
   });
 
   it('drives dynamic product, category, and store sitemap URLs from DB catalog-shaped records', async () => {
