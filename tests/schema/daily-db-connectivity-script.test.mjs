@@ -8,6 +8,7 @@ import {
   checkDailyDatabaseConnectivity,
   classifyDatabaseUrl,
   isTransientDailyDatabaseError,
+  printDailyDatabaseIoHotspots,
   redactDatabaseUrl
 } from '../../scripts/ops/check-daily-db-connectivity.mjs';
 
@@ -154,6 +155,73 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.equal(result.attempts, 1);
     assert.deepEqual(queries, ['set default_transaction_read_only=off', 'select 1 as ok']);
     assert.equal(JSON.stringify(result).includes('password'), false);
+  });
+
+  it('prints redacted pg_stat_statements IO hotspots for before-and-after ingestion evidence', async () => {
+    const calls = [];
+    class HotspotPool {
+      constructor(config) {
+        calls.push({ type: 'constructor', config });
+      }
+
+      async query(sql, params) {
+        calls.push({ type: 'query', sql, params });
+        return {
+          rows: [
+            {
+              queryid: '123456789',
+              calls: '7',
+              shared_blks_read: '500',
+              shared_blks_written: '12',
+              local_blks_read: '4',
+              local_blks_written: '3',
+              temp_blks_read: '2',
+              temp_blks_written: '1',
+              blk_read_time_ms: 10.5,
+              blk_write_time_ms: 2.25,
+              query_snippet: 'select *  from latest_prices where password = super-secret and url = postgres://user:pass@db.example.test/postgres'
+            }
+          ]
+        };
+      }
+
+      async end() {
+        calls.push({ type: 'end' });
+      }
+    }
+
+    const result = await printDailyDatabaseIoHotspots(
+      {
+        DATABASE_URL: 'postgres://operator:database-secret@db.example.test:5432/groceryview',
+        GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT: '5',
+        GROCERYVIEW_DB_IO_HOTSPOTS_SNIPPET_LENGTH: '120'
+      },
+      { Pool: HotspotPool }
+    );
+
+    assert.equal(result.status, 'ready');
+    assert.equal(result.evidence, 'pg_stat_statements_io_hotspots');
+    assert.equal(result.limit, 5);
+    assert.equal(result.snippetLength, 120);
+    assert.equal(result.redactedUrl, 'postgres://operator:***@db.example.test:5432/groceryview');
+    assert.equal(result.hotspots[0].queryid, '123456789');
+    assert.equal(result.hotspots[0].sharedBlksRead, 500);
+    assert.equal(result.hotspots[0].sharedBlksWritten, 12);
+    assert.equal(result.hotspots[0].localBlksRead, 4);
+    assert.equal(result.hotspots[0].localBlksWritten, 3);
+    assert.equal(result.hotspots[0].tempBlksRead, 2);
+    assert.equal(result.hotspots[0].tempBlksWritten, 1);
+    assert.equal(result.hotspots[0].blkReadTimeMs, 10.5);
+    assert.equal(result.hotspots[0].blkWriteTimeMs, 2.25);
+    assert.equal(result.hotspots[0].querySnippet.includes('database-secret'), false);
+    assert.equal(result.hotspots[0].querySnippet.includes('super-secret'), false);
+    assert.equal(result.hotspots[0].querySnippet.includes('postgres://user:pass'), false);
+    assert.match(calls[1].sql, /from pg_stat_statements/);
+    assert.match(calls[1].sql, /shared_blks_read/);
+    assert.match(calls[1].sql, /local_blks_written/);
+    assert.match(calls[1].sql, /temp_blks_written/);
+    assert.deepEqual(calls[1].params, [120, 5]);
+    assert.equal(calls.at(-1).type, 'end');
   });
 
   it('uses a startup-sized retry window for database 57P03 recovery before failing closed', async () => {

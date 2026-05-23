@@ -9,6 +9,8 @@ const DEFAULT_RETRY_BASE_DELAY_MS = 10_000;
 const DEFAULT_RETRY_MAX_DELAY_MS = 30_000;
 const DEFAULT_DIRECT_PROBE_ATTEMPTS = 1;
 const DEFAULT_ALTERNATE_POOLER_PROBE_ATTEMPTS = 1;
+const DEFAULT_IO_HOTSPOTS_LIMIT = 20;
+const DEFAULT_IO_HOTSPOTS_SNIPPET_LENGTH = 180;
 
 export function redactDatabaseUrl(rawUrl) {
   const url = new URL(rawUrl);
@@ -123,6 +125,14 @@ function sanitizeError(error) {
   return text
     .replace(/postgres(?:ql)?:\/\/[^\s'"]+/gi, '[redacted_database_url]')
     .replace(/password=[^\s]+/gi, 'password=[redacted]');
+}
+
+function sanitizeQuerySnippet(value) {
+  return String(value ?? '')
+    .replace(/\s+/g, ' ')
+    .replace(/postgres(?:ql)?:\/\/[^\s'"]+/gi, '[redacted_database_url]')
+    .replace(/password\s*=\s*[^\s,)]+/gi, 'password=[redacted]')
+    .trim();
 }
 
 async function probeConnection({ connectionString, retryAttempts, retryBaseDelayMs, retryMaxDelayMs, Pool, wait }) {
@@ -266,9 +276,94 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
   };
 }
 
+export async function printDailyDatabaseIoHotspots(env = process.env, options = {}) {
+  const databaseUrl = env.DATABASE_URL;
+  if (!databaseUrl?.trim()) throw new Error('DATABASE_URL is required.');
+
+  const limit = parsePositiveInteger(env.GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT, DEFAULT_IO_HOTSPOTS_LIMIT);
+  const snippetLength = parsePositiveInteger(
+    env.GROCERYVIEW_DB_IO_HOTSPOTS_SNIPPET_LENGTH,
+    DEFAULT_IO_HOTSPOTS_SNIPPET_LENGTH
+  );
+  const Pool = options.Pool ?? PgPool;
+  const classification = classifyDatabaseUrl(databaseUrl);
+  const pool = new Pool({
+    connectionString: buildDailyWriteConnectionString(databaseUrl),
+    max: 1,
+    idleTimeoutMillis: 1_000,
+    connectionTimeoutMillis: 15_000
+  });
+
+  try {
+    const result = await pool.query(
+      `
+        select
+          queryid::text as queryid,
+          calls::bigint as calls,
+          shared_blks_read::bigint as shared_blks_read,
+          shared_blks_written::bigint as shared_blks_written,
+          local_blks_read::bigint as local_blks_read,
+          local_blks_written::bigint as local_blks_written,
+          temp_blks_read::bigint as temp_blks_read,
+          temp_blks_written::bigint as temp_blks_written,
+          coalesce(blk_read_time, 0)::double precision as blk_read_time_ms,
+          coalesce(blk_write_time, 0)::double precision as blk_write_time_ms,
+          left(regexp_replace(query, '\\s+', ' ', 'g'), $1)::text as query_snippet
+        from pg_stat_statements
+        where coalesce(shared_blks_read, 0)
+          + coalesce(shared_blks_written, 0)
+          + coalesce(local_blks_read, 0)
+          + coalesce(local_blks_written, 0)
+          + coalesce(temp_blks_read, 0)
+          + coalesce(temp_blks_written, 0) > 0
+        order by
+          coalesce(shared_blks_read, 0)
+          + coalesce(shared_blks_written, 0)
+          + coalesce(local_blks_read, 0)
+          + coalesce(local_blks_written, 0)
+          + coalesce(temp_blks_read, 0)
+          + coalesce(temp_blks_written, 0) desc,
+          calls desc
+        limit $2
+      `,
+      [snippetLength, limit]
+    );
+
+    return {
+      status: 'ready',
+      evidence: 'pg_stat_statements_io_hotspots',
+      limit,
+      snippetLength,
+      collectedAt: new Date().toISOString(),
+      host: classification.host,
+      port: classification.port,
+      database: classification.database,
+      username: classification.username,
+      redactedUrl: classification.redactedUrl,
+      hotspots: result.rows.map((row) => ({
+        queryid: String(row.queryid),
+        calls: Number(row.calls),
+        sharedBlksRead: Number(row.shared_blks_read),
+        sharedBlksWritten: Number(row.shared_blks_written),
+        localBlksRead: Number(row.local_blks_read),
+        localBlksWritten: Number(row.local_blks_written),
+        tempBlksRead: Number(row.temp_blks_read),
+        tempBlksWritten: Number(row.temp_blks_written),
+        blkReadTimeMs: Number(row.blk_read_time_ms),
+        blkWriteTimeMs: Number(row.blk_write_time_ms),
+        querySnippet: sanitizeQuerySnippet(row.query_snippet)
+      }))
+    };
+  } finally {
+    await pool.end();
+  }
+}
+
 if (import.meta.url === new URL(process.argv[1], 'file:').href) {
   try {
-    const result = await checkDailyDatabaseConnectivity(process.env);
+    const result = process.argv.includes('--pg-stat-statements-io')
+      ? await printDailyDatabaseIoHotspots(process.env)
+      : await checkDailyDatabaseConnectivity(process.env);
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     if (result.status !== 'ready') process.exitCode = 1;
   } catch (error) {

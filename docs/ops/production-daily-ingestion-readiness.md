@@ -122,6 +122,33 @@ or says new connections are temporarily blocked, the diagnostic reports
 Supabase health, then wait for provider recovery or validate replacement DB
 cutover rather than rotating application credentials blindly.
 
+Before and after any ingestion IO mitigation PR, capture the heaviest
+`pg_stat_statements` block IO queries from the production database. The command
+prints JSON only, uses the existing `DATABASE_URL`, redacts the connection URL,
+and emits each normalized statement as `queryid` plus a compact `querySnippet`
+with `sharedBlks*`, `localBlks*`, `tempBlks*`, and block read/write timing
+counters:
+
+```bash
+DATABASE_URL="$DATABASE_URL" \
+GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT=20 \
+npm run --silent ops:db-io-hotspots \
+  > /tmp/groceryview-db-io-hotspots-before.json
+```
+
+Run the same command after the mitigation lands, writing
+`/tmp/groceryview-db-io-hotspots-after.json`, then compare the `queryid` rows and
+block counters. The daily ingestion workflow also captures this automatically
+after production DB connectivity and again after the ingestion result is
+preserved, writing `/tmp/daily-db-io-hotspots-before.json` and
+`/tmp/daily-db-io-hotspots-after.json` into the
+`groceryview-daily-db-io-hotspots` artifact. Empty `hotspots[]` rows are valid
+evidence that no block IO rows were present in `pg_stat_statements`; a workflow
+failure should mean the diagnostic file was missing or the query itself failed.
+If the command fails with `relation "pg_stat_statements" does not exist`, enable
+the Supabase `pg_stat_statements` extension or collect the same query in the SQL
+editor before treating IO evidence as complete.
+
 When connectivity still fails, the daily workflow tries to generate a redacted
 `groceryview-production-db-recovery-packet` artifact with
 `npm run --silent ops:db-recovery-packet`. Configure `SUPABASE_ACCESS_TOKEN` and

@@ -43,6 +43,7 @@ describe('daily ingestion workflow', () => {
       'npm run --silent ops:catalog-coverage-targets',
       'npm run --silent ops:validate-production-env',
       'npm run --silent ops:check-daily-db-connectivity',
+      'npm run --silent ops:db-io-hotspots',
       'npm run --silent ops:apply-db-migrations',
       'node packages/ingestion/dist/index.js',
       '/api/readiness/postgres',
@@ -108,6 +109,20 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /path:\s*\/tmp\/daily-db-connectivity\.json/);
     assert.match(workflow, /name: Upload daily DB connectivity diagnostic\n\s+if:\s*always\(\)/);
     assert.match(workflow, /name:\s*groceryview-daily-db-connectivity[\s\S]*if-no-files-found:\s*error/);
+    assert.match(workflow, /name: Capture daily DB IO hotspots before ingestion/);
+    assert.ok(
+      workflow.indexOf('name: Upload daily DB connectivity diagnostic') < workflow.indexOf('name: Capture daily DB IO hotspots before ingestion'),
+      'before-ingestion DB IO hotspots must run after the DB connectivity diagnostic artifact is attempted'
+    );
+    assert.ok(
+      workflow.indexOf('name: Capture daily DB IO hotspots before ingestion') < workflow.indexOf('name: Run configured daily ingestion'),
+      'before-ingestion DB IO hotspots must be captured before ingestion writes new rows'
+    );
+    assert.match(workflow, /\/tmp\/daily-db-io-hotspots-before\.json/);
+    assert.match(workflow, /GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT:\s*\$\{\{ vars\.GROCERYVIEW_DB_IO_HOTSPOTS_LIMIT \|\| '20' \}\}/);
+    assert.match(workflow, /daily_db_io_hotspots_before_database_url_config_missing/);
+    assert.match(workflow, /db_io_hotspots_before_status=\$\?/);
+    assert.match(workflow, /daily_db_io_hotspots_before_diagnostic_missing/);
     assert.match(workflow, /name: Generate production DB recovery packet/);
     assert.match(workflow, /if:\s*failure\(\)/);
     assert.match(workflow, /SUPABASE_ACCESS_TOKEN:\s*\$\{\{ secrets\.SUPABASE_ACCESS_TOKEN \}\}/);
@@ -192,6 +207,24 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /name: Upload daily ingestion result\n\s+if:\s*always\(\)/);
     assert.match(workflow, /name:\s*groceryview-daily-ingestion-result/);
     assert.match(workflow, /path:\s*\|\n\s+\/tmp\/daily-ingestion-result\.json\n\s+codex-tasks\/ingestion-blockers\.txt/);
+    assert.match(workflow, /name: Capture daily DB IO hotspots after ingestion\n\s+if:\s*always\(\)/);
+    assert.ok(
+      workflow.indexOf('name: Upload daily ingestion result') < workflow.indexOf('name: Capture daily DB IO hotspots after ingestion'),
+      'after-ingestion DB IO hotspots must run after ingestion result preservation and upload'
+    );
+    assert.ok(
+      workflow.indexOf('name: Capture daily DB IO hotspots after ingestion') < workflow.indexOf('name: Export DB-backed site snapshot'),
+      'after-ingestion DB IO hotspots must be captured before later readiness exports can obscure the ingestion delta'
+    );
+    assert.match(workflow, /\/tmp\/daily-db-io-hotspots-after\.json/);
+    assert.match(workflow, /daily_db_io_hotspots_after_database_url_config_missing/);
+    assert.match(workflow, /db_io_hotspots_after_status=\$\?/);
+    assert.match(workflow, /daily_db_io_hotspots_after_diagnostic_missing/);
+    assert.match(workflow, /name: Upload daily DB IO hotspots\n\s+if:\s*always\(\)/);
+    assert.match(workflow, /name:\s*groceryview-daily-db-io-hotspots/);
+    assert.match(workflow, /path:\s*\|\n\s+\/tmp\/daily-db-io-hotspots-before\.json\n\s+\/tmp\/daily-db-io-hotspots-after\.json/);
+    assert.match(workflow, /name:\s*groceryview-daily-db-io-hotspots[\s\S]*if-no-files-found:\s*error/);
+    assert.doesNotMatch(workflow, /hotspots\.length/);
     assert.match(workflow, /name: Export DB-backed site snapshot/);
     assert.ok(
       workflow.indexOf('name: Run configured daily ingestion') < workflow.indexOf('name: Export DB-backed site snapshot'),
