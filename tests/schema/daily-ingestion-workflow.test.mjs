@@ -65,6 +65,8 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /daily_connectors_diagnostic_missing/);
     assert.match(workflow, /CATALOG_COVERAGE_TARGETS_JSON_FILE=\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /ops:catalog-coverage-targets\s+--\s+--from-current-connectors >\/tmp\/groceryview-catalog-targets\.json/);
+    assert.match(workflow, /catalog_targets_status=\$\?/);
+    assert.match(workflow, /catalog_targets_diagnostic_missing/);
     assert.match(workflow, /ops:validate-production-env\s+--\s+--scope\s+daily-ingestion/);
     assert.match(workflow, /name: Check production DB write connectivity/);
     assert.ok(

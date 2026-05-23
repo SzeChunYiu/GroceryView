@@ -142,8 +142,22 @@ jobs:
           if [ "${daily_connectors_status}" -ne 0 ]; then
             exit "${daily_connectors_status}"
           fi
+          catalog_targets_status=0
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
-            npm run --silent ops:catalog-coverage-targets -- --from-current-connectors >/tmp/groceryview-catalog-targets.json
+            npm run --silent ops:catalog-coverage-targets -- --from-current-connectors >/tmp/groceryview-catalog-targets.json || catalog_targets_status=$?
+          if [ ! -s /tmp/groceryview-catalog-targets.json ]; then
+            cat > /tmp/groceryview-catalog-targets.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "catalog_targets_diagnostic_missing",
+            "exitCode": ${catalog_targets_status}
+          }
+          EOF
+          fi
+          cat /tmp/groceryview-catalog-targets.json
+          if [ "${catalog_targets_status}" -ne 0 ]; then
+            exit "${catalog_targets_status}"
+          fi
           GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
           CATALOG_COVERAGE_TARGETS_JSON_FILE=/tmp/groceryview-catalog-targets.json \
             npm run --silent ops:validate-production-env -- --scope daily-ingestion \
