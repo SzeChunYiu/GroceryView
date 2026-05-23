@@ -5040,6 +5040,51 @@ describe('daily ingestion runner', () => {
     assert.equal(executor.calls.filter((call) => call.sql.includes('insert into aliases')).length, 1);
   });
 
+  it('upserts every configured daily store before writing partial store-scoped observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-weekly-normalized-json',
+          chainId: 'willys',
+          sourceType: 'flyer_campaign',
+          endpointUrl: 'https://sources.example.test/willys/weekly.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [
+            { storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' },
+            { storeId: '2149', name: 'Willys Alingsås Hagaplan', address: 'Hagaplan 1', city: 'Alingsås' }
+          ]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [{
+          storeId: '2110',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Zoégas Skånerost 450g',
+          canonicalName: 'Zoégas Coffee 450g',
+          productId: 'zoegas-coffee-450g',
+          categoryId: 'coffee',
+          brand: 'Zoégas',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.observationIds.length, 1);
+    const storeInserts = executor.calls.filter((call) => call.sql.includes('insert into stores'));
+    assert.deepEqual(storeInserts.map((call) => call.params[0]), ['2110', '2149']);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+  });
+
   it('materializes native Willys all-store weekly offers into daily database observations', async () => {
     const executor = new DailyIngestionExecutor();
     const requestedUrls: string[] = [];

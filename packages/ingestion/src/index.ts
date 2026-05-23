@@ -3487,11 +3487,11 @@ async function persistDailyConnectorOutput(input: {
     return id;
   }
 
-  async function getDailyStoreId(chainId: string, store: DailyIngestionStoreConfig): Promise<string> {
+  async function getDailyStoreId(chainDbId: string, store: DailyIngestionStoreConfig): Promise<string> {
     const slug = normalizeDailySlug(store.storeId);
     const cached = storeIdsBySlug.get(slug);
     if (cached) return cached;
-    const id = await upsertDailyStore(executor, chainId, store, domain);
+    const id = await upsertDailyStore(executor, chainDbId, store, domain);
     storeIdsBySlug.set(slug, id);
     return id;
   }
@@ -3775,6 +3775,11 @@ async function persistDailyConnectorOutput(input: {
   }
 
   try {
+    const configuredChainId = await getDailyChainId(config.chainId);
+    for (const store of config.stores ?? []) {
+      await getDailyStoreId(configuredChainId, store);
+    }
+
     const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product), domain);
     const aliasesToUpsert: Parameters<typeof upsertDailyAliasBatch>[1] = [];
     for (const accepted of result.ingestion.accepted) {
