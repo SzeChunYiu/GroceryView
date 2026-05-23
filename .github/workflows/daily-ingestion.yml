@@ -34,7 +34,8 @@ jobs:
           GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN: ${{ vars.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN || secrets.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN }}
         run: |
           set -euo pipefail
-          node <<'NODE' >/tmp/production-config-preflight.json
+          production_config_preflight_status=0
+          node <<'NODE' >/tmp/production-config-preflight.json || production_config_preflight_status=$?
           const required = [
             'AUTH_SECRET',
             'DATABASE_URL',
@@ -55,8 +56,17 @@ jobs:
           };
           console.log(JSON.stringify(body, null, 2));
           NODE
+          if [ ! -s /tmp/production-config-preflight.json ]; then
+            cat > /tmp/production-config-preflight.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "production_config_preflight_diagnostic_missing",
+            "exitCode": ${production_config_preflight_status}
+          }
+          EOF
+          fi
           cat /tmp/production-config-preflight.json
-          node -e "const body=require('/tmp/production-config-preflight.json'); if (body.status !== 'ready') { for (const name of body.missing) console.error('missing production config: ' + name); console.error(body.blocker); process.exit(1); }"
+          node -e "const body=require('/tmp/production-config-preflight.json'); if (body.status !== 'ready') { for (const name of body.missing ?? []) console.error('missing production config: ' + name); console.error(body.blocker); process.exit(1); }"
 
       - name: Upload production config preflight evidence
         if: always()

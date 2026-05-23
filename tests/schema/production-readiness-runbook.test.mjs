@@ -12,6 +12,7 @@ describe('production daily ingestion readiness runbook', () => {
     );
 
     assert.doesNotMatch(requiredSecretsSection, /GROCERYVIEW_DAILY_CONNECTORS_JSON/);
+    assert.match(runbook, /production_config_preflight_diagnostic_missing/);
     assert.match(runbook, /daily ingestion workflow generates `GROCERYVIEW_DAILY_CONNECTORS_JSON`/);
     assert.match(runbook, /npm run --silent ops:daily-connectors/);
     assert.match(runbook, /npm run --silent ops:daily-connectors > \/tmp\/groceryview-daily-connectors\.json/);
