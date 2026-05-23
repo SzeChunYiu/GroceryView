@@ -27,7 +27,7 @@ await mkdir(INGESTED_DIR, { recursive: true });
 const cityGrossProducts = await fetchCityGrossProductsForAllStores({
   maxStores: 40,
   queries: CITY_GROSS_QUERIES,
-  maxRowsPerStore: 120,
+  maxRowsPerStore: 180,
   pageSize: 24,
   retrievedAt
 });
