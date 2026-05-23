@@ -1879,6 +1879,22 @@ ${seo}`;
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces a compare-overlay chart from real price chart series output', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/compare/page.tsx');
+
+    assert.match(verified, /compareOverlayChart/);
+    assert.match(verified, /buildPriceChartSeries/);
+    assert.match(verified, /rangeDays: 365/);
+    assert.match(verified, /provenanceLabel/);
+    assert.match(route, /compareOverlayChart/);
+    assert.match(route, /Compare-overlay chart/);
+    assert.match(route, /overlaySeries/);
+    assert.match(route, /lineStyle/);
+    assert.match(route, /No forecast/);
+    assert.doesNotMatch(route, /Math\.random|placeholder|synthetic/i);
+  });
+
   it('surfaces a retailer browser overlay contract backed by the cheapest-now API', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/compare/page.tsx');
