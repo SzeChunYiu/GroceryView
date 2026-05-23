@@ -8,6 +8,7 @@ import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
 import { PricesModule } from './prices/prices.module.js';
 import { ProductsModule } from './products/products.module.js';
+import { ItemsModule } from './routes/items.module.js';
 import { StoresModule } from './stores/stores.module.js';
 import { UsersModule } from './users/users.module.js';
 import { WatchlistsModule } from './watchlists/watchlists.module.js';
@@ -17,6 +18,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnvironment }),
     DatabaseModule,
     HealthModule,
+    ItemsModule,
     ProductsModule,
     StoresModule,
     PricesModule,

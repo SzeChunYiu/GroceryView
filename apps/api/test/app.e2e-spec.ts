@@ -110,6 +110,26 @@ describe('GroceryView API app', () => {
     assert.match(comparison.body.strategies[0].warnings[0], /missing verified prices/);
 
     await request(app.getHttpServer()).get('/users/demo/alerts').expect(200);
+
+    const firstPage = await request(app.getHttpServer()).get('/api/items').expect(200);
+    assert.equal(firstPage.body.total, 4);
+    assert.equal(firstPage.body.items.length, 4);
+
+    const dairyPage = await request(app.getHttpServer()).get('/api/items?category=dairy&page=1&pageSize=2').expect(200);
+    assert.equal(dairyPage.body.total, 3);
+    assert.ok(dairyPage.body.totalPages >= 2);
+    assert.equal(dairyPage.body.items.length, 2);
+    assert.equal(dairyPage.body.items.every((item: { category: string }) => item.category === 'dairy'), true);
+
+    const filtered = await request(app.getHttpServer())
+      .get('/api/items?store=coop-odenplan&category=coffee&organic=false')
+      .expect(200);
+    assert.equal(filtered.body.total, 1);
+    assert.equal(filtered.body.items[0].id, 'coffee');
+
+    const search = await request(app.getHttpServer()).get('/api/items?q=milk').expect(200);
+    assert.equal(search.body.total, 2);
+    assert.equal(search.body.items.some((item: { id: string }) => item.id === 'milk'), true);
   });
 
   it('rejects invalid request DTOs through the global ValidationPipe', async () => {
