@@ -28,13 +28,13 @@ describe('production env value validation script', () => {
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
       assert.match(script, new RegExp(`['"]${chain}['"]`));
     }
-    assert.match(script, /requireEveryProductInEveryStore must be true/);
+    assert.match(script, /requireEveryProductInEveryStore must be false/);
     assert.match(script, /stores must list every branch/);
     assert.match(script, /targetStores missing from connector stores/);
     assert.equal(pkg.scripts['ops:validate-production-env'], 'node scripts/ops/validate-production-env.mjs');
   });
 
-  it('self-test passes with six connectors and product-store matrix targets', () => {
+  it('self-test passes with six connectors and branch-observed store targets', () => {
     const output = execFileSync(process.execPath, [scriptPath.pathname, '--self-test'], { encoding: 'utf8' });
     assert.deepEqual(JSON.parse(output), {
       status: 'ready',
@@ -91,7 +91,7 @@ describe('production env value validation script', () => {
         targetCategories: ['coffee'],
         targetChains: chains,
         targetStores: chains.map((chainId) => `${chainId}-odenplan`),
-        requireEveryProductInEveryStore: true
+        requireEveryProductInEveryStore: false
       })
     }).status, 'ready');
   });
@@ -130,7 +130,7 @@ describe('production env value validation script', () => {
         targetCategories: ['coffee'],
         targetChains: chains,
         targetStores: ['willys-unknown-branch'],
-        requireEveryProductInEveryStore: true
+        requireEveryProductInEveryStore: false
       })
     };
     const result = spawnSync(process.execPath, [scriptPath.pathname], { encoding: 'utf8', env });
