@@ -124,7 +124,7 @@ npm run --silent ingest:export-db-snapshot
 The exporter fails closed with `No latest price rows available` when the database
 reader returns no public latest-price rows. The artifact summarizes product, chain,
 store, and observation coverage and carries only the normalized public row plus
-provenance; it does not include raw private payloads.
+provenance; it does not include raw private payloads. The daily ingestion workflow exports this snapshot after the ingestion write succeeds, checks that the artifact status is `passed` with at least one observation, and uploads it as the `groceryview-db-site-snapshot` artifact. Operators can tune the workflow export with `GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE` and `GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT`.
 
 ## Trigger and monitor the daily gate
 
@@ -142,9 +142,10 @@ The workflow must pass these gates in order:
 1. DB and ingestion package tests
 2. production ingestion configuration validator
 3. configured daily ingestion runner
-4. `/api/readiness/postgres`
-5. `/api/readiness/source-runs`
-6. `/api/readiness/catalog-coverage`
+4. DB-backed site snapshot export and `groceryview-db-site-snapshot` artifact upload
+5. `/api/readiness/postgres`
+6. `/api/readiness/source-runs`
+7. `/api/readiness/catalog-coverage`
 
 ## Expected blocker meanings
 

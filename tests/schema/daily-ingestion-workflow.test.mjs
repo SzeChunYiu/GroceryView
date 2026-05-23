@@ -28,7 +28,9 @@ describe('daily ingestion workflow', () => {
       'node packages/ingestion/dist/index.js',
       '/api/readiness/postgres',
       '/api/readiness/source-runs',
-      '/api/readiness/catalog-coverage'
+      '/api/readiness/catalog-coverage',
+      'npm run --silent ingest:export-db-snapshot',
+      'actions/upload-artifact@v4'
     ]) {
       assert.match(workflow, new RegExp(command.replaceAll(' ', '\\s+').replaceAll('/', '\\/')));
     }
@@ -62,6 +64,18 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /coverageStoreCount/);
     assert.doesNotMatch(workflow, /connectorCount !== 6/);
     assert.match(workflow, /body\.status !== 'succeeded'/);
+    assert.match(workflow, /name: Export DB-backed site snapshot/);
+    assert.ok(
+      workflow.indexOf('name: Run configured daily ingestion') < workflow.indexOf('name: Export DB-backed site snapshot'),
+      'DB-backed site snapshot export must run only after daily ingestion writes latest_prices'
+    );
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_PATH:\s*\/tmp\/groceryview-db-site-snapshot\.json/);
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE:\s*\$\{\{ vars\.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE \|\| '0\.5' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT:\s*\$\{\{ vars\.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT \|\| '50000' \}\}/);
+    assert.match(workflow, /body\.status !== 'passed'/);
+    assert.match(workflow, /body\.coverage\?\.observations < 1/);
+    assert.match(workflow, /name:\s*groceryview-db-site-snapshot/);
+    assert.match(workflow, /path:\s*\/tmp\/groceryview-db-site-snapshot\.json/);
     assert.match(workflow, /missingProductStorePairs/);
     assert.match(workflow, /requiredActions/);
 

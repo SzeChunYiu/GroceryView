@@ -103,6 +103,33 @@ jobs:
             >/tmp/daily-ingestion-result.json
           node -e "const body=require('/tmp/daily-ingestion-result.json'); if (body.status !== 'succeeded') { console.error(JSON.stringify(body)); process.exit(1); }"
 
+      - name: Export DB-backed site snapshot
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_PATH: /tmp/groceryview-db-site-snapshot.json
+          GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE || '0.5' }}
+          GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT: ${{ vars.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT || '50000' }}
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}"
+          npm run --silent ingest:export-db-snapshot \
+            >/tmp/db-site-snapshot-result.json
+          node <<'NODE'
+          const body = require('/tmp/db-site-snapshot-result.json');
+          if (body.status !== 'passed' || body.coverage?.observations < 1) {
+            console.error(JSON.stringify(body));
+            process.exit(1);
+          }
+          NODE
+
+      - name: Upload DB-backed site snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-db-site-snapshot
+          path: /tmp/groceryview-db-site-snapshot.json
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Check deployed PostgreSQL readiness
         env:
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
