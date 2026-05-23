@@ -3,6 +3,8 @@ export type CatalogProductCoverage = {
   categoryId: string;
   observedChainIds: string[];
   observedStoreIds: string[];
+  observedPriceTypes?: string[];
+  observedStorePriceTypes?: string[];
 };
 
 export { COMMODITIES, STAPLE_BASKET, findCommodity, type Commodity, type ComparableUnit } from './commodities.js';
@@ -13,7 +15,9 @@ export type CatalogCoverageInput = {
   targetCategories: string[];
   targetChains: string[];
   targetStores: string[];
+  targetPriceTypes?: string[];
   requireEveryProductInEveryStore?: boolean;
+  requireEveryStorePriceType?: boolean;
   products: CatalogProductCoverage[];
 };
 
@@ -32,8 +36,10 @@ export type CatalogCoverageReport = {
     categories: CoverageDimension;
     chains: CoverageDimension;
     stores: CoverageDimension;
+    priceTypes?: CoverageDimension;
   };
   missingProductStorePairs: Array<{ productId: string; storeId: string }>;
+  missingStorePriceTypes?: Array<{ storeId: string; priceType: string }>;
   requiredActions: string[];
 };
 
@@ -78,14 +84,17 @@ export function buildCatalogCoverageReport(input: CatalogCoverageInput): Catalog
   const observedCategories = new Set(input.products.map((product) => product.categoryId));
   const observedChains = new Set(input.products.flatMap((product) => product.observedChainIds));
   const observedStores = new Set(input.products.flatMap((product) => product.observedStoreIds));
+  const observedPriceTypes = new Set(input.products.flatMap((product) => product.observedPriceTypes ?? []));
 
   const products = input.targetProducts ? summarizeCoverage(input.targetProducts, observedProductIds) : undefined;
   const categories = summarizeCoverage(input.targetCategories, observedCategories);
   const chains = summarizeCoverage(input.targetChains, observedChains);
   const stores = summarizeCoverage(input.targetStores, observedStores);
+  const priceTypes = input.targetPriceTypes ? summarizeCoverage(input.targetPriceTypes, observedPriceTypes) : undefined;
 
   const targetProducts = [...new Set(input.targetProducts ?? [])].sort();
   const targetStores = [...new Set(input.targetStores)].sort();
+  const targetPriceTypes = [...new Set(input.targetPriceTypes ?? [])].sort();
   const productsById = new Map(input.products.map((product) => [product.id, product]));
   const missingProductStorePairs = input.requireEveryProductInEveryStore
     ? targetProducts.flatMap((productId) => {
@@ -96,12 +105,21 @@ export function buildCatalogCoverageReport(input: CatalogCoverageInput): Catalog
       })
     : [];
 
+  const observedStorePriceTypes = new Set(input.products.flatMap((product) => product.observedStorePriceTypes ?? []));
+  const missingStorePriceTypes = input.requireEveryStorePriceType
+    ? targetStores.flatMap((storeId) => targetPriceTypes
+      .filter((priceType) => !observedStorePriceTypes.has(`${storeId}:${priceType}`))
+      .map((priceType) => ({ storeId, priceType })))
+    : [];
+
   const requiredActions = [
     products ? actionFor('products', products.missing) : null,
     actionFor('categories', categories.missing),
     actionFor('chains', chains.missing),
     actionFor('stores', stores.missing),
-    missingProductStorePairs.length > 0 ? `backfill_product_store_pairs:${missingProductStorePairs.length}` : null
+    priceTypes ? actionFor('price_types', priceTypes.missing) : null,
+    missingProductStorePairs.length > 0 ? `backfill_product_store_pairs:${missingProductStorePairs.length}` : null,
+    missingStorePriceTypes.length > 0 ? `backfill_store_price_types:${missingStorePriceTypes.length}` : null
   ].filter(
     (action): action is string => action !== null
   );
@@ -109,8 +127,9 @@ export function buildCatalogCoverageReport(input: CatalogCoverageInput): Catalog
   return {
     status: requiredActions.length === 0 ? 'complete' : 'incomplete',
     productCount: input.products.length,
-    coverage: { ...(products ? { products } : {}), categories, chains, stores },
+    coverage: { ...(products ? { products } : {}), categories, chains, stores, ...(priceTypes ? { priceTypes } : {}) },
     missingProductStorePairs,
+    ...(input.targetPriceTypes ? { missingStorePriceTypes } : {}),
     requiredActions
   };
 }

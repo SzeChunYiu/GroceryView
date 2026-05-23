@@ -361,13 +361,17 @@ class RecordingQueryExecutor implements QueryExecutor {
       product_id: 'coffee',
       category_id: 'pantry',
       observed_chain_ids: ['coop', 'willys'],
-      observed_store_ids: ['216502', '2102']
+      observed_store_ids: ['216502', '2102'],
+      observed_price_types: ['promotion', 'shelf'],
+      observed_store_price_types: ['216502:promotion', '2102:shelf']
     },
     {
       product_id: 'milk',
       category_id: 'dairy',
       observed_chain_ids: ['willys'],
-      observed_store_ids: ['2102']
+      observed_store_ids: ['2102'],
+      observed_price_types: ['shelf'],
+      observed_store_price_types: ['2102:shelf']
     }
   ];
 
@@ -1221,19 +1225,25 @@ describe('createPostgresCatalogReader', () => {
         id: 'coffee',
         categoryId: 'pantry',
         observedChainIds: ['coop', 'willys'],
-        observedStoreIds: ['2102', '216502']
+        observedStoreIds: ['2102', '216502'],
+        observedPriceTypes: ['promotion', 'shelf'],
+        observedStorePriceTypes: ['2102:shelf', '216502:promotion']
       },
       {
         id: 'milk',
         categoryId: 'dairy',
         observedChainIds: ['willys'],
-        observedStoreIds: ['2102']
+        observedStoreIds: ['2102'],
+        observedPriceTypes: ['shelf'],
+        observedStorePriceTypes: ['2102:shelf']
       }
     ]);
     assert.match(executor.calls[0]!.sql, /left join latest_prices on latest_prices\.product_id = products\.id/);
     assert.match(executor.calls[0]!.sql, /left join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
     assert.match(executor.calls[0]!.sql, /array_agg\(distinct replace\(chains\.slug, '-', '_'\)\)/);
+    assert.match(executor.calls[0]!.sql, /array_agg\(distinct latest_prices\.price_type\)/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.price_type/);
     assert.match(executor.calls[0]!.sql, /stores\.external_ref/);
     assert.deepEqual(executor.calls[0]!.params, [25]);
   });

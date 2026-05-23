@@ -39,13 +39,15 @@ DATABASE_URL="$DATABASE_URL" npm run ops:catalog-coverage-targets \
 Review counts without dumping the full JSON:
 
 ```bash
-node -e "const t=require('/tmp/catalog-coverage-targets.json'); console.log({products:t.targetProducts.length,categories:t.targetCategories.length,chains:t.targetChains,stores:t.targetStores.length,requireEveryProductInEveryStore:t.requireEveryProductInEveryStore})"
+node -e "const t=require('/tmp/catalog-coverage-targets.json'); console.log({products:t.targetProducts.length,categories:t.targetCategories.length,chains:t.targetChains,stores:t.targetStores.length,priceTypes:t.targetPriceTypes,requireEveryProductInEveryStore:t.requireEveryProductInEveryStore,requireEveryStorePriceType:t.requireEveryStorePriceType})"
 ```
 
 Store the compact JSON as `CATALOG_COVERAGE_TARGETS_JSON` in the deployment/GitHub secret store.
 Every `targetStores[]` entry must also appear in the matching daily connector
 `stores[]` metadata, otherwise ingestion cannot prove that product prices are
-branch-scoped before it writes `latest_prices`.
+branch-scoped before it writes `latest_prices`. The exported target also requires
+`targetPriceTypes: ["shelf"]` and `requireEveryStorePriceType: true` so weekly
+flyer promotions cannot satisfy branch shelf-price readiness by themselves.
 
 ## Export live branch metadata and connector config
 
@@ -137,6 +139,8 @@ The workflow must pass these gates in order:
 - `unknown_store_ids:<stores>`: connector output referenced branch ids not declared in connector `stores[]`.
 - `CATALOG_COVERAGE_TARGETS_JSON.targetStores missing from connector stores: <stores>`: production env has target branches that no daily connector declares.
 - `backfill_product_store_pairs:<count>`: catalog coverage target requires product-store prices that are not in `latest_prices`.
+- `backfill_price_types:<types>`: catalog coverage target requires price types, such as `shelf`, that are not present in `latest_prices`.
+- `backfill_store_price_types:<count>`: target branches are missing one or more required price types, so promotion-only stores do not count as shelf-price ready.
 - `backfill_chains:<chains>`: coverage targets include chains with no observed latest prices.
 - `catalog_coverage_probe_failed`: readiness provider failed; check server logs without exposing secrets.
 

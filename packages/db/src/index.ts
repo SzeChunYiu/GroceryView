@@ -399,6 +399,8 @@ export type CatalogProductCoverageRecord = {
   categoryId: string;
   observedChainIds: string[];
   observedStoreIds: string[];
+  observedPriceTypes: string[];
+  observedStorePriceTypes: string[];
 };
 
 export type ProductAliasSourceType = 'retailer' | 'receipt' | 'community' | 'import' | 'manual';
@@ -1581,6 +1583,8 @@ type CatalogProductCoverageRow = {
   category_id: string | null;
   observed_chain_ids: string[] | null;
   observed_store_ids: string[] | null;
+  observed_price_types: string[] | null;
+  observed_store_price_types: string[] | null;
 };
 type ProductAliasRow = {
   id: string;
@@ -1798,7 +1802,9 @@ function mapCatalogProductCoverage(row: CatalogProductCoverageRow): CatalogProdu
     id: row.product_id,
     categoryId: row.category_id ?? 'uncategorized',
     observedChainIds: [...(row.observed_chain_ids ?? [])].sort(),
-    observedStoreIds: [...(row.observed_store_ids ?? [])].sort()
+    observedStoreIds: [...(row.observed_store_ids ?? [])].sort(),
+    observedPriceTypes: [...(row.observed_price_types ?? [])].sort(),
+    observedStorePriceTypes: [...(row.observed_store_price_types ?? [])].sort()
   };
 }
 
@@ -3060,7 +3066,17 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
                   array_agg(distinct coalesce(stores.external_ref, stores.slug, latest_prices.store_id::text))
                     filter (where latest_prices.store_id is not null),
                   '{}'
-                ) as observed_store_ids
+                ) as observed_store_ids,
+                coalesce(
+                  array_agg(distinct latest_prices.price_type)
+                    filter (where latest_prices.price_type is not null),
+                  '{}'
+                ) as observed_price_types,
+                coalesce(
+                  array_agg(distinct coalesce(stores.external_ref, stores.slug, latest_prices.store_id::text) || ':' || latest_prices.price_type)
+                    filter (where latest_prices.store_id is not null and latest_prices.price_type is not null),
+                  '{}'
+                ) as observed_store_price_types
          from products
          left join latest_prices on latest_prices.product_id = products.id
          left join chains on chains.id = latest_prices.chain_id
