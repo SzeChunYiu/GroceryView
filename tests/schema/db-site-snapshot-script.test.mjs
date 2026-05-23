@@ -46,7 +46,7 @@ describe('DB-backed site snapshot export script', () => {
     assert.equal(artifact.status, 'passed');
     assert.equal(artifact.generatedAt, '2026-05-22T21:20:00.000Z');
     assert.equal(artifact.priceRows.length, 1);
-    assert.deepEqual(artifact.coverage, { products: 1, chains: 1, stores: 1, observations: 1, requiredChains: ['willys'], missingRequiredChains: [] });
+    assert.deepEqual(artifact.coverage, { products: 1, chains: 1, stores: 1, observations: 1, requiredChains: ['willys'], missingRequiredChains: [], requiredStoreExternalRefs: [], missingRequiredStoreExternalRefs: [] });
     assert.deepEqual(artifact.priceRows[0], {
       productSlug: 'bryggkaffe-450g',
       canonicalName: 'Bryggkaffe mellanrost 450 g',
@@ -123,6 +123,62 @@ describe('DB-backed site snapshot export script', () => {
 
     assert.deepEqual(artifact.coverage.requiredChains, ['ica', 'willys']);
     assert.deepEqual(artifact.coverage.missingRequiredChains, []);
+  });
+
+  it('fails closed when required store coverage is missing from the DB snapshot', () => {
+    const base = {
+      productId: 'product-1',
+      productSlug: 'bryggkaffe-450g',
+      canonicalName: 'Bryggkaffe mellanrost 450 g',
+      categoryPath: ['Pantry', 'Coffee'],
+      comparableUnit: 'kg',
+      chainId: 'chain-1',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      priceType: 'online',
+      price: 44.9,
+      unitPrice: 99.7778,
+      currency: 'SEK',
+      observedAt: '2026-05-20T09:00:00.000Z',
+      confidence: 0.88
+    };
+    assert.throws(() => buildDbSiteSnapshotArtifact({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      requiredChains: ['willys'],
+      requiredStoreExternalRefs: ['1004599', '216502'],
+      rows: [{ ...base, storeExternalRef: '216502', observationId: 'observation-willys-216502' }]
+    }), /db_site_snapshot_missing_required_stores:1004599/);
+  });
+
+  it('records required store coverage when every target store has latest price evidence', () => {
+    const base = {
+      productId: 'product-1',
+      productSlug: 'bryggkaffe-450g',
+      canonicalName: 'Bryggkaffe mellanrost 450 g',
+      categoryPath: ['Pantry', 'Coffee'],
+      comparableUnit: 'kg',
+      chainId: 'chain-1',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      priceType: 'online',
+      price: 44.9,
+      unitPrice: 99.7778,
+      currency: 'SEK',
+      observedAt: '2026-05-20T09:00:00.000Z',
+      confidence: 0.88
+    };
+    const artifact = buildDbSiteSnapshotArtifact({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      requiredChains: ['willys'],
+      requiredStoreExternalRefs: ['1004599', '216502'],
+      rows: [
+        { ...base, storeExternalRef: '216502', observationId: 'observation-willys-216502' },
+        { ...base, storeExternalRef: '1004599', observationId: 'observation-willys-1004599' }
+      ]
+    });
+
+    assert.deepEqual(artifact.coverage.requiredStoreExternalRefs, ['1004599', '216502']);
+    assert.deepEqual(artifact.coverage.missingRequiredStoreExternalRefs, []);
   });
 
   it('fails closed when the database reader returns no latest price rows', () => {

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import process from 'node:process';
 
 function optional(value, key) {
@@ -16,7 +16,15 @@ export function parseRequiredSnapshotChains(value) {
     .filter(Boolean);
 }
 
-export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS }) {
+export function parseRequiredStoreExternalRefsFromCatalogTargets(value) {
+  if (!value) return [];
+  const targets = typeof value === 'string' ? JSON.parse(value) : value;
+  if (!targets || typeof targets !== 'object' || Array.isArray(targets)) throw new Error('Catalog coverage targets must be an object.');
+  if (!Array.isArray(targets.targetStores)) throw new Error('Catalog coverage targets must include targetStores.');
+  return targets.targetStores.map((store) => String(store).trim()).filter(Boolean);
+}
+
+export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS, requiredStoreExternalRefs = [] }) {
   if (!Array.isArray(rows) || rows.length === 0) throw new Error('No latest price rows available for DB-to-site snapshot export.');
 
   const priceRows = rows.map((row) => ({
@@ -50,6 +58,12 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
   if (missingRequiredChains.length > 0) {
     throw new Error(`db_site_snapshot_missing_required_chains:${missingRequiredChains.join(',')}`);
   }
+  const observedStoreExternalRefs = new Set(priceRows.map((row) => row.storeExternalRef).filter(Boolean));
+  const normalizedRequiredStoreExternalRefs = [...new Set(requiredStoreExternalRefs.map((store) => String(store).trim()).filter(Boolean))].sort();
+  const missingRequiredStoreExternalRefs = normalizedRequiredStoreExternalRefs.filter((store) => !observedStoreExternalRefs.has(store));
+  if (missingRequiredStoreExternalRefs.length > 0) {
+    throw new Error(`db_site_snapshot_missing_required_stores:${missingRequiredStoreExternalRefs.join(',')}`);
+  }
 
   return {
     status: 'passed',
@@ -61,7 +75,9 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
       stores: new Set(priceRows.map((row) => row.storeSlug).filter(Boolean)).size,
       observations: priceRows.length,
       requiredChains: normalizedRequiredChains,
-      missingRequiredChains
+      missingRequiredChains,
+      requiredStoreExternalRefs: normalizedRequiredStoreExternalRefs,
+      missingRequiredStoreExternalRefs
     },
     priceRows
   };
@@ -75,6 +91,10 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   const minConfidence = env.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE ? Number(env.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE) : undefined;
   const limit = env.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT ? Number(env.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT) : undefined;
   const requiredChains = parseRequiredSnapshotChains(env.GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS);
+  const requiredStoreTargetsJson = env.GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE
+    ? readFileSync(env.GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE, 'utf8')
+    : env.GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON;
+  const requiredStoreExternalRefs = parseRequiredStoreExternalRefsFromCatalogTargets(requiredStoreTargetsJson);
 
   const [{ createPgQueryExecutor, createPostgresSiteSnapshotReader }, pg] = await Promise.all([
     import('@groceryview/db'),
@@ -84,7 +104,7 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   try {
     const reader = createPostgresSiteSnapshotReader(createPgQueryExecutor(pool));
     const rows = await reader.listLatestPriceSnapshotRows({ minConfidence, limit });
-    const artifact = buildDbSiteSnapshotArtifact({ rows, requiredChains });
+    const artifact = buildDbSiteSnapshotArtifact({ rows, requiredChains, requiredStoreExternalRefs });
     writeFileSync(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
     return artifact;
   } finally {
