@@ -146,6 +146,10 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS \|\| '250' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS \|\| '1' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS \|\| '500' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_STORE_CONCURRENCY:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_STORE_CONCURRENCY \|\| '4' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_STORE_START_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_STORE_START_DELAY_MS \|\| '100' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS \|\| '1' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS \|\| '500' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_BLOCKER_LOG_PATH:\s*codex-tasks\/ingestion-blockers\.txt/);
     assert.match(workflow, /daily_ingestion_blocker_log_missing/);
     assert.doesNotMatch(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON=\$\(npm run --silent ops:daily-connectors\)/);

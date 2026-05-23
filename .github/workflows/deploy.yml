@@ -31,7 +31,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-          PUBLIC_WEB_URL: ${{ secrets.PUBLIC_WEB_URL }}
+          PUBLIC_WEB_URL: ${{ vars.PUBLIC_WEB_URL || secrets.PUBLIC_WEB_URL }}
           NOTIFICATION_WEBHOOK_SECRET: ${{ secrets.NOTIFICATION_WEBHOOK_SECRET }}
           BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}

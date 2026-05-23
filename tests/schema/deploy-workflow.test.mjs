@@ -21,10 +21,12 @@ describe('deploy workflow', () => {
     ]) {
       assert.match(workflow, new RegExp(`${variable}:\\s*\\$\\{\\{ vars\\.${variable} \\}\\}`));
     }
-    assert.match(
-      workflow,
-      /GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN:\s*\$\{\{ vars\.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN \|\| secrets\.GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN \}\}/
-    );
+    for (const variableBackedRuntime of ['PUBLIC_WEB_URL', 'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN']) {
+      assert.match(
+        workflow,
+        new RegExp(`${variableBackedRuntime}:\\s*\\$\\{\\{ vars\\.${variableBackedRuntime} \\|\\| secrets\\.${variableBackedRuntime} \\}\\}`)
+      );
+    }
     assert.doesNotMatch(workflow, /gh secret list/);
   });
 
@@ -40,7 +42,6 @@ describe('deploy workflow', () => {
       'VERCEL_PROJECT_ID',
       'METRICS_TOKEN',
       'AUTH_SECRET',
-      'PUBLIC_WEB_URL',
       'NOTIFICATION_WEBHOOK_SECRET',
       'BILLING_WEBHOOK_SECRET',
       'STRIPE_SECRET_KEY',

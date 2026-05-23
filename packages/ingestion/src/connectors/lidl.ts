@@ -1,3 +1,5 @@
+import { runAllStoreTasks, type AllStoreTaskRunnerControls } from './all-store-runner.js';
+
 export type LidlStore = {
   storeId: string;
   name: string;
@@ -86,7 +88,7 @@ export const DEFAULT_LIDL_OFFER_PATHS = [
   '/c/veckans-blommor/a10094398'
 ] as const;
 
-export type FetchLidlStoresOptions = {
+export type FetchLidlStoresOptions = AllStoreTaskRunnerControls & {
   fetchImpl?: typeof fetch;
   maxRows?: number;
   retrievedAt?: string;
@@ -101,7 +103,7 @@ export type FetchLidlOffersOptions = {
   baseUrl?: string;
 };
 
-export type FetchLidlOffersForAllStoresOptions = FetchLidlOffersOptions & {
+export type FetchLidlOffersForAllStoresOptions = FetchLidlOffersOptions & AllStoreTaskRunnerControls & {
   maxStores?: number;
 };
 
@@ -130,24 +132,32 @@ export async function fetchLidlStores(options: FetchLidlStoresOptions = {}): Pro
   if (!response.ok) throw new Error(`Lidl store directory request failed: ${response.status}`);
   const html = await response.text();
   const paths = extractLidlStorePaths(html);
-  const rows: LidlStore[] = [];
-  const seen = new Set<string>();
-  for (const path of paths) {
-    const detailUrl = buildLidlStoreDetailPayloadUrl(path, options.baseUrl);
-    const detailResponse = await fetchImpl(detailUrl, {
-      headers: {
-        accept: 'text/html,application/xhtml+xml',
-        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-      }
-    });
-    if (!detailResponse.ok) throw new Error(`Lidl store detail request failed for ${path}: ${detailResponse.status}`);
-    const row = normalizeLidlStore(path, await detailResponse.text(), detailUrl, retrievedAt, options.baseUrl);
-    if (!row || seen.has(row.storeId)) continue;
-    seen.add(row.storeId);
-    rows.push(row);
-    if (options.maxRows && rows.length >= options.maxRows) break;
+  const limitedPaths = options.maxRows ? paths.slice(0, options.maxRows) : paths;
+  const { rows, failures } = await runAllStoreTasks({
+    stores: limitedPaths,
+    storeId: (path) => path,
+    storeConcurrency: options.storeConcurrency,
+    storeStartDelayMs: options.storeStartDelayMs,
+    storeRetryAttempts: options.storeRetryAttempts,
+    storeRetryBaseDelayMs: options.storeRetryBaseDelayMs,
+    failOnStoreFailure: options.failOnStoreFailure,
+    task: async (path) => {
+      const detailUrl = buildLidlStoreDetailPayloadUrl(path, options.baseUrl);
+      const detailResponse = await fetchImpl(detailUrl, {
+        headers: {
+          accept: 'text/html,application/xhtml+xml',
+          'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+        }
+      });
+      if (!detailResponse.ok) throw new Error(`Lidl store detail request failed for ${path}: ${detailResponse.status}`);
+      const row = normalizeLidlStore(path, await detailResponse.text(), detailUrl, retrievedAt, options.baseUrl);
+      return row ? [row] : [];
+    }
+  });
+  if (rows.length === 0) {
+    const reason = failures[0] ? ` ${failures[0].storeId}:${failures[0].error}` : '';
+    throw new Error(`Lidl store directory had no usable stores.${reason}`);
   }
-  if (rows.length === 0) throw new Error('Lidl store directory had no usable stores.');
   return rows;
 }
 
@@ -185,7 +195,12 @@ export async function fetchLidlOffersForAllStores(options: FetchLidlOffersForAll
     fetchImpl: options.fetchImpl,
     maxRows: options.maxStores,
     retrievedAt: options.retrievedAt,
-    baseUrl: options.baseUrl
+    baseUrl: options.baseUrl,
+    storeConcurrency: options.storeConcurrency,
+    storeStartDelayMs: options.storeStartDelayMs,
+    storeRetryAttempts: options.storeRetryAttempts,
+    storeRetryBaseDelayMs: options.storeRetryBaseDelayMs,
+    failOnStoreFailure: options.failOnStoreFailure
   });
   const offers = await fetchLidlOffers({
     fetchImpl: options.fetchImpl,

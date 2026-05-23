@@ -3783,73 +3783,76 @@ export const mealPlanner = {
   ]
 };
 
+const mealCostBreakdownInput = {
+  mealId: 'weekday-lunchbox-bundle',
+  title: 'Weekday lunchbox bundle',
+  servings: 2,
+  ingredients: [
+    {
+      ingredientId: 'bread',
+      label: 'Wholegrain bread',
+      quantityNeeded: 0.25,
+      unit: 'kg',
+      offers: [
+        {
+          chainId: 'coop',
+          storeName: 'Coop Medborgarplatsen',
+          productId: 'pagen-lingongrova-500g',
+          productName: 'Pågen Lingongrova 500g',
+          packageQuantity: 0.5,
+          packageUnit: 'kg',
+          packagePrice: 33.9,
+          confidence: 0.72,
+          source: 'visible shelf product row'
+        }
+      ]
+    },
+    {
+      ingredientId: 'cheese',
+      label: 'Sliced cheese',
+      quantityNeeded: 0.12,
+      unit: 'kg',
+      offers: [
+        {
+          chainId: 'coop',
+          storeName: 'Coop Medborgarplatsen',
+          productId: 'arla-hushallsost-500g',
+          productName: 'Arla Hushållsost 500g',
+          packageQuantity: 0.5,
+          packageUnit: 'kg',
+          packagePrice: 54.9,
+          confidence: 0.7,
+          source: 'visible shelf product row'
+        }
+      ]
+    },
+    {
+      ingredientId: 'cucumber',
+      label: 'Cucumber',
+      quantityNeeded: 0.15,
+      unit: 'kg',
+      offers: [
+        {
+          chainId: 'coop',
+          storeName: 'Coop Medborgarplatsen',
+          productId: 'garant-gurka-300g',
+          productName: 'Garant Gurka 300g',
+          packageQuantity: 0.3,
+          packageUnit: 'kg',
+          packagePrice: 16.9,
+          confidence: 0.66,
+          source: 'visible shelf product row'
+        }
+      ]
+    }
+  ]
+} satisfies Parameters<typeof calculateMealCostBreakdown>[0];
+
 export const mealCostBreakdown = {
   persona: 'Meal-preppers / families',
   title: 'Ingredient-level meal costing',
-  summary: calculateMealCostBreakdown({
-    mealId: 'weekday-lunchbox-bundle',
-    title: 'Weekday lunchbox bundle',
-    servings: 2,
-    ingredients: [
-      {
-        ingredientId: 'bread',
-        label: 'Wholegrain bread',
-        quantityNeeded: 0.25,
-        unit: 'kg',
-        offers: [
-          {
-            chainId: 'coop',
-            storeName: 'Coop Medborgarplatsen',
-            productId: 'pagen-lingongrova-500g',
-            productName: 'Pågen Lingongrova 500g',
-            packageQuantity: 0.5,
-            packageUnit: 'kg',
-            packagePrice: 33.9,
-            confidence: 0.72,
-            source: 'visible shelf product row'
-          }
-        ]
-      },
-      {
-        ingredientId: 'cheese',
-        label: 'Sliced cheese',
-        quantityNeeded: 0.12,
-        unit: 'kg',
-        offers: [
-          {
-            chainId: 'coop',
-            storeName: 'Coop Medborgarplatsen',
-            productId: 'arla-hushallsost-500g',
-            productName: 'Arla Hushållsost 500g',
-            packageQuantity: 0.5,
-            packageUnit: 'kg',
-            packagePrice: 54.9,
-            confidence: 0.7,
-            source: 'visible shelf product row'
-          }
-        ]
-      },
-      {
-        ingredientId: 'cucumber',
-        label: 'Cucumber',
-        quantityNeeded: 0.15,
-        unit: 'kg',
-        offers: [
-          {
-            chainId: 'coop',
-            storeName: 'Coop Medborgarplatsen',
-            productId: 'garant-gurka-300g',
-            productName: 'Garant Gurka 300g',
-            packageQuantity: 0.3,
-            packageUnit: 'kg',
-            packagePrice: 16.9,
-            confidence: 0.66,
-            source: 'visible shelf product row'
-          }
-        ]
-      }
-    ]
-  }),
+  input: mealCostBreakdownInput,
+  summary: calculateMealCostBreakdown(mealCostBreakdownInput),
   coverage: {
     confidence: 'medium',
     caveat: 'Calls calculateMealCostBreakdown with only visible product rows and package quantities; missing substitute chains are excluded rather than estimated.'
