@@ -2702,6 +2702,74 @@ export const publicApiDirectory = {
   ]
 };
 
+export const apiPerformanceReadiness = {
+  title: 'API performance readiness',
+  status: 'fail closed until Redis cache and pgbouncer are configured',
+  source: 'packages/server/src/index.ts hot public endpoint cache + cursor-paginated product search',
+  requiredRuntime: [
+    {
+      label: 'Redis cache',
+      evidence: 'apiResponseCache injection wraps public hot endpoints and emits x-groceryview-cache=hit/miss/bypass',
+      currentState: 'wired for runtime provider; production remains fail closed until Redis credentials are configured outside the repo'
+    },
+    {
+      label: 'pgbouncer',
+      evidence: 'serverless Postgres traffic must use DATABASE_URL pointing at the pooler before production readiness is claimed',
+      currentState: 'configuration gate only; no direct database secret is printed on public pages'
+    },
+    {
+      label: 'cursor pagination',
+      evidence: '/api/products/search returns items plus pagination.nextCursor instead of offset page numbers',
+      currentState: 'live on public search envelope with invalid cursors rejected'
+    }
+  ],
+  hotEndpoints: [
+    {
+      path: '/api/market/overview',
+      ttlSeconds: 60,
+      coverage: 'Grocery Index market overview, movers, and top deals'
+    },
+    {
+      path: '/api/indices',
+      ttlSeconds: 300,
+      coverage: 'chain-index and grocery-index summaries'
+    },
+    {
+      path: '/api/deals/discounts',
+      ttlSeconds: 300,
+      coverage: 'weekly discount provider rows by chain, category, store, or product'
+    },
+    {
+      path: '/api/deals/flyer-offers',
+      ttlSeconds: 300,
+      coverage: 'flyer offer provider rows by chain, category, store, or product'
+    }
+  ],
+  cursorEndpoints: [
+    {
+      path: '/api/products/search',
+      limit: 'limit=1..100',
+      cursor: 'pagination.nextCursor',
+      guardrail: 'No offset page numbers; clients continue only with the opaque cursor token.'
+    }
+  ],
+  rollupTables: [
+    {
+      table: 'price_daily',
+      usage: 'daily product×chain min/max/avg/last rows for charts and 52-week-low reads'
+    },
+    {
+      table: 'price_weekly',
+      usage: 'weekly long-range analytics so product history avoids raw observation scans'
+    }
+  ],
+  guardrails: [
+    'Redis cache evidence is a runtime capability, not a claim that production Redis is configured today.',
+    'pgbouncer readiness stays blocked until DATABASE_URL points at the pooler and the production secret audit passes.',
+    'Long-range history must read price_daily or price_weekly rollups; raw observations remain for hot recent evidence only.'
+  ]
+};
+
 export const chainSavingsLedger = Object.values(
   matchedChainProducts.reduce<Record<string, {
     chain: string;

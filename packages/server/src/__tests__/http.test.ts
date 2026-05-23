@@ -696,6 +696,59 @@ describe('createHttpHandler', () => {
     assert.equal((await json(index) as { label: string }).label, 'Stockholm Grocery Index');
   });
 
+  it('caches hot public API endpoints through an injected response cache', async () => {
+    const entries = new Map<string, string>();
+    const writes: Array<{ key: string; ttlSeconds: number }> = [];
+    const handle = createHttpHandler(undefined, {
+      apiResponseCache: {
+        get: async (key: string) => entries.get(key) ?? null,
+        set: async (key: string, value: string, options: { ttlSeconds: number }) => {
+          writes.push({ key, ttlSeconds: options.ttlSeconds });
+          entries.set(key, value);
+        }
+      }
+    } as any);
+
+    const first = await handle(new Request('http://localhost/api/market/overview'));
+    assert.equal(first.status, 200);
+    assert.equal(first.headers.get('x-groceryview-cache'), 'miss');
+    const firstBody = await json(first);
+    assert.equal(writes.length, 1);
+    assert.match(writes[0]?.key ?? '', /^hot-endpoint:v1:\/api\/market\/overview/);
+    assert.equal(writes[0]?.ttlSeconds, 60);
+
+    const second = await handle(new Request('http://localhost/api/market/overview'));
+    assert.equal(second.status, 200);
+    assert.equal(second.headers.get('x-groceryview-cache'), 'hit');
+    assert.deepEqual(await json(second), firstBody);
+  });
+
+  it('returns cursor-paginated product search envelopes for public search', async () => {
+    const handle = createHttpHandler();
+
+    const first = await handle(new Request('http://localhost/api/products/search?q=&limit=2'));
+    assert.equal(first.status, 200);
+    const firstBody = await json(first) as {
+      items: Array<{ id: string }>;
+      pagination: { limit: number; nextCursor: string | null; hasMore: boolean; source: string };
+      guardrails: string[];
+    };
+    assert.deepEqual(firstBody.items.map((product) => product.id), ['coffee', 'milk']);
+    assert.equal(firstBody.pagination.limit, 2);
+    assert.equal(firstBody.pagination.hasMore, true);
+    assert.match(firstBody.pagination.nextCursor ?? '', /^[A-Za-z0-9_-]+$/);
+    assert.match(firstBody.pagination.source, /cursor pagination/i);
+    assert.match(firstBody.guardrails.join(' '), /No offset page numbers/i);
+
+    const second = await handle(new Request(`http://localhost/api/products/search?q=&limit=2&cursor=${firstBody.pagination.nextCursor}`));
+    assert.equal(second.status, 200);
+    const secondBody = await json(second) as { items: Array<{ id: string }>; pagination: { limit: number; nextCursor: string | null; hasMore: boolean } };
+    assert.deepEqual(secondBody.items.map((product) => product.id), ['private-label-milk', 'butter']);
+    assert.equal(secondBody.pagination.limit, 2);
+    assert.equal(secondBody.pagination.hasMore, false);
+    assert.equal(secondBody.pagination.nextCursor, null);
+  });
+
   it('returns product not found for unknown product child resources', async () => {
     const handle = createHttpHandler();
 

@@ -6,6 +6,7 @@ import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedS
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
+  apiPerformanceReadiness,
   chainSavingsLedger,
   chainCategoryCoverage,
   categoryDealLeaders,
@@ -66,6 +67,11 @@ const homepageMarketTerminal = {
     'No forecast, sponsored boost, or synthetic placeholder row changes the Grocery Index readout.',
     'Each terminal CTA lands on an existing evidence route before a shopper acts.'
   ]
+};
+const homepageApiPerformanceReadiness = {
+  hotEndpoints: apiPerformanceReadiness.hotEndpoints.slice(0, 3),
+  cursorEndpoint: apiPerformanceReadiness.cursorEndpoints[0],
+  runtimeChecks: apiPerformanceReadiness.requiredRuntime.map((item) => item.label)
 };
 const elderlyAccessibilityMode = {
   persona: 'Elderly / seniors',
@@ -183,6 +189,37 @@ export function MarketShell() {
           {homepageMarketTerminal.guardrails.map((guardrail) => (
             <p className="rounded-2xl border border-white/10 bg-white/10 p-3 text-xs font-bold leading-5 text-slate-200" key={guardrail}>{guardrail}</p>
           ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <Eyebrow>API performance readiness</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Redis cache, cursor pagination, and pooler guardrails</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-cyan-950">
+              The public API now labels the hot-endpoint cache path, returns cursor pagination on product search, and keeps pgbouncer plus Redis cache production readiness fail-closed until runtime configuration is present.
+            </p>
+          </div>
+          <Link className="rounded-full bg-cyan-700 px-5 py-3 text-center text-sm font-black text-white" href="/data-sources">
+            Review performance contract
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {homepageApiPerformanceReadiness.hotEndpoints.map((endpoint) => (
+            <Link className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm hover:border-cyan-700" data-api-performance-readiness={endpoint.path} href="/data-sources" key={endpoint.path}>
+              <p className="font-mono text-sm font-black text-slate-950">{endpoint.path}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">Redis cache TTL {endpoint.ttlSeconds}s · {endpoint.coverage}</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
+          <p className="rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-cyan-950">
+            {homepageApiPerformanceReadiness.cursorEndpoint.path} uses {homepageApiPerformanceReadiness.cursorEndpoint.cursor}; {homepageApiPerformanceReadiness.cursorEndpoint.guardrail}
+          </p>
+          <p className="rounded-2xl bg-white/80 p-3 text-xs font-black uppercase tracking-[0.16em] text-cyan-950">
+            {homepageApiPerformanceReadiness.runtimeChecks.join(' · ')}
+          </p>
         </div>
       </Card>
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import {
+  apiPerformanceReadiness,
   categoryQualityMatrix,
   commodityIngestionClassifierEvidence,
   commodityMappingReviewPlan,
@@ -119,6 +120,57 @@ export default function DataSourcesPage() {
             <li className="rounded-2xl bg-white p-3" key={guardrail}>• {guardrail}</li>
           ))}
         </ul>
+      </Card>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-800">perf(web)</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">API performance readiness</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              Hot public API paths now have an injectable Redis cache contract, product search returns cursor pagination envelopes, and production readiness remains fail closed until Redis cache credentials and pgbouncer pooler routing are configured. Long-range analytics are documented as rollups only.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-cyan-900 shadow-sm">{apiPerformanceReadiness.status}</p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {apiPerformanceReadiness.requiredRuntime.map((item) => (
+            <section className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm" key={item.label}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">{item.label}</p>
+              <p className="mt-2 text-sm font-bold leading-6 text-slate-800">{item.evidence}</p>
+              <p className="mt-3 rounded-xl bg-cyan-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-cyan-950">{item.currentState}</p>
+            </section>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_1fr]">
+          <section className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">Hot endpoints</p>
+            <div className="mt-3 space-y-3">
+              {apiPerformanceReadiness.hotEndpoints.map((endpoint) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={endpoint.path}>
+                  <p className="font-mono text-sm font-black text-slate-950">{endpoint.path}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{endpoint.coverage} · Redis cache TTL {endpoint.ttlSeconds}s</p>
+                </div>
+              ))}
+            </div>
+          </section>
+          <section className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">Rollups only for long ranges</p>
+            <div className="mt-3 space-y-3">
+              {apiPerformanceReadiness.rollupTables.map((rollup) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={rollup.table}>
+                  <p className="font-mono text-sm font-black text-slate-950">{rollup.table}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{rollup.usage}</p>
+                </div>
+              ))}
+            </div>
+            <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
+              {apiPerformanceReadiness.guardrails.map((guardrail) => (
+                <li key={guardrail}>• {guardrail}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
       </Card>
 
       <Card className="mt-6 border-lime-200 bg-lime-50/60">
