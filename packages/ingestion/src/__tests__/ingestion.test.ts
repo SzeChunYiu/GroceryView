@@ -89,6 +89,7 @@ import {
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
   parseOpenPricesSnapshot,
+  parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
   planIngestionBatch,
@@ -906,6 +907,190 @@ describe('fetchCoopWeeklyDiscounts', () => {
     assert.equal(rows[0]?.promotionId, 'flyer:105860:2383471000006:2026-05-18');
     assert.equal(rows[0]?.medMeraRequired, true);
     assert.equal(rows[0]?.flyerUrl, 'https://dr.coop.se/Butik/Stora-Coop-Stadion');
+  });
+
+  it('parses Coop DR flyer PDF text into branch weekly offers', () => {
+    const rows = parseCoopDrPdfTextOffers([
+      'Kvistcocktailtomater',
+      'Spanien/Nederländerna/Marocko. Klass 1. 500 g.',
+      'Jfr-pris 29:80/kg.',
+      '14',
+      '90',
+      '/ask',
+      'Hushållsost',
+      'Arla. Fetthalt 17-26%. Välj mellan olika sorter. Ca 1100-2200 g.',
+      'Ord. pris från 116:41/kg.',
+      '69:-',
+      '/kg'
+    ].join('\n'), {
+      flyerUrl: 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden',
+      productSearchUrl: 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden',
+      sourceUrl: buildCoopStoreInfoUrl('216502'),
+      retrievedAt: '2026-05-23T01:45:00.000Z',
+      storeId: '216502',
+      storeName: 'X:-Tra Kirseberg',
+      region: 'Malmö',
+      validFrom: '2026-05-25T00:00:00',
+      validTo: '2026-05-31T23:59:59'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.name, row.offerPrice, row.offerUnitPriceText]), [
+      ['216502', 'Kvistcocktailtomater', 14.9, '/ask'],
+      ['216502', 'Hushållsost', 69, '/kg']
+    ]);
+    assert.equal(rows[0]?.packageText, 'Spanien/Nederländerna/Marocko. Klass 1. 500 g.');
+    assert.equal(rows[1]?.flyerUrl, 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden');
+  });
+
+  it('falls back to Coop DR flyer PDF text when a physical branch has no product API rows', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/stores/216502')) {
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: '216502',
+          name: 'X:-Tra Kirseberg',
+          city: 'Malmö',
+          flyers: [{
+            startDate: '2026-05-25T00:00:00',
+            stopDate: '2026-05-31T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden',
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url).startsWith('https://dr.coop.se/')) {
+        return new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { 'content-type': 'application/pdf' } });
+      }
+      return new Response(JSON.stringify({ results: { count: 0, items: [] } }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscounts({
+      storeIds: ['216502'],
+      productQueries: ['kaffe'],
+      fetchImpl,
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-23T01:45:00.000Z',
+      pdfTextExtractor: async () => [
+        'Kvistcocktailtomater',
+        'Spanien/Nederländerna/Marocko. Klass 1. 500 g.',
+        'Jfr-pris 29:80/kg.',
+        '14',
+        '90',
+        '/ask'
+      ].join('\n')
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopStoreInfoUrl('216502'),
+      buildCoopSearchUrl('216502'),
+      'https://dr.coop.se/Butik/216502/period/180853/erbjudanden'
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.name, row.offerPrice]), [
+      ['216502', 'Kvistcocktailtomater', 14.9]
+    ]);
+  });
+
+  it('tries the next Coop DR flyer PDF when the current flyer URL is an HTML placeholder', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/stores/216502')) {
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: '216502',
+          name: 'X:-Tra Kirseberg',
+          city: 'Malmö',
+          flyers: [{
+            startDate: '2026-05-18T00:00:00',
+            stopDate: '2026-05-24T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: 'https://dr.coop.se/Butik/X%3A-tra-Kirseberg',
+            isHemmaBilaga: false
+          }, {
+            startDate: '2026-05-25T00:00:00',
+            stopDate: '2026-05-31T23:59:59',
+            current: false,
+            pdfExists: true,
+            pdfUrl: 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden',
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url) === 'https://dr.coop.se/Butik/X%3A-tra-Kirseberg') {
+        return new Response('<html>DR-blad saknas</html>', { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+      if (String(url) === 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden') {
+        return new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { 'content-type': 'application/pdf' } });
+      }
+      return new Response(JSON.stringify({ results: { count: 0, items: [] } }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscounts({
+      storeIds: ['216502'],
+      productQueries: ['kaffe'],
+      fetchImpl,
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-23T01:45:00.000Z',
+      pdfTextExtractor: async () => [
+        'Kvistcocktailtomater',
+        '14',
+        '90',
+        '/ask'
+      ].join('\n')
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopStoreInfoUrl('216502'),
+      buildCoopSearchUrl('216502'),
+      'https://dr.coop.se/Butik/X%3A-tra-Kirseberg',
+      'https://dr.coop.se/Butik/216502/period/180853/erbjudanden'
+    ]);
+    assert.deepEqual(rows.map((row) => [row.name, row.offerPrice, row.flyerUrl]), [
+      ['Kvistcocktailtomater', 14.9, 'https://dr.coop.se/Butik/216502/period/180853/erbjudanden']
+    ]);
+  });
+
+  it('parses Coop DR flyers where product names and prices are separate columns', () => {
+    const rows = parseCoopDrPdfTextOffers([
+      'GRILL',
+      'GLÄDJE',
+      'MAX 2 ST/HUSHÅLL.',
+      'Färsk kycklingbröstfilé',
+      'Sverige/Kronfågel.',
+      'Kyld. Ca 925 g.',
+      'Ätmogen avokado 3-pack',
+      'Chile/Peru/Coop.',
+      'Klass 1. 400 g. Jfr-pris 9:-/st.',
+      'VECKANS',
+      'SUPER-',
+      'KLIPP!',
+      '109k',
+      '/kg',
+      'MEDLEMSPRIS',
+      '2 FÖR',
+      '99k',
+      'cn_2621_mandag_mitt plugg_s1-4_sid 1'
+    ].join('\n'), {
+      flyerUrl: 'https://dr.coop.se/Butik/Coop-Krylbo',
+      productSearchUrl: 'https://dr.coop.se/Butik/Coop-Krylbo',
+      sourceUrl: buildCoopStoreInfoUrl('196183'),
+      retrievedAt: '2026-05-23T01:45:00.000Z',
+      storeId: '196183',
+      storeName: 'Coop Krylbo',
+      region: 'Krylbo',
+      validFrom: '2026-05-18T00:00:00',
+      validTo: '2026-05-24T23:59:59'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.name, row.offerPrice, row.offerUnitPriceText]), [
+      ['Färsk kycklingbröstfilé', 109, '/kg'],
+      ['Ätmogen avokado 3-pack', 99, '']
+    ]);
   });
 
   it('can expand Coop weekly discounts across the live store catalog', async () => {
