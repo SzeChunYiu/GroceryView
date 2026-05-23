@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 10:32 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 12:34 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **222**
+- **Shipped `feat:`/`wire:` PRs to date:** **216**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,6 +42,11 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1308 feat(ingest): add ICA Kvantum Kista promotions
+- #1303 feat(ingest): expand Axfood weekly branch flyers
+- #1297 feat(fuel): prices
+- #1291 feat: wire pantry planner replenishment
+- #1289 feat(fuel): prices
 - #1280 feat(fuel): prices
 - #1276 feat(web): surface pharmacy OTC evidence
 - #1271 feat(fuel): prices
@@ -52,16 +57,17 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1239 feat(web): add grocery market heatmap
 - #1232 feat(readiness): configure source run row thresholds
 - #1231 feat(web): sync map and list selection
-- #1228 feat(ingestion): require branch observations
-- #1227 feat(web): add account-bound product watchlist hearts
-- #1219 feat(products): add faceted search surface
-- #1213 feat(ingestion): expose daily chain summaries
-- #1211 feat(products): explain price move notes
 
 ## 🔄 In progress (open PRs)
 
-- #1282 ci(ingestion): preserve runner connector diagnostics
-- #1270 docs(readme): refresh live status board
+- #1310 feat(ingest): add Coop branch weekly discounts _(draft)_
+- #1309 feat(ingest): deepen real grocery source rows
+- #1306 feat(ingest): expand Coop weekly branch discounts
+- #1305 feat(ingest): deepen live grocery source coverage
+- #1304 feat(ingest): add ICA Tierp promotions
+- #1299 docs(readme): refresh live status board
+- #1298 feat(ingest): deepen Matspar Matpriskollen Lidl ICA rows
+- #1283 feat(web): add verified deal screener
 - #1262 feat(web): product cross chain table (WIP from LUNARC fleet)
 - #1261 feat(web): nav groups (WIP from LUNARC fleet)
 - #1260 feat(web): dark mode (WIP from LUNARC fleet)
