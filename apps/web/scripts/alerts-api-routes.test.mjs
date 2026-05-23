@@ -56,3 +56,34 @@ describe('price history CSV export API route', () => {
     assert.match(route, /product_id must be a UUID/);
   });
 });
+
+
+describe('price change webhook API route', () => {
+  it('ships a DB-backed dispatcher that fires only for >5% price drops', async () => {
+    const [route, store, migration] = await Promise.all([
+      read('src/app/api/webhooks/price-change/route.ts'),
+      read('src/app/api/webhooks/price-change/store.ts'),
+      read('../../infra/db/migrations/018_webhook_subscriptions.sql')
+    ]);
+
+    assert.match(route, /export async function POST\(request: Request\)/);
+    assert.match(route, /dispatchPriceChangeWebhook/);
+    assert.match(route, /export const runtime = 'nodejs'/);
+
+    assert.match(store, /webhook_subscriptions/);
+    assert.match(store, /product_id/);
+    assert.match(store, /callback_url/);
+    assert.match(store, /new_price < old_price \* PRICE_DROP_THRESHOLD/);
+    assert.match(store, /fetch\(subscription\.callbackUrl/);
+    assert.match(store, /product_id: event\.product_id/);
+    assert.match(store, /old_price: event\.old_price/);
+    assert.match(store, /new_price: event\.new_price/);
+    assert.match(store, /chain: event\.chain/);
+    assert.match(store, /https:/);
+
+    assert.match(migration, /create table if not exists webhook_subscriptions/);
+    assert.match(migration, /callback_url text not null/);
+    assert.match(migration, /product_id uuid references products\(id\)/);
+    assert.match(migration, /create index if not exists webhook_subscriptions_active_product_idx/);
+  });
+});

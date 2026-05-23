@@ -71,6 +71,7 @@ REQUIRED_TABLES=(
   budgets
   alerts
   price_alerts
+  webhook_subscriptions
   app_users
   favorite_stores
   user_preferences

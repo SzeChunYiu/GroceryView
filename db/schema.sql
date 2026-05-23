@@ -160,6 +160,20 @@ create table if not exists watchlist_items (
   created_at timestamptz not null default now()
 );
 
+create table if not exists webhook_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id text references app_users(id) on delete cascade,
+  product_id text references products(id),
+  chain text,
+  callback_url text not null,
+  secret text,
+  active boolean not null default true,
+  last_delivery_at timestamptz,
+  failure_count integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists weekly_baskets (
   id bigserial primary key,
   user_id text not null references app_users(id) on delete cascade,
