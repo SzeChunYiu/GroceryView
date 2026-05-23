@@ -64,6 +64,7 @@ import {
   fetchCoopStores,
   fetchCoopWeeklyDiscounts,
   fetchCoopWeeklyDiscountsForAllStores,
+  fetchDailyConnectorSnapshot,
   fetchHemkopProducts,
   fetchHemkopProductsForAllStores,
   fetchHemkopStores,
@@ -93,6 +94,7 @@ import {
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
+  GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   ingestRetailerProduct,
@@ -182,6 +184,38 @@ describe('OKQ8 fuel price connector', () => {
       }),
       /blocked with HTTP 403/
     );
+  });
+
+  it('adapts OKQ8 fuel rows into daily litre-priced fuel observations', async () => {
+    const snapshot = await fetchDailyConnectorSnapshot({
+      status: 'ready',
+      connectorId: 'okq8-fuel-prices',
+      chainId: 'okq8',
+      sourceType: 'retailer_online_page',
+      runKey: 'okq8:retailer-online-page:okq8-fuel-prices:2026-05-23',
+      sourceRunId: 'source-run:okq8:retailer-online-page:okq8-fuel-prices:2026-05-23',
+      provenance: {
+        sourceType: 'retailer_online_page',
+        sourceUrl: GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+        capturedAt: '2026-05-23T08:35:34.000Z',
+        parserVersion: 'okq8-fuel-prices-v1'
+      },
+      requiredActions: []
+    }, {
+      retrievedAt: '2026-05-23T08:35:34.000Z',
+      fetchImpl: async () => new Response(okq8FuelHtml, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+
+    const parsed = JSON.parse(snapshot.body) as { items: Array<{ chainId: string; productId: string; packageSize: number; packageUnit: string; price: number; sourceType: string; storeId?: string }> };
+    assert.deepEqual(parsed.items.map((row) => [row.chainId, row.productId, row.packageSize, row.packageUnit, row.price]), [
+      ['okq8', 'fuel-95-e10', 1, 'l', 18.89],
+      ['okq8', 'fuel-98', 1, 'l', 20.49],
+      ['okq8', 'fuel-diesel', 1, 'l', 21.34],
+      ['okq8', 'fuel-hvo100', 1, 'l', 29.89],
+      ['okq8', 'fuel-e85', 1, 'l', 15.84]
+    ]);
+    assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
+    assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
   });
 });
 
@@ -5441,6 +5475,52 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.store_id, 'store-db-2');
     assert.equal(observation.price, 31.5);
     assert.equal(observation.regular_price, 39.9);
+  });
+
+  it('materializes native OKQ8 fuel prices into domain=fuel litre observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T08:35:34.000Z',
+      connectors: [{
+        connectorId: 'okq8-fuel-prices',
+        chainId: 'okq8',
+        domain: 'fuel',
+        sourceType: 'retailer_online_page',
+        endpointUrl: GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+        parserVersion: 'okq8-fuel-prices-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(`
+          <script>window.__APP_INIT_DATA__ = {"informationArea":[{"content":{"heading":"Drivmedel på station","itemsRow":[
+            {"title":"OKQ8 GoEasy 95 (Blyfri 95)","cells":[{"text":"18,89 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-22","links":[]}]},
+            {"title":"OKQ8 GoEasy 98 (Blyfri 98)","cells":[{"text":"20,49 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-22","links":[]}]},
+            {"title":"OKQ8 GoEasy Diesel","cells":[{"text":"21,34 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-21","links":[]}]},
+            {"title":"Neste MY Förnybar Diesel (HVO100)","cells":[{"text":"29,89 kr","links":[]},{"text":"- 40 öre","links":[]},{"text":"2026-05-21","links":[]}]},
+            {"title":"Etanol E85","cells":[{"text":"15,84 kr","links":[]},{"text":"- 50 öre","links":[]},{"text":"2026-05-22","links":[]}]}
+          ]}}]}</script>
+        `, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 5);
+    assert.deepEqual(requestedUrls, [GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL]);
+    assert.equal(executor.calls.some((call) => call.sql.includes('insert into stores')), false);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.domain, 'fuel');
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 18.89);
+    assert.equal(observation.unit_price, 18.89);
+    assert.equal(observation.quantity, 1);
+    assert.equal(observation.quantity_unit, 'l');
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {

@@ -47,6 +47,11 @@ import {
   type LidlStoreOffer
 } from './connectors/lidl.js';
 import {
+  fetchOkq8FuelPrices,
+  OKQ8_FUEL_PRICES_URL,
+  type FuelPriceObservation
+} from './connectors/okq8-fuel.js';
+import {
   fetchWillysProductsForAllStores,
   fetchWillysWeeklyDiscountsForAllStores,
   type WillysStoreProduct,
@@ -1832,6 +1837,26 @@ function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorPa
   };
 }
 
+function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorParsedProduct {
+  return {
+    sourceType: 'retailer_online_page',
+    observedAt: row.observedAt,
+    chainId: row.chainId,
+    retailerProductId: row.productId,
+    rawName: row.gradeLabel,
+    canonicalName: row.gradeLabel,
+    productId: row.productId,
+    categoryId: 'fuel',
+    brand: row.operatorName,
+    packageSize: 1,
+    packageUnit: 'l',
+    price: row.pricePerLitre,
+    memberOnly: false,
+    validFrom: row.effectiveFrom,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 function dailyNativeSnapshotResult(input: {
   plan: RetailerConnectorRunPlan;
   retrievedAt: string;
@@ -1990,6 +2015,16 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(cityGrossProductToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL}?`)) {
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchOkq8FuelPrices({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      capturedAt: retrievedAt,
+      sourceUrl: OKQ8_FUEL_PRICES_URL
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(okq8FuelPriceToDailyItem) });
+  }
+
   return await fetchRetailerConnectorSnapshot(plan, options);
 }
 
@@ -2109,6 +2144,11 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
     const path = `items[${index}]`;
     const record = recordFrom(item, path);
     return {
+      sourceType: optionalString(record, 'sourceType', path) as SourceType | undefined,
+      parserVersion: optionalString(record, 'parserVersion', path),
+      rawSnapshotRef: optionalString(record, 'rawSnapshotRef', path),
+      sourceRunId: optionalString(record, 'sourceRunId', path),
+      chainId: optionalString(record, 'chainId', path),
       storeId: optionalString(record, 'storeId', path),
       retailerProductId: optionalString(record, 'retailerProductId', path),
       rawName: requiredString(record, 'rawName', path),
@@ -2610,10 +2650,6 @@ export type DailyIngestionEnv = Partial<Record<
   | 'DATABASE_URL'
   | 'GROCERYVIEW_DAILY_CONNECTORS_JSON'
   | 'GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE'
-  | 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'
-  | 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'
-  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'
-  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'
   | 'GROCERYVIEW_DAILY_BLOCKER_LOG_PATH'
   | 'GROCERYVIEW_DATABASE_URL'
   | 'GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES'
@@ -2722,6 +2758,7 @@ export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lid
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
+export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
 
 const requireForDailyIngestion = createRequire(import.meta.url);
 

@@ -104,6 +104,8 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS \|\| '250' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS \|\| '1' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS \|\| '500' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_BLOCKER_LOG_PATH:\s*codex-tasks\/ingestion-blockers\.txt/);
+    assert.match(workflow, /daily_ingestion_blocker_log_missing/);
     assert.doesNotMatch(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON=\$\(npm run --silent ops:daily-connectors\)/);
     assert.doesNotMatch(workflow, /test -n "\$\{GROCERYVIEW_DAILY_CONNECTORS_JSON:-\}"/);
     assert.doesNotMatch(workflow, /missing production config: CATALOG_COVERAGE_TARGETS_JSON/);
@@ -138,7 +140,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /daily_ingestion_chain_without_observations/);
     assert.match(workflow, /name: Upload daily ingestion result\n\s+if:\s*always\(\)/);
     assert.match(workflow, /name:\s*groceryview-daily-ingestion-result/);
-    assert.match(workflow, /path:\s*\/tmp\/daily-ingestion-result\.json/);
+    assert.match(workflow, /path:\s*\|\n\s+\/tmp\/daily-ingestion-result\.json\n\s+codex-tasks\/ingestion-blockers\.txt/);
     assert.match(workflow, /name: Export DB-backed site snapshot/);
     assert.ok(
       workflow.indexOf('name: Run configured daily ingestion') < workflow.indexOf('name: Export DB-backed site snapshot'),
