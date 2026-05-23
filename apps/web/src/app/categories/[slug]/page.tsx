@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { categoryPathForSlug } from '@groceryview/db';
 import { summarizeCategoryDealLeaders } from '@groceryview/core';
-import { CategoryBreadcrumb } from '@/components/Breadcrumb';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
@@ -28,15 +29,25 @@ export default async function CategoryPage({ params }: Readonly<{ params: Promis
   const { slug } = await params;
   const categoryLabel = categoryLabels[slug];
   if (!categoryLabel) notFound();
+  const categoryPath = categoryPathForSlug(slug);
   const chainRows = axfoodProducts.filter((product) => product.category === slug).slice(0, 24);
   const openRows = pricedProducts.filter((product) => product.category === slug).slice(0, 24);
   const categoryFreshnessBadges = dataFreshnessBadges.filter((badge) => badge.sourceKind === 'axfood' || badge.sourceKind === 'openprices');
   const dealLeaders = categoryDealLeadersFor(slug);
   return (
     <PageShell>
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Categories', href: '/categories' },
+          ...categoryPath.map((node, index, allNodes) => ({
+            label: node.label,
+            href: node.routable && index !== allNodes.length - 1 ? `/categories/${node.slug}` : undefined,
+          })),
+        ]}
+      />
       <Eyebrow>Category</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">{categoryLabel}</h1>
-      <CategoryBreadcrumb categoryLabel={categoryLabel} slug={slug} />
       <p className="mt-3 text-lg text-slate-700">{chainRows.length} Axfood rows and {openRows.length} OpenPrices rows shown from verified source modules.</p>
       <Card className="mt-6 border-emerald-200 bg-emerald-50/60">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
