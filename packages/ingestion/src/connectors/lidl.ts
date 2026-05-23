@@ -84,7 +84,13 @@ export const LIDL_BASE_URL = 'https://www.lidl.se';
 export const LIDL_STORES_PATH = '/s/sv-SE/butiker/';
 export const DEFAULT_LIDL_OFFER_PATHS = [
   '/c/veckans-frukt-groent/a10094676',
+  '/c/veckans-kott-fisk-fagel/a10094677',
+  '/c/veckans-mejeri-ost/a10094678',
+  '/c/veckans-skafferi/a10094679',
+  '/c/veckans-frys/a10094680',
+  '/c/veckans-gott/a10094681',
   '/c/lidl-plus-erbjudanden/a10094682',
+  '/c/veckans-hushall/a10094683',
   '/c/veckans-blommor/a10094398'
 ] as const;
 
@@ -164,7 +170,7 @@ export async function fetchLidlStores(options: FetchLidlStoresOptions = {}): Pro
 export async function fetchLidlOffers(options: FetchLidlOffersOptions = {}): Promise<LidlOffer[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const offerPaths = options.offerPaths ?? DEFAULT_LIDL_OFFER_PATHS;
-  const maxRows = options.maxRows ?? 500;
+  const maxRows = options.maxRows ?? 1000;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: LidlOffer[] = [];
   const seen = new Set<string>();
