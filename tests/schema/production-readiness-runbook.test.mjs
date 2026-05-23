@@ -40,7 +40,9 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /positive integer threshold for all six required chains/);
     assert.match(runbook, /source_run_insufficient_accepted_rows/);
     assert.match(runbook, /GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS/);
+    assert.match(runbook, /GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS/);
     assert.match(runbook, /supabase_direct_host/);
+    assert.match(runbook, /supabase_transaction_pooler/);
     assert.match(runbook, /alternateConnections/);
   });
 
