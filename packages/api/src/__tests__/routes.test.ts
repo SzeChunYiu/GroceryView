@@ -121,6 +121,19 @@ describe('createGroceryViewApi', () => {
     assert.equal(api.getStoreDetail('missing-store'), null);
   });
 
+  it('returns supported retailer labels with logo and website metadata', () => {
+    const api = createGroceryViewApi();
+
+    assert.deepEqual(api.getRetailers().map((retailer) => [retailer.id, retailer.name, retailer.logo, retailer.websiteUrl]), [
+      ['city-gross', 'City Gross', '/retailers/city-gross.svg', 'https://www.citygross.se/'],
+      ['coop', 'Coop', '/retailers/coop.svg', 'https://www.coop.se/'],
+      ['hemkop', 'Hemköp', '/retailers/hemkop.svg', 'https://www.hemkop.se/'],
+      ['ica', 'ICA', '/retailers/ica.svg', 'https://www.ica.se/'],
+      ['lidl', 'Lidl', '/retailers/lidl.svg', 'https://www.lidl.se/'],
+      ['willys', 'Willys', '/retailers/willys.svg', 'https://www.willys.se/']
+    ]);
+  });
+
   it('builds product price-history reports from persisted observation inputs', () => {
     assert.deepEqual(productPriceHistoryPriceTypes, ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated']);
     assert.deepEqual(productPriceHistoryEndpoint, {

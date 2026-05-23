@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 
 export * from './queries/stores.js';
+export * from './queries/retailers.js';
 
 export type Migration = {
   version: string;
