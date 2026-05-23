@@ -1152,16 +1152,19 @@ describe('verified-data UI', () => {
     const shell = await read('src/components/market-shell.tsx');
     const dataSources = await read('src/app/data-sources/page.tsx');
 
+    assert.match(generated, /ICA Supermarket Toria/);
+    assert.match(generated, /"storeAccountId":"1003822"/);
+    assert.match(generated, /retrieved 2026-05-23T15:31:20\.601Z/);
+    assert.match(generated, /maxProductsToDecorate=1&maxPageSize=1/);
     assert.match(generated, /ICA Kvantum Tomelilla/);
-    assert.match(generated, /"storeAccountId":"1004070"/);
-    assert.match(generated, /retrieved 2026-05-23T13:26:35\.000Z/);
     assert.match(generated, /ICA Supermarket Tierp/);
     assert.match(summary, /AUTO-GENERATED summary from public ICA store-scoped promotions JSON/);
     assert.match(summary, /generatedFrom: 'apps\/web\/src\/lib\/ingested\/ica\.ts'/);
-    assert.match(summary, /totalRowCount: 93083/);
-    assert.match(summary, /storeEndpointCount: 323/);
+    assert.match(summary, /totalRowCount: 93084/);
+    assert.match(summary, /storeEndpointCount: 324/);
+    assert.match(summary, /ICA Supermarket Toria/);
+    assert.match(summary, /storeAccountId: '1003822'/);
     assert.match(summary, /ICA Kvantum Tomelilla/);
-    assert.match(summary, /storeAccountId: '1004070'/);
     assert.match(summary, /ICA Supermarket Tierp/);
     assert.match(verified, /import \{ icaStorePromotionSourceSummary \} from '\.\/ingested\/ica-source-summary'/);
     assert.match(verified, /export const icaStorePromotionEvidence/);
