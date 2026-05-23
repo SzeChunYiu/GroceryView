@@ -3229,7 +3229,7 @@ export async function runOpenFoodFactsProductMetadataEnrichmentFromEnv(env: Dail
     throw new Error('GROCERYVIEW_OPENFOODFACTS_MAX_DB_BARCODES must be a positive number when provided.');
   }
 
-  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void> } };
+  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void>; on?(event: 'error', listener: (error: unknown) => void): void } };
   if (!pg.Pool) throw new Error('pg Pool export is not available.');
   const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
   try {
@@ -3940,16 +3940,20 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
 
 export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.env): Promise<DailyIngestionRunResult> {
   const { databaseUrl, connectors } = buildDailyConnectorConfigsFromEnv(env);
-  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void> } };
+  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void>; on?(event: 'error', listener: (error: unknown) => void): void } };
   if (!pg.Pool) throw new Error('pg Pool export is not available.');
   const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
+  pool.on?.('error', (error: unknown) => {
+    process.stderr.write(`[daily-ingestion] database pool error: ${error instanceof Error ? error.message : String(error)}\n`);
+  });
+  const executor = createDailyIngestionQueryExecutor(pool, {
+    retryAttempts: env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS) : 2,
+    retryBaseDelayMs: env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS) : 250
+  });
   try {
-    await pool.query('set default_transaction_read_only=off');
+    await executor.query('set default_transaction_read_only=off');
     return await runDailyIngestion({
-      executor: createDailyIngestionQueryExecutor(pool, {
-        retryAttempts: env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_ATTEMPTS) : 2,
-        retryBaseDelayMs: env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS?.trim() ? Number(env.GROCERYVIEW_DAILY_DB_RETRY_BASE_DELAY_MS) : 250
-      }),
+      executor,
       requestedAt: new Date().toISOString(),
       connectors
     });
