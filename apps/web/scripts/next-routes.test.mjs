@@ -1786,6 +1786,21 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces price-move explanation notes from observed event logs without invented causes', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /priceMoveNotesFor/);
+    assert.match(source, /priceChangeEventLogFor/);
+    assert.match(source, /Why this price moved/);
+    assert.match(source, /sourceProvenance/);
+    assert.match(source, /consecutive OpenPrices rows/);
+    assert.match(source, /No news or retailer cause is inferred/);
+    assert.match(source, /no promotion or seasonality claim/i);
+    assert.doesNotMatch(source, /invented cause|retailer news claim|synthetic explanation/i);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces a seasonal-by-month view from historical monthly averages without forecasting', async () => {
     const source = await read('src/app/products/[slug]/page.tsx');
 
