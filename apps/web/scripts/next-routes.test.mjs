@@ -2917,6 +2917,37 @@ ${seo}`;
     assert.match(packageJson, /@groceryview\/api/);
   });
 
+  it('uses crawlable URL query params for instant product search facets', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const products = await read('src/app/products/page.tsx');
+    const api = await read('../../packages/api/src/index.ts');
+
+    assert.match(api, /labels\?: string\[\]/);
+    assert.match(api, /inStockOnly\?: boolean/);
+    assert.match(api, /minConfidence\?: number/);
+    assert.match(api, /row\.labels/);
+    assert.match(api, /row\.unitPrice/);
+    assert.match(verified, /buildProductSearchView/);
+    assert.match(verified, /const filters = \{ query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence/);
+    assert.match(verified, /buildFacetedProductSearch\(\{ rows: facetedSearchRows, filters/);
+    assert.match(products, /type SearchParams = \{/);
+    assert.match(products, /q\?: string \| string\[\]/);
+    assert.match(products, /category\?: string \| string\[\]/);
+    assert.match(products, /label\?: string \| string\[\]/);
+    assert.match(products, /chain\?: string \| string\[\]/);
+    assert.match(products, /minPrice\?: string \| string\[\]/);
+    assert.match(products, /maxPrice\?: string \| string\[\]/);
+    assert.match(products, /inStockOnly\?: string \| string\[\]/);
+    assert.match(products, /minConfidence\?: string \| string\[\]/);
+    assert.match(products, /buildProductSearchView\(resolvedSearchParams\)/);
+    assert.match(products, /search\.activeFilters/);
+    assert.match(products, /href=\{searchFacetUrl\(\{ label: facet\.value \}\)\}/);
+    assert.match(products, /href=\{searchFacetUrl\(\{ chain: facet\.value \}\)\}/);
+    assert.match(products, /name="q"/);
+    assert.match(products, /name="inStockOnly"/);
+    assert.doesNotMatch(api, /Math\.random|placeholder/i);
+  });
+
   it('surfaces account-bound save-to-watchlist hearts on product cards', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
@@ -2962,7 +2993,7 @@ ${seo}`;
     assert.match(products, /productBrandFilterOptions/);
     assert.match(products, /name="brand"/);
     assert.match(products, /defaultValue=\{selectedBrand\}/);
-    assert.match(products, /productsPageUrl\(currentPage \+ 1, selectedBrand\)/);
+    assert.match(products, /productsPageUrl\(currentPage \+ 1, selectedBrand, resolvedSearchParams\)/);
     assert.match(shell, /ProductPriceCards/);
     assert.match(shell, /homepageAdaptiveProductCards/);
     assert.match(cards, /next\/image/);
