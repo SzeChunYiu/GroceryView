@@ -603,6 +603,59 @@ export type PostgresWeeklyPriceDropDigestReader = {
   listWeeklyPriceDropDigest(filter: WeeklyPriceDropDigestFilter): Promise<WeeklyPriceDropDigestItem[]>;
 };
 
+export type TrendingPriceChangePoint = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+  brand?: string;
+  categoryLabel?: string;
+  price: number;
+  currency: string;
+  observedAt: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeSlug?: string;
+  storeName?: string;
+};
+
+export type TrendingProductPriceChange = {
+  rank: number;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  brand?: string;
+  categoryLabel?: string;
+  changeCount: number;
+  observationCount: number;
+  latestPrice: number;
+  previousPrice: number;
+  changeAmount: number;
+  changePercent: number;
+  currency: string;
+  latestObservedAt: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeSlug?: string;
+  storeName?: string;
+};
+
+export type TrendingPriceChangeInput = {
+  points: TrendingPriceChangePoint[];
+  asOf: string;
+  windowDays?: number;
+  limit?: number;
+};
+
+export type TrendingPriceChangeFilter = {
+  since: string;
+  until: string;
+  limit?: number;
+};
+
+export type PostgresTrendingPriceChangeReader = {
+  listTrendingPriceChanges(filter: TrendingPriceChangeFilter): Promise<TrendingProductPriceChange[]>;
+};
+
 export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
   productSlug: string;
   canonicalName: string;
@@ -1613,6 +1666,26 @@ type WeeklyPriceDropDigestRow = {
   observed_at: string | Date;
   confidence: string | number;
 };
+type TrendingPriceChangeRow = {
+  rank: string | number;
+  product_id: string;
+  product_slug: string;
+  product_name: string;
+  brand: string | null;
+  category_label: string | null;
+  change_count: string | number;
+  observation_count: string | number;
+  latest_price: string | number;
+  previous_price: string | number;
+  change_amount: string | number;
+  change_percent: string | number;
+  currency: string;
+  latest_observed_at: string | Date;
+  chain_slug: string | null;
+  chain_name: string | null;
+  store_slug: string | null;
+  store_name: string | null;
+};
 type PriceObservationHistoryRow = {
   id: string;
   product_id: string;
@@ -1859,6 +1932,119 @@ function mapWeeklyPriceDropDigestRow(row: WeeklyPriceDropDigestRow, index: numbe
     confidence: Number(row.confidence),
     emailSubject: `${formatDigestPercent(dropPercent)} drop: ${row.product_name} at ${row.chain_name}`,
     emailPreview: `Now ${formatDigestMoney(row.currency, price)}, down from ${formatDigestMoney(row.currency, regularPrice)}. Save ${formatDigestMoney(row.currency, savingsAmount)} at ${location}.`
+  };
+}
+
+function sortTrendingPriceChangePoints(left: TrendingPriceChangePoint, right: TrendingPriceChangePoint): number {
+  const dateDelta = Date.parse(left.observedAt) - Date.parse(right.observedAt);
+  if (dateDelta !== 0) return dateDelta;
+  const productDelta = left.productId.localeCompare(right.productId);
+  if (productDelta !== 0) return productDelta;
+  const leftLocation = `${left.chainSlug ?? ''}:${left.storeSlug ?? ''}`;
+  const rightLocation = `${right.chainSlug ?? ''}:${right.storeSlug ?? ''}`;
+  return leftLocation.localeCompare(rightLocation);
+}
+
+function sameObservedPrice(left: number, right: number): boolean {
+  return Math.abs(left - right) < 0.000001;
+}
+
+function rankTrendingPriceChanges(items: Omit<TrendingProductPriceChange, 'rank'>[], limit: number): TrendingProductPriceChange[] {
+  return items
+    .sort((left, right) => {
+      const changeDelta = right.changeCount - left.changeCount;
+      if (changeDelta !== 0) return changeDelta;
+      const observationDelta = right.observationCount - left.observationCount;
+      if (observationDelta !== 0) return observationDelta;
+      const magnitudeDelta = Math.abs(right.changeAmount) - Math.abs(left.changeAmount);
+      if (magnitudeDelta !== 0) return magnitudeDelta;
+      return left.productName.localeCompare(right.productName, 'sv');
+    })
+    .slice(0, limit)
+    .map((item, index) => ({ rank: index + 1, ...item }));
+}
+
+export function summarizeTrendingProductPriceChanges(input: TrendingPriceChangeInput): TrendingProductPriceChange[] {
+  const limit = Math.min(Math.max(input.limit ?? 10, 1), 10);
+  const windowDays = Math.min(Math.max(input.windowDays ?? 7, 1), 31);
+  const untilMs = Date.parse(input.asOf);
+  if (Number.isNaN(untilMs)) throw new Error(`Invalid trending price asOf date: ${input.asOf}`);
+  const sinceMs = untilMs - windowDays * 24 * 60 * 60 * 1000;
+  const byProduct = new Map<string, TrendingPriceChangePoint[]>();
+
+  for (const point of input.points) {
+    const observedMs = Date.parse(point.observedAt);
+    if (!Number.isFinite(point.price) || Number.isNaN(observedMs) || observedMs > untilMs) continue;
+    byProduct.set(point.productId, [...(byProduct.get(point.productId) ?? []), point]);
+  }
+
+  const ranked: Omit<TrendingProductPriceChange, 'rank'>[] = [];
+  for (const points of byProduct.values()) {
+    const sorted = [...points].sort(sortTrendingPriceChangePoints);
+    let previous: TrendingPriceChangePoint | undefined;
+    const windowChanges: Array<{ previous: TrendingPriceChangePoint; latest: TrendingPriceChangePoint }> = [];
+    let windowObservationCount = 0;
+
+    for (const point of sorted) {
+      const observedMs = Date.parse(point.observedAt);
+      if (observedMs >= sinceMs && observedMs <= untilMs) {
+        windowObservationCount += 1;
+        if (previous && !sameObservedPrice(previous.price, point.price)) {
+          windowChanges.push({ previous, latest: point });
+        }
+      }
+      previous = point;
+    }
+
+    const latestChange = windowChanges.at(-1);
+    if (!latestChange) continue;
+    const latestPoint = latestChange.latest;
+    const previousPoint = latestChange.previous;
+    const changeAmount = latestPoint.price - previousPoint.price;
+    ranked.push({
+      productId: latestPoint.productId,
+      productSlug: latestPoint.productSlug,
+      productName: latestPoint.productName,
+      ...(latestPoint.brand ? { brand: latestPoint.brand } : {}),
+      ...(latestPoint.categoryLabel ? { categoryLabel: latestPoint.categoryLabel } : {}),
+      changeCount: windowChanges.length,
+      observationCount: windowObservationCount,
+      latestPrice: latestPoint.price,
+      previousPrice: previousPoint.price,
+      changeAmount,
+      changePercent: previousPoint.price > 0 ? (changeAmount / previousPoint.price) * 100 : 0,
+      currency: latestPoint.currency,
+      latestObservedAt: latestPoint.observedAt,
+      ...(latestPoint.chainSlug ? { chainSlug: latestPoint.chainSlug } : {}),
+      ...(latestPoint.chainName ? { chainName: latestPoint.chainName } : {}),
+      ...(latestPoint.storeSlug ? { storeSlug: latestPoint.storeSlug } : {}),
+      ...(latestPoint.storeName ? { storeName: latestPoint.storeName } : {})
+    });
+  }
+
+  return rankTrendingPriceChanges(ranked, limit);
+}
+
+function mapTrendingPriceChangeRow(row: TrendingPriceChangeRow): TrendingProductPriceChange {
+  return {
+    rank: Number(row.rank),
+    productId: row.product_id,
+    productSlug: row.product_slug,
+    productName: row.product_name,
+    ...(row.brand ? { brand: row.brand } : {}),
+    ...(row.category_label ? { categoryLabel: row.category_label } : {}),
+    changeCount: Number(row.change_count),
+    observationCount: Number(row.observation_count),
+    latestPrice: Number(row.latest_price),
+    previousPrice: Number(row.previous_price),
+    changeAmount: Number(row.change_amount),
+    changePercent: Number(row.change_percent),
+    currency: row.currency,
+    latestObservedAt: asIso(row.latest_observed_at),
+    ...(row.chain_slug ? { chainSlug: row.chain_slug } : {}),
+    ...(row.chain_name ? { chainName: row.chain_name } : {}),
+    ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
+    ...(row.store_name ? { storeName: row.store_name } : {})
   };
 }
 
@@ -4463,6 +4649,122 @@ export function createPostgresWeeklyPriceDropDigestReader(executor: QueryExecuto
         [filter.since, filter.until, limit]
       );
       return rows.map(mapWeeklyPriceDropDigestRow);
+    }
+  };
+}
+
+export function createPostgresTrendingPriceChangeReader(executor: QueryExecutor): PostgresTrendingPriceChangeReader {
+  return {
+    async listTrendingPriceChanges(filter) {
+      const limit = Math.min(Math.max(filter.limit ?? 10, 1), 10);
+      const rows = await executor.query<TrendingPriceChangeRow>(
+        `/* trending_price_changes */
+         with observed as (
+           select observations.product_id,
+                  products.slug as product_slug,
+                  products.canonical_name as product_name,
+                  products.brand,
+                  products.category_path[1] as category_label,
+                  observations.chain_id,
+                  chains.slug as chain_slug,
+                  chains.name as chain_name,
+                  observations.store_id,
+                  stores.slug as store_slug,
+                  stores.name as store_name,
+                  observations.price,
+                  observations.currency,
+                  observations.observed_at,
+                  lag(observations.price) over (
+                    partition by observations.product_id, observations.chain_id, observations.store_id, observations.price_type
+                    order by observations.observed_at, observations.id
+                  ) as previous_price
+           from observations
+           join products on products.id = observations.product_id
+           join chains on chains.id = observations.chain_id
+           left join stores on stores.id = observations.store_id
+           where observations.domain = 'grocery'
+             and observations.observed_at >= ($1::timestamptz - interval '31 days')
+             and observations.observed_at < $2::timestamptz
+             and observations.price >= 0
+         ),
+         changed as (
+           select *
+           from observed
+           where observed_at >= $1::timestamptz
+             and previous_price is not null
+             and previous_price is distinct from price
+         ),
+         latest_change as (
+           select distinct on (product_id)
+                  product_id,
+                  product_slug,
+                  product_name,
+                  brand,
+                  category_label,
+                  chain_slug,
+                  chain_name,
+                  store_slug,
+                  store_name,
+                  price as latest_price,
+                  previous_price,
+                  round((price - previous_price)::numeric, 2) as change_amount,
+                  round((((price - previous_price) / nullif(previous_price, 0)) * 100)::numeric, 2) as change_percent,
+                  currency,
+                  observed_at as latest_observed_at
+           from changed
+           order by product_id, observed_at desc
+         ),
+         change_counts as (
+           select product_id, count(*) as change_count
+           from changed
+           group by product_id
+         ),
+         observation_counts as (
+           select product_id, count(*) as observation_count
+           from observed
+           where observed_at >= $1::timestamptz
+           group by product_id
+         ),
+         ranked as (
+           select latest_change.*,
+                  change_counts.change_count,
+                  observation_counts.observation_count
+           from latest_change
+           join change_counts on change_counts.product_id = latest_change.product_id
+           join observation_counts on observation_counts.product_id = latest_change.product_id
+         )
+         select dense_rank() over (
+                  order by change_count desc,
+                           observation_count desc,
+                           abs(change_amount) desc,
+                           product_name
+                ) as rank,
+                product_id,
+                product_slug,
+                product_name,
+                brand,
+                category_label,
+                change_count,
+                observation_count,
+                latest_price,
+                previous_price,
+                change_amount,
+                change_percent,
+                currency,
+                latest_observed_at,
+                chain_slug,
+                chain_name,
+                store_slug,
+                store_name
+         from ranked
+         group by product_id, product_slug, product_name, brand, category_label, change_count, observation_count,
+                  latest_price, previous_price, change_amount, change_percent, currency, latest_observed_at,
+                  chain_slug, chain_name, store_slug, store_name
+         order by rank, product_name
+         limit $3`,
+        [filter.since, filter.until, limit]
+      );
+      return rows.map(mapTrendingPriceChangeRow);
     }
   };
 }

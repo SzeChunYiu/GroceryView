@@ -1,6 +1,7 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
 import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
+import { summarizeTrendingProductPriceChanges, type TrendingPriceChangePoint } from '@groceryview/db';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
 import { icaStorePromotionSourceSummary } from './ingested/ica-source-summary';
@@ -222,6 +223,31 @@ export const matchedChainProducts = axfoodProducts.filter((product) => product.i
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
+
+const openPricesTrendingAsOfDate = pricedProducts.reduce((latest, product) => (
+  product.lastObservedAt > latest ? product.lastObservedAt : latest
+), '1970-01-01');
+const openPricesTrendingPoints: TrendingPriceChangePoint[] = pricedProducts.flatMap((product) => (
+  product.observations.map((observation) => ({
+    productId: product.code,
+    productSlug: product.slug,
+    productName: product.name,
+    ...(product.brands ? { brand: product.brands } : {}),
+    categoryLabel: labelFromSlug(product.category),
+    price: observation.price,
+    currency: observedSnapshotCurrency,
+    observedAt: `${observation.date}T00:00:00.000Z`,
+    chainSlug: 'openprices',
+    chainName: 'OpenPrices'
+  }))
+));
+
+export const homepageTrendingPriceChanges = summarizeTrendingProductPriceChanges({
+  points: openPricesTrendingPoints,
+  asOf: `${openPricesTrendingAsOfDate}T23:59:59.999Z`,
+  windowDays: 7,
+  limit: 10
+});
 
 const chainDisplayNames: Record<string, string> = {
   willys: 'Willys',
