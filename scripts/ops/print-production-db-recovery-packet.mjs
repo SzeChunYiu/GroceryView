@@ -61,7 +61,7 @@ function buildRecommendedActions(health, queryDiagnostic) {
     actions.push({
       id: 'replacement-db-cutover',
       owner: 'operator_after_approval',
-      action: 'If the provider cannot recover the existing DB promptly, create or select a replacement Supabase project, update DATABASE_URL and runtime secrets, run npm run ops:apply-db-migrations, then rerun Daily ingestion readiness on main.'
+      action: 'If the provider cannot recover the existing DB promptly, create or select a replacement Supabase project, store its connection string as REPLACEMENT_DATABASE_URL or CANDIDATE_DATABASE_URL, run the Production DB cutover validation workflow to prove write connectivity, migrations, all-store ingestion, and DB-backed snapshot evidence, then update DATABASE_URL and rerun Daily ingestion readiness on main.'
     });
   } else if (health.status !== 'ready' || queryDiagnostic.status !== 'ready') {
     actions.push({
@@ -138,7 +138,7 @@ export async function createProductionDbRecoveryPacket(env = process.env, option
     },
     blockers,
     recommendedActions: buildRecommendedActions(health, queryDiagnostic),
-    completionGate: 'Do not run production migrations or all-store daily ingestion until this packet status is ready, or until DATABASE_URL is cut over to a replacement DB that passes this packet and ops:check-daily-db-connectivity.'
+    completionGate: 'Do not run production migrations or all-store daily ingestion against the production DATABASE_URL until this packet status is ready, or until a replacement DB passes the Production DB cutover validation workflow and DATABASE_URL is updated to that validated target.'
   };
 }
 
