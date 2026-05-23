@@ -1,118 +1,204 @@
 import Link from 'next/link';
+import { buildWatchlistAlerts, calculateDealScore, planNotifications, type NotificationPreferences, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
-import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, watchlistAlertBoard, watchlistAlertInputs, watchlistSparklineBoard, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
-import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
+import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
+import { chainPriceRows, priceAlertThresholdPreferenceContract, topChainSpreads } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+
+type ConfidenceLevel = 'high' | 'medium' | 'low';
+type WatchlistAlert = ReturnType<typeof buildWatchlistAlerts>[number];
+type PricedChainRow = ReturnType<typeof chainPriceRows>[number] & { price: number };
+type VerifiedWatchlistProduct = WatchlistProductSnapshot & {
+  source: string;
+};
+
+const notificationNow = '2026-05-22T10:00:00.000Z';
+const notificationPreferences: NotificationPreferences = {
+  channels: ['email', 'push'],
+  enabledTypes: ['target_price'],
+  quietHours: { startHour: 21, endHour: 7, timezone: 'Europe/Stockholm' }
+};
+
+const chainDisplayNames: Record<string, string> = {
+  willys: 'Willys',
+  hemkop: 'Hemköp'
+};
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function watchlistPriceTypeFor(row: PricedChainRow): WatchlistPriceType {
+  return typeof row.savings === 'number' && row.savings > 0 ? 'promotion' : 'shelf';
+}
+
+const watchlistSourceRows = topChainSpreads
+  .map((product) => {
+    const pricedRows = chainPriceRows(product)
+      .filter((row): row is PricedChainRow => typeof row.price === 'number' && Number.isFinite(row.price) && row.price > 0)
+      .sort((left, right) => left.price - right.price || String(left.chain).localeCompare(String(right.chain), 'sv'));
+    const cheapest = pricedRows[0];
+    if (!cheapest) return null;
+    const dealScore = calculateDealScore({
+      currentCityPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+      knownPromoHistoryPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+      equivalentUnitPricePercentile: product.inChains.length > 1 ? 0 : 50,
+      discountDepthPercent: product.spreadPct,
+      sourceConfidence: clamp(product.inChains.length / 2, 0, 1)
+    });
+    return { product, pricedRows, cheapest, dealScore };
+  })
+  .filter((row): row is NonNullable<typeof row> => row !== null)
+  .slice(0, 4);
+
+const watchlistItems: WatchlistItem[] = watchlistSourceRows.map(({ product, cheapest, dealScore }) => ({
+  productId: product.slug,
+  targetPrice: Math.round(cheapest.price * 1.02 * 100) / 100,
+  alertDealScoreAt: Math.max(50, Math.min(90, dealScore)),
+  favoriteStoresOnly: false,
+  allowedPriceTypes: [watchlistPriceTypeFor(cheapest)]
+}));
+
+const watchlistProducts: VerifiedWatchlistProduct[] = watchlistSourceRows.map(({ product, pricedRows, cheapest, dealScore }) => ({
+  productId: product.slug,
+  productName: product.name,
+  bestPrice: cheapest.price,
+  bestStoreId: `${cheapest.chain}-online-catalog`,
+  bestPriceType: watchlistPriceTypeFor(cheapest),
+  prices: pricedRows.map((row) => ({
+    storeId: `${row.chain}-online-catalog`,
+    storeName: `${chainDisplayNames[row.chain] ?? row.chain} online catalog`,
+    price: row.price,
+    priceType: watchlistPriceTypeFor(row)
+  })),
+  dealScore,
+  isNew52WeekLow: product.spreadPct >= 20,
+  source: `${pricedRows.length} verified Axfood chain price row${pricedRows.length === 1 ? '' : 's'} · ${product.inChains.join(' + ')}`
+}));
+
+const watchlistAlertInputs: {
+  favoriteStoreIds: string[];
+  watchlist: WatchlistItem[];
+  products: VerifiedWatchlistProduct[];
+} = {
+  favoriteStoreIds: Array.from(new Set(watchlistProducts.map((product) => product.bestStoreId))),
+  watchlist: watchlistItems,
+  products: watchlistProducts
+};
 
 export function generateMetadata() {
   return routeMetadata('/watchlist');
 }
 
+function productForAlert(productId: string) {
+  return watchlistAlertInputs.products.find((product) => product.productId === productId);
+}
+
+function watchlistItemForAlert(productId: string) {
+  return watchlistAlertInputs.watchlist.find((item) => item.productId === productId);
+}
+
 function priceSource(productId: string) {
-  return watchlistAlertInputs.products.find((product) => product.productId === productId)?.source ?? 'visible price row';
+  return productForAlert(productId)?.source ?? 'visible price row';
+}
+
+function priceRowCount(productId: string) {
+  return productForAlert(productId)?.prices?.length ?? 0;
+}
+
+function confidenceForProduct(productId: string): ConfidenceLevel {
+  const product = productForAlert(productId);
+  const rows = product?.prices?.length ?? 0;
+  if (!product || rows === 0) return 'low';
+  if (rows >= 2) return 'high';
+  return 'medium';
+}
+
+function confidenceForCoverage(priceRows: number, alertCount: number): ConfidenceLevel {
+  if (priceRows >= 6 && alertCount > 0) return 'high';
+  if (priceRows > 0 && alertCount > 0) return 'medium';
+  return 'low';
+}
+
+function notificationEventForAlert(alert: WatchlistAlert) {
+  return {
+    type: 'target_price' as const,
+    title: alert.productName,
+    body: alert.message,
+    priority: alert.severity === 'urgent' ? 'high' as const : 'normal' as const
+  };
 }
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
 
-function sparklineBarHeight(value: number, values: number[]) {
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  if (max === min) return 50;
-  return 20 + ((value - min) / (max - min)) * 70;
-}
-
 export default function WatchlistPage() {
+  const watchlistAlerts = buildWatchlistAlerts(watchlistAlertInputs)
+    .filter((alert) => alert.type === 'target_price');
+  const plannedNotifications = planNotifications({
+    now: notificationNow,
+    preferences: notificationPreferences,
+    events: watchlistAlerts.map(notificationEventForAlert)
+  });
+  const watchedProducts = watchlistAlertInputs.watchlist.length;
+  const eligiblePriceRows = watchlistAlertInputs.products.reduce((sum, product) => sum + (product.prices?.length ?? 0), 0);
+  const coverageConfidence = confidenceForCoverage(eligiblePriceRows, watchlistAlerts.length);
+
   return (
     <PageShell>
       <Eyebrow>Watchlist price alerts</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Tracked products with notification-ready alerts</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        This page calls buildWatchlistAlerts with visible price rows, then runs planNotifications so push and email rows respect user preferences and quiet-hour rules.
+        This page calls buildWatchlistAlerts with verified chain price rows, then runs planNotifications so set-target push and email rows respect user preferences and quiet-hour rules.
       </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Watched products</p>
-          <p className="mt-2 text-5xl font-black text-slate-950">{watchlistAlertBoard.coverage.watchedProducts}</p>
-          <p className="mt-3 font-semibold text-slate-700">filtered against {watchlistAlertBoard.coverage.eligiblePriceRows} visible price rows.</p>
+          <p className="mt-2 text-5xl font-black text-slate-950">{watchedProducts}</p>
+          <p className="mt-3 font-semibold text-slate-700">filtered against {eligiblePriceRows} verified chain price rows.</p>
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Active alerts</p>
-          <p className="mt-2 text-5xl font-black text-emerald-800">{watchlistAlertBoard.alerts.length}</p>
-          <p className="mt-3 font-semibold text-slate-700">target price, Deal Score, and new-low signals only when core rules pass.</p>
+          <p className="mt-2 text-5xl font-black text-emerald-800">{watchlistAlerts.length}</p>
+          <p className="mt-3 font-semibold text-slate-700">set-target price signals only when core rules pass.</p>
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Planned notifications</p>
-          <p className="mt-2 text-5xl font-black text-slate-950">{watchlistAlertBoard.plannedNotifications.length}</p>
-          <p className="mt-3 font-semibold text-slate-700">email + push rows generated by planNotifications.</p>
+          <p className="mt-2 text-5xl font-black text-slate-950">{plannedNotifications.length}</p>
+          <div className="mt-3">
+            <ConfidenceBadge level={coverageConfidence} label={`${coverageConfidence} alert confidence`} sampleSize={eligiblePriceRows} />
+          </div>
         </Card>
       </div>
-
-      <Card className="mt-6 border-sky-200 bg-sky-50">
-        <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">TradingView-style watchlist</p>
-        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Watchlist sparklines</h2>
-        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-          Each mini chart is built from buildPriceChartSeries output in the driver file. No missing history is interpolated: sparklinePoints are visible observations with provenance and confidence attached.
-        </p>
-        <div className="mt-4 grid gap-4 lg:grid-cols-3">
-          {watchlistSparklineBoard.map((row) => {
-            const values = row.sparklinePoints.map((point) => point.value);
-            const seriesCount = row.priceChartSeries.series.length;
-            return (
-              <Link className="rounded-2xl border border-sky-200 bg-white p-4 shadow-sm hover:border-sky-700" href={`/products/${row.productId}`} key={row.productId}>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-lg font-black text-slate-950">{row.productName}</p>
-                    <p className="mt-1 text-xs font-bold text-slate-600">{row.coverageLabel}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xl font-black text-sky-900">{formatSek(row.latestPrice)}</p>
-                    <p className={`text-sm font-black ${row.movementPercent <= 0 ? 'text-emerald-800' : 'text-rose-700'}`}>{row.movementPercent}%</p>
-                  </div>
-                </div>
-                <div className="mt-4 flex h-20 items-end gap-1 rounded-2xl bg-slate-950 p-3" aria-label={`sparklinePoints for ${row.productName}`}>
-                  {row.sparklinePoints.map((point) => (
-                    <span
-                      className="flex-1 rounded-t bg-sky-300"
-                      key={`${row.productId}-${point.time}-${point.value}`}
-                      style={{ height: `${sparklineBarHeight(point.value, values)}%` }}
-                      title={`${point.time.slice(0, 10)} · ${formatSek(point.value)} · confidence ${Math.round(point.confidence * 100)}%`}
-                    />
-                  ))}
-                </div>
-                <div className="mt-3 grid gap-2 text-xs font-semibold text-slate-700">
-                  <p className="rounded-2xl bg-sky-100 p-3">priceChartSeries: {seriesCount} source/store line{seriesCount === 1 ? '' : 's'} · confidence {row.confidence}</p>
-                  <p className="rounded-2xl bg-white p-3">Latest provenance: {row.provenanceLabel}</p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </Card>
 
       <Card className="mt-6">
         <h2 className="text-2xl font-black">Alert board</h2>
         <div className="mt-4 space-y-3">
-          {watchlistAlertBoard.alerts.map((alert, index) => (
+          {watchlistAlerts.map((alert, index) => (
             <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${alert.productId}`} key={`${alert.productId}-${alert.type}-${index}`}>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-xl font-black text-slate-950">{alert.productName}</p>
                   <p className="mt-1 text-sm text-slate-600">{alert.message}</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-700">{priceSource(alert.productId)}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <ConfidenceBadge level={confidenceForProduct(alert.productId)} label={`${confidenceForProduct(alert.productId)} source confidence`} sampleSize={priceRowCount(alert.productId)} />
+                    <span className="text-sm font-semibold text-slate-700">{priceSource(alert.productId)}</span>
+                  </div>
                 </div>
                 <div className="text-right">
                   <p className={`text-2xl font-black ${alert.severity === 'urgent' ? 'text-rose-700' : 'text-emerald-800'}`}>{alert.severity}</p>
                   <p className="text-sm font-semibold capitalize text-slate-600">{alert.type.replaceAll('_', ' ')}</p>
                 </div>
               </div>
-              <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-3">
+              <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-4">
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Metric: {alert.trigger.metric}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Store: {alert.trigger.storeName}</p>
                 <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Value: {String(alert.trigger.value)}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Target: {watchlistItemForAlert(alert.productId)?.targetPrice ? formatSek(watchlistItemForAlert(alert.productId)!.targetPrice!) : 'No target'}</p>
               </div>
             </Link>
           ))}
@@ -246,9 +332,9 @@ export default function WatchlistPage() {
 
       <Card className="mt-6">
         <h2 className="text-2xl font-black">Notification plan</h2>
-        <p className="mt-2 text-sm font-semibold text-slate-600">{watchlistAlertBoard.coverage.caveat}</p>
+        <p className="mt-2 text-sm font-semibold text-slate-600">Set-target alerts use verified Axfood chain rows and allowed price-type filters; rows without the requested price type are excluded instead of estimated.</p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {watchlistAlertBoard.plannedNotifications.map((notification, index) => (
+          {plannedNotifications.map((notification, index) => (
             <div className="rounded-2xl bg-slate-50 p-4" key={`${notification.title}-${notification.channel}-${index}`}>
               <p className="font-black">{notification.title}</p>
               <p className="mt-1 text-sm text-slate-600">{notification.channel} · {notification.type} · {notification.priority}</p>
