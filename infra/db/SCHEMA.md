@@ -240,6 +240,14 @@ Key columns: `id`, `user_email`, `product_id`, `target_price`, `created_at`.
 
 Indexes: `price_alerts_user_created_idx` for account alert reads and `price_alerts_product_idx` for product-scoped alert evaluation.
 
+### `webhook_subscriptions`
+
+Outbound price-change webhook subscriptions used by `/api/webhooks/price-change` after verified price drops.
+
+Key columns: `id`, `user_id`, `product_id`, `chain`, `callback_url`, `secret`, `active`, `last_delivery_at`, `failure_count`, `created_at`, `updated_at`.
+
+Indexes: `webhook_subscriptions_active_product_idx` for product and chain fanout and `webhook_subscriptions_user_idx` for account-scoped subscription management.
+
 ### `alert_rules`
 
 Application repository alert rules keyed by the text `app_users` identity used by current API and worker packages.
