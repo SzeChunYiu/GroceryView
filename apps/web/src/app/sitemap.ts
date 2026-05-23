@@ -1,19 +1,80 @@
 import type { MetadataRoute } from 'next';
-import { categoryLabels } from '@/lib/openprices-products';
+import {
+  groceryCategoryHierarchy,
+  type CategoryHierarchyNode,
+  type ProductCatalogRecord,
+  type StoreCatalogRecord
+} from '@groceryview/db';
+import { axfoodProducts } from '@/lib/axfood-products';
 import { osmStores } from '@/lib/osm-stores';
+import { pricedProducts } from '@/lib/openprices-products';
 import { seoLandingCities, seoLandingProducts } from '@/lib/seo-landing-pages';
-import { productUniverse } from '@/lib/verified-data';
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
-const lastModified = new Date('2026-05-22T00:00:00.000Z');
+const fallbackLastModified = new Date('2026-05-22T00:00:00.000Z');
 
-function entry(path: string, priority: number, changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']) {
+type ProductSitemapRecord = Pick<ProductCatalogRecord, 'slug' | 'updatedAt'>;
+type StoreSitemapRecord = Pick<StoreCatalogRecord, 'slug' | 'updatedAt'>;
+type CategorySitemapRecord = Pick<CategoryHierarchyNode, 'slug' | 'routable'>;
+
+const productSitemapRecords: ProductSitemapRecord[] = [
+  ...axfoodProducts.map((product) => ({
+    slug: product.slug,
+    updatedAt: fallbackLastModified.toISOString()
+  })),
+  ...pricedProducts.map((product) => ({
+    slug: product.slug,
+    updatedAt: product.lastObservedAt
+  }))
+];
+
+const categorySitemapRecords: CategorySitemapRecord[] = groceryCategoryHierarchy.filter((category) => category.routable);
+
+const storeSitemapRecords: StoreSitemapRecord[] = osmStores.map((store) => ({
+  slug: store.slug,
+  updatedAt: store.retrievedDate
+}));
+
+function lastModifiedFrom(updatedAt: string | undefined) {
+  if (!updatedAt) return fallbackLastModified;
+  const value = new Date(updatedAt);
+  return Number.isNaN(value.getTime()) ? fallbackLastModified : value;
+}
+
+function uniqueRecordsBySlug<T extends { slug: string }>(records: readonly T[]) {
+  return [
+    ...new Map(
+      records
+        .filter((record) => record.slug.length > 0)
+        .map((record) => [record.slug, record])
+    ).values()
+  ];
+}
+
+function entry(
+  path: string,
+  priority: number,
+  changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'],
+  lastModified = fallbackLastModified
+) {
   return {
     url: `${siteUrl}${path}`,
     lastModified,
     changeFrequency,
     priority
   };
+}
+
+export function buildCatalogSitemapEntries(): MetadataRoute.Sitemap {
+  const products = uniqueRecordsBySlug(productSitemapRecords);
+  const categories = uniqueRecordsBySlug(categorySitemapRecords);
+  const stores = uniqueRecordsBySlug(storeSitemapRecords);
+
+  return [
+    ...products.map((product) => entry(`/products/${product.slug}`, 0.82, 'daily', lastModifiedFrom(product.updatedAt))),
+    ...categories.map((category) => entry(`/categories/${category.slug}`, 0.74, 'daily')),
+    ...stores.map((store) => entry(`/stores/${store.slug}`, 0.58, 'weekly', lastModifiedFrom(store.updatedAt)))
+  ];
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -40,15 +101,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/chain-coverage', 0.65, 'weekly')
   ];
 
-  const productRoutes = productUniverse.map((product) =>
-    entry(`/products/${product.slug}`, 0.82, 'daily')
-  );
-  const categoryRoutes = Object.keys(categoryLabels).map((slug) =>
-    entry(`/categories/${slug}`, 0.74, 'daily')
-  );
-  const storeRoutes = osmStores.slice(0, 80).map((store) =>
-    entry(`/stores/${store.slug}`, 0.58, 'weekly')
-  );
   const seoLandingRoutes = seoLandingProducts.flatMap((product) => [
     entry(`/billigaste/${product.slug}`, 0.78, 'daily'),
     entry(`/prisjamforelse/${product.slug}`, 0.78, 'daily'),
@@ -59,9 +111,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...staticRoutes,
-    ...productRoutes,
-    ...categoryRoutes,
-    ...storeRoutes,
+    ...buildCatalogSitemapEntries(),
     ...seoLandingRoutes
   ];
 }
