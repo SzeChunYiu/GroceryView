@@ -22,7 +22,7 @@ function parseEnvExample(text) {
 
 describe('production env value validation script', () => {
   it('validates daily connectors and catalog coverage targets for all required chains', () => {
-    for (const name of ['GROCERYVIEW_DAILY_CONNECTORS_JSON', 'CATALOG_COVERAGE_TARGETS_JSON', 'EXPO_PUSH_ACCESS_TOKEN', 'SENDGRID_FROM_EMAIL', 'SENDGRID_API_KEY', 'OCR_SPACE_API_KEY', 'OCR_SPACE_HEALTHCHECK_IMAGE_URL', 'OPENFOODFACTS_USER_AGENT', 'OPENFOODFACTS_HEALTHCHECK_BARCODE']) {
+    for (const name of ['GROCERYVIEW_DAILY_CONNECTORS_JSON', 'CATALOG_COVERAGE_TARGETS_JSON', 'EXPO_PUSH_ACCESS_TOKEN', 'SENDGRID_FROM_EMAIL', 'SENDGRID_API_KEY', 'OCR_SPACE_API_KEY', 'OCR_SPACE_HEALTHCHECK_IMAGE_URL', 'OPENFOODFACTS_USER_AGENT', 'OPENFOODFACTS_HEALTHCHECK_BARCODE', 'S3_ENDPOINT', 'S3_REGION', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY']) {
       assert.match(script, new RegExp(name));
     }
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
@@ -107,6 +107,11 @@ describe('production env value validation script', () => {
       OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/0.1 test@groceryview.se',
       OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
+      S3_ENDPOINT: 'https://storage.example',
+      S3_REGION: 'eu-north-1',
+      S3_BUCKET: 'groceryview-receipts',
+      S3_ACCESS_KEY_ID: 'test-s3-access-key',
+      S3_SECRET_ACCESS_KEY: 'test-s3-secret-key',
       GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE: connectorPath,
       CATALOG_COVERAGE_TARGETS_JSON_FILE: catalogTargetPath
     }).status, 'ready');
@@ -171,6 +176,11 @@ describe('production env value validation script', () => {
       OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/0.1 test@groceryview.se',
       OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
+      S3_ENDPOINT: 'https://storage.example',
+      S3_REGION: 'eu-north-1',
+      S3_BUCKET: 'groceryview-receipts',
+      S3_ACCESS_KEY_ID: 'test-s3-access-key',
+      S3_SECRET_ACCESS_KEY: 'test-s3-secret-key',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(chains.map((chainId) => ({
         connectorId: `${chainId}-normalized-json`,
         chainId,
@@ -214,6 +224,11 @@ describe('production env value validation script', () => {
       OCR_SPACE_HEALTHCHECK_IMAGE_URL: 'https://groceryview.example/fixtures/receipt-healthcheck.jpg',
       OPENFOODFACTS_USER_AGENT: 'GroceryView/0.1 test@groceryview.se',
       OPENFOODFACTS_HEALTHCHECK_BARCODE: '0735000123456',
+      S3_ENDPOINT: 'https://storage.example',
+      S3_REGION: 'eu-north-1',
+      S3_BUCKET: 'groceryview-receipts',
+      S3_ACCESS_KEY_ID: 'test-s3-access-key',
+      S3_SECRET_ACCESS_KEY: 'test-s3-secret-key',
       GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify(chains.map((chainId) => ({
         connectorId: `${chainId}-normalized-json`,
         chainId,
