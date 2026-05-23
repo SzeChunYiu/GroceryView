@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 
 import {
   buildSupabaseDirectConnectionString,
+  buildSupabaseTransactionPoolerConnectionString,
   checkDailyDatabaseConnectivity,
   classifyDatabaseUrl,
   isTransientDailyDatabaseError,
@@ -71,13 +72,21 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.equal(result.transformedForDailyWrites, true);
     assert.deepEqual(result.blockers, ['database_not_accepting_connections']);
     assert.equal(JSON.stringify(result).includes('super-secret'), false);
-    assert.equal(calls.filter((call) => call.type === 'constructor').length, 3);
-    assert.equal(calls.filter((call) => call.type === 'query' && call.sql === 'set default_transaction_read_only=off').length, 3);
-    assert.equal(calls.filter((call) => call.type === 'end').length, 3);
+    assert.equal(calls.filter((call) => call.type === 'constructor').length, 4);
+    assert.equal(calls.filter((call) => call.type === 'query' && call.sql === 'set default_transaction_read_only=off').length, 4);
+    assert.equal(calls.filter((call) => call.type === 'end').length, 4);
     assert.equal(calls[0].config.connectionString.includes(':5432/'), true);
+    assert.equal(result.alternateConnections[0].name, 'supabase_transaction_pooler');
     assert.equal(result.alternateConnections[0].status, 'blocked');
   });
 
+
+
+  it('builds the original transaction-pooler URL for alternate Supabase pooler diagnostics', () => {
+    const poolerUrl = 'postgres://postgres.dgsoqwanrkqgdichtgzl:super-secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres?sslmode=no-verify';
+    assert.equal(buildSupabaseTransactionPoolerConnectionString(poolerUrl), poolerUrl);
+    assert.equal(buildSupabaseTransactionPoolerConnectionString('postgres://user:secret@db.example.test:5432/postgres'), null);
+  });
 
   it('derives a redacted direct Supabase host probe from pooler credentials', async () => {
     const poolerUrl = 'postgres://postgres.dgsoqwanrkqgdichtgzl:super-secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres?sslmode=no-verify';
@@ -109,12 +118,16 @@ describe('daily DB connectivity diagnostic script', () => {
 
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['database_not_accepting_connections']);
-    assert.equal(result.alternateConnections.length, 1);
-    assert.equal(result.alternateConnections[0].name, 'supabase_direct_host');
-    assert.equal(result.alternateConnections[0].status, 'ready');
-    assert.equal(result.alternateConnections[0].host, 'db.dgsoqwanrkqgdichtgzl.supabase.co');
-    assert.match(result.alternateConnections[0].action, /Direct Supabase host accepts writes/);
+    assert.equal(result.alternateConnections.length, 2);
+    assert.equal(result.alternateConnections[0].name, 'supabase_transaction_pooler');
+    assert.equal(result.alternateConnections[0].status, 'blocked');
+    assert.equal(result.alternateConnections[0].port, 6543);
+    assert.equal(result.alternateConnections[1].name, 'supabase_direct_host');
+    assert.equal(result.alternateConnections[1].status, 'ready');
+    assert.equal(result.alternateConnections[1].host, 'db.dgsoqwanrkqgdichtgzl.supabase.co');
+    assert.match(result.alternateConnections[1].action, /Direct Supabase host accepts writes/);
     assert.equal(JSON.stringify(result).includes('super-secret'), false);
+    assert.equal(connections.some((connection) => connection.includes('aws-1-eu-north-1.pooler.supabase.com:6543')), true);
     assert.equal(connections.some((connection) => connection.includes('db.dgsoqwanrkqgdichtgzl.supabase.co:5432')), true);
   });
 
@@ -188,6 +201,8 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.equal(isTransientDailyDatabaseError(new Error('Failed to connect to database: {"error":"econnrefused"}')), true);
     assert.equal(isTransientDailyDatabaseError(new Error('Failed to connect to database: {:error, :db_connection_closed_in_auth} 08006')), true);
     assert.equal(isTransientDailyDatabaseError(new Error('57P03: the database system is not accepting connections DETAIL: Hot standby mode is disabled.')), true);
+    assert.equal(isTransientDailyDatabaseError(new Error('(EAUTHQUERY) authentication query failed: connection to database not available XX000')), true);
+    assert.equal(isTransientDailyDatabaseError(new Error('(ECIRCUITBREAKER) failed to retrieve database credentials after multiple attempts, new connections are temporarily blocked XX000')), true);
   });
 
   it('classifies Supabase pooler auth-closed and hot-standby failures as actionable blockers', async () => {
@@ -232,5 +247,73 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.equal(hotStandby.status, 'blocked');
     assert.deepEqual(hotStandby.blockers, ['database_not_accepting_connections']);
     assert.match(hotStandby.error, /Hot standby mode is disabled/);
+  });
+
+  it('classifies Supabase pooler database-unavailable auth query failures without overstating attempts', async () => {
+    let attempts = 0;
+    class SupabaseDatabaseUnavailablePool {
+      async query() {
+        attempts += 1;
+        const error = new Error('(EAUTHQUERY) authentication query failed: connection to database not available XX000');
+        error.code = 'EAUTHQUERY';
+        throw error;
+      }
+
+      async end() {}
+    }
+
+    const result = await checkDailyDatabaseConnectivity(
+      {
+        DATABASE_URL: 'postgres://postgres.dgsoqwanrkqgdichtgzl:super-secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres',
+        GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: '2',
+        GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS: '0',
+        GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS: '1',
+        GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS: '1'
+      },
+      { Pool: SupabaseDatabaseUnavailablePool, sleep: async () => {} }
+    );
+
+    assert.equal(result.status, 'blocked');
+    assert.equal(result.attempts, 2);
+    assert.deepEqual(result.blockers, ['supabase_pooler_database_unavailable']);
+    assert.equal(result.alternateConnections[0].name, 'supabase_transaction_pooler');
+    assert.deepEqual(result.alternateConnections[0].blockers, ['supabase_pooler_database_unavailable']);
+    assert.equal(result.alternateConnections[1].name, 'supabase_direct_host');
+    assert.deepEqual(result.alternateConnections[1].blockers, ['supabase_pooler_database_unavailable']);
+    assert.equal(attempts, 4);
+  });
+
+  it('classifies Supabase pooler credential circuit-breaker failures as provider recovery blockers', async () => {
+    let attempts = 0;
+    class SupabaseCircuitBreakerPool {
+      async query() {
+        attempts += 1;
+        const error = new Error('(ECIRCUITBREAKER) failed to retrieve database credentials after multiple attempts, new connections are temporarily blocked XX000');
+        error.code = 'ECIRCUITBREAKER';
+        throw error;
+      }
+
+      async end() {}
+    }
+
+    const result = await checkDailyDatabaseConnectivity(
+      {
+        DATABASE_URL: 'postgres://postgres.dgsoqwanrkqgdichtgzl:super-secret@aws-1-eu-north-1.pooler.supabase.com:6543/postgres',
+        GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: '2',
+        GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS: '0',
+        GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS: '1',
+        GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS: '1'
+      },
+      { Pool: SupabaseCircuitBreakerPool, sleep: async () => {} }
+    );
+
+    assert.equal(result.status, 'blocked');
+    assert.equal(result.attempts, 2);
+    assert.deepEqual(result.blockers, ['supabase_pooler_circuit_breaker']);
+    assert.equal(result.alternateConnections[0].name, 'supabase_transaction_pooler');
+    assert.deepEqual(result.alternateConnections[0].blockers, ['supabase_pooler_circuit_breaker']);
+    assert.equal(result.alternateConnections[1].name, 'supabase_direct_host');
+    assert.deepEqual(result.alternateConnections[1].blockers, ['supabase_pooler_circuit_breaker']);
+    assert.equal(attempts, 4);
   });
 });

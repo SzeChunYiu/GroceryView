@@ -478,8 +478,13 @@ export type PriceObservationWriteResult = {
   status?: 'unchanged';
 };
 
+export type PriceObservationBatchWriteResult = {
+  observationIds: string[];
+};
+
 export type PostgresPriceObservationWriter = {
   recordPriceObservation(observation: PriceObservationRecord): Promise<PriceObservationWriteResult>;
+  upsertConnectorPriceObservations(observations: PriceObservationRecord[]): Promise<PriceObservationBatchWriteResult>;
 };
 
 export type PriceObservationHistoryRecord = PriceObservationRecord & {
@@ -522,6 +527,7 @@ export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
   productSlug: string;
   canonicalName: string;
   brand?: string;
+  imageUrl?: string;
   categoryPath: string[];
   packageSize?: number;
   packageUnit?: string;
@@ -532,6 +538,13 @@ export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
   storeExternalRef?: string;
   storeName?: string;
   city?: string;
+  promotionText?: string;
+  promotionStartsOn?: string;
+  promotionEndsOn?: string;
+  memberRequired: boolean;
+  validFrom?: string;
+  validUntil?: string;
+  retailerProductRef?: string;
 };
 
 export type SiteLatestPriceSnapshotFilter = {
@@ -1482,6 +1495,7 @@ type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
   product_slug: string;
   canonical_name: string;
   brand: string | null;
+  image_url: string | null;
   category_path: string[] | string | null;
   package_size: string | number | null;
   package_unit: string | null;
@@ -1492,6 +1506,13 @@ type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
   store_external_ref: string | null;
   store_name: string | null;
   city: string | null;
+  promotion_text: string | null;
+  promotion_starts_on: string | Date | null;
+  promotion_ends_on: string | Date | null;
+  member_required: boolean;
+  valid_from: string | Date | null;
+  valid_until: string | Date | null;
+  retailer_product_ref: string | null;
 };
 type PriceObservationHistoryRow = {
   id: string;
@@ -1680,6 +1701,7 @@ function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): Site
     productSlug: row.product_slug,
     canonicalName: row.canonical_name,
     ...(row.brand ? { brand: row.brand } : {}),
+    ...(row.image_url ? { imageUrl: row.image_url } : {}),
     categoryPath: asStringArray(row.category_path),
     ...(optionalNumberFromDb(row.package_size) === undefined ? {} : { packageSize: optionalNumberFromDb(row.package_size) }),
     ...(row.package_unit ? { packageUnit: row.package_unit } : {}),
@@ -1689,7 +1711,14 @@ function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): Site
     ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
     ...(row.store_external_ref ? { storeExternalRef: row.store_external_ref } : {}),
     ...(row.store_name ? { storeName: row.store_name } : {}),
-    ...(row.city ? { city: row.city } : {})
+    ...(row.city ? { city: row.city } : {}),
+    ...(row.promotion_text ? { promotionText: row.promotion_text } : {}),
+    ...(row.promotion_starts_on ? { promotionStartsOn: asIso(row.promotion_starts_on) } : {}),
+    ...(row.promotion_ends_on ? { promotionEndsOn: asIso(row.promotion_ends_on) } : {}),
+    memberRequired: row.member_required,
+    ...(row.valid_from ? { validFrom: asIso(row.valid_from) } : {}),
+    ...(row.valid_until ? { validUntil: asIso(row.valid_until) } : {}),
+    ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {})
   };
 }
 
@@ -3170,6 +3199,33 @@ export type PostgresIntegrationProbe = {
   }>;
 };
 
+export type TimescaleDbEvaluationProbe = {
+  timescaleExtensionAvailable: boolean;
+  hypertables: string[];
+  compressionPolicies: string[];
+  retentionPolicies: string[];
+  fallbackTables: string[];
+  fallbackFunctions: string[];
+};
+
+export type TimescaleDbEvaluationReport = {
+  status: 'timescale_ready' | 'fallback_ready' | 'blocked';
+  blockers: string[];
+  timescaleGaps: string[];
+  evidence: string[];
+  recommendation: string;
+  summary: string;
+};
+
+export const TIMESCALEDB_EVALUATION_HYPERTABLES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_RETENTION_POLICIES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_FALLBACK_TABLES = ['observations_v2', 'price_daily', 'price_weekly'] as const;
+export const TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS = [
+  'create_observations_partitions',
+  'drop_observations_partitions_before'
+] as const;
+
 export type PostgresRepositoryProbe = {
   name: string;
   run(executor: QueryExecutor): Promise<void>;
@@ -3198,9 +3254,12 @@ export type CheckPostgresRepositoryIntegrationReadinessInput = Omit<CollectPostg
 export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'chains',
   'products',
+  'fuel_grades',
   'source_runs',
   'raw_records',
   'retailer_source_policies',
+  'fuel_price_sources',
+  'fuel_price_source_observations',
   'observations',
   'observations_v2',
   'latest_prices',
@@ -3244,7 +3303,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '010_commodity_taxonomy',
   '011_multi_vertical_domains',
   '012_price_rollups',
-  '013_observations_partitioning'
+  '013_observations_partitioning',
+  '014_fuel_price_sources'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -3585,6 +3645,7 @@ type MigrationVersionRow = { version: string };
 type ProbeIdRow = { id: string };
 type LatestPriceProbeRow = { observation_id: string };
 type ObservationIdRow = { id: string };
+type BatchObservationIdRow = { ordinal: string | number; id: string };
 type SourceRunIdRow = { id: string };
 type RawRecordIdRow = { id: string };
 
@@ -3855,6 +3916,271 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
       );
 
       return { observationId };
+    },
+
+    async upsertConnectorPriceObservations(observations) {
+      if (observations.length === 0) return { observationIds: [] };
+      const rows = await executor.query<BatchObservationIdRow>(
+        `with input as (
+           select *
+           from jsonb_to_recordset($1::jsonb) as x(
+             ordinal int,
+             product_id uuid,
+             chain_id uuid,
+             store_id uuid,
+             domain text,
+             source_run_id uuid,
+             raw_record_id uuid,
+             retailer_product_ref text,
+             price_type text,
+             price numeric(12, 2),
+             regular_price numeric(12, 2),
+             unit_price numeric(12, 4),
+             currency char(3),
+             quantity numeric,
+             quantity_unit text,
+             promotion_text text,
+             promotion_starts_on date,
+             promotion_ends_on date,
+             member_required boolean,
+             observed_at timestamptz,
+             valid_from timestamptz,
+             valid_until timestamptz,
+             confidence numeric(5, 4),
+             provenance jsonb
+           )
+         ),
+         ranked_input as (
+           select input.*,
+                  row_number() over (
+                    partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, confidence, provenance
+                    order by ordinal
+                  ) as input_rank
+           from input
+         ),
+         existing as (
+           select distinct on (ranked_input.ordinal)
+                  ranked_input.ordinal,
+                  observations.id,
+                  observations.product_id,
+                  observations.chain_id,
+                  observations.store_id,
+                  observations.domain,
+                  observations.price_type,
+                  observations.price,
+                  observations.regular_price,
+                  observations.unit_price,
+                  observations.currency,
+                  observations.observed_at,
+                  observations.confidence,
+                  observations.provenance
+           from ranked_input
+           join observations on observations.product_id = ranked_input.product_id
+             and observations.chain_id = ranked_input.chain_id
+             and observations.store_id is not distinct from ranked_input.store_id
+             and observations.domain = ranked_input.domain
+             and observations.price_type = ranked_input.price_type
+             and observations.observed_at = ranked_input.observed_at
+             and observations.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
+             and observations.price = ranked_input.price
+             and observations.unit_price = ranked_input.unit_price
+             and observations.currency = ranked_input.currency
+             and observations.confidence = ranked_input.confidence
+             and observations.provenance = ranked_input.provenance
+           order by ranked_input.ordinal, observations.created_at, observations.id
+         ),
+         inserted as (
+           insert into observations(
+             product_id,
+             chain_id,
+             store_id,
+             domain,
+             source_run_id,
+             raw_record_id,
+             retailer_product_ref,
+             price_type,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             quantity,
+             quantity_unit,
+             promotion_text,
+             promotion_starts_on,
+             promotion_ends_on,
+             member_required,
+             observed_at,
+             valid_from,
+             valid_until,
+             confidence,
+             provenance
+           )
+           select
+             product_id,
+             chain_id,
+             store_id,
+             domain,
+             source_run_id,
+             raw_record_id,
+             retailer_product_ref,
+             price_type,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             quantity,
+             quantity_unit,
+             promotion_text,
+             promotion_starts_on,
+             promotion_ends_on,
+             member_required,
+             observed_at,
+             valid_from,
+             valid_until,
+             confidence,
+             provenance
+           from ranked_input
+           where input_rank = 1
+             and not exists (
+               select 1
+               from existing
+               where existing.ordinal = ranked_input.ordinal
+             )
+           returning id, product_id, chain_id, store_id, domain, retailer_product_ref, price_type, price, regular_price, unit_price, currency, observed_at, confidence, provenance
+         ),
+         written as (
+           select ranked_input.ordinal,
+                  coalesce(inserted.id, existing.id) as id,
+                  coalesce(inserted.product_id, existing.product_id) as product_id,
+                  coalesce(inserted.chain_id, existing.chain_id) as chain_id,
+                  coalesce(inserted.store_id, existing.store_id) as store_id,
+                  coalesce(inserted.domain, existing.domain) as domain,
+                  coalesce(inserted.price_type, existing.price_type) as price_type,
+                  coalesce(inserted.price, existing.price) as price,
+                  coalesce(inserted.regular_price, existing.regular_price) as regular_price,
+                  coalesce(inserted.unit_price, existing.unit_price) as unit_price,
+                  coalesce(inserted.currency, existing.currency) as currency,
+                  coalesce(inserted.observed_at, existing.observed_at) as observed_at,
+                  coalesce(inserted.confidence, existing.confidence) as confidence,
+                  coalesce(inserted.provenance, existing.provenance) as provenance
+           from ranked_input
+           left join existing on existing.ordinal = ranked_input.ordinal
+           left join inserted on inserted.product_id = ranked_input.product_id
+             and inserted.chain_id = ranked_input.chain_id
+             and inserted.store_id is not distinct from ranked_input.store_id
+             and inserted.domain = ranked_input.domain
+             and inserted.price_type = ranked_input.price_type
+             and inserted.observed_at = ranked_input.observed_at
+             and inserted.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
+             and inserted.price = ranked_input.price
+             and inserted.unit_price = ranked_input.unit_price
+             and inserted.currency = ranked_input.currency
+             and inserted.confidence = ranked_input.confidence
+             and inserted.provenance = ranked_input.provenance
+           where inserted.id is not null or existing.id is not null
+         ),
+         latest_upsert as (
+           insert into latest_prices(
+             product_id,
+             chain_id,
+             store_id,
+             domain,
+             price_type,
+             observation_id,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             observed_at,
+             confidence,
+             provenance
+           )
+           select
+             product_id,
+             chain_id,
+             store_id,
+             domain,
+             price_type,
+             id,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             observed_at,
+             confidence,
+             provenance
+           from (
+             select distinct on (product_id, chain_id, store_id, price_type)
+               product_id,
+               chain_id,
+               store_id,
+               domain,
+               price_type,
+               id,
+               price,
+               regular_price,
+               unit_price,
+               currency,
+               observed_at,
+               confidence,
+               provenance
+             from written
+             order by product_id, chain_id, store_id, price_type, observed_at desc, id desc
+           ) latest_input
+           on conflict (product_id, chain_id, store_id, price_type) do update set
+             observation_id = excluded.observation_id,
+             price = excluded.price,
+             regular_price = excluded.regular_price,
+             unit_price = excluded.unit_price,
+             currency = excluded.currency,
+             observed_at = excluded.observed_at,
+             confidence = excluded.confidence,
+             domain = excluded.domain,
+             provenance = excluded.provenance,
+             updated_at = now()
+           where latest_prices.observed_at <= excluded.observed_at
+           returning 1
+         )
+         select ordinal, id
+         from written
+         order by ordinal`,
+        [JSON.stringify(observations.map((observation, ordinal) => ({
+          ordinal,
+          product_id: observation.productId,
+          chain_id: observation.chainId,
+          store_id: observation.storeId ?? null,
+          domain: observation.domain ?? 'grocery',
+          source_run_id: observation.sourceRunId ?? null,
+          raw_record_id: observation.rawRecordId ?? null,
+          retailer_product_ref: observation.retailerProductRef ?? null,
+          price_type: observation.priceType,
+          price: observation.price,
+          regular_price: observation.regularPrice ?? null,
+          unit_price: observation.unitPrice,
+          currency: observation.currency ?? 'SEK',
+          quantity: observation.quantity ?? null,
+          quantity_unit: observation.quantityUnit ?? null,
+          promotion_text: observation.promotionText ?? null,
+          promotion_starts_on: observation.promotionStartsOn ?? null,
+          promotion_ends_on: observation.promotionEndsOn ?? null,
+          member_required: observation.memberRequired ?? false,
+          observed_at: observation.observedAt,
+          valid_from: observation.validFrom ?? null,
+          valid_until: observation.validUntil ?? null,
+          confidence: observation.confidence,
+          provenance: observation.provenance
+        })))]
+      );
+      if (rows.length !== observations.length) throw new Error('Connector price observation upsert did not return an id for every input row');
+
+      const idsByOrdinal = new Map(rows.map((row) => [Number(row.ordinal), row.id]));
+      return {
+        observationIds: observations.map((_, ordinal) => {
+          const id = idsByOrdinal.get(ordinal);
+          if (!id) throw new Error(`Connector price observation upsert did not return an id for input row ${ordinal}`);
+          return id;
+        })
+      };
     }
   };
 }
@@ -3863,12 +4189,13 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
   return {
     async listLatestPriceSnapshotRows(filter = {}) {
       const minConfidence = Math.min(Math.max(filter.minConfidence ?? 0, 0), 1);
-      const limit = Math.min(Math.max(filter.limit ?? 1000, 1), 10000);
+      const limit = Math.min(Math.max(filter.limit ?? 10000, 1), 10000);
       const rows = await executor.query<SiteLatestPriceSnapshotRowSql>(
         `select latest_prices.product_id,
                 products.slug as product_slug,
                 products.canonical_name,
                 products.brand,
+                products.image_url,
                 products.category_path,
                 products.package_size,
                 products.package_unit,
@@ -3889,12 +4216,21 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
                 latest_prices.currency,
                 latest_prices.observed_at,
                 latest_prices.confidence,
-                latest_prices.provenance
+                observations.promotion_text,
+                observations.promotion_starts_on,
+                observations.promotion_ends_on,
+                observations.member_required,
+                observations.valid_from,
+                observations.valid_until,
+                observations.retailer_product_ref,
+                coalesce(observations.provenance, latest_prices.provenance) as provenance
          from latest_prices
+         join observations on observations.id = latest_prices.observation_id
          join products on products.id = latest_prices.product_id
          join chains on chains.id = latest_prices.chain_id
          left join stores on stores.id = latest_prices.store_id
          where latest_prices.confidence >= $1
+           and latest_prices.domain = 'grocery'
          order by latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
          limit $2`,
         [minConfidence, limit]
@@ -4058,6 +4394,137 @@ export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrati
     evidence,
     summary: blockers.length === 0 ? 'PostgreSQL integration contract is ready.' : 'PostgreSQL integration contract is blocked.'
   };
+}
+
+export function buildTimescaleDbEvaluationReport(input: TimescaleDbEvaluationProbe): TimescaleDbEvaluationReport {
+  const hypertables = new Set(input.hypertables);
+  const compressionPolicies = new Set(input.compressionPolicies);
+  const retentionPolicies = new Set(input.retentionPolicies);
+  const fallbackTables = new Set(input.fallbackTables);
+  const fallbackFunctions = new Set(input.fallbackFunctions);
+  const timescaleGaps: string[] = [];
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+
+  if (input.timescaleExtensionAvailable) {
+    evidence.push('timescaledb_extension:available');
+  } else {
+    timescaleGaps.push('timescaledb_extension_not_installed');
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_HYPERTABLES) {
+    if (hypertables.has(table)) evidence.push(`hypertable:${table}`);
+    else timescaleGaps.push(`missing_hypertable:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES) {
+    if (compressionPolicies.has(table)) evidence.push(`compression_policy:${table}`);
+    else timescaleGaps.push(`missing_compression_policy:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_RETENTION_POLICIES) {
+    if (retentionPolicies.has(table)) evidence.push(`retention_policy:${table}`);
+    else timescaleGaps.push(`missing_retention_policy:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_FALLBACK_TABLES) {
+    if (fallbackTables.has(table)) evidence.push(`fallback_table:${table}`);
+    else blockers.push(`missing_fallback_table:${table}`);
+  }
+
+  for (const routine of TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS) {
+    if (fallbackFunctions.has(routine)) evidence.push(`fallback_function:${routine}`);
+    else blockers.push(`missing_fallback_function:${routine}`);
+  }
+
+  if (timescaleGaps.length === 0) {
+    return {
+      status: 'timescale_ready',
+      blockers,
+      timescaleGaps: [],
+      evidence,
+      recommendation: 'TimescaleDB is ready for observations_v2 hypertable compression and retention policies.',
+      summary: blockers.length === 0 ? 'TimescaleDB evaluation is ready.' : 'TimescaleDB evaluation is blocked by missing fallback evidence.'
+    };
+  }
+
+  if (blockers.length === 0) {
+    return {
+      status: 'fallback_ready',
+      blockers: [],
+      timescaleGaps,
+      evidence,
+      recommendation: 'Use declarative monthly partitions, BRIN pruning, price_daily/price_weekly rollups, and partition-drop retention until TimescaleDB is installed.',
+      summary: 'TimescaleDB is not fully configured; the declarative partition fallback is ready.'
+    };
+  }
+
+  return {
+    status: 'blocked',
+    blockers,
+    timescaleGaps,
+    evidence,
+    recommendation: 'Block price-tape scale claims until either TimescaleDB policies or the declarative partition fallback are fully present.',
+    summary: 'TimescaleDB evaluation is blocked.'
+  };
+}
+
+export async function collectTimescaleDbEvaluationProbe(executor: QueryExecutor): Promise<TimescaleDbEvaluationProbe> {
+  const extensionRows = await executor.query<{ installed_version: string | null }>(
+    "select installed_version from pg_available_extensions where name = 'timescaledb'"
+  );
+  const timescaleExtensionAvailable = Boolean(extensionRows[0]?.installed_version);
+  const fallbackTableRows = await executor.query<{ table_name: string }>(
+    'select table_name from information_schema.tables where table_schema = current_schema() and table_name = any($1)',
+    [[...TIMESCALEDB_EVALUATION_FALLBACK_TABLES]]
+  );
+  const fallbackFunctionRows = await executor.query<{ routine_name: string }>(
+    'select routine_name from information_schema.routines where routine_schema = current_schema() and routine_name = any($1)',
+    [[...TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS]]
+  );
+
+  const probe: TimescaleDbEvaluationProbe = {
+    timescaleExtensionAvailable,
+    hypertables: [],
+    compressionPolicies: [],
+    retentionPolicies: [],
+    fallbackTables: fallbackTableRows.map((row) => row.table_name),
+    fallbackFunctions: fallbackFunctionRows.map((row) => row.routine_name)
+  };
+
+  if (!timescaleExtensionAvailable) return probe;
+
+  try {
+    const hypertableRows = await executor.query<{ hypertable_name: string }>(
+      'select hypertable_name from timescaledb_information.hypertables where hypertable_name = any($1)',
+      [[...TIMESCALEDB_EVALUATION_HYPERTABLES]]
+    );
+    probe.hypertables = hypertableRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.hypertables = [];
+  }
+
+  try {
+    const compressionRows = await executor.query<{ hypertable_name: string }>(
+      "select hypertable_name from timescaledb_information.jobs where proc_name = 'policy_compression' and hypertable_name = any($1)",
+      [[...TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES]]
+    );
+    probe.compressionPolicies = compressionRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.compressionPolicies = [];
+  }
+
+  try {
+    const retentionRows = await executor.query<{ hypertable_name: string }>(
+      "select hypertable_name from timescaledb_information.jobs where proc_name = 'policy_retention' and hypertable_name = any($1)",
+      [[...TIMESCALEDB_EVALUATION_RETENTION_POLICIES]]
+    );
+    probe.retentionPolicies = retentionRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.retentionPolicies = [];
+  }
+
+  return probe;
 }
 
 export function summarizePostgresIntegrationReadinessReport(

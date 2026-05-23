@@ -8,6 +8,7 @@ const DEFAULT_RETRY_ATTEMPTS = 30;
 const DEFAULT_RETRY_BASE_DELAY_MS = 10_000;
 const DEFAULT_RETRY_MAX_DELAY_MS = 30_000;
 const DEFAULT_DIRECT_PROBE_ATTEMPTS = 1;
+const DEFAULT_ALTERNATE_POOLER_PROBE_ATTEMPTS = 1;
 
 export function redactDatabaseUrl(rawUrl) {
   const url = new URL(rawUrl);
@@ -49,6 +50,14 @@ export function classifyDatabaseUrl(rawUrl) {
   };
 }
 
+export function buildSupabaseTransactionPoolerConnectionString(rawUrl) {
+  const classification = classifyDatabaseUrl(rawUrl);
+  if (!classification.transformedForDailyWrites) return null;
+  const url = new URL(rawUrl);
+  url.port = String(classification.originalPort);
+  return url.toString();
+}
+
 export function buildSupabaseDirectConnectionString(rawUrl) {
   const classification = classifyDatabaseUrl(rawUrl);
   if (!classification.isSupabasePooler) return null;
@@ -87,6 +96,10 @@ export function isTransientDailyDatabaseError(error) {
     'db_connection_closed_in_auth',
     'hot standby mode is disabled',
     'edbhandlerexited',
+    'eauthquery',
+    'ecircuitbreaker',
+    'connection to database not available',
+    'new connections are temporarily blocked',
     'timeout',
     'epipe'
   ].some((signature) => text.includes(signature));
@@ -94,6 +107,8 @@ export function isTransientDailyDatabaseError(error) {
 
 function blockerForError(error) {
   const text = errorText(error).toLowerCase();
+  if (text.includes('ecircuitbreaker') && text.includes('new connections are temporarily blocked')) return 'supabase_pooler_circuit_breaker';
+  if (text.includes('eauthquery') && text.includes('connection to database not available')) return 'supabase_pooler_database_unavailable';
   if (text.includes('database system is not accepting connections')) return 'database_not_accepting_connections';
   if (text.includes('db_connection_closed_in_auth')) return 'supabase_pooler_auth_closed';
   if (text.includes('hot standby mode is disabled')) return 'supabase_database_hot_standby_disabled';
@@ -112,7 +127,9 @@ function sanitizeError(error) {
 
 async function probeConnection({ connectionString, retryAttempts, retryBaseDelayMs, retryMaxDelayMs, Pool, wait }) {
   let lastError;
+  let attempts = 0;
   for (let attempt = 1; attempt <= retryAttempts; attempt += 1) {
+    attempts = attempt;
     const pool = new Pool({
       connectionString,
       max: 1,
@@ -138,7 +155,7 @@ async function probeConnection({ connectionString, retryAttempts, retryBaseDelay
   }
   return {
     status: 'blocked',
-    attempts: retryAttempts,
+    attempts,
     blockers: [blockerForError(lastError)],
     error: sanitizeError(lastError)
   };
@@ -176,6 +193,37 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
   }
 
   const alternateConnections = [];
+  const transactionPoolerConnectionString = buildSupabaseTransactionPoolerConnectionString(databaseUrl);
+  if (transactionPoolerConnectionString) {
+    const transactionProbeAttempts = parsePositiveInteger(env.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS, DEFAULT_ALTERNATE_POOLER_PROBE_ATTEMPTS);
+    const transactionClassification = classifyDatabaseUrl(transactionPoolerConnectionString);
+    const transactionProbe = await probeConnection({
+      connectionString: transactionPoolerConnectionString,
+      retryAttempts: transactionProbeAttempts,
+      retryBaseDelayMs,
+      retryMaxDelayMs,
+      Pool,
+      wait
+    });
+    alternateConnections.push({
+      name: 'supabase_transaction_pooler',
+      status: transactionProbe.status,
+      attempts: transactionProbe.attempts,
+      host: transactionClassification.host,
+      port: transactionClassification.originalPort,
+      originalPort: transactionClassification.originalPort,
+      database: transactionClassification.database,
+      username: transactionClassification.username,
+      poolerMode: 'transaction',
+      redactedUrl: transactionClassification.redactedUrl,
+      blockers: transactionProbe.blockers,
+      error: transactionProbe.error,
+      action: transactionProbe.status === 'ready'
+        ? 'Transaction pooler accepts writes; the session-pooler endpoint is the blocker, but run migrations and ingestion only through a validated session/direct/replacement DB path.'
+        : 'Transaction pooler also failed; continue provider recovery or replacement DB cutover.'
+    });
+  }
+
   const directConnectionString = buildSupabaseDirectConnectionString(databaseUrl);
   if (directConnectionString) {
     const directProbeAttempts = parsePositiveInteger(env.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS, DEFAULT_DIRECT_PROBE_ATTEMPTS);

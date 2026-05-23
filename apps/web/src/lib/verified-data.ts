@@ -3,12 +3,23 @@ import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, ty
 import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
-import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
-import { mathemProducts, mathemSource } from './ingested/mathem';
+import { icaStorePromotionSourceSummary } from './ingested/ica-source-summary';
+import { icaReklambladOffers as staticIcaReklambladOffers, icaReklambladSource as staticIcaReklambladSource } from './ingested/ica-reklamblad';
+import { mathemProducts as staticMathemProducts, mathemSource as staticMathemSource } from './ingested/mathem';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
-import { lidlStoreOffers, lidlSource } from './ingested/lidl';
-import { matpriskollenOffers } from './ingested/matpriskollen';
+import { lidlStoreOffers as staticLidlStoreOffers, lidlSource as staticLidlSource } from './ingested/lidl';
+import { matpriskollenOffers as staticMatpriskollenOffers } from './ingested/matpriskollen';
 import { verifiedFuelPriceObservations, verifiedFuelPriceSource } from './fuel-prices';
+import {
+  dbSiteIcaReklambladOffers,
+  dbSiteIcaReklambladSource,
+  dbSiteLidlSource,
+  dbSiteLidlStoreOffers,
+  dbSiteMathemProducts,
+  dbSiteMathemSource,
+  dbSiteMatpriskollenOffers,
+  dbSiteMatpriskollenSource
+} from './generated/db-site-ingested-overrides';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { osmStores } from './osm-stores';
 import {
@@ -20,9 +31,18 @@ import {
   supportedCurrencies
 } from './i18n';
 
+const icaReklambladOffers = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladOffers : staticIcaReklambladOffers;
+const icaReklambladSource = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladSource : staticIcaReklambladSource;
+const mathemProducts = dbSiteMathemProducts.length > 0 ? dbSiteMathemProducts : staticMathemProducts;
+const mathemSource = dbSiteMathemProducts.length > 0 ? dbSiteMathemSource : staticMathemSource;
+const lidlStoreOffers = dbSiteLidlStoreOffers.length > 0 ? dbSiteLidlStoreOffers : staticLidlStoreOffers;
+const lidlSource = dbSiteLidlStoreOffers.length > 0 ? dbSiteLidlSource : staticLidlSource;
+const matpriskollenOffers = dbSiteMatpriskollenOffers.length > 0 ? dbSiteMatpriskollenOffers : staticMatpriskollenOffers;
+
 export const snapshot = {
   retrievedLabel: '20-21 May 2026',
   axfoodSource: 'Willys and Hemköp public search endpoints',
+  icaStorePromotionsSource: 'ICA handlaprivatkund store-scoped promotions endpoints',
   openPricesSource: 'OpenPrices / Open Food Facts SEK observations',
   openFoodFactsCatalogSource: 'OpenFoodFacts Sweden metadata catalog',
   osmSource: 'OpenStreetMap Overpass Sweden extract'
@@ -1651,6 +1671,81 @@ const digitalCatalogueSampleOffers = icaReklambladOffers
     evidenceLabel: `${offer.storeName} · ${offer.availableOnline ? 'online + in-store' : offer.availableInStore ? 'in-store' : 'availability not reported'}`
   }));
 
+export const icaStorePromotionEvidence = {
+  title: 'ICA store-scoped promotions',
+  latestStore: icaStorePromotionSourceSummary.latestStores[0] ?? null,
+  latestStores: icaStorePromotionSourceSummary.latestStores,
+  storeEndpointCount: icaStorePromotionSourceSummary.storeEndpointCount,
+  storeScopedRows: icaStorePromotionSourceSummary.totalRowCount,
+  productRowCount: icaStorePromotionSourceSummary.totalRowCount,
+  sourceLabel: icaStorePromotionSourceSummary.sourceLabel,
+  generatedFrom: icaStorePromotionSourceSummary.generatedFrom,
+  coverageLabel: `${icaStorePromotionSourceSummary.storeEndpointCount.toLocaleString('sv-SE')} store endpoints · ${icaStorePromotionSourceSummary.totalRowCount.toLocaleString('sv-SE')} fetched promotion rows`,
+  guardrails: [
+    'Rows come from ICA public store-scoped promotion listing JSON and retain storeAccountId, regionId, retrievedAt, and sourceUrl evidence.',
+    'No branch shelf-price claim: these are promotion listing rows, not guaranteed in-store shelf prices, stock levels, or checkout totals.',
+    'The latest-store card is a provenance surface only; it does not rank ICA branches or compare availability across stores.'
+  ]
+};
+
+export const allStoreDailyRunnerReadiness = {
+  title: 'All-store daily batch runner',
+  status: 'visible_workflow_contract_ready',
+  runnerPath: 'packages/ingestion/src/connectors/all-store-runner.ts',
+  workflowPath: '.github/workflows/daily-ingestion.yml',
+  storeEnumerationArtifact: 'groceryview-daily-connector-stores',
+  connectorArtifact: 'groceryview-daily-connectors',
+  requiredChains: ['ICA', 'Willys', 'Coop', 'Hemköp', 'Lidl', 'City Gross'],
+  runnerControls: [
+    {
+      name: 'storeConcurrency',
+      defaultValue: '4 workers',
+      purpose: 'caps concurrent branch fetches so all-store jobs can finish without overloading retailer endpoints'
+    },
+    {
+      name: 'storeStartDelayMs',
+      defaultValue: '0 ms',
+      purpose: 'optionally spaces store starts for conservative production runs'
+    },
+    {
+      name: 'storeRetryAttempts',
+      defaultValue: '1 retry',
+      purpose: 'retries transient per-store fetch failures before recording a store failure'
+    },
+    {
+      name: 'storeRetryBaseDelayMs',
+      defaultValue: '250 ms',
+      purpose: 'applies a bounded backoff between per-store retries'
+    },
+    {
+      name: 'failOnStoreFailure',
+      defaultValue: 'false unless configured',
+      purpose: 'lets production decide whether any branch failure should block the daily run'
+    }
+  ],
+  allStoreConnectorUrls: [
+    { chain: 'Willys', scope: 'weekly offers', url: 'groceryview://daily/willys/weekly-offers/all-stores' },
+    { chain: 'Willys', scope: 'products', url: 'groceryview://daily/willys/products/all-stores' },
+    { chain: 'Hemköp', scope: 'products', url: 'groceryview://daily/hemkop/products/all-stores' },
+    { chain: 'Hemköp', scope: 'weekly offers', url: 'groceryview://daily/hemkop/weekly-offers/all-stores' },
+    { chain: 'Coop', scope: 'weekly offers', url: 'groceryview://daily/coop/weekly-offers/all-stores' },
+    { chain: 'Coop', scope: 'products', url: 'groceryview://daily/coop/products/all-stores' },
+    { chain: 'Lidl', scope: 'public offers', url: 'groceryview://daily/lidl/public-offers/all-stores' },
+    { chain: 'City Gross', scope: 'public products', url: 'groceryview://daily/city-gross/public-products/all-stores' }
+  ],
+  workflowSteps: [
+    'Export live store enumeration',
+    'Validate production ingestion configuration',
+    'Run daily ingestion',
+    'Upload deployed readiness evidence'
+  ],
+  guardrails: [
+    'This is an operator-readiness contract, not proof that production has completed a fresh all-store run today.',
+    'All-store connector URLs enumerate branches for supported chains before daily writes; missing secrets or DB blockers still fail closed.',
+    'Per-store fetch failures stay visible through runner failure rows instead of being hidden behind a partial aggregate.'
+  ]
+};
+
 export const digitalCatalogueOfferBoard = {
   title: 'ICA e-magin weekly catalogue ingestion',
   sourceLabel: icaReklambladSource.source,
@@ -2502,6 +2597,14 @@ export const sourceCoverage = [
     caveat: 'Chain-wide online catalogue prices; not per-branch shelf prices.'
   },
   {
+    name: 'ICA store-scoped promotions',
+    source: snapshot.icaStorePromotionsSource,
+    rows: icaStorePromotionEvidence.storeScopedRows,
+    coverage: `${icaStorePromotionEvidence.storeEndpointCount.toLocaleString('sv-SE')} store endpoints including ${icaStorePromotionEvidence.latestStore?.storeName ?? 'latest store not reported'}`,
+    freshness: icaStorePromotionEvidence.latestStore?.retrievedAt ?? 'Not reported',
+    caveat: 'Store-scoped promotion listing rows; no branch shelf-price, inventory, or checkout-total claim.'
+  },
+  {
     name: 'OpenPrices SEK observations',
     source: snapshot.openPricesSource,
     rows: pricedProducts.length,
@@ -2537,6 +2640,7 @@ export const sourceCoverage = [
 
 function sourceKindFor(name: string) {
   if (name === 'Axfood chain price snapshot') return 'axfood';
+  if (name === 'ICA store-scoped promotions') return 'ica-promotions';
   if (name === 'OpenPrices SEK observations') return 'openprices';
   if (name === 'OpenFoodFacts metadata catalog') return 'openfoodfacts';
   if (name === 'OKQ8 fuel operator prices') return 'fuel';
@@ -2546,12 +2650,14 @@ function sourceKindFor(name: string) {
 function sourceRouteFor(name: string) {
   if (name === 'Sweden store directory') return '/stores';
   if (name === 'OKQ8 fuel operator prices') return '/fuel';
+  if (name === 'ICA store-scoped promotions') return '/data-sources';
   if (name === 'OpenPrices SEK observations' || name === 'OpenFoodFacts metadata catalog') return '/products';
   return '/compare';
 }
 
 function confidenceBadgeFor(name: string) {
   if (name === 'Axfood chain price snapshot') return 'chain-wide catalogue confidence';
+  if (name === 'ICA store-scoped promotions') return 'store-scoped promotion provenance';
   if (name === 'OKQ8 fuel operator prices') return 'operator-page confidence';
   if (name === 'OpenPrices SEK observations') return 'community-observed confidence';
   if (name === 'OpenFoodFacts metadata catalog') return 'metadata-only confidence';
@@ -2577,6 +2683,8 @@ export const sourceReadinessMatrix = sourceCoverage.map((source) => {
       ? '/stores'
       : source.name === 'OKQ8 fuel operator prices'
         ? '/fuel'
+      : source.name === 'ICA store-scoped promotions'
+        ? '/data-sources'
       : source.name === 'OpenPrices SEK observations' || source.name === 'OpenFoodFacts metadata catalog'
         ? '/products'
         : '/compare';
@@ -2596,6 +2704,8 @@ export const sourceRouteMap = sourceReadinessMatrix.map((source) => {
   const supportingRoutes =
     source.name === 'Sweden store directory'
       ? ['/stores', '/map', '/data-sources']
+      : source.name === 'ICA store-scoped promotions'
+        ? ['/', '/data-sources', '/deals']
       : source.name === 'OpenPrices SEK observations'
         ? ['/products', '/categories', '/data-sources']
         : source.name === 'OpenFoodFacts metadata catalog'
@@ -2615,12 +2725,16 @@ export const sourceClaimLedger = sourceCoverage.map((source) => {
   const route =
     source.name === 'Sweden store directory'
       ? '/stores'
+      : source.name === 'ICA store-scoped promotions'
+        ? '/data-sources'
       : source.name === 'OpenPrices SEK observations' || source.name === 'OpenFoodFacts metadata catalog'
         ? '/products'
         : '/compare';
   const allowedClaim =
     source.name === 'Sweden store directory'
       ? 'Verified Sweden store locations, brands, formats, districts, and address coverage.'
+      : source.name === 'ICA store-scoped promotions'
+        ? 'ICA public store-scoped promotion listing rows with storeAccountId, regionId, retrievedAt, row counts, and source URLs.'
       : source.name === 'OpenPrices SEK observations'
         ? 'Observed community price medians, observation counts, product codes, and latest sighting dates.'
         : source.name === 'OpenFoodFacts metadata catalog'
@@ -2629,6 +2743,8 @@ export const sourceClaimLedger = sourceCoverage.map((source) => {
   const blockedClaim =
     source.name === 'Sweden store directory'
       ? 'Branch-level prices, inventory, opening hours, or promotion availability.'
+      : source.name === 'ICA store-scoped promotions'
+        ? 'Branch shelf-price guarantee, stock status, authenticated ICA loyalty pricing, or checkout-total availability.'
       : source.name === 'OpenPrices SEK observations'
         ? 'Guaranteed current shelf price, store-specific availability, or member-only offer state.'
         : source.name === 'OpenFoodFacts metadata catalog'
@@ -2767,6 +2883,106 @@ export const apiPerformanceReadiness = {
     'Redis cache evidence is a runtime capability, not a claim that production Redis is configured today.',
     'pgbouncer readiness stays blocked until DATABASE_URL points at the pooler and the production secret audit passes.',
     'Long-range history must read price_daily or price_weekly rollups; raw observations remain for hot recent evidence only.'
+  ]
+};
+
+export const timescaleDbEvaluation = {
+  title: 'TimescaleDB evaluation',
+  status: 'fallback_ready',
+  source: 'packages/db/src/index.ts buildTimescaleDbEvaluationReport over infra/db migrations 012_price_rollups and 013_observations_partitioning',
+  recommendation: 'Use declarative monthly partitions until TimescaleDB hypertable compression and retention policies are installed.',
+  evaluationSignals: [
+    {
+      label: 'Timescale extension',
+      state: 'not assumed installed',
+      evidence: 'timescaleDbEvaluation.timescaleGaps keeps timescaledb_extension_not_installed visible instead of claiming adoption'
+    },
+    {
+      label: 'Hypertable target',
+      state: 'observations_v2 is the candidate hypertable',
+      evidence: 'buildTimescaleDbEvaluationReport requires hypertable:observations_v2 before status can become timescale_ready'
+    },
+    {
+      label: 'Compression + retention',
+      state: 'policy evidence required',
+      evidence: 'compression_policy:observations_v2 and retention_policy:observations_v2 must both exist before TimescaleDB is marked ready'
+    }
+  ],
+  fallbackTables: [
+    {
+      table: 'observations_v2',
+      role: 'declarative monthly partitions plus BRIN pruning for append-only price tape reads'
+    },
+    {
+      table: 'price_daily',
+      role: 'daily rollup table for product charts, 52-week-low badges, and historic range reads'
+    },
+    {
+      table: 'price_weekly',
+      role: 'weekly rollup table for long-range history without scanning raw observations'
+    }
+  ],
+  fallbackFunctions: [
+    {
+      name: 'create_observations_partitions',
+      role: 'pre-create monthly observations_v2 partitions before daily ingestion writes arrive'
+    },
+    {
+      name: 'drop_observations_partitions_before',
+      role: 'retention tiering hook so operators archive/downsample before partition-drop cleanup'
+    }
+  ],
+  timescaleGaps: [
+    'timescaledb_extension_not_installed',
+    'missing_hypertable:observations_v2',
+    'missing_compression_policy:observations_v2',
+    'missing_retention_policy:observations_v2'
+  ],
+  guardrails: [
+    'fallback_ready is not a claim that TimescaleDB is installed in production.',
+    'No long-range chart should read raw observations when price_daily or price_weekly can answer the request.',
+    'TimescaleDB adoption must show extension, hypertable, compression policy, and retention policy evidence before replacing the fallback.'
+  ]
+};
+
+export const webPerformanceBudgetGate = {
+  title: 'Lighthouse CI budget',
+  status: 'Core Web Vitals budget enforced in CI',
+  command: 'npm run perf:lighthouse:ci -w @groceryview/web',
+  configPath: 'apps/web/lighthouserc.cjs',
+  workflow: '.github/workflows/ci.yml',
+  terminalRoutes: [
+    '/',
+    '/products',
+    '/compare',
+    '/data-sources'
+  ],
+  assertions: [
+    {
+      metric: 'categories:performance',
+      budget: 'minimum Lighthouse performance score 0.45',
+      gate: 'error'
+    },
+    {
+      metric: 'largest-contentful-paint',
+      budget: '≤ 6000 ms desktop CI route load',
+      gate: 'error'
+    },
+    {
+      metric: 'cumulative-layout-shift',
+      budget: '≤ 0.15 layout shift (CI-calibrated desktop smoke)',
+      gate: 'error'
+    },
+    {
+      metric: 'total-byte-weight',
+      budget: '≤ 9 MB transferred bytes per terminal route',
+      gate: 'error'
+    }
+  ],
+  guardrails: [
+    'The Lighthouse CI budget runs after Next build in the required CI workflow, so regressions block PR checks instead of becoming a production surprise.',
+    'The budget covers the public terminal homepage plus product discovery, compare, and data-source evidence routes.',
+    'Lighthouse reports are stored in .lighthouseci as filesystem artifacts during CI; no secret token or external performance SaaS is required.'
   ]
 };
 

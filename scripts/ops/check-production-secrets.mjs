@@ -33,6 +33,9 @@ export const requiredDbRecoverySecrets = [
   'SUPABASE_ACCESS_TOKEN'
 ];
 
+export const supabaseManagementTokenRequirement =
+  'SUPABASE_ACCESS_TOKEN must be a Supabase Management API personal access token beginning with sbp_.';
+
 export const requiredDbRecoveryVariables = [
   'SUPABASE_PROJECT_REF'
 ];
@@ -63,9 +66,38 @@ export const requiredRuntimeSecrets = [
   'CATALOG_COVERAGE_TARGETS_JSON'
 ];
 
+export const runtimeSecretsSatisfiableByVariables = [
+  'PUBLIC_WEB_URL',
+  'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN'
+];
+
 export function findMissingSecrets(requiredNames, listedNames) {
   const listed = new Set(listedNames);
   return requiredNames.filter((name) => !listed.has(name));
+}
+
+export function findMissingRuntimeSecrets(requiredNames, listedSecretNames, listedVariableNames) {
+  const listedSecrets = new Set(listedSecretNames);
+  const listedVariables = new Set(listedVariableNames);
+  const variableBackedRuntimeNames = new Set(runtimeSecretsSatisfiableByVariables);
+  return requiredNames.filter((name) => {
+    if (listedSecrets.has(name)) return false;
+    return !(variableBackedRuntimeNames.has(name) && listedVariables.has(name));
+  });
+}
+
+export function isSupabaseManagementAccessTokenShape(value) {
+  const token = String(value ?? '').trim();
+  return token.startsWith('sbp_') && token.length > 'sbp_'.length;
+}
+
+export function findInvalidDbRecoverySecrets(env) {
+  const invalid = [];
+  const token = env.SUPABASE_ACCESS_TOKEN;
+  if (typeof token === 'string' && token.trim().length > 0 && !isSupabaseManagementAccessTokenShape(token)) {
+    invalid.push('SUPABASE_ACCESS_TOKEN');
+  }
+  return invalid;
 }
 
 function uniqueSecretNames() {
@@ -79,7 +111,11 @@ function uniqueSecretNames() {
 }
 
 function uniqueVariableNames() {
-  return Array.from(new Set([...requiredGithubActionVariables, ...requiredDbRecoveryVariables]));
+  return Array.from(new Set([
+    ...requiredGithubActionVariables,
+    ...requiredDbRecoveryVariables,
+    ...runtimeSecretsSatisfiableByVariables
+  ]));
 }
 
 function hasAnySecret(candidateNames, listedNames) {
@@ -123,6 +159,64 @@ function readEnvironmentSecretNames(requiredNames) {
   });
 }
 
+function scopeStatus(scope, checks) {
+  if (scope === 'db-recovery') {
+    return checks.missingDbRecoverySecrets.length === 0 &&
+      checks.missingDbRecoveryVariables.length === 0 &&
+      checks.invalidDbRecoverySecrets.length === 0
+      ? 'ready'
+      : 'blocked';
+  }
+  if (scope === 'db-cutover') {
+    return checks.missingDbCutoverSecrets.length === 0 && checks.missingDbCutoverCandidateSecrets.length === 0
+      ? 'ready'
+      : 'blocked';
+  }
+  return checks.missingGithubActionSecrets.length === 0 &&
+    checks.missingGithubActionVariables.length === 0 &&
+    checks.missingRuntimeSecrets.length === 0 &&
+    checks.missingDbCutoverSecrets.length === 0 &&
+    checks.missingDbCutoverCandidateSecrets.length === 0 &&
+    checks.missingDbRecoverySecrets.length === 0 &&
+    checks.missingDbRecoveryVariables.length === 0 &&
+    checks.invalidDbRecoverySecrets.length === 0
+    ? 'ready'
+    : 'blocked';
+}
+
+function resultBlocker(scope, checks) {
+  if ((scope === 'db-recovery' || scope === 'all') && checks.invalidDbRecoverySecrets.length > 0) {
+    return 'db_recovery_secret_invalid_format';
+  }
+  if (scope === 'db-recovery' && (
+    checks.missingDbRecoverySecrets.length > 0 ||
+    checks.missingDbRecoveryVariables.length > 0
+  )) return 'db_recovery_prerequisites_missing';
+  if (scope === 'db-cutover' && (
+    checks.missingDbCutoverSecrets.length > 0 ||
+    checks.missingDbCutoverCandidateSecrets.length > 0
+  )) return 'db_cutover_prerequisites_missing';
+  if (scope === 'all') {
+    const hasMissing = Object.values(checks).some((value) => Array.isArray(value) && value.length > 0);
+    if (hasMissing) return 'production_secret_audit_blocked';
+  }
+  return undefined;
+}
+
+function readOption(name) {
+  const index = process.argv.indexOf(name);
+  return index >= 0 ? process.argv[index + 1] : undefined;
+}
+
+function readScope() {
+  const scope = readOption('--scope') ?? 'all';
+  const supportedScopes = new Set(['all', 'db-recovery', 'db-cutover']);
+  if (!supportedScopes.has(scope)) {
+    throw new Error(`Unsupported --scope ${scope}. Expected one of: ${Array.from(supportedScopes).join(', ')}.`);
+  }
+  return scope;
+}
+
 function main() {
   if (process.argv.includes('--self-test')) {
     const missing = findMissingSecrets(['DATABASE_URL', 'METRICS_TOKEN'], ['DATABASE_URL']);
@@ -131,37 +225,41 @@ function main() {
   }
 
   const fromEnvironment = process.argv.includes('--from-env');
-  const repoIndex = process.argv.indexOf('--repo');
-  const repo = repoIndex >= 0 ? process.argv[repoIndex + 1] : undefined;
-  const envIndex = process.argv.indexOf('--env');
-  const environment = envIndex >= 0 ? process.argv[envIndex + 1] : undefined;
+  const repo = readOption('--repo');
+  const environment = readOption('--env');
+  const scope = readScope();
   const secretNames = fromEnvironment ? readEnvironmentSecretNames(uniqueSecretNames()) : readGithubSecretNames(repo, environment);
   const variableNames = fromEnvironment
     ? readEnvironmentSecretNames(uniqueVariableNames())
     : readGithubVariableNames(repo, environment);
   const missingGithubActionSecrets = findMissingSecrets(requiredGithubActionSecrets, secretNames);
   const missingGithubActionVariables = findMissingSecrets(requiredGithubActionVariables, variableNames);
-  const missingRuntimeSecrets = findMissingSecrets(requiredRuntimeSecrets, secretNames);
+  const missingRuntimeSecrets = findMissingRuntimeSecrets(requiredRuntimeSecrets, secretNames, variableNames);
   const missingDbCutoverSecrets = findMissingSecrets(requiredDbCutoverSecrets, secretNames);
   const hasReplacementDbCandidate = hasAnySecret(replacementDbCandidateSecrets, secretNames);
   const missingDbCutoverCandidateSecrets = hasReplacementDbCandidate ? [] : replacementDbCandidateSecrets;
   const missingDbRecoverySecrets = findMissingSecrets(requiredDbRecoverySecrets, secretNames);
   const missingDbRecoveryVariables = findMissingSecrets(requiredDbRecoveryVariables, variableNames);
+  const invalidDbRecoverySecrets = fromEnvironment ? findInvalidDbRecoverySecrets(process.env) : [];
+  const checks = {
+    missingGithubActionSecrets,
+    missingGithubActionVariables,
+    missingRuntimeSecrets,
+    missingDbCutoverSecrets,
+    missingDbCutoverCandidateSecrets,
+    missingDbRecoverySecrets,
+    missingDbRecoveryVariables,
+    invalidDbRecoverySecrets
+  };
+  const status = scopeStatus(scope, checks);
   const result = {
-    status:
-      missingGithubActionSecrets.length === 0 &&
-      missingGithubActionVariables.length === 0 &&
-      missingRuntimeSecrets.length === 0 &&
-      missingDbCutoverSecrets.length === 0 &&
-      missingDbCutoverCandidateSecrets.length === 0 &&
-      missingDbRecoverySecrets.length === 0 &&
-      missingDbRecoveryVariables.length === 0
-        ? 'ready'
-        : 'blocked',
+    status,
+    scope,
     checkedSecretNames: secretNames.sort(),
     checkedVariableNames: variableNames.sort(),
     environment: environment ?? null,
     source: fromEnvironment ? 'environment' : 'github',
+    blocker: status === 'ready' ? undefined : resultBlocker(scope, checks),
     missingGithubActionSecrets,
     missingGithubActionVariables,
     missingRuntimeSecrets,
@@ -170,7 +268,18 @@ function main() {
     hasReplacementDbCandidate,
     missingDbCutoverCandidateSecrets,
     missingDbRecoverySecrets,
-    missingDbRecoveryVariables
+    missingDbRecoveryVariables,
+    invalidDbRecoverySecrets,
+    dbRecoverySecretValidation: fromEnvironment
+      ? {
+          validated: true,
+          requirement: supabaseManagementTokenRequirement
+        }
+      : {
+          validated: false,
+          reason: 'GitHub secret values are not readable from gh secret list; run with --from-env inside the workflow to validate secret shape.',
+          requirement: supabaseManagementTokenRequirement
+        }
   };
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   if (result.status !== 'ready') process.exitCode = 1;

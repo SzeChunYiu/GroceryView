@@ -13,6 +13,7 @@ import { willysProducts, willysWeeklyDiscounts, type WillysIngestedWeeklyDiscoun
 import { hemkopProducts, hemkopWeeklyDiscounts, type HemkopIngestedWeeklyDiscount } from './ingested/hemkop';
 import { matpriskollenOffers } from './ingested/matpriskollen';
 import { axfoodProducts } from './axfood-products';
+import { dbSiteSnapshotChainPriceObservations } from './generated/db-site-chain-observations';
 import { calculateChainPriceIndex, type BrandTierPriceObservation, type ChainPriceObservation } from '@groceryview/core';
 
 // ── unit canonicalisation ────────────────────────────────────────────────────
@@ -95,6 +96,8 @@ function push(out: ChainPriceObservation[], chainId: string, rawCategory: string
 }
 
 export function buildChainPriceObservations(): ChainPriceObservation[] {
+  if (dbSiteSnapshotChainPriceObservations.length > 0) return dbSiteSnapshotChainPriceObservations;
+
   const out: ChainPriceObservation[] = [];
 
   for (const p of coopProducts) {

@@ -36,9 +36,23 @@ describe('production daily ingestion readiness runbook', () => {
 
   it('documents source-run accepted-row thresholds for every required chain', () => {
     assert.match(runbook, /GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN/);
+    assert.match(runbook, /GitHub variable or secret/);
     assert.match(runbook, /source-run row thresholds/);
     assert.match(runbook, /positive integer threshold for all six required chains/);
     assert.match(runbook, /source_run_insufficient_accepted_rows/);
+    assert.match(runbook, /GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS/);
+    assert.match(runbook, /GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS/);
+    assert.match(runbook, /supabase_direct_host/);
+    assert.match(runbook, /supabase_transaction_pooler/);
+    assert.match(runbook, /supabase_pooler_database_unavailable/);
+    assert.match(runbook, /supabase_pooler_circuit_breaker/);
+    assert.match(runbook, /alternateConnections/);
+    assert.match(runbook, /groceryview-production-db-recovery-packet/);
+    assert.match(runbook, /ops:db-recovery-packet/);
+    assert.match(runbook, /SUPABASE_ACCESS_TOKEN/);
+    assert.match(runbook, /SUPABASE_PROJECT_REF/);
+    assert.match(runbook, /sbp_/);
+    assert.match(runbook, /db_recovery_secret_invalid_format/);
   });
 
 
@@ -52,11 +66,18 @@ describe('production daily ingestion readiness runbook', () => {
 
   it('documents production ingestion config evidence artifacts', () => {
     assert.match(runbook, /groceryview-production-ingestion-config/);
+    assert.match(runbook, /groceryview-db-unblocker-preflight/);
+    assert.match(runbook, /db-recovery/);
+    assert.match(runbook, /db-cutover/);
+    assert.match(runbook, /daily-db-unblocker-preflight\.json/);
+    assert.match(runbook, /db_recovery_secret_audit_diagnostic_missing/);
+    assert.match(runbook, /db_cutover_secret_audit_diagnostic_missing/);
     assert.match(runbook, /production-env-validation\.json/);
     assert.match(runbook, /groceryview-catalog-targets\.json/);
     assert.match(runbook, /groceryview-daily-connectors\.json/);
     assert.match(runbook, /daily_db_connectivity_database_url_config_missing/);
     assert.match(runbook, /production_db_migrations_database_url_config_missing/);
+    assert.match(runbook, /production_db_migrations_skipped_after_prior_failure/);
   });
 
 
@@ -65,6 +86,7 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /groceryview-daily-ingestion-result/);
     assert.match(runbook, /daily_ingestion_connectors_diagnostic_missing/);
     assert.match(runbook, /daily_ingestion_database_url_config_missing/);
+    assert.match(runbook, /daily_ingestion_skipped_after_prior_failure/);
     assert.match(runbook, /daily_ingestion_missing_chain_summary/);
     assert.match(runbook, /daily_ingestion_chain_not_succeeded/);
     assert.match(runbook, /daily_ingestion_chain_without_observations/);
@@ -105,6 +127,7 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /db_site_snapshot_missing_required_categories/);
     assert.match(runbook, /db_site_snapshot_stale_observations/);
     assert.match(runbook, /db_site_snapshot_database_url_config_missing/);
+    assert.match(runbook, /db_site_snapshot_skipped_after_prior_failure/);
     assert.match(runbook, /missingRequiredChains/);
     assert.match(runbook, /missingRequiredStoreExternalRefs/);
     assert.match(runbook, /missingRequiredProductSlugs/);

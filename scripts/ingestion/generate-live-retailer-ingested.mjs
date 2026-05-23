@@ -1,30 +1,24 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import {
-  buildSwedishCountyGroceryOverpassQuery,
+  DEFAULT_CITY_GROSS_PRODUCT_QUERIES,
+  DEFAULT_HEMKOP_SEARCH_QUERIES,
+  DEFAULT_LIDL_OFFER_PATHS,
+  DEFAULT_WILLYS_SEARCH_QUERIES,
   fetchCityGrossProductsForAllStores,
-  fetchIcaReklambladOffers,
+  fetchHemkopProducts,
+  fetchHemkopWeeklyDiscountsForAllStores,
   fetchLidlOffersForAllStores,
-  fetchOverpassGroceryStores
+  fetchWillysProducts,
+  fetchWillysWeeklyDiscountsForAllStores
 } from '../../packages/ingestion/dist/index.js';
 
 const REPO_ROOT = new URL('../../', import.meta.url);
 const INGESTED_DIR = new URL('apps/web/src/lib/ingested/', REPO_ROOT);
 
-const CITY_GROSS_QUERIES = ['kaffe'];
-const ICA_REKLAMBLAD_SOURCE_URLS = [
-  'https://www.ica.se/erbjudanden/ica-focus-1004247/',
-  'https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/',
-  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-solna-1003380/',
-  'https://www.ica.se/erbjudanden/ica-kvantum-kungsholmen-1004599/',
-  'https://www.ica.se/erbjudanden/ica-supermarket-faltoversten-1004228/',
-  'https://www.ica.se/erbjudanden/ica-kvantum-sodermalm-1004222/',
-  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-bromma-1015001/'
-];
-const LIDL_OFFER_PATHS = [
-  '/c/veckans-frukt-groent/a10094676',
-  '/c/lidl-plus-erbjudanden/a10094682',
-  '/c/veckans-blommor/a10094398'
-];
+const CITY_GROSS_QUERIES = [DEFAULT_CITY_GROSS_PRODUCT_QUERIES[0]];
+const WILLYS_QUERIES = DEFAULT_WILLYS_SEARCH_QUERIES;
+const HEMKOP_QUERIES = DEFAULT_HEMKOP_SEARCH_QUERIES;
+const LIDL_OFFER_PATHS = DEFAULT_LIDL_OFFER_PATHS;
 
 const retrievedAt = new Date().toISOString();
 
@@ -33,40 +27,53 @@ await mkdir(INGESTED_DIR, { recursive: true });
 const cityGrossProducts = await fetchCityGrossProductsForAllStores({
   maxStores: 40,
   queries: CITY_GROSS_QUERIES,
-  maxRowsPerStore: 24,
+  maxRowsPerStore: 120,
   pageSize: 24,
   retrievedAt
 });
 await writeCityGross(cityGrossProducts);
 
+const willysProducts = await fetchWillysProducts({
+  queries: WILLYS_QUERIES,
+  maxRows: 1200,
+  retrievedAt
+});
+const willysWeeklyDiscounts = await fetchWillysWeeklyDiscountsForAllStores({
+  maxRows: 50000,
+  pageSize: 100,
+  retrievedAt
+});
+await writeWillys(willysProducts, willysWeeklyDiscounts);
+
+const hemkopProducts = await fetchHemkopProducts({
+  queries: HEMKOP_QUERIES,
+  maxRows: 4200,
+  pageSize: 100,
+  retrievedAt
+});
+const hemkopWeeklyDiscounts = await fetchHemkopWeeklyDiscountsForAllStores({
+  maxRows: 30000,
+  pageSize: 100,
+  retrievedAt
+});
+await writeHemkop(hemkopProducts, hemkopWeeklyDiscounts);
+
 const lidlStoreOffers = await fetchLidlOffersForAllStores({
-  maxStores: 20,
+  maxStores: 40,
   offerPaths: LIDL_OFFER_PATHS,
   maxRows: 150,
   retrievedAt
 });
 await writeLidl(lidlStoreOffers);
 
-const overpassQuery = buildSwedishCountyGroceryOverpassQuery('SE-AB');
-const overpassStores = await fetchOverpassGroceryStores({
-  query: overpassQuery,
-  retrievedAt
-});
-await writeOverpass(overpassStores, overpassQuery);
-
-const icaReklambladOffers = await fetchIcaReklambladOffers({
-  sourceUrls: ICA_REKLAMBLAD_SOURCE_URLS,
-  maxRows: 1000,
-  retrievedAt
-});
-await writeIcaReklamblad(icaReklambladOffers);
-
 console.log(JSON.stringify({
   retrievedAt,
   cityGrossProducts: cityGrossProducts.length,
-  lidlStoreOffers: lidlStoreOffers.length,
-  overpassStores: overpassStores.length,
-  icaReklambladOffers: icaReklambladOffers.length
+  willysProducts: willysProducts.length,
+  willysWeeklyDiscounts: willysWeeklyDiscounts.length,
+  hemkopProducts: hemkopProducts.length,
+  hemkopWeeklyDiscounts: hemkopWeeklyDiscounts.length,
+  lidlStoreOffers: lidlStoreOffers.length
 }, null, 2));
 
 async function writeCityGross(rows) {
@@ -111,6 +118,178 @@ async function writeCityGross(rows) {
     })} as const;`,
     '',
     `export const cityGrossProducts: CityGrossIngestedProduct[] = ${literal(rows)};`,
+    ''
+  ]);
+}
+
+async function writeWillys(products, weeklyDiscounts) {
+  const productSourceUrls = unique(products.map((row) => row.sourceUrl));
+  const weeklySourceUrls = unique(weeklyDiscounts.map((row) => row.sourceUrl));
+  const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
+  await writeGeneratedFile('willys.ts', [
+    '// AUTO-GENERATED from public Willys search JSON and public Axfood campaign JSON.',
+    `// Product source URL pattern: https://www.willys.se/search?q={query}`,
+    `// Product source URLs: ${productSourceUrls.join('; ')}`,
+    `// Product retrieved: ${retrievedAt}`,
+    `// Product row count: ${products.length} real product rows fetched from willys.se search.`,
+    `// Weekly discount store catalog source URL: https://www.willys.se/axfood/rest/store`,
+    `// Weekly discount source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100`,
+    `// Weekly discount source URLs: ${weeklySourceUrls.join('; ')}`,
+    `// Weekly discount retrieved: ${retrievedAt}`,
+    `// Weekly discount row count: ${weeklyDiscounts.length} real Axfood campaign rows fetched from willys.se across ${weeklyStoreIds.length} store IDs.`,
+    '',
+    'export type WillysIngestedProduct = {',
+    '  code: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  packageText: string;',
+    '  category: string;',
+    '  price: number;',
+    '  priceText: string;',
+    '  unitPriceText: string;',
+    '  unitPriceUnit: string;',
+    '  imageUrl: string;',
+    '  labels: string[];',
+    '  online: boolean;',
+    '  outOfStock: boolean;',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    'export type WillysIngestedWeeklyDiscount = {',
+    '  code: string;',
+    '  productCode: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  storeId: string;',
+    '  campaignType: string;',
+    '  promotionType: string;',
+    '  price: number;',
+    '  priceText: string;',
+    '  comparePriceText: string;',
+    '  regularPriceText: string;',
+    '  savePriceText: string;',
+    '  packageText: string;',
+    '  conditionText: string;',
+    '  redeemLimitText: string;',
+    '  startDate: string;',
+    '  endDate: string;',
+    '  validUntil: string;',
+    '  category: string;',
+    '  imageUrl: string;',
+    '  labels: string[];',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const willysSource = ${literal({
+      source: 'willys.se public search JSON',
+      retrievedAt,
+      rowCount: products.length,
+      sourceUrlPattern: 'https://www.willys.se/search?q={query}',
+      queries: WILLYS_QUERIES,
+      sourceUrls: productSourceUrls
+    })} as const;`,
+    '',
+    `export const willysProducts: WillysIngestedProduct[] = ${literal(products)};`,
+    '',
+    `export const willysWeeklyDiscountSource = ${literal({
+      source: 'willys.se public Axfood campaign JSON',
+      retrievedAt,
+      rowCount: weeklyDiscounts.length,
+      storeSourceUrl: 'https://www.willys.se/axfood/rest/store',
+      sourceUrlPattern: 'https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100',
+      storeIds: weeklyStoreIds,
+      sourceUrls: weeklySourceUrls
+    })} as const;`,
+    '',
+    `export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = ${literal(weeklyDiscounts)};`,
+    ''
+  ]);
+}
+
+async function writeHemkop(products, weeklyDiscounts) {
+  const productSourceUrls = unique(products.map((row) => row.sourceUrl));
+  const weeklySourceUrls = unique(weeklyDiscounts.map((row) => row.sourceUrl));
+  const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
+  await writeGeneratedFile('hemkop.ts', [
+    '// AUTO-GENERATED from public Hemkop search JSON and public Axfood campaign JSON.',
+    `// Product source URL pattern: https://www.hemkop.se/search?q={query}&page={page}&size=100`,
+    `// Product source URLs: ${productSourceUrls.join('; ')}`,
+    `// Product retrieved: ${retrievedAt}`,
+    `// Product row count: ${products.length} real product rows fetched from hemkop.se search.`,
+    `// Weekly discount store catalog source URL: https://www.hemkop.se/axfood/rest/store`,
+    `// Weekly discount source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100`,
+    `// Weekly discount source URLs: ${weeklySourceUrls.join('; ')}`,
+    `// Weekly discount retrieved: ${retrievedAt}`,
+    `// Weekly discount row count: ${weeklyDiscounts.length} real Axfood campaign rows fetched from hemkop.se across ${weeklyStoreIds.length} store IDs.`,
+    '',
+    'export type HemkopIngestedProduct = {',
+    '  code: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  packageText: string;',
+    '  category: string;',
+    '  price: number;',
+    '  priceText: string;',
+    '  unitPriceText: string;',
+    '  unitPriceUnit: string;',
+    '  imageUrl: string;',
+    '  labels: string[];',
+    '  online: boolean;',
+    '  outOfStock: boolean;',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    'export type HemkopIngestedWeeklyDiscount = {',
+    '  code: string;',
+    '  productCode: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  storeId: string;',
+    '  campaignType: string;',
+    '  promotionType: string;',
+    '  price: number;',
+    '  priceText: string;',
+    '  comparePriceText: string;',
+    '  regularPriceText: string;',
+    '  savePriceText: string;',
+    '  packageText: string;',
+    '  conditionText: string;',
+    '  redeemLimitText: string;',
+    '  startDate: string;',
+    '  endDate: string;',
+    '  validUntil: string;',
+    '  category: string;',
+    '  imageUrl: string;',
+    '  labels: string[];',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const hemkopSource = ${literal({
+      source: 'hemkop.se public search JSON',
+      retrievedAt,
+      rowCount: products.length,
+      sourceUrlPattern: 'https://www.hemkop.se/search?q={query}&page={page}&size=100',
+      queries: HEMKOP_QUERIES,
+      sourceUrls: productSourceUrls
+    })} as const;`,
+    '',
+    `export const hemkopProducts: HemkopIngestedProduct[] = ${literal(products)};`,
+    '',
+    `export const hemkopWeeklyDiscountSource = ${literal({
+      source: 'hemkop.se public Axfood campaign JSON',
+      retrievedAt,
+      rowCount: weeklyDiscounts.length,
+      storeSourceUrl: 'https://www.hemkop.se/axfood/rest/store',
+      sourceUrlPattern: 'https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100',
+      storeIds: weeklyStoreIds,
+      sourceUrls: weeklySourceUrls
+    })} as const;`,
+    '',
+    `export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = ${literal(weeklyDiscounts)};`,
     ''
   ]);
 }

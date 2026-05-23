@@ -77,6 +77,85 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Preflight DB recovery and cutover unblockers
+        if: always()
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REPLACEMENT_DATABASE_URL: ${{ secrets.REPLACEMENT_DATABASE_URL }}
+          CANDIDATE_DATABASE_URL: ${{ secrets.CANDIDATE_DATABASE_URL }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF || secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -euo pipefail
+          dbRecoveryStatus=0
+          npm run --silent ops:check-production-secrets -- --from-env --scope db-recovery >/tmp/db-recovery-secret-audit.json || dbRecoveryStatus=$?
+          if [ ! -s /tmp/db-recovery-secret-audit.json ]; then
+            cat > /tmp/db-recovery-secret-audit.json <<EOF
+          {
+            "status": "blocked",
+            "scope": "db-recovery",
+            "source": "environment",
+            "blocker": "db_recovery_secret_audit_diagnostic_missing",
+            "exitCode": ${dbRecoveryStatus}
+          }
+          EOF
+          fi
+          dbCutoverStatus=0
+          npm run --silent ops:check-production-secrets -- --from-env --scope db-cutover >/tmp/db-cutover-secret-audit.json || dbCutoverStatus=$?
+          if [ ! -s /tmp/db-cutover-secret-audit.json ]; then
+            cat > /tmp/db-cutover-secret-audit.json <<EOF
+          {
+            "status": "blocked",
+            "scope": "db-cutover",
+            "source": "environment",
+            "blocker": "db_cutover_secret_audit_diagnostic_missing",
+            "exitCode": ${dbCutoverStatus}
+          }
+          EOF
+          fi
+          DB_RECOVERY_STATUS="${dbRecoveryStatus}" DB_CUTOVER_STATUS="${dbCutoverStatus}" node <<'NODE' >/tmp/daily-db-unblocker-preflight.json
+          const fs = require('node:fs');
+          const recovery = JSON.parse(fs.readFileSync('/tmp/db-recovery-secret-audit.json', 'utf8'));
+          const cutover = JSON.parse(fs.readFileSync('/tmp/db-cutover-secret-audit.json', 'utf8'));
+          const dbRecoveryStatus = Number(process.env.DB_RECOVERY_STATUS ?? 0);
+          const dbCutoverStatus = Number(process.env.DB_CUTOVER_STATUS ?? 0);
+          const body = {
+            status: recovery.status === 'ready' || cutover.status === 'ready' ? 'ready' : 'blocked',
+            checkedAt: new Date().toISOString(),
+            dbRecoveryStatus,
+            dbCutoverStatus,
+            dbRecovery: {
+              status: recovery.status,
+              missingSecrets: recovery.missingDbRecoverySecrets ?? [],
+              missingVariables: recovery.missingDbRecoveryVariables ?? [],
+              blocker: recovery.blocker
+            },
+            dbCutover: {
+              status: cutover.status,
+              missingSecrets: cutover.missingDbCutoverSecrets ?? [],
+              missingCandidateSecrets: cutover.missingDbCutoverCandidateSecrets ?? [],
+              blocker: cutover.blocker
+            },
+            blocker: recovery.status === 'ready' || cutover.status === 'ready'
+              ? undefined
+              : 'daily_db_unblocker_preflight_blocked'
+          };
+          console.log(JSON.stringify(body, null, 2));
+          NODE
+          cat /tmp/daily-db-unblocker-preflight.json
+
+      - name: Upload DB unblocker preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-db-unblocker-preflight
+          path: |
+            /tmp/daily-db-unblocker-preflight.json
+            /tmp/db-recovery-secret-audit.json
+            /tmp/db-cutover-secret-audit.json
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Install
         run: npm ci
 
@@ -217,6 +296,8 @@ jobs:
           GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS || '30' }}
           GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS || '10000' }}
           GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS || '30000' }}
+          GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS || '1' }}
+          GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS || '1' }}
         run: |
           set -euo pipefail
           if [ -z "${DATABASE_URL:-}" ]; then
@@ -241,7 +322,7 @@ jobs:
           EOF
           fi
           cat /tmp/daily-db-connectivity.json
-          node -e "const body=require('/tmp/daily-db-connectivity.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+          node -e "const body=require('/tmp/daily-db-connectivity.json'); for (const candidate of body.alternateConnections ?? []) { if (candidate.name === 'supabase_direct_host' || candidate.name === 'supabase_transaction_pooler') console.error(JSON.stringify({ alternateConnection: candidate.name, status: candidate.status, action: candidate.action })); } if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
           exit "${connectivity_status}"
 
       - name: Upload daily DB connectivity diagnostic
@@ -250,6 +331,62 @@ jobs:
         with:
           name: groceryview-daily-db-connectivity
           path: /tmp/daily-db-connectivity.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Generate production DB recovery packet
+        if: failure()
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF || secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_ACCESS_TOKEN:-}" ] || [ -z "${SUPABASE_PROJECT_REF:-}" ]; then
+            node <<'NODE' >/tmp/production-db-recovery-packet.json
+          const missing = [];
+          if (!process.env.SUPABASE_ACCESS_TOKEN) missing.push('SUPABASE_ACCESS_TOKEN');
+          if (!process.env.SUPABASE_PROJECT_REF) missing.push('SUPABASE_PROJECT_REF');
+          console.log(JSON.stringify({
+            status: 'blocked',
+            blocker: 'production_db_recovery_packet_missing_credentials',
+            missing,
+            recommendedActions: [
+              {
+                id: 'configure-supabase-management-access',
+                owner: 'operator',
+                action: 'Set SUPABASE_ACCESS_TOKEN to a Supabase Management API personal access token beginning with sbp_, set SUPABASE_PROJECT_REF, and verify the injected workflow values with npm run --silent ops:check-production-secrets -- --from-env --scope db-recovery.'
+              },
+              {
+                id: 'configure-replacement-db-cutover',
+                owner: 'operator_after_approval',
+                action: 'If the existing Supabase project cannot be recovered promptly, set REPLACEMENT_DATABASE_URL or CANDIDATE_DATABASE_URL and verify with npm run --silent ops:check-production-secrets -- --scope db-cutover before running the Production DB cutover validation workflow.'
+              }
+            ]
+          }, null, 2));
+          NODE
+            cat /tmp/production-db-recovery-packet.json
+            exit 1
+          fi
+          recovery_packet_status=0
+          npm run --silent ops:db-recovery-packet >/tmp/production-db-recovery-packet.json || recovery_packet_status=$?
+          if [ ! -s /tmp/production-db-recovery-packet.json ]; then
+            cat > /tmp/production-db-recovery-packet.json <<EOF
+          {
+            "status": "blocked",
+            "blocker": "production_db_recovery_packet_diagnostic_missing",
+            "exitCode": ${recovery_packet_status}
+          }
+          EOF
+          fi
+          cat /tmp/production-db-recovery-packet.json
+          exit "${recovery_packet_status}"
+
+      - name: Upload production DB recovery packet
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: groceryview-production-db-recovery-packet
+          path: /tmp/production-db-recovery-packet.json
           if-no-files-found: error
           retention-days: 14
 
@@ -283,6 +420,20 @@ jobs:
           node -e "const body=require('/tmp/production-db-migrations.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
           exit "${migration_status}"
 
+      - name: Preserve skipped production DB migrations result
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/production-db-migrations.json ]; then
+            cat > /tmp/production-db-migrations.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "production_db_migrations_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          cat /tmp/production-db-migrations.json
+
       - name: Upload production DB migrations result
         if: always()
         uses: actions/upload-artifact@v4
@@ -299,6 +450,10 @@ jobs:
           GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS || '250' }}
           GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS || '1' }}
           GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS || '500' }}
+          GROCERYVIEW_DAILY_STORE_CONCURRENCY: ${{ vars.GROCERYVIEW_DAILY_STORE_CONCURRENCY || '4' }}
+          GROCERYVIEW_DAILY_STORE_START_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_STORE_START_DELAY_MS || '100' }}
+          GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS: ${{ vars.GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS || '1' }}
+          GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS: ${{ vars.GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS || '500' }}
           GROCERYVIEW_DAILY_BLOCKER_LOG_PATH: codex-tasks/ingestion-blockers.txt
         run: |
           set -euo pipefail
@@ -395,6 +550,30 @@ jobs:
           }
           NODE
 
+      - name: Preserve skipped daily ingestion result
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/daily-ingestion-result.json ]; then
+            cat > /tmp/daily-ingestion-result.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "daily_ingestion_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          if [ ! -s codex-tasks/ingestion-blockers.txt ]; then
+            mkdir -p codex-tasks
+            {
+              echo "# Daily ingestion blockers"
+              echo
+              echo "status: skipped"
+              echo "blockers:"
+              echo "- daily_ingestion_skipped_after_prior_failure"
+            } > codex-tasks/ingestion-blockers.txt
+          fi
+          cat /tmp/daily-ingestion-result.json
+
       - name: Upload daily ingestion result
         if: always()
         uses: actions/upload-artifact@v4
@@ -453,6 +632,28 @@ jobs:
             process.exit(1);
           }
           NODE
+
+      - name: Preserve skipped DB-backed site snapshot
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/groceryview-db-site-snapshot.json ]; then
+            cat > /tmp/groceryview-db-site-snapshot.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "db_site_snapshot_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          if [ ! -s /tmp/db-site-snapshot-result.json ]; then
+            cat > /tmp/db-site-snapshot-result.json <<EOF
+          {
+            "status": "skipped",
+            "blocker": "db_site_snapshot_skipped_after_prior_failure"
+          }
+          EOF
+          fi
+          cat /tmp/db-site-snapshot-result.json
 
       - name: Upload DB-backed site snapshot
         if: always()

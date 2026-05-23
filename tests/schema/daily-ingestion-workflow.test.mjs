@@ -23,6 +23,16 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /production_config_preflight_diagnostic_missing/);
     assert.match(workflow, /name: Upload production config preflight evidence\n\s+if:\s*always\(\)/);
     assert.match(workflow, /name:\s*groceryview-production-config-preflight/);
+    assert.match(workflow, /name: Preflight DB recovery and cutover unblockers/);
+    assert.match(workflow, /ops:check-production-secrets\s+--\s+--from-env\s+--scope\s+db-recovery/);
+    assert.match(workflow, /ops:check-production-secrets\s+--\s+--from-env\s+--scope\s+db-cutover/);
+    assert.match(workflow, /\/tmp\/daily-db-unblocker-preflight\.json/);
+    assert.match(workflow, /dbRecoveryStatus/);
+    assert.match(workflow, /dbCutoverStatus/);
+    assert.match(workflow, /db_recovery_secret_audit_diagnostic_missing/);
+    assert.match(workflow, /db_cutover_secret_audit_diagnostic_missing/);
+    assert.match(workflow, /name: Upload DB unblocker preflight evidence\n\s+if:\s*always\(\)/);
+    assert.match(workflow, /name:\s*groceryview-db-unblocker-preflight/);
 
     for (const command of [
       'npm ci',
@@ -89,10 +99,30 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS \|\| '30' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS \|\| '10000' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS \|\| '30000' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS \|\| '1' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS \|\| '1' \}\}/);
+    assert.match(workflow, /supabase_direct_host/);
+    assert.match(workflow, /supabase_transaction_pooler/);
+    assert.match(workflow, /alternateConnections/);
     assert.match(workflow, /name:\s*groceryview-daily-db-connectivity/);
     assert.match(workflow, /path:\s*\/tmp\/daily-db-connectivity\.json/);
     assert.match(workflow, /name: Upload daily DB connectivity diagnostic\n\s+if:\s*always\(\)/);
     assert.match(workflow, /name:\s*groceryview-daily-db-connectivity[\s\S]*if-no-files-found:\s*error/);
+    assert.match(workflow, /name: Generate production DB recovery packet/);
+    assert.match(workflow, /if:\s*failure\(\)/);
+    assert.match(workflow, /SUPABASE_ACCESS_TOKEN:\s*\$\{\{ secrets\.SUPABASE_ACCESS_TOKEN \}\}/);
+    assert.match(workflow, /SUPABASE_PROJECT_REF:\s*\$\{\{ vars\.SUPABASE_PROJECT_REF \|\| secrets\.SUPABASE_PROJECT_REF \}\}/);
+    assert.match(workflow, /npm run --silent ops:db-recovery-packet >\/tmp\/production-db-recovery-packet\.json/);
+    assert.match(workflow, /production_db_recovery_packet_missing_credentials/);
+    assert.match(workflow, /configure-replacement-db-cutover/);
+    assert.match(workflow, /REPLACEMENT_DATABASE_URL or CANDIDATE_DATABASE_URL/);
+    assert.match(workflow, /SUPABASE_ACCESS_TOKEN to a Supabase Management API personal access token beginning with sbp_/);
+    assert.match(workflow, /npm run --silent ops:check-production-secrets -- --from-env --scope db-recovery/);
+    assert.match(workflow, /npm run --silent ops:check-production-secrets -- --scope db-cutover/);
+    assert.match(workflow, /production_db_recovery_packet_diagnostic_missing/);
+    assert.match(workflow, /name: Upload production DB recovery packet\n\s+if:\s*failure\(\)/);
+    assert.match(workflow, /name:\s*groceryview-production-db-recovery-packet/);
+    assert.match(workflow, /path:\s*\/tmp\/production-db-recovery-packet\.json/);
     assert.match(workflow, /name: Apply production DB migrations/);
     assert.ok(
       workflow.indexOf('name: Check production DB write connectivity') < workflow.indexOf('name: Apply production DB migrations'),
@@ -105,6 +135,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /\/tmp\/production-db-migrations\.json/);
     assert.match(workflow, /production_db_migrations_diagnostic_missing/);
     assert.match(workflow, /production_db_migrations_database_url_config_missing/);
+    assert.match(workflow, /production_db_migrations_skipped_after_prior_failure/);
     assert.match(workflow, /migration_status=\$\?/);
     assert.match(workflow, /body\.status !== 'ready'/);
     assert.match(workflow, /name:\s*groceryview-production-db-migrations/);
@@ -116,6 +147,10 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS \|\| '250' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS \|\| '1' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS \|\| '500' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_STORE_CONCURRENCY:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_STORE_CONCURRENCY \|\| '4' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_STORE_START_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_STORE_START_DELAY_MS \|\| '100' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS \|\| '1' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS \|\| '500' \}\}/);
     assert.match(workflow, /GROCERYVIEW_DAILY_BLOCKER_LOG_PATH:\s*codex-tasks\/ingestion-blockers\.txt/);
     assert.match(workflow, /daily_ingestion_blocker_log_missing/);
     assert.doesNotMatch(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON=\$\(npm run --silent ops:daily-connectors\)/);
@@ -147,6 +182,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /daily_ingestion_connectors_diagnostic_missing/);
     assert.match(workflow, /daily_ingestion_database_url_config_missing/);
     assert.match(workflow, /daily_ingestion_result_diagnostic_missing/);
+    assert.match(workflow, /daily_ingestion_skipped_after_prior_failure/);
     assert.match(workflow, /ingestion_status=\$\?/);
     assert.match(workflow, /body\.status !== 'succeeded'/);
     assert.match(workflow, /chainSummaries/);
@@ -169,6 +205,7 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE:\s*\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /db_site_snapshot_result_diagnostic_missing/);
     assert.match(workflow, /db_site_snapshot_database_url_config_missing/);
+    assert.match(workflow, /db_site_snapshot_skipped_after_prior_failure/);
     assert.match(workflow, /snapshot_status=\$\?/);
     assert.match(workflow, /body\.status !== 'passed'/);
     assert.match(workflow, /body\.coverage\?\.observations < 1/);

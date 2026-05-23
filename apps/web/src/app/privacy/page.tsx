@@ -1,4 +1,6 @@
+import { buildPrivacyExport } from '@groceryview/core';
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { PrivacyRequestActions } from '@/components/privacy-request-actions';
 import { routeMetadata } from '@/lib/seo';
 
@@ -24,6 +26,17 @@ const titles: Record<string, string> = {
   privacy: 'Privacy controls'
 };
 
+const privacyExportContract = buildPrivacyExport(
+  {
+    userId: 'signed-in-account',
+    favoriteStoreIds: [],
+    watchlistProductIds: [],
+    receiptIds: [],
+    householdIds: []
+  },
+  '2026-05-20T12:00:00.000Z'
+);
+
 export default function FeaturePage() {
   const route = 'privacy';
   return (
@@ -35,6 +48,27 @@ export default function FeaturePage() {
       </p>
 
       <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
+
+      <Card className="mt-6 border-emerald-200">
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Account data export</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Export my data uses the core GDPR export contract</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              The signed-in export action below returns account-owned data through the protected privacy endpoint, using the same buildPrivacyExport sections from @groceryview/core.
+            </p>
+          </div>
+          <ConfidenceBadge level="high" label="Core export contract" sampleSize={privacyExportContract.sections.length} />
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-5">
+          {privacyExportContract.sections.map((section) => (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={section.name}>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Section</p>
+              <p className="mt-2 break-words text-sm font-black text-slate-950">{section.name}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
       <PrivacyRequestActions />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

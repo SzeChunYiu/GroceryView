@@ -1,3 +1,5 @@
+import { runAllStoreTasks, type AllStoreTaskRunnerControls } from './all-store-runner.js';
+
 export type CoopProduct = {
   code: string;
   ean: string;
@@ -360,7 +362,36 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '236742',
   '236788',
   '235580',
-  '126500'
+  '126500',
+  '176211',
+  '106436',
+  '135060',
+  '086815',
+  '192500',
+  '056095',
+  '235620',
+  '245020',
+  '183500',
+  '065050',
+  '072700',
+  '236085',
+  '106114',
+  '122000',
+  '056030',
+  '056215',
+  '056212',
+  '016041',
+  '026828',
+  '126400',
+  '123300',
+  '235970',
+  '016170',
+  '055030',
+  '015480',
+  '232400',
+  '245270',
+  '235990',
+  '236401'
 ] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
@@ -557,7 +588,7 @@ export type FetchCoopProductCatalogOptions = Omit<FetchCoopProductsOptions, 'que
   ecommerceApiSubscriptionKey?: string;
 };
 
-export type FetchCoopProductsForAllStoresOptions = Omit<FetchCoopProductsOptions, 'storeId' | 'query' | 'maxRows'> & {
+export type FetchCoopProductsForAllStoresOptions = Omit<FetchCoopProductsOptions, 'storeId' | 'query' | 'maxRows'> & AllStoreTaskRunnerControls & {
   queries?: readonly string[];
   categoryIds?: readonly string[];
   maxStores?: number;
@@ -588,7 +619,7 @@ export type FetchCoopWeeklyDiscountsOptions = {
   pdfTextExtractor?: (input: ArrayBuffer) => Promise<string>;
 };
 
-export type FetchCoopAllStoreWeeklyDiscountsOptions = Omit<FetchCoopWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & {
+export type FetchCoopAllStoreWeeklyDiscountsOptions = Omit<FetchCoopWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & AllStoreTaskRunnerControls & {
   maxStores?: number;
   includeStoreDetails?: boolean;
 };
@@ -1061,12 +1092,15 @@ export async function fetchCoopProductsForAllStores(
     onlineProductPricesOnly: true,
     retrievedAt: options.retrievedAt
   });
-  const rows: CoopStoreProduct[] = [];
-  const failures: string[] = [];
-  const concurrency = 8;
-  for (let index = 0; index < stores.length; index += concurrency) {
-    const batch = stores.slice(index, index + concurrency);
-    const settled = await Promise.allSettled(batch.map(async (store) => {
+  const { rows, failures } = await runAllStoreTasks({
+    stores,
+    storeId: (store) => store.storeId,
+    storeConcurrency: options.storeConcurrency,
+    storeStartDelayMs: options.storeStartDelayMs,
+    storeRetryAttempts: options.storeRetryAttempts,
+    storeRetryBaseDelayMs: options.storeRetryBaseDelayMs,
+    failOnStoreFailure: options.failOnStoreFailure,
+    task: async (store) => {
       const products = await fetchCoopProductCatalog({
         fetchImpl,
         queries: options.queries,
@@ -1089,17 +1123,9 @@ export async function fetchCoopProductsForAllStores(
         storeName: store.name,
         city: store.city
       }));
-    }));
-    for (let offset = 0; offset < settled.length; offset += 1) {
-      const result = settled[offset]!;
-      if (result.status === 'fulfilled') {
-        rows.push(...result.value);
-      } else {
-        failures.push(`${batch[offset]?.storeId ?? 'unknown'}:${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
-      }
     }
-  }
-  if (rows.length === 0 && failures.length > 0) throw new Error(`Coop all-store product requests returned no usable branch products: ${failures[0]}`);
+  });
+  if (rows.length === 0 && failures.length > 0) throw new Error(`Coop all-store product requests returned no usable branch products: ${failures[0]!.storeId}:${failures[0]!.error}`);
   return rows;
 }
 
@@ -1296,7 +1322,7 @@ export async function extractCoopDrPdfText(input: ArrayBuffer): Promise<string> 
     const page = await document.getPage(pageNumber);
     const content = await page.getTextContent();
     const lines = content.items
-      .map((item) => 'str' in item ? text(item.str) : '')
+      .map((item: { str?: unknown }) => typeof item.str === 'string' ? text(item.str) : '')
       .filter(Boolean);
     pages.push(lines.join('\n'));
   }
@@ -1624,21 +1650,22 @@ export async function fetchCoopWeeklyDiscountsForAllStores(
     retrievedAt: options.retrievedAt
   });
   const maxRows = options.maxRows ?? stores.length * (options.productQueries?.length ?? DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES.length);
-  const rows: CoopWeeklyDiscount[] = [];
-  const failures: string[] = [];
-  const concurrency = 8;
-  for (let index = 0; index < stores.length; index += concurrency) {
-    const batch = stores.slice(index, index + concurrency);
-    const settled = await Promise.allSettled(batch.map(async (store) => ({
-      storeId: store.storeId,
-      rows: await fetchCoopWeeklyDiscounts({
+  const { rows, failures } = await runAllStoreTasks<CoopStore, CoopWeeklyDiscount>({
+    stores,
+    storeId: (store) => store.storeId,
+    storeConcurrency: options.storeConcurrency,
+    storeStartDelayMs: options.storeStartDelayMs,
+    storeRetryAttempts: options.storeRetryAttempts,
+    storeRetryBaseDelayMs: options.storeRetryBaseDelayMs,
+    failOnStoreFailure: options.failOnStoreFailure,
+    task: async (store) => await fetchCoopWeeklyDiscounts({
         fetchImpl,
         storeIds: [store.storeId],
         storeApiVersion: options.storeApiVersion,
         storeApiUrl: serviceAccess.storeApiUrl,
         storeApiSubscriptionKey: serviceAccess.storeApiSubscriptionKey,
         productQueries: options.productQueries,
-        maxRows: Math.max(1, maxRows - rows.length),
+        maxRows,
         device: options.device,
         apiVersion: serviceAccess.personalizationApiVersion,
         subscriptionKey: serviceAccess.personalizationApiSubscriptionKey,
@@ -1646,21 +1673,10 @@ export async function fetchCoopWeeklyDiscountsForAllStores(
         retrievedAt: options.retrievedAt,
         flyerOfferHints: options.flyerOfferHints
       })
-    })));
-    for (let offset = 0; offset < settled.length; offset += 1) {
-      const result = settled[offset]!;
-      if (result.status === 'fulfilled') {
-        rows.push(...result.value.rows);
-        if (rows.length >= maxRows) {
-          return rows.slice(0, maxRows);
-        }
-      } else {
-        failures.push(`${batch[offset]?.storeId ?? 'unknown'}:${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
-      }
-    }
-  }
+  });
+  if (rows.length >= maxRows) return rows.slice(0, maxRows);
   if (rows.length === 0 && failures.length > 0) {
-    throw new Error(`Coop all-store weekly discount requests returned no usable branch offers: ${failures[0]}`);
+    throw new Error(`Coop all-store weekly discount requests returned no usable branch offers: ${failures[0]!.storeId}:${failures[0]!.error}`);
   }
   return rows;
 }

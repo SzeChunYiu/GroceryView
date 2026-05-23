@@ -47,6 +47,26 @@ export function PrivacyRequestActions() {
     setMessage(successMessage);
   }
 
+  async function downloadJsonResponse(response: Response, fileName: string, successMessage: string) {
+    if (!response.ok) {
+      setStatus('error');
+      setMessage('Privacy request was rejected by the production API.');
+      return;
+    }
+
+    const payload = await response.json();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(objectUrl);
+
+    setStatus('ready');
+    setMessage(successMessage);
+  }
+
   async function requestExport() {
     setActiveAction('export');
     const session = requireSession();
@@ -56,7 +76,7 @@ export function PrivacyRequestActions() {
       method: 'GET',
       headers: { Authorization: `Bearer ${accessToken}` }
     });
-    await handleResponse(response, 'Privacy export prepared for the signed-in account.');
+    await downloadJsonResponse(response, `groceryview-privacy-export-${userId}.json`, 'Privacy export downloaded for the signed-in account.');
   }
 
   async function requestDeletionPlan() {
@@ -92,7 +112,7 @@ export function PrivacyRequestActions() {
         These controls use the sessionStorage token created by the production session exchange. The public snapshot keeps private records hidden, and every action fails closed until a signed-in account session is available.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
-        <button className="rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" onClick={requestExport} type="button">Prepare data export</button>
+        <button className="rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white" onClick={requestExport} type="button">Export my data</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" onClick={requestDeletionPlan} type="button">Plan account deletion</button>
         <button className="rounded-full border border-sky-700 px-4 py-2 text-sm font-black text-sky-900" onClick={requestFulfillmentPlan} type="button">Classify privacy request deadlines</button>
       </div>

@@ -47,6 +47,13 @@ describe('verified-data UI', () => {
     assert.match(verified, /sourceCoverage/);
   });
 
+
+  it('renders the consent banner visible in the first HTML pass to avoid homepage CLS', async () => {
+    const consentManager = await read('src/components/consent-manager.tsx');
+    assert.match(consentManager, /useState\(true\)/);
+    assert.match(consentManager, /Cookie consent banner/);
+  });
+
   it('removes rendered dependencies on old demo and sample drivers', async () => {
     const renderedSources = await Promise.all(appFiles.map(read));
     const joined = renderedSources.join('\n');
@@ -506,13 +513,26 @@ describe('verified-data UI', () => {
     const verified = await read('src/lib/verified-data.ts');
     const fuelRoute = await read('src/app/fuel/page.tsx');
     const overpass = await read('../../packages/ingestion/src/connectors/overpass.ts');
+    const brandedFuelConnector = await read('../../packages/ingestion/src/connectors/fuel-stations.ts');
+    const fuelArtifact = await read('src/lib/ingested/fuel-stations.ts');
 
     assert.match(overpass, /fetchOverpassFuelStations/);
     assert.match(overpass, /amenity"="fuel/);
+    assert.match(brandedFuelConnector, /SWEDEN_BRANDED_FUEL_STATIONS_OVERPASS_QUERY/);
+    assert.match(brandedFuelConnector, /amenity"="fuel/);
+    assert.match(brandedFuelConnector, /Circle K/);
+    assert.match(brandedFuelConnector, /OKQ8/);
     assert.match(verified, /export const fuelStationSourceCoverage/);
     assert.match(verified, /fetchOverpassFuelStations/);
     assert.match(verified, /amenity=fuel/);
+    assert.match(fuelArtifact, /Row count: [1-9][0-9]{2,} real OSM rows/);
+    assert.match(fuelArtifact, /fetched with curl from Overpass/);
+    assert.match(fuelArtifact, /"latitude"/);
+    assert.match(fuelArtifact, /"longitude"/);
     assert.match(fuelRoute, /fuelStationSourceCoverage/);
+    assert.match(fuelRoute, /fuelStations\.map/);
+    assert.match(fuelRoute, /fuelStationPosition/);
+    assert.match(fuelRoute, /fuelStationSource\.chainCounts/);
     assert.match(fuelRoute, /OSM fuel station source/);
     assert.match(fuelRoute, /amenity=fuel/);
     assert.match(fuelRoute, /verifiedFuelPriceObservations/);
@@ -520,6 +540,25 @@ describe('verified-data UI', () => {
     assert.match(fuelRoute, /price per litre/);
     assert.match(fuelRoute, /operator domain=fuel observations/);
     assert.doesNotMatch(fuelRoute, /currentPrice|price SEK/);
+  });
+
+  it('surfaces fuel target price alerts through the real watchlist engine without station-price claims', async () => {
+    const fuelRoute = await read('src/app/fuel/page.tsx');
+    const fuelPrices = await read('src/lib/fuel-prices.ts');
+    const core = await read('../../packages/core/src/index.ts');
+
+    assert.match(core, /export function buildWatchlistAlerts/);
+    assert.match(fuelPrices, /buildWatchlistAlerts/);
+    assert.match(fuelPrices, /export const fuelPriceTargetAlerts/);
+    assert.match(fuelPrices, /okq8-operator-price-page/);
+    assert.match(fuelPrices, /95 E10 alert/);
+    assert.match(fuelRoute, /fuelPriceTargetAlerts/);
+    assert.match(fuelRoute, /Fuel target price alerts/);
+    assert.match(fuelPrices, /target 19 kr\/l/i);
+    assert.match(fuelRoute, /target\.targetLabel/);
+    assert.match(fuelPrices, /No station-level fuel alert/);
+    assert.match(fuelRoute, /fuelPriceTargetAlerts\.guardrails\.map/);
+    assert.doesNotMatch(fuelRoute, /near me pump price|synthetic station/i);
   });
 
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
@@ -1029,6 +1068,8 @@ describe('verified-data UI', () => {
     const demo = await read('src/lib/demo-data.ts');
     assert.match(demo, /calculateMealCostBreakdown/);
     assert.match(demo, /mealCostBreakdown/);
+    assert.match(source, /calculateMealCostBreakdown/);
+    assert.match(source, /ConfidenceBadge/);
     assert.match(source, /mealCostBreakdown/);
     assert.match(source, /Ingredient-level meal costing/);
     assert.match(source, /costPerServing/);
@@ -1102,6 +1143,79 @@ describe('verified-data UI', () => {
     assert.match(deals, /real weekly offer rows/);
     assert.match(deals, /flyerPdfUrl retained/);
     assert.doesNotMatch(shell, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
+  it('wires the latest ICA store-scoped promotion import to visible source surfaces', async () => {
+    const generated = await read('src/lib/ingested/ica.ts');
+    const summary = await read('src/lib/ingested/ica-source-summary.ts');
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const dataSources = await read('src/app/data-sources/page.tsx');
+
+    assert.match(generated, /ICA Kvantum Tomelilla/);
+    assert.match(generated, /"storeAccountId":"1004070"/);
+    assert.match(generated, /ICA Supermarket Tierp/);
+    assert.match(generated, /"storeAccountId":"1003693"/);
+    assert.match(generated, /retrieved 2026-05-23T13:59:01\.000Z/);
+    assert.match(summary, /AUTO-GENERATED summary from public ICA store-scoped promotions JSON/);
+    assert.match(summary, /generatedFrom: 'apps\/web\/src\/lib\/ingested\/ica\.ts'/);
+    assert.match(summary, /totalRowCount: 93084/);
+    assert.match(summary, /storeEndpointCount: 323/);
+    assert.match(summary, /ICA Kvantum Tomelilla/);
+    assert.match(summary, /storeAccountId: '1004070'/);
+    assert.match(summary, /ICA Supermarket Tierp/);
+    assert.match(summary, /storeAccountId: '1003693'/);
+    assert.match(summary, /retrievedAt: '2026-05-23T13:59:01\.000Z'/);
+    assert.match(verified, /import \{ icaStorePromotionSourceSummary \} from '\.\/ingested\/ica-source-summary'/);
+    assert.match(verified, /export const icaStorePromotionEvidence/);
+    assert.match(verified, /latestStore/);
+    assert.match(verified, /storeScopedRows/);
+    assert.match(verified, /ICA store-scoped promotions/);
+    assert.match(verified, /No branch shelf-price claim/);
+    assert.match(shell, /icaStorePromotionEvidence/);
+    assert.match(shell, /Latest ICA store-scoped promotions/);
+    assert.match(shell, /data-ica-store-promotion-import/);
+    assert.match(shell, /href="\/data-sources"/);
+    assert.match(dataSources, /icaStorePromotionEvidence/);
+    assert.match(dataSources, /ICA store-scoped promotions/);
+    assert.match(dataSources, /latestStores\.map/);
+    assert.match(dataSources, /sourceUrl/);
+    assert.doesNotMatch(`${shell}\n${dataSources}`, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
+  it('wires the all-store daily batch runner to homepage and source readiness surfaces', async () => {
+    const runner = await read('../../packages/ingestion/src/connectors/all-store-runner.ts');
+    const ingestion = await read('../../packages/ingestion/src/index.ts');
+    const workflow = await read('../../.github/workflows/daily-ingestion.yml');
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const dataSources = await read('src/app/data-sources/page.tsx');
+
+    assert.match(runner, /export async function runAllStoreTasks/);
+    assert.match(runner, /storeConcurrency/);
+    assert.match(runner, /storeRetryAttempts/);
+    assert.match(runner, /failOnStoreFailure/);
+    assert.match(ingestion, /GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL/);
+    assert.match(ingestion, /GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL/);
+    assert.match(ingestion, /GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL/);
+    assert.match(ingestion, /GROCERYVIEW_DAILY_STORE_CONCURRENCY/);
+    assert.match(workflow, /ops:daily-connectors/);
+    assert.match(workflow, /Export live store enumeration/);
+    assert.match(workflow, /groceryview-daily-connectors/);
+    assert.match(verified, /export const allStoreDailyRunnerReadiness/);
+    assert.match(verified, /All-store daily batch runner/);
+    assert.match(verified, /runnerControls/);
+    assert.match(verified, /allStoreConnectorUrls/);
+    assert.match(verified, /failOnStoreFailure/);
+    assert.match(shell, /allStoreDailyRunnerReadiness/);
+    assert.match(shell, /All-store daily batch runner/);
+    assert.match(shell, /data-all-store-daily-runner/);
+    assert.match(shell, /href="\/data-sources"/);
+    assert.match(dataSources, /allStoreDailyRunnerReadiness/);
+    assert.match(dataSources, /All-store daily batch runner/);
+    assert.match(dataSources, /runnerControls\.map/);
+    assert.match(dataSources, /allStoreConnectorUrls\.map/);
+    assert.doesNotMatch(`${shell}\n${dataSources}`, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
 
@@ -1259,6 +1373,33 @@ describe('verified-data UI', () => {
     assert.match(nextConfig, /remotePatterns/);
     assert.match(nextConfig, /assets\.axfood\.se/);
     assert.match(nextConfig, /images\.openfoodfacts\.org/);
+  });
+
+  it('ships a Lighthouse CI performance budget gate for web terminal routes', async () => {
+    const pkg = await read('package.json');
+    const lhci = await read('lighthouserc.cjs');
+    const workflow = await read('../../.github/workflows/ci.yml');
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(pkg, /"perf:lighthouse:ci"/);
+    assert.match(pkg, /@lhci\/cli/);
+    assert.match(lhci, /http:\/\/127\.0\.0\.1:3000\//);
+    assert.match(lhci, /numberOfRuns:\s*3/);
+    assert.match(lhci, /categories:performance/);
+    assert.match(lhci, /largest-contentful-paint/);
+    assert.match(lhci, /cumulative-layout-shift/);
+    assert.match(lhci, /'cumulative-layout-shift': \['error', \{ maxNumericValue: 0\.15 \}\]/);
+    assert.match(lhci, /total-byte-weight/);
+    assert.match(lhci, /filesystem/);
+    assert.match(workflow, /Lighthouse performance budget/);
+    assert.match(workflow, /npm run perf:lighthouse:ci -w @groceryview\/web/);
+    assert.match(verified, /export const webPerformanceBudgetGate/);
+    assert.match(verified, /Core Web Vitals budget/);
+    assert.match(verified, /≤ 0\.15 layout shift/);
+    assert.match(shell, /webPerformanceBudgetGate/);
+    assert.match(shell, /Lighthouse CI budget/);
+    assert.doesNotMatch(shell, /NoVerifiedData/);
   });
 
 
@@ -2668,6 +2809,28 @@ ${seo}`;
     assert.match(shell, /cursor pagination/);
   });
 
+  it('surfaces the TimescaleDB evaluation with declarative partition fallback evidence', async () => {
+    const db = await read('../../packages/db/src/index.ts');
+    const route = await read('src/app/data-sources/page.tsx');
+    const shell = await read('src/components/market-shell.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+
+    assert.match(db, /buildTimescaleDbEvaluationReport/);
+    assert.match(db, /TIMESCALEDB_EVALUATION_FALLBACK_TABLES/);
+    assert.match(verified, /export const timescaleDbEvaluation/);
+    assert.match(verified, /TimescaleDB evaluation/);
+    assert.match(verified, /fallback_ready/);
+    assert.match(verified, /observations_v2/);
+    assert.match(verified, /price_daily/);
+    assert.match(verified, /price_weekly/);
+    assert.match(route, /timescaleDbEvaluation/);
+    assert.match(route, /TimescaleDB evaluation/);
+    assert.match(route, /declarative monthly partitions/);
+    assert.match(shell, /timescaleDbEvaluation/);
+    assert.match(shell, /data-timescale-evaluation/);
+    assert.match(shell, /TimescaleDB/);
+  });
+
   it('surfaces verified OSM coverage on the store coverage route', async () => {
     const route = await read('src/app/store-coverage/page.tsx');
 
@@ -2788,6 +2951,7 @@ ${seo}`;
     const pharmacyRoute = await read('src/app/pharmacy/page.tsx');
     const seo = await read('src/lib/seo.ts');
     const domainMigration = await read('../../infra/db/migrations/011_multi_vertical_domains.sql');
+    const fuelSourceMigration = await read('../../infra/db/migrations/014_fuel_price_sources.sql');
 
     assert.match(catalogDomains, /PriceDomain/);
     assert.match(catalogDomains, /grocery/);
@@ -2802,6 +2966,10 @@ ${seo}`;
     assert.match(domainMigration, /alter table observations add column if not exists domain/);
     assert.match(domainMigration, /default 'grocery'/);
     assert.match(domainMigration, /price_domain_check/);
+    assert.match(fuelSourceMigration, /fuel_grades/);
+    assert.match(fuelSourceMigration, /operator_public_price_page/);
+    assert.match(fuelSourceMigration, /crowd_station_report/);
+    assert.match(fuelSourceMigration, /fuel_price_source_observations/);
 
     assert.match(verified, /multiVerticalDomainFoundation/);
     assert.match(verified, /SUPPORTED_PRICE_DOMAINS/);

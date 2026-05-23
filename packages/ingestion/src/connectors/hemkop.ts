@@ -1,3 +1,5 @@
+import { runAllStoreTasks, type AllStoreTaskRunnerControls } from './all-store-runner.js';
+
 export type HemkopProduct = {
   code: string;
   name: string;
@@ -232,7 +234,19 @@ export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS = [
   '4508',
   '4265',
   '4353',
-  '4204'
+  '4204',
+  '4797',
+  '4714',
+  '4514',
+  '4770',
+  '4515',
+  '4638',
+  '4624',
+  '4629',
+  '4669',
+  '4774',
+  '4623',
+  '4609'
 ] as const;
 
 export const DEFAULT_HEMKOP_CATEGORY_PAGE_SIZE = 100;
@@ -252,7 +266,46 @@ export const DEFAULT_HEMKOP_SEARCH_QUERIES = [
   'banan',
   'kyckling',
   'ketchup',
-  'havregryn'
+  'havregryn',
+  'juice',
+  'flingor',
+  'mjol',
+  'olja',
+  'tomat',
+  'fisk',
+  'kottfars',
+  'korv',
+  'glass',
+  'choklad',
+  'frukt',
+  'gronsaker',
+  'godis',
+  'soppa',
+  'tacos',
+  'nudlar',
+  'falukorv',
+  'lax',
+  'tonfisk',
+  'gurka',
+  'paprika',
+  'morot',
+  'lok',
+  'vitlok',
+  'apelsin',
+  'apple',
+  'citron',
+  'broccoli',
+  'majs',
+  'bonor',
+  'linser',
+  'skinka',
+  'bacon',
+  'gradde',
+  'kvarg',
+  'knackebrod',
+  'mineralvatten',
+  'havredryck',
+  'toalettpapper'
 ] as const;
 
 export type FetchHemkopProductsOptions = {
@@ -266,7 +319,7 @@ export type FetchHemkopProductsOptions = {
   retrievedAt?: string;
 };
 
-export type FetchHemkopProductsForAllStoresOptions = Omit<FetchHemkopProductsOptions, 'storeId' | 'maxRows'> & {
+export type FetchHemkopProductsForAllStoresOptions = Omit<FetchHemkopProductsOptions, 'storeId' | 'maxRows'> & AllStoreTaskRunnerControls & {
   storeApiUrl?: string;
   maxStores?: number;
   maxRowsPerStore?: number;
@@ -281,7 +334,7 @@ export type FetchHemkopWeeklyDiscountsOptions = {
   retrievedAt?: string;
 };
 
-export type FetchHemkopAllStoreWeeklyDiscountsOptions = Omit<FetchHemkopWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & {
+export type FetchHemkopAllStoreWeeklyDiscountsOptions = Omit<FetchHemkopWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & AllStoreTaskRunnerControls & {
   storeApiUrl?: string;
   maxStores?: number;
 };
@@ -480,12 +533,15 @@ export async function fetchHemkopProductsForAllStores(
     retrievedAt: options.retrievedAt,
     storeApiUrl: options.storeApiUrl
   });
-  const rows: HemkopStoreProduct[] = [];
-  const failures: string[] = [];
-  const concurrency = 8;
-  for (let index = 0; index < stores.length; index += concurrency) {
-    const batch = stores.slice(index, index + concurrency);
-    const settled = await Promise.allSettled(batch.map(async (store) => {
+  const { rows, failures } = await runAllStoreTasks({
+    stores,
+    storeId: (store) => store.storeId,
+    storeConcurrency: options.storeConcurrency,
+    storeStartDelayMs: options.storeStartDelayMs,
+    storeRetryAttempts: options.storeRetryAttempts,
+    storeRetryBaseDelayMs: options.storeRetryBaseDelayMs,
+    failOnStoreFailure: options.failOnStoreFailure,
+    task: async (store) => {
       const products = await fetchHemkopProducts({
         fetchImpl: options.fetchImpl,
         queries: options.queries,
@@ -502,17 +558,9 @@ export async function fetchHemkopProductsForAllStores(
         storeName: store.name,
         city: store.city
       }));
-    }));
-    for (let offset = 0; offset < settled.length; offset += 1) {
-      const result = settled[offset]!;
-      if (result.status === 'fulfilled') {
-        rows.push(...result.value);
-      } else {
-        failures.push(`${batch[offset]?.storeId ?? 'unknown'}:${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
-      }
     }
-  }
-  if (rows.length === 0 && failures.length > 0) throw new Error(`Hemkop all-store product requests returned no usable branch products: ${failures[0]}`);
+  });
+  if (rows.length === 0 && failures.length > 0) throw new Error(`Hemkop all-store product requests returned no usable branch products: ${failures[0]!.storeId}:${failures[0]!.error}`);
   return rows;
 }
 
@@ -588,13 +636,26 @@ export async function fetchHemkopWeeklyDiscountsForAllStores(
     retrievedAt: options.retrievedAt,
     storeApiUrl: options.storeApiUrl
   });
-  return await fetchHemkopWeeklyDiscounts({
-    fetchImpl: options.fetchImpl,
-    storeIds: stores.map((store) => store.storeId),
-    maxRows: options.maxRows ?? stores.length * 300,
-    pageSize: options.pageSize,
-    retrievedAt: options.retrievedAt
+  const perStoreMaxRows = Math.min(options.maxRows ?? 300, 300);
+  const { rows, failures } = await runAllStoreTasks({
+    stores,
+    storeId: (store) => store.storeId,
+    storeConcurrency: options.storeConcurrency,
+    storeStartDelayMs: options.storeStartDelayMs,
+    storeRetryAttempts: options.storeRetryAttempts,
+    storeRetryBaseDelayMs: options.storeRetryBaseDelayMs,
+    failOnStoreFailure: options.failOnStoreFailure,
+    task: async (store) => await fetchHemkopWeeklyDiscounts({
+      fetchImpl: options.fetchImpl,
+      storeIds: [store.storeId],
+      maxRows: perStoreMaxRows,
+      pageSize: options.pageSize,
+      retrievedAt: options.retrievedAt
+    })
   });
+  if (options.maxRows && rows.length >= options.maxRows) return rows.slice(0, options.maxRows);
+  if (rows.length === 0 && failures.length > 0) throw new Error(`Hemkop all-store weekly discount requests returned no usable branch products: ${failures[0]!.storeId}:${failures[0]!.error}`);
+  return rows;
 }
 
 export function normalizeHemkopStore(

@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import {
+  allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
   categoryQualityMatrix,
   commodityIngestionClassifierEvidence,
   commodityMappingReviewPlan,
   formatPct,
+  icaStorePromotionEvidence,
   multiVerticalDomainFoundation,
   publicApiDirectory,
   snapshot,
@@ -13,7 +15,8 @@ import {
   sourceCoverage,
   sourceReadinessMatrix,
   sourceRouteMap,
-  storeBrandLedger
+  storeBrandLedger,
+  timescaleDbEvaluation
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -37,6 +40,86 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <Card className="mt-6 border-lime-200 bg-lime-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-lime-800">All-store daily batch runner</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">{allStoreDailyRunnerReadiness.title}</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              All-store daily ingestion now has a visible readiness contract: the workflow enumerates live stores, emits daily connector configs, and passes bounded runner controls into branch-scoped connectors before source-run evidence can be accepted.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-lime-900 shadow-sm">{allStoreDailyRunnerReadiness.status}</p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {allStoreDailyRunnerReadiness.runnerControls.map((control) => (
+            <section className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm" key={control.name}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">{control.name}</p>
+              <p className="mt-2 text-sm font-black text-slate-950">{control.defaultValue}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{control.purpose}</p>
+            </section>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          <section className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">All-store connector URLs</p>
+            <div className="mt-3 space-y-3">
+              {allStoreDailyRunnerReadiness.allStoreConnectorUrls.map((connector) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={connector.url}>
+                  <p className="text-sm font-black text-slate-950">{connector.chain} · {connector.scope}</p>
+                  <p className="mt-1 break-all font-mono text-xs font-semibold text-slate-600">{connector.url}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+          <section className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">Workflow evidence</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{allStoreDailyRunnerReadiness.workflowPath}</p>
+            <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">{allStoreDailyRunnerReadiness.runnerPath}</p>
+            <div className="mt-3 grid gap-2">
+              {allStoreDailyRunnerReadiness.workflowSteps.map((step) => (
+                <p className="rounded-xl bg-lime-50 p-3 text-sm font-bold text-lime-950" key={step}>{step}</p>
+              ))}
+            </div>
+          </section>
+        </div>
+        <ul className="mt-4 grid gap-2 text-sm font-semibold leading-6 text-lime-950 md:grid-cols-3">
+          {allStoreDailyRunnerReadiness.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white p-3" key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
+      </Card>
+
+      <Card className="mt-6 border-red-200 bg-red-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-red-800">wire: ICA source import</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">{icaStorePromotionEvidence.title}</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              ICA store-scoped promotions are now part of the visible source ledger. The latest import keeps storeAccountId, regionId, retrievedAt, rowCount, and sourceUrl evidence on this page before any shopper-facing branch shelf-price or stock claim can be made.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-red-900 shadow-sm">
+            {icaStorePromotionEvidence.storeScopedRows.toLocaleString('sv-SE')} rows
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {icaStorePromotionEvidence.latestStores.map((store) => (
+            <a className="rounded-2xl border border-red-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-red-700" href={store.sourceUrl} key={`${store.storeAccountId}-${store.retrievedAt}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-red-800">storeAccountId {store.storeAccountId}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{store.storeName}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{store.rowCount.toLocaleString('sv-SE')} rows · regionId {store.regionId}</p>
+              <p className="mt-3 rounded-xl bg-red-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-red-950">sourceUrl · retrieved {store.retrievedAt}</p>
+            </a>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          {icaStorePromotionEvidence.guardrails.map((guardrail) => (
+            <p className="rounded-2xl bg-white p-3 text-xs font-bold leading-5 text-red-950" key={guardrail}>{guardrail}</p>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
@@ -166,6 +249,57 @@ export default function DataSourcesPage() {
             </div>
             <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
               {apiPerformanceReadiness.guardrails.map((guardrail) => (
+                <li key={guardrail}>• {guardrail}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-fuchsia-800">perf(db)</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">TimescaleDB evaluation</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              {timescaleDbEvaluation.title} is {timescaleDbEvaluation.status}: {timescaleDbEvaluation.recommendation} The visible contract keeps declarative monthly partitions as the active fallback instead of claiming TimescaleDB adoption without extension, hypertable, compression, and retention evidence.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-fuchsia-900 shadow-sm">{timescaleDbEvaluation.status}</p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {timescaleDbEvaluation.evaluationSignals.map((signal) => (
+            <section className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm" key={signal.label}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">{signal.label}</p>
+              <p className="mt-2 text-sm font-bold leading-6 text-slate-800">{signal.state}</p>
+              <p className="mt-3 rounded-xl bg-fuchsia-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-fuchsia-950">{signal.evidence}</p>
+            </section>
+          ))}
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_1fr]">
+          <section className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">Fallback tables</p>
+            <div className="mt-3 space-y-3">
+              {timescaleDbEvaluation.fallbackTables.map((item) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={item.table}>
+                  <p className="font-mono text-sm font-black text-slate-950">{item.table}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{item.role}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+          <section className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">Retention fallback</p>
+            <div className="mt-3 space-y-3">
+              {timescaleDbEvaluation.fallbackFunctions.map((item) => (
+                <div className="rounded-xl bg-slate-50 p-3" key={item.name}>
+                  <p className="font-mono text-sm font-black text-slate-950">{item.name}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{item.role}</p>
+                </div>
+              ))}
+            </div>
+            <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
+              {timescaleDbEvaluation.guardrails.map((guardrail) => (
                 <li key={guardrail}>• {guardrail}</li>
               ))}
             </ul>

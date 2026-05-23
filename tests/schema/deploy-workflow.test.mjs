@@ -10,11 +10,33 @@ describe('deploy workflow', () => {
     for (const command of ['npm ci', 'npm test', 'npm run build', 'npm run typecheck']) {
       assert.match(workflow, new RegExp(command.replaceAll(' ', '\\s+')));
     }
+    assert.match(workflow, /name: Export DB-backed site snapshot/);
+    assert.match(workflow, /DATABASE_URL:\s*\$\{\{\s*secrets\.DATABASE_URL\s*\}\}/);
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_PATH:\s*\/tmp\/groceryview-db-site-snapshot\.json/);
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_MODULE_PATH:\s*apps\/web\/src\/lib\/generated\/db-site-products\.ts/);
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_CHAIN_OBSERVATIONS_MODULE_PATH:\s*apps\/web\/src\/lib\/generated\/db-site-chain-observations\.ts/);
+    assert.match(workflow, /GROCERYVIEW_DB_SITE_SNAPSHOT_INGESTED_OVERRIDES_MODULE_PATH:\s*apps\/web\/src\/lib\/generated\/db-site-ingested-overrides\.ts/);
+    assert.match(workflow, /npm run --silent ingest:export-db-snapshot/);
+    assert.ok(
+      workflow.indexOf('name: Export DB-backed site snapshot') < workflow.indexOf('name: Build workspaces'),
+      'DB-backed site snapshot must be generated before the deploy build renders web pages'
+    );
     assert.match(workflow, /deploy\/groceryview\.manifest\.json/);
     assert.match(workflow, /environment:\s*production/);
     assert.match(workflow, /ops:check-production-secrets -- --from-env/);
-    for (const variable of ['GROCERYVIEW_PRODUCTION_URL', 'GROCERYVIEW_TERMINAL_PRODUCT_ID', 'GROCERYVIEW_SCANNER_USER_ID']) {
+    for (const variable of [
+      'GROCERYVIEW_PRODUCTION_URL',
+      'GROCERYVIEW_TERMINAL_PRODUCT_ID',
+      'GROCERYVIEW_SCANNER_USER_ID',
+      'SUPABASE_PROJECT_REF'
+    ]) {
       assert.match(workflow, new RegExp(`${variable}:\\s*\\$\\{\\{ vars\\.${variable} \\}\\}`));
+    }
+    for (const variableBackedRuntime of ['PUBLIC_WEB_URL', 'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN']) {
+      assert.match(
+        workflow,
+        new RegExp(`${variableBackedRuntime}:\\s*\\$\\{\\{ vars\\.${variableBackedRuntime} \\|\\| secrets\\.${variableBackedRuntime} \\}\\}`)
+      );
     }
     assert.doesNotMatch(workflow, /gh secret list/);
   });
@@ -31,15 +53,16 @@ describe('deploy workflow', () => {
       'VERCEL_PROJECT_ID',
       'METRICS_TOKEN',
       'AUTH_SECRET',
-      'PUBLIC_WEB_URL',
       'NOTIFICATION_WEBHOOK_SECRET',
       'BILLING_WEBHOOK_SECRET',
       'STRIPE_SECRET_KEY',
       'STRIPE_PRICE_PREMIUM_MONTHLY',
       'STRIPE_PRICE_PREMIUM_YEARLY',
       'GROCERYVIEW_SCANNER_BEARER_TOKEN',
-      'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN',
-      'CATALOG_COVERAGE_TARGETS_JSON'
+      'CATALOG_COVERAGE_TARGETS_JSON',
+      'SUPABASE_ACCESS_TOKEN',
+      'REPLACEMENT_DATABASE_URL',
+      'CANDIDATE_DATABASE_URL'
     ]) {
       assert.match(workflow, new RegExp(`${secret}:\\s*\\$\\{\\{ secrets\\.${secret} \\}\\}`));
     }

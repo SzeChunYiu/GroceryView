@@ -1,3 +1,5 @@
+import { runAllStoreTasks, type AllStoreTaskRunnerControls } from './all-store-runner.js';
+
 export type WillysProduct = {
   code: string;
   name: string;
@@ -342,7 +344,19 @@ export const DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS = [
   '2139',
   '2197',
   '2120',
-  '2357'
+  '2357',
+  '2860',
+  '2823',
+  '2878',
+  '2810',
+  '2874',
+  '2858',
+  '2857',
+  '2871',
+  '2875',
+  '2850',
+  '2859',
+  '2820'
 ] as const;
 
 export const DEFAULT_WILLYS_SEARCH_QUERIES = [
@@ -381,7 +395,26 @@ export const DEFAULT_WILLYS_SEARCH_QUERIES = [
   'lax',
   'tonfisk',
   'gurka',
-  'paprika'
+  'paprika',
+  'morot',
+  'lok',
+  'vitlok',
+  'apelsin',
+  'apple',
+  'citron',
+  'broccoli',
+  'majs',
+  'bonor',
+  'linser',
+  'skinka',
+  'bacon',
+  'gradde',
+  'kvarg',
+  'flingor',
+  'knackebrod',
+  'mineralvatten',
+  'havredryck',
+  'toalettpapper'
 ] as const;
 export const DEFAULT_WILLYS_PRODUCTS_MAX_ROWS = 500;
 export const DEFAULT_WILLYS_CATEGORY_PAGE_SIZE = 100;
@@ -396,7 +429,7 @@ export type FetchWillysProductsOptions = {
   retrievedAt?: string;
 };
 
-export type FetchWillysProductsForAllStoresOptions = Omit<FetchWillysProductsOptions, 'storeId' | 'maxRows'> & {
+export type FetchWillysProductsForAllStoresOptions = Omit<FetchWillysProductsOptions, 'storeId' | 'maxRows'> & AllStoreTaskRunnerControls & {
   storeApiUrl?: string;
   maxStores?: number;
   maxRowsPerStore?: number;
@@ -411,7 +444,7 @@ export type FetchWillysWeeklyDiscountsOptions = {
   retrievedAt?: string;
 };
 
-export type FetchWillysAllStoreWeeklyDiscountsOptions = Omit<FetchWillysWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & {
+export type FetchWillysAllStoreWeeklyDiscountsOptions = Omit<FetchWillysWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & AllStoreTaskRunnerControls & {
   storeApiUrl?: string;
   maxStores?: number;
 };
@@ -604,12 +637,15 @@ export async function fetchWillysProductsForAllStores(
     retrievedAt: options.retrievedAt,
     storeApiUrl: options.storeApiUrl
   });
-  const rows: WillysStoreProduct[] = [];
-  const failures: string[] = [];
-  const concurrency = 8;
-  for (let index = 0; index < stores.length; index += concurrency) {
-    const batch = stores.slice(index, index + concurrency);
-    const settled = await Promise.allSettled(batch.map(async (store) => {
+  const { rows, failures } = await runAllStoreTasks({
+    stores,
+    storeId: (store) => store.storeId,
+    storeConcurrency: options.storeConcurrency,
+    storeStartDelayMs: options.storeStartDelayMs,
+    storeRetryAttempts: options.storeRetryAttempts,
+    storeRetryBaseDelayMs: options.storeRetryBaseDelayMs,
+    failOnStoreFailure: options.failOnStoreFailure,
+    task: async (store) => {
       const products = await fetchWillysProducts({
         fetchImpl: options.fetchImpl,
         queries: options.queries,
@@ -625,17 +661,9 @@ export async function fetchWillysProductsForAllStores(
         storeName: store.name,
         city: store.city
       }));
-    }));
-    for (let offset = 0; offset < settled.length; offset += 1) {
-      const result = settled[offset]!;
-      if (result.status === 'fulfilled') {
-        rows.push(...result.value);
-      } else {
-        failures.push(`${batch[offset]?.storeId ?? 'unknown'}:${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
-      }
     }
-  }
-  if (rows.length === 0 && failures.length > 0) throw new Error(`Willys all-store product requests returned no usable branch products: ${failures[0]}`);
+  });
+  if (rows.length === 0 && failures.length > 0) throw new Error(`Willys all-store product requests returned no usable branch products: ${failures[0]!.storeId}:${failures[0]!.error}`);
   return rows;
 }
 
@@ -711,34 +739,25 @@ export async function fetchWillysWeeklyDiscountsForAllStores(
     retrievedAt: options.retrievedAt,
     storeApiUrl: options.storeApiUrl
   });
-  const rows: WillysWeeklyDiscount[] = [];
-  const failures: string[] = [];
-  const concurrency = 8;
   const perStoreMaxRows = Math.min(options.maxRows ?? 300, 300);
-  for (let index = 0; index < stores.length; index += concurrency) {
-    const batch = stores.slice(index, index + concurrency);
-    const settled = await Promise.allSettled(batch.map(async (store) => (
-      await fetchWillysWeeklyDiscounts({
+  const { rows, failures } = await runAllStoreTasks({
+    stores,
+    storeId: (store) => store.storeId,
+    storeConcurrency: options.storeConcurrency,
+    storeStartDelayMs: options.storeStartDelayMs,
+    storeRetryAttempts: options.storeRetryAttempts,
+    storeRetryBaseDelayMs: options.storeRetryBaseDelayMs,
+    failOnStoreFailure: options.failOnStoreFailure,
+    task: async (store) => await fetchWillysWeeklyDiscounts({
         fetchImpl: options.fetchImpl,
         storeIds: [store.storeId],
         maxRows: perStoreMaxRows,
         pageSize: options.pageSize,
         retrievedAt: options.retrievedAt
       })
-    )));
-    for (let offset = 0; offset < settled.length; offset += 1) {
-      const result = settled[offset]!;
-      if (result.status === 'fulfilled') {
-        rows.push(...result.value);
-      } else {
-        failures.push(`${batch[offset]?.storeId ?? 'unknown'}:${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
-      }
-    }
-    if (options.maxRows && rows.length >= options.maxRows) {
-      return rows.slice(0, options.maxRows);
-    }
-  }
-  if (rows.length === 0 && failures.length > 0) throw new Error(`Willys all-store weekly discount requests returned no usable branch products: ${failures[0]}`);
+  });
+  if (options.maxRows && rows.length >= options.maxRows) return rows.slice(0, options.maxRows);
+  if (rows.length === 0 && failures.length > 0) throw new Error(`Willys all-store weekly discount requests returned no usable branch products: ${failures[0]!.storeId}:${failures[0]!.error}`);
   return rows;
 }
 
