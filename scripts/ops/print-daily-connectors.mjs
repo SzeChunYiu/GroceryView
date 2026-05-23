@@ -95,6 +95,19 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: true
   },
   {
+    connectorId: 'matspar-public-search',
+    chainId: 'matspar',
+    domain: 'grocery',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'groceryview://daily/matspar/products/public-search',
+    parserVersion: 'matspar-public-search-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
     connectorId: 'pharmacy-public-products',
     chainId: 'pharmacy',
     domain: 'pharmacy',
