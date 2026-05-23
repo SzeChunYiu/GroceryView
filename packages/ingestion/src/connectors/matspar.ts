@@ -66,53 +66,66 @@ export const DEFAULT_MATSPAR_SEARCH_QUERIES = [
   'gronsaker',
   'godis',
   'soppa',
-  'tacos'
+  'tacos',
+  'nudlar',
+  'falukorv',
+  'lax',
+  'tonfisk',
+  'gurka',
+  'paprika',
+  'havredryck'
 ] as const;
-export const DEFAULT_MATSPAR_MAX_ROWS = 1200;
+export const DEFAULT_MATSPAR_SEARCH_PAGES = [1, 2] as const;
+export const DEFAULT_MATSPAR_MAX_ROWS = 3000;
 
 export type FetchMatsparProductsOptions = {
   fetchImpl?: typeof fetch;
   queries?: readonly string[];
+  pages?: readonly number[];
   maxRows?: number;
   retrievedAt?: string;
 };
 
-export function buildMatsparSearchUrl(query: string): string {
+export function buildMatsparSearchUrl(query: string, page = 1): string {
   const url = new URL(MATSPAR_SEARCH_BASE_URL);
   url.searchParams.set('q', query);
+  if (page > 1) url.searchParams.set('page', String(page));
   return url.toString();
 }
 
 export async function fetchMatsparProducts(options: FetchMatsparProductsOptions = {}): Promise<MatsparProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const queries = options.queries ?? DEFAULT_MATSPAR_SEARCH_QUERIES;
+  const pages = options.pages ?? DEFAULT_MATSPAR_SEARCH_PAGES;
   const maxRows = options.maxRows ?? DEFAULT_MATSPAR_MAX_ROWS;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: MatsparProduct[] = [];
   const seenCodes = new Set<string>();
 
   for (const query of queries) {
-    const sourceUrl = buildMatsparSearchUrl(query);
-    const response = await fetchImpl(sourceUrl, {
-      headers: {
-        accept: 'text/html,application/xhtml+xml',
-        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-      }
-    });
+    for (const page of pages) {
+      const sourceUrl = buildMatsparSearchUrl(query, page);
+      const response = await fetchImpl(sourceUrl, {
+        headers: {
+          accept: 'text/html,application/xhtml+xml',
+          'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+        }
+      });
 
-    if (!response.ok) {
-      throw new Error(`Matspar search request failed for ${query}: ${response.status}`);
-    }
-
-    for (const product of parseMatsparPageProducts(await response.text())) {
-      const row = normalizeMatsparProduct(product, sourceUrl, retrievedAt);
-      if (!row || seenCodes.has(row.code)) {
-        continue;
+      if (!response.ok) {
+        throw new Error(`Matspar search request failed for ${query} page ${page}: ${response.status}`);
       }
-      seenCodes.add(row.code);
-      rows.push(row);
-      if (rows.length >= maxRows) {
-        return rows;
+
+      for (const product of parseMatsparPageProducts(await response.text())) {
+        const row = normalizeMatsparProduct(product, sourceUrl, retrievedAt);
+        if (!row || seenCodes.has(row.code)) {
+          continue;
+        }
+        seenCodes.add(row.code);
+        rows.push(row);
+        if (rows.length >= maxRows) {
+          return rows;
+        }
       }
     }
   }
