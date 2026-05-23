@@ -110,6 +110,11 @@ export const routeMetadataCatalog = {
     description: 'Authentication is withheld in the static build until a production auth provider can return a verified user session.',
     noIndex: true
   },
+  '/list': {
+    title: 'Shopping list check-off | GroceryView',
+    description: 'Check off grocery list items while shopping with browser-local checked state that survives refreshes.',
+    noIndex: true
+  },
   '/map': {
     title: 'Sweden grocery store map and price heat overlay | GroceryView',
     description: 'Map verified OSM grocery stores with chain-index marker colors, district heat signals, and cheapest-chain context.'
