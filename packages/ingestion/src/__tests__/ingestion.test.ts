@@ -5159,6 +5159,18 @@ describe('daily ingestion runner', () => {
     assert.equal(result.persistedRuns, 3);
     assert.equal(result.acceptedCount, 3);
     assert.equal(result.blockers.length, 0);
+    assert.deepEqual(result.chainSummaries.map((summary) => ({
+      connectorId: summary.connectorId,
+      chainId: summary.chainId,
+      status: summary.status,
+      persistedRuns: summary.persistedRuns,
+      acceptedCount: summary.acceptedCount,
+      observationCount: summary.observationIds.length
+    })), [
+      { connectorId: 'ica-normalized-json', chainId: 'ica', status: 'succeeded', persistedRuns: 1, acceptedCount: 1, observationCount: 1 },
+      { connectorId: 'willys-normalized-json', chainId: 'willys', status: 'succeeded', persistedRuns: 1, acceptedCount: 1, observationCount: 1 },
+      { connectorId: 'coop-normalized-json', chainId: 'coop', status: 'succeeded', persistedRuns: 1, acceptedCount: 1, observationCount: 1 }
+    ]);
     assert.equal(attempts.get('ica'), 2);
     assert.equal(active.max, 2);
   });

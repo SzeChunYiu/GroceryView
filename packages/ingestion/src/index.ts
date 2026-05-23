@@ -2644,6 +2644,19 @@ export type DailyIngestionRunInput = {
   connectorRetryBaseDelayMs?: number;
 };
 
+export type DailyIngestionConnectorSummary = {
+  connectorId: string;
+  chainId: string;
+  status: 'succeeded' | 'partial' | 'blocked';
+  blockers: string[];
+  persistedRuns: number;
+  acceptedCount: number;
+  rejectedCount: number;
+  sourceRunIds: string[];
+  rawRecordIds: string[];
+  observationIds: string[];
+};
+
 export type DailyIngestionRunResult = {
   status: 'succeeded' | 'partial' | 'blocked';
   blockers: string[];
@@ -2653,6 +2666,7 @@ export type DailyIngestionRunResult = {
   sourceRunIds: string[];
   rawRecordIds: string[];
   observationIds: string[];
+  chainSummaries: DailyIngestionConnectorSummary[];
 };
 
 type IdRow = { id: string };
@@ -3944,12 +3958,15 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
   const sourceRunIds: string[] = [];
   const rawRecordIds: string[] = [];
   const observationIds: string[] = [];
+  const chainSummaries: DailyIngestionConnectorSummary[] = [];
   let persistedRuns = 0;
   let acceptedCount = 0;
   let rejectedCount = 0;
 
-  for (const result of results) {
+  for (const [index, result] of results.entries()) {
     if (!result) continue;
+    const config = input.connectors[index];
+    if (!config) continue;
     blockers.push(...result.blockers);
     persistedRuns += result.persistedRuns;
     acceptedCount += result.acceptedCount;
@@ -3957,6 +3974,18 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
     sourceRunIds.push(...result.sourceRunIds);
     rawRecordIds.push(...result.rawRecordIds);
     observationIds.push(...result.observationIds);
+    chainSummaries.push({
+      connectorId: config.connectorId,
+      chainId: config.chainId,
+      status: result.blockers.length === 0 ? 'succeeded' : result.persistedRuns > 0 ? 'partial' : 'blocked',
+      blockers: [...result.blockers],
+      persistedRuns: result.persistedRuns,
+      acceptedCount: result.acceptedCount,
+      rejectedCount: result.rejectedCount,
+      sourceRunIds: [...result.sourceRunIds],
+      rawRecordIds: [...result.rawRecordIds],
+      observationIds: [...result.observationIds]
+    });
   }
 
   return {
@@ -3967,7 +3996,8 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
     rejectedCount,
     sourceRunIds,
     rawRecordIds,
-    observationIds
+    observationIds,
+    chainSummaries
   };
 }
 
