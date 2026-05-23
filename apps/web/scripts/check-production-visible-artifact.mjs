@@ -8,11 +8,21 @@ const requiredVisibleSlugs = [
   'coop-swedenborgsgatan',
   'lidl-sveavagen'
 ];
+const requiredMinimumStoreSlugs = 6;
+const requiredMinimumProductSlugs = 10;
 
 function normalizeUrl(value) {
   const url = new URL(value);
   url.pathname = url.pathname || '/';
   return url.toString();
+}
+
+function extractDataSlugs(html, attributeName) {
+  return new Set(
+    Array.from(html.matchAll(new RegExp(`${attributeName}="([^"]+)"`, 'g')))
+      .map((match) => match[1])
+      .filter(Boolean)
+  );
 }
 
 async function main() {
@@ -38,7 +48,21 @@ async function main() {
     return;
   }
 
-  console.log(`Production visible artifact is current at ${url}; found ${requiredVisibleSlugs.length} launch store slugs.`);
+  const storeSlugs = extractDataSlugs(html, 'data-store-slug');
+  if (storeSlugs.size < requiredMinimumStoreSlugs) {
+    console.error(`Production visible artifact is stale at ${url}; found ${storeSlugs.size} data-store-slug entries, expected at least ${requiredMinimumStoreSlugs}.`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const productSlugs = extractDataSlugs(html, 'data-product-slug');
+  if (productSlugs.size < requiredMinimumProductSlugs) {
+    console.error(`Production visible artifact is stale at ${url}; found ${productSlugs.size} data-product-slug entries, expected at least ${requiredMinimumProductSlugs}.`);
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log(`Production visible artifact is current at ${url}; found ${storeSlugs.size} store slugs and ${productSlugs.size} product slugs.`);
 }
 
 main().catch((error) => {

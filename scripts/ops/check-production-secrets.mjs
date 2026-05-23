@@ -7,6 +7,9 @@ export const requiredGithubActionSecrets = [
   'GROCERYVIEW_SERVER_URL',
   'GROCERYVIEW_API_BASE_URL',
   'EXPO_TOKEN',
+  'VERCEL_TOKEN',
+  'VERCEL_ORG_ID',
+  'VERCEL_PROJECT_ID',
   'METRICS_TOKEN'
 ];
 
@@ -38,8 +41,15 @@ function parseGhSecretList(output) {
 function readGithubSecretNames(repo, environment) {
   const args = ['secret', 'list'];
   if (repo) args.push('--repo', repo);
-  if (environment) args.push('--env', environment);
-  return parseGhSecretList(execFileSync('gh', args, { encoding: 'utf8' }));
+  const names = new Set(parseGhSecretList(execFileSync('gh', args, { encoding: 'utf8' })));
+  if (environment) {
+    const environmentArgs = [...args];
+    environmentArgs.push('--env', environment);
+    for (const name of parseGhSecretList(execFileSync('gh', environmentArgs, { encoding: 'utf8' }))) {
+      names.add(name);
+    }
+  }
+  return Array.from(names);
 }
 
 function main() {

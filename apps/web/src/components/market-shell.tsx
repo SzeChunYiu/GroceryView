@@ -112,7 +112,7 @@ export function MarketShell() {
           </div>
           <div className="mt-6 grid gap-3">
             {freshestOpenPrices.slice(0, 3).map((product) => (
-              <Link className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-600" href={`/products/${product.slug}`} key={product.slug}>
+              <Link className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-600" data-product-slug={product.slug} href={`/products/${product.slug}`} key={product.slug}>
                 <p className="font-black text-slate-950">{product.name}</p>
                 <p className="text-sm text-slate-600">{product.brands || 'Brand not reported'} · observed {product.lastObservedAt}</p>
                 <p className="mt-1 font-black text-emerald-800">Median {formatSek(product.priceMedian)}</p>
@@ -143,7 +143,7 @@ export function MarketShell() {
             <p className="mt-2 text-2xl font-black">{homepageMarketTerminal.indexLabel}</p>
             <p className="mt-1 text-sm font-semibold text-slate-300">{homepageMarketTerminal.indexValue?.toFixed(1) ?? 'Not reported'} vs market 100</p>
           </div>
-          <Link className="rounded-2xl border border-white/10 bg-white/10 p-4 hover:border-emerald-300" href={homepageMarketTerminal.mover ? `/products/${homepageMarketTerminal.mover.productSlug}` : '/products'}>
+          <Link className="rounded-2xl border border-white/10 bg-white/10 p-4 hover:border-emerald-300" data-product-slug={homepageMarketTerminal.mover?.productSlug} href={homepageMarketTerminal.mover ? `/products/${homepageMarketTerminal.mover.productSlug}` : '/products'}>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-200">Price-drop mover</p>
             <p className="mt-2 text-lg font-black">{homepageMarketTerminal.mover?.productName ?? 'No mover available'}</p>
             <p className="mt-1 text-sm font-semibold text-slate-300">{homepageMarketTerminal.mover ? formatPct(homepageMarketTerminal.mover.changePercent) : 'Not reported'} latest move</p>
@@ -227,7 +227,7 @@ export function MarketShell() {
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-3">
           {seasonalProduceCalendar.topBestBuys.slice(0, 3).map((row) => (
-            <Link className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm hover:border-emerald-700" href={`/products/${row.slug}`} key={row.slug}>
+            <Link className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm hover:border-emerald-700" data-product-slug={row.slug} href={`/products/${row.slug}`} key={row.slug}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Best time to buy · {row.bestBuyMonth}</p>
               <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
               <p className="mt-2 text-sm font-semibold text-slate-700">{row.historicalMonthlyAverageLabel} historicalMonthlyAverage · {row.savingsVsTypicalLabel}</p>
@@ -349,7 +349,7 @@ export function MarketShell() {
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {privateLabelDupeFinder.topDupes.slice(0, 4).map((dupe) => (
-            <Link className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm hover:border-fuchsia-700" href={`/products/${dupe.dupeSlug}`} key={`${dupe.sourceSlug}-${dupe.dupeSlug}`}>
+            <Link className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm hover:border-fuchsia-700" data-product-slug={dupe.dupeSlug} href={`/products/${dupe.dupeSlug}`} key={`${dupe.sourceSlug}-${dupe.dupeSlug}`}>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">Save {formatPct(dupe.savingsPercent)} per unit</p>
               <h3 className="mt-2 text-lg font-black text-slate-950">{dupe.privateLabelBrand} for {dupe.nationalBrand}</h3>
               <p className="mt-1 text-sm font-semibold text-slate-600">{dupe.dupeName} · {dupe.dupePackage} · {dupe.cheapestChain}</p>
@@ -449,6 +449,7 @@ export function MarketShell() {
           {priceDropMoversBoard.map((mover) => (
             <Link
               className="grid gap-3 py-4 transition hover:bg-emerald-50/70 md:grid-cols-[1fr_auto_auto]"
+              data-product-slug={mover.productSlug}
               href={`/products/${mover.productSlug}`}
               key={mover.productSlug}
             >
@@ -542,6 +543,7 @@ export function MarketShell() {
           {homepageFreshOpenPrices.map((product) => (
             <Link
               className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              data-product-slug={product.slug}
               href={`/products/${product.slug}`}
               key={product.slug}
             >
@@ -596,6 +598,7 @@ export function MarketShell() {
           {homepageChainSavings.map((chain) => (
             <Link
               className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              data-product-slug={chain.topProductSlug}
               href={`/products/${chain.topProductSlug}`}
               key={chain.chain}
             >
@@ -894,7 +897,7 @@ export function MarketShell() {
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {launchFixtureStores.map((store) => (
-              <Link className="block rounded-2xl border border-emerald-200 bg-emerald-50 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}>
+              <Link className="block rounded-2xl border border-emerald-200 bg-emerald-50 p-4 hover:border-emerald-700" data-store-slug={store.slug} href={`/stores/${store.slug}`} key={store.slug}>
                 <p className="font-black text-slate-950">{store.name}</p>
                 <p className="text-sm text-slate-600">{store.district} · fixture {store.fixture}</p>
                 <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{store.slug}</p>
@@ -908,7 +911,7 @@ export function MarketShell() {
           <h2 className="mt-2 text-2xl font-black tracking-tight">Sweden stores from OSM</h2>
           <div className="mt-5 space-y-3">
             {featuredStores.slice(0, 7).map((store) => (
-              <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/stores/${store.slug}`} key={store.slug}>
+              <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" data-store-slug={store.slug} href={`/stores/${store.slug}`} key={store.slug}>
                 <p className="font-black text-slate-950">{store.name}</p>
                 <p className="text-sm text-slate-600">{store.brand} · {store.address || 'Address not reported by OSM'}</p>
               </Link>

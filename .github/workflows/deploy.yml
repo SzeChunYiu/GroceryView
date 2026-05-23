@@ -2,6 +2,8 @@ name: Deploy
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 
 jobs:
   deploy:
@@ -30,10 +32,15 @@ jobs:
         run: npm run typecheck
       - name: Validate deployment manifest
         run: test -f deploy/groceryview.manifest.json && cat deploy/groceryview.manifest.json
-      - name: Deployment handoff
+      - name: Deploy to Vercel production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          echo "Deployment manifest verified."
-          echo "Provider-specific deploy command intentionally not wired until hosting target is selected."
+          npx --yes vercel@latest pull --yes --environment=production --token "$VERCEL_TOKEN"
+          npx --yes vercel@latest build --prod --token "$VERCEL_TOKEN"
+          npx --yes vercel@latest deploy --prebuilt --prod --token "$VERCEL_TOKEN"
       - name: Verify production visible artifact
         env:
           GROCERYVIEW_PRODUCTION_URL: ${{ vars.GROCERYVIEW_PRODUCTION_URL }}
