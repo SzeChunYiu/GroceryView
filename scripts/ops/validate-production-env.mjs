@@ -80,7 +80,9 @@ function validateCatalogTargets(env) {
   const targetChains = requireNonEmptyStringArray(targets.targetChains, 'CATALOG_COVERAGE_TARGETS_JSON.targetChains');
   const targetStores = requireNonEmptyStringArray(targets.targetStores, 'CATALOG_COVERAGE_TARGETS_JSON.targetStores');
   requireRequiredChains('CATALOG_COVERAGE_TARGETS_JSON.targetChains', targetChains);
-  if (targets.requireEveryProductInEveryStore !== true) throw new Error('CATALOG_COVERAGE_TARGETS_JSON.requireEveryProductInEveryStore must be true.');
+  if (targets.requireEveryProductInEveryStore !== false) {
+    throw new Error('CATALOG_COVERAGE_TARGETS_JSON.requireEveryProductInEveryStore must be false; branch-price readiness uses observed/queryable store coverage, not a cross-chain product-store cartesian matrix.');
+  }
   return { productCount: targetProducts.length, storeCount: targetStores.length, targetStores };
 }
 
@@ -141,7 +143,7 @@ function selfTestEnv() {
       targetCategories: ['coffee', 'dairy'],
       targetChains: chains,
       targetStores: chains.map((chainId) => `${chainId}-odenplan`),
-      requireEveryProductInEveryStore: true
+        requireEveryProductInEveryStore: false
     })
   };
 }
