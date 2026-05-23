@@ -61,6 +61,7 @@ describe('production daily ingestion readiness runbook', () => {
   it('documents daily ingestion chain summary evidence', () => {
     assert.match(runbook, /chainSummaries/);
     assert.match(runbook, /groceryview-daily-ingestion-result/);
+    assert.match(runbook, /daily_ingestion_connectors_diagnostic_missing/);
     assert.match(runbook, /daily_ingestion_missing_chain_summary/);
     assert.match(runbook, /daily_ingestion_chain_not_succeeded/);
     assert.match(runbook, /daily_ingestion_chain_without_observations/);

@@ -141,6 +141,8 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /\/tmp\/groceryview-catalog-targets\.json/);
     assert.match(workflow, /\/tmp\/groceryview-daily-connectors\.json/);
     assert.doesNotMatch(workflow, /connectorCount !== 6/);
+    assert.match(workflow, /daily_ingestion_connectors_status=\$\?/);
+    assert.match(workflow, /daily_ingestion_connectors_diagnostic_missing/);
     assert.match(workflow, /daily_ingestion_result_diagnostic_missing/);
     assert.match(workflow, /ingestion_status=\$\?/);
     assert.match(workflow, /body\.status !== 'succeeded'/);
