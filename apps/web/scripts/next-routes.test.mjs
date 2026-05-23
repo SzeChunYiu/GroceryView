@@ -2600,6 +2600,28 @@ ${seo}`;
     assert.match(route, /origin_country/);
   });
 
+  it('surfaces commodity mapping curator review through human review assignments', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/data-sources/page.tsx');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(verified, /commodityMappingReviewPlan/);
+    assert.match(verified, /planHumanReviewQueue/);
+    assert.match(verified, /planHumanReviewAssignments/);
+    assert.match(verified, /planCommunityReportAbuseControls/);
+    assert.match(verified, /human_review_assignments/);
+    assert.match(verified, /community_reporter_trust/);
+    assert.match(route, /commodityMappingReviewPlan/);
+    assert.match(route, /Commodity mapping curator review/);
+    assert.match(route, /human_review_assignments/);
+    assert.match(route, /community_reporter_trust/);
+    assert.match(route, /reviewWritebacks/);
+    assert.match(shell, /homepageCommodityMappingReview/);
+    assert.match(shell, /Commodity mapping review/);
+    assert.match(shell, /data-commodity-mapping-review/);
+    assert.doesNotMatch(`${route}\n${shell}`, /Math\.random|Date\.now|NoVerifiedData/);
+  });
+
   it('surfaces public price and nutrition API documentation on the data sources route', async () => {
     const server = await read('../../packages/server/src/index.ts');
     const route = await read('src/app/data-sources/page.tsx');

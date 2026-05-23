@@ -3,6 +3,7 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import {
   categoryQualityMatrix,
   commodityIngestionClassifierEvidence,
+  commodityMappingReviewPlan,
   formatPct,
   multiVerticalDomainFoundation,
   publicApiDirectory,
@@ -152,6 +153,59 @@ export default function DataSourcesPage() {
             <p className="mt-2 text-sm font-bold leading-6 text-amber-950">{commodityIngestionClassifierEvidence.sourceConfidencePolicy}</p>
             <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
               {commodityIngestionClassifierEvidence.guardrails.map((guardrail) => (
+                <li key={guardrail}>• {guardrail}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-orange-200 bg-orange-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-orange-800">feat(commodity)</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Commodity mapping curator review · {commodityMappingReviewPlan.title}</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              Low-confidence loose-item aliases are routed through human_review_assignments before any shopper-facing commodity coverage changes. Reporter trust is checked in community_reporter_trust, and reviewWritebacks stay limited to approved commodity mapping actions.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 text-right shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">Status</p>
+            <p className="mt-2 text-2xl font-black text-orange-950">{commodityMappingReviewPlan.status}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-700">{commodityMappingReviewPlan.queue.length} queued · {commodityMappingReviewPlan.assignments.length} assigned</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {commodityMappingReviewPlan.queue.map((item) => (
+            <section className="rounded-2xl border border-orange-100 bg-white p-4 shadow-sm" key={item.id}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">{item.priority} priority</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{item.subjectType}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{item.reason}</p>
+              <p className="mt-3 rounded-xl bg-orange-50 p-2 text-xs font-bold text-orange-950">{commodityMappingReviewPlan.queueTable} · {item.subjectId}</p>
+            </section>
+          ))}
+          {commodityMappingReviewPlan.reporterControls.map((control) => (
+            <section className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm" key={control.reporterId}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{commodityMappingReviewPlan.trustTable}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{control.reporterId}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{control.action}: {control.reason}</p>
+            </section>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_1fr]">
+          <section className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">reviewWritebacks</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {commodityMappingReviewPlan.reviewWritebacks.map((writeback) => (
+                <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-black text-orange-950" key={writeback}>{writeback}</span>
+              ))}
+            </div>
+            <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">{commodityMappingReviewPlan.nextRuntimeStep}</p>
+          </section>
+          <section className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">Guardrails</p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
+              {commodityMappingReviewPlan.guardrails.map((guardrail) => (
                 <li key={guardrail}>• {guardrail}</li>
               ))}
             </ul>

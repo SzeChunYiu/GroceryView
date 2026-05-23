@@ -11,6 +11,7 @@ import {
   categoryDealLeaders,
   categoryQualityMatrix,
   categorySummaries,
+  commodityMappingReviewPlan,
   dataFreshnessBadges,
   digitalCatalogueOfferBoard,
   featuredStores,
@@ -46,6 +47,11 @@ const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
 const homepageMarketHeatmap = marketHeatmapTiles.slice(0, 6);
 const homepageChainIndexTrend = buildChainIndexTrendSeries().series.slice(0, 2);
 const homepageBasketCostHeatmap = basketCostHeatmap.rows.slice(0, 3);
+const homepageCommodityMappingReview = {
+  queue: commodityMappingReviewPlan.queue.slice(0, 2),
+  controls: commodityMappingReviewPlan.reporterControls.slice(0, 1),
+  assignmentCount: commodityMappingReviewPlan.assignments.length
+};
 const homepageMarketTerminal = {
   title: 'Grocery Index market terminal',
   indexLabel: mapChainIndexScores[0]?.chainId ?? 'chain-index unavailable',
@@ -289,6 +295,46 @@ export function MarketShell() {
             <p className="rounded-2xl bg-white/80 p-3 text-xs font-bold leading-5 text-fuchsia-950" key={guardrail}>{guardrail}</p>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-orange-200 bg-orange-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <Eyebrow>Commodity mapping review</Eyebrow>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">Curator queue for loose-item aliases</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-orange-950">
+              The homepage now exposes the commodity_mapping review queue before aliases affect shopper-facing coverage. human_review_assignments receives low-confidence kr/kg mappings, while community_reporter_trust gates risky reporters.
+            </p>
+          </div>
+          <Link className="rounded-full bg-orange-700 px-5 py-3 text-center text-sm font-black text-white" href="/data-sources">
+            Inspect review plan
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {homepageCommodityMappingReview.queue.map((item) => (
+            <Link
+              className="rounded-2xl border border-orange-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-700 hover:shadow-lg"
+              data-commodity-mapping-review={item.subjectId}
+              href="/data-sources"
+              key={item.id}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">{item.priority} priority · {item.subjectType}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{item.reason}</p>
+            </Link>
+          ))}
+          <Link
+            className="rounded-2xl border border-amber-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-700 hover:shadow-lg"
+            data-commodity-mapping-review={homepageCommodityMappingReview.controls[0]?.reporterId ?? 'reporter-controls'}
+            href="/data-sources"
+          >
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">community_reporter_trust</p>
+            <p className="mt-2 text-lg font-black text-slate-950">{homepageCommodityMappingReview.controls[0]?.action ?? 'no controls'}</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{homepageCommodityMappingReview.controls[0]?.reason ?? 'Reporter controls are currently clear.'}</p>
+          </Link>
+        </div>
+        <p className="mt-4 rounded-2xl bg-white/80 p-3 text-xs font-bold uppercase tracking-[0.16em] text-orange-950">
+          {homepageCommodityMappingReview.assignmentCount} curator assignments prepared in {commodityMappingReviewPlan.queueTable}
+        </p>
       </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
