@@ -20,6 +20,16 @@ The script starts the core services, waits for healthy Postgres, Redis, and MinI
 
 GitHub Actions also runs this smoke check in `Local infrastructure smoke` for pull requests that change local infrastructure files.
 
+## Production workflow configuration audit
+
+Production deploy and hosted-smoke workflows require both secrets and repository/environment variables. Before promoting a release, audit GitHub configuration with:
+
+```bash
+npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView --env production
+```
+
+The audit checks required secrets plus workflow variables such as `GROCERYVIEW_PRODUCTION_URL`, `GROCERYVIEW_TERMINAL_PRODUCT_ID`, and `GROCERYVIEW_SCANNER_USER_ID`. In GitHub Actions, `npm run ops:check-production-secrets -- --from-env` fails closed from injected `secrets.*` and `vars.*` values before deploy-time smokes run.
+
 ## Retailer connector smoke
 
 After a connector has approved legal/robots/data-agreement gates, build the ingestion package and run a real endpoint pull smoke without parsing or persisting product rows:

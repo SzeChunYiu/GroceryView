@@ -13,6 +13,9 @@ describe('deploy workflow', () => {
     assert.match(workflow, /deploy\/groceryview\.manifest\.json/);
     assert.match(workflow, /environment:\s*production/);
     assert.match(workflow, /ops:check-production-secrets -- --from-env/);
+    for (const variable of ['GROCERYVIEW_PRODUCTION_URL', 'GROCERYVIEW_TERMINAL_PRODUCT_ID', 'GROCERYVIEW_SCANNER_USER_ID']) {
+      assert.match(workflow, new RegExp(`${variable}:\\s*\\$\\{\\{ vars\\.${variable} \\}\\}`));
+    }
     assert.doesNotMatch(workflow, /gh secret list/);
   });
 

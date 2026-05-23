@@ -23,6 +23,8 @@ jobs:
         env:
           GROCERYVIEW_API_BASE_URL: ${{ secrets.GROCERYVIEW_API_BASE_URL }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+          GROCERYVIEW_PRODUCTION_URL: ${{ vars.GROCERYVIEW_PRODUCTION_URL }}
+          GROCERYVIEW_TERMINAL_PRODUCT_ID: ${{ vars.GROCERYVIEW_TERMINAL_PRODUCT_ID }}
           GROCERYVIEW_SCANNER_USER_ID: ${{ vars.GROCERYVIEW_SCANNER_USER_ID }}
           GROCERYVIEW_SCANNER_BEARER_TOKEN: ${{ secrets.GROCERYVIEW_SCANNER_BEARER_TOKEN }}
         run: |
@@ -32,6 +34,14 @@ jobs:
           fi
           if [ -z "$METRICS_TOKEN" ]; then
             echo "missing production config: METRICS_TOKEN" >&2
+            exit 1
+          fi
+          if [ -z "$GROCERYVIEW_PRODUCTION_URL" ]; then
+            echo "missing production config: GROCERYVIEW_PRODUCTION_URL" >&2
+            exit 1
+          fi
+          if [ -z "$GROCERYVIEW_TERMINAL_PRODUCT_ID" ]; then
+            echo "missing production config: GROCERYVIEW_TERMINAL_PRODUCT_ID" >&2
             exit 1
           fi
           if [ -z "$GROCERYVIEW_SCANNER_USER_ID" ]; then
