@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { BarChart3, Database, MapPin, ScanSearch, ShoppingBasket, Store } from 'lucide-react';
+import { BarChart3, Database, Fuel, MapPin, Pill, ScanSearch, ShoppingBasket, Store } from 'lucide-react';
 import {
   categories,
   dealOpportunityRail,
@@ -23,6 +23,48 @@ const activeOpenPriceCategories = new Set(pricedProducts.map((product) => produc
 const activeStoreBrands = new Set(osmStores.map((store) => store.brand || 'Other')).size;
 const openPriceLeaders = pricedProducts.slice(0, 6);
 
+type MarketDomain = 'grocery' | 'fuel' | 'pharmacy';
+
+const verticalRouteStubs = {
+  fuel: {
+    label: 'Fuel terminal',
+    eyebrow: 'Fuel domain stub',
+    title: 'Fuel prices are ready for domain-tagged ingestion.',
+    body:
+      'This route reuses the market terminal shell while chain, product, and observation rows gain fuel domain tags.',
+    primaryMetric: 'Fuel',
+    secondaryMetric: 'SEK/liter',
+    status: 'Schema ready',
+    icon: Fuel,
+    rows: ['Station chains', 'Grade catalog', 'Pump observations']
+  },
+  pharmacy: {
+    label: 'Pharmacy terminal',
+    eyebrow: 'Pharmacy domain stub',
+    title: 'Pharmacy prices are ready for domain-tagged ingestion.',
+    body:
+      'This route reuses the market terminal shell while pharmacy chains, products, and observations are separated from grocery rows.',
+    primaryMetric: 'Pharmacy',
+    secondaryMetric: 'Unit price',
+    status: 'Schema ready',
+    icon: Pill,
+    rows: ['Pharmacy chains', 'OTC catalog', 'Shelf observations']
+  }
+} satisfies Record<
+  Exclude<MarketDomain, 'grocery'>,
+  {
+    label: string;
+    eyebrow: string;
+    title: string;
+    body: string;
+    primaryMetric: string;
+    secondaryMetric: string;
+    status: string;
+    icon: typeof Fuel;
+    rows: string[];
+  }
+>;
+
 function formatSek(value: number) {
   return `SEK ${value.toFixed(2)}`;
 }
@@ -31,7 +73,11 @@ function formatConfidence(value: number) {
   return `${Math.round(value * 100)}%`;
 }
 
-export function MarketShell() {
+export function MarketShell({ domain = 'grocery' }: Readonly<{ domain?: MarketDomain }> = {}) {
+  if (domain !== 'grocery') {
+    return <VerticalRouteStub config={verticalRouteStubs[domain]} domain={domain} />;
+  }
+
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <nav className="flex flex-wrap items-center justify-between gap-3 border-b border-market-ink/10 pb-4">
@@ -381,6 +427,86 @@ export function MarketShell() {
         <ScanSearch size={18} />
         Scanner and receipt review routes can reuse this shell when the scanner placeholder graduates.
       </div>
+    </main>
+  );
+}
+
+function VerticalRouteStub({
+  config,
+  domain
+}: Readonly<{ config: (typeof verticalRouteStubs)[Exclude<MarketDomain, 'grocery'>]; domain: Exclude<MarketDomain, 'grocery'> }>) {
+  const Icon = config.icon;
+
+  return (
+    <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <nav className="flex flex-wrap items-center justify-between gap-3 border-b border-market-ink/10 pb-4">
+        <Link href="/" className="text-lg font-black tracking-tight">
+          GroceryView
+        </Link>
+        <div className="flex gap-3 text-sm font-semibold text-market-ink/70">
+          <Link href="/products">Products</Link>
+          <Link href="/stores">Stores</Link>
+          <Link href="/categories">Categories</Link>
+        </div>
+      </nav>
+
+      <section className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="rounded-lg bg-market-ink p-6 text-white">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-market-mint">
+            <Icon size={18} />
+            {config.eyebrow}
+          </div>
+          <h1 className="mt-3 max-w-3xl text-4xl font-black leading-tight sm:text-5xl">{config.title}</h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-white/75">{config.body}</p>
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <Metric label="Domain" value={config.primaryMetric} />
+            <Metric label="Comparable unit" value={config.secondaryMetric} />
+            <Metric label="Route state" value={config.status} />
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-market-ink/10 bg-white p-5">
+          <h2 className="text-lg font-black">{config.label}</h2>
+          <dl className="mt-4 grid gap-3 text-sm">
+            <MetadataRow label="Domain tag" value={domain} />
+            <MetadataRow label="Allowed values" value="grocery | fuel | pharmacy" />
+            <MetadataRow label="Existing data" value="grocery default" />
+            <MetadataRow label="Ingestion state" value="stubbed" />
+          </dl>
+        </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        {config.rows.map((row) => (
+          <FeatureCard key={row} icon={<Icon size={20} />} title={row} href="/">
+            Domain-aware rows can land without changing the existing grocery terminal routes.
+          </FeatureCard>
+        ))}
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Vertical readiness tape</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              The database domain tag is the boundary before live {domain} connectors start writing price observations.
+            </p>
+          </div>
+          <LightMetric label="Chains" value="tagged" />
+          <LightMetric label="Products" value="tagged" />
+        </div>
+        <div className="grid gap-0 md:grid-cols-3">
+          {config.rows.map((row) => (
+            <div key={row} className="border-b border-market-ink/10 px-4 py-4 text-sm md:border-r">
+              <span className="block text-xs font-bold uppercase text-market-ink/50">{domain}</span>
+              <span className="mt-1 block font-black">{row}</span>
+              <p className="mt-3 leading-6 text-market-ink/65">
+                Placeholder surface ready for vertical-specific source policy and ingestion work.
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }

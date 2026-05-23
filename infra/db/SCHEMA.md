@@ -22,6 +22,10 @@ Price and ingestion records expose provenance directly:
 
 Every price-bearing row carries `price_type`, `confidence`, `observed_at`, and `provenance` either directly or through its referenced observation.
 
+## Domain Model
+
+`chains`, `products`, and `observations` carry a `domain` tag so the catalog can support grocery, fuel, and pharmacy verticals from the same infrastructure schema. Allowed values are `grocery`, `fuel`, and `pharmacy`. The domain migration defaults existing rows to `grocery` so current data keeps its established behavior until vertical-specific ingestion lands.
+
 ## Partitioning Plan
 
 `observations` is intentionally kept as a single table for the first migration so early API and worker lanes can integrate without partition-management code. When write volume requires partitioning, add a follow-up migration that:
@@ -44,7 +48,7 @@ The schema stores store location in `stores.position` for map and trip-planning 
 
 Retail banners such as ICA, Willys, Coop, Lidl, Hemkop, and City Gross.
 
-Key columns: `slug`, `name`, `country_code`, `website_url`.
+Key columns: `slug`, `name`, `domain`, `country_code`, `website_url`.
 
 ### `stores`
 
@@ -58,7 +62,7 @@ Indexes: `stores_position_gix` for location queries, plus `stores_name_trgm_idx`
 
 Canonical product records used by search, charts, baskets, and matching.
 
-Key columns: `slug`, `canonical_name`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`.
+Key columns: `slug`, `canonical_name`, `domain`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`.
 
 Indexes: `products_name_trgm_idx` and `products_slug_trgm_idx` for fuzzy product search.
 
@@ -100,7 +104,7 @@ Indexes: `retailer_source_policies_label_review_idx`, `retailer_source_policies_
 
 Immutable normalized price facts. This is the canonical table for historical charts and price provenance.
 
-Key columns: `product_id`, `chain_id`, `store_id`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `observed_at`, validity window fields, `confidence`, `provenance`.
+Key columns: `product_id`, `chain_id`, `store_id`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `domain`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `observed_at`, validity window fields, `confidence`, `provenance`.
 
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
