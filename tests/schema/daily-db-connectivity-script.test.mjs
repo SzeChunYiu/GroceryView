@@ -101,6 +101,37 @@ describe('daily DB connectivity diagnostic script', () => {
     assert.equal(JSON.stringify(result).includes('password'), false);
   });
 
+  it('uses a startup-sized retry window for database 57P03 recovery before failing closed', async () => {
+    const sleeps = [];
+    let attempts = 0;
+    class RecoveringPool {
+      async query(sql) {
+        if (sql === 'set default_transaction_read_only=off') {
+          attempts += 1;
+          if (attempts < 3) {
+            const error = new Error('the database system is not accepting connections');
+            error.code = '57P03';
+            throw error;
+          }
+        }
+        return { rows: [{ ok: 1 }] };
+      }
+
+      async end() {}
+    }
+
+    const result = await checkDailyDatabaseConnectivity(
+      {
+        DATABASE_URL: 'postgres://user:password@aws-1-eu-north-1.pooler.supabase.com:6543/postgres'
+      },
+      { Pool: RecoveringPool, sleep: async (ms) => sleeps.push(ms) }
+    );
+
+    assert.equal(result.status, 'ready');
+    assert.ok(result.retryAttempts >= 20, 'default retry attempts must cover slow Supabase startup/recovery windows');
+    assert.deepEqual(sleeps, [10_000, 20_000]);
+  });
+
   it('documents the production failure signatures currently blocking daily ingestion', () => {
     for (const signature of [
       'DATABASE_URL',

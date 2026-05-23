@@ -67,6 +67,9 @@ describe('daily ingestion workflow', () => {
     );
     assert.match(workflow, /\/tmp\/daily-db-connectivity\.json/);
     assert.match(workflow, /body\.status !== 'ready'/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS \|\| '30' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS \|\| '10000' \}\}/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS:\s*\$\{\{ vars\.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS \|\| '30000' \}\}/);
     assert.match(workflow, /name:\s*groceryview-daily-db-connectivity/);
     assert.match(workflow, /path:\s*\/tmp\/daily-db-connectivity\.json/);
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=\/tmp\/groceryview-daily-connectors\.json/);

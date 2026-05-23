@@ -4,8 +4,9 @@ import pg from 'pg';
 
 const { Pool: PgPool } = pg;
 
-const DEFAULT_RETRY_ATTEMPTS = 3;
-const DEFAULT_RETRY_BASE_DELAY_MS = 2_000;
+const DEFAULT_RETRY_ATTEMPTS = 30;
+const DEFAULT_RETRY_BASE_DELAY_MS = 10_000;
+const DEFAULT_RETRY_MAX_DELAY_MS = 30_000;
 
 export function redactDatabaseUrl(rawUrl) {
   const url = new URL(rawUrl);
@@ -16,6 +17,11 @@ export function redactDatabaseUrl(rawUrl) {
 function parsePositiveInteger(value, fallback) {
   const parsed = Number.parseInt(String(value ?? ''), 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parseNonNegativeInteger(value, fallback) {
+  const parsed = Number.parseInt(String(value ?? ''), 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
 }
 
 function sleep(ms) {
@@ -93,7 +99,8 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
 
   const classification = classifyDatabaseUrl(databaseUrl);
   const retryAttempts = parsePositiveInteger(env.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_ATTEMPTS, DEFAULT_RETRY_ATTEMPTS);
-  const retryBaseDelayMs = parsePositiveInteger(env.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS, DEFAULT_RETRY_BASE_DELAY_MS);
+  const retryBaseDelayMs = parseNonNegativeInteger(env.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_BASE_DELAY_MS, DEFAULT_RETRY_BASE_DELAY_MS);
+  const retryMaxDelayMs = parseNonNegativeInteger(env.GROCERYVIEW_DAILY_DB_CONNECTIVITY_RETRY_MAX_DELAY_MS, DEFAULT_RETRY_MAX_DELAY_MS);
   const Pool = options.Pool ?? PgPool;
   const wait = options.sleep ?? sleep;
 
@@ -113,6 +120,8 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
         status: 'ready',
         attempts: attempt,
         retryAttempts,
+        retryBaseDelayMs,
+        retryMaxDelayMs,
         ...classification
       };
     } catch (error) {
@@ -124,7 +133,7 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
       }
       const transient = isTransientDailyDatabaseError(error);
       if (!transient || attempt === retryAttempts) break;
-      await wait(retryBaseDelayMs * attempt);
+      await wait(Math.min(retryBaseDelayMs * attempt, retryMaxDelayMs));
     }
   }
 
@@ -132,6 +141,8 @@ export async function checkDailyDatabaseConnectivity(env = process.env, options 
     status: 'blocked',
     attempts: retryAttempts,
     retryAttempts,
+    retryBaseDelayMs,
+    retryMaxDelayMs,
     ...classification,
     blockers: [blockerForError(lastError)],
     error: sanitizeError(lastError)
