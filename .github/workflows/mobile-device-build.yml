@@ -1,0 +1,53 @@
+name: Mobile device build
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Platform to build with EAS
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - ios
+          - android
+
+jobs:
+  eas-production-build:
+    name: EAS production device build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preflight mobile production credentials
+        run: |
+          missing=0
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "missing production config: EXPO_TOKEN" >&2
+            missing=1
+          fi
+          test -f apps/mobile/app.config.json || { echo "missing apps/mobile/app.config.json" >&2; missing=1; }
+          test -f apps/mobile/eas.json || { echo "missing apps/mobile/eas.json" >&2; missing=1; }
+          exit "$missing"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify mobile package
+        run: |
+          npm run test -w @groceryview/mobile
+          npm run build -w @groceryview/mobile
+
+      - name: Start EAS production build
+        working-directory: apps/mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli build --profile production --non-interactive --no-wait --platform "${{ inputs.platform }}"
