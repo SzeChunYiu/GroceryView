@@ -206,10 +206,44 @@ describe('createGroceryViewApi', () => {
     assert.equal(result.products[0]?.productId, 'product-milk');
     assert.equal(result.products[0]?.cheapestPrice, 14.9);
     assert.equal(result.products[0]?.currentPrices[0]?.observationId, 'obs-milk-willys');
+    assert.equal(result.products[0]?.currentPrices[0]?.isAvailable, true);
     assert.deepEqual(result.facets.categories.find((facet) => facet.value === 'Dairy'), { value: 'Dairy', count: 2 });
     assert.deepEqual(result.facets.chains.find((facet) => facet.value === 'willys'), { value: 'willys', label: 'Willys', count: 2 });
     assert.deepEqual(result.facets.priceRange, { min: 14.9, max: 54.9 });
     assert.deepEqual(result.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores']);
+  });
+
+  it('carries latest_prices availability into faceted product cards for out-of-stock badges', () => {
+    const result = buildFacetedProductSearch({
+      rows: [
+        {
+          productId: 'product-coffee',
+          slug: 'bryggkaffe-450g',
+          canonicalName: 'Bryggkaffe 450 g',
+          brand: 'Rosteriet',
+          categoryPath: ['Pantry', 'Coffee'],
+          packageSize: 450,
+          packageUnit: 'g',
+          comparableUnit: 'kg',
+          observationId: 'obs-coffee-out',
+          price: 49.9,
+          unitPrice: 110.8889,
+          currency: 'SEK',
+          priceType: 'online',
+          confidence: 0.95,
+          observedAt: '2026-05-21T10:00:00.000Z',
+          chainId: 'chain-coop',
+          chainSlug: 'coop',
+          chainName: 'Coop',
+          isAvailable: false
+        }
+      ]
+    });
+
+    assert.equal(result.products[0]?.currentPrices[0]?.isAvailable, false);
+    assert.equal(result.products[0]?.isAvailable, false);
+    assert.equal(result.evidence.availableLatestPriceCount, 0);
+    assert.equal(result.evidence.outOfStockLatestPriceCount, 1);
   });
 
   it('keeps unpriced catalog rows unpriced in faceted search responses', () => {

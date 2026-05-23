@@ -5,7 +5,7 @@
 
 import { dbSiteAxfoodProducts } from './generated/db-site-products';
 
-export type ChainPrice = { price: number | null; priceText: string; priceUnit: string; savings: number | null; url: string };
+export type ChainPrice = { price: number | null; priceText: string; priceUnit: string; savings: number | null; url: string; isAvailable?: boolean };
 export type AxfoodProduct = {
   code: string; slug: string; name: string; brand: string; subline: string;
   category: string; image: string | null; labels: string[];

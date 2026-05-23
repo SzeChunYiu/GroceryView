@@ -272,6 +272,7 @@ export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.fla
       priceType: priceRow.savings ? 'promotion' : 'online',
       confidence: 0.95,
       observedAt: '2026-05-21T00:00:00.000Z',
+      isAvailable: priceRow.isAvailable !== false,
       chainId: priceRow.chain,
       chainSlug: priceRow.chain,
       chainName: chainDisplayNames[priceRow.chain] ?? priceRow.chain,
@@ -300,7 +301,9 @@ export const facetedProductSearch = {
   inStockOnly: {
     label: 'In-stock / priced rows only',
     productCount: rawFacetedProductSearch.evidence.pricedProductCount,
-    latestPriceCount: rawFacetedProductSearch.evidence.latestPriceCount
+    latestPriceCount: rawFacetedProductSearch.evidence.latestPriceCount,
+    availableLatestPriceCount: rawFacetedProductSearch.evidence.availableLatestPriceCount,
+    outOfStockLatestPriceCount: rawFacetedProductSearch.evidence.outOfStockLatestPriceCount
   },
   resultCards: rawFacetedProductSearch.products.map((product) => {
     const cheapest = product.currentPrices[0] ?? null;
@@ -316,6 +319,7 @@ export const facetedProductSearch = {
         currency: cheapest.currency,
         unit: product.comparableUnit
       }) : 'No current price row',
+      isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
       sourceTables: rawFacetedProductSearch.evidence.sourceTables
     };
@@ -1596,6 +1600,7 @@ export type AdaptiveProductCard = {
     priceLabel: string;
   }>;
   sparklineLabel: string;
+  isAvailable: boolean;
 };
 
 function isOpenPricesProduct(product: (typeof productUniverse)[number]): product is (typeof pricedProducts)[number] {
@@ -1632,6 +1637,9 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
   const packageText = isChainProduct ? product.subline : product.quantity;
   const normalizedUnit = normalizeComparableUnitPrice(totalPrice, packageText);
   const productKind = adaptiveProductKind(product.category);
+  const isAvailable = isChainProduct
+    ? Object.values(product.chains).some((row) => typeof row.price === 'number' && row.price > 0 && row.isAvailable !== false)
+    : true;
   const peerUnitPrices = isChainProduct && normalizedUnit
     ? Object.values(product.chains)
       .map((row) => row.price === null ? null : normalizeComparableUnitPrice(row.price, packageText)?.unitPrice ?? null)
@@ -1663,7 +1671,8 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     sparklinePoints,
     sparklineLabel: sparklinePoints.length >= 2
       ? `${sparklinePoints.length} observed daily points from price_daily/OpenPrices history`
-      : '7-day sparkline waits for at least two observed price-history points'
+      : '7-day sparkline waits for at least two observed price-history points',
+    isAvailable
   };
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);

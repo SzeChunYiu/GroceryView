@@ -1247,6 +1247,7 @@ export type RealCatalogSearchPriceRow = {
   priceType?: RealCatalogPriceType;
   confidence?: number;
   observedAt?: string;
+  isAvailable?: boolean;
   chainId?: string;
   chainSlug?: string;
   chainName?: string;
@@ -1294,6 +1295,7 @@ export type FacetedProductSearchResult = {
     comparableUnit: string;
     imageUrl: string | null;
     cheapestPrice: number | null;
+    isAvailable: boolean | null;
     currency: string;
     currentPrices: Array<{
       observationId: string;
@@ -1303,6 +1305,7 @@ export type FacetedProductSearchResult = {
       priceType: RealCatalogPriceType;
       confidence: number;
       observedAt: string;
+      isAvailable: boolean;
       chainId: string;
       chainSlug: string;
       chainName: string;
@@ -1322,6 +1325,8 @@ export type FacetedProductSearchResult = {
   evidence: {
     pricedProductCount: number;
     latestPriceCount: number;
+    availableLatestPriceCount: number;
+    outOfStockLatestPriceCount: number;
     sourceTables: ['products', 'latest_prices', 'chains', 'stores'];
   };
 };
@@ -1426,6 +1431,8 @@ export function buildFacetedProductSearch(input: {
   let minPrice: number | null = null;
   let maxPrice: number | null = null;
   let latestPriceCount = 0;
+  let availableLatestPriceCount = 0;
+  let outOfStockLatestPriceCount = 0;
 
   for (const row of input.rows) {
     let product = productMap.get(row.productId);
@@ -1441,6 +1448,7 @@ export function buildFacetedProductSearch(input: {
         comparableUnit: row.comparableUnit,
         imageUrl: row.imageUrl ?? null,
         cheapestPrice: null,
+        isAvailable: null,
         currency: row.currency ?? 'SEK',
         currentPrices: []
       };
@@ -1461,6 +1469,9 @@ export function buildFacetedProductSearch(input: {
       row.chainName
     ) {
       latestPriceCount += 1;
+      const isAvailable = row.isAvailable ?? true;
+      if (isAvailable) availableLatestPriceCount += 1;
+      else outOfStockLatestPriceCount += 1;
       product.cheapestPrice = product.cheapestPrice === null ? row.price : Math.min(product.cheapestPrice, row.price);
       minPrice = minPrice === null ? row.price : Math.min(minPrice, row.price);
       maxPrice = maxPrice === null ? row.price : Math.max(maxPrice, row.price);
@@ -1472,6 +1483,7 @@ export function buildFacetedProductSearch(input: {
         priceType: row.priceType,
         confidence: row.confidence,
         observedAt: row.observedAt,
+        isAvailable,
         chainId: row.chainId,
         chainSlug: row.chainSlug,
         chainName: row.chainName,
@@ -1494,6 +1506,7 @@ export function buildFacetedProductSearch(input: {
   const products = [...productMap.values()]
     .map((product) => ({
       ...product,
+      isAvailable: product.currentPrices.length === 0 ? null : product.currentPrices.some((price) => price.isAvailable),
       currentPrices: product.currentPrices.sort((a, b) => a.price - b.price || b.observedAt.localeCompare(a.observedAt))
     }))
     .sort((a, b) => {
@@ -1535,6 +1548,8 @@ export function buildFacetedProductSearch(input: {
     evidence: {
       pricedProductCount: products.filter((product) => product.currentPrices.length > 0).length,
       latestPriceCount,
+      availableLatestPriceCount,
+      outOfStockLatestPriceCount,
       sourceTables: ['products', 'latest_prices', 'chains', 'stores']
     }
   };

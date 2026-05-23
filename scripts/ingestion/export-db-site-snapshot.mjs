@@ -84,6 +84,7 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
     unitPrice: row.unitPrice,
     currency: row.currency,
     observedAt: row.observedAt,
+    isAvailable: row.isAvailable !== false,
     confidence: row.confidence,
     observationId: row.observationId,
     ...optional(row.promotionText, 'promotionText'),
@@ -237,6 +238,7 @@ function buildChainPrice(row) {
     price: row.price,
     priceText: formatSek(row.price),
     priceUnit: observedPriceUnit(row),
+    isAvailable: row.isAvailable !== false,
     savings: typeof row.regularPrice === 'number' && row.regularPrice > row.price ? Math.round((row.regularPrice - row.price) * 100) / 100 : null,
     url: ''
   };
@@ -444,7 +446,7 @@ export function buildDbSiteIcaReklambladOffers(rows) {
       storeName: row.storeName || chainDisplayName(row),
       storeId: row.storeSlug || row.storeExternalRef || row.chainSlug,
       availableInStore: true,
-      availableOnline: false,
+      availableOnline: row.isAvailable !== false,
       eans: [],
       sourceUrl: sourceUrl(row),
       flyerUrl: '',
@@ -476,7 +478,7 @@ export function buildDbSiteMathemProducts(rows) {
       unitPriceUnit: row.comparableUnit || row.packageUnit || '',
       imageUrl: row.imageUrl ?? '',
       productUrl: productUrl(row),
-      available: true,
+      available: row.isAvailable !== false,
       sourceUrl: sourceUrl(row),
       retrievedAt: row.observedAt
     }))
