@@ -748,8 +748,15 @@ describe('createHttpHandler', () => {
     assert.deepEqual(await json(second), firstBody);
   });
 
-  it('returns cursor-paginated product search envelopes for public search', async () => {
+  it('returns cursor-paginated product envelopes for public product listing and search', async () => {
     const handle = createHttpHandler();
+
+    const listing = await handle(new Request('http://localhost/api/products?limit=2'));
+    assert.equal(listing.status, 200);
+    const listingBody = await json(listing) as { items: Array<{ id: string }>; pagination: { hasMore: boolean; nextCursor: string | null } };
+    assert.deepEqual(listingBody.items.map((product) => product.id), ['coffee', 'milk']);
+    assert.equal(listingBody.pagination.hasMore, true);
+    assert.match(listingBody.pagination.nextCursor ?? '', /^[A-Za-z0-9_-]+$/);
 
     const first = await handle(new Request('http://localhost/api/products/search?q=&limit=2'));
     assert.equal(first.status, 200);

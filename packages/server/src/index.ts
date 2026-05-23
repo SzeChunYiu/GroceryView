@@ -2347,7 +2347,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(api.getPriceFreshnessReport(url.searchParams.get('asOf') ?? undefined));
       }
 
-      if (method === 'GET' && path === '/api/products/search') {
+      if (method === 'GET' && (path === '/api/products' || path === '/api/products/search')) {
         return jsonResponse(cursorPaginatedEnvelope(api.searchProducts(url.searchParams.get('q') ?? ''), url.searchParams));
       }
 
@@ -2989,6 +2989,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/stores/{id}/discounts': { get: publicOperation('Get active weekly discounts captured for one branch.') },
       '/api/stores/{id}/flyer-offers': { get: publicOperation('Get active weekly flyer offers captured for one branch.') },
       '/api/stores/{id}/price-coverage': { get: publicOperation('Get store catalog price coverage with missing product guardrails.') },
+      '/api/products': { get: publicOperation('List products with cursor pagination.') },
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
       '/api/products/{id}/deal-score': { get: publicOperation('Get Deal Score v1 report with customer-facing reasons.') },
