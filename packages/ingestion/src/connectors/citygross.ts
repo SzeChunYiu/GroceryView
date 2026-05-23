@@ -1,3 +1,5 @@
+import { runAllStoreTasks, type AllStoreTaskRunnerControls } from './all-store-runner.js';
+
 export type CityGrossStore = {
   storeId: string;
   name: string;
@@ -101,7 +103,7 @@ export type FetchCityGrossProductsOptions = {
   apiBaseUrl?: string;
 };
 
-export type FetchCityGrossProductsForAllStoresOptions = Omit<FetchCityGrossProductsOptions, 'siteId' | 'query' | 'maxRows'> & {
+export type FetchCityGrossProductsForAllStoresOptions = Omit<FetchCityGrossProductsOptions, 'siteId' | 'query' | 'maxRows'> & AllStoreTaskRunnerControls & {
   queries?: readonly string[];
   maxStores?: number;
   maxRowsPerStore?: number;
@@ -203,28 +205,40 @@ export async function fetchCityGrossProductsForAllStores(
     retrievedAt: options.retrievedAt,
     apiBaseUrl: options.apiBaseUrl
   });
+  const queries: readonly (string | undefined)[] = options.queries ?? [undefined];
+  const { rows: fetchedRows, failures } = await runAllStoreTasks({
+    stores,
+    storeId: (store) => store.storeId,
+    storeConcurrency: options.storeConcurrency,
+    storeStartDelayMs: options.storeStartDelayMs,
+    storeRetryAttempts: options.storeRetryAttempts,
+    storeRetryBaseDelayMs: options.storeRetryBaseDelayMs,
+    failOnStoreFailure: options.failOnStoreFailure,
+    task: async (store) => {
+      const rows: CityGrossProduct[] = [];
+      for (const query of queries) {
+        rows.push(...await fetchCityGrossProducts({
+          fetchImpl: options.fetchImpl,
+          siteId: store.storeId,
+          query,
+          maxRows: options.maxRowsPerStore,
+          pageSize: options.pageSize,
+          retrievedAt: options.retrievedAt,
+          apiBaseUrl: options.apiBaseUrl
+        }));
+      }
+      return rows;
+    }
+  });
   const rows: CityGrossProduct[] = [];
   const seen = new Set<string>();
-  const queries: readonly (string | undefined)[] = options.queries ?? [undefined];
-  for (const store of stores) {
-    for (const query of queries) {
-      const products = await fetchCityGrossProducts({
-        fetchImpl: options.fetchImpl,
-        siteId: store.storeId,
-        query,
-        maxRows: options.maxRowsPerStore,
-        pageSize: options.pageSize,
-        retrievedAt: options.retrievedAt,
-        apiBaseUrl: options.apiBaseUrl
-      });
-      for (const product of products) {
-        const key = `${product.storeId}:${product.code}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        rows.push(product);
-      }
-    }
+  for (const product of fetchedRows) {
+    const key = `${product.storeId}:${product.code}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    rows.push(product);
   }
+  if (rows.length === 0 && failures.length > 0) throw new Error(`City Gross all-store product requests returned no usable branch products: ${failures[0]!.storeId}:${failures[0]!.error}`);
   return rows;
 }
 
