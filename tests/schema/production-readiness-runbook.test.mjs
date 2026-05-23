@@ -101,4 +101,25 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /staleObservationCount/);
   });
 
+
+  it('documents replacement DB cutover validation before production DATABASE_URL changes', () => {
+    assert.match(runbook, /Replacement DB cutover validation/);
+    assert.match(runbook, /db-cutover-validation\.yml/);
+    assert.match(runbook, /REPLACEMENT_DATABASE_URL/);
+    assert.match(runbook, /CANDIDATE_DATABASE_URL/);
+    assert.match(runbook, /ops:validate-db-cutover/);
+    assert.match(runbook, /ops:apply-db-migrations/);
+    assert.match(runbook, /ingest:export-db-snapshot/);
+    assert.match(runbook, /groceryview-replacement-db-migrations/);
+    assert.match(runbook, /groceryview-replacement-db-ingestion/);
+    assert.match(runbook, /groceryview-replacement-db-site-snapshot/);
+    assert.match(runbook, /replacement_database_url_missing/);
+    assert.match(runbook, /replacement_database_url_matches_current_database_url/);
+    assert.match(runbook, /replacement_database_not_writable/);
+    assert.match(runbook, /replacement_daily_ingestion_missing_chain_summary/);
+    assert.match(runbook, /replacement_daily_ingestion_chain_without_observations/);
+    assert.match(runbook, /replacement_db_site_snapshot_without_observations/);
+    assert.match(runbook, /Only after this workflow passes/);
+  });
+
 });
