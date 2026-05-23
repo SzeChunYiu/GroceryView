@@ -29,3 +29,23 @@ describe('price alert API routes', () => {
     assert.match(store, /alert\.userEmail !== normalizeEmail\(userEmail\)/);
   });
 });
+
+describe('price history CSV export API route', () => {
+  it('ships a DB-backed CSV export for all observations of a validated product id', async () => {
+    const route = await read('src/app/api/export/prices/route.ts');
+
+    assert.match(route, /export async function GET\(request: Request\)/);
+    assert.match(route, /searchParams\.get\('product_id'\)/);
+    assert.match(route, /isValidProductId/);
+    assert.match(route, /createPostgresPriceReader/);
+    assert.match(route, /listPriceObservationHistory\(\{\s*productId,\s*limit: 1000\s*\}\)/s);
+    assert.match(route, /Content-Disposition/);
+    assert.match(route, /attachment; filename="price-history-\$\{productId\}\.csv"/);
+    assert.match(route, /text\/csv; charset=utf-8/);
+    assert.match(route, /csvCell/);
+    assert.match(route, /formulaInjectionPrefixPattern/);
+    assert.match(route, /DATABASE_URL/);
+    assert.match(route, /export_database_unconfigured/);
+    assert.match(route, /product_id must be a UUID/);
+  });
+});
