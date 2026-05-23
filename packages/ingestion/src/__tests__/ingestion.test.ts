@@ -12,6 +12,7 @@ import {
   buildCityGrossStoresUrl,
   buildDailyConnectorConfigsFromEnv,
   buildDailyIngestionPostgresPoolConfig,
+  createDailyIngestionQueryExecutor,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
   buildHemkopSearchUrl,
@@ -4370,6 +4371,25 @@ describe('daily ingestion runner', () => {
         max: 1
       }
     );
+  });
+
+  it('retries transient production database disconnects while writing daily ingestion batches', async () => {
+    const calls: Array<{ text: string; values: unknown[] }> = [];
+    let attempts = 0;
+    const client = {
+      async query(text: string, values: unknown[]) {
+        calls.push({ text, values });
+        attempts += 1;
+        if (attempts === 1) throw new Error('terminating connection due to administrator command');
+        return { rows: [{ id: 'row-1' }] };
+      }
+    };
+
+    const executor = createDailyIngestionQueryExecutor(client, { retryAttempts: 1, retryBaseDelayMs: 0 });
+    const rows = await executor.query<{ id: string }>('select id from products where id = $1', ['product-1']);
+
+    assert.deepEqual(rows, [{ id: 'row-1' }]);
+    assert.equal(calls.length, 2);
   });
 
   it('fails closed when daily connector config omits any required chain', () => {
