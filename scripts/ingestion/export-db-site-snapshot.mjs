@@ -59,7 +59,7 @@ function normalizeCoverageSlug(value) {
     .replace(/^-+|-+$/g, '');
 }
 
-export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS, requiredStoreExternalRefs = [], requiredProductSlugs = [], requiredPriceTypes = [], requiredCategorySlugs = [] }) {
+export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOString(), rows, requiredChains = DEFAULT_REQUIRED_SNAPSHOT_CHAINS, requiredStoreExternalRefs = [], requiredProductSlugs = [], requiredPriceTypes = [], requiredCategorySlugs = [], maxObservedAgeHours }) {
   if (!Array.isArray(rows) || rows.length === 0) throw new Error('No latest price rows available for DB-to-site snapshot export.');
 
   const priceRows = rows.map((row) => ({
@@ -86,6 +86,28 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
     observationId: row.observationId,
     provenance: row.provenance ?? {}
   }));
+
+  const normalizedMaxObservedAgeHours = maxObservedAgeHours === undefined ? undefined : Number(maxObservedAgeHours);
+  if (normalizedMaxObservedAgeHours !== undefined && (!Number.isFinite(normalizedMaxObservedAgeHours) || normalizedMaxObservedAgeHours <= 0)) {
+    throw new Error('maxObservedAgeHours must be a positive number.');
+  }
+  const generatedAtMs = Date.parse(generatedAt);
+  const observedAtTimes = priceRows.map((row) => ({
+    observationId: row.observationId,
+    observedAt: row.observedAt,
+    observedAtMs: Date.parse(row.observedAt)
+  }));
+  const oldestObservedAt = observedAtTimes
+    .filter((row) => Number.isFinite(row.observedAtMs))
+    .sort((a, b) => a.observedAtMs - b.observedAtMs)[0]?.observedAt;
+  const staleObservationIds = normalizedMaxObservedAgeHours === undefined
+    ? []
+    : observedAtTimes
+      .filter((row) => !Number.isFinite(generatedAtMs) || !Number.isFinite(row.observedAtMs) || generatedAtMs - row.observedAtMs > normalizedMaxObservedAgeHours * 60 * 60 * 1000)
+      .map((row) => row.observationId);
+  if (staleObservationIds.length > 0) {
+    throw new Error(`db_site_snapshot_stale_observations:${staleObservationIds.join(',')}`);
+  }
 
   const observedChains = new Set(priceRows.map((row) => row.chainSlug));
   const normalizedRequiredChains = [...new Set(requiredChains.map((chain) => String(chain).trim()).filter(Boolean))].sort();
@@ -142,7 +164,13 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
       requiredPriceTypes: normalizedRequiredPriceTypes,
       missingRequiredStorePriceTypes,
       requiredCategorySlugs: normalizedRequiredCategorySlugs,
-      missingRequiredCategorySlugs
+      missingRequiredCategorySlugs,
+      ...(normalizedMaxObservedAgeHours === undefined ? {} : {
+        maxObservedAgeHours: normalizedMaxObservedAgeHours,
+        oldestObservedAt,
+        staleObservationCount: staleObservationIds.length,
+        staleObservationIds
+      })
     },
     priceRows
   };
@@ -155,6 +183,7 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   if (!outputPath) throw new Error('GROCERYVIEW_DB_SITE_SNAPSHOT_PATH is required for DB-to-site snapshot export.');
   const minConfidence = env.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE ? Number(env.GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE) : undefined;
   const limit = env.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT ? Number(env.GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT) : undefined;
+  const maxObservedAgeHours = env.GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS ? Number(env.GROCERYVIEW_DB_SITE_SNAPSHOT_MAX_OBSERVED_AGE_HOURS) : undefined;
   const requiredChains = parseRequiredSnapshotChains(env.GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS);
   const requiredStoreTargetsJson = env.GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE
     ? readFileSync(env.GROCERYVIEW_DB_SITE_SNAPSHOT_CATALOG_TARGETS_JSON_FILE, 'utf8')
@@ -172,7 +201,7 @@ async function exportDbSiteSnapshotFromEnv(env = process.env) {
   try {
     const reader = createPostgresSiteSnapshotReader(createPgQueryExecutor(pool));
     const rows = await reader.listLatestPriceSnapshotRows({ minConfidence, limit });
-    const artifact = buildDbSiteSnapshotArtifact({ rows, requiredChains, requiredStoreExternalRefs, requiredProductSlugs, requiredPriceTypes, requiredCategorySlugs });
+    const artifact = buildDbSiteSnapshotArtifact({ rows, requiredChains, requiredStoreExternalRefs, requiredProductSlugs, requiredPriceTypes, requiredCategorySlugs, maxObservedAgeHours });
     writeFileSync(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
     return artifact;
   } finally {
