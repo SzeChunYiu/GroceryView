@@ -16,6 +16,7 @@ import {
   fetchCityGrossProductsForAllStores,
   type CityGrossProduct
 } from './connectors/citygross.js';
+import type { AllStoreTaskRunnerControls } from './connectors/all-store-runner.js';
 import {
   fetchCoopProductsForAllStores,
   fetchCoopWeeklyDiscountsForAllStores,
@@ -61,6 +62,7 @@ import {
 } from './connectors/willys.js';
 
 export * from './connectors/openfoodfacts.js';
+export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';
 export * from './connectors/citygross.js';
 export * from './connectors/coop.js';
@@ -1516,7 +1518,7 @@ export type FetchRetailerConnectorSnapshotOptions = {
   headers?: Record<string, string>;
   retrievedAt?: string;
   rawSnapshotRefPrefix?: string;
-};
+} & AllStoreTaskRunnerControls;
 
 const emptyIngestionBatch = (): IngestionBatchPlan => ({ accepted: [], rejected: [] });
 const isIsoDate = (value: string): boolean => !Number.isNaN(Date.parse(value));
@@ -1890,10 +1892,18 @@ export async function fetchDailyConnectorSnapshot(
   options: FetchRetailerConnectorSnapshotOptions = {}
 ): Promise<RetailerConnectorFetchResult> {
   const sourceUrl = plan.provenance.sourceUrl;
+  const runnerControlsFromUrl = (url: URL): AllStoreTaskRunnerControls => ({
+    storeConcurrency: dailyNativeNumberParam(url, 'storeConcurrency') ?? options.storeConcurrency,
+    storeStartDelayMs: dailyNativeNumberParam(url, 'storeStartDelayMs') ?? options.storeStartDelayMs,
+    storeRetryAttempts: dailyNativeNumberParam(url, 'storeRetryAttempts') ?? options.storeRetryAttempts,
+    storeRetryBaseDelayMs: dailyNativeNumberParam(url, 'storeRetryBaseDelayMs') ?? options.storeRetryBaseDelayMs
+  });
+
   if (sourceUrl === GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
     const rows = await fetchWillysWeeklyDiscountsForAllStores({
+      ...runnerControlsFromUrl(url),
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       maxStores: dailyNativeNumberParam(url, 'maxStores'),
       maxRows: dailyNativeNumberParam(url, 'maxRows'),
@@ -1911,6 +1921,7 @@ export async function fetchDailyConnectorSnapshot(
       ? DEFAULT_ICA_STORE_CONFIGS.slice(0, maxStores)
       : undefined;
     const rows = await fetchIcaDefaultStoreProducts({
+      ...runnerControlsFromUrl(url),
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       stores,
       maxRows: dailyNativeNumberParam(url, 'maxRows'),
@@ -1924,6 +1935,7 @@ export async function fetchDailyConnectorSnapshot(
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
     const rows = await fetchWillysProductsForAllStores({
+      ...runnerControlsFromUrl(url),
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       maxStores: dailyNativeNumberParam(url, 'maxStores'),
       maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
@@ -1938,6 +1950,7 @@ export async function fetchDailyConnectorSnapshot(
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
     const rows = await fetchHemkopProductsForAllStores({
+      ...runnerControlsFromUrl(url),
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       maxStores: dailyNativeNumberParam(url, 'maxStores'),
       maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
@@ -1952,6 +1965,7 @@ export async function fetchDailyConnectorSnapshot(
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
     const rows = await fetchHemkopWeeklyDiscountsForAllStores({
+      ...runnerControlsFromUrl(url),
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       maxStores: dailyNativeNumberParam(url, 'maxStores'),
       maxRows: dailyNativeNumberParam(url, 'maxRows'),
@@ -1965,6 +1979,7 @@ export async function fetchDailyConnectorSnapshot(
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
     const rows = await fetchCoopWeeklyDiscountsForAllStores({
+      ...runnerControlsFromUrl(url),
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       maxStores: dailyNativeNumberParam(url, 'maxStores'),
       maxRows: dailyNativeNumberParam(url, 'maxRows'),
@@ -1983,6 +1998,7 @@ export async function fetchDailyConnectorSnapshot(
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
     const rows = await fetchCoopProductsForAllStores({
+      ...runnerControlsFromUrl(url),
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       maxStores: dailyNativeNumberParam(url, 'maxStores'),
       maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
@@ -2001,6 +2017,7 @@ export async function fetchDailyConnectorSnapshot(
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
     const rows = await fetchLidlOffersForAllStores({
+      ...runnerControlsFromUrl(url),
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       maxStores: dailyNativeNumberParam(url, 'maxStores'),
       maxRows: dailyNativeNumberParam(url, 'maxRows'),
@@ -2014,6 +2031,7 @@ export async function fetchDailyConnectorSnapshot(
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
     const rows = await fetchCityGrossProductsForAllStores({
+      ...runnerControlsFromUrl(url),
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       maxStores: dailyNativeNumberParam(url, 'maxStores'),
       maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
@@ -2673,7 +2691,7 @@ export type DailyIngestionStoreConfig = {
 
 export type DailyIngestionDomain = 'grocery' | 'fuel' | 'pharmacy';
 
-export type DailyIngestionConnectorConfig = Omit<RetailerConnectorPlanInput, 'requestedAt'> & {
+export type DailyIngestionConnectorConfig = Omit<RetailerConnectorPlanInput, 'requestedAt'> & AllStoreTaskRunnerControls & {
   requestedAt?: string;
   domain?: DailyIngestionDomain;
   stores?: DailyIngestionStoreConfig[];
@@ -2693,7 +2711,11 @@ export type DailyIngestionEnv = Partial<Record<
   | 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'
   | 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'
   | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS'
-  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS',
+  | 'GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS'
+  | 'GROCERYVIEW_DAILY_STORE_CONCURRENCY'
+  | 'GROCERYVIEW_DAILY_STORE_START_DELAY_MS'
+  | 'GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS'
+  | 'GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS',
   string
 >>;
 
@@ -2707,6 +2729,10 @@ export type DailyIngestionEnvConfig = {
     connectorStartDelayMs?: number;
     connectorRetryAttempts?: number;
     connectorRetryBaseDelayMs?: number;
+    storeConcurrency?: number;
+    storeStartDelayMs?: number;
+    storeRetryAttempts?: number;
+    storeRetryBaseDelayMs?: number;
   };
 };
 
@@ -2858,7 +2884,11 @@ function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[
       parserVersion: String(record.parserVersion),
       domain: record.domain === undefined ? 'grocery' : record.domain as DailyIngestionDomain,
       stores: parseDailyStoreConfigs(record.stores, `GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}].stores`),
-      requireStoreScopedPrices: record.requireStoreScopedPrices === undefined ? true : Boolean(record.requireStoreScopedPrices)
+      requireStoreScopedPrices: record.requireStoreScopedPrices === undefined ? true : Boolean(record.requireStoreScopedPrices),
+      storeConcurrency: dailyRunnerIntegerFromUnknown(record.storeConcurrency),
+      storeStartDelayMs: dailyRunnerIntegerFromUnknown(record.storeStartDelayMs),
+      storeRetryAttempts: dailyRunnerIntegerFromUnknown(record.storeRetryAttempts),
+      storeRetryBaseDelayMs: dailyRunnerIntegerFromUnknown(record.storeRetryBaseDelayMs)
     };
   });
   const configuredChains = new Set(connectors.map((connector) => normalizeDailySlug(connector.chainId)));
@@ -2869,12 +2899,28 @@ function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[
   return connectors;
 }
 
+function dailyRunnerIntegerFromUnknown(value: unknown): number | undefined {
+  if (value === undefined || value === null || value === '') return undefined;
+  const parsed = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(parsed)) return undefined;
+  return Math.max(0, Math.floor(parsed));
+}
+
 function dailyRunnerIntegerFromEnv(value: string | undefined, fallback?: number): number | undefined {
   const trimmed = value?.trim();
   if (!trimmed) return fallback;
   const parsed = Number(trimmed);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.max(0, Math.floor(parsed));
+}
+
+function definedAllStoreRunnerControls(input: AllStoreTaskRunnerControls): AllStoreTaskRunnerControls {
+  const controls: AllStoreTaskRunnerControls = {};
+  if (input.storeConcurrency !== undefined) controls.storeConcurrency = input.storeConcurrency;
+  if (input.storeStartDelayMs !== undefined) controls.storeStartDelayMs = input.storeStartDelayMs;
+  if (input.storeRetryAttempts !== undefined) controls.storeRetryAttempts = input.storeRetryAttempts;
+  if (input.storeRetryBaseDelayMs !== undefined) controls.storeRetryBaseDelayMs = input.storeRetryBaseDelayMs;
+  return controls;
 }
 
 export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): DailyIngestionEnvConfig {
@@ -2885,6 +2931,21 @@ export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): Daily
   if (!connectorsJson) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON or GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE is required for daily ingestion.');
   const parsedConnectors = parseDailyConnectorsJson(connectorsJson);
   const maxConnectors = dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_MAX_CONNECTORS);
+  const storeRunnerOptions = {
+    storeConcurrency: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_STORE_CONCURRENCY),
+    storeStartDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_STORE_START_DELAY_MS),
+    storeRetryAttempts: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_STORE_RETRY_ATTEMPTS),
+    storeRetryBaseDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_STORE_RETRY_BASE_DELAY_MS)
+  };
+  const connectors = parsedConnectors.map((connector) => ({
+    ...connector,
+    ...definedAllStoreRunnerControls({
+      storeConcurrency: connector.storeConcurrency ?? storeRunnerOptions.storeConcurrency,
+      storeStartDelayMs: connector.storeStartDelayMs ?? storeRunnerOptions.storeStartDelayMs,
+      storeRetryAttempts: connector.storeRetryAttempts ?? storeRunnerOptions.storeRetryAttempts,
+      storeRetryBaseDelayMs: connector.storeRetryBaseDelayMs ?? storeRunnerOptions.storeRetryBaseDelayMs
+    })
+  }));
   const runtimeOptions = {
     maxConcurrency: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY, 1, 'GROCERYVIEW_DAILY_MAX_CONCURRENCY'),
     connectorStartDelayMs: parseDailyEnvInteger(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS, 0, 'GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS'),
@@ -2894,14 +2955,15 @@ export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): Daily
   };
   return {
     databaseUrl,
-    connectors: maxConnectors && maxConnectors > 0 ? parsedConnectors.slice(0, maxConnectors) : parsedConnectors,
+    connectors: maxConnectors && maxConnectors > 0 ? connectors.slice(0, maxConnectors) : connectors,
     runtimeOptions,
     runner: {
       maxConnectors,
       maxConcurrency: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_MAX_CONCURRENCY),
       connectorStartDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_START_DELAY_MS),
       connectorRetryAttempts: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_ATTEMPTS),
-      connectorRetryBaseDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS)
+      connectorRetryBaseDelayMs: dailyRunnerIntegerFromEnv(env.GROCERYVIEW_DAILY_CONNECTOR_RETRY_BASE_DELAY_MS),
+      ...definedAllStoreRunnerControls(storeRunnerOptions)
     }
   };
 }
@@ -4123,6 +4185,10 @@ async function runDailyIngestionConnector(input: {
         retrievedAt: requestedAt,
         rawSnapshotRefPrefix: 'raw://daily-ingestion',
         fetchImpl,
+        storeConcurrency: config.storeConcurrency,
+        storeStartDelayMs: config.storeStartDelayMs,
+        storeRetryAttempts: config.storeRetryAttempts,
+        storeRetryBaseDelayMs: config.storeRetryBaseDelayMs,
         headers: { accept: 'application/json' }
       }),
       parser: parseRetailerProductJsonSnapshot
