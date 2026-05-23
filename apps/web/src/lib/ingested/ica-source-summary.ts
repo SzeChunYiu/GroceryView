@@ -19,9 +19,17 @@ export type IcaStorePromotionSourceSummary = {
 export const icaStorePromotionSourceSummary: IcaStorePromotionSourceSummary = {
   sourceLabel: 'ICA handlaprivatkund store-scoped promotions endpoints',
   generatedFrom: 'apps/web/src/lib/ingested/ica.ts',
-  totalRowCount: 93084,
-  storeEndpointCount: 323,
+  totalRowCount: 93096,
+  storeEndpointCount: 324,
   latestStores: [
+    {
+      retrievedAt: '2026-05-23T18:07:56.646Z',
+      rowCount: 12,
+      storeAccountId: '1003822',
+      storeName: 'ICA Supermarket Toria',
+      regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d',
+      sourceUrl: 'https://handlaprivatkund.ica.se/stores/1003822/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=12&maxPageSize=12'
+    },
     {
       retrievedAt: '2026-05-23T13:26:35.000Z',
       rowCount: 10,
