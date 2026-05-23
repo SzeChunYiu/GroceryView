@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { BarcodeSearchClient } from '@/components/barcode-search-client';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
@@ -35,6 +36,7 @@ export default function ProductsPage() {
         </div>
       </Card>
       <Card className="mt-8 border-violet-200 bg-violet-50/70">
+        <div className="mb-8"><BarcodeSearchClient /></div>
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.24em] text-violet-800">Product search</p>
