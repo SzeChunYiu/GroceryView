@@ -158,6 +158,12 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /\/tmp\/source-run-readiness\.json/);
     assert.match(workflow, /\/tmp\/catalog-coverage-readiness\.json/);
 
+    assert.match(workflow, /body\.summary\?\.blockers\?\.total/);
+    assert.match(workflow, /body\.summary\?\.blockers\?\.missingFreshChains/);
+    assert.match(workflow, /body\.summary\?\.blockers\?\.insufficientAcceptedRows/);
+    assert.match(workflow, /body\.summary\?\.evidence\?\.succeeded/);
+    assert.match(workflow, /body\.summary\?\.latestSuccessfulFinishedAt/);
+
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
       assert.match(workflow, new RegExp(`source_run_missing_fresh_chain:${chain}`));
     }

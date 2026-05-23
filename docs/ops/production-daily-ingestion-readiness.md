@@ -167,7 +167,7 @@ The workflow must pass these gates in order:
 4. configured daily ingestion runner; its `chainSummaries` must include every required chain, every summary must be `succeeded`, every official product connector must emit at least one observation for every configured branch in `stores[]`, and every required chain must emit at least one observation id before the workflow uploads `groceryview-daily-ingestion-result`
 5. DB-backed site snapshot export and `groceryview-db-site-snapshot` artifact upload
 6. `/api/readiness/postgres`
-7. `/api/readiness/source-runs`
+7. `/api/readiness/source-runs`, including zero blockers, zero missing fresh chains, zero insufficient accepted-row blockers, at least six succeeded daily source-run evidence entries, and a latest successful finish timestamp
 8. `/api/readiness/catalog-coverage`, including zero missing chain, store, product, category, price-type, product-store pair, and store-price-type gaps
 9. upload `groceryview-deployed-readiness` with `postgres-readiness.json`, `source-run-readiness.json`, and `catalog-coverage-readiness.json`
 
@@ -198,4 +198,4 @@ Do not treat the system as production-ready until all are true:
 - `npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView` reports `ready`.
 - `npm run ops:validate-production-env` reports `ready` in the deployment environment.
 - the latest `daily-ingestion.yml` run passes and includes the `groceryview-production-ingestion-config` and `groceryview-deployed-readiness` artifacts.
-- `/api/readiness/postgres`, `/api/readiness/source-runs`, and `/api/readiness/catalog-coverage` all return healthy/complete responses with HTTP 200, and catalog coverage has no missing dimension, product-store-pair, or store-price-type gaps.
+- `/api/readiness/postgres`, `/api/readiness/source-runs`, and `/api/readiness/catalog-coverage` all return healthy/complete responses with HTTP 200; source-run readiness has zero blockers, zero missing fresh chains, zero insufficient accepted-row blockers, at least six succeeded evidence entries, and a latest successful finish timestamp; and catalog coverage has no missing dimension, product-store-pair, or store-price-type gaps.
