@@ -46,7 +46,7 @@ describe('DB-backed site snapshot export script', () => {
     assert.equal(artifact.status, 'passed');
     assert.equal(artifact.generatedAt, '2026-05-22T21:20:00.000Z');
     assert.equal(artifact.priceRows.length, 1);
-    assert.deepEqual(artifact.coverage, { products: 1, chains: 1, stores: 1, observations: 1, requiredChains: ['willys'], missingRequiredChains: [], requiredStoreExternalRefs: [], missingRequiredStoreExternalRefs: [] });
+    assert.deepEqual(artifact.coverage, { products: 1, chains: 1, stores: 1, observations: 1, requiredChains: ['willys'], missingRequiredChains: [], requiredStoreExternalRefs: [], missingRequiredStoreExternalRefs: [], requiredProductSlugs: [], missingRequiredProductSlugs: [] });
     assert.deepEqual(artifact.priceRows[0], {
       productSlug: 'bryggkaffe-450g',
       canonicalName: 'Bryggkaffe mellanrost 450 g',
@@ -179,6 +179,56 @@ describe('DB-backed site snapshot export script', () => {
 
     assert.deepEqual(artifact.coverage.requiredStoreExternalRefs, ['1004599', '216502']);
     assert.deepEqual(artifact.coverage.missingRequiredStoreExternalRefs, []);
+  });
+
+  it('fails closed when required product coverage is missing from the DB snapshot', () => {
+    const base = {
+      chainId: 'chain-1',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      categoryPath: ['Pantry', 'Coffee'],
+      comparableUnit: 'kg',
+      priceType: 'online',
+      price: 44.9,
+      unitPrice: 99.7778,
+      currency: 'SEK',
+      observedAt: '2026-05-20T09:00:00.000Z',
+      confidence: 0.88
+    };
+    assert.throws(() => buildDbSiteSnapshotArtifact({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      requiredChains: ['willys'],
+      requiredProductSlugs: ['bryggkaffe-450g', 'mjolk-1l'],
+      rows: [{ ...base, productId: 'product-1', productSlug: 'bryggkaffe-450g', canonicalName: 'Bryggkaffe mellanrost 450 g', observationId: 'observation-coffee' }]
+    }), /db_site_snapshot_missing_required_products:mjolk-1l/);
+  });
+
+  it('records required product coverage when every target product has latest price evidence', () => {
+    const base = {
+      chainId: 'chain-1',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      categoryPath: ['Pantry', 'Coffee'],
+      comparableUnit: 'kg',
+      priceType: 'online',
+      price: 44.9,
+      unitPrice: 99.7778,
+      currency: 'SEK',
+      observedAt: '2026-05-20T09:00:00.000Z',
+      confidence: 0.88
+    };
+    const artifact = buildDbSiteSnapshotArtifact({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      requiredChains: ['willys'],
+      requiredProductSlugs: ['bryggkaffe-450g', 'mjolk-1l'],
+      rows: [
+        { ...base, productId: 'product-1', productSlug: 'bryggkaffe-450g', canonicalName: 'Bryggkaffe mellanrost 450 g', observationId: 'observation-coffee' },
+        { ...base, productId: 'product-2', productSlug: 'mjolk-1l', canonicalName: 'Mjölk 1 l', observationId: 'observation-milk' }
+      ]
+    });
+
+    assert.deepEqual(artifact.coverage.requiredProductSlugs, ['bryggkaffe-450g', 'mjolk-1l']);
+    assert.deepEqual(artifact.coverage.missingRequiredProductSlugs, []);
   });
 
   it('fails closed when the database reader returns no latest price rows', () => {
