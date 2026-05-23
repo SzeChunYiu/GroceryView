@@ -55,11 +55,7 @@ const sortOptions = [
 ] satisfies { mode: SortMode; label: string; detail: string }[];
 
 export function generateMetadata() {
-  return routeMetadata({
-    path: '/screener',
-    title: 'Verified deal screener | GroceryView',
-    description: 'Sort and filter verified grocery deal rows by biggest price drop, cheapest SEK per kg, and widest cross-chain spread.'
-  });
+  return routeMetadata('/screener');
 }
 
 function paramValue(value: string | string[] | undefined) {

@@ -158,6 +158,10 @@ export const routeMetadataCatalog = {
     title: 'Receipt scanner evidence gate | GroceryView',
     description: 'Receipt scanning stays gated until production uploads, extraction records, and account-bound review are verified.'
   },
+  '/screener': {
+    title: 'Verified deal screener | GroceryView',
+    description: 'Sort and filter verified grocery deal rows by biggest price drop, cheapest SEK per kg, and widest cross-chain spread.'
+  },
   '/seasonal-calendar': {
     title: 'Seasonal produce price calendar | GroceryView',
     description: 'Find the best time to buy produce from historical monthly averages, with no forecasted prices and eco planning guardrails.'

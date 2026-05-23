@@ -1468,6 +1468,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces the dedicated screener route in navigation, metadata, and sitemap', async () => {
+    const nav = await read('src/components/app-nav.tsx');
+    const route = await read('src/app/screener/page.tsx');
+    const seo = await read('src/lib/seo.ts');
+    const sitemap = await read('src/app/sitemap.ts');
+
+    assert.match(nav, /href: '\/screener', label: 'Screener'/);
+    assert.match(route, /routeMetadata\('\/screener'\)/);
+    assert.match(seo, /'\/screener'/);
+    assert.match(seo, /Verified deal screener/);
+    assert.match(sitemap, /entry\('\/screener'/);
+  });
+
   it('surfaces a seasonal best time to buy produce calendar from historical monthly averages', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/seasonal-calendar/page.tsx');
@@ -1631,6 +1644,7 @@ describe('verified-data UI', () => {
 ${seo}`;
     assert.match(globals, /radial-gradient/);
     assert.match(nav, /Verified grocery intelligence/);
+    assert.match(nav, /href: '\/screener', label: 'Screener'/, 'Screener nav item should point to the dedicated /screener route');
     assert.match(shell, /zero placeholder rows/);
     assert.match(shell, /Data provenance|SourceCoverage/);
     assert.match(shell, /Verified product universe/);
@@ -2414,6 +2428,7 @@ ${seo}`;
     assert.match(sitemap, /\/products\/\$\{product\.slug\}/);
     assert.match(sitemap, /\/stores\/\$\{store\.slug\}/);
     assert.match(sitemap, /\/categories\/\$\{slug\}/);
+    assert.match(sitemap, /entry\('\/screener'/);
     assert.match(sitemap, /changeFrequency/);
     assert.match(sitemap, /lastModified/);
     assert.doesNotMatch(sitemap, /@\/lib\/demo-data|@\/components\/sample-data/);
@@ -2460,6 +2475,7 @@ ${seo}`;
       'src/app/products/[slug]/page.tsx',
       'src/app/savings-dashboard/page.tsx',
       'src/app/scanner/page.tsx',
+      'src/app/screener/page.tsx',
       'src/app/seasonal-calendar/page.tsx',
       'src/app/shopping-trips/page.tsx',
       'src/app/store-coverage/page.tsx',

@@ -22,6 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/products', 0.95, 'daily'),
     entry('/compare', 0.9, 'daily'),
     entry('/deals', 0.9, 'daily'),
+    entry('/screener', 0.9, 'daily'),
     entry('/fuel', 0.7, 'weekly'),
     entry('/pharmacy', 0.7, 'weekly'),
     entry('/seasonal-calendar', 0.89, 'weekly'),
