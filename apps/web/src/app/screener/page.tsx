@@ -280,9 +280,9 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] border-collapse text-left text-sm">
-            <thead className="bg-slate-50 text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+        <div className="overflow-hidden sm:overflow-x-auto">
+          <table className="w-full border-separate border-spacing-y-3 text-left text-sm sm:min-w-[920px] sm:border-collapse sm:border-spacing-y-0">
+            <thead className="hidden bg-slate-50 text-xs font-black uppercase tracking-[0.16em] text-slate-500 sm:table-header-group">
               <tr>
                 <th className="px-5 py-3">Product</th>
                 <th className="px-5 py-3">Signal</th>
@@ -291,23 +291,32 @@ export default async function ScreenerPage({ searchParams }: Readonly<{ searchPa
                 <th className="px-5 py-3">Confidence</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="block sm:table-row-group sm:divide-y sm:divide-slate-200">
               {visibleRows.map((row) => (
-                <tr className="align-top hover:bg-emerald-50/50" key={row.id}>
-                  <td className="px-5 py-4">
+                <tr className="block rounded-2xl border border-slate-200 bg-white p-4 align-top shadow-sm hover:bg-emerald-50/50 sm:table-row sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none" key={row.id}>
+                  <td className="block px-0 py-2 sm:table-cell sm:px-5 sm:py-4">
+                    <span className="mb-1 block text-[0.68rem] font-black uppercase tracking-[0.16em] text-slate-500 sm:hidden">Product</span>
                     <Link className="text-base font-black text-slate-950 underline decoration-slate-300 underline-offset-4 hover:text-emerald-800" href={`/products/${row.productSlug}`}>
                       {row.productName}
                     </Link>
                     <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">{row.categoryLabel}</p>
                     <p className="mt-2 text-xs font-semibold text-slate-500">source: {row.source}</p>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="block px-0 py-2 sm:table-cell sm:px-5 sm:py-4">
+                    <span className="mb-1 block text-[0.68rem] font-black uppercase tracking-[0.16em] text-slate-500 sm:hidden">Signal</span>
                     <p className="text-lg font-black text-emerald-800">{row.metricLabel}</p>
                     <p className="mt-2 max-w-xs text-xs font-semibold leading-5 text-slate-600">{row.evidenceLabel}</p>
                   </td>
-                  <td className="px-5 py-4 font-black text-slate-950">{row.priceLabel}</td>
-                  <td className="px-5 py-4 font-semibold text-slate-700">{row.compareLabel}</td>
-                  <td className="px-5 py-4">
+                  <td className="block px-0 py-2 font-black text-slate-950 sm:table-cell sm:px-5 sm:py-4">
+                    <span className="mb-1 block text-[0.68rem] font-black uppercase tracking-[0.16em] text-slate-500 sm:hidden">Price</span>
+                    {row.priceLabel}
+                  </td>
+                  <td className="block px-0 py-2 font-semibold text-slate-700 sm:table-cell sm:px-5 sm:py-4">
+                    <span className="mb-1 block text-[0.68rem] font-black uppercase tracking-[0.16em] text-slate-500 sm:hidden">Comparison</span>
+                    {row.compareLabel}
+                  </td>
+                  <td className="block px-0 py-2 sm:table-cell sm:px-5 sm:py-4">
+                    <span className="mb-1 block text-[0.68rem] font-black uppercase tracking-[0.16em] text-slate-500 sm:hidden">Confidence</span>
                     <ConfidenceBadge level={row.confidence.level} label={row.confidence.label} sampleSize={row.confidence.sampleSize} />
                   </td>
                 </tr>

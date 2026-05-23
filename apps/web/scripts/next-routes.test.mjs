@@ -1111,6 +1111,20 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /NoVerifiedData/);
   });
 
+  it('keeps the screener ranked table usable below the small breakpoint', async () => {
+    const route = await read('src/app/screener/page.tsx');
+
+    assert.match(route, /sm:min-w-\[920px\]/);
+    assert.match(route, /hidden bg-slate-50[^`"]*sm:table-header-group/);
+    assert.match(route, /block rounded-2xl[^`"]*sm:table-row/);
+    assert.match(route, /sm:hidden[^>]*>Product</);
+    assert.match(route, /sm:hidden[^>]*>Signal</);
+    assert.match(route, /sm:hidden[^>]*>Price</);
+    assert.match(route, /sm:hidden[^>]*>Comparison</);
+    assert.match(route, /sm:hidden[^>]*>Confidence</);
+    assert.doesNotMatch(route, /className="w-full min-w-\[920px\]/);
+  });
+
   it('covers invalid sort query values on the screener route with explicit default selection', async () => {
     const route = await read('src/app/screener/page.tsx');
 
