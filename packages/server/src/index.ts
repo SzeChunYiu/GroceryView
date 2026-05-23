@@ -680,6 +680,8 @@ function cursorPaginatedEnvelope<T>(items: T[], params: URLSearchParams) {
       nextCursor: hasMore ? encodeCursorOffset(nextOffset) : null,
       hasMore,
       totalReturned: window.length,
+      totalItems: items.length,
+      totalProductCount: items.length,
       source: 'cursor pagination over stable product search ordering'
     },
     guardrails: [
