@@ -325,6 +325,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_table:latest_prices',
       'missing_table:notification_suppressions',
       'missing_table:observations',
+      'missing_table:observations_v2',
       'missing_table:pantry_items',
       'missing_table:price_daily',
       'missing_table:price_weekly',
@@ -350,6 +351,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_migration:010_commodity_taxonomy',
       'missing_migration:011_multi_vertical_domains',
       'missing_migration:012_price_rollups',
+      'missing_migration:013_observations_partitioning',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -398,6 +400,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'table:notification_suppressions',
         'table:notification_tasks',
         'table:observations',
+        'table:observations_v2',
         'table:pantry_items',
         'table:price_daily',
         'table:price_weekly',
@@ -424,6 +427,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'migration:010_commodity_taxonomy',
         'migration:011_multi_vertical_domains',
         'migration:012_price_rollups',
+        'migration:013_observations_partitioning',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',

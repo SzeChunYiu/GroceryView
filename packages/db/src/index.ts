@@ -38,7 +38,10 @@ export function migrationVersionFromPath(path: string): string {
 
 export function createMigrationPlan(files: SqlMigrationFile[]): Migration[] {
   const migrations = files
-    .filter((file) => file.path.endsWith('.sql'))
+    .filter((file) => {
+      const filename = file.path.split(/[\\/]/).filter(Boolean).at(-1) ?? '';
+      return filename.endsWith('.sql') && !filename.startsWith('._');
+    })
     .sort((a, b) => a.path.localeCompare(b.path))
     .map((file) => ({
       version: migrationVersionFromPath(file.path),
@@ -3182,6 +3185,7 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'raw_records',
   'retailer_source_policies',
   'observations',
+  'observations_v2',
   'latest_prices',
   'price_daily',
   'price_weekly',
@@ -3222,7 +3226,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '010_basket_import_reviews',
   '010_commodity_taxonomy',
   '011_multi_vertical_domains',
-  '012_price_rollups'
+  '012_price_rollups',
+  '013_observations_partitioning'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {

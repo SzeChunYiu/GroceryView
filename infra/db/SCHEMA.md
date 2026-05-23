@@ -24,15 +24,16 @@ Every price-bearing row carries `price_type`, `confidence`, `observed_at`, and `
 
 ## Partitioning Plan
 
-`observations` is intentionally kept as a single table for the first migration so early API and worker lanes can integrate without partition-management code. When write volume requires partitioning, add a follow-up migration that:
+Migration 013 builds the first time-series partition lane without breaking existing `latest_prices` foreign keys:
 
-1. creates `observations_v2 partition by range (observed_at)`,
-2. creates monthly partitions named `observations_YYYY_MM`,
-3. recreates the product/time, store/time, price type/time, and provenance indexes on each partition,
-4. backfills from `observations`,
-5. swaps read/write code to `observations_v2`.
+1. `observations` remains the canonical immutable write table for current adapters.
+2. `observations_v2` is a mirror table partitioned by range on `observed_at`.
+3. Monthly range partitions are named `observations_YYYY_MM` and can be pre-created with `create_observations_partitions(window_start, months_ahead)`.
+4. `ensure_observations_monthly_partition(partition_month)` auto-creates the matching month before trigger-synced writes land.
+5. Each monthly partition carries product/time, store/time, price type/time, domain/time, provenance GIN, and BRIN indexes. BRIN keeps append-only time pruning cheap at large row counts.
+6. `drop_observations_partitions_before(cutoff_month)` is the retention tiering hook: operators can archive a month, then perform retention by partition drop instead of row deletes.
 
-The same pattern can be reused for long-term raw payload retention in `raw_records` if retailer capture volume grows faster than normalized observations.
+The same monthly range partition and retention by partition drop pattern can be reused for long-term raw payload retention in `raw_records` if retailer capture volume grows faster than normalized observations.
 
 ## Deal Score Boundary
 
@@ -117,6 +118,16 @@ Write policy: daily ingestion uses change-only writes. Before inserting a new im
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
 Indexes: product/time, store/time, price type/time, and provenance GIN.
+
+### `observations_v2`
+
+Range-partitioned monthly mirror of immutable `observations` for high-volume history reads. It is populated by `observations_partition_lane_sync`, which calls `ensure_observations_monthly_partition()` before copying inserts and updates from the canonical table.
+
+Key columns: same price, source, provenance, validity, domain, and observed-time fields as `observations`. The partitioned primary key is `(id, observed_at)` because PostgreSQL range-partitioned unique keys must include the partition key.
+
+Partitions: monthly range partitions named `observations_YYYY_MM`, plus `observations_default` for rows outside the pre-created window. Operators should drain the default partition by creating the matching monthly partition before long-term retention.
+
+Indexes: parent and per-partition product/time, store/time, price type/time, domain/time, provenance GIN, and `observed_at` BRIN. Retention uses `drop_observations_partitions_before(cutoff_month)` after archive/downsample handoff.
 
 ### `latest_prices`
 
