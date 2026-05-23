@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { pricedProducts, categoryLabels } from '@/lib/openprices-products';
+import { ItemCard } from '@/components/ItemCard';
 
 export const dynamic = 'force-static';
 
@@ -30,11 +31,8 @@ export default async function CategoryPage({ params }: Readonly<{ params: Promis
       </header>
       <ul className="divide-y divide-market-ink/5 rounded-lg border border-market-ink/10 bg-white">
         {items.map((p) => (
-          <li key={p.code} className="grid grid-cols-[2.5fr_1fr_1fr_0.5fr] gap-3 px-4 py-3 text-sm">
-            <span className="font-semibold">{p.name}</span>
-            <span className="text-market-ink/65">{p.brands || '—'}</span>
-            <span className="font-bold">SEK {p.priceMedian.toFixed(2)}</span>
-            <span className="text-right text-xs text-market-ink/45">{p.observationCount} obs</span>
+          <li key={p.code} className="px-2 py-2">
+            <ItemCard product={p} />
           </li>
         ))}
       </ul>
