@@ -1433,6 +1433,28 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(shell, /NoVerifiedData|@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('surfaces a grocery market heatmap on homepage and chain-index from verified market tiles', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const route = await read('src/app/chain-index/page.tsx');
+
+    assert.match(verified, /export const marketHeatmapTiles/);
+    assert.match(verified, /marketHeatmapSourceSignals/);
+    assert.match(verified, /categoryDealLeaders/);
+    assert.match(verified, /openPriceObservationDepth/);
+    assert.match(verified, /chainCategoryCoverage/);
+    assert.match(shell, /homepageMarketHeatmap/);
+    assert.match(shell, /marketHeatmapTiles\.slice\(0, 6\)/);
+    assert.match(shell, /Grocery market heatmap/);
+    assert.match(shell, /data-heatmap-tile/);
+    assert.match(shell, /tile\.heatScore/);
+    assert.match(route, /marketHeatmapTiles/);
+    assert.match(route, /Market heatmap/);
+    assert.match(route, /heatScore\.toFixed/);
+    assert.match(route, /No forecast/);
+    assert.doesNotMatch(verified, /Math\.random/);
+  });
+
   it('uses a readable global shell and provenance surfaces across the app', async () => {
     const globals = await read('src/app/globals.css');
     const nav = await read('src/components/app-nav.tsx');
