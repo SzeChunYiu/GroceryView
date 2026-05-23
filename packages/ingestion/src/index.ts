@@ -1891,7 +1891,9 @@ export async function fetchDailyConnectorSnapshot(
       maxStores: dailyNativeNumberParam(url, 'maxStores'),
       maxRows: dailyNativeNumberParam(url, 'maxRows'),
       productQueries: dailyNativeStringListParam(url, 'productQueries'),
-      includeStoreDetails: url.searchParams.get('includeStoreDetails') === 'true',
+      includeStoreDetails: url.searchParams.has('includeStoreDetails')
+        ? url.searchParams.get('includeStoreDetails') === 'true'
+        : undefined,
       subscriptionKey: url.searchParams.get('subscriptionKey') ?? undefined,
       storeApiSubscriptionKey: url.searchParams.get('storeApiSubscriptionKey') ?? undefined,
       retrievedAt
@@ -3578,18 +3580,15 @@ async function persistDailyConnectorOutput(input: {
     const payload = {
       chainId: config.chainId,
       productId: accepted.product.id,
-      retailerProductId: accepted.priceObservation.retailerProductId,
       storeId: accepted.priceObservation.storeId,
       priceType: accepted.priceObservation.priceType,
       price: accepted.priceObservation.price,
-      unitPrice: accepted.priceObservation.unitPrice,
-      ...(accepted.priceObservation.regularPrice !== undefined ? { regularPrice: accepted.priceObservation.regularPrice } : {}),
-      currency: accepted.priceObservation.currency,
-      observedAt: accepted.priceObservation.observedAt,
-      sourceUrl: accepted.priceObservation.provenance.sourceUrl
+      observedAt: accepted.priceObservation.observedAt
     };
     const rawProvenance = {
-      ...accepted.priceObservation.provenance,
+      sourceType: accepted.priceObservation.provenance.sourceType,
+      parserVersion: accepted.priceObservation.provenance.parserVersion,
+      rawSnapshotRef: accepted.priceObservation.provenance.rawSnapshotRef,
       chainId: config.chainId,
       cadence: 'daily',
       connectorId: config.connectorId,

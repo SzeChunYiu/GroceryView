@@ -1007,30 +1007,65 @@ export async function fetchCoopWeeklyDiscounts(
 export async function fetchCoopWeeklyDiscountsForAllStores(
   options: FetchCoopAllStoreWeeklyDiscountsOptions = {}
 ): Promise<CoopWeeklyDiscount[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const serviceAccess = options.subscriptionKey && options.storeApiSubscriptionKey
+    ? {
+        personalizationApiUrl: options.personalizationApiUrl ?? COOP_PERSONALIZATION_API_URL,
+        personalizationApiSubscriptionKey: options.subscriptionKey,
+        personalizationApiVersion: options.apiVersion ?? DEFAULT_COOP_API_VERSION,
+        storeApiUrl: options.storeApiUrl ?? COOP_STORE_API_URL,
+        storeApiSubscriptionKey: options.storeApiSubscriptionKey
+      }
+    : await fetchCoopPublicWeeklyServiceAccess(fetchImpl);
   const stores = await fetchCoopStores({
-    fetchImpl: options.fetchImpl,
+    fetchImpl,
     maxRows: options.maxStores,
     storeApiVersion: options.storeApiVersion,
-    storeApiUrl: options.storeApiUrl,
-    storeApiSubscriptionKey: options.storeApiSubscriptionKey,
+    storeApiUrl: serviceAccess.storeApiUrl,
+    storeApiSubscriptionKey: serviceAccess.storeApiSubscriptionKey,
     includeDetails: options.includeStoreDetails,
     retrievedAt: options.retrievedAt
   });
-  return await fetchCoopWeeklyDiscounts({
-    fetchImpl: options.fetchImpl,
-    storeIds: stores.map((store) => store.storeId),
-    storeApiVersion: options.storeApiVersion,
-    storeApiUrl: options.storeApiUrl,
-    storeApiSubscriptionKey: options.storeApiSubscriptionKey,
-    productQueries: options.productQueries,
-    maxRows: options.maxRows ?? stores.length * (options.productQueries?.length ?? DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES.length),
-    device: options.device,
-    apiVersion: options.apiVersion,
-    subscriptionKey: options.subscriptionKey,
-    personalizationApiUrl: options.personalizationApiUrl,
-    retrievedAt: options.retrievedAt,
-    flyerOfferHints: options.flyerOfferHints
-  });
+  const maxRows = options.maxRows ?? stores.length * (options.productQueries?.length ?? DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES.length);
+  const rows: CoopWeeklyDiscount[] = [];
+  const failures: string[] = [];
+  const concurrency = 8;
+  for (let index = 0; index < stores.length; index += concurrency) {
+    const batch = stores.slice(index, index + concurrency);
+    const settled = await Promise.allSettled(batch.map(async (store) => ({
+      storeId: store.storeId,
+      rows: await fetchCoopWeeklyDiscounts({
+        fetchImpl,
+        storeIds: [store.storeId],
+        storeApiVersion: options.storeApiVersion,
+        storeApiUrl: serviceAccess.storeApiUrl,
+        storeApiSubscriptionKey: serviceAccess.storeApiSubscriptionKey,
+        productQueries: options.productQueries,
+        maxRows: Math.max(1, maxRows - rows.length),
+        device: options.device,
+        apiVersion: serviceAccess.personalizationApiVersion,
+        subscriptionKey: serviceAccess.personalizationApiSubscriptionKey,
+        personalizationApiUrl: serviceAccess.personalizationApiUrl,
+        retrievedAt: options.retrievedAt,
+        flyerOfferHints: options.flyerOfferHints
+      })
+    })));
+    for (let offset = 0; offset < settled.length; offset += 1) {
+      const result = settled[offset]!;
+      if (result.status === 'fulfilled') {
+        rows.push(...result.value.rows);
+        if (rows.length >= maxRows) {
+          return rows.slice(0, maxRows);
+        }
+      } else {
+        failures.push(`${batch[offset]?.storeId ?? 'unknown'}:${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
+      }
+    }
+  }
+  if (rows.length === 0 && failures.length > 0) {
+    throw new Error(`Coop all-store weekly discount requests returned no usable branch offers: ${failures[0]}`);
+  }
+  return rows;
 }
 
 export function normalizeCoopProduct(

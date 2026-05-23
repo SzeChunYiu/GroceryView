@@ -939,14 +939,75 @@ describe('fetchCoopWeeklyDiscounts', () => {
       retrievedAt: '2026-05-22T09:05:00.000Z'
     });
 
-    assert.deepEqual(requestedUrls, [
-      buildCoopStoresUrl(),
+    assert.equal(requestedUrls[0], buildCoopStoresUrl());
+    assert.deepEqual(new Set(requestedUrls.slice(1)), new Set([
       buildCoopStoreInfoUrl('251300'),
       buildCoopSearchUrl('251300'),
       buildCoopStoreInfoUrl('252700'),
       buildCoopSearchUrl('252700')
-    ]);
+    ]));
     assert.deepEqual(rows.map((row) => row.storeId), ['251300', '252700']);
+  });
+
+  it('keeps Coop all-store weekly discounts when one branch request fails', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildCoopStoresUrl()) {
+        return new Response(JSON.stringify({
+          stores: [
+            { ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', conceptName: 'Stora Coop', address: 'Rapsgatan 1b', city: 'Uppsala' },
+            { ledgerAccountNumber: '176111', name: 'X:-Tra Hallsberg', conceptName: 'X:-Tra', address: 'Testgatan 1', city: 'Hallsberg' },
+            { ledgerAccountNumber: '252700', name: 'Stora Coop Bromma', conceptName: 'Stora Coop', address: 'Ulvsundavägen 185', city: 'Bromma' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url).includes('/stores/176111')) {
+        throw new TypeError('fetch failed');
+      }
+      if (String(url).includes('/stores/')) {
+        const storeId = String(url).includes('/252700') ? '252700' : '251300';
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: storeId,
+          name: storeId === '252700' ? 'Stora Coop Bromma' : 'Stora Coop Boländerna',
+          city: storeId === '252700' ? 'Bromma' : 'Uppsala',
+          flyers: [{
+            startDate: '2026-05-18T00:00:00',
+            stopDate: '2026-05-24T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: `https://dr.coop.se/butik/${storeId}`,
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: 'coop-catalog-promo',
+            ean: '7310865005168',
+            name: 'Smör Normalsaltat',
+            manufacturerName: 'Svenskt Smör från Arla',
+            packageSizeInformation: '500g',
+            salesPriceData: { b2cPrice: 61.45 },
+            onlinePromotions: [{ id: 'promo', message: 'Smör 45 kr/st', priceData: { b2cPrice: 45 } }]
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscountsForAllStores({
+      fetchImpl,
+      includeStoreDetails: false,
+      maxStores: 3,
+      productQueries: ['Svenskt smör Arla 500 g'],
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-22T09:05:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => row.storeId), ['251300', '252700']);
+    assert.ok(requestedUrls.includes(buildCoopStoreInfoUrl('176111')));
   });
 });
 
@@ -4022,16 +4083,11 @@ describe('daily ingestion runner', () => {
     assert.equal('product' in rawRows[0]!.payload, false);
     assert.deepEqual(Object.keys(rawRows[0]!.payload).sort(), [
       'chainId',
-      'currency',
       'observedAt',
       'price',
       'priceType',
       'productId',
-      'regularPrice',
-      'retailerProductId',
-      'sourceUrl',
-      'storeId',
-      'unitPrice'
+      'storeId'
     ]);
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into observations')), true);
     const storeInsert = executor.calls.find((call) => call.sql.includes('insert into stores'));
@@ -4382,13 +4438,14 @@ describe('daily ingestion runner', () => {
         requestedUrls.push(String(url));
         if (String(url) === buildCoopStoresUrl()) {
           return new Response(JSON.stringify({
-            stores: [{ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', conceptName: 'Stora Coop', address: 'Rapsgatan 1b', city: 'Uppsala' }]
+            stores: [{ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', conceptName: 'Stora Coop' }]
           }), { status: 200, headers: { 'content-type': 'application/json' } });
         }
         if (String(url).includes('/stores/251300')) {
           return new Response(JSON.stringify({
             ledgerAccountNumber: '251300',
             name: 'Stora Coop Boländerna',
+            address: 'Rapsgatan 1b',
             city: 'Uppsala',
             flyers: [{ startDate: '2026-05-18T00:00:00', stopDate: '2026-05-24T23:59:59', current: true, pdfExists: true, pdfUrl: 'https://dr.coop.se/butik/251300' }]
           }), { status: 200, headers: { 'content-type': 'application/json' } });
@@ -4413,6 +4470,7 @@ describe('daily ingestion runner', () => {
     assert.equal(result.acceptedCount, 1);
     assert.deepEqual(requestedUrls, [
       buildCoopStoresUrl(),
+      buildCoopStoreInfoUrl('251300'),
       buildCoopStoreInfoUrl('251300'),
       buildCoopSearchUrl('251300')
     ]);
