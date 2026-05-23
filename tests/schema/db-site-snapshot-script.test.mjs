@@ -1,16 +1,23 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import {
   buildDbSiteChainPriceObservations,
   buildDbSiteAxfoodProducts,
   buildDbSiteSnapshotArtifact,
+  readFreshDbSiteSnapshotCache,
   renderDbSiteChainObservationsModule,
   renderDbSiteIngestedOverridesModule,
-  renderDbSiteProductsModule
+  renderDbSiteProductsModule,
+  validateDbSiteSnapshotCacheArtifact
 } from '../../scripts/ingestion/export-db-site-snapshot.mjs';
 
 const rootPackage = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+const exportScriptPath = fileURLToPath(new URL('../../scripts/ingestion/export-db-site-snapshot.mjs', import.meta.url));
 
 describe('DB-backed site snapshot export script', () => {
   it('publishes a root operator command for DB-to-site snapshot generation', () => {
@@ -414,6 +421,177 @@ describe('DB-backed site snapshot export script', () => {
     assert.equal(artifact.coverage.maxObservedAgeHours, 72);
     assert.equal(artifact.coverage.staleObservationCount, 0);
     assert.deepEqual(artifact.coverage.staleObservationIds, []);
+  });
+
+  it('accepts a cached snapshot only while TTL, coverage, and freshness are still valid', () => {
+    const artifact = buildDbSiteSnapshotArtifact({
+      generatedAt: '2026-05-22T21:20:00.000Z',
+      requiredChains: ['willys'],
+      maxObservedAgeHours: 36,
+      rows: [{
+        productId: 'product-1',
+        productSlug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        categoryPath: ['Pantry', 'Coffee'],
+        comparableUnit: 'kg',
+        chainId: 'chain-1',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        priceType: 'online',
+        observationId: 'observation-fresh',
+        price: 44.9,
+        unitPrice: 99.7778,
+        currency: 'SEK',
+        observedAt: '2026-05-22T09:00:00.000Z',
+        confidence: 0.88
+      }]
+    });
+
+    assert.equal(validateDbSiteSnapshotCacheArtifact({
+      artifact,
+      cacheTtlSeconds: 60 * 60,
+      maxObservedAgeHours: 36,
+      now: new Date('2026-05-22T21:40:00.000Z')
+    }), true);
+    assert.equal(validateDbSiteSnapshotCacheArtifact({
+      artifact,
+      cacheTtlSeconds: 60,
+      maxObservedAgeHours: 36,
+      now: new Date('2026-05-22T21:40:00.000Z')
+    }), false);
+    assert.equal(validateDbSiteSnapshotCacheArtifact({
+      artifact,
+      cacheTtlSeconds: 60 * 60,
+      maxObservedAgeHours: 12,
+      now: new Date('2026-05-22T21:40:00.000Z')
+    }), false);
+    assert.equal(validateDbSiteSnapshotCacheArtifact({
+      artifact: { ...artifact, coverage: { ...artifact.coverage, missingRequiredChains: ['ica'] } },
+      cacheTtlSeconds: 60 * 60,
+      maxObservedAgeHours: 36,
+      now: new Date('2026-05-22T21:40:00.000Z')
+    }), false);
+  });
+
+  it('reuses a cached snapshot only when every requested output already exists', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'db-site-snapshot-cache-'));
+    try {
+      const outputPath = join(dir, 'snapshot.json');
+      const modulePath = join(dir, 'db-site-products.ts');
+      const artifact = buildDbSiteSnapshotArtifact({
+        generatedAt: new Date().toISOString(),
+        requiredChains: ['willys'],
+        rows: [{
+          productId: 'product-1',
+          productSlug: 'bryggkaffe-450g',
+          canonicalName: 'Bryggkaffe mellanrost 450 g',
+          categoryPath: ['Pantry', 'Coffee'],
+          comparableUnit: 'kg',
+          chainId: 'chain-1',
+          chainSlug: 'willys',
+          chainName: 'Willys',
+          priceType: 'online',
+          observationId: 'observation-fresh',
+          price: 44.9,
+          unitPrice: 99.7778,
+          currency: 'SEK',
+          observedAt: new Date().toISOString(),
+          confidence: 0.88
+        }]
+      });
+      writeFileSync(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
+
+      assert.equal(readFreshDbSiteSnapshotCache({
+        outputPath,
+        modulePath,
+        cacheTtlSeconds: 60
+      }), undefined);
+
+      writeFileSync(modulePath, renderDbSiteProductsModule({ generatedAt: artifact.generatedAt, rows: artifact.priceRows }));
+      assert.deepEqual(readFreshDbSiteSnapshotCache({
+        outputPath,
+        modulePath,
+        cacheTtlSeconds: 60
+      }), artifact);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('serves the CLI from cache and rewrites every requested output without reading Postgres', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'db-site-snapshot-cli-cache-'));
+    try {
+      const outputPath = join(dir, 'snapshot.json');
+      const modulePath = join(dir, 'db-site-products.ts');
+      const chainObservationsModulePath = join(dir, 'db-site-chain-observations.ts');
+      const ingestedOverridesModulePath = join(dir, 'db-site-ingested-overrides.ts');
+      const generatedAt = new Date().toISOString();
+      const observedAt = new Date().toISOString();
+      const artifact = buildDbSiteSnapshotArtifact({
+        generatedAt,
+        requiredChains: ['willys'],
+        rows: [{
+          productId: 'product-1',
+          productSlug: 'bryggkaffe-450g',
+          canonicalName: 'Bryggkaffe mellanrost 450 g',
+          brand: 'Rosteriet',
+          categoryPath: ['Pantry', 'Coffee'],
+          packageSize: 450,
+          packageUnit: 'g',
+          comparableUnit: 'kg',
+          chainId: 'chain-1',
+          chainSlug: 'willys',
+          chainName: 'Willys',
+          storeSlug: 'willys-hemma-stockholm-torsplan',
+          storeExternalRef: 'seed:willys:torsplan',
+          storeName: 'Willys Hemma Stockholm Torsplan',
+          priceType: 'online',
+          observationId: 'observation-fresh',
+          price: 44.9,
+          unitPrice: 99.7778,
+          currency: 'SEK',
+          observedAt,
+          confidence: 0.88,
+          provenance: { sourceUrl: 'https://example.test/product' }
+        }]
+      });
+      writeFileSync(outputPath, JSON.stringify(artifact));
+      writeFileSync(modulePath, 'stale products module');
+      writeFileSync(chainObservationsModulePath, 'stale chain observations module');
+      writeFileSync(ingestedOverridesModulePath, 'stale ingested overrides module');
+
+      const result = spawnSync(process.execPath, [exportScriptPath], {
+        cwd: new URL('../..', import.meta.url),
+        env: {
+          ...process.env,
+          DATABASE_URL: 'postgres://groceryview:groceryview@127.0.0.1:1/groceryview',
+          GROCERYVIEW_DB_SITE_SNAPSHOT_CACHE_TTL_SECONDS: '3600',
+          GROCERYVIEW_DB_SITE_SNAPSHOT_REQUIRED_CHAINS: 'willys',
+          GROCERYVIEW_DB_SITE_SNAPSHOT_PATH: outputPath,
+          GROCERYVIEW_DB_SITE_SNAPSHOT_MODULE_PATH: modulePath,
+          GROCERYVIEW_DB_SITE_SNAPSHOT_CHAIN_OBSERVATIONS_MODULE_PATH: chainObservationsModulePath,
+          GROCERYVIEW_DB_SITE_SNAPSHOT_INGESTED_OVERRIDES_MODULE_PATH: ingestedOverridesModulePath
+        },
+        encoding: 'utf8'
+      });
+
+      assert.equal(result.status, 0, result.stderr);
+      assert.equal(result.stderr, '');
+      assert.deepEqual(JSON.parse(result.stdout), {
+        status: 'passed',
+        coverage: artifact.coverage,
+        outputPath,
+        modulePath,
+        chainObservationsModulePath,
+        ingestedOverridesModulePath
+      });
+      assert.equal(readFileSync(outputPath, 'utf8'), `${JSON.stringify(artifact, null, 2)}\n`);
+      assert.equal(readFileSync(modulePath, 'utf8'), renderDbSiteProductsModule({ generatedAt, rows: artifact.priceRows }));
+      assert.equal(readFileSync(chainObservationsModulePath, 'utf8'), renderDbSiteChainObservationsModule({ generatedAt, rows: artifact.priceRows }));
+      assert.equal(readFileSync(ingestedOverridesModulePath, 'utf8'), renderDbSiteIngestedOverridesModule({ generatedAt, rows: artifact.priceRows }));
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it('fails closed when the database reader returns no latest price rows', () => {
