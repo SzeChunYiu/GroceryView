@@ -48,8 +48,10 @@ describe('production DB recovery packet script', () => {
     ]);
     assert.equal(packet.projectName, 'groceryview-prod');
     assert.equal(packet.evidence.managementSqlProbe.status, 'blocked');
-    assert.match(packet.completionGate, /Do not run production migrations/);
+    assert.match(packet.completionGate, /Production DB cutover validation workflow/);
     assert.deepEqual(packet.recommendedActions.map((action) => action.id), ['supabase-platform-recovery', 'replacement-db-cutover']);
+    assert.match(packet.recommendedActions.find((action) => action.id === 'replacement-db-cutover').action, /REPLACEMENT_DATABASE_URL/);
+    assert.match(packet.recommendedActions.find((action) => action.id === 'replacement-db-cutover').action, /all-store ingestion/);
     assert.equal(calls.every((call) => call.auth === 'Bearer sbp_secret'), true);
     assert.equal(JSON.stringify(packet).includes('secret@'), false);
     assert.equal(JSON.stringify(packet).includes('sbp_secret'), false);
