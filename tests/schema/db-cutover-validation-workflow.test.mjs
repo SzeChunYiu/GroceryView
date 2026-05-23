@@ -44,6 +44,7 @@ describe('production DB cutover validation workflow', () => {
     assert.match(workflow, /\/tmp\/replacement-db-migrations\.json/);
     assert.match(workflow, /replacement_db_migrations_diagnostic_missing/);
     assert.match(workflow, /name:\s*groceryview-replacement-db-migrations/);
+    assert.match(workflow, /name:\s*groceryview-replacement-db-migrations[\s\S]*if-no-files-found:\s*error/);
 
     assert.match(workflow, /name:\s*Run replacement DB all-store ingestion validation/);
     assert.ok(
@@ -54,10 +55,15 @@ describe('production DB cutover validation workflow', () => {
     assert.match(workflow, /\/tmp\/replacement-daily-connectors\.json/);
     assert.match(workflow, /\/tmp\/replacement-catalog-targets\.json/);
     assert.match(workflow, /\/tmp\/replacement-daily-ingestion-result\.json/);
+    assert.match(workflow, /replacement_daily_connectors_status=\$\?/);
+    assert.match(workflow, /replacement_daily_connectors_diagnostic_missing/);
+    assert.match(workflow, /replacement_catalog_targets_status=\$\?/);
+    assert.match(workflow, /replacement_catalog_targets_diagnostic_missing/);
     assert.match(workflow, /replacement_daily_ingestion_missing_chain_summary/);
     assert.match(workflow, /replacement_daily_ingestion_chain_not_succeeded/);
     assert.match(workflow, /replacement_daily_ingestion_chain_without_observations/);
     assert.match(workflow, /name:\s*groceryview-replacement-db-ingestion/);
+    assert.match(workflow, /name:\s*groceryview-replacement-db-ingestion[\s\S]*if-no-files-found:\s*error/);
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
       assert.match(workflow, new RegExp(`'${chain}'`));
     }
@@ -74,6 +80,7 @@ describe('production DB cutover validation workflow', () => {
     assert.match(workflow, /missingRequiredStoreExternalRefs/);
     assert.match(workflow, /missingRequiredStorePriceTypes/);
     assert.match(workflow, /name:\s*groceryview-replacement-db-site-snapshot/);
+    assert.match(workflow, /name:\s*groceryview-replacement-db-site-snapshot[\s\S]*if-no-files-found:\s*error/);
     assert.doesNotMatch(workflow, /continue-on-error:\s*true/);
   });
 });
