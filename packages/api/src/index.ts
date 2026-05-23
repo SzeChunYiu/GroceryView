@@ -1210,6 +1210,30 @@ export type NotificationInboxQueueItem = {
   productId?: string;
 };
 
+export type NotificationInboxTaskInput = {
+  id: string;
+  title: string;
+  channel: 'push' | 'email';
+  status: 'queued' | 'delivered' | 'dead_lettered' | 'suppressed';
+  priority: 'normal' | 'high';
+  sendAt: string;
+  type?: string;
+};
+
+export type NotificationInboxSuppressionInput = {
+  id?: string;
+  recipient: string;
+  channel?: 'push' | 'email';
+  reason: 'unsubscribed' | 'bounce' | 'complaint';
+  active: boolean;
+};
+
+export type NotificationInboxReportOptions = {
+  now?: string;
+  tasks?: NotificationInboxTaskInput[];
+  suppressions?: NotificationInboxSuppressionInput[];
+};
+
 export type NotificationInboxReport = {
   userId: string;
   trackedItemCount: number;
@@ -3937,6 +3961,12 @@ function storeFlyerOfferReport(storeId: string, asOf?: string): StoreFlyerOfferR
   };
 }
 
+function notificationSuppressionInboxReason(reason: NotificationInboxSuppressionInput['reason']) {
+  if (reason === 'bounce') return 'Provider token invalid';
+  if (reason === 'complaint') return 'Provider complaint';
+  return 'Recipient unsubscribed';
+}
+
 export function createGroceryViewApi() {
   const favoriteStores = new Map<string, Set<string>>();
   const watchlists = new Map<string, WatchlistItem[]>();
@@ -4174,7 +4204,7 @@ export function createGroceryViewApi() {
       };
     },
 
-    getNotificationInboxReport(userId: string): NotificationInboxReport {
+    getNotificationInboxReport(userId: string, options: NotificationInboxReportOptions = {}): NotificationInboxReport {
       requireNonEmptyId(userId, 'userId');
       const watchlist = this.getWatchlist(userId);
       const deliveredRows: NotificationInboxQueueItem[] = watchlist.alerts.map((alert, index) => ({
@@ -4187,27 +4217,38 @@ export function createGroceryViewApi() {
         priority: alert.severity === 'urgent' ? 'high' : 'normal',
         productId: alert.productId
       }));
+      const heldRows: NotificationInboxQueueItem[] = (options.tasks ?? [])
+        .filter((task) => task.status === 'queued' && (!options.now || task.sendAt <= options.now))
+        .sort((left, right) => left.sendAt.localeCompare(right.sendAt) || left.id.localeCompare(right.id))
+        .map((task) => ({
+          id: task.id,
+          title: task.title,
+          channel: task.channel,
+          status: 'held',
+          reason: task.type === 'receipt_review' ? 'Quiet hours 21:00-07:00' : `Held until ${task.sendAt}`,
+          action: task.type === 'receipt_review' ? 'Send in morning digest' : 'Resume notification delivery',
+          priority: task.priority
+        }));
+      const suppressedRows: NotificationInboxQueueItem[] = (options.suppressions ?? [])
+        .filter((suppression) => suppression.active)
+        .sort((left, right) =>
+          (left.channel ?? '').localeCompare(right.channel ?? '') ||
+          left.recipient.localeCompare(right.recipient) ||
+          (left.id ?? '').localeCompare(right.id ?? '')
+        )
+        .map((suppression) => ({
+          id: suppression.id ?? `suppression-${suppression.recipient}-${suppression.channel ?? 'all'}`,
+          title: suppression.channel === 'email' ? 'Email notification suppression' : 'Push notification suppression',
+          channel: suppression.channel ?? 'push',
+          status: 'suppressed',
+          reason: notificationSuppressionInboxReason(suppression.reason),
+          action: suppression.channel === 'email' ? 'Request email refresh' : 'Request device refresh',
+          priority: 'normal'
+        }));
       const queue: NotificationInboxQueueItem[] = [
         ...deliveredRows,
-        {
-          id: 'receipt-review-quiet-hours',
-          title: 'Receipt review reminder',
-          channel: 'push',
-          status: 'held',
-          reason: 'Quiet hours 21:00-07:00',
-          action: 'Send in morning digest',
-          priority: 'normal'
-        },
-        {
-          id: 'butter-provider-suppression',
-          title: 'Butter target price',
-          channel: 'push',
-          status: 'suppressed',
-          reason: 'Provider token invalid',
-          action: 'Request device refresh',
-          priority: 'normal',
-          productId: 'butter'
-        }
+        ...heldRows,
+        ...suppressedRows
       ];
       const deliveredCount = queue.filter((item) => item.status === 'delivered').length;
       const heldCount = queue.filter((item) => item.status === 'held').length;

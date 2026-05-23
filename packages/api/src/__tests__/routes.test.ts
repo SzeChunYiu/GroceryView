@@ -955,7 +955,7 @@ describe('createGroceryViewApi', () => {
     assert.equal(premiumReport.blockedCount, 4);
   });
 
-  it('serves notification inbox reports from watchlist alerts plus delivery guardrails', () => {
+  it('serves notification inbox reports from watchlist alerts and persisted notification rows', () => {
     const api = createGroceryViewApi();
     api.addFavoriteStore('user-1', 'willys-odenplan');
     api.addWatchlistItem('user-1', {
@@ -965,7 +965,37 @@ describe('createGroceryViewApi', () => {
       favoriteStoresOnly: true
     });
 
-    const report = api.getNotificationInboxReport('user-1');
+    const report = api.getNotificationInboxReport('user-1', {
+      now: '2026-05-20T08:00:00.000Z',
+      tasks: [
+        {
+          id: 'receipt-review-quiet-hours',
+          title: 'Receipt review reminder',
+          channel: 'push',
+          status: 'queued',
+          priority: 'normal',
+          sendAt: '2026-05-20T07:00:00.000Z',
+          type: 'receipt_review'
+        },
+        {
+          id: 'future-digest',
+          title: 'Future digest',
+          channel: 'email',
+          status: 'queued',
+          priority: 'normal',
+          sendAt: '2026-05-20T09:00:00.000Z'
+        }
+      ],
+      suppressions: [
+        {
+          id: 'butter-provider-suppression',
+          recipient: 'ExponentPushToken[butter]',
+          channel: 'push',
+          reason: 'bounce',
+          active: true
+        }
+      ]
+    });
 
     assert.equal(report.userId, 'user-1');
     assert.equal(report.trackedItemCount, 1);
@@ -982,6 +1012,7 @@ describe('createGroceryViewApi', () => {
     assert.match(report.queue[0]?.title ?? '', /Zoégas Coffee 450g/);
     assert.match(report.queue.find((item) => item.status === 'held')?.reason ?? '', /Quiet hours/i);
     assert.match(report.queue.find((item) => item.status === 'suppressed')?.reason ?? '', /Provider token invalid/i);
+    assert.equal(report.queue.some((item) => item.id === 'future-digest'), false);
     assert.match(report.guardrails[0], /Estimated prices never generate household alerts/i);
   });
 
