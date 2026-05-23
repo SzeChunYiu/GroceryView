@@ -1178,7 +1178,30 @@ function scanProviderReadinessFailureResponse(): ScanProviderReadinessReport {
   };
 }
 
-function buildRuntimeScanProviderReadinessReport(config: RuntimeConfig): ScanProviderReadinessReport {
+async function providerHealthStatus(check: (() => Promise<unknown>) | undefined): Promise<'pass' | 'fail' | 'not_run'> {
+  if (!check) return 'not_run';
+  try {
+    await check();
+    return 'pass';
+  } catch {
+    return 'fail';
+  }
+}
+
+async function buildRuntimeScanProviderReadinessReport(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): Promise<ScanProviderReadinessReport> {
+  const fetchOption = options.scanProviderFetch ? { fetch: options.scanProviderFetch } : {};
+  const barcodeProvider = config.openFoodFactsUserAgent
+    ? createOpenFoodFactsBarcodeProvider({ userAgent: config.openFoodFactsUserAgent, ...fetchOption })
+    : undefined;
+  const receiptProvider = config.ocrSpaceApiKey
+    ? createOcrSpaceReceiptProvider({ apiKey: config.ocrSpaceApiKey, ...fetchOption })
+    : undefined;
+
+  const [barcodeHealth, receiptHealth] = await Promise.all([
+    providerHealthStatus(barcodeProvider && config.openFoodFactsHealthcheckBarcode ? () => barcodeProvider.lookup(config.openFoodFactsHealthcheckBarcode!) : undefined),
+    providerHealthStatus(receiptProvider && config.ocrSpaceHealthcheckImageUrl ? () => receiptProvider.parse(config.ocrSpaceHealthcheckImageUrl!) : undefined)
+  ]);
+
   return buildScanProviderReadinessReport({
     requiredProviders: ['barcode', 'receiptOcr'],
     providers: [
@@ -1187,14 +1210,14 @@ function buildRuntimeScanProviderReadinessReport(config: RuntimeConfig): ScanPro
         providerName: 'openfoodfacts',
         configured: Boolean(config.openFoodFactsUserAgent),
         credentialsPresent: Boolean(config.openFoodFactsUserAgent),
-        healthStatus: 'not_run'
+        healthStatus: barcodeHealth
       },
       {
         kind: 'receiptOcr',
         providerName: 'ocrspace',
         configured: Boolean(config.ocrSpaceApiKey),
         credentialsPresent: Boolean(config.ocrSpaceApiKey),
-        healthStatus: 'not_run'
+        healthStatus: receiptHealth
       }
     ]
   });
@@ -2605,7 +2628,9 @@ export type RuntimeConfig = {
   expoPushAccessToken?: string;
   metricsToken?: string;
   ocrSpaceApiKey?: string;
+  ocrSpaceHealthcheckImageUrl?: string;
   openFoodFactsUserAgent?: string;
+  openFoodFactsHealthcheckBarcode?: string;
   catalogCoverageTargets?: Omit<CatalogCoverageInput, 'products'>;
 };
 
@@ -2672,7 +2697,9 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.BILLING_WEBHOOK_SECRET) throw new Error('BILLING_WEBHOOK_SECRET is required in production.');
     if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
     if (!env.OCR_SPACE_API_KEY) throw new Error('OCR_SPACE_API_KEY is required in production.');
+    if (!env.OCR_SPACE_HEALTHCHECK_IMAGE_URL) throw new Error('OCR_SPACE_HEALTHCHECK_IMAGE_URL is required in production.');
     if (!env.OPENFOODFACTS_USER_AGENT) throw new Error('OPENFOODFACTS_USER_AGENT is required in production.');
+    if (!env.OPENFOODFACTS_HEALTHCHECK_BARCODE) throw new Error('OPENFOODFACTS_HEALTHCHECK_BARCODE is required in production.');
     if (!env.CATALOG_COVERAGE_TARGETS_JSON) throw new Error('CATALOG_COVERAGE_TARGETS_JSON is required in production.');
   }
   validatePublicWebUrl(env.PUBLIC_WEB_URL);
@@ -2696,7 +2723,9 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     ...(Object.keys(stripePriceIds).length > 0 ? { stripePriceIds } : {}),
     metricsToken: env.METRICS_TOKEN,
     ...(env.OCR_SPACE_API_KEY ? { ocrSpaceApiKey: env.OCR_SPACE_API_KEY } : {}),
+    ...(env.OCR_SPACE_HEALTHCHECK_IMAGE_URL ? { ocrSpaceHealthcheckImageUrl: env.OCR_SPACE_HEALTHCHECK_IMAGE_URL } : {}),
     ...(env.OPENFOODFACTS_USER_AGENT ? { openFoodFactsUserAgent: env.OPENFOODFACTS_USER_AGENT } : {}),
+    ...(env.OPENFOODFACTS_HEALTHCHECK_BARCODE ? { openFoodFactsHealthcheckBarcode: env.OPENFOODFACTS_HEALTHCHECK_BARCODE } : {}),
     ...(catalogCoverageTargets ? { catalogCoverageTargets } : {})
   };
 }
@@ -2784,7 +2813,7 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     postgresReadinessProvider: options.postgresReadinessProvider,
     sourceRunHealthProvider: options.sourceRunHealthProvider,
     catalogCoverageProvider: options.catalogCoverageProvider,
-    scanProviderReadinessProvider: options.scanProviderReadinessProvider ?? (() => Promise.resolve(buildRuntimeScanProviderReadinessReport(config))),
+    scanProviderReadinessProvider: options.scanProviderReadinessProvider ?? (() => buildRuntimeScanProviderReadinessReport(config, options)),
     flyerOffersProvider: options.flyerOffersProvider,
     storeFlyerOffersProvider: options.storeFlyerOffersProvider,
     watchlistPriceAlertsProvider: options.watchlistPriceAlertsProvider,
