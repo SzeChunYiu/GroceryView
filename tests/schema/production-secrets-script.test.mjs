@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
   findMissingRuntimeSecrets,
+  isSupabaseManagementAccessTokenShape,
   requiredRuntimeSecrets,
   runtimeSecretsSatisfiableByVariables
 } from '../../scripts/ops/check-production-secrets.mjs';
@@ -106,6 +107,16 @@ describe('production secret audit script', () => {
     assert.deepEqual(output.missingDbCutoverCandidateSecrets, ['REPLACEMENT_DATABASE_URL', 'CANDIDATE_DATABASE_URL']);
     assert.deepEqual(output.missingDbRecoverySecrets, ['SUPABASE_ACCESS_TOKEN']);
     assert.deepEqual(output.missingDbRecoveryVariables, ['SUPABASE_PROJECT_REF']);
+    assert.deepEqual(output.invalidDbRecoverySecrets, []);
+    assert.equal(output.dbRecoverySecretValidation.validated, true);
+  });
+
+  it('requires a Supabase Management API personal access token shape for DB recovery', () => {
+    assert.equal(isSupabaseManagementAccessTokenShape('sbp_secret'), true);
+    assert.equal(isSupabaseManagementAccessTokenShape(' sbp_secret\n'), true);
+    assert.equal(isSupabaseManagementAccessTokenShape('go-k_keychain_session_value'), false);
+    assert.equal(isSupabaseManagementAccessTokenShape('service_role.jwt.payload'), false);
+    assert.equal(isSupabaseManagementAccessTokenShape('sb_publishable_example'), false);
   });
 
   it('treats only selected runtime secrets as satisfiable by GitHub variables', () => {
@@ -201,6 +212,7 @@ process.exit(1);
     assert.deepEqual(output.missingDbCutoverCandidateSecrets, []);
     assert.deepEqual(output.missingDbRecoverySecrets, []);
     assert.deepEqual(output.missingDbRecoveryVariables, []);
+    assert.deepEqual(output.invalidDbRecoverySecrets, []);
     assert.equal(JSON.stringify(output).includes('postgres://candidate'), false);
     assert.equal(JSON.stringify(output).includes('sbp_secret'), false);
   });
@@ -219,6 +231,25 @@ process.exit(1);
     assert.equal(output.status, 'blocked');
     assert.deepEqual(output.missingDbRecoverySecrets, ['SUPABASE_ACCESS_TOKEN']);
     assert.deepEqual(output.missingDbRecoveryVariables, []);
+    assert.deepEqual(output.invalidDbRecoverySecrets, []);
+
+    const invalidTokenResult = spawnSync(process.execPath, [scriptPath.pathname, '--from-env', '--scope', 'db-recovery'], {
+      encoding: 'utf8',
+      env: {
+        SUPABASE_PROJECT_REF: 'dgsoqwanrkqgdichtgzl',
+        SUPABASE_ACCESS_TOKEN: 'go-k_keychain_session_value'
+      }
+    });
+    const invalidTokenOutput = JSON.parse(invalidTokenResult.stdout);
+    assert.equal(invalidTokenResult.status, 1);
+    assert.equal(invalidTokenOutput.scope, 'db-recovery');
+    assert.equal(invalidTokenOutput.status, 'blocked');
+    assert.equal(invalidTokenOutput.blocker, 'db_recovery_secret_invalid_format');
+    assert.deepEqual(invalidTokenOutput.missingDbRecoverySecrets, []);
+    assert.deepEqual(invalidTokenOutput.missingDbRecoveryVariables, []);
+    assert.deepEqual(invalidTokenOutput.invalidDbRecoverySecrets, ['SUPABASE_ACCESS_TOKEN']);
+    assert.match(invalidTokenOutput.dbRecoverySecretValidation.requirement, /sbp_/);
+    assert.equal(JSON.stringify(invalidTokenOutput).includes('go-k_keychain_session_value'), false);
 
     const readyResult = spawnSync(process.execPath, [scriptPath.pathname, '--from-env', '--scope', 'db-recovery'], {
       encoding: 'utf8',
@@ -233,6 +264,7 @@ process.exit(1);
     assert.equal(readyOutput.status, 'ready');
     assert.equal(readyOutput.missingGithubActionSecrets.length > 0, true);
     assert.equal(readyOutput.missingRuntimeSecrets.length > 0, true);
+    assert.deepEqual(readyOutput.invalidDbRecoverySecrets, []);
   });
 
   it('can focus status on DB cutover prerequisites and either candidate secret', () => {

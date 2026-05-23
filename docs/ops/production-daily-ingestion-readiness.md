@@ -43,7 +43,11 @@ npm run ops:check-production-secrets -- --repo SzeChunYiu/GroceryView --scope db
 ```
 
 `db-recovery` is ready only when `SUPABASE_ACCESS_TOKEN` and
-`SUPABASE_PROJECT_REF` are available. `db-cutover` is ready only when the current
+`SUPABASE_PROJECT_REF` are available, and when the injected
+`SUPABASE_ACCESS_TOKEN` has the Supabase Management API personal access token
+shape (`sbp_...`) used for automation in Supabase's Management API and CLI
+documentation. A logged-in Supabase CLI/keychain session string is not enough
+for GitHub Actions recovery evidence. `db-cutover` is ready only when the current
 `DATABASE_URL` plus either `REPLACEMENT_DATABASE_URL` or `CANDIDATE_DATABASE_URL`
 are configured; the full `all` scope remains the default production-wide gate.
 The daily workflow also records these two focused checks from injected workflow
@@ -118,7 +122,10 @@ When connectivity still fails, the daily workflow tries to generate a redacted
 `npm run --silent ops:db-recovery-packet`. Configure `SUPABASE_ACCESS_TOKEN` and
 `SUPABASE_PROJECT_REF` so failed readiness runs can attach Supabase service
 health, management SQL probe status, and cutover/recovery actions without
-dumping database credentials. If those values are absent, the artifact is still
+dumping database credentials. Use a Supabase dashboard personal access token
+that begins with `sbp_`; if the daily `db-recovery` preflight reports
+`db_recovery_secret_invalid_format`, replace the GitHub secret before trusting
+the recovery packet. If those values are absent, the artifact is still
 written with `production_db_recovery_packet_missing_credentials` so operators can
 fix the evidence gap before retrying.
 
@@ -353,6 +360,7 @@ The workflow must pass these gates in order:
 - `supabase_transaction_pooler`: an alternate `alternateConnections[]` entry proving whether the original Supabase transaction-pooler endpoint accepts writes when the session-pooler rewrite fails; tune `GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS` if provider startup is flapping.
 - `supabase_direct_host`: an alternate `alternateConnections[]` entry proving whether the direct Supabase DB host accepts writes when the pooler path fails; tune `GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS` if provider startup is flapping.
 - `supabase_pooler_database_unavailable`: Supabase pooler authentication reached the project but reported `connection to database not available` (for example `EAUTHQUERY`); wait for provider recovery, use the recovery packet to inspect Supabase project health, or validate a replacement DB cutover before retrying daily ingestion.
+- `db_recovery_secret_invalid_format`: the injected `SUPABASE_ACCESS_TOKEN` is present but does not look like a Supabase Management API personal access token (`sbp_...`); replace the GitHub secret with a dashboard PAT before relying on recovery evidence.
 - `production_db_recovery_packet_missing_credentials`: DB connectivity failed, but the workflow could not call Supabase management APIs because `SUPABASE_ACCESS_TOKEN` or `SUPABASE_PROJECT_REF` was absent; inspect `groceryview-production-db-recovery-packet` and configure the missing value before the next failure.
 - `production_db_recovery_packet_diagnostic_missing`: the recovery-packet command failed before writing JSON; inspect `groceryview-production-db-recovery-packet` for the command exit code.
 - `production_db_migrations_diagnostic_missing`: the production DB migration command failed before writing a diagnostic JSON payload; inspect the `groceryview-production-db-migrations` artifact for the command exit code.
