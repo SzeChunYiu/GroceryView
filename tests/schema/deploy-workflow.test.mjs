@@ -13,7 +13,12 @@ describe('deploy workflow', () => {
     assert.match(workflow, /deploy\/groceryview\.manifest\.json/);
     assert.match(workflow, /environment:\s*production/);
     assert.match(workflow, /ops:check-production-secrets -- --from-env/);
-    for (const variable of ['GROCERYVIEW_PRODUCTION_URL', 'GROCERYVIEW_TERMINAL_PRODUCT_ID', 'GROCERYVIEW_SCANNER_USER_ID', 'SUPABASE_PROJECT_REF']) {
+    for (const variable of [
+      'GROCERYVIEW_PRODUCTION_URL',
+      'GROCERYVIEW_TERMINAL_PRODUCT_ID',
+      'GROCERYVIEW_SCANNER_USER_ID',
+      'SUPABASE_PROJECT_REF'
+    ]) {
       assert.match(workflow, new RegExp(`${variable}:\\s*\\$\\{\\{ vars\\.${variable} \\}\\}`));
     }
     for (const variableBackedRuntime of ['PUBLIC_WEB_URL', 'GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN']) {
