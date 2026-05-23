@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { planPantryReplenishment } from '@groceryview/core';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { pantryReplenishmentPlan } from '@/lib/demo-data';
+import { pantryReplenishmentInput } from '@/lib/demo-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -12,7 +14,21 @@ function formatSek(value: number) {
 }
 
 export default function PantryPlannerPage() {
-  const { plan, replenishment, expiringSoonProductIds, coverage } = pantryReplenishmentPlan;
+  const pantryReplenishmentPlan = planPantryReplenishment(pantryReplenishmentInput);
+  const replenishment = pantryReplenishmentPlan.replenishment;
+  const expiringSoonProductIds = pantryReplenishmentPlan.expiringSoonProductIds;
+  const evidenceRows =
+    pantryReplenishmentInput.pantry.length +
+    pantryReplenishmentInput.usage.length +
+    pantryReplenishmentInput.deals.length +
+    pantryReplenishmentInput.household.basketItems.length;
+  const coverage = {
+    visiblePantryItems: pantryReplenishmentInput.pantry.length,
+    dealBackedItems: pantryReplenishmentInput.deals.length,
+    confidence: 'medium' as const,
+    caveat: 'Uses visible pantry fixtures, household basket rows, usage events, and current deal rows only; missing authenticated inventory remains excluded.'
+  };
+
   return (
     <PageShell>
       <Eyebrow>Pantry replenishment</Eyebrow>
@@ -34,7 +50,9 @@ export default function PantryPlannerPage() {
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Confidence</p>
-          <p className="mt-2 text-5xl font-black capitalize text-slate-950">{coverage.confidence}</p>
+          <div className="mt-3">
+            <ConfidenceBadge level={coverage.confidence} label="Medium confidence" sampleSize={evidenceRows} />
+          </div>
           <p className="mt-3 font-semibold text-slate-700">{coverage.caveat}</p>
         </Card>
       </div>
@@ -70,7 +88,7 @@ export default function PantryPlannerPage() {
         <Card>
           <h2 className="text-2xl font-black">Pantry status</h2>
           <div className="mt-4 space-y-3">
-            {plan.statuses.map((item) => (
+            {pantryReplenishmentPlan.statuses.map((item) => (
               <div className="rounded-2xl bg-slate-50 p-4" key={item.productId}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
