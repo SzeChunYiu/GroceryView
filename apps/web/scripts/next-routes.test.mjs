@@ -1180,6 +1180,41 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(`${shell}\n${dataSources}`, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('wires the all-store daily batch runner to homepage and source readiness surfaces', async () => {
+    const runner = await read('../../packages/ingestion/src/connectors/all-store-runner.ts');
+    const ingestion = await read('../../packages/ingestion/src/index.ts');
+    const workflow = await read('../../.github/workflows/daily-ingestion.yml');
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const dataSources = await read('src/app/data-sources/page.tsx');
+
+    assert.match(runner, /export async function runAllStoreTasks/);
+    assert.match(runner, /storeConcurrency/);
+    assert.match(runner, /storeRetryAttempts/);
+    assert.match(runner, /failOnStoreFailure/);
+    assert.match(ingestion, /GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL/);
+    assert.match(ingestion, /GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL/);
+    assert.match(ingestion, /GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL/);
+    assert.match(ingestion, /GROCERYVIEW_DAILY_STORE_CONCURRENCY/);
+    assert.match(workflow, /ops:daily-connectors/);
+    assert.match(workflow, /Export live store enumeration/);
+    assert.match(workflow, /groceryview-daily-connectors/);
+    assert.match(verified, /export const allStoreDailyRunnerReadiness/);
+    assert.match(verified, /All-store daily batch runner/);
+    assert.match(verified, /runnerControls/);
+    assert.match(verified, /allStoreConnectorUrls/);
+    assert.match(verified, /failOnStoreFailure/);
+    assert.match(shell, /allStoreDailyRunnerReadiness/);
+    assert.match(shell, /All-store daily batch runner/);
+    assert.match(shell, /data-all-store-daily-runner/);
+    assert.match(shell, /href="\/data-sources"/);
+    assert.match(dataSources, /allStoreDailyRunnerReadiness/);
+    assert.match(dataSources, /All-store daily batch runner/);
+    assert.match(dataSources, /runnerControls\.map/);
+    assert.match(dataSources, /allStoreConnectorUrls\.map/);
+    assert.doesNotMatch(`${shell}\n${dataSources}`, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
 
 
   it('surfaces a retailer flyer validity calendar without unsupported tomorrow claims', async () => {
