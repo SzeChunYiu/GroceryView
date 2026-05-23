@@ -84,6 +84,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/compare', 0.9, 'daily'),
     entry('/deals', 0.9, 'daily'),
     entry('/screener', 0.9, 'daily'),
+    entry('/alerts', 0.72, 'daily'),
     entry('/fuel', 0.7, 'weekly'),
     entry('/pharmacy', 0.7, 'weekly'),
     entry('/seasonal-calendar', 0.89, 'weekly'),

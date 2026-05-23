@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
+  Bell,
   ChevronDown,
   Database,
   Flame,
@@ -67,6 +68,7 @@ const navGroups: NavGroup[] = [
     icon: Heart,
     items: [
       { href: '/savings-dashboard', label: 'Savings', icon: PiggyBank },
+      { href: '/alerts', label: 'Alerts', icon: Bell },
       { href: '/watchlist', label: 'Watchlist', icon: Heart },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
       { href: '/meal-planner', label: 'Meal planner', icon: Utensils }
