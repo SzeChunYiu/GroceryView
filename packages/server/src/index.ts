@@ -2509,7 +2509,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/import-export': { post: protectedOperation('Import consented bookmarklet or extension basket rows and return unmatched review items.') },
       '/api/basket/import-review': { get: protectedOperation('Get account-bound retailer basket import review rows.') },
       '/api/basket/import-review/{reviewItemId}/decisions': { post: protectedOperation('Resolve an account-bound retailer basket import review row.') },
-      '/api/basket/trip-cost': { get: protectedOperation('Get basket totals ranked by shelf price plus explicit travel, time, delivery, and split-shop costs.') },
+      '/api/basket/trip-cost': { get: protectedOperation('Get basket totals ranked by branch product price plus explicit travel, time, delivery, and split-shop costs.') },
       '/api/basket/transfer/{retailerId}': { get: protectedOperation('Preflight secure retailer basket transfer and block unless capability is verified.') },
       '/api/basket/recurring-digest': { get: protectedOperation('Get recurring basket changes, missing-price blockers, and suggested review actions.') },
       '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },
@@ -2567,8 +2567,8 @@ function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCov
   };
   const targetChains = readStringArray('targetChains');
   const targetPriceTypes = readStringArray('targetPriceTypes');
-  if (!targetPriceTypes.includes('shelf')) {
-    throw new Error('CATALOG_COVERAGE_TARGETS_JSON.targetPriceTypes must include shelf.');
+  if (!targetPriceTypes.includes('online')) {
+    throw new Error('CATALOG_COVERAGE_TARGETS_JSON.targetPriceTypes must include online.');
   }
   const missingRequiredChains = requiredDailyChainIds.filter((chainId) => !targetChains.includes(chainId));
   if (missingRequiredChains.length > 0) {

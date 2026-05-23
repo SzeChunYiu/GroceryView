@@ -56,7 +56,7 @@ export function buildCatalogCoverageTargets(rows, options = {}) {
     targetCategories,
     targetChains: requiredDailyChainIds,
     targetStores,
-    targetPriceTypes: ['shelf'],
+    targetPriceTypes: ['online'],
     requireEveryProductInEveryStore: false,
     requireEveryStorePriceType: true
   };

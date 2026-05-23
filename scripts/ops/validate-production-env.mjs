@@ -84,8 +84,8 @@ function validateCatalogTargets(env) {
   const targetStores = requireNonEmptyStringArray(targets.targetStores, 'CATALOG_COVERAGE_TARGETS_JSON.targetStores');
   const targetPriceTypes = requireNonEmptyStringArray(targets.targetPriceTypes, 'CATALOG_COVERAGE_TARGETS_JSON.targetPriceTypes');
   requireRequiredChains('CATALOG_COVERAGE_TARGETS_JSON.targetChains', targetChains);
-  if (!targetPriceTypes.includes('shelf')) {
-    throw new Error('CATALOG_COVERAGE_TARGETS_JSON.targetPriceTypes must include shelf so weekly promotions cannot satisfy branch shelf-price readiness.');
+  if (!targetPriceTypes.includes('online')) {
+    throw new Error('CATALOG_COVERAGE_TARGETS_JSON.targetPriceTypes must include online so weekly promotions cannot satisfy branch product-price readiness.');
   }
   if (targets.requireEveryProductInEveryStore !== false) {
     throw new Error('CATALOG_COVERAGE_TARGETS_JSON.requireEveryProductInEveryStore must be false; branch-price readiness uses observed/queryable store coverage, not a cross-chain product-store cartesian matrix.');
@@ -157,7 +157,7 @@ function selfTestEnv() {
       targetCategories: ['coffee', 'dairy'],
       targetChains: chains,
       targetStores: chains.map((chainId) => `${chainId}-odenplan`),
-      targetPriceTypes: ['shelf'],
+      targetPriceTypes: ['online'],
       requireEveryProductInEveryStore: false,
       requireEveryStorePriceType: true
     })

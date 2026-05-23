@@ -29,7 +29,7 @@ describe('catalog coverage target export script', () => {
     assert.deepEqual(targets.targetStores, ['coop-odenplan', 'willys-odenplan']);
     assert.doesNotMatch(script, /select id from stores order by id/);
     assert.equal(targets.requireEveryProductInEveryStore, false);
-    assert.deepEqual(targets.targetPriceTypes, ['shelf']);
+    assert.deepEqual(targets.targetPriceTypes, ['online']);
     assert.equal(targets.requireEveryStorePriceType, true);
   });
 
@@ -44,7 +44,7 @@ describe('catalog coverage target export script', () => {
     const targets = JSON.parse(output);
     assert.deepEqual(targets.targetStores, ['216502']);
     assert.equal(targets.requireEveryProductInEveryStore, false);
-    assert.deepEqual(targets.targetPriceTypes, ['shelf']);
+    assert.deepEqual(targets.targetPriceTypes, ['online']);
     assert.equal(targets.requireEveryStorePriceType, true);
   });
 });
