@@ -38,6 +38,10 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_PATH=/);
     assert.match(runbook, /postgres\.latest_prices/);
     assert.match(runbook, /No latest price rows available/);
+    assert.match(runbook, /daily ingestion workflow exports this snapshot/);
+    assert.match(runbook, /groceryview-db-site-snapshot/);
+    assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_MIN_CONFIDENCE/);
+    assert.match(runbook, /GROCERYVIEW_DB_SITE_SNAPSHOT_LIMIT/);
   });
 
 });
