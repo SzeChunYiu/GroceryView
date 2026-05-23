@@ -275,7 +275,12 @@ jobs:
               {
                 id: 'configure-supabase-management-access',
                 owner: 'operator',
-                action: 'Set SUPABASE_ACCESS_TOKEN and SUPABASE_PROJECT_REF so failed daily DB readiness runs can upload a redacted Supabase recovery packet.'
+                action: 'Set SUPABASE_ACCESS_TOKEN and SUPABASE_PROJECT_REF so failed daily DB readiness runs can upload a redacted Supabase recovery packet; verify with npm run --silent ops:check-production-secrets -- --scope db-recovery.'
+              },
+              {
+                id: 'configure-replacement-db-cutover',
+                owner: 'operator_after_approval',
+                action: 'If the existing Supabase project cannot be recovered promptly, set REPLACEMENT_DATABASE_URL or CANDIDATE_DATABASE_URL and verify with npm run --silent ops:check-production-secrets -- --scope db-cutover before running the Production DB cutover validation workflow.'
               }
             ]
           }, null, 2));
