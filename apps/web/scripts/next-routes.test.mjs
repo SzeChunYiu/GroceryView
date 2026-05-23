@@ -2642,6 +2642,32 @@ ${seo}`;
     assert.match(route, /\/api\/nutrition\/value/);
   });
 
+  it('surfaces the fail-closed API performance readiness contract', async () => {
+    const server = await read('../../packages/server/src/index.ts');
+    const route = await read('src/app/data-sources/page.tsx');
+    const shell = await read('src/components/market-shell.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+
+    assert.match(server, /apiResponseCache/);
+    assert.match(server, /x-groceryview-cache/);
+    assert.match(server, /nextCursor/);
+    assert.match(verified, /export const apiPerformanceReadiness/);
+    assert.match(verified, /Redis cache/);
+    assert.match(verified, /cursor pagination/);
+    assert.match(verified, /pgbouncer/);
+    assert.match(verified, /price_daily/);
+    assert.match(verified, /price_weekly/);
+    assert.match(route, /apiPerformanceReadiness/);
+    assert.match(route, /API performance readiness/);
+    assert.match(route, /fail closed/i);
+    assert.match(route, /hotEndpoints\.map/);
+    assert.match(route, /rollupTables\.map/);
+    assert.match(shell, /apiPerformanceReadiness/);
+    assert.match(shell, /data-api-performance-readiness/);
+    assert.match(shell, /Redis cache/);
+    assert.match(shell, /cursor pagination/);
+  });
+
   it('surfaces verified OSM coverage on the store coverage route', async () => {
     const route = await read('src/app/store-coverage/page.tsx');
 

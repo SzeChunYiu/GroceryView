@@ -107,6 +107,7 @@ export type AuthOptions = {
   runtimeConfig?: RuntimeConfig;
   authSecret?: string;
   now?: Date;
+  apiResponseCache?: ApiResponseCache;
   authSessionExchange?: AuthSessionExchangeVerifier;
   subscriptionEntitlementRepository?: {
     getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementLookupRecord | null>;
@@ -218,9 +219,15 @@ export type RuntimePgPool = PgLikeClient & {
 
 export type RuntimePgPoolFactory = (databaseUrl: string) => RuntimePgPool;
 
+export type ApiResponseCache = {
+  get(key: string): Promise<string | null> | string | null;
+  set(key: string, value: string, options: { ttlSeconds: number }): Promise<void> | void;
+};
+
 export type RuntimeHandlerOptions = {
   now?: Date;
   repository?: RuntimePersistenceRepository;
+  apiResponseCache?: ApiResponseCache;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
   notificationWorkerRunner?: () => Promise<RepositoryNotificationWorkerCycleResult>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
@@ -347,6 +354,52 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(body), {
     ...init,
     headers: { ...jsonHeaders, ...(init.headers ?? {}) }
+  });
+}
+
+function jsonTextResponse(body: string, init: ResponseInit = {}): Response {
+  return new Response(body, {
+    ...init,
+    headers: { ...jsonHeaders, ...(init.headers ?? {}) }
+  });
+}
+
+const apiHotEndpointCacheTtlSeconds: Readonly<Record<string, number>> = {
+  '/api/market/overview': 60,
+  '/api/indices': 300,
+  '/api/deals/flyer-offers': 300,
+  '/api/deals/discounts': 300
+};
+
+function hotEndpointCacheKey(url: URL): string {
+  const params = new URLSearchParams(url.search);
+  params.sort();
+  const query = params.toString();
+  return `hot-endpoint:v1:${url.pathname}${query ? `?${query}` : ''}`;
+}
+
+async function cachedJsonResponse(cache: ApiResponseCache | undefined, url: URL, ttlSeconds: number, bodyFactory: () => Promise<unknown> | unknown): Promise<Response> {
+  const cacheKey = hotEndpointCacheKey(url);
+  if (cache) {
+    const cached = await cache.get(cacheKey);
+    if (cached !== null) {
+      return jsonTextResponse(cached, {
+        headers: {
+          'cache-control': `public, s-maxage=${ttlSeconds}, stale-while-revalidate=${ttlSeconds * 5}`,
+          'x-groceryview-cache': 'hit'
+        }
+      });
+    }
+  }
+
+  const body = await bodyFactory();
+  const serialized = JSON.stringify(body);
+  if (cache) await cache.set(cacheKey, serialized, { ttlSeconds });
+  return jsonTextResponse(serialized, {
+    headers: {
+      'cache-control': `public, s-maxage=${ttlSeconds}, stale-while-revalidate=${ttlSeconds * 5}`,
+      'x-groceryview-cache': cache ? 'miss' : 'bypass'
+    }
   });
 }
 
@@ -576,6 +629,61 @@ function optionalStringArray(value: unknown, field: string): string[] | undefine
   if (value === undefined) return undefined;
   if (!Array.isArray(value)) throw new Error(`${field} must be an array.`);
   return value.map((item, index) => requiredString(item, `${field}[${index}]`));
+}
+
+function parseCursorOffset(cursor: string | null): number {
+  if (!cursor) return 0;
+  try {
+    const decoded = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8')) as unknown;
+    if (
+      decoded === null ||
+      typeof decoded !== 'object' ||
+      Array.isArray(decoded) ||
+      typeof (decoded as { offset?: unknown }).offset !== 'number' ||
+      !Number.isInteger((decoded as { offset: number }).offset) ||
+      (decoded as { offset: number }).offset < 0
+    ) {
+      throw new Error('invalid offset');
+    }
+    return (decoded as { offset: number }).offset;
+  } catch {
+    throw new Error('cursor must be a valid GroceryView cursor pagination token.');
+  }
+}
+
+function encodeCursorOffset(offset: number): string {
+  return Buffer.from(JSON.stringify({ offset })).toString('base64url');
+}
+
+function parseCursorLimit(value: string | null): number {
+  if (value === null || value.trim() === '') return 25;
+  const limit = Number(value);
+  if (!Number.isInteger(limit) || limit < 1) throw new Error('limit must be a positive integer.');
+  return Math.min(limit, 100);
+}
+
+function cursorPaginatedEnvelope<T>(items: T[], params: URLSearchParams) {
+  const limit = parseCursorLimit(params.get('limit'));
+  const offset = parseCursorOffset(params.get('cursor'));
+  const window = items.slice(offset, offset + limit);
+  const nextOffset = offset + window.length;
+  const hasMore = nextOffset < items.length;
+  return {
+    items: window,
+    pagination: {
+      limit,
+      cursor: params.get('cursor'),
+      nextCursor: hasMore ? encodeCursorOffset(nextOffset) : null,
+      hasMore,
+      totalReturned: window.length,
+      source: 'cursor pagination over stable product search ordering'
+    },
+    guardrails: [
+      'No offset page numbers are exposed in the public API; clients continue with nextCursor only.',
+      'Search result order remains the API sort order before pagination, so cursors do not fabricate ranking changes.',
+      'Missing or invalid cursor tokens fail closed instead of silently returning the first page.'
+    ]
+  };
 }
 
 const watchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const satisfies readonly WatchlistPriceType[];
@@ -1723,7 +1831,9 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       }
 
       if (method === 'GET' && path === '/api/openapi.json') return jsonResponse(buildOpenApiDocument());
-      if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
+      if (method === 'GET' && path === '/api/market/overview') {
+        return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => api.getMarketOverview());
+      }
       if (method === 'GET' && path === '/api/nutrition/value') return jsonResponse(api.getNutritionValueReport(optionalNutritionMetric(url.searchParams.get('metric'))));
       if (path === '/api/meal-plans/suggestions') {
         const user = userIdFrom(url);
@@ -1818,7 +1928,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           productId: url.searchParams.get('productId') ?? undefined
         };
         if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Flyer offers provider is not configured.');
-        return jsonResponse(await authOptions.flyerOffersProvider(query));
+        return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.flyerOffersProvider!(query));
       }
 
       if (method === 'GET' && path === '/api/deals/discounts') {
@@ -1830,7 +1940,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           productId: url.searchParams.get('productId') ?? undefined
         };
         if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Discounts provider is not configured.');
-        return jsonResponse(await authOptions.flyerOffersProvider(query));
+        return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.flyerOffersProvider!(query));
       }
 
       if (method === 'GET' && path === '/api/account/subscription-access') {
@@ -2237,7 +2347,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       }
 
       if (method === 'GET' && path === '/api/products/search') {
-        return jsonResponse(api.searchProducts(url.searchParams.get('q') ?? ''));
+        return jsonResponse(cursorPaginatedEnvelope(api.searchProducts(url.searchParams.get('q') ?? ''), url.searchParams));
       }
 
       const productMatch = path.match(/^\/api\/products\/([^/]+)$/);
@@ -2755,11 +2865,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
-      if (method === 'GET' && path === '/api/indices') return jsonResponse(api.getIndices());
+      if (method === 'GET' && path === '/api/indices') {
+        return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => api.getIndices());
+      }
       const indexMatch = path.match(/^\/api\/indices\/([^/]+)$/);
       if (method === 'GET' && indexMatch) {
         const index = api.getIndex(decodeURIComponent(indexMatch[1]));
-        return index ? jsonResponse(index) : errorResponse(404, 'Index not found.');
+        return index ? cachedJsonResponse(authOptions.apiResponseCache, url, 300, () => index) : errorResponse(404, 'Index not found.');
       }
 
       return errorResponse(404, `Route not found: ${method} ${path}`);
@@ -3282,6 +3394,7 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     runtimeConfig: config,
     authSecret: config.authSecret,
     now: options.now,
+    apiResponseCache: options.apiResponseCache,
     notificationWebhookSecret: config.notificationWebhookSecret,
     billingWebhookSecret: config.billingWebhookSecret,
     billingCheckoutPriceIds: config.stripePriceIds,
