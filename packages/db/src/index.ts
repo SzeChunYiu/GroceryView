@@ -900,7 +900,7 @@ export type CommunityReporterTrustRecord = {
 
 export type NotificationTaskRecord = {
   id: string;
-  channel: 'push' | 'email';
+  channel: 'push' | 'email' | 'telegram';
   type: string;
   title: string;
   body: string;
@@ -944,7 +944,7 @@ export type NotificationTaskAcknowledgement =
 export type NotificationSuppressionRecord = {
   id: string;
   recipient: string;
-  channel?: 'push' | 'email';
+  channel?: 'push' | 'email' | 'telegram';
   reason: 'unsubscribed' | 'bounce' | 'complaint';
   active: boolean;
   updatedAt: string;

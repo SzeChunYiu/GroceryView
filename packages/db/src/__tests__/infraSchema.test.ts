@@ -16,13 +16,14 @@ const householdPlansMigration = readFileSync(join(repoRoot, 'infra/db/migrations
 const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/009_retailer_source_policies.sql'), 'utf8').toLowerCase();
 const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/010_basket_import_reviews.sql'), 'utf8').toLowerCase();
 const priceAlertsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/011_price_alerts.sql'), 'utf8').toLowerCase();
+const telegramNotificationsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/018_telegram_notifications.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql') && !entry.startsWith('._'))
   .sort()
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}`;
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}\n${telegramNotificationsMigration}`;
 const sourcePolicyTables = ['retailer_source_policies'];
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
@@ -58,6 +59,7 @@ const repositoryTables = [
   'subscription_entitlements',
   'notification_tasks',
   'notification_suppressions',
+  'notification_subscriptions',
   'alert_rules',
   'pantry_items',
   'receipt_uploads',
@@ -290,7 +292,9 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('subscription_entitlements'), /user_id text primary key references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('subscription_entitlements'), /provider_subscription_id text/);
     assert.match(repositoryTableDefinition('notification_tasks'), /status text not null check/);
-    assert.match(repositoryTableDefinition('notification_suppressions'), /channel text check \(channel in \('push', 'email'\)\)/);
+    assert.match(repositoryTableDefinition('notification_suppressions'), /channel text check \(channel in \('push', 'email', 'telegram'\)\)/);
+    assert.match(repositoryTableDefinition('notification_subscriptions'), /chat_id text/);
+    assert.match(repositoryTableDefinition('notification_subscriptions'), /check \(channel <> 'telegram' or chat_id is not null\)/);
     assert.match(repositoryTableDefinition('alert_rules'), /user_id text not null references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('alert_rules'), /alert_type text not null check/);
     assert.match(repositoryTableDefinition('alert_rules'), /deal_score_threshold integer check/);
@@ -343,6 +347,7 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(entitlementMigration, /subscription_entitlements_status_idx on subscription_entitlements \(status, updated_at desc\)/);
     assert.match(repositoryMigration, /notification_tasks_due_idx on notification_tasks \(status, send_at, id\)/);
     assert.match(repositoryMigration, /notification_suppressions_active_idx on notification_suppressions \(active, recipient, channel, id\)/);
+    assert.match(telegramNotificationsMigration, /notification_subscriptions_active_product_idx on notification_subscriptions \(active, product_id, channel\)/);
     assert.match(alertRulesMigration, /alert_rules_active_user_idx on alert_rules \(user_id, active, product_id, alert_type, id\)/);
     assert.match(pantryInventoryMigration, /pantry_items_user_idx on pantry_items \(user_id, product_id\)/);
     assert.match(pantryInventoryMigration, /pantry_items_expiry_idx on pantry_items \(expires_on\) where expires_on is not null/);

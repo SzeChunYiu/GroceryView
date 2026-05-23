@@ -1236,7 +1236,7 @@ export type AdDisclosureReport = {
 export type NotificationInboxQueueItem = {
   id: string;
   title: string;
-  channel: 'push' | 'email';
+  channel: 'push' | 'email' | 'telegram';
   status: 'delivered' | 'held' | 'suppressed';
   reason: string;
   action: string;
@@ -1247,7 +1247,7 @@ export type NotificationInboxQueueItem = {
 export type NotificationInboxTaskInput = {
   id: string;
   title: string;
-  channel: 'push' | 'email';
+  channel: 'push' | 'email' | 'telegram';
   status: 'queued' | 'delivered' | 'dead_lettered' | 'suppressed';
   priority: 'normal' | 'high';
   sendAt: string;
@@ -1257,7 +1257,7 @@ export type NotificationInboxTaskInput = {
 export type NotificationInboxSuppressionInput = {
   id?: string;
   recipient: string;
-  channel?: 'push' | 'email';
+  channel?: 'push' | 'email' | 'telegram';
   reason: 'unsubscribed' | 'bounce' | 'complaint';
   active: boolean;
 };

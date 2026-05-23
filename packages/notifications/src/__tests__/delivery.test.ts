@@ -6,11 +6,13 @@ import {
   buildNotificationProviderReadinessReport,
   createExpoPushProvider,
   createSendgridEmailProvider,
+  createTelegramBotProvider,
   deliverDueNotifications,
   planNotificationOperationsAlerts,
   formatNotificationOperationsMetrics,
   planDeadLetterNotificationReplay,
   planHumanReviewSlaNotifications,
+  planTelegramPriceAlertNotifications,
   parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
   runRepositoryNotificationWorkerCycle,
@@ -95,6 +97,102 @@ describe('notification provider adapters', () => {
       priority: 'high',
       data: { type: 'budget_alert', sendAt: '2026-05-22T09:00:00.000Z' }
     });
+  });
+
+  it('sends Telegram messages through the Bot API using chat IDs as recipients', async () => {
+    const calls: Array<{ url: string; init: RequestInit }> = [];
+    const provider = createTelegramBotProvider({
+      botToken: 'telegram-bot-token',
+      fetch: async (url: string | URL | Request, init?: RequestInit) => {
+        calls.push({ url: String(url), init: init ?? {} });
+        return Response.json({ ok: true, result: { message_id: 42 } });
+      }
+    });
+
+    const messageId = await provider.send({
+      recipient: '123456789',
+      title: 'Coffee price alert',
+      body: 'Zoegas is 49.90 SEK at Willys, below your 50.00 SEK target.',
+      metadata: { type: 'target_price', priority: 'high', sendAt: '2026-05-22T09:00:00.000Z' }
+    });
+
+    assert.equal(messageId, 'telegram:42');
+    assert.equal(calls[0]?.url, 'https://api.telegram.org/bottelegram-bot-token/sendMessage');
+    assert.equal(calls[0]?.init.method, 'POST');
+    assert.equal((calls[0]?.init.headers as Record<string, string>)['content-type'], 'application/json');
+    assert.deepEqual(JSON.parse(String(calls[0]?.init.body)), {
+      chat_id: '123456789',
+      text: 'Coffee price alert\n\nZoegas is 49.90 SEK at Willys, below your 50.00 SEK target.',
+      disable_web_page_preview: true
+    });
+  });
+
+  it('fails closed when Telegram rejects a Bot API request', async () => {
+    const provider = createTelegramBotProvider({
+      botToken: 'telegram-bot-token',
+      fetch: async () => Response.json({ ok: false, description: 'chat not found' }, { status: 400 })
+    });
+
+    await assert.rejects(
+      provider.send({
+        recipient: 'missing-chat',
+        title: 'Coffee price alert',
+        body: 'Below target.',
+        metadata: { type: 'target_price', priority: 'high', sendAt: '2026-05-22T09:00:00.000Z' }
+      }),
+      /Telegram delivery failed: chat not found/
+    );
+  });
+});
+
+describe('planTelegramPriceAlertNotifications', () => {
+  it('plans Telegram target-price notifications for active chat subscriptions', () => {
+    const notifications = planTelegramPriceAlertNotifications({
+      now: '2026-05-22T09:00:00.000Z',
+      subscriptions: [
+        { userId: 'user-1', productId: 'coffee', chatId: '111', active: true },
+        { userId: 'user-1', chatId: '222', active: true },
+        { userId: 'user-2', productId: 'milk', chatId: '333', active: true },
+        { userId: 'user-3', productId: 'coffee', chatId: '444', active: false }
+      ],
+      alerts: [
+        {
+          productId: 'coffee',
+          productName: 'Zoegas Skane roast',
+          type: 'target_price',
+          trigger: { metric: 'price', value: 49.9, threshold: 50, storeName: 'Willys' },
+          message: 'Zoegas Skane roast is 49.90 SEK at Willys, below your 50.00 SEK target.'
+        },
+        {
+          productId: 'milk',
+          productName: 'Milk',
+          type: 'target_price',
+          trigger: { metric: 'price', value: 16, threshold: 15 },
+          message: 'Milk is still above target.'
+        }
+      ]
+    });
+
+    assert.deepEqual(notifications, [
+      {
+        channel: 'telegram',
+        type: 'target_price',
+        title: 'Zoegas Skane roast price alert',
+        body: 'Zoegas Skane roast is 49.90 SEK at Willys, below your 50.00 SEK target.',
+        priority: 'high',
+        sendAt: '2026-05-22T09:00:00.000Z',
+        recipient: '111'
+      },
+      {
+        channel: 'telegram',
+        type: 'target_price',
+        title: 'Zoegas Skane roast price alert',
+        body: 'Zoegas Skane roast is 49.90 SEK at Willys, below your 50.00 SEK target.',
+        priority: 'high',
+        sendAt: '2026-05-22T09:00:00.000Z',
+        recipient: '222'
+      }
+    ]);
   });
 });
 

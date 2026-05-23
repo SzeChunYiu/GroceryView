@@ -1,4 +1,13 @@
-export type DeliveryChannel = 'push' | 'email';
+export {
+  createTelegramBotProvider,
+  planTelegramPriceAlertNotifications,
+  type PlanTelegramPriceAlertNotificationsInput,
+  type TelegramBotProviderOptions,
+  type TelegramNotificationSubscription,
+  type TelegramPriceAlert
+} from './telegram.js';
+
+export type DeliveryChannel = 'push' | 'email' | 'telegram';
 
 export type DeliveryNotification = {
   channel: DeliveryChannel;

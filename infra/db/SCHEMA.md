@@ -318,7 +318,7 @@ Key columns: `reports_last_24_hours`, `pending_reports`, `accepted_reports_last_
 
 ### `notification_tasks`
 
-Scheduled push/email notification work items.
+Scheduled push/email/Telegram notification work items.
 
 Key columns: `channel`, `type`, `title`, `body`, `priority`, `send_at`, `recipient`, `attempt_count`, `max_attempts`, `status`.
 
@@ -327,6 +327,12 @@ Key columns: `channel`, `type`, `title`, `body`, `priority`, `send_at`, `recipie
 Recipient suppression records for unsubscribe, bounce, and complaint handling.
 
 Key columns: `recipient`, `channel`, `reason`, `active`, `updated_at`.
+
+### `notification_subscriptions`
+
+Account-scoped delivery destinations for notification fanout. Telegram rows store the Bot API `chat_id` used for target-price alerts.
+
+Key columns: `user_id`, `channel`, `recipient`, `chat_id`, `product_id`, `active`.
 
 ### `subscription_entitlements`
 

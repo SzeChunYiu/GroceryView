@@ -73,6 +73,7 @@ import {
 import {
   createExpoPushProvider,
   createSendgridEmailProvider,
+  createTelegramBotProvider,
   formatNotificationOperationsMetrics,
   parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
@@ -474,8 +475,8 @@ function requiredAuthProvider(value: unknown): AuthProvider {
 
 function optionalDeliveryChannel(value: unknown): DeliveryChannel | undefined {
   if (value === undefined) return undefined;
-  if (value === 'push' || value === 'email') return value;
-  throw new Error('channel must be push or email.');
+  if (value === 'push' || value === 'email' || value === 'telegram') return value;
+  throw new Error('channel must be push, email, or telegram.');
 }
 
 function optionalNutritionMetric(value: string | null): 'protein' | 'calories' | 'fiber' {
@@ -3102,6 +3103,7 @@ export type RuntimeConfig = {
   sendgridApiKey?: string;
   sendgridFromEmail?: string;
   expoPushAccessToken?: string;
+  telegramBotToken?: string;
   metricsToken?: string;
   ocrSpaceApiKey?: string;
   ocrSpaceHealthcheckImageUrl?: string;
@@ -3211,6 +3213,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.SENDGRID_API_KEY) throw new Error('SENDGRID_API_KEY is required in production.');
     if (!env.SENDGRID_FROM_EMAIL) throw new Error('SENDGRID_FROM_EMAIL is required in production.');
     if (!env.EXPO_PUSH_ACCESS_TOKEN) throw new Error('EXPO_PUSH_ACCESS_TOKEN is required in production.');
+    if (!env.TELEGRAM_BOT_TOKEN) throw new Error('TELEGRAM_BOT_TOKEN is required in production.');
     if (!env.BILLING_WEBHOOK_SECRET) throw new Error('BILLING_WEBHOOK_SECRET is required in production.');
     if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
     if (!env.OCR_SPACE_API_KEY) throw new Error('OCR_SPACE_API_KEY is required in production.');
@@ -3244,6 +3247,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     ...(env.SENDGRID_API_KEY ? { sendgridApiKey: env.SENDGRID_API_KEY } : {}),
     ...(env.SENDGRID_FROM_EMAIL ? { sendgridFromEmail: env.SENDGRID_FROM_EMAIL } : {}),
     ...(env.EXPO_PUSH_ACCESS_TOKEN ? { expoPushAccessToken: env.EXPO_PUSH_ACCESS_TOKEN } : {}),
+    ...(env.TELEGRAM_BOT_TOKEN ? { telegramBotToken: env.TELEGRAM_BOT_TOKEN } : {}),
     billingWebhookSecret: env.BILLING_WEBHOOK_SECRET,
     ...(env.STRIPE_SECRET_KEY ? { stripeSecretKey: env.STRIPE_SECRET_KEY } : {}),
     ...(Object.keys(stripePriceIds).length > 0 ? { stripePriceIds } : {}),
@@ -3282,6 +3286,14 @@ function buildRuntimeNotificationProviders(config: RuntimeConfig, options: Runti
             ...(options.notificationProviderFetch ? { fetch: options.notificationProviderFetch } : {})
           })
         }
+      : {}),
+    ...(config.telegramBotToken
+      ? {
+          telegram: createTelegramBotProvider({
+            botToken: config.telegramBotToken,
+            ...(options.notificationProviderFetch ? { fetch: options.notificationProviderFetch } : {})
+          })
+        }
       : {})
   };
 }
@@ -3293,7 +3305,7 @@ function buildRuntimeNotificationWorkerRunner(
 ): (() => Promise<RepositoryNotificationWorkerCycleResult>) | undefined {
   if (!repository?.listDueNotificationTasks || !repository.listActiveNotificationSuppressions || !repository.upsertNotificationTask) return undefined;
   const providers = buildRuntimeNotificationProviders(config, options);
-  if (!providers.email && !providers.push) return undefined;
+  if (!providers.email && !providers.push && !providers.telegram) return undefined;
   return () => runRepositoryNotificationWorkerCycle({
     now: (options.now ?? new Date()).toISOString(),
     retryDelayMinutes: 15,
