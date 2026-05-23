@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 08:30 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-23 10:32 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **233**
+- **Shipped `feat:`/`wire:` PRs to date:** **222**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,6 +42,12 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #1280 feat(fuel): prices
+- #1276 feat(web): surface pharmacy OTC evidence
+- #1271 feat(fuel): prices
+- #1258 feat(fuel): prices
+- #1265 feat(web): surface commodity mapping curator review
+- #1257 feat(web): add basket cost heatmap by area
 - #1250 feat(web): add chain index trend chart
 - #1239 feat(web): add grocery market heatmap
 - #1232 feat(readiness): configure source run row thresholds
@@ -51,16 +57,14 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #1219 feat(products): add faceted search surface
 - #1213 feat(ingestion): expose daily chain summaries
 - #1211 feat(products): explain price move notes
-- #1205 feat(ingestion): bound bulk daily runner
-- #1204 feat(compare): add price overlay chart
-- #1197 feat(scanning): add hosted upload smoke
-- #1196 feat(watchlist): add price sparklines
-- #1194 feat(scanning): add upload write readiness
-- #1192 feat(scanning): add upload CORS readiness
 
 ## 🔄 In progress (open PRs)
 
-- #1253 ci(ingestion): upload preflight config evidence
+- #1282 ci(ingestion): preserve runner connector diagnostics
+- #1270 docs(readme): refresh live status board
+- #1262 feat(web): product cross chain table (WIP from LUNARC fleet)
+- #1261 feat(web): nav groups (WIP from LUNARC fleet)
+- #1260 feat(web): dark mode (WIP from LUNARC fleet)
 
 ## 📋 To-do (from GOAL.md backlog)
 
