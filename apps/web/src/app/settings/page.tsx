@@ -28,7 +28,7 @@ export default function SettingsPage() {
       <Eyebrow>Account settings</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">Settings and GDPR account export</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        Download my data is a signed-in account action. The export includes lists, alerts, preferences, and analytics events alongside legacy privacy sections, and the page never renders anonymous private rows.
+        Download my data and Delete my account are signed-in account actions. The export includes lists, alerts, preferences, and analytics events alongside legacy privacy sections, and the page never renders anonymous private rows.
       </p>
 
       <SettingsDataExportActions />

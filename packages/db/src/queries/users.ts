@@ -6,6 +6,20 @@ export type UserDataExportQuery = {
   values: [userId: string];
 };
 
+export type UserAccountDeletionTable =
+  | 'basket_items'
+  | 'weekly_baskets'
+  | 'watchlist_items'
+  | 'user_preferences'
+  | 'favorite_stores'
+  | 'app_users';
+
+export type UserAccountDeletionQuery = {
+  table: UserAccountDeletionTable;
+  sql: string;
+  values: [userId: string];
+};
+
 export function buildUserDataExportQueries(userId: string): UserDataExportQuery[] {
   return [
     {
@@ -57,6 +71,49 @@ export function buildUserDataExportQueries(userId: string): UserDataExportQuery[
       section: 'analytics_events',
       sql: `select $1::text as user_id
              where false`,
+      values: [userId]
+    }
+  ];
+}
+
+export function buildUserAccountDeletionQueries(userId: string): UserAccountDeletionQuery[] {
+  return [
+    {
+      table: 'basket_items',
+      sql: `delete from basket_items
+             using weekly_baskets
+             where basket_items.basket_id = weekly_baskets.id
+               and weekly_baskets.user_id = $1`,
+      values: [userId]
+    },
+    {
+      table: 'weekly_baskets',
+      sql: `delete from weekly_baskets
+             where user_id = $1`,
+      values: [userId]
+    },
+    {
+      table: 'watchlist_items',
+      sql: `delete from watchlist_items
+             where user_id = $1`,
+      values: [userId]
+    },
+    {
+      table: 'user_preferences',
+      sql: `delete from user_preferences
+             where user_id = $1`,
+      values: [userId]
+    },
+    {
+      table: 'favorite_stores',
+      sql: `delete from favorite_stores
+             where user_id = $1`,
+      values: [userId]
+    },
+    {
+      table: 'app_users',
+      sql: `delete from app_users
+             where id = $1`,
       values: [userId]
     }
   ];

@@ -241,6 +241,7 @@ describe('verified-data UI', () => {
 
     assert.match(settings, /SettingsDataExportActions/);
     assert.match(settings, /Download my data/);
+    assert.match(settings, /Delete my account/);
     assert.match(settings, /lists, alerts, preferences, and analytics events/);
     assert.match(actions, /'use client'/);
     assert.match(actions, /sessionStorage\.getItem\('groceryview:accessToken'/);
@@ -250,10 +251,16 @@ describe('verified-data UI', () => {
     assert.match(actions, /method: 'GET'/);
     assert.match(actions, /new Blob\(\[JSON\.stringify\(payload, null, 2\)\]/);
     assert.match(actions, /link\.download = `groceryview-data-export-\$\{userId\}\.json`/);
+    assert.match(actions, /window\.confirm\('Delete my account\? This removes your lists, alerts, preferences, and account profile\.'/);
+    assert.match(actions, /\/api\/settings\/account\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /method: 'DELETE'/);
+    assert.match(actions, /body: JSON\.stringify\(\{ confirmation: 'DELETE ACCOUNT' \}\)/);
+    assert.match(actions, /No anonymous account deletion/);
     assert.match(actions, /Sign in first/);
     assert.match(actions, /No anonymous data exports/);
     assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
     assert.match(server, /\/api\/settings\/data-export/);
+    assert.match(server, /\/api\/settings\/account/);
   });
 
 

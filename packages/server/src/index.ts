@@ -31,6 +31,7 @@ import {
   createPostgresCatalogReader,
   createPostgresRepository,
   createPostgresSourceRecordReader,
+  buildUserAccountDeletionQueries,
   type BudgetRecord,
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
@@ -119,6 +120,9 @@ export type AuthOptions = {
     upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
     getBudget(userId: string): Promise<BudgetRecord | null>;
   };
+  accountDeletionRepository?: {
+    deleteUserAccount(userId: string): Promise<void>;
+  };
   humanReviewRepository?: {
     getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
     listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
@@ -197,6 +201,7 @@ export type RuntimePersistenceRepository = {
   upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
   getBudget(userId: string): Promise<BudgetRecord | null>;
+  deleteUserAccount?(userId: string): Promise<void>;
   getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
@@ -1856,6 +1861,17 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     );
   };
 
+  const deleteAccountData = async (user: string) => {
+    await authOptions.accountDeletionRepository?.deleteUserAccount(user);
+    api.deleteAccount(user);
+    return {
+      userId: user,
+      deleted: true,
+      deletedTables: buildUserAccountDeletionQueries(user).map((query) => query.table),
+      requiresReauthentication: true
+    };
+  };
+
   return async (request: Request): Promise<Response> => {
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
@@ -2888,6 +2904,18 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(buildAccountDataExport(user));
       }
 
+      if (path === '/api/settings/account') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'DELETE') {
+          const body = await readJson(request);
+          if (body.confirmation !== 'DELETE ACCOUNT') return errorResponse(400, 'confirmation must be DELETE ACCOUNT.');
+          return jsonResponse(await deleteAccountData(user));
+        }
+      }
+
       if (path === '/api/privacy/deletion-plan') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -3106,6 +3134,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/households/join': { post: protectedOperation('Join an existing household from a signed-in invite token.') },
       '/api/households/current/basket/check': { post: protectedOperation('Check or uncheck a shared household shopping-list item with member attribution.') },
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
+      '/api/settings/account': { delete: protectedOperation('Delete the signed-in account after confirmation, wiping lists, alerts, preferences, and profile rows.') },
       '/api/settings/data-export': { get: protectedOperation('Download my data JSON export with lists, alerts, preferences, and analytics event records.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/privacy/request-fulfillment': { post: protectedOperation('Classify privacy export, deletion, and ad opt-out requests by fulfillment deadline.') },
@@ -3572,6 +3601,13 @@ export function buildRepositoryBackedAuthOptions(
       upsertBudget: (userId, budget) => repository.upsertBudget(userId, budget),
       getBudget: (userId) => repository.getBudget(userId)
     },
+    ...(repository.deleteUserAccount
+      ? {
+          accountDeletionRepository: {
+            deleteUserAccount: (userId) => repository.deleteUserAccount!(userId)
+          }
+        }
+      : {}),
     humanReviewRepository: {
       getHumanReviewer: (reviewerId) => repository.getHumanReviewer(reviewerId),
       listOpenHumanReviewAssignments: () => repository.listOpenHumanReviewAssignments(),

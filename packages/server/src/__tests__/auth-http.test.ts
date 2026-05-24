@@ -17,6 +17,11 @@ describe('authenticated HTTP routes', () => {
     assert.equal(unauthenticatedPrivacyExport.status, 401);
     const unauthenticatedSettingsExport = await handle(new Request('http://localhost/api/settings/data-export?userId=user-1'));
     assert.equal(unauthenticatedSettingsExport.status, 401);
+    const unauthenticatedSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
+      method: 'DELETE',
+      body: JSON.stringify({ confirmation: 'DELETE ACCOUNT' })
+    }));
+    assert.equal(unauthenticatedSettingsDelete.status, 401);
     const unauthenticatedPrivacyFulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
       method: 'POST',
       body: JSON.stringify({ requests: [] })
@@ -77,6 +82,12 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
     assert.equal(forbiddenSettingsExport.status, 403);
+    const forbiddenSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
+      method: 'DELETE',
+      headers: { authorization: `Bearer ${wrongUserToken}` },
+      body: JSON.stringify({ confirmation: 'DELETE ACCOUNT' })
+    }));
+    assert.equal(forbiddenSettingsDelete.status, 403);
     const forbiddenPrivacyFulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
       method: 'POST',
       headers: { authorization: `Bearer ${wrongUserToken}` },
@@ -149,6 +160,12 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${token}` }
     }));
     assert.equal(authorizedSettingsExport.status, 200);
+    const authorizedSettingsDelete = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
+      method: 'DELETE',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ confirmation: 'DELETE ACCOUNT' })
+    }));
+    assert.equal(authorizedSettingsDelete.status, 200);
     const authorizedPrivacyFulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
       method: 'POST',
       headers: { authorization: `Bearer ${token}` },
