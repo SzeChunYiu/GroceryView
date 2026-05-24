@@ -63,4 +63,45 @@ describe('calculateChainPriceIndex', () => {
     // Raw ratio would be ~0.09 (index ~9); shrinkage must pull it far toward 100.
     assert.ok(cell.index > 60, `shrinkage should pull a 1-obs cell toward market (got ${cell.index})`);
   });
+
+  it('accepts matched-basket refinement rows without drifting the 100-centred scale', () => {
+    const broad = [
+      obs('willys', 'pantry', 10),
+      obs('hemkop', 'pantry', 12),
+      obs('willys', 'dairy', 20),
+      obs('hemkop', 'dairy', 24)
+    ];
+    const matchedBasket = Array.from({ length: 8 }, (_, index) => [
+      obs('willys', `matched-basket-${index}`, 100),
+      obs('hemkop', `matched-basket-${index}`, 110)
+    ]).flat();
+
+    const summary = calculateChainPriceIndex([...broad, ...matchedBasket]);
+    const willys = summary.chains.find((chain) => chain.chainId === 'willys');
+    const hemkop = summary.chains.find((chain) => chain.chainId === 'hemkop');
+
+    assert.ok(willys && hemkop);
+    assert.equal(summary.generatedFrom, broad.length + matchedBasket.length);
+    assert.equal(summary.marketReferenceByCategory['matched-basket-0'], 105);
+    assert.ok(willys.overallIndex < 100, `Willys matched basket should stay below 100 (got ${willys.overallIndex})`);
+    assert.ok(hemkop.overallIndex > 100, `Hemköp matched basket should stay above 100 (got ${hemkop.overallIndex})`);
+    assert.equal(willys.categoriesCovered, 10);
+    assert.equal(willys.confidence, 'medium');
+  });
+
+  it('does not invent matched-basket categories for chains missing those rows', () => {
+    const summary = calculateChainPriceIndex([
+      obs('willys', 'matched-basket-coffee', 80),
+      obs('hemkop', 'matched-basket-coffee', 100),
+      obs('coop', 'bread', 25),
+      obs('willys', 'bread', 20),
+      obs('hemkop', 'bread', 22)
+    ]);
+    const coop = summary.chains.find((chain) => chain.chainId === 'coop');
+
+    assert.ok(coop);
+    assert.equal(coop.categoriesCovered, 1);
+    assert.equal(coop.byCategory.some((cell) => cell.category === 'matched-basket-coffee'), false);
+    assert.equal(summary.categories.includes('matched-basket-coffee'), true);
+  });
 });
