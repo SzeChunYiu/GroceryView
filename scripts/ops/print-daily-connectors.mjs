@@ -95,6 +95,19 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: true
   },
   {
+    connectorId: 'mathem-public-search',
+    chainId: 'mathem',
+    domain: 'grocery',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'groceryview://daily/mathem/products/public-search',
+    parserVersion: 'mathem-public-search-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
+  },
+  {
     connectorId: 'matspar-public-search',
     chainId: 'matspar',
     domain: 'grocery',
