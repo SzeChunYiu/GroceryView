@@ -5,12 +5,22 @@ import type { LidlIngestedStoreOffer } from '../ingested/lidl';
 import type { MathemIngestedProduct } from '../ingested/mathem';
 import type { MatpriskollenIngestedOffer } from '../ingested/matpriskollen';
 
+export type DbSiteCompareStoreCapability = {
+  chainId: string;
+  coupon: boolean;
+  delivery: boolean;
+  pickup: boolean;
+  evidenceLabel: string;
+  evidenceUpdatedAt: string | null;
+};
+
 export const dbSiteIngestedOverridesGeneratedAt = null;
 
 export const dbSiteMatpriskollenOffers: MatpriskollenIngestedOffer[] = [];
 export const dbSiteLidlStoreOffers: LidlIngestedStoreOffer[] = [];
 export const dbSiteIcaReklambladOffers: IcaReklambladIngestedOffer[] = [];
 export const dbSiteMathemProducts: MathemIngestedProduct[] = [];
+export const dbSiteCompareStoreCapabilities: DbSiteCompareStoreCapability[] = [];
 
 export const dbSiteMatpriskollenSource = {
   source: 'postgres.latest_prices/observations Matpriskollen-compatible fallback',
