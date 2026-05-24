@@ -11,7 +11,7 @@ function readSession(): BrowserSession {
   return { accessToken, userId };
 }
 
-export function SettingsDataExportActions() {
+export function SettingsDataExportActions({ errorAnnouncements = 'assertive' }: Readonly<{ errorAnnouncements?: 'assertive' | 'polite' }> = {}) {
   const [status, setStatus] = useState<ExportStatus>('idle');
   const [message, setMessage] = useState('No anonymous data exports. No anonymous account deletion. Sign in first to manage account-owned JSON records.');
 
@@ -106,7 +106,7 @@ export function SettingsDataExportActions() {
       <button className="ml-2 mt-4 rounded-full border border-rose-300 px-4 py-2 text-sm font-black text-rose-800" onClick={deleteMyAccount} type="button">
         Delete my account
       </button>
-      <p className="mt-4 rounded-2xl bg-emerald-50 p-3 text-sm font-bold text-emerald-950" data-status={status}>{message}</p>
+      <p aria-live={status === 'blocked' || status === 'error' ? errorAnnouncements : 'polite'} className="mt-4 rounded-2xl bg-emerald-50 p-3 text-sm font-bold text-emerald-950" data-status={status} role={status === 'blocked' || status === 'error' ? 'alert' : undefined}>{message}</p>
     </section>
   );
 }

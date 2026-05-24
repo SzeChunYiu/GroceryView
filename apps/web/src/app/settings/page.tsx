@@ -31,7 +31,7 @@ export default function SettingsPage() {
         Download my data and Delete my account are signed-in account actions. The export includes lists, alerts, preferences, and analytics events alongside legacy privacy sections, and the page never renders anonymous private rows.
       </p>
 
-      <SettingsDataExportActions />
+      <SettingsDataExportActions errorAnnouncements="assertive" />
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">

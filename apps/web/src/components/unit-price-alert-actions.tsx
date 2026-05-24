@@ -191,7 +191,7 @@ export function UnitPriceAlertActions({ suggestedAlerts }: Readonly<{ suggestedA
         ))}
       </div>
 
-      <p className="mt-4 rounded-2xl bg-white p-3 text-sm font-bold text-amber-950" data-status={status}>{message}</p>
+      <p aria-live={status === 'blocked' || status === 'error' ? 'assertive' : 'polite'} className="mt-4 rounded-2xl bg-white p-3 text-sm font-bold text-amber-950" data-status={status} role={status === 'blocked' || status === 'error' ? 'alert' : undefined}>{message}</p>
 
       {alerts.length > 0 ? (
         <div className="mt-4 space-y-3">
