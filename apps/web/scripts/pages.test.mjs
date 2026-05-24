@@ -14,6 +14,7 @@ describe('buildStaticPages', () => {
         'account/index.html',
         'account/sync/index.html',
         'admin/human-review/index.html',
+        'admin/users/index.html',
         'ads/disclosure/index.html',
         'basket/index.html',
         'billing/status/index.html',
@@ -410,6 +411,19 @@ describe('buildStaticPages', () => {
       assert.match(humanReview, /data-human-review-priority/);
       assert.match(humanReview, /fetch\(apiUrl\('\/api\/human-review\/assignments'/);
       assert.match(humanReview, /Connected human review queue loaded/);
+
+      const adminUsers = await readFile(join(root, 'admin/users/index.html'), 'utf8');
+      assert.match(adminUsers, /Admin user management/);
+      assert.match(adminUsers, /r\.svensson@example\.se/);
+      assert.match(adminUsers, /2026-01-18/);
+      assert.match(adminUsers, /Active alerts/);
+      assert.match(adminUsers, /account status/);
+      assert.match(adminUsers, /Disable user/);
+      assert.match(adminUsers, /Resend verification/);
+      assert.match(adminUsers, /data-groceryview-flow="admin-users"/);
+      assert.match(adminUsers, /data-flow-action="load-admin-users"/);
+      assert.match(adminUsers, /fetch\(apiUrl\('\/api\/admin\/users'/);
+      assert.match(adminUsers, /Local preview mode: connect the API session bridge before loading admin users\./);
 
       const privacy = await readFile(join(root, 'privacy/index.html'), 'utf8');
       assert.match(privacy, /Export or delete your data/);

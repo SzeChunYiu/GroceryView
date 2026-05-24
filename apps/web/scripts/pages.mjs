@@ -93,6 +93,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-human-review-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setAdminUsersMetric = (metric, message) => {
+    const target = document.querySelector('[data-admin-users-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setSavingsLedgerMetric = (metric, message) => {
     const target = document.querySelector('[data-savings-ledger-' + metric + ']');
     if (target) target.textContent = message;
@@ -1101,6 +1105,34 @@ window.GroceryViewFlowActions = (() => {
       setResult('human-review', 'Human review API load failed: ' + error.message + '. Static moderator queue remains visible.');
     }
   };
+  const loadAdminUsersFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('admin-users', 'Local preview mode: connect the API session bridge before loading admin users.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/admin/users', config, false), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const users = Array.isArray(payload.users) ? payload.users : [];
+      const activeUsers = users.filter((user) => user.status === 'active' || user.status === 'pending');
+      const firstUser = users[0] || {};
+      const alerts = Array.isArray(firstUser.alerts) ? firstUser.alerts : [];
+      setAdminUsersMetric('email', firstUser.email || 'No users returned');
+      setAdminUsersMetric('registered', firstUser.registeredAt || 'No registration date');
+      setAdminUsersMetric('alerts', String(firstUser.alerts?.length || alerts.length || 0));
+      setAdminUsersMetric('status', String(firstUser.status || 'unknown'));
+      setResult(
+        'admin-users',
+        'Connected admin users loaded: ' + users.length + ' users, ' + activeUsers.length + ' active-capable states, first user ' + (firstUser.email || 'n/a') + '.'
+      );
+    } catch (error) {
+      setResult('admin-users', 'Admin users API load failed: ' + error.message + '. Static admin list remains visible.');
+    }
+  };
   const loadSavingsLedgerFromApi = async () => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -1279,7 +1311,10 @@ window.GroceryViewFlowActions = (() => {
     'download-export': 'Data export plan prepared with receipts, budgets, baskets, and anonymous contributions.',
     'plan-deletion': 'Deletion plan queued; destructive production action still requires re-authentication.',
     'route-review': 'Capture routed to manual review queue before it can update catalog prices.',
-    'mark-matched': 'Matched capture previewed for basket and budget update.'
+    'mark-matched': 'Matched capture previewed for basket and budget update.',
+    'admin-users-load': 'Local preview mode: connect the API session bridge before loading admin users.',
+    'admin-disable-user': 'Disable action preview recorded; production save requires authenticated API session.',
+    'admin-resend-verification': 'Verification action preview recorded; production send requires authenticated API session.'
   };
   configureApiSessionPanel();
   document.querySelectorAll('[data-groceryview-flow] form').forEach((form) => {
@@ -1408,6 +1443,10 @@ window.GroceryViewFlowActions = (() => {
       }
       if (flow === 'human-review' && action === 'load-human-review') {
         await loadHumanReviewFromApi();
+        return;
+      }
+      if (flow === 'admin-users' && action === 'load-admin-users') {
+        await loadAdminUsersFromApi();
         return;
       }
       if (flow === 'savings-ledger' && action === 'load-savings-ledger') {
@@ -1762,6 +1801,12 @@ const pages = [
     title: 'Human review operations — GroceryView',
     description: 'GroceryView admin page scaffold for human-review assignments, SLA status, reviewer authorization, and decision writebacks.',
     body: `<section class="card"><div class="eyebrow">Operations</div><h1>Human review operations</h1><p class="lede">Review low-confidence product matches and community reports before they can update catalog data.</p><div class="grid"><div class="metric"><strong>breached</strong><span>SLA status</span></div><div class="metric"><strong>2</strong><span>open assignments</span></div><div class="metric"><strong>moderator-owned</strong><span>decision access</span></div></div></section><section class="card" style="margin-top:16px"><h2>Moderator assignments</h2><table class="table"><thead><tr><th>Review</th><th>Priority</th><th>Assignee</th><th>Due</th><th>Action</th></tr></thead><tbody><tr><td>review-match-1</td><td>high</td><td>moderator-1</td><td>SLA breached</td><td>Approve product match</td></tr><tr><td>review-report-1</td><td>medium</td><td>moderator-2</td><td>Due tomorrow</td><td>Keep in review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Decision writeback</h2><p class="lede">Approval writes <strong>approve_product_match</strong>; rejection writes <strong>reject_product_match</strong>; needs-more-info keeps the assignment in progress for a registered reviewer.</p></section>${humanReviewLivePanel}`
+  },
+  {
+    path: 'admin/users/index.html',
+    title: 'Admin user management — GroceryView',
+    description: 'GroceryView admin page for user registry, registration dates, alert state, account status, and account actions in a fail-closed workflow.',
+    body: `<section class="card" data-groceryview-flow="admin-users"><div class="eyebrow">Administration</div><h1>Admin user management</h1><p class="lede">Inspect user registry records and account actions before production changes are written.</p><div class="grid"><div class="metric"><strong data-admin-users-email>r.svensson@example.se</strong><span>example email</span></div><div class="metric"><strong data-admin-users-registered>2026-01-18</strong><span>registered</span></div><div class="metric"><strong data-admin-users-alerts>3</strong><span>active alerts</span></div><div class="metric"><strong data-admin-users-status>Active</strong><span>account status</span></div></div><div class="flow-panel" aria-label="Admin users actions"><button type="button" data-flow-action="load-admin-users">Refresh admin users</button><button type="button" data-flow-action="admin-disable-user">Disable user</button><button type="button" data-flow-action="admin-resend-verification">Resend verification</button></div><p class="flow-result" data-flow-result="admin-users" aria-live="polite">Local preview mode: connect the API session bridge before loading admin users.</p></section><section class="card" style="margin-top:16px"><h2>Account status queue</h2><table class="table"><thead><tr><th>Email</th><th>Registered</th><th>Active alerts</th><th>Status</th></tr></thead><tbody><tr><td>r.svensson@example.se</td><td>2026-01-18</td><td>3</td><td>Active</td></tr><tr><td>u.nordstrom@example.se</td><td>2025-11-09</td><td>1</td><td>Disabled</td></tr></tbody></table></section>`
   },
   {
     path: 'market/index.html',
