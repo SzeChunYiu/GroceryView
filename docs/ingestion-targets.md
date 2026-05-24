@@ -10,6 +10,7 @@ Pick the highest unblocked P0/P1. Apply A1→A12 from the playbook. As soon as a
 | **P0** | OSM nationwide stores | ✅ shipped | yes (location) | Sweden-wide Overpass query and `apps/web/scripts/refresh-osm-stores.mjs` now regenerate the OSM store universe; keep monitoring row counts before production refreshes. |
 | **P0** | Coop product-search | 🟡 partial | partial (regional) | Inspect coop.se/handla DevTools; trace `api.coop.se/digital/<path>` (found in HTML). |
 | **P1** | Mathem catalog | 🟡 partial | per-postcode | buildId=`483b9ac11c96ee6d17bea0c10bff3cb4b3dbd207` (2026-05-20). Enumerate `/_next/data/<buildId>/sv-se/<route>.json` — try `kategori`, `varor`, `sortiment`, `produkt/<slug>`. |
+| **P1** | Matspar public search aggregator | ✅ shipped | no — aggregate public search prices, not branch-specific | `packages/ingestion/src/connectors/matspar.ts` now fetches public `__PAGEDATA__` rows and the daily native endpoint `groceryview://daily/matspar/products/public-search` upserts at least 100 chain-level observations with `requireStoreScopedPrices:false`. |
 | **P1** | MatPiraten | ⏳ pending | unknown | matpiraten.se HTML scrape; small but real per-product prices. |
 | **P1** | Hemglass | ⏳ pending | per-postcode (delivery) | hemglass.se Next.js? Full frozen-food catalog probable. |
 | **P1** | Apohem | ⏳ pending | online-only | apohem.se REST API; pharmacy + select grocery. |

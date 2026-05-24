@@ -1,11 +1,25 @@
 import { notFound } from 'next/navigation';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { osmStores } from '@/lib/osm-stores';
-import { findStore, storePricePercentileRankForStore, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
+import {
+  findStore,
+  storeAssortmentOverviewForStore,
+  storeOpeningHoursLabel,
+  storePricePercentileRankForStore,
+  storePricePercentileRanks,
+  storeUniverse
+} from '@/lib/verified-data';
 import { metadataForStore } from '@/lib/seo';
+
+type ConfidenceLevel = 'high' | 'medium' | 'low';
 
 function cohortKeyFor(store: (typeof storeUniverse)[number]) {
   return store.city || store.district || 'kommun not reported';
+}
+
+function confidenceLevelForRank(matchedRank: NonNullable<ReturnType<typeof storePricePercentileRankForStore>>): ConfidenceLevel {
+  return matchedRank.matchedPerBranchObservationCount >= 30 && matchedRank.regularPriceObservationCount >= 12 ? 'high' : 'medium';
 }
 
 function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
@@ -26,6 +40,7 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
       coverageLabel: matchedRank.coverageLabel,
       confidenceLabel: matchedRank.confidenceLabel,
       matchedPerBranchObservationCount: matchedRank.matchedPerBranchObservationCount,
+      confidenceLevel: confidenceLevelForRank(matchedRank),
       detail:
         `Ranked from ${matchedRank.matchedPerBranchObservationCount.toLocaleString('sv-SE')} per-branch Lidl offer observations matched to ${matchedRank.externalStoreId}. Lower index means the branch has deeper public offer prices versus regular-price baselines.`,
       cohorts: [
@@ -53,6 +68,7 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
   const kommunCohortKey = cohortKeyFor(store);
   const kommunStores = storeUniverse.filter((candidate) => cohortKeyFor(candidate) === kommunCohortKey);
   const sameBrandStores = storeUniverse.filter((candidate) => candidate.brand === store.brand);
+  const confidenceLevel: ConfidenceLevel = 'low';
 
   return {
     title: 'store price-percentile rank',
@@ -68,6 +84,7 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
     averageRelativeIndexLabel: 'Not reported',
     coverageLabel: `${storePricePercentileRanks.length.toLocaleString('sv-SE')} matched Lidl stores have per-branch offer ranks; this OSM record is not matched.`,
     confidenceLabel: 'coverage blocker',
+    confidenceLevel,
     matchedPerBranchObservationCount: 0,
     cohorts: [
       {
@@ -109,6 +126,8 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
   const store = findStore(slug);
   if (!store) notFound();
   const pricePercentileRank = storePricePercentileRankFor(store);
+  const openingHoursLabel = storeOpeningHoursLabel(store);
+  const assortmentOverview = storeAssortmentOverviewForStore(store);
 
   return (
     <PageShell>
@@ -139,6 +158,55 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
             </div>
           </dl>
         </Card>
+        <Card>
+          <h2 className="text-2xl font-black">Opening hours</h2>
+          <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-lg font-black text-slate-900">{openingHoursLabel}</p>
+          <p className="mt-4 text-sm leading-6 text-slate-700">
+            Hours are shown only when the store source reports them. Missing hours stay explicit instead of being inferred from
+            chain defaults.
+          </p>
+        </Card>
+        <Card>
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-slate-500">Store detail assortment</p>
+          <h2 className="mt-2 text-2xl font-black">Assortment overview</h2>
+          <p className="mt-3 rounded-full bg-slate-100 px-3 py-2 text-sm font-black text-slate-800">
+            {assortmentOverview.statusLabel}
+          </p>
+          <p className="mt-4 text-sm leading-6 text-slate-700">{assortmentOverview.sourceLabel}</p>
+          {assortmentOverview.categories.length > 0 ? (
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {assortmentOverview.categories.map((category) => (
+                <div className="rounded-2xl border border-slate-200 p-4" key={category.category}>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{category.category}</p>
+                  <p className="mt-1 text-xl font-black">{category.itemCount.toLocaleString('sv-SE')} items</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-950">
+              No branch-specific assortment rows are matched for this OSM store yet.
+            </p>
+          )}
+          {assortmentOverview.items.length > 0 ? (
+            <div className="mt-4 grid gap-3">
+              {assortmentOverview.items.slice(0, 24).map((item) => (
+                <div className="rounded-2xl border border-slate-200 p-4" key={item.id}>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{item.category}</p>
+                  <p className="mt-1 font-black">{item.name}</p>
+                  <p className="mt-1 text-sm font-bold text-slate-700">
+                    {item.priceLabel} · {item.unitPriceLabel} · {item.packageLabel}
+                  </p>
+                  <p className="mt-1 text-xs font-bold text-slate-500">{item.validWindow}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-700">
+            {assortmentOverview.guardrails.map((guardrail) => (
+              <li key={guardrail}>{guardrail}</li>
+            ))}
+          </ul>
+        </Card>
         <Card className="border-amber-200 bg-amber-50">
           <h2 className="text-2xl font-black text-amber-950">Price guardrail</h2>
           <p className="mt-4 leading-7 text-amber-950">
@@ -158,6 +226,13 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
           <p className="mt-3 rounded-full bg-white px-3 py-2 text-sm font-black text-cyan-900">
             {pricePercentileRank.statusLabel}
           </p>
+          <div className="mt-4">
+            <ConfidenceBadge
+              level={pricePercentileRank.confidenceLevel}
+              label={pricePercentileRank.confidenceLabel}
+              sampleSize={pricePercentileRank.matchedPerBranchObservationCount}
+            />
+          </div>
           <p className="mt-4 leading-7 text-cyan-950">{pricePercentileRank.detail}</p>
           {pricePercentileRank.isRanked ? (
             <div className="mt-4 grid gap-3 md:grid-cols-3">

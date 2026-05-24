@@ -53,6 +53,18 @@ export const routeMetadataCatalog = {
     title: 'Basket ideas and import contracts | GroceryView',
     description: 'Plan student staples, basket imports, retailer handoff support, and verified account-bound basket review guardrails.'
   },
+  '/basket': {
+    title: 'Cross-chain cheapest basket calculator | GroceryView',
+    description: 'Add verified grocery products and compare the cheapest complete chain basket with a split basket built from current DB-backed price rows.'
+  },
+  '/items': {
+    title: 'Item detail lookup | GroceryView',
+    description: 'Open crawlable item entry points backed by verified product slugs, source evidence, and canonical GroceryView product metadata.'
+  },
+  '/search': {
+    title: 'Product search | GroceryView',
+    description: 'Search verified grocery products with crawlable category, dietary, chain, price, stock, and confidence filters.'
+  },
   '/catalogue-savings': {
     title: 'Matched catalogue savings ledger | GroceryView',
     description: 'Compare matched Willys and Hemkop catalogue rows with savings totals, source caveats, and chain-level confidence.'
@@ -77,6 +89,10 @@ export const routeMetadataCatalog = {
     title: 'Compare grocery prices across chains | GroceryView',
     description: 'See matched Willys and Hemkop products, cheapest-chain highlights, catalogue savings, and real cross-chain price spreads.'
   },
+  '/compare-items': {
+    title: 'Compare grocery items side by side | GroceryView',
+    description: 'Compare up to four verified grocery items by nutrition labels, store price evidence, and observed trend charts.'
+  },
   '/coupon-stacks': {
     title: 'Coupon stack evidence gate | GroceryView',
     description: 'Coupon stacking is blocked from public rendering until verified production coupon and retailer records are available.'
@@ -93,6 +109,20 @@ export const routeMetadataCatalog = {
     title: 'Verified grocery deal radar | GroceryView',
     description: 'Find expiry deals, single-portion deals, lunchbox deals, and trusted deal opportunities from visible source-backed rows.'
   },
+  '/expiry-deals': {
+    title: 'Near-expiry grocery deal radar | GroceryView',
+    description: 'Surface near-expiry markdowns from timestamped product rows with verification, stale evidence, and confidence labels.'
+  },
+  '/favorites': {
+    title: 'Favorite grocery items | GroceryView',
+    description: 'View signed-in bookmarked products with current cheapest price and store evidence.',
+    noIndex: true
+  },
+  '/favourites': {
+    title: 'Local favourite products | GroceryView',
+    description: 'Save product hearts in browser localStorage and revisit them with current verified product price cards.',
+    noIndex: true
+  },
   '/fuel': {
     title: 'Fuel prices by grade | GroceryView',
     description: 'View source-backed fuel observations by grade with price per litre, domain=fuel modeling, and operator provenance.'
@@ -104,6 +134,11 @@ export const routeMetadataCatalog = {
   '/login': {
     title: 'Sign in to GroceryView',
     description: 'Authentication is withheld in the static build until a production auth provider can return a verified user session.',
+    noIndex: true
+  },
+  '/list': {
+    title: 'Shopping list check-off | GroceryView',
+    description: 'Check off grocery list items while shopping with browser-local checked state that survives refreshes.',
     noIndex: true
   },
   '/map': {
@@ -154,6 +189,15 @@ export const routeMetadataCatalog = {
     title: 'Receipt scanner evidence gate | GroceryView',
     description: 'Receipt scanning stays gated until production uploads, extraction records, and account-bound review are verified.'
   },
+  '/screener': {
+    title: 'Verified deal screener | GroceryView',
+    description: 'Sort and filter verified grocery deal rows by biggest price drop, cheapest SEK per kg, and widest cross-chain spread.'
+  },
+  '/settings': {
+    title: 'Settings data export | GroceryView',
+    description: 'Download signed-in account data exports for lists, alerts, preferences, analytics events, and other private GDPR sections.',
+    noIndex: true
+  },
   '/seasonal-calendar': {
     title: 'Seasonal produce price calendar | GroceryView',
     description: 'Find the best time to buy produce from historical monthly averages, with no forecasted prices and eco planning guardrails.'
@@ -173,6 +217,10 @@ export const routeMetadataCatalog = {
   '/unit-price-alerts': {
     title: 'Unit-price spread alerts | GroceryView',
     description: 'Spot wide unit-price spreads and cheapest-per-unit opportunities across matched chain products.'
+  },
+  '/alerts': {
+    title: 'Manage grocery price alerts | GroceryView',
+    description: 'List active target-price alerts, compare targets with verified current chain prices, and delete alerts that no longer matter.'
   },
   '/watchlist': {
     title: 'Grocery watchlist price alerts | GroceryView',

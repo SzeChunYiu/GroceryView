@@ -2,7 +2,8 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { pricedProducts } from './openprices-products';
 
 export const products = [
   {
@@ -2055,30 +2056,64 @@ export const mealPrepBulkBuyOptimizer = {
   }
 };
 
+const openPricesStockUpProducts = [
+  { slug: 'orientaliskt-r-gbr-d-7340083492464', weeklyNeedUnits: 2, storageLimitWeeks: 3 },
+  { slug: 'havredryck-choklad-7340083494406', weeklyNeedUnits: 3, storageLimitWeeks: 2 },
+  { slug: 'hummus-original-7331217012993', weeklyNeedUnits: 2, storageLimitWeeks: 3 }
+].map((candidate) => {
+  const product = pricedProducts.find((row) => row.slug === candidate.slug);
+  if (!product) throw new Error(`Missing OpenPrices stock-up product ${candidate.slug}`);
+  const datedObservations = product.observations
+    .filter((observation) => observation.date && Number.isFinite(observation.price))
+    .sort((left, right) => left.date.localeCompare(right.date));
+  const latestObservation = datedObservations.at(-1);
+  if (!latestObservation) throw new Error(`Missing OpenPrices observations for ${candidate.slug}`);
+  return {
+    product,
+    latestObservation,
+    weeklyNeedUnits: candidate.weeklyNeedUnits,
+    storageLimitWeeks: candidate.storageLimitWeeks,
+    history: datedObservations.map((observation) => ({
+      observedAt: `${observation.date}T00:00:00.000Z`,
+      unitPrice: observation.price,
+      sourceType: 'online' as const,
+      confidence: product.observationCount >= 8 ? 0.78 : 0.66
+    }))
+  };
+});
+
+const plannedMultiWeekStockUpList = planMultiWeekStockUpList({
+  asOf: '2026-05-22T10:00:00.000Z',
+  planningWeeks: 3,
+  weeklyBudget: 1150,
+  items: openPricesStockUpProducts.map((row) => ({
+    productId: row.product.slug,
+    productName: row.product.name,
+    storeName: 'OpenPrices SEK observations',
+    weeklyNeedUnits: row.weeklyNeedUnits,
+    packageUnits: 1,
+    comparableUnit: 'pack',
+    currentUnitPrice: row.latestObservation.price,
+    history: row.history,
+    storageLimitWeeks: row.storageLimitWeeks,
+    seasonalityNote: `OpenPrices dated SEK observations for barcode ${row.product.code}; no seasonality or future shelf-price projection.`
+  }))
+});
+
 export const multiWeekStockUpList = {
   persona: 'Meal-preppers / large households',
   title: 'Multi-week stock-up list',
-  planningWeeks: 3,
-  noForecastReason: 'No price forecast: the list only combines visible bulk unit prices, observed basket-change signals, and shopper storage limits.',
-  rows: mealPrepBulkBuyOptimizer.rows.map((row, index) => ({
-    productId: row.productId,
-    productName: row.productName,
-    storeName: row.storeName,
-    planningWeeks: [3, 2, 4][index] ?? 2,
-    plannedServings: row.freezerPortions + row.paybackMeals,
-    observedHistoryWindow: 'visible weekly basket rows plus changed-since-last-shop digest, no projected shelf price',
-    currentBulkUnitPrice: row.bulkUnitPrice,
-    unitSavingsPercent: row.unitSavingsPercent,
-    reviewTrigger: row.unitSavingsPercent >= 10
-      ? 'Review after the planned servings are used or when a new visible unit-price row arrives'
-      : 'Review before buying more because the observed unit spread is small',
-    stockUpDecision: row.stockUpDecision,
-    source: row.coverageEvidence
+  ...plannedMultiWeekStockUpList,
+  rows: plannedMultiWeekStockUpList.rows.map((row) => ({
+    ...row,
+    observedHistoryWindow: row.observedHistoryWindow,
+    reviewTrigger: row.reviewTrigger
   })),
+  noForecastReason: 'No price forecast: the list combines current OpenPrices observed pack prices with factual observed low/typical context and spreads today’s budget impact across the planning horizon.',
   coverageGuardrails: [
-    'No price forecast is displayed; every row is a present-tense stock-up plan from visible package math.',
+    'No price forecast is displayed; every row is a present-tense stock-up plan from generated OpenPrices dated observations.',
     'PlanningWeeks is a household usage horizon, not a price outlook.',
-    'reviewTrigger tells shoppers when to re-check observed prices before buying again.',
+    'Historical low and typical prices are computed from observed pack-price rows and labelled with coverage.',
     'Rows stay advisory until account-owned pantry, freezer, and expiry data confirm the storage limits.'
   ]
 };
@@ -3783,73 +3818,76 @@ export const mealPlanner = {
   ]
 };
 
+const mealCostBreakdownInput = {
+  mealId: 'weekday-lunchbox-bundle',
+  title: 'Weekday lunchbox bundle',
+  servings: 2,
+  ingredients: [
+    {
+      ingredientId: 'bread',
+      label: 'Wholegrain bread',
+      quantityNeeded: 0.25,
+      unit: 'kg',
+      offers: [
+        {
+          chainId: 'coop',
+          storeName: 'Coop Medborgarplatsen',
+          productId: 'pagen-lingongrova-500g',
+          productName: 'Pågen Lingongrova 500g',
+          packageQuantity: 0.5,
+          packageUnit: 'kg',
+          packagePrice: 33.9,
+          confidence: 0.72,
+          source: 'visible shelf product row'
+        }
+      ]
+    },
+    {
+      ingredientId: 'cheese',
+      label: 'Sliced cheese',
+      quantityNeeded: 0.12,
+      unit: 'kg',
+      offers: [
+        {
+          chainId: 'coop',
+          storeName: 'Coop Medborgarplatsen',
+          productId: 'arla-hushallsost-500g',
+          productName: 'Arla Hushållsost 500g',
+          packageQuantity: 0.5,
+          packageUnit: 'kg',
+          packagePrice: 54.9,
+          confidence: 0.7,
+          source: 'visible shelf product row'
+        }
+      ]
+    },
+    {
+      ingredientId: 'cucumber',
+      label: 'Cucumber',
+      quantityNeeded: 0.15,
+      unit: 'kg',
+      offers: [
+        {
+          chainId: 'coop',
+          storeName: 'Coop Medborgarplatsen',
+          productId: 'garant-gurka-300g',
+          productName: 'Garant Gurka 300g',
+          packageQuantity: 0.3,
+          packageUnit: 'kg',
+          packagePrice: 16.9,
+          confidence: 0.66,
+          source: 'visible shelf product row'
+        }
+      ]
+    }
+  ]
+} satisfies Parameters<typeof calculateMealCostBreakdown>[0];
+
 export const mealCostBreakdown = {
   persona: 'Meal-preppers / families',
   title: 'Ingredient-level meal costing',
-  summary: calculateMealCostBreakdown({
-    mealId: 'weekday-lunchbox-bundle',
-    title: 'Weekday lunchbox bundle',
-    servings: 2,
-    ingredients: [
-      {
-        ingredientId: 'bread',
-        label: 'Wholegrain bread',
-        quantityNeeded: 0.25,
-        unit: 'kg',
-        offers: [
-          {
-            chainId: 'coop',
-            storeName: 'Coop Medborgarplatsen',
-            productId: 'pagen-lingongrova-500g',
-            productName: 'Pågen Lingongrova 500g',
-            packageQuantity: 0.5,
-            packageUnit: 'kg',
-            packagePrice: 33.9,
-            confidence: 0.72,
-            source: 'visible shelf product row'
-          }
-        ]
-      },
-      {
-        ingredientId: 'cheese',
-        label: 'Sliced cheese',
-        quantityNeeded: 0.12,
-        unit: 'kg',
-        offers: [
-          {
-            chainId: 'coop',
-            storeName: 'Coop Medborgarplatsen',
-            productId: 'arla-hushallsost-500g',
-            productName: 'Arla Hushållsost 500g',
-            packageQuantity: 0.5,
-            packageUnit: 'kg',
-            packagePrice: 54.9,
-            confidence: 0.7,
-            source: 'visible shelf product row'
-          }
-        ]
-      },
-      {
-        ingredientId: 'cucumber',
-        label: 'Cucumber',
-        quantityNeeded: 0.15,
-        unit: 'kg',
-        offers: [
-          {
-            chainId: 'coop',
-            storeName: 'Coop Medborgarplatsen',
-            productId: 'garant-gurka-300g',
-            productName: 'Garant Gurka 300g',
-            packageQuantity: 0.3,
-            packageUnit: 'kg',
-            packagePrice: 16.9,
-            confidence: 0.66,
-            source: 'visible shelf product row'
-          }
-        ]
-      }
-    ]
-  }),
+  input: mealCostBreakdownInput,
+  summary: calculateMealCostBreakdown(mealCostBreakdownInput),
   coverage: {
     confidence: 'medium',
     caveat: 'Calls calculateMealCostBreakdown with only visible product rows and package quantities; missing substitute chains are excluded rather than estimated.'

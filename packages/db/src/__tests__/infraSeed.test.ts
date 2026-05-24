@@ -8,7 +8,7 @@ const repoRoot = join(fileURLToPath(new URL('.', import.meta.url)), '../../../..
 const stockholmSeed = readFileSync(join(repoRoot, 'infra/db/seeds/001_stockholm_seed.sql'), 'utf8').toLowerCase();
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 
-const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city-gross'];
+const requiredChains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city-gross', 'netto'];
 const requiredStoreSlugs = [
   'ica-nara-baronen-odenplan',
   'willys-hemma-stockholm-torsplan',
@@ -47,6 +47,19 @@ describe('infra/db Stockholm seed contract', () => {
     }
     assert.match(stockholmSeed, /insert into chains/);
     assert.match(stockholmSeed, /on conflict \(slug\) do update/);
+  });
+
+  it('seeds ticket-required chain-level website metadata used by comparisons', () => {
+    for (const [slug, website] of [
+      ['ica', 'https://www.ica.se/'],
+      ['coop', 'https://www.coop.se/'],
+      ['willys', 'https://www.willys.se/'],
+      ['hemkop', 'https://www.hemkop.se/'],
+      ['lidl', 'https://www.lidl.se/'],
+      ['netto', 'https://www.coop.se/']
+    ]) {
+      assert.match(stockholmSeed, new RegExp(`'${slug}',\\s*'[^']+',\\s*'se',\\s*'${website.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`, 'i'));
+    }
   });
 
   it('seeds six stores with geography coordinates', () => {

@@ -2,22 +2,127 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
-import { adaptiveProductCards, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
+import { apohemSource } from '@/lib/ingested/apohem';
+import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
+
+const PRODUCTS_PER_PAGE = 50;
 
 export function generateMetadata() {
   return routeMetadata('/products');
 }
 
-export default function ProductsPage() {
-  const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = facetedProductSearch;
+type SearchParams = {
+  q?: string | string[];
+  category?: string | string[];
+  label?: string | string[];
+  dietary?: string | string[];
+  chain?: string | string[];
+  minPrice?: string | string[];
+  maxPrice?: string | string[];
+  inStockOnly?: string | string[];
+  minConfidence?: string | string[];
+  brand?: string | string[];
+  page?: string | string[];
+};
+
+function toPageNumber(value: string | string[] | undefined): number {
+  const raw = Array.isArray(value) ? value[0] : value;
+  const parsed = Number.parseInt(raw ?? '1', 10);
+  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) return 1;
+  return parsed;
+}
+
+function normalizeSelectedBrand(brand: string | string[] | undefined) {
+  const requested = (Array.isArray(brand) ? brand[0] : brand)?.trim();
+  if (!requested) return '';
+  return productBrandFilterOptions.find((option) => option.value.toLocaleLowerCase('sv-SE') === requested.toLocaleLowerCase('sv-SE'))?.value ?? '';
+}
+
+function setFirstParam(params: URLSearchParams, key: keyof SearchParams, value: string | string[] | undefined) {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (raw?.trim()) params.set(key, raw.trim());
+}
+
+function setAllParams(params: URLSearchParams, key: keyof SearchParams, value: string | string[] | undefined) {
+  const rawValues = Array.isArray(value) ? value : value ? [value] : [];
+  for (const rawValue of rawValues.flatMap((item) => item.split(','))) {
+    const trimmed = rawValue.trim();
+    if (trimmed) params.append(key, trimmed);
+  }
+}
+
+function copySearchParams(params: URLSearchParams, source: SearchParams) {
+  setFirstParam(params, 'q', source.q);
+  setFirstParam(params, 'category', source.category);
+  setFirstParam(params, 'label', source.label);
+  setAllParams(params, 'dietary', source.dietary);
+  setFirstParam(params, 'chain', source.chain);
+  setFirstParam(params, 'minPrice', source.minPrice);
+  setFirstParam(params, 'maxPrice', source.maxPrice);
+  setFirstParam(params, 'inStockOnly', source.inStockOnly);
+  setFirstParam(params, 'minConfidence', source.minConfidence);
+}
+
+function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
+  const params = new URLSearchParams();
+  copySearchParams(params, searchParams);
+  if (selectedBrand) params.set('brand', selectedBrand);
+  if (page > 1) params.set('page', String(page));
+  const query = params.toString();
+  return query ? `/products?${query}` : '/products';
+}
+
+export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
+  const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
+  const search = buildProductSearchView(resolvedSearchParams);
+  const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
+  const requestedPage = toPageNumber(resolvedSearchParams.page);
+  const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
+  const productCards = selectedBrand
+    ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
+    : adaptiveProductCards;
+  const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
+  const currentPage = Math.min(requestedPage, totalPages);
+  const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const pagedResultCards = resultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
+  const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
+  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
+  const defaultSearchCount = facetedProductSearch.resultCards.length;
+
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+    const params = new URLSearchParams();
+    copySearchParams(params, resolvedSearchParams);
+    for (const [key, value] of Object.entries(overrides)) {
+      if (value?.trim()) params.set(key, value.trim());
+      else params.delete(key);
+    }
+    params.delete('page');
+    const query = params.toString();
+    return query ? `/products?${query}` : '/products';
+  }
 
   return (
     <PageShell>
       <Eyebrow>Products</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Verified product catalogue</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Products are shown only when present in the Axfood chain snapshot or OpenPrices SEK observations. No synthetic prices or filler products are rendered.</p>
+      <Card className="mt-8 border-indigo-200 bg-indigo-50/70">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-indigo-800">Pharmacy catalog</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Apohem + Apotek Hjärtat OTC rows</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              {apohemSource.rowCount.toLocaleString('sv-SE')} EAN-coded OTC, supplement, and beauty rows are surfaced on
+              the pharmacy route with prescription products and medical advice excluded.
+            </p>
+          </div>
+          <Link className="rounded-full bg-indigo-700 px-5 py-3 text-center text-sm font-black text-white" href="/pharmacy">
+            Open pharmacy catalog
+          </Link>
+        </div>
+      </Card>
       <Card className="mt-8 border-violet-200 bg-violet-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -26,18 +131,72 @@ export default function ProductsPage() {
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
               This preview calls buildFacetedProductSearch over facetedSearchRows generated from real product, latest_prices, chains, and stores-shaped Axfood rows.
               Shoppers can narrow by category, label/dietary evidence, kr/kg or kr/l range, chain, and the inStockOnly priced-row gate without synthetic product or price filler.
+              The default facetedProductSearch export contains {defaultSearchCount.toLocaleString('sv-SE')} server-backed rows before URL filters are applied.
             </p>
           </div>
           <div className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-violet-950 shadow-sm">
             {inStockOnly.productCount.toLocaleString('sv-SE')} priced products · {inStockOnly.latestPriceCount.toLocaleString('sv-SE')} latest_prices rows
           </div>
         </div>
+        <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_0.6fr_0.6fr_0.6fr_auto]" method="get">
+          {selectedBrand ? <input name="brand" type="hidden" value={selectedBrand} /> : null}
+          {search.filters.categories.length > 0 ? <input name="category" type="hidden" value={search.filters.categories.join(',')} /> : null}
+          {search.labelFilters.length > 0 ? <input name="label" type="hidden" value={search.labelFilters.join(',')} /> : null}
+          {search.filters.chains.length > 0 ? <input name="chain" type="hidden" value={search.filters.chains.join(',')} /> : null}
+          <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
+            Search
+            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.query} id="product-search-q" name="q" />
+          </label>
+          <label className="text-sm font-black text-slate-950" htmlFor="product-search-min-price">
+            Min unit SEK
+            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.minPrice ?? ''} id="product-search-min-price" min="0" name="minPrice" step="0.01" type="number" />
+          </label>
+          <label className="text-sm font-black text-slate-950" htmlFor="product-search-max-price">
+            Max unit SEK
+            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.maxPrice ?? ''} id="product-search-max-price" min="0" name="maxPrice" step="0.01" type="number" />
+          </label>
+          <label className="text-sm font-black text-slate-950" htmlFor="product-search-confidence">
+            Min confidence
+            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.minConfidence ?? ''} id="product-search-confidence" max="1" min="0" name="minConfidence" step="0.01" type="number" />
+          </label>
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-3 lg:col-span-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Dietary filters</p>
+            <div className="mt-2 grid gap-2 sm:grid-cols-3">
+              {search.dietaryFilters.map((filter) => (
+                <label className="flex items-start gap-2 rounded-2xl bg-white px-3 py-2 text-sm font-black text-emerald-950 shadow-sm" key={filter.value}>
+                  <input className="mt-1" defaultChecked={filter.checked} name="dietary" type="checkbox" value={filter.value} />
+                  <span>
+                    {filter.label}
+                    <span className="block text-xs font-semibold text-emerald-700">{filter.count.toLocaleString('sv-SE')} evidence rows · {filter.evidenceSummary}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+            <p className="mt-2 text-xs font-semibold leading-5 text-emerald-900">
+              Gluten-free, lactose-free, and vegan filters require verified label metadata or explicit product text; GroceryView does not infer dietary status from shopper profiles.
+            </p>
+          </div>
+          <div className="flex flex-col justify-end gap-2">
+            <label className="flex items-center gap-2 rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950">
+              <input defaultChecked={search.filters.inStockOnly} name="inStockOnly" type="checkbox" value="true" />
+              In-stock only
+            </label>
+            <button className="rounded-full bg-violet-800 px-4 py-3 text-sm font-black text-white" type="submit">Apply filters</button>
+          </div>
+        </form>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {search.activeFilters.length > 0 ? search.activeFilters.map((filter) => (
+            <span className="rounded-full bg-violet-900 px-3 py-1 text-xs font-black text-white" key={filter}>{filter}</span>
+          )) : (
+            <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-violet-900 shadow-sm">No active URL filters</span>
+          )}
+        </div>
         <div className="mt-5 grid gap-3 lg:grid-cols-4">
           <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Category facets</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {categoryFacets.map((facet) => (
-                <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-900" key={facet.value}>{facet.value} · {facet.count}</span>
+                <Link className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-900" href={searchFacetUrl({ category: facet.value })} key={facet.value}>{facet.value} · {facet.count}</Link>
               ))}
             </div>
           </div>
@@ -45,7 +204,7 @@ export default function ProductsPage() {
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Label / dietary facets</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {labelFacets.map((facet) => (
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900" key={facet.value}>{facet.label} · {facet.count}</span>
+                <Link className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900" href={searchFacetUrl({ label: facet.value })} key={facet.value}>{facet.label} · {facet.count}</Link>
               ))}
             </div>
           </div>
@@ -53,7 +212,7 @@ export default function ProductsPage() {
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Chain facets</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {chainFacets.map((facet) => (
-                <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" key={facet.value}>{facet.label} · {facet.count}</span>
+                <Link className="rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" href={searchFacetUrl({ chain: facet.value })} key={facet.value}>{facet.label} · {facet.count}</Link>
               ))}
             </div>
           </div>
@@ -64,7 +223,7 @@ export default function ProductsPage() {
           </div>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {resultCards.map((product) => (
+          {pagedResultCards.map((product) => (
             <Link className="group rounded-2xl border border-violet-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-700" href={`/products/${product.slug}`} key={product.slug}>
               <div className="flex gap-3">
                 {product.imageUrl ? (
@@ -73,7 +232,12 @@ export default function ProductsPage() {
                   </div>
                 ) : null}
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">{product.brand}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">{product.brand}</p>
+                    {product.isAvailable === false ? (
+                      <span className="rounded-full bg-rose-100 px-2 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-rose-900">Out of stock</span>
+                    ) : null}
+                  </div>
                   <h3 className="mt-1 text-lg font-black text-slate-950">{product.name}</h3>
                   <p className="mt-1 text-xs font-semibold text-slate-500">{product.categoryLabel}</p>
                 </div>
@@ -86,6 +250,29 @@ export default function ProductsPage() {
             </Link>
           ))}
         </div>
+        {resultCards.length > PRODUCTS_PER_PAGE ? (
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
+            <p className="font-black text-slate-700">
+              Showing {rangeStart}-{rangeEnd} of {resultCards.length} instant products (page {currentPage}/{totalPages})
+            </p>
+            <div className="flex gap-3">
+              {currentPage > 1 ? (
+                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1, selectedBrand, resolvedSearchParams)}>
+                  Previous
+                </Link>
+              ) : (
+                <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Previous</span>
+              )}
+              {currentPage < totalPages ? (
+                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1, selectedBrand, resolvedSearchParams)}>
+                  Next
+                </Link>
+              ) : (
+                <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Next</span>
+              )}
+            </div>
+          </div>
+        ) : null}
       </Card>
       <Card className="mt-8 border-rose-200 bg-rose-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
@@ -243,10 +430,36 @@ export default function ProductsPage() {
         </div>
       </Card>
       <div className="mt-6">
+        <Card className="mb-4 border-emerald-200 bg-emerald-50/70">
+          <form action="/products" className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end" method="get">
+            <div>
+              <label className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800" htmlFor="products-brand-filter">Brand filter</label>
+              <select
+                className="mt-2 min-h-11 w-full rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm font-bold text-slate-900"
+                defaultValue={selectedBrand}
+                id="products-brand-filter"
+                name="brand"
+              >
+                <option value="">All brands</option>
+                {productBrandFilterOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label} ({option.productCount})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button className="rounded-xl bg-emerald-700 px-5 py-3 text-sm font-black text-white" type="submit">Apply brand</button>
+          </form>
+          <p className="mt-3 text-sm font-bold text-emerald-950">
+            {selectedBrand
+              ? `Showing ${productCards.length.toLocaleString('sv-SE')} verified product card${productCards.length === 1 ? '' : 's'} for ${selectedBrand}.`
+              : 'Brand options are reused from the shared verified product option set so homepage and catalogue filters stay consistent.'}
+          </p>
+        </Card>
         <ProductPriceCards
-          cards={adaptiveProductCards}
+          cards={productCards}
           eyebrow="Product-card display"
-          title="Adaptive total ⇄ per-unit price cards"
+          title={selectedBrand ? `${selectedBrand} adaptive total ⇄ per-unit price cards` : 'Adaptive total ⇄ per-unit price cards'}
           intro="Branded products lead with the actual pack price, commodity-like produce leads with comparable unit price, and the toggle flips the sort key across every card."
         />
       </div>

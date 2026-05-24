@@ -76,11 +76,17 @@ export const DEFAULT_MATPRISKOLLEN_REGIONS = [
   { name: 'malmo', lat: 55.605, lon: 13.0038 },
   { name: 'stockholm', lat: 59.3293, lon: 18.0686 },
   { name: 'goteborg', lat: 57.7089, lon: 11.9746 },
-  { name: 'uppsala', lat: 59.8586, lon: 17.6389 }
+  { name: 'uppsala', lat: 59.8586, lon: 17.6389 },
+  { name: 'vasteras', lat: 59.6099, lon: 16.5448 },
+  { name: 'orebro', lat: 59.2753, lon: 15.2134 },
+  { name: 'linkoping', lat: 58.4108, lon: 15.6214 },
+  { name: 'helsingborg', lat: 56.0465, lon: 12.6945 },
+  { name: 'umea', lat: 63.8258, lon: 20.263 },
+  { name: 'lulea', lat: 65.5848, lon: 22.1567 }
 ] as const;
 export const DEFAULT_MATPRISKOLLEN_STORE_LIMIT = 60;
 export const DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE = 200;
-export const DEFAULT_MATPRISKOLLEN_MAX_ROWS = 1000;
+export const DEFAULT_MATPRISKOLLEN_MAX_ROWS = 3500;
 export const DEFAULT_MATPRISKOLLEN_GROCERY_STORE_PATTERN = /(willys|lidl|coop|ica|hemk[oö]p|city gross)/i;
 
 export type MatpriskollenRegion = {
@@ -144,7 +150,7 @@ export async function fetchMatpriskollenOffers(
       ? [{ lat, lon }]
       : DEFAULT_MATPRISKOLLEN_REGIONS);
   const rows: MatpriskollenOffer[] = [];
-  const seenCodes = new Set<string>();
+  const seenOfferStoreKeys = new Set<string>();
 
   for (const region of regions) {
     const storeUrl = buildMatpriskollenStoresUrl(region.lat, region.lon, storeLimit);
@@ -189,10 +195,14 @@ export async function fetchMatpriskollenOffers(
           storeKey,
           storeId: text(store.id)
         });
-        if (!row || seenCodes.has(row.code)) {
+        if (!row) {
           continue;
         }
-        seenCodes.add(row.code);
+        const offerStoreKey = `${row.code}:${row.storeKey}`;
+        if (seenOfferStoreKeys.has(offerStoreKey)) {
+          continue;
+        }
+        seenOfferStoreKeys.add(offerStoreKey);
         rows.push(row);
         if (rows.length >= maxRows) {
           return rows;

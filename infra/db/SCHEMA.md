@@ -19,8 +19,11 @@ Price and ingestion records expose provenance directly:
 - `retailer_source_policies.provenance`: source-policy metadata such as robots crawl evidence, reviewer, policy matrix version, and source-policy notes.
 - `observations.provenance`: normalized price metadata such as extraction rule, original displayed price, campaign identifiers, and review notes.
 - `latest_prices.provenance`: copied from the winning observation so API callers can show source context without joining.
+- `fuel_price_sources.provenance`: source-level fuel evidence such as operator page, crowd reporter metadata, legal review, and policy notes.
+- `fuel_price_source_observations`: links fuel source evidence to immutable `domain='fuel'` observations while preserving the original source price text.
 
 Every price-bearing row carries `price_type`, `confidence`, `observed_at`, and `provenance` either directly or through its referenced observation.
+Fuel-domain rows carry litre unit prices through immutable `domain = fuel` observations and fuel source links.
 
 ## Partitioning Plan
 
@@ -43,11 +46,13 @@ The schema stores store location in `stores.position` for map and trip-planning 
 
 Migration 011 adds a `domain` column to `chains`, `stores`, `products`, `observations`, and `latest_prices`. Existing rows default to `grocery`; future verticals are constrained to `fuel` and `pharmacy` until a later migration expands the supported set. This keeps matching domain-scoped: grocery uses EAN + commodity matching, fuel uses fuel grades, and pharmacy uses OTC/health EANs. Public routes must not render non-grocery prices until `observations.domain` has connector or trusted crowd rows for that vertical.
 
+Migration 014 adds the fuel source contract. `fuel_grades` is the only supported grade catalog for the current fuel lane: 95 E10, 98, diesel, HVO100, and E85. `fuel_price_sources` accepts either an operator public price page or a trusted crowd station report, and `fuel_price_source_observations` ties that source evidence to immutable `domain='fuel'` observations with the original price text. Fuel prices are always price per litre; estimated fuel rows are not part of this source model.
+
 ## Tables
 
 ### `chains`
 
-Retail banners such as ICA, Willys, Coop, Lidl, Hemkop, and City Gross.
+Retail banners such as ICA, Willys, Coop, Lidl, Hemkop, Netto, and City Gross.
 
 Key columns: `slug`, `name`, `domain`, `country_code`, `website_url`.
 
@@ -63,15 +68,21 @@ Indexes: `stores_position_gix` for location queries, plus `stores_name_trgm_idx`
 
 Canonical product records used by search, charts, baskets, and matching.
 
-Key columns: `slug`, `canonical_name`, `domain`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`. Commodity columns (migration 010): `product_kind` (`branded`|`commodity`), `commodity_id`, `variant`, `is_organic`, `origin_country`.
+Key columns: `slug`, `canonical_name`, localized display names (`name_sv`, `name_en`), `domain`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`. Commodity columns (migration 010): `product_kind` (`branded`|`commodity`), `commodity_id`, `variant`, `is_organic`, `origin_country`. Fuel column (migration 014): `fuel_grade_id`.
 
-Indexes: `products_name_trgm_idx` and `products_slug_trgm_idx` for fuzzy product search; `products_commodity_idx` and `products_kind_idx` for commodity matching.
+Indexes: `products_name_trgm_idx`, `products_name_sv_trgm_idx`, `products_name_en_trgm_idx`, and `products_slug_trgm_idx` for fuzzy product search; `products_commodity_idx` and `products_kind_idx` for commodity matching.
 
 ### `commodities`
 
 Canonical generic products for unbranded / loose items (meat, vegetables, fruit, bakery, bulk) that have no EAN and are sold by weight. Chain loose items map here via `products.commodity_id`; cross-chain comparison is on `unit_price` (kr/kg, kr/l, kr/st), not barcode. `is_staple` marks the representative basket behind the per-chain fresh-food index. Starter taxonomy: `packages/catalog/src/commodities.ts`.
 
 Key columns: `slug`, `name_sv`, `name_en`, `category_path`, `comparable_unit` (`kg`|`l`|`st`), `default_variant`, `is_staple`.
+
+### `fuel_grades`
+
+Canonical fuel products for the fuel vertical. Fuel grades are matched by grade id, not EAN or grocery commodity alias, and every supported grade compares on litres only.
+
+Key columns: `id`, `grade_code`, `label`, `comparable_unit`, `match_key`, `active`.
 
 ### `aliases`
 
@@ -107,23 +118,41 @@ Allowed `policy_label` values: `allowed`, `fixture_review`, `manual_review`, `bl
 
 Indexes: `retailer_source_policies_label_review_idx`, `retailer_source_policies_disallowed_gin_idx`, and `retailer_source_policies_provenance_gin_idx`.
 
+### `fuel_price_sources`
+
+Source rows accepted by the fuel lane before facts are linked to observations. Operator rows require `operator_id`, `operator_name`, `source_url`, `parser_version`, and `captured_at`. Crowd rows require `station_id`, `reporter_id`, `reporter_trust_tier`, `evidence_type`, and `submitted_at`, with reporter risk controlled by `community_reporter_trust`.
+
+Key columns: `source_kind`, `operator_id`, `operator_name`, `station_id`, `reporter_id`, `reporter_trust_tier`, `evidence_type`, `source_url`, `parser_version`, `captured_at`, `submitted_at`, `provenance`.
+
+Indexes: `fuel_price_sources_kind_captured_idx`.
+
+### `fuel_price_source_observations`
+
+Join table from a fuel operator/crowd source row to the immutable `observations` row it produced. Stores the grade id plus original source price text so rendered rows can prove the per-litre price was copied from source evidence, not inferred.
+
+Key columns: `source_id`, `observation_id`, `fuel_grade_id`, `original_price_text`, `original_effective_date`.
+
+Indexes: `fuel_price_source_observations_grade_idx`.
+
 ### `observations`
 
 Immutable normalized price facts. This is the canonical table for historical charts and price provenance.
 
-Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `observed_at`, validity window fields, `confidence`, `provenance`.
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `is_available`, `observed_at`, validity window fields, `confidence`, `provenance`.
+
+`observations.is_available` defaults true for historical rows and is set false when connector evidence shows a product is out-of-stock, not found, or backed by an empty stock response. The field is part of connector replay idempotency so a stock-state change can append an immutable fact without overwriting price history.
 
 Write policy: daily ingestion uses change-only writes. Before inserting a new immutable observation, the PostgreSQL writer compares the incoming `(product_id, chain_id, store_id, price_type)` price tuple with `latest_prices`; unchanged current snapshots reuse the existing `observation_id` instead of creating another daily duplicate. Changed rows keep temporal state by writing `valid_from` from source evidence or defaulting it to `observed_at`.
 
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
-Indexes: product/time, store/time, price type/time, and provenance GIN.
+Indexes: product/time, store/time, price type/time, provenance GIN, and `observations_connector_idempotency_idx` as the compound unique price snapshot guard for scraper upserts and exact connector replay idempotency without updating stored history.
 
 ### `observations_v2`
 
 Range-partitioned monthly mirror of immutable `observations` for high-volume history reads. It is populated by `observations_partition_lane_sync`, which calls `ensure_observations_monthly_partition()` before copying inserts and updates from the canonical table.
 
-Key columns: same price, source, provenance, validity, domain, and observed-time fields as `observations`. The partitioned primary key is `(id, observed_at)` because PostgreSQL range-partitioned unique keys must include the partition key.
+Key columns: same price, source, availability, provenance, validity, domain, and observed-time fields as `observations`. The partitioned primary key is `(id, observed_at)` because PostgreSQL range-partitioned unique keys must include the partition key.
 
 Partitions: monthly range partitions named `observations_YYYY_MM`, plus `observations_default` for rows outside the pre-created window. Operators should drain the default partition by creating the matching monthly partition before long-term retention.
 
@@ -133,9 +162,13 @@ Indexes: parent and per-partition product/time, store/time, price type/time, dom
 
 Materialized latest price lookup for API and UI reads, and the write-side change detector for daily ingestion. Each row references the observation that won the rollup.
 
-Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `observation_id`, `price`, `regular_price`, `unit_price`, `currency`, `observed_at`, `confidence`, `provenance`, `updated_at`.
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `observation_id`, `price`, `regular_price`, `unit_price`, `currency`, `observed_at`, `is_available`, `confidence`, `provenance`, `updated_at`.
+
+`latest_prices.is_available` is copied from the winning observation so API and static ProductCard surfaces can show an `Out of stock` badge without scanning raw history.
 
 Primary key: `(product_id, chain_id, store_id, price_type)`.
+
+Snapshot IO note: the DB-backed site snapshot exporter was identified as the likely Supabase Disk IO hot read after the all-store daily runner and DB snapshot work landed. Keep `scripts/ingestion/export-db-site-snapshot.mjs` on the `latest_prices_grocery_snapshot_idx` access pattern: filter to `domain='grocery'`, bound confidence/limit, and read the latest rows from `latest_prices` before joining metadata. Do not replace it with a raw `observations` scan or an unbounded latest-price export; preserve the change-only write path so unchanged daily snapshots reuse existing observations instead of silently dropping writes.
 
 ### `price_daily`
 
@@ -199,6 +232,22 @@ Key columns: `user_id`, `watchlist_id`, `product_id`, `store_id`, `alert_type`, 
 
 Indexes: `alerts_active_user_idx`.
 
+### `price_alerts`
+
+Target-price alert subscriptions captured by the web alert API.
+
+Key columns: `id`, `user_email`, `product_id`, `target_price`, `created_at`.
+
+Indexes: `price_alerts_user_created_idx` for account alert reads and `price_alerts_product_idx` for product-scoped alert evaluation.
+
+### `webhook_subscriptions`
+
+Outbound price-change webhook subscriptions used by `/api/webhooks/price-change` after verified price drops.
+
+Key columns: `id`, `user_id`, `product_id`, `chain`, `callback_url`, `secret`, `active`, `last_delivery_at`, `failure_count`, `created_at`, `updated_at`.
+
+Indexes: `webhook_subscriptions_active_product_idx` for product and chain fanout and `webhook_subscriptions_user_idx` for account-scoped subscription management.
+
 ### `alert_rules`
 
 Application repository alert rules keyed by the text `app_users` identity used by current API and worker packages.
@@ -223,9 +272,9 @@ Primary key: `(user_id, store_id)`.
 
 ### `user_preferences`
 
-Legacy app repository budget preferences.
+App repository budget and authenticated settings preferences.
 
-Key columns: `user_id`, `weekly_budget`, `monthly_budget`, `updated_at`.
+Key columns: `user_id`, `weekly_budget`, `monthly_budget`, `preferred_currency`, `notification_channels`, `updated_at`.
 
 ### `watchlist_items`
 
@@ -277,7 +326,7 @@ Key columns: `reports_last_24_hours`, `pending_reports`, `accepted_reports_last_
 
 ### `notification_tasks`
 
-Scheduled push/email notification work items.
+Scheduled push/email/Telegram notification work items.
 
 Key columns: `channel`, `type`, `title`, `body`, `priority`, `send_at`, `recipient`, `attempt_count`, `max_attempts`, `status`.
 
@@ -286,6 +335,12 @@ Key columns: `channel`, `type`, `title`, `body`, `priority`, `send_at`, `recipie
 Recipient suppression records for unsubscribe, bounce, and complaint handling.
 
 Key columns: `recipient`, `channel`, `reason`, `active`, `updated_at`.
+
+### `notification_subscriptions`
+
+Account-scoped delivery destinations for notification fanout. Telegram rows store the Bot API `chat_id` used for target-price alerts.
+
+Key columns: `user_id`, `channel`, `recipient`, `chat_id`, `product_id`, `active`.
 
 ### `subscription_entitlements`
 

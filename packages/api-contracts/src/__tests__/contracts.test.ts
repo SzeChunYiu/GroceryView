@@ -4,7 +4,9 @@ import {
   apiContractOpenApiComponents,
   apiContractSchemas,
   fuelPriceObservationSchema,
+  notificationInboxResponseSchema,
   priceObservationSchema,
+  type NotificationInboxResponseDto,
   type PriceObservationDto
 } from '../index.js';
 
@@ -33,6 +35,36 @@ const validPrice: PriceObservationDto = {
   }
 };
 
+const validNotificationInbox: NotificationInboxResponseDto = {
+  userId: 'user-1',
+  generatedAt: '2026-05-20T08:00:00.000Z',
+  trackedItemCount: 1,
+  activeAlertCount: 1,
+  deliveredCount: 0,
+  heldCount: 1,
+  suppressedCount: 0,
+  summary: {
+    delivered: 0,
+    held: 1,
+    suppressed: 0,
+    total: 1
+  },
+  queue: [
+    {
+      id: 'receipt-review-quiet-hours',
+      title: 'Receipt review reminder',
+      channel: 'push',
+      status: 'held',
+      reason: 'Quiet hours 21:00-07:00',
+      action: 'Send in morning digest',
+      priority: 'normal',
+      sendAt: '2026-05-20T07:00:00.000Z'
+    }
+  ],
+  quietHoursWindow: '21:00-07:00',
+  guardrails: ['Quiet-hours holds wait for the morning digest unless the alert is critical.']
+};
+
 describe('api contract schemas', () => {
   it('exports DTO schemas for the Phase 1 API resources', () => {
     assert.deepEqual(Object.keys(apiContractSchemas).sort(), [
@@ -41,7 +73,9 @@ describe('api contract schemas', () => {
       'basketItem',
       'fuelPriceObservation',
       'fuelPriceSource',
+      'fuelPricesResponse',
       'latestPrice',
+      'notificationInboxResponse',
       'priceObservation',
       'product',
       'productPricesResponse',
@@ -133,8 +167,27 @@ describe('api contract schemas', () => {
     );
   });
 
+  it('requires notification inbox timing fields for API and server contracts', () => {
+    const parsed = notificationInboxResponseSchema.parse(validNotificationInbox);
+
+    assert.equal(parsed.generatedAt, '2026-05-20T08:00:00.000Z');
+    assert.equal(parsed.queue[0]?.sendAt, '2026-05-20T07:00:00.000Z');
+    assert.equal(
+      notificationInboxResponseSchema.safeParse({
+        ...validNotificationInbox,
+        generatedAt: undefined,
+        queue: validNotificationInbox.queue.map(({ sendAt: _sendAt, ...item }) => item)
+      }).success,
+      false
+    );
+  });
+
   it('publishes OpenAPI-compatible component metadata for price provenance', () => {
     const price = apiContractOpenApiComponents.PriceObservation;
+    const fuel = apiContractOpenApiComponents.FuelPriceObservation;
+    assert.ok(fuel.required.includes('domain'));
+    assert.ok(fuel.required.includes('fuelGrade'));
+    assert.ok(fuel.required.includes('pricePerLitre'));
     assert.ok(price.required.includes('priceType'));
     assert.ok(price.required.includes('confidence'));
     assert.ok(price.required.includes('observedAt'));
@@ -142,5 +195,22 @@ describe('api contract schemas', () => {
     assert.ok(price.required.includes('provenance'));
     assert.deepEqual(price.properties.priceType.enum, ['shelf', 'member', 'promotion', 'estimated']);
     assert.deepEqual(apiContractOpenApiComponents.FuelPriceObservation.properties.fuelGrade.enum, ['95', '98', 'diesel', 'hvo100', 'e85']);
+    assert.deepEqual(apiContractOpenApiComponents.NotificationInboxResponse.properties.queue.items, {
+      $ref: '#/components/schemas/NotificationInboxQueueItem'
+    });
+    assert.deepEqual(apiContractOpenApiComponents.NotificationInboxResponse.required, [
+      'userId',
+      'generatedAt',
+      'trackedItemCount',
+      'activeAlertCount',
+      'deliveredCount',
+      'heldCount',
+      'suppressedCount',
+      'summary',
+      'queue',
+      'quietHoursWindow',
+      'guardrails'
+    ]);
+    assert.equal(apiContractOpenApiComponents.NotificationInboxQueueItem.properties.sendAt.format, 'date-time');
   });
 });

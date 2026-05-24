@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  categoryPathForSlug,
   createPostgresCatalogReader,
   createPostgresPriceObservationWriter,
   createPostgresPriceReader,
@@ -9,13 +10,33 @@ import {
   createPostgresSiteSnapshotReader,
   createPostgresSourceRecordReader,
   createPostgresSourceRecordWriter,
+  createPostgresTrendingPriceChangeReader,
+  createPostgresWeeklyPriceDropDigestReader,
+  groceryCategoryHierarchy,
+  persistOpenPricesArtifact,
+  summarizeTrendingProductPriceChanges,
   type QueryExecutor
 } from '../index.js';
+
+describe('groceryCategoryHierarchy', () => {
+  it('returns parent-to-leaf paths for public grocery category slugs', () => {
+    assert.ok(groceryCategoryHierarchy.length > 0);
+    assert.deepEqual(
+      categoryPathForSlug('coffee-tea').map((category) => category.slug),
+      ['grocery', 'packaged-grocery', 'beverages', 'coffee-tea']
+    );
+    assert.deepEqual(
+      categoryPathForSlug('produce').map((category) => category.label),
+      ['Grocery', 'Fresh food', 'Fruit & Vegetables']
+    );
+  });
+});
 
 class RecordingQueryExecutor implements QueryExecutor {
   calls: Array<{ sql: string; params: unknown[] }> = [];
   basketId: string | number | undefined = 'basket-1';
   observationId: string | undefined = 'observation-1';
+  existingObservationRows: unknown[] = [];
   sourceRunId: string | undefined = 'source-run-1';
   rawRecordId: string | undefined = 'raw-record-1';
   chainId: string | undefined = 'chain-open-prices';
@@ -154,11 +175,11 @@ class RecordingQueryExecutor implements QueryExecutor {
     }
   ];
   householdMemberRows: unknown[] = [
-    { household_id: 'house-1', user_id: 'partner', display_name: 'Mina' },
-    { household_id: 'house-1', user_id: 'user-1', display_name: 'Alex' }
+    { household_id: 'house-1', user_id: 'partner', display_name: 'Mina', role: 'editor' },
+    { household_id: 'house-1', user_id: 'user-1', display_name: 'Alex', role: 'owner' }
   ];
   householdBasketItemRows: unknown[] = [
-    { household_id: 'house-1', line_position: 0, product_id: 'milk', quantity: '2.000', added_by: 'partner' }
+    { household_id: 'house-1', line_position: 0, product_id: 'milk', quantity: '2.000', added_by: 'partner', checked: true, checked_by: 'user-1', checked_at: '2026-05-20T08:02:00.000Z' }
   ];
   householdWatchlistItemRows: unknown[] = [
     { household_id: 'house-1', line_position: 0, product_id: 'coffee', added_by: 'user-1', target_price: '50.00' }
@@ -265,6 +286,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       promotion_starts_on: '2026-05-18',
       promotion_ends_on: '2026-05-24',
       member_required: true,
+      is_available: false,
       observed_at: new Date('2026-05-20T09:00:00.000Z'),
       valid_from: '2026-05-18T00:00:00.000Z',
       valid_until: '2026-05-24T23:59:59.000Z',
@@ -290,6 +312,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       promotion_starts_on: null,
       promotion_ends_on: null,
       member_required: false,
+      is_available: true,
       observed_at: '2026-05-20T08:00:00.000Z',
       valid_from: null,
       valid_until: null,
@@ -308,6 +331,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       regular_price: null,
       unit_price: '110.8889',
       currency: 'SEK',
+      is_available: true,
       observed_at: new Date('2026-05-20T08:00:00.000Z'),
       confidence: '0.9100',
       provenance: '{"sourceType":"retailer_api","sourceName":"Willys"}'
@@ -322,9 +346,53 @@ class RecordingQueryExecutor implements QueryExecutor {
       regular_price: '59.90',
       unit_price: 99.7778,
       currency: 'SEK',
+      is_available: false,
       observed_at: '2026-05-20T09:00:00.000Z',
       confidence: 0.88,
+      member_required: false,
       provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
+    }
+  ];
+  weeklyPriceDropDigestRows: unknown[] = [
+    {
+      product_id: 'product-1',
+      product_slug: 'bryggkaffe-450g',
+      product_name: 'Bryggkaffe mellanrost 450 g',
+      brand: 'Rosteriet',
+      chain_slug: 'willys',
+      chain_name: 'Willys',
+      store_slug: 'willys-hemma-stockholm-torsplan',
+      store_name: 'Willys Hemma Stockholm Torsplan',
+      price_type: 'promotion',
+      price: '44.90',
+      regular_price: '59.90',
+      savings_amount: '15.00',
+      drop_percent: '25.04',
+      currency: 'SEK',
+      observed_at: '2026-05-22T09:00:00.000Z',
+      confidence: '0.8800'
+    }
+  ];
+  trendingPriceChangeRows: unknown[] = [
+    {
+      rank: '1',
+      product_id: 'product-1',
+      product_slug: 'bryggkaffe-450g',
+      product_name: 'Bryggkaffe mellanrost 450 g',
+      brand: 'Rosteriet',
+      category_label: 'Coffee',
+      change_count: '3',
+      observation_count: '5',
+      latest_price: '44.90',
+      previous_price: '49.90',
+      change_amount: '-5.00',
+      change_percent: '-10.02',
+      currency: 'SEK',
+      latest_observed_at: '2026-05-22T09:00:00.000Z',
+      chain_slug: 'willys',
+      chain_name: 'Willys',
+      store_slug: 'willys-hemma-stockholm-torsplan',
+      store_name: 'Willys Hemma Stockholm Torsplan'
     }
   ];
   siteSnapshotRows: unknown[] = [
@@ -333,6 +401,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       product_slug: 'bryggkaffe-450g',
       canonical_name: 'Bryggkaffe mellanrost 450 g',
       brand: 'Rosteriet',
+      image_url: 'https://example.invalid/coffee.png',
       category_path: ['Pantry', 'Coffee'],
       package_size: '450.000',
       package_unit: 'g',
@@ -351,8 +420,16 @@ class RecordingQueryExecutor implements QueryExecutor {
       regular_price: '59.90',
       unit_price: 99.7778,
       currency: 'SEK',
+      is_available: false,
       observed_at: '2026-05-20T09:00:00.000Z',
       confidence: 0.88,
+      promotion_text: null,
+      promotion_starts_on: null,
+      promotion_ends_on: null,
+      member_required: false,
+      valid_from: null,
+      valid_until: null,
+      retailer_product_ref: null,
       provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
     }
   ];
@@ -382,10 +459,15 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('from source_runs')) return this.sourceRunRows as T[];
     if (sql.includes('insert into raw_records')) return this.rawRecordId === undefined ? ([] as T[]) : ([{ id: this.rawRecordId }] as T[]);
     if (sql.includes('from raw_records')) return this.rawRecordRows as T[];
+    if (sql.includes('insert into chains')) return this.chainId === undefined ? ([] as T[]) : ([{ id: this.chainId }] as T[]);
+    if (sql.includes('insert into products')) return this.productId === undefined ? ([] as T[]) : ([{ id: this.productId }] as T[]);
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
     if (sql.includes('left join latest_prices')) return this.catalogCoverageRows as T[];
+    if (sql.includes('weekly_price_drop_digest')) return this.weeklyPriceDropDigestRows as T[];
+    if (sql.includes('trending_price_changes')) return this.trendingPriceChangeRows as T[];
     if (sql.includes('join products on products.id = latest_prices.product_id')) return this.siteSnapshotRows as T[];
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
+    if (sql.includes('retailer_product_ref is not distinct from')) return this.existingObservationRows as T[];
     if (sql.includes('from observations')) return this.observationHistoryRows as T[];
     if (sql.includes('from stores')) return this.storeRows as T[];
     if (sql.includes('from products')) return this.productRows as T[];
@@ -1023,10 +1105,10 @@ describe('createPostgresRepository', () => {
       approvalLimit: 400,
       reviewer: 'user-1',
       members: [
-        { userId: 'user-1', displayName: 'Alex' },
-        { userId: 'partner', displayName: 'Mina' }
+        { userId: 'user-1', displayName: 'Alex', role: 'owner' },
+        { userId: 'partner', displayName: 'Mina', role: 'editor' }
       ],
-      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner' }],
+      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner', checked: true, checkedBy: 'user-1', checkedAt: '2026-05-20T08:02:00.000Z' }],
       watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
       sharedFavoriteStoreIds: ['lidl-sveavagen', 'willys-odenplan'],
       createdAt: '2026-05-20T08:00:00.000Z',
@@ -1041,10 +1123,10 @@ describe('createPostgresRepository', () => {
       approvalLimit: 400,
       reviewer: 'user-1',
       members: [
-        { userId: 'partner', displayName: 'Mina' },
-        { userId: 'user-1', displayName: 'Alex' }
+        { userId: 'partner', displayName: 'Mina', role: 'editor' },
+        { userId: 'user-1', displayName: 'Alex', role: 'owner' }
       ],
-      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner' }],
+      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner', checked: true, checkedBy: 'user-1', checkedAt: '2026-05-20T08:02:00.000Z' }],
       watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
       sharedFavoriteStoreIds: ['lidl-sveavagen', 'willys-odenplan'],
       createdAt: '2026-05-20T08:00:00.000Z',
@@ -1060,8 +1142,8 @@ describe('createPostgresRepository', () => {
       '2026-05-20T08:00:00.000Z',
       '2026-05-20T08:01:00.000Z'
     ]);
-    assert.deepEqual(executor.calls[5].params, ['house-1', 'user-1', 'Alex']);
-    assert.deepEqual(executor.calls[7].params, ['house-1', 0, 'milk', 2, 'partner']);
+    assert.deepEqual(executor.calls[5].params, ['house-1', 'user-1', 'Alex', 'owner']);
+    assert.deepEqual(executor.calls[7].params, ['house-1', 0, 'milk', 2, 'partner', true, 'user-1', '2026-05-20T08:02:00.000Z']);
     assert.deepEqual(executor.calls[8].params, ['house-1', 0, 'coffee', 'user-1', 50]);
     assert.deepEqual(executor.calls[10].params, ['house-1', 'willys-odenplan']);
     assert.deepEqual(executor.calls[11].params, ['user-1']);
@@ -1134,7 +1216,17 @@ describe('createPostgresCatalogReader', () => {
     assert.match(executor.calls[0]!.sql, /category_path @> \$2::text\[\]/);
     assert.match(executor.calls[0]!.sql, /when products\.barcode = query\.term then 0/);
     assert.match(executor.calls[0]!.sql, /similarity\(products\.canonical_name, coalesce\(query\.term, ''\)\)/);
-    assert.deepEqual(executor.calls[0]!.params, ['kaffe', ['Pantry', 'Coffee'], 25]);
+    assert.match(executor.calls[0]!.sql, /offset \$4/);
+    assert.deepEqual(executor.calls[0]!.params, ['kaffe', ['Pantry', 'Coffee'], 25, 0]);
+  });
+
+  it('supports page-based offsets for product listings', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    await reader.listProducts({ limit: 25, page: 3 });
+
+    assert.deepEqual(executor.calls[0]!.params, [null, null, 25, 50]);
   });
 
   it('clamps product list limits to a safe range', async () => {
@@ -1143,9 +1235,11 @@ describe('createPostgresCatalogReader', () => {
 
     await reader.listProducts({ limit: 5000 });
     await reader.listProducts({ limit: 0 });
+    await reader.listProducts({ limit: 25, page: 0 });
 
-    assert.deepEqual(executor.calls[0]!.params, [null, null, 500]);
-    assert.deepEqual(executor.calls[1]!.params, [null, null, 1]);
+    assert.deepEqual(executor.calls[0]!.params, [null, null, 500, 0]);
+    assert.deepEqual(executor.calls[1]!.params, [null, null, 1, 0]);
+    assert.deepEqual(executor.calls[2]!.params, [null, null, 25, 0]);
   });
 
   it('reads stores by slug with chain and coordinate metadata', async () => {
@@ -1538,8 +1632,94 @@ describe('createPostgresSourceRecordReader', () => {
   });
 });
 
+describe('persistOpenPricesArtifact', () => {
+  it('upserts connector rows into immutable observations idempotently', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.observationId = undefined;
+    executor.existingObservationRows = [{ id: 'observation-existing' }];
+
+    const result = await persistOpenPricesArtifact(executor, {
+      status: 'passed',
+      sourceUrl: 'https://prices.openfoodfacts.org/api/v1/prices?currency=SEK',
+      retrievedAt: '2026-05-20T08:00:00.000Z',
+      contentHash: 'sha256:artifact',
+      rawSnapshotRef: 'raw://open-prices/snapshot',
+      acceptedObservations: [
+        {
+          product: {
+            id: 'off-0731000000000',
+            canonicalName: 'Bryggkaffe mellanrost 450 g',
+            brand: 'Rosteriet',
+            categoryId: 'coffee',
+            packageSize: 450,
+            packageUnit: 'g',
+            comparableUnit: 'kg'
+          },
+          alias: {
+            rawName: 'Bryggkaffe Mellanrost',
+            matchConfidence: 0.95
+          },
+          priceObservation: {
+            productId: 'off-0731000000000',
+            retailerProductId: 'open-prices-price-123',
+            chainId: 'open-prices-chain',
+            observedAt: '2026-05-19T00:00:00.000Z',
+            price: 49.9,
+            unitPrice: 110.8889,
+            currency: 'SEK',
+            priceType: 'online',
+            sourceType: 'official_api',
+            sourceUrl: 'https://prices.openfoodfacts.org/api/v1/prices/123',
+            parserVersion: 'open-prices-v1',
+            rawSnapshotRef: 'raw://open-prices/snapshot',
+            confidenceScore: 0.95,
+            provenance: { sourceType: 'official_api', parserVersion: 'open-prices-v1' }
+          },
+          promotionObservation: null
+        }
+      ]
+    });
+
+    assert.deepEqual(result, {
+      status: 'persisted',
+      sourceRunId: 'source-run-1',
+      acceptedCount: 1,
+      rawRecordIds: ['raw-record-1'],
+      observationIds: ['observation-existing'],
+      productIds: ['product-open-prices'],
+      chainIds: ['chain-open-prices']
+    });
+
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.ok(observationInsert);
+    assert.match(observationInsert.sql, /on conflict/);
+    assert.deepEqual(observationInsert.params.slice(0, 12), [
+      'product-open-prices',
+      'chain-open-prices',
+      null,
+      'grocery',
+      'source-run-1',
+      'raw-record-1',
+      'open-prices-price-123',
+      'online',
+      49.9,
+      null,
+      110.8889,
+      'SEK'
+    ]);
+    assert.equal(observationInsert.params[18], true);
+    assert.equal(observationInsert.params[19], '2026-05-19T00:00:00.000Z');
+    assert.equal(observationInsert.params[22], 0.95);
+    assert.equal(executor.calls.some((call) => /update observations\b/.test(call.sql)), false);
+
+    const latestInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
+    assert.ok(latestInsert);
+    assert.equal(latestInsert.params[5], 'observation-existing');
+  });
+});
+
 describe('createPostgresPriceObservationWriter', () => {
-  it('skips unchanged daily snapshots and reuses the existing latest observation id', async () => {
+  it('appends unchanged daily snapshots instead of treating latest_prices as source of truth', async () => {
     const executor = new RecordingQueryExecutor();
     executor.latestPriceRows = [
       {
@@ -1554,6 +1734,7 @@ describe('createPostgresPriceObservationWriter', () => {
         currency: 'SEK',
         observed_at: '2026-05-20T08:00:00.000Z',
         confidence: '0.9100',
+        is_available: true,
         provenance: '{"sourceType":"retailer_api","sourceName":"Willys"}'
       }
     ];
@@ -1573,13 +1754,14 @@ describe('createPostgresPriceObservationWriter', () => {
         confidence: 0.93,
         provenance: { sourceType: 'retailer_api', sourceName: 'Willys', snapshot: 'daily-unchanged' }
       }),
-      { observationId: 'existing-observation', status: 'unchanged' }
+      { observationId: 'observation-1' }
     );
 
-    assert.match(executor.calls[0]!.sql, /from latest_prices/);
-    assert.match(executor.calls[0]!.sql, /store_id is not distinct from/);
-    assert.equal(executor.calls.some((call) => /insert into observations/.test(call.sql)), false);
-    assert.equal(executor.calls.some((call) => /insert into latest_prices/.test(call.sql)), false);
+    assert.match(executor.calls[0]!.sql, /insert into observations/);
+    assert.equal(executor.calls[0]!.params[18], true);
+    assert.equal(executor.calls[0]!.params[19], '2026-05-21T08:00:00.000Z');
+    assert.match(executor.calls[1]!.sql, /insert into latest_prices/);
+    assert.equal(executor.calls[1]!.params[5], 'observation-1');
   });
 
   it('persists immutable observations before rolling up latest prices', async () => {
@@ -1605,6 +1787,7 @@ describe('createPostgresPriceObservationWriter', () => {
         promotionStartsOn: '2026-05-18',
         promotionEndsOn: '2026-05-24',
         memberRequired: true,
+        isAvailable: false,
         observedAt: '2026-05-20T08:00:00.000Z',
         validFrom: '2026-05-18T00:00:00.000Z',
         validUntil: '2026-05-24T23:59:59.000Z',
@@ -1614,12 +1797,10 @@ describe('createPostgresPriceObservationWriter', () => {
       { observationId: 'observation-1' }
     );
 
-    assert.match(executor.calls[0]!.sql, /from latest_prices/);
-    assert.match(executor.calls[0]!.sql, /store_id is not distinct from/);
-
-    assert.match(executor.calls[1]!.sql, /insert into observations/);
-    assert.match(executor.calls[1]!.sql, /returning id/);
-    assert.deepEqual(executor.calls[1]!.params.slice(0, 12), [
+    assert.match(executor.calls[0]!.sql, /insert into observations/);
+    assert.match(executor.calls[0]!.sql, /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*confidence,\s*provenance\s*\) do nothing/);
+    assert.match(executor.calls[0]!.sql, /returning id/);
+    assert.deepEqual(executor.calls[0]!.params.slice(0, 12), [
       'product-1',
       'chain-1',
       'store-1',
@@ -1633,12 +1814,13 @@ describe('createPostgresPriceObservationWriter', () => {
       110.8889,
       'SEK'
     ]);
-    assert.equal(executor.calls[1]!.params[22], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
+    assert.equal(executor.calls[0]!.params[18], false);
+    assert.equal(executor.calls[0]!.params[23], JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' }));
 
-    assert.match(executor.calls[2]!.sql, /insert into latest_prices/);
-    assert.match(executor.calls[2]!.sql, /on conflict \(product_id, chain_id, store_id, price_type\) do update/);
-    assert.match(executor.calls[2]!.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
-    assert.deepEqual(executor.calls[2]!.params, [
+    assert.match(executor.calls[1]!.sql, /insert into latest_prices/);
+    assert.match(executor.calls[1]!.sql, /on conflict \(product_id, chain_id, store_id, price_type\) do update/);
+    assert.match(executor.calls[1]!.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
+    assert.deepEqual(executor.calls[1]!.params, [
       'product-1',
       'chain-1',
       'store-1',
@@ -1650,9 +1832,61 @@ describe('createPostgresPriceObservationWriter', () => {
       110.8889,
       'SEK',
       '2026-05-20T08:00:00.000Z',
+      false,
       0.91,
       JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', extractionRule: 'weekly-offers-v1' })
     ]);
+  });
+
+  it('returns an existing observation for exact connector replays without overwriting history', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.observationId = undefined;
+    executor.existingObservationRows = [{ id: 'observation-replayed' }];
+    const writer = createPostgresPriceObservationWriter(executor);
+
+    assert.deepEqual(
+      await writer.recordPriceObservation({
+        productId: 'product-1',
+        chainId: 'chain-1',
+        storeId: 'store-1',
+        rawRecordId: 'raw-replayed',
+        retailerProductRef: 'retailer-1',
+        priceType: 'online',
+        price: 49.9,
+        unitPrice: 110.8889,
+        currency: 'SEK',
+        isAvailable: false,
+        observedAt: '2026-05-20T08:00:00.000Z',
+        confidence: 0.91,
+        provenance: { sourceType: 'retailer_api', sourceName: 'Willys', replay: true }
+      }),
+      { observationId: 'observation-replayed' }
+    );
+
+    assert.match(executor.calls[0]!.sql, /insert into observations/);
+    assert.match(executor.calls[0]!.sql, /do nothing/);
+    assert.match(executor.calls[1]!.sql, /from observations/);
+    assert.match(executor.calls[1]!.sql, /store_id is not distinct from \$3/);
+    assert.match(executor.calls[1]!.sql, /domain = \$4/);
+    assert.match(executor.calls[1]!.sql, /retailer_product_ref is not distinct from \$5/);
+    assert.deepEqual(executor.calls[1]!.params, [
+      'product-1',
+      'chain-1',
+      'store-1',
+      'grocery',
+      'retailer-1',
+      'online',
+      '2026-05-20T08:00:00.000Z',
+      49.9,
+      110.8889,
+      'SEK',
+      false,
+      0.91,
+      JSON.stringify({ sourceType: 'retailer_api', sourceName: 'Willys', replay: true })
+    ]);
+    assert.equal(executor.calls.some((call) => /update observations\b/.test(call.sql)), false);
+    assert.match(executor.calls[2]!.sql, /insert into latest_prices/);
+    assert.equal(executor.calls[2]!.params[5], 'observation-replayed');
   });
 
   it('fails closed when the observation insert does not return an id', async () => {
@@ -1675,6 +1909,128 @@ describe('createPostgresPriceObservationWriter', () => {
     );
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into latest_prices')), false);
   });
+
+  it('upserts connector observation batches idempotently while keeping observations append-only', async () => {
+    class BatchRecordingExecutor implements QueryExecutor {
+      calls: Array<{ sql: string; params: unknown[] }> = [];
+
+      async query<T>(sql: string, params: unknown[] = []) {
+        this.calls.push({ sql, params });
+        const rows = JSON.parse(String(params[0])) as Array<{ ordinal: number }>;
+        return rows.map((row) => ({ ordinal: row.ordinal, id: `observation-${row.ordinal + 1}` })) as T[];
+      }
+    }
+
+    const executor = new BatchRecordingExecutor();
+    const writer = createPostgresPriceObservationWriter(executor);
+
+    assert.deepEqual(
+      await writer.upsertConnectorPriceObservations([
+        {
+          productId: '00000000-0000-0000-0000-000000000001',
+          chainId: '00000000-0000-0000-0000-000000000002',
+          storeId: '00000000-0000-0000-0000-000000000003',
+          sourceRunId: '00000000-0000-0000-0000-000000000004',
+          rawRecordId: '00000000-0000-0000-0000-000000000005',
+          retailerProductRef: 'wil-zoegas-450',
+          priceType: 'online',
+          price: 49.9,
+          regularPrice: 69.9,
+          unitPrice: 110.8889,
+          currency: 'SEK',
+          quantity: 450,
+          quantityUnit: 'g',
+          promotionText: 'Veckans erbjudande',
+          memberRequired: false,
+          isAvailable: false,
+          observedAt: '2026-05-21T03:17:00.000Z',
+          confidence: 0.95,
+          provenance: { connectorId: 'willys-normalized-json', runKey: 'willys:2026-05-21' }
+        },
+        {
+          productId: '00000000-0000-0000-0000-000000000001',
+          chainId: '00000000-0000-0000-0000-000000000002',
+          storeId: '00000000-0000-0000-0000-000000000003',
+          sourceRunId: '00000000-0000-0000-0000-000000000006',
+          rawRecordId: '00000000-0000-0000-0000-000000000007',
+          retailerProductRef: 'wil-zoegas-450',
+          priceType: 'online',
+          price: 47.9,
+          regularPrice: 69.9,
+          unitPrice: 106.4444,
+          currency: 'SEK',
+          quantity: 450,
+          quantityUnit: 'g',
+          observedAt: '2026-05-22T03:17:00.000Z',
+          confidence: 0.95,
+          provenance: { connectorId: 'willys-normalized-json', runKey: 'willys:2026-05-22' }
+        }
+      ]),
+      { observationIds: ['observation-1', 'observation-2'] }
+    );
+
+    assert.equal(executor.calls.length, 1);
+    assert.match(executor.calls[0]!.sql, /from jsonb_to_recordset\(\$1::jsonb\)/);
+    assert.match(executor.calls[0]!.sql, /price numeric\(12, 2\)/);
+    assert.match(executor.calls[0]!.sql, /unit_price numeric\(12, 4\)/);
+    assert.match(executor.calls[0]!.sql, /is_available boolean/);
+    assert.match(executor.calls[0]!.sql, /confidence numeric\(5, 4\)/);
+    assert.match(executor.calls[0]!.sql, /domain text/);
+    assert.match(executor.calls[0]!.sql, /partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, confidence, provenance/);
+    assert.match(executor.calls[0]!.sql, /join observations on observations\.product_id = ranked_input\.product_id/);
+    assert.match(executor.calls[0]!.sql, /and observations\.domain = ranked_input\.domain/);
+    assert.match(executor.calls[0]!.sql, /and observations\.retailer_product_ref is not distinct from ranked_input\.retailer_product_ref/);
+    assert.match(executor.calls[0]!.sql, /and observations\.price = ranked_input\.price/);
+    assert.match(executor.calls[0]!.sql, /and observations\.unit_price = ranked_input\.unit_price/);
+    assert.match(executor.calls[0]!.sql, /and observations\.currency = ranked_input\.currency/);
+    assert.match(executor.calls[0]!.sql, /and observations\.is_available = ranked_input\.is_available/);
+    assert.match(executor.calls[0]!.sql, /and observations\.confidence = ranked_input\.confidence/);
+    assert.match(executor.calls[0]!.sql, /and observations\.provenance = ranked_input\.provenance/);
+    assert.match(executor.calls[0]!.sql, /where input_rank = 1/);
+    assert.match(executor.calls[0]!.sql, /and not exists/);
+    const observationsInsertSql = executor.calls[0]!.sql.slice(
+      executor.calls[0]!.sql.indexOf('insert into observations'),
+      executor.calls[0]!.sql.indexOf('),\n         written as')
+    );
+    assert.match(
+      observationsInsertSql,
+      /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*confidence,\s*provenance\s*\) do nothing/
+    );
+    assert.match(executor.calls[0]!.sql, /insert into latest_prices/);
+    assert.match(executor.calls[0]!.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
+
+    const payload = JSON.parse(String(executor.calls[0]!.params[0])) as Array<Record<string, unknown>>;
+    assert.deepEqual(payload.map((row) => row.ordinal), [0, 1]);
+    assert.deepEqual(payload[0], {
+      ordinal: 0,
+      product_id: '00000000-0000-0000-0000-000000000001',
+      chain_id: '00000000-0000-0000-0000-000000000002',
+      store_id: '00000000-0000-0000-0000-000000000003',
+      domain: 'grocery',
+      source_run_id: '00000000-0000-0000-0000-000000000004',
+      raw_record_id: '00000000-0000-0000-0000-000000000005',
+      retailer_product_ref: 'wil-zoegas-450',
+      price_type: 'online',
+      price: 49.9,
+      regular_price: 69.9,
+      unit_price: 110.8889,
+      currency: 'SEK',
+      quantity: 450,
+      quantity_unit: 'g',
+      promotion_text: 'Veckans erbjudande',
+      promotion_starts_on: null,
+      promotion_ends_on: null,
+      member_required: false,
+      is_available: false,
+      observed_at: '2026-05-21T03:17:00.000Z',
+      valid_from: null,
+      valid_until: null,
+      confidence: 0.95,
+      provenance: { connectorId: 'willys-normalized-json', runKey: 'willys:2026-05-21' }
+    });
+    assert.equal(payload[1]!.observed_at, '2026-05-22T03:17:00.000Z');
+    assert.equal(payload[1]!.price, 47.9);
+  });
 });
 
 describe('createPostgresSiteSnapshotReader', () => {
@@ -1688,6 +2044,7 @@ describe('createPostgresSiteSnapshotReader', () => {
         productSlug: 'bryggkaffe-450g',
         canonicalName: 'Bryggkaffe mellanrost 450 g',
         brand: 'Rosteriet',
+        imageUrl: 'https://example.invalid/coffee.png',
         categoryPath: ['Pantry', 'Coffee'],
         packageSize: 450,
         packageUnit: 'g',
@@ -1706,18 +2063,225 @@ describe('createPostgresSiteSnapshotReader', () => {
         regularPrice: 59.9,
         unitPrice: 99.7778,
         currency: 'SEK',
+        isAvailable: false,
         observedAt: '2026-05-20T09:00:00.000Z',
         confidence: 0.88,
+        memberRequired: false,
         provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
       }
     ]);
 
     assert.match(executor.calls[0]!.sql, /from latest_prices/);
+    assert.match(executor.calls[0]!.sql, /join observations on observations\.id = latest_prices\.observation_id/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.is_available/);
+    assert.match(executor.calls[0]!.sql, /observations\.is_available/);
     assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
     assert.match(executor.calls[0]!.sql, /join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.confidence >= \$1/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.domain = 'grocery'/);
     assert.deepEqual(executor.calls[0]!.params, [0.8, 25]);
+  });
+});
+
+describe('createPostgresWeeklyPriceDropDigestReader', () => {
+  it('lists top weekly latest_prices drops with email-ready copy and bounded SQL', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresWeeklyPriceDropDigestReader(executor);
+
+    assert.deepEqual(
+      await reader.listWeeklyPriceDropDigest({
+        since: '2026-05-16T00:00:00.000Z',
+        until: '2026-05-23T00:00:00.000Z',
+        limit: 10
+      }),
+      [
+        {
+          rank: 1,
+          productId: 'product-1',
+          productSlug: 'bryggkaffe-450g',
+          productName: 'Bryggkaffe mellanrost 450 g',
+          brand: 'Rosteriet',
+          chainSlug: 'willys',
+          chainName: 'Willys',
+          storeSlug: 'willys-hemma-stockholm-torsplan',
+          storeName: 'Willys Hemma Stockholm Torsplan',
+          priceType: 'promotion',
+          price: 44.9,
+          regularPrice: 59.9,
+          savingsAmount: 15,
+          dropPercent: 25.04,
+          currency: 'SEK',
+          observedAt: '2026-05-22T09:00:00.000Z',
+          confidence: 0.88,
+          emailSubject: '25% drop: Bryggkaffe mellanrost 450 g at Willys',
+          emailPreview: 'Now SEK 44.90, down from SEK 59.90. Save SEK 15.00 at Willys Hemma Stockholm Torsplan.'
+        }
+      ]
+    );
+
+    assert.match(executor.calls[0]!.sql, /weekly_price_drop_digest/);
+    assert.match(executor.calls[0]!.sql, /from latest_prices/);
+    assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
+    assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.domain = 'grocery'/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.observed_at >= \$1::timestamptz/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.observed_at < \$2::timestamptz/);
+    assert.match(executor.calls[0]!.sql, /latest_prices\.regular_price > latest_prices\.price/);
+    assert.match(executor.calls[0]!.sql, /limit \$3/);
+    assert.deepEqual(executor.calls[0]!.params, ['2026-05-16T00:00:00.000Z', '2026-05-23T00:00:00.000Z', 10]);
+  });
+});
+
+describe('summarizeTrendingProductPriceChanges', () => {
+  it('ranks products by real price changes inside the seven-day time-series window', () => {
+    const result = summarizeTrendingProductPriceChanges({
+      asOf: '2026-05-23T00:00:00.000Z',
+      limit: 10,
+      points: [
+        {
+          productId: 'coffee',
+          productSlug: 'coffee',
+          productName: 'Coffee',
+          brand: 'Rosteriet',
+          categoryLabel: 'Coffee',
+          price: 59.9,
+          currency: 'SEK',
+          observedAt: '2026-05-15T00:00:00.000Z'
+        },
+        {
+          productId: 'coffee',
+          productSlug: 'coffee',
+          productName: 'Coffee',
+          brand: 'Rosteriet',
+          categoryLabel: 'Coffee',
+          price: 54.9,
+          currency: 'SEK',
+          observedAt: '2026-05-17T00:00:00.000Z'
+        },
+        {
+          productId: 'coffee',
+          productSlug: 'coffee',
+          productName: 'Coffee',
+          brand: 'Rosteriet',
+          categoryLabel: 'Coffee',
+          price: 49.9,
+          currency: 'SEK',
+          observedAt: '2026-05-19T00:00:00.000Z'
+        },
+        {
+          productId: 'tea',
+          productSlug: 'tea',
+          productName: 'Tea',
+          price: 25,
+          currency: 'SEK',
+          observedAt: '2026-05-17T00:00:00.000Z'
+        },
+        {
+          productId: 'tea',
+          productSlug: 'tea',
+          productName: 'Tea',
+          price: 25,
+          currency: 'SEK',
+          observedAt: '2026-05-18T00:00:00.000Z'
+        },
+        {
+          productId: 'pasta',
+          productSlug: 'pasta',
+          productName: 'Pasta',
+          price: 18,
+          currency: 'SEK',
+          observedAt: '2026-05-18T00:00:00.000Z'
+        },
+        {
+          productId: 'pasta',
+          productSlug: 'pasta',
+          productName: 'Pasta',
+          price: 20,
+          currency: 'SEK',
+          observedAt: '2026-05-20T00:00:00.000Z'
+        }
+      ]
+    });
+
+    assert.deepEqual(result, [
+      {
+        rank: 1,
+        productId: 'coffee',
+        productSlug: 'coffee',
+        productName: 'Coffee',
+        brand: 'Rosteriet',
+        categoryLabel: 'Coffee',
+        changeCount: 2,
+        observationCount: 2,
+        latestPrice: 49.9,
+        previousPrice: 54.9,
+        changeAmount: -5,
+        changePercent: -9.107468123861567,
+        currency: 'SEK',
+        latestObservedAt: '2026-05-19T00:00:00.000Z'
+      },
+      {
+        rank: 2,
+        productId: 'pasta',
+        productSlug: 'pasta',
+        productName: 'Pasta',
+        changeCount: 1,
+        observationCount: 2,
+        latestPrice: 20,
+        previousPrice: 18,
+        changeAmount: 2,
+        changePercent: 11.11111111111111,
+        currency: 'SEK',
+        latestObservedAt: '2026-05-20T00:00:00.000Z'
+      }
+    ]);
+  });
+});
+
+describe('createPostgresTrendingPriceChangeReader', () => {
+  it('lists top products with the most observed price changes in the window', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresTrendingPriceChangeReader(executor);
+
+    assert.deepEqual(
+      await reader.listTrendingPriceChanges({
+        since: '2026-05-16T00:00:00.000Z',
+        until: '2026-05-23T00:00:00.000Z',
+        limit: 10
+      }),
+      [
+        {
+          rank: 1,
+          productId: 'product-1',
+          productSlug: 'bryggkaffe-450g',
+          productName: 'Bryggkaffe mellanrost 450 g',
+          brand: 'Rosteriet',
+          categoryLabel: 'Coffee',
+          changeCount: 3,
+          observationCount: 5,
+          latestPrice: 44.9,
+          previousPrice: 49.9,
+          changeAmount: -5,
+          changePercent: -10.02,
+          currency: 'SEK',
+          latestObservedAt: '2026-05-22T09:00:00.000Z',
+          chainSlug: 'willys',
+          chainName: 'Willys',
+          storeSlug: 'willys-hemma-stockholm-torsplan',
+          storeName: 'Willys Hemma Stockholm Torsplan'
+        }
+      ]
+    );
+
+    assert.match(executor.calls[0]!.sql, /trending_price_changes/);
+    assert.match(executor.calls[0]!.sql, /from observations/);
+    assert.match(executor.calls[0]!.sql, /lag\(observations\.price\) over/);
+    assert.match(executor.calls[0]!.sql, /observations\.domain = 'grocery'/);
+    assert.match(executor.calls[0]!.sql, /observations\.observed_at >= \(\$1::timestamptz - interval '31 days'\)/);
+    assert.match(executor.calls[0]!.sql, /observed_at >= \$1::timestamptz/);
+    assert.match(executor.calls[0]!.sql, /limit \$3/);
+    assert.deepEqual(executor.calls[0]!.params, ['2026-05-16T00:00:00.000Z', '2026-05-23T00:00:00.000Z', 10]);
   });
 });
 
@@ -1735,6 +2299,7 @@ describe('createPostgresPriceReader', () => {
         price: 49.9,
         unitPrice: 110.8889,
         currency: 'SEK',
+        isAvailable: true,
         observedAt: '2026-05-20T08:00:00.000Z',
         confidence: 0.91,
         provenance: { sourceType: 'retailer_api', sourceName: 'Willys' }
@@ -1751,6 +2316,7 @@ describe('createPostgresPriceReader', () => {
         currency: 'SEK',
         observedAt: '2026-05-20T09:00:00.000Z',
         confidence: 0.88,
+        isAvailable: false,
         provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
       }
     ]);
@@ -1795,6 +2361,7 @@ describe('createPostgresPriceReader', () => {
           promotionStartsOn: '2026-05-18',
           promotionEndsOn: '2026-05-24',
           memberRequired: true,
+          isAvailable: false,
           observedAt: '2026-05-20T09:00:00.000Z',
           validFrom: '2026-05-18T00:00:00.000Z',
           validUntil: '2026-05-24T23:59:59.000Z',
@@ -1812,12 +2379,14 @@ describe('createPostgresPriceReader', () => {
           memberRequired: false,
           observedAt: '2026-05-20T08:00:00.000Z',
           confidence: 0.91,
+          isAvailable: true,
           provenance: { sourceType: 'retailer_api' }
         }
       ]
     );
 
     assert.match(executor.calls[0]!.sql, /from observations/);
+    assert.match(executor.calls[0]!.sql, /is_available/);
     assert.match(executor.calls[0]!.sql, /where product_id = \$1/);
     assert.match(executor.calls[0]!.sql, /\$2::uuid is null or chain_id = \$2::uuid/);
     assert.match(executor.calls[0]!.sql, /\$3::uuid is null or store_id = \$3::uuid/);

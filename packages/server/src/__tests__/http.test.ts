@@ -119,7 +119,41 @@ describe('createHttpHandler', () => {
   });
 
   it('serves market, store, product, and index GET endpoints as JSON', async () => {
-    const handle = createHttpHandler();
+    const notificationInboxTaskNowValues: string[] = [];
+    const handle = createHttpHandler(undefined, {
+      now: new Date('2026-05-20T08:00:00.000Z'),
+      notificationInboxRepository: {
+        async listDueNotificationTasks(now) {
+          notificationInboxTaskNowValues.push(now);
+          return [
+            {
+              id: 'receipt-review-quiet-hours',
+              title: 'Receipt review reminder',
+              body: 'Review receipt OCR matches',
+              channel: 'push',
+              type: 'receipt_review',
+              priority: 'normal',
+              sendAt: '2026-05-20T07:00:00.000Z',
+              recipient: 'user-1',
+              attemptCount: 0,
+              maxAttempts: 3,
+              status: 'queued'
+            }
+          ];
+        },
+        async listActiveNotificationSuppressions() {
+          return [
+            {
+              id: 'suppression-provider-record-123',
+              recipient: 'ExponentPushToken[butter]',
+              channel: 'push',
+              reason: 'bounce',
+              active: true
+            }
+          ];
+        }
+      }
+    });
 
     const openApi = await handle(new Request('http://localhost/api/openapi.json'));
     assert.equal(openApi.status, 200);
@@ -137,6 +171,31 @@ describe('createHttpHandler', () => {
     assert.equal(marketBody.movers[0]?.oneMonthMovePercent, -16.7);
     assert.equal(marketBody.movers[0]?.stockholmMedianGap, -10);
     assert.equal(marketBody.movers[0]?.verifiedHistoryPoints, 3);
+
+    const fuel = await handle(new Request('http://localhost/api/fuel'));
+    assert.equal(fuel.status, 200);
+    const fuelBody = await json(fuel) as {
+      domain: string;
+      grades: string[];
+      observations: Array<{ grade: string; pricePerLitre: { amount: number; currency: string }; domain: string; source: { kind: string; operatorName: string } }>;
+      sources: Array<{ kind: string; sourceUrl: string }>;
+    };
+    assert.equal(fuelBody.domain, 'fuel');
+    assert.deepEqual(fuelBody.grades, ['98', '95', 'E85', 'diesel', 'HVO100']);
+    assert.deepEqual(fuelBody.observations.map((row) => [row.grade, row.pricePerLitre.amount, row.pricePerLitre.currency, row.domain]), [
+      ['98', 20.19, 'SEK', 'fuel'],
+      ['95', 18.89, 'SEK', 'fuel'],
+      ['E85', 15.84, 'SEK', 'fuel'],
+      ['diesel', 21.34, 'SEK', 'fuel'],
+      ['HVO100', 29.74, 'SEK', 'fuel']
+    ]);
+    assert.equal(fuelBody.observations[0]?.source.kind, 'operator');
+    assert.equal(fuelBody.observations[0]?.source.operatorName, 'St1 Sverige AB');
+    assert.equal(fuelBody.sources[0]?.sourceUrl, 'https://st1.se/foretag/listpris');
+
+    const fuelAlias = await handle(new Request('http://localhost/fuel'));
+    assert.equal(fuelAlias.status, 200);
+    assert.equal((await json(fuelAlias) as { domain: string }).domain, 'fuel');
 
     const nutrition = await handle(new Request('http://localhost/api/nutrition/value?metric=protein'));
     assert.equal(nutrition.status, 200);
@@ -243,20 +302,27 @@ describe('createHttpHandler', () => {
     assert.equal(notificationInbox.status, 200);
     const notificationInboxBody = await json(notificationInbox) as {
       userId: string;
+      generatedAt: string;
       activeAlertCount: number;
       deliveredCount: number;
       heldCount: number;
       suppressedCount: number;
       summary: { total: number };
-      queue: Array<{ status: string; reason: string }>;
+      queue: Array<{ id: string; status: string; reason: string; sendAt: string }>;
       guardrails: string[];
     };
     assert.equal(notificationInboxBody.userId, 'user-1');
+    assert.equal(notificationInboxBody.generatedAt, '2026-05-20T08:00:00.000Z');
     assert.equal(notificationInboxBody.activeAlertCount, 0);
     assert.equal(notificationInboxBody.deliveredCount, 0);
     assert.equal(notificationInboxBody.heldCount, 1);
     assert.equal(notificationInboxBody.suppressedCount, 1);
     assert.equal(notificationInboxBody.summary.total, 2);
+    assert.deepEqual(notificationInboxTaskNowValues, ['2026-05-20T08:00:00.000Z']);
+    assert.equal(notificationInboxBody.queue.some((item) => item.id === 'receipt-review-quiet-hours'), true);
+    assert.equal(notificationInboxBody.queue.some((item) => item.id === 'suppression-provider-record-123'), true);
+    assert.equal(notificationInboxBody.queue.find((item) => item.id === 'receipt-review-quiet-hours')?.sendAt, '2026-05-20T07:00:00.000Z');
+    assert.equal(notificationInboxBody.queue.find((item) => item.id === 'suppression-provider-record-123')?.sendAt, '2026-05-20T08:00:00.000Z');
     assert.match(notificationInboxBody.queue.find((item) => item.status === 'held')?.reason ?? '', /Quiet hours/i);
     assert.match(notificationInboxBody.guardrails[0] ?? '', /Estimated prices never generate household alerts/i);
 
@@ -295,9 +361,63 @@ describe('createHttpHandler', () => {
       ['coffee', -16.7, 0, 3]
     ]);
 
+    const categories = await handle(new Request('http://localhost/api/categories'));
+    assert.equal(categories.status, 200);
+    assert.deepEqual(await json(categories), [
+      { id: 'coffee', name: 'Coffee', slug: 'coffee', parentId: null, itemCount: 1 },
+      { id: 'dairy', name: 'Dairy', slug: 'dairy', parentId: null, itemCount: 3 }
+    ]);
+
     const stores = await handle(new Request('http://localhost/api/stores'));
     assert.equal(stores.status, 200);
     assert.equal((await json(stores) as Array<{ id: string }>)[0].id, 'willys-odenplan');
+
+    const retailers = await handle(new Request('http://localhost/api/retailers'));
+    assert.equal(retailers.status, 200);
+    assert.deepEqual((await json(retailers) as Array<{ id: string; name: string; logo: string; websiteUrl: string }>).map((retailer) => [
+      retailer.id,
+      retailer.name,
+      retailer.logo,
+      retailer.websiteUrl
+    ]), [
+      ['city-gross', 'City Gross', '/retailers/city-gross.svg', 'https://www.citygross.se/'],
+      ['coop', 'Coop', '/retailers/coop.svg', 'https://www.coop.se/'],
+      ['hemkop', 'Hemköp', '/retailers/hemkop.svg', 'https://www.hemkop.se/'],
+      ['ica', 'ICA', '/retailers/ica.svg', 'https://www.ica.se/'],
+      ['lidl', 'Lidl', '/retailers/lidl.svg', 'https://www.lidl.se/'],
+      ['netto', 'Netto', '/retailers/netto.svg', 'https://www.coop.se/'],
+      ['willys', 'Willys', '/retailers/willys.svg', 'https://www.willys.se/']
+    ]);
+
+    const storeDetail = await handle(new Request('http://localhost/api/stores/willys-odenplan'));
+    assert.equal(storeDetail.status, 200);
+    const storeDetailBody = await json(storeDetail) as {
+      id: string;
+      name: string;
+      store: { id: string; address: string };
+      openingHours: string[];
+      assortment: {
+        items: Array<{ category: string; productId: string; priceLabel: string }>;
+        categories: Array<{ category: string; itemCount: number }>;
+      };
+      guardrails: string[];
+    };
+    assert.equal(storeDetailBody.id, 'willys-odenplan');
+    assert.equal(storeDetailBody.name, 'Willys Odenplan');
+    assert.equal(storeDetailBody.store.id, 'willys-odenplan');
+    assert.equal(storeDetailBody.store.address, 'Odenplan, Stockholm');
+    assert.deepEqual(storeDetailBody.openingHours, ['Mon-Fri 08:00-22:00', 'Sat-Sun 09:00-21:00']);
+    assert.deepEqual(storeDetailBody.assortment.items.map((item) => [item.category, item.productId, item.priceLabel]), [
+      ['coffee', 'coffee', 'verified_shelf'],
+      ['dairy', 'milk', 'verified_shelf'],
+      ['dairy', 'butter', 'verified_shelf'],
+      ['dairy', 'private-label-milk', 'verified_shelf']
+    ]);
+    assert.deepEqual(storeDetailBody.assortment.categories.map((category) => [category.category, category.itemCount]), [
+      ['coffee', 1],
+      ['dairy', 3]
+    ]);
+    assert.match(storeDetailBody.guardrails[0] ?? '', /verified shelf price rows/i);
 
     const storeDeals = await handle(new Request('http://localhost/api/stores/willys-odenplan/deals'));
     assert.equal(storeDeals.status, 200);
@@ -696,6 +816,72 @@ describe('createHttpHandler', () => {
     assert.equal((await json(index) as { label: string }).label, 'Stockholm Grocery Index');
   });
 
+  it('caches hot public API endpoints through an injected response cache', async () => {
+    const entries = new Map<string, string>();
+    const writes: Array<{ key: string; ttlSeconds: number }> = [];
+    const handle = createHttpHandler(undefined, {
+      apiResponseCache: {
+        get: async (key: string) => entries.get(key) ?? null,
+        set: async (key: string, value: string, options: { ttlSeconds: number }) => {
+          writes.push({ key, ttlSeconds: options.ttlSeconds });
+          entries.set(key, value);
+        }
+      }
+    } as any);
+
+    const first = await handle(new Request('http://localhost/api/market/overview'));
+    assert.equal(first.status, 200);
+    assert.equal(first.headers.get('x-groceryview-cache'), 'miss');
+    const firstBody = await json(first);
+    assert.equal(writes.length, 1);
+    assert.match(writes[0]?.key ?? '', /^hot-endpoint:v1:\/api\/market\/overview/);
+    assert.equal(writes[0]?.ttlSeconds, 60);
+
+    const second = await handle(new Request('http://localhost/api/market/overview'));
+    assert.equal(second.status, 200);
+    assert.equal(second.headers.get('x-groceryview-cache'), 'hit');
+    assert.deepEqual(await json(second), firstBody);
+  });
+
+  it('returns cursor-paginated product envelopes for public product listing and search', async () => {
+    const handle = createHttpHandler();
+
+    const listing = await handle(new Request('http://localhost/api/products?limit=2'));
+    assert.equal(listing.status, 200);
+    const listingBody = await json(listing) as { items: Array<{ id: string }>; pagination: { hasMore: boolean; nextCursor: string | null } };
+    assert.deepEqual(listingBody.items.map((product) => product.id), ['coffee', 'milk']);
+    assert.equal(listingBody.pagination.hasMore, true);
+    assert.match(listingBody.pagination.nextCursor ?? '', /^[A-Za-z0-9_-]+$/);
+
+    const first = await handle(new Request('http://localhost/api/products/search?q=&limit=2'));
+    assert.equal(first.status, 200);
+    const firstBody = await json(first) as {
+      items: Array<{ id: string }>;
+      pagination: { limit: number; nextCursor: string | null; hasMore: boolean; source: string; totalItems: number; totalProductCount: number; totalReturned: number };
+      guardrails: string[];
+    };
+    assert.deepEqual(firstBody.items.map((product) => product.id), ['coffee', 'milk']);
+    assert.equal(firstBody.pagination.limit, 2);
+    assert.equal(firstBody.pagination.totalReturned, 2);
+    assert.equal(firstBody.pagination.totalItems, 4);
+    assert.equal(firstBody.pagination.totalProductCount, 4);
+    assert.equal(firstBody.pagination.hasMore, true);
+    assert.match(firstBody.pagination.nextCursor ?? '', /^[A-Za-z0-9_-]+$/);
+    assert.match(firstBody.pagination.source, /cursor pagination/i);
+    assert.match(firstBody.guardrails.join(' '), /No offset page numbers/i);
+
+    const second = await handle(new Request(`http://localhost/api/products/search?q=&limit=2&cursor=${firstBody.pagination.nextCursor}`));
+    assert.equal(second.status, 200);
+    const secondBody = await json(second) as { items: Array<{ id: string }>; pagination: { limit: number; nextCursor: string | null; hasMore: boolean; totalItems: number; totalProductCount: number; totalReturned: number } };
+    assert.deepEqual(secondBody.items.map((product) => product.id), ['private-label-milk', 'butter']);
+    assert.equal(secondBody.pagination.limit, 2);
+    assert.equal(secondBody.pagination.totalReturned, 2);
+    assert.equal(secondBody.pagination.totalItems, 4);
+    assert.equal(secondBody.pagination.totalProductCount, 4);
+    assert.equal(secondBody.pagination.hasMore, false);
+    assert.equal(secondBody.pagination.nextCursor, null);
+  });
+
   it('returns product not found for unknown product child resources', async () => {
     const handle = createHttpHandler();
 
@@ -1088,6 +1274,8 @@ describe('createHttpHandler', () => {
     const api = createGroceryViewApi();
     api.addFavoriteStore('user-1', 'willys-odenplan');
     api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, favoriteStoresOnly: true });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.updateBudget('user-1', { weeklyBudget: 100, monthlyBudget: 400 });
     const handle = createHttpHandler(api, { now: new Date('2026-05-20T12:00:00.000Z') });
 
     const exported = await json(await handle(new Request('http://localhost/api/privacy/export?userId=user-1'))) as {
@@ -1097,6 +1285,19 @@ describe('createHttpHandler', () => {
     assert.equal(exported.generatedAt, '2026-05-20T12:00:00.000Z');
     assert.deepEqual(exported.sections.find((section) => section.name === 'favorite_stores')?.records, [{ storeId: 'willys-odenplan' }]);
     assert.deepEqual(exported.sections.find((section) => section.name === 'watchlist')?.records, [{ productId: 'coffee' }]);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'lists')?.records, [
+      { id: 'current_basket', items: [{ productId: 'milk', quantity: 2 }] }
+    ]);
+    assert.equal(exported.sections.find((section) => section.name === 'alerts')?.records.length, 1);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'preferences')?.records, [{ weeklyBudget: 100, monthlyBudget: 400 }]);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'analytics_events')?.records, []);
+
+    const settingsExport = await json(await handle(new Request('http://localhost/api/settings/data-export?userId=user-1'))) as {
+      generatedAt: string;
+      sections: Array<{ name: string; records: Array<Record<string, unknown>> }>;
+    };
+    assert.equal(settingsExport.generatedAt, '2026-05-20T12:00:00.000Z');
+    assert.deepEqual(settingsExport.sections.map((section) => section.name), exported.sections.map((section) => section.name));
 
     const deletion = await handle(new Request('http://localhost/api/privacy/deletion-plan?userId=user-1', { method: 'POST' }));
     assert.equal(deletion.status, 200);
@@ -1155,6 +1356,36 @@ describe('createHttpHandler', () => {
       })
     }));
     assert.equal(crossUser.status, 400);
+  });
+
+  it('deletes signed-in settings account data after explicit confirmation', async () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, favoriteStoresOnly: true });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.updateBudget('user-1', { weeklyBudget: 100, monthlyBudget: 400 });
+    const handle = createHttpHandler(api, { now: new Date('2026-05-20T12:00:00.000Z') });
+
+    const unconfirmed = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
+      method: 'DELETE',
+      body: JSON.stringify({ confirmation: 'delete' })
+    }));
+    assert.equal(unconfirmed.status, 400);
+
+    const deleted = await json(await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
+      method: 'DELETE',
+      body: JSON.stringify({ confirmation: 'DELETE ACCOUNT' })
+    }))) as { userId: string; deleted: boolean; deletedTables: string[]; requiresReauthentication: boolean };
+
+    assert.equal(deleted.userId, 'user-1');
+    assert.equal(deleted.deleted, true);
+    assert.equal(deleted.requiresReauthentication, true);
+    assert.deepEqual(deleted.deletedTables, ['basket_items', 'weekly_baskets', 'watchlist_items', 'user_preferences', 'favorite_stores', 'app_users']);
+    assert.deepEqual(api.getFavoriteStores('user-1'), []);
+    assert.deepEqual(api.getWatchlist('user-1').items, []);
+    assert.deepEqual(api.getBasket('user-1').items, []);
+    assert.equal(api.getBudgetSummary('user-1').weeklyBudget, 0);
+    assert.equal(api.getBudgetSummary('user-1').monthlyBudget, 0);
   });
 
   it('plans pantry replenishment from stock, usage, expiry, and deal candidates', async () => {
@@ -1245,6 +1476,61 @@ describe('createHttpHandler', () => {
     }));
     assert.equal(invalid.status, 400);
     assert.match(JSON.stringify(await json(invalid)), /Unknown productId: missing-product/);
+  });
+
+  it('lets invited household members join and check shared grocery list lines with attribution', async () => {
+    const handle = createHttpHandler();
+    const payload = {
+      householdId: 'house-join-1',
+      name: 'Shared flat',
+      weeklyBudget: 500,
+      approvalLimit: 70,
+      reviewer: 'user-1',
+      members: [{ userId: 'user-1', displayName: 'Alex', role: 'owner' }],
+      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'user-1' }],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
+      sharedFavoriteStoreIds: ['willys-odenplan']
+    };
+
+    await handle(new Request('http://localhost/api/households/current?userId=user-1', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    }));
+
+    const joined = await handle(new Request('http://localhost/api/households/join?userId=user-2', {
+      method: 'POST',
+      body: JSON.stringify({
+        householdId: 'house-join-1',
+        inviteToken: 'house-join-1:join',
+        displayName: 'Mina',
+        role: 'editor'
+      })
+    }));
+    assert.equal(joined.status, 200);
+    const joinedBody = await json(joined) as { household: { members: Array<{ userId: string; role: string }> } };
+    assert.deepEqual(joinedBody.household.members.map((member) => `${member.userId}:${member.role}`), ['user-1:owner', 'user-2:editor']);
+
+    const checked = await handle(new Request('http://localhost/api/households/current/basket/check?userId=user-2', {
+      method: 'POST',
+      body: JSON.stringify({
+        productId: 'milk',
+        checked: true,
+        checkedAt: '2026-05-23T11:00:00.000Z'
+      })
+    }));
+    assert.equal(checked.status, 200);
+    const checkedBody = await json(checked) as {
+      household: { basketItems: Array<{ productId: string; checked: boolean; checkedBy?: string }> };
+      summary: { checkedItemCount: number; openItemCount: number };
+    };
+    assert.deepEqual(checkedBody.household.basketItems.map((item) => [item.productId, item.checked, item.checkedBy]), [
+      ['milk', true, 'user-2']
+    ]);
+    assert.equal(checkedBody.summary.checkedItemCount, 1);
+    assert.equal(checkedBody.summary.openItemCount, 0);
+
+    const partnerRead = await json(await handle(new Request('http://localhost/api/households/current?userId=user-2'))) as { household: { id: string } };
+    assert.equal(partnerRead.household.id, 'house-join-1');
   });
 
   it('creates private scan upload tickets before scan processing', async () => {

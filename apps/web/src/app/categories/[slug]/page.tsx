@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { summarizeCategoryDealLeaders } from '@groceryview/core';
+import { CategoryBreadcrumb } from '@/components/Breadcrumb';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
-import { categoryDealLeaderCandidates, categorySummaries, dataFreshnessBadges, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
+import { categoryDealLeaderCandidates, categorySummaries, dataFreshnessBadges, formatPct, formatSek } from '@/lib/verified-data';
 import { metadataForCategory } from '@/lib/seo';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
@@ -25,7 +26,8 @@ function categoryDealLeadersFor(slug: string) {
 
 export default async function CategoryPage({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
-  if (!categoryLabels[slug]) notFound();
+  const categoryLabel = categoryLabels[slug];
+  if (!categoryLabel) notFound();
   const chainRows = axfoodProducts.filter((product) => product.category === slug).slice(0, 24);
   const openRows = pricedProducts.filter((product) => product.category === slug).slice(0, 24);
   const categoryFreshnessBadges = dataFreshnessBadges.filter((badge) => badge.sourceKind === 'axfood' || badge.sourceKind === 'openprices');
@@ -33,7 +35,8 @@ export default async function CategoryPage({ params }: Readonly<{ params: Promis
   return (
     <PageShell>
       <Eyebrow>Category</Eyebrow>
-      <h1 className="mt-2 text-4xl font-black tracking-tight">{labelFromSlug(slug)}</h1>
+      <h1 className="mt-2 text-4xl font-black tracking-tight">{categoryLabel}</h1>
+      <CategoryBreadcrumb categoryLabel={categoryLabel} slug={slug} />
       <p className="mt-3 text-lg text-slate-700">{chainRows.length} Axfood rows and {openRows.length} OpenPrices rows shown from verified source modules.</p>
       <Card className="mt-6 border-emerald-200 bg-emerald-50/60">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">

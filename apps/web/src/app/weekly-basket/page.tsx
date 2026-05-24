@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
+import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizer } from '@/lib/demo-data';
+import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizerInput } from '@/lib/demo-data';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -12,8 +14,16 @@ function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
 }
 
+const weeklyBasketConfidence = {
+  level: 'medium' as const,
+  caveat: 'The optimizer uses visible price rows for favorite stores only; missing store-product prices reduce coverage instead of being estimated.'
+};
+
 export default function WeeklyBasketPage() {
-  const { comparison, coverage } = weeklyBasketOptimizer;
+  const comparison = compareBasketStrategies(weeklyBasketOptimizerInput);
+  const coverage = summarizeStoreBasketCoverage(weeklyBasketOptimizerInput);
+  const bestSingleStore = comparison.bestSingleStore;
+
   return (
     <PageShell>
       <Eyebrow>Basket optimizer</Eyebrow>
@@ -31,14 +41,40 @@ export default function WeeklyBasketPage() {
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Savings vs best single store</p>
           <p className="mt-2 text-5xl font-black text-slate-950">{formatSek(comparison.savingsVsBestSingleStore)}</p>
-          <p className="mt-3 font-semibold text-slate-700">Best full-coverage store: {comparison.bestSingleStore?.storeName ?? 'none with full coverage'}.</p>
+          <p className="mt-3 font-semibold text-slate-700">Best full-coverage store: {bestSingleStore?.storeName ?? 'none with full coverage'}.</p>
         </Card>
         <Card>
           <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Coverage confidence</p>
-          <p className="mt-2 text-5xl font-black capitalize text-slate-950">{weeklyBasketOptimizer.confidence.level}</p>
-          <p className="mt-3 font-semibold text-slate-700">{weeklyBasketOptimizer.confidence.caveat}</p>
+          <div className="mt-3">
+            <ConfidenceBadge level={weeklyBasketConfidence.level} label={`${weeklyBasketConfidence.level} confidence`} sampleSize={weeklyBasketOptimizerInput.items.length} />
+          </div>
+          <p className="mt-3 font-semibold text-slate-700">{weeklyBasketConfidence.caveat}</p>
         </Card>
       </div>
+
+      <Card className="mt-6 border-emerald-200 bg-white">
+        <div className="grid gap-5 lg:grid-cols-[0.85fr_1fr] lg:items-start">
+          <div>
+            <Eyebrow>Single vs split shop</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Real basket strategy comparison</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              compareBasketStrategies prices the visible favorite-store rows as both one full-coverage shop and a cheapest split-shop plan. summarizeStoreBasketCoverage keeps missing product rows visible instead of filling gaps.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Best single shop</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{bestSingleStore?.storeName ?? 'No full-coverage store'}</p>
+              <p className="mt-1 text-2xl font-black text-slate-950">{bestSingleStore ? formatSek(bestSingleStore.total) : 'n/a'}</p>
+            </div>
+            <div className="rounded-2xl bg-emerald-50 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700">Cheapest split shop</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{comparison.splitStoreCount} stores</p>
+              <p className="mt-1 text-2xl font-black text-emerald-800">{formatSek(comparison.cheapestByProduct.total)}</p>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-sky-200 bg-sky-50/70">
         <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr] lg:items-start">
@@ -351,12 +387,14 @@ export default function WeeklyBasketPage() {
             <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">{multiWeekStockUpList.persona}</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Multi-week stock-up list</h2>
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-              This planningWeeks view blocks price outlook claims. No price forecast is shown; each observedHistoryWindow comes from visible package math and changed basket rows that shoppers should review before restocking.
+              This planningWeeks view blocks price outlook claims. No price forecast is shown; low and typical prices are historical observed unit-price facts, while budget impact is today&apos;s stock-up cost spread across the plan.
             </p>
           </div>
-          <p className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-orange-950 shadow-sm">
-            planningWeeks {multiWeekStockUpList.planningWeeks}
-          </p>
+          <div className="grid gap-2 sm:grid-cols-3 lg:min-w-[34rem]">
+            <p className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-orange-950 shadow-sm">planningWeeks {multiWeekStockUpList.planningWeeks}</p>
+            <p className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-orange-950 shadow-sm">upfront {formatSek(multiWeekStockUpList.totalUpfrontCost)}</p>
+            <p className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-orange-950 shadow-sm">weekly impact {multiWeekStockUpList.weeklyBudgetSharePercent}%</p>
+          </div>
         </div>
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           {multiWeekStockUpList.rows.map((row) => (
@@ -364,17 +402,18 @@ export default function WeeklyBasketPage() {
               <p className="text-lg font-black text-slate-950">{row.productName}</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">{row.storeName} · {row.planningWeeks} week plan</p>
               <div className="mt-3 grid gap-2 text-sm text-slate-700">
-                <p className="rounded-2xl bg-orange-50 p-3 font-semibold">observedHistoryWindow: {row.observedHistoryWindow}</p>
-                <p className="rounded-2xl bg-white p-3 font-semibold">planned servings {row.plannedServings} · unit savings {row.unitSavingsPercent}%</p>
-                <p className="rounded-2xl bg-emerald-50 p-3 font-black text-emerald-900">{formatSek(row.currentBulkUnitPrice)} current bulk unit</p>
+                <p className="rounded-2xl bg-orange-50 p-3 font-semibold">observedHistoryWindow: {row.observationCount} rows · {row.historyWindowStart.slice(0, 10)} to {row.historyWindowEnd.slice(0, 10)} · {row.confidence}</p>
+                <p className="rounded-2xl bg-white p-3 font-semibold">low {formatSek(row.historicalLowUnitPrice)} · typical {formatSek(row.typicalUnitPrice)} / {row.comparableUnit}</p>
+                <p className="rounded-2xl bg-white p-3 font-semibold">planned {row.plannedUnits} {row.comparableUnit} · {row.packagesNeeded} packs · upfront {formatSek(row.upfrontCost)}</p>
+                <p className="rounded-2xl bg-emerald-50 p-3 font-black text-emerald-900">{formatSek(row.currentUnitPrice)} current bulk unit · {row.currentVsTypicalPercent}% vs typical</p>
               </div>
               <p className="mt-3 text-sm font-black text-orange-950">reviewTrigger: {row.reviewTrigger}</p>
-              <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{row.stockUpDecision}</p>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{row.contextLabel} {row.seasonalityNote}</p>
             </Link>
           ))}
         </div>
         <div className="mt-4 grid gap-3 lg:grid-cols-[0.8fr_1fr]">
-          <p className="rounded-2xl bg-white p-4 text-sm font-black text-orange-950">{multiWeekStockUpList.noForecastReason}</p>
+          <p className="rounded-2xl bg-white p-4 text-sm font-black text-orange-950">{multiWeekStockUpList.noForecastReason} Coverage: {multiWeekStockUpList.coverage.confidence} confidence across {multiWeekStockUpList.coverage.observedItemCount}/{multiWeekStockUpList.coverage.totalItemCount} items.</p>
           <ul className="grid gap-2 text-sm font-semibold text-slate-700 md:grid-cols-2">
             {multiWeekStockUpList.coverageGuardrails.map((guardrail) => (
               <li className="rounded-2xl bg-white p-3" key={guardrail}>{guardrail}</li>

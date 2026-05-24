@@ -82,7 +82,10 @@ class RecordingPgPool {
           'household_members',
           'household_basket_items',
           'household_watchlist_items',
-          'household_favorite_stores'
+          'household_favorite_stores',
+          'fuel_grades',
+          'fuel_price_sources',
+          'fuel_price_source_observations'
         ].map((table_name) => ({ table_name }))
       };
     }
@@ -102,7 +105,12 @@ class RecordingPgPool {
           '010_commodity_taxonomy',
           '011_multi_vertical_domains',
           '012_price_rollups',
-          '013_observations_partitioning'
+          '013_observations_partitioning',
+          '014_fuel_price_sources',
+          '016_observation_connector_idempotency',
+          '017_observation_availability',
+          '018_household_collaboration_rls',
+          '019_price_snapshot_unique_index'
         ].map((version) => ({ version }))
       };
     }
@@ -246,6 +254,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       STRIPE_SECRET_KEY: 'sk_test_runtime',
       STRIPE_PRICE_PREMIUM_MONTHLY: 'price_monthly_runtime',
@@ -289,6 +298,7 @@ describe('runtime config', () => {
       sendgridApiKey: 'sg-runtime-key',
       sendgridFromEmail: 'alerts@groceryview.se',
       expoPushAccessToken: 'expo-runtime-token',
+      telegramBotToken: 'telegram-runtime-token',
       billingWebhookSecret: 'billing-webhook-secret',
       stripeSecretKey: 'sk_test_runtime',
       stripePriceIds: {
@@ -697,6 +707,18 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token'
+    }), /TELEGRAM_BOT_TOKEN is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      SENDGRID_API_KEY: 'sg-runtime-key',
+      SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
+      EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token'
     }), /BILLING_WEBHOOK_SECRET is required/);
     assert.throws(() => loadRuntimeConfig({
       NODE_ENV: 'production',
@@ -708,6 +730,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret'
     }), /METRICS_TOKEN is required/);
     assert.throws(() => loadRuntimeConfig({
@@ -720,6 +743,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token'
     }), /OCR_SPACE_API_KEY is required/);
@@ -733,6 +757,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key'
@@ -747,6 +772,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
@@ -762,6 +788,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
@@ -778,6 +805,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
@@ -800,6 +828,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
@@ -837,6 +866,7 @@ describe('runtime config', () => {
       SENDGRID_API_KEY: 'sg-runtime-key',
       SENDGRID_FROM_EMAIL: 'alerts@groceryview.se',
       EXPO_PUSH_ACCESS_TOKEN: 'expo-runtime-token',
+      TELEGRAM_BOT_TOKEN: 'telegram-runtime-token',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token',
       OCR_SPACE_API_KEY: 'ocr-runtime-key',
@@ -1442,6 +1472,11 @@ describe('runtime config', () => {
       assert.equal(body.evidence.includes('migration:008_household_plans'), true);
       assert.equal(body.evidence.includes('migration:012_price_rollups'), true);
       assert.equal(body.evidence.includes('migration:013_observations_partitioning'), true);
+      assert.equal(body.evidence.includes('migration:014_fuel_price_sources'), true);
+      assert.equal(body.evidence.includes('migration:016_observation_connector_idempotency'), true);
+      assert.equal(body.evidence.includes('migration:017_observation_availability'), true);
+      assert.equal(body.evidence.includes('migration:018_household_collaboration_rls'), true);
+      assert.equal(body.evidence.includes('migration:019_price_snapshot_unique_index'), true);
       assert.equal(JSON.stringify(body).includes('runtime-password'), false);
     } finally {
       await service.close();

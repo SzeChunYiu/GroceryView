@@ -53,10 +53,13 @@ REQUIRED_TABLES=(
   chains
   stores
   products
+  fuel_grades
   aliases
   source_runs
   raw_records
   retailer_source_policies
+  fuel_price_sources
+  fuel_price_source_observations
   observations
   observations_v2
   latest_prices
@@ -67,6 +70,8 @@ REQUIRED_TABLES=(
   baskets
   budgets
   alerts
+  price_alerts
+  webhook_subscriptions
   app_users
   favorite_stores
   user_preferences
@@ -80,6 +85,7 @@ REQUIRED_TABLES=(
   subscription_entitlements
   notification_tasks
   notification_suppressions
+  notification_subscriptions
   alert_rules
   pantry_items
   receipt_uploads
@@ -103,6 +109,7 @@ REQUIRED_SEED_CHAIN_SLUGS=(
   coop
   hemkop
   lidl
+  netto
   city-gross
 )
 
@@ -347,7 +354,7 @@ if [ "${#SEEDS[@]}" -gt 0 ]; then
   positioned_stores_count="$(docker exec "$CONTAINER_NAME" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from stores where position is not null")"
   products_count="$(docker exec "$CONTAINER_NAME" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from products")"
 
-  if [ "$chains_count" -lt 6 ] || [ "$positioned_stores_count" -lt 6 ] || [ "$products_count" -lt 20 ]; then
+  if [ "$chains_count" -lt 7 ] || [ "$positioned_stores_count" -lt 6 ] || [ "$products_count" -lt 20 ]; then
     echo "seed assertion failed: chains=$chains_count positioned_stores=$positioned_stores_count products=$products_count" >&2
     exit 1
   fi

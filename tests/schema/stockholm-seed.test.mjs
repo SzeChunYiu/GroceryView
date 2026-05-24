@@ -6,7 +6,7 @@ const seed = readFileSync(new URL('../../db/migrations/010_stockholm_hero_seed.s
 
 describe('Stockholm hero seed migration', () => {
   it('includes all launch chains required for Stockholm coverage', () => {
-    for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'citygross']) {
+    for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'citygross', 'netto']) {
       assert.match(seed, new RegExp(`'${chain}'`), `${chain} chain missing`);
     }
   });

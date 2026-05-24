@@ -218,6 +218,25 @@ Per-store row counts:
 - 2353: 202 rows
 - 2355: 206 rows
 
+## Willys weekly discounts 254-store expansion 2026-05-23
+
+- Source: willys.se public Axfood campaign JSON
+- Store catalog source: https://www.willys.se/axfood/rest/store
+- Source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-23T19:16:15.751Z
+- Store count: 254
+- Source URLs fetched: 644
+- Real weekly discount rows fetched and wired: 44241
+- Web wire: apps/web/src/lib/ingested/willys.ts
+- Connector: packages/ingestion/src/connectors/willys.ts
+
+Sample rows:
+1. 2500306014 | 2149 | Grön sparris 250g | 29,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500306996 | 2149 | Lyxrosor 12-pack | 99,00/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500303258 | 2149 | Mozzarella | 2 för 20,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
+4. 2500298388 | 2149 | Hushållspapper 12-pack, toalettpapper 18-pack | 59,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
+5. 2500301201 | 2149 | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
+
 Sample rows:
 1. 2500306014 | 2110 | Grön sparris 250g | 29,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
 2. 2500306996 | 2110 | Lyxrosor 12-pack | 99,00/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
@@ -466,3 +485,56 @@ Sample rows:
 3. 2500303258 | 2110 | Mozzarella | 2 för 20,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
 4. 2500298388 | 2110 | Hushållspapper 12-pack, toalettpapper 18-pack | 59,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500301201 | 2110 | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+
+## Willys weekly discounts public-store batch expansion 2026-05-23
+
+- Source: www.willys.se public Axfood campaign JSON
+- Store catalog source: https://www.willys.se/axfood/rest/store
+- Source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-23T11:16:28.616Z
+- Public store IDs attempted in current fetch: 12
+- Current fetch rows inspected before de-duping existing rows: 984
+- New weekly discount rows added and wired: 984
+- Final real weekly discount rows in file: 37554
+- Added store IDs in this iteration: 2860, 2823, 2878, 2810, 2874, 2858, 2857, 2871, 2875, 2850, 2859, 2820
+- Zero-row public store IDs in current fetch: none
+- Source URLs fetched: 555
+- Web wire: apps/web/src/lib/ingested/willys.ts
+- Connector: packages/ingestion/src/connectors/willys.ts
+
+Added-store row counts:
+- 2860: 82 rows
+- 2823: 82 rows
+- 2878: 82 rows
+- 2810: 82 rows
+- 2874: 82 rows
+- 2858: 82 rows
+- 2857: 82 rows
+- 2871: 82 rows
+- 2875: 82 rows
+- 2850: 82 rows
+- 2859: 82 rows
+- 2820: 82 rows
+
+Sample newly added rows:
+1. 2500306028 | 2860 | Grön sparris 250g | 29,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2860&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500307003 | 2860 | Lyxrosor 12-pack | 99,00/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2860&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500303259 | 2860 | Mozzarella | 2 för 20,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2860&type=PERSONAL_GENERAL&page=0&size=100
+4. 2500297756 | 2860 | Crunchy fries | 19,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2860&type=PERSONAL_GENERAL&page=0&size=100
+5. 2500304262 | 2860 | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2860&type=PERSONAL_GENERAL&page=0&size=100
+
+## Willys chain-wide bulk product fetch 2026-05-23
+
+- Source: www.willys.se public Axfood category/search JSON
+- Source URL pattern: https://www.willys.se/c/{category}?page={page}&size=100
+- Connector: packages/ingestion/src/connectors/willys-bulk.ts
+- Daily ingestion URL: groceryview://daily/willys/products/bulk
+- Retrieved: 2026-05-23T16:35:00.000Z
+- Real priced rows fetched in live verification: 100
+- Minimum live row gate: 100
+- Store fanout: no; rows are chain-level product observations unless an all-store Willys connector is configured separately
+- Persistence path: runDailyIngestion materializes rows as products, aliases, raw_records, and observations via @groceryview/db writers
+
+Sample live rows:
+1. 101860922_ST | Kyckling Bröstfilé | Top Choice | 56,68 kr | https://www.willys.se/c/kott-chark-och-fagel?page=0&size=100
+2. 101222270_ST | Kycklingfilé Svensk Fryst | Garant | 85,08 kr | https://www.willys.se/c/kott-chark-och-fagel?page=0&size=100

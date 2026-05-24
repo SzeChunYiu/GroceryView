@@ -8,8 +8,8 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/api && npm run build -w @groceryview/api-contracts && npm run build -w @groceryview/auth && npm run build -w @groceryview/notifications && npm run build -w @groceryview/server && npm run build -w @groceryview/db && npm run build -w @groceryview/scanning && npm run build -w @groceryview/monetization && npm run build -w @groceryview/ops && npm run build -w @groceryview/catalog && npm run build -w @groceryview/ingestion && npm run build -w @groceryview/mobile && npm run build -w @groceryview/web",
-    "test": "npm run test -w @groceryview/core && npm run test -w @groceryview/api && npm run test -w @groceryview/api-contracts && npm run test -w @groceryview/auth && npm run test -w @groceryview/notifications && npm run test -w @groceryview/server && npm run test -w @groceryview/db && npm run test -w @groceryview/scanning && npm run test -w @groceryview/monetization && npm run test -w @groceryview/ops && npm run test -w @groceryview/catalog && npm run test -w @groceryview/ingestion && npm run test -w @groceryview/mobile && npm run test -w @groceryview/web && npm run ingest:verify && node --test tests/schema/*.test.mjs",
+    "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/analytics && npm run build -w @groceryview/geo && npm run build -w @groceryview/api && npm run build -w @groceryview/api-contracts && npm run build -w @groceryview/auth && npm run build -w @groceryview/notifications && npm run build -w @groceryview/server && npm run build -w @groceryview/db && npm run build -w @groceryview/jobs && npm run build -w @groceryview/scanning && npm run build -w @groceryview/monetization && npm run build -w @groceryview/ops && npm run build -w @groceryview/catalog && npm run build -w @groceryview/image-cache && npm run build -w @groceryview/ingestion && npm run build -w @groceryview/mobile && npm run build -w @groceryview/web",
+    "test": "npm run test -w @groceryview/core && npm run test -w @groceryview/analytics && npm run test -w @groceryview/geo && npm run test -w @groceryview/api && npm run test -w @groceryview/api-contracts && npm run test -w @groceryview/auth && npm run test -w @groceryview/notifications && npm run test -w @groceryview/server && npm run test -w @groceryview/db && npm run test -w @groceryview/jobs && npm run test -w @groceryview/scanning && npm run test -w @groceryview/monetization && npm run test -w @groceryview/ops && npm run test -w @groceryview/catalog && npm run test -w @groceryview/image-cache && npm run test -w @groceryview/ingestion && npm run test -w @groceryview/mobile && npm run test -w @groceryview/web && npm run ingest:verify && node --test tests/schema/*.test.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "ingest:generate-live": "npm run build -w @groceryview/ingestion && node scripts/ingestion/generate-live-retailer-ingested.mjs",
     "ingest:openfoodfacts-db": "npm run build -w @groceryview/ingestion && node scripts/ingestion/persist-openfoodfacts-metadata.mjs",
@@ -18,16 +18,29 @@
     "ops:apply-db-migrations": "npm run build -w @groceryview/db && node scripts/ops/apply-db-migrations.mjs",
     "ops:check-production-secrets": "node scripts/ops/check-production-secrets.mjs",
     "ops:check-daily-db-connectivity": "node scripts/ops/check-daily-db-connectivity.mjs",
+    "ops:db-io-hotspots": "node scripts/ops/check-daily-db-connectivity.mjs --pg-stat-statements-io",
+    "ops:compare-db-io-hotspots": "node scripts/ops/compare-db-io-hotspots.mjs",
     "ops:daily-connectors": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connectors.mjs",
     "ops:daily-connector-stores": "npm run build -w @groceryview/ingestion && node scripts/ops/print-daily-connector-stores.mjs",
+    "ops:norway-readiness": "npm run build -w @groceryview/ops && node scripts/ops/print-norway-coverage-readiness.mjs",
     "ops:validate-production-env": "node scripts/ops/validate-production-env.mjs",
     "ingest:export-db-snapshot": "npm run build -w @groceryview/db && node scripts/ingestion/export-db-site-snapshot.mjs",
     "ops:check-supabase-health": "node scripts/ops/check-supabase-project-health.mjs",
     "ops:db-recovery-packet": "node scripts/ops/print-production-db-recovery-packet.mjs",
-    "ops:validate-db-cutover": "node scripts/ops/validate-db-cutover.mjs"
+    "ops:validate-db-cutover": "node scripts/ops/validate-db-cutover.mjs",
+    "db:check-retailer-seeds": "npm run test:retailer-seeds -w @groceryview/db && node --test tests/schema/stockholm-seed.test.mjs",
+    "db:seed:categories": "npm run build -w @groceryview/db && node packages/db/dist/seed/categories.js"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma",
+    "seed": "npm run db:seed:categories"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
+    "prisma": "^6.19.3",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3"
   }
 }

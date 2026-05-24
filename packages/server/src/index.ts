@@ -15,11 +15,14 @@ import {
   type FlyerOfferObservationInput,
   type FlyerOfferReport,
   type FlyerOfferStoreSummary,
+  type HouseholdBasketCheckRequest,
+  type HouseholdJoinRequest,
   type HouseholdPlanRequest,
   type StoreFlyerOfferReport,
   type WatchlistPriceAlertReport,
   type WatchlistPriceAlertRequest
 } from '@groceryview/api';
+import { apiContractOpenApiComponents } from '@groceryview/api-contracts';
 import { createSessionToken, parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
 import { buildCatalogCoverageReport, type CatalogCoverageInput, type CatalogCoverageReport } from '@groceryview/catalog';
 import {
@@ -29,6 +32,7 @@ import {
   createPostgresCatalogReader,
   createPostgresRepository,
   createPostgresSourceRecordReader,
+  buildUserAccountDeletionQueries,
   type BudgetRecord,
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
@@ -73,6 +77,7 @@ import {
 import {
   createExpoPushProvider,
   createSendgridEmailProvider,
+  createTelegramBotProvider,
   formatNotificationOperationsMetrics,
   parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
@@ -107,6 +112,7 @@ export type AuthOptions = {
   runtimeConfig?: RuntimeConfig;
   authSecret?: string;
   now?: Date;
+  apiResponseCache?: ApiResponseCache;
   authSessionExchange?: AuthSessionExchangeVerifier;
   subscriptionEntitlementRepository?: {
     getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementLookupRecord | null>;
@@ -114,6 +120,9 @@ export type AuthOptions = {
   budgetRepository?: {
     upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
     getBudget(userId: string): Promise<BudgetRecord | null>;
+  };
+  accountDeletionRepository?: {
+    deleteUserAccount(userId: string): Promise<void>;
   };
   humanReviewRepository?: {
     getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
@@ -133,6 +142,10 @@ export type AuthOptions = {
   notificationWebhookSecret?: string;
   notificationSuppressionSink?: {
     upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
+  };
+  notificationInboxRepository?: {
+    listDueNotificationTasks(now: string): Promise<PersistedNotificationTask[]>;
+    listActiveNotificationSuppressions(): Promise<NotificationSuppression[]>;
   };
   billingWebhookSecret?: string;
   billingPriceIdPlanMap?: Partial<Record<string, SubscriptionPlan>>;
@@ -189,6 +202,7 @@ export type RuntimePersistenceRepository = {
   upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
   getBudget(userId: string): Promise<BudgetRecord | null>;
+  deleteUserAccount?(userId: string): Promise<void>;
   getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
@@ -218,9 +232,15 @@ export type RuntimePgPool = PgLikeClient & {
 
 export type RuntimePgPoolFactory = (databaseUrl: string) => RuntimePgPool;
 
+export type ApiResponseCache = {
+  get(key: string): Promise<string | null> | string | null;
+  set(key: string, value: string, options: { ttlSeconds: number }): Promise<void> | void;
+};
+
 export type RuntimeHandlerOptions = {
   now?: Date;
   repository?: RuntimePersistenceRepository;
+  apiResponseCache?: ApiResponseCache;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
   notificationWorkerRunner?: () => Promise<RepositoryNotificationWorkerCycleResult>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
@@ -350,6 +370,52 @@ function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   });
 }
 
+function jsonTextResponse(body: string, init: ResponseInit = {}): Response {
+  return new Response(body, {
+    ...init,
+    headers: { ...jsonHeaders, ...(init.headers ?? {}) }
+  });
+}
+
+const apiHotEndpointCacheTtlSeconds: Readonly<Record<string, number>> = {
+  '/api/market/overview': 60,
+  '/api/indices': 300,
+  '/api/deals/flyer-offers': 300,
+  '/api/deals/discounts': 300
+};
+
+function hotEndpointCacheKey(url: URL): string {
+  const params = new URLSearchParams(url.search);
+  params.sort();
+  const query = params.toString();
+  return `hot-endpoint:v1:${url.pathname}${query ? `?${query}` : ''}`;
+}
+
+async function cachedJsonResponse(cache: ApiResponseCache | undefined, url: URL, ttlSeconds: number, bodyFactory: () => Promise<unknown> | unknown): Promise<Response> {
+  const cacheKey = hotEndpointCacheKey(url);
+  if (cache) {
+    const cached = await cache.get(cacheKey);
+    if (cached !== null) {
+      return jsonTextResponse(cached, {
+        headers: {
+          'cache-control': `public, s-maxage=${ttlSeconds}, stale-while-revalidate=${ttlSeconds * 5}`,
+          'x-groceryview-cache': 'hit'
+        }
+      });
+    }
+  }
+
+  const body = await bodyFactory();
+  const serialized = JSON.stringify(body);
+  if (cache) await cache.set(cacheKey, serialized, { ttlSeconds });
+  return jsonTextResponse(serialized, {
+    headers: {
+      'cache-control': `public, s-maxage=${ttlSeconds}, stale-while-revalidate=${ttlSeconds * 5}`,
+      'x-groceryview-cache': cache ? 'miss' : 'bypass'
+    }
+  });
+}
+
 function errorResponse(status: number, error: string): Response {
   return jsonResponse({ error }, { status });
 }
@@ -417,8 +483,8 @@ function requiredAuthProvider(value: unknown): AuthProvider {
 
 function optionalDeliveryChannel(value: unknown): DeliveryChannel | undefined {
   if (value === undefined) return undefined;
-  if (value === 'push' || value === 'email') return value;
-  throw new Error('channel must be push or email.');
+  if (value === 'push' || value === 'email' || value === 'telegram') return value;
+  throw new Error('channel must be push, email, or telegram.');
 }
 
 function optionalNutritionMetric(value: string | null): 'protein' | 'calories' | 'fiber' {
@@ -490,6 +556,17 @@ function optionalString(value: unknown, field: string): string | undefined {
   if (typeof value !== 'string') throw new Error(`${field} must be a string.`);
   const trimmed = value.trim();
   return trimmed ? trimmed : undefined;
+}
+
+function requiredBoolean(value: unknown, field: string): boolean {
+  if (typeof value !== 'boolean') throw new Error(`${field} must be a boolean.`);
+  return value;
+}
+
+function optionalHouseholdJoinRole(value: unknown): HouseholdJoinRequest['role'] {
+  if (value === undefined) return undefined;
+  if (value === 'editor' || value === 'viewer') return value;
+  throw new Error('role must be editor or viewer.');
 }
 
 const isoTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
@@ -576,6 +653,63 @@ function optionalStringArray(value: unknown, field: string): string[] | undefine
   if (value === undefined) return undefined;
   if (!Array.isArray(value)) throw new Error(`${field} must be an array.`);
   return value.map((item, index) => requiredString(item, `${field}[${index}]`));
+}
+
+function parseCursorOffset(cursor: string | null): number {
+  if (!cursor) return 0;
+  try {
+    const decoded = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8')) as unknown;
+    if (
+      decoded === null ||
+      typeof decoded !== 'object' ||
+      Array.isArray(decoded) ||
+      typeof (decoded as { offset?: unknown }).offset !== 'number' ||
+      !Number.isInteger((decoded as { offset: number }).offset) ||
+      (decoded as { offset: number }).offset < 0
+    ) {
+      throw new Error('invalid offset');
+    }
+    return (decoded as { offset: number }).offset;
+  } catch {
+    throw new Error('cursor must be a valid GroceryView cursor pagination token.');
+  }
+}
+
+function encodeCursorOffset(offset: number): string {
+  return Buffer.from(JSON.stringify({ offset })).toString('base64url');
+}
+
+function parseCursorLimit(value: string | null): number {
+  if (value === null || value.trim() === '') return 25;
+  const limit = Number(value);
+  if (!Number.isInteger(limit) || limit < 1) throw new Error('limit must be a positive integer.');
+  return Math.min(limit, 100);
+}
+
+function cursorPaginatedEnvelope<T>(items: T[], params: URLSearchParams) {
+  const limit = parseCursorLimit(params.get('limit'));
+  const offset = parseCursorOffset(params.get('cursor'));
+  const window = items.slice(offset, offset + limit);
+  const nextOffset = offset + window.length;
+  const hasMore = nextOffset < items.length;
+  return {
+    items: window,
+    pagination: {
+      limit,
+      cursor: params.get('cursor'),
+      nextCursor: hasMore ? encodeCursorOffset(nextOffset) : null,
+      hasMore,
+      totalReturned: window.length,
+      totalItems: items.length,
+      totalProductCount: items.length,
+      source: 'cursor pagination over stable product search ordering'
+    },
+    guardrails: [
+      'No offset page numbers are exposed in the public API; clients continue with nextCursor only.',
+      'Search result order remains the API sort order before pagination, so cursors do not fabricate ranking changes.',
+      'Missing or invalid cursor tokens fail closed instead of silently returning the first page.'
+    ]
+  };
 }
 
 const watchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const satisfies readonly WatchlistPriceType[];
@@ -944,12 +1078,16 @@ function householdPlanRequestFromBody(body: JsonRecord): HouseholdPlanRequest {
     reviewer: requiredString(body.reviewer, 'reviewer'),
     members: requiredRecordArray(body.members, 'members').map((member) => ({
       userId: requiredString(member.userId, 'members.userId'),
-      displayName: requiredString(member.displayName, 'members.displayName')
+      displayName: requiredString(member.displayName, 'members.displayName'),
+      ...(member.role === undefined ? {} : { role: requiredString(member.role, 'members.role') as HouseholdPlanRequest['members'][number]['role'] })
     })),
     basketItems: (optionalRecordArray(body.basketItems, 'basketItems') ?? []).map((item) => ({
       productId: requiredString(item.productId, 'basketItems.productId'),
       quantity: requiredNumber(item.quantity, 'basketItems.quantity'),
-      addedBy: requiredString(item.addedBy, 'basketItems.addedBy')
+      addedBy: requiredString(item.addedBy, 'basketItems.addedBy'),
+      ...(item.checked === undefined ? {} : { checked: requiredBoolean(item.checked, 'basketItems.checked') }),
+      ...(item.checkedBy === undefined ? {} : { checkedBy: requiredString(item.checkedBy, 'basketItems.checkedBy') }),
+      ...(item.checkedAt === undefined ? {} : { checkedAt: requiredString(item.checkedAt, 'basketItems.checkedAt') })
     })),
     watchlistItems: (optionalRecordArray(body.watchlistItems, 'watchlistItems') ?? []).map((item) => {
       const targetPrice = optionalNumber(item.targetPrice, 'watchlistItems.targetPrice');
@@ -960,6 +1098,24 @@ function householdPlanRequestFromBody(body: JsonRecord): HouseholdPlanRequest {
       };
     }),
     sharedFavoriteStoreIds: optionalStringArray(body.sharedFavoriteStoreIds, 'sharedFavoriteStoreIds') ?? []
+  };
+}
+
+function householdJoinRequestFromBody(body: JsonRecord): HouseholdJoinRequest {
+  const role = optionalHouseholdJoinRole(body.role);
+  return {
+    householdId: requiredString(body.householdId, 'householdId'),
+    inviteToken: requiredString(body.inviteToken, 'inviteToken'),
+    displayName: requiredString(body.displayName, 'displayName'),
+    ...(role === undefined ? {} : { role })
+  };
+}
+
+function householdBasketCheckRequestFromBody(body: JsonRecord): HouseholdBasketCheckRequest {
+  return {
+    productId: requiredString(body.productId, 'productId'),
+    checked: requiredBoolean(body.checked, 'checked'),
+    ...(body.checkedAt === undefined ? {} : { checkedAt: requiredString(body.checkedAt, 'checkedAt') })
   };
 }
 
@@ -1673,6 +1829,50 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     return null;
   };
 
+  const buildAccountDataExport = (user: string) => {
+    const householdPlan = api.getHouseholdPlan(user);
+    const watchlist = api.getWatchlist(user);
+    const budgetSummary = api.getBudgetSummary(user);
+    const alerts = watchlist.items
+      .filter((item) => item.targetPrice !== undefined || item.alertDealScoreAt !== undefined)
+      .map((item) => ({
+        productId: item.productId,
+        ...(item.targetPrice === undefined ? {} : { targetPrice: item.targetPrice }),
+        ...(item.alertDealScoreAt === undefined ? {} : { alertDealScoreAt: item.alertDealScoreAt }),
+        favoriteStoresOnly: item.favoriteStoresOnly ?? false,
+        allowedPriceTypes: item.allowedPriceTypes ?? []
+      }));
+    const preferences = budgetSummary.weeklyBudget > 0 || budgetSummary.monthlyBudget > 0
+      ? [{ weeklyBudget: budgetSummary.weeklyBudget, monthlyBudget: budgetSummary.monthlyBudget }]
+      : [];
+
+    return buildPrivacyExport(
+      {
+        userId: user,
+        lists: [{ id: 'current_basket', items: api.getBasket(user).items }],
+        alerts,
+        preferences,
+        analyticsEvents: [],
+        favoriteStoreIds: api.getFavoriteStores(user).map((store) => store.id),
+        watchlistProductIds: watchlist.items.map((item) => item.productId),
+        receiptIds: [],
+        householdIds: householdPlan ? [householdPlan.household.id] : []
+      },
+      (authOptions.now ?? new Date()).toISOString()
+    );
+  };
+
+  const deleteAccountData = async (user: string) => {
+    await authOptions.accountDeletionRepository?.deleteUserAccount(user);
+    api.deleteAccount(user);
+    return {
+      userId: user,
+      deleted: true,
+      deletedTables: buildUserAccountDeletionQueries(user).map((query) => query.table),
+      requiresReauthentication: true
+    };
+  };
+
   return async (request: Request): Promise<Response> => {
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
@@ -1723,7 +1923,10 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       }
 
       if (method === 'GET' && path === '/api/openapi.json') return jsonResponse(buildOpenApiDocument());
-      if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
+      if (method === 'GET' && path === '/api/market/overview') {
+        return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => api.getMarketOverview());
+      }
+      if (method === 'GET' && (path === '/api/fuel' || path === '/fuel')) return jsonResponse(api.getFuelPrices());
       if (method === 'GET' && path === '/api/nutrition/value') return jsonResponse(api.getNutritionValueReport(optionalNutritionMetric(url.searchParams.get('metric'))));
       if (path === '/api/meal-plans/suggestions') {
         const user = userIdFrom(url);
@@ -1792,7 +1995,16 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
-        if (method === 'GET') return jsonResponse(api.getNotificationInboxReport(user));
+        if (method === 'GET') {
+          const now = (authOptions.now ?? new Date()).toISOString();
+          const [tasks, suppressions] = authOptions.notificationInboxRepository
+            ? await Promise.all([
+                authOptions.notificationInboxRepository.listDueNotificationTasks(now),
+                authOptions.notificationInboxRepository.listActiveNotificationSuppressions()
+              ])
+            : [undefined, undefined];
+          return jsonResponse(api.getNotificationInboxReport(user, { now, tasks, suppressions }));
+        }
       }
       if (path === '/api/receipts/review') {
         const user = userIdFrom(url);
@@ -1807,7 +2019,9 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (!report) return errorResponse(404, 'Category market not found.');
         return jsonResponse(report);
       }
+      if (method === 'GET' && path === '/api/categories') return jsonResponse(api.getCategories());
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
+      if (method === 'GET' && path === '/api/retailers') return jsonResponse(api.getRetailers());
 
       if (method === 'GET' && path === '/api/deals/flyer-offers') {
         const query = {
@@ -1818,7 +2032,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           productId: url.searchParams.get('productId') ?? undefined
         };
         if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Flyer offers provider is not configured.');
-        return jsonResponse(await authOptions.flyerOffersProvider(query));
+        return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.flyerOffersProvider!(query));
       }
 
       if (method === 'GET' && path === '/api/deals/discounts') {
@@ -1830,7 +2044,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           productId: url.searchParams.get('productId') ?? undefined
         };
         if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Discounts provider is not configured.');
-        return jsonResponse(await authOptions.flyerOffersProvider(query));
+        return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.flyerOffersProvider!(query));
       }
 
       if (method === 'GET' && path === '/api/account/subscription-access') {
@@ -2184,8 +2398,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
 
       const storeMatch = path.match(/^\/api\/stores\/([^/]+)$/);
       if (method === 'GET' && storeMatch) {
-        const store = api.getStore(decodeURIComponent(storeMatch[1]));
-        return store ? jsonResponse(store) : errorResponse(404, 'Store not found.');
+        const storeDetail = api.getStoreDetail(decodeURIComponent(storeMatch[1]));
+        return storeDetail ? jsonResponse(storeDetail) : errorResponse(404, 'Store not found.');
       }
 
       const storeDealsMatch = path.match(/^\/api\/stores\/([^/]+)\/deals$/);
@@ -2236,8 +2450,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(api.getPriceFreshnessReport(url.searchParams.get('asOf') ?? undefined));
       }
 
-      if (method === 'GET' && path === '/api/products/search') {
-        return jsonResponse(api.searchProducts(url.searchParams.get('q') ?? ''));
+      if (method === 'GET' && (path === '/api/products' || path === '/api/products/search')) {
+        return jsonResponse(cursorPaginatedEnvelope(api.searchProducts(url.searchParams.get('q') ?? ''), url.searchParams));
       }
 
       const productMatch = path.match(/^\/api\/products\/([^/]+)$/);
@@ -2661,25 +2875,45 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
-      if (path === '/api/privacy/export') {
+      if (path === '/api/households/join') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
-        if (method === 'GET') {
-          const householdPlan = api.getHouseholdPlan(user);
-          return jsonResponse(
-            buildPrivacyExport(
-              {
-                userId: user,
-                favoriteStoreIds: api.getFavoriteStores(user).map((store) => store.id),
-                watchlistProductIds: api.getWatchlist(user).items.map((item) => item.productId),
-                receiptIds: [],
-                householdIds: householdPlan ? [householdPlan.household.id] : []
-              },
-              (authOptions.now ?? new Date()).toISOString()
-            )
-          );
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse({ userId: user, ...api.joinHouseholdPlan(user, householdJoinRequestFromBody(body)) });
+        }
+      }
+
+      if (path === '/api/households/current/basket/check') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse({ userId: user, ...api.checkHouseholdBasketItem(user, householdBasketCheckRequestFromBody(body)) });
+        }
+      }
+
+      if (path === '/api/privacy/export' || path === '/api/settings/data-export') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(buildAccountDataExport(user));
+      }
+
+      if (path === '/api/settings/account') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'DELETE') {
+          const body = await readJson(request);
+          if (body.confirmation !== 'DELETE ACCOUNT') return errorResponse(400, 'confirmation must be DELETE ACCOUNT.');
+          return jsonResponse(await deleteAccountData(user));
         }
       }
 
@@ -2755,11 +2989,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
-      if (method === 'GET' && path === '/api/indices') return jsonResponse(api.getIndices());
+      if (method === 'GET' && path === '/api/indices') {
+        return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => api.getIndices());
+      }
       const indexMatch = path.match(/^\/api\/indices\/([^/]+)$/);
       if (method === 'GET' && indexMatch) {
         const index = api.getIndex(decodeURIComponent(indexMatch[1]));
-        return index ? jsonResponse(index) : errorResponse(404, 'Index not found.');
+        return index ? cachedJsonResponse(authOptions.apiResponseCache, url, 300, () => index) : errorResponse(404, 'Index not found.');
       }
 
       return errorResponse(404, `Route not found: ${method} ${path}`);
@@ -2798,6 +3034,12 @@ export function createNodeServer(handler: HttpHandler = createHttpHandler()) {
 export type OpenApiOperation = {
   summary: string;
   security?: OpenApiSecurityRequirement[];
+  responses?: Record<string, {
+    description: string;
+    content?: Record<string, {
+      schema: { $ref: string } | Record<string, unknown>;
+    }>;
+  }>;
 };
 
 export type OpenApiSecurityRequirement = {
@@ -2822,6 +3064,7 @@ export type OpenApiDocument = {
       billingWebhookSignature: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-billing-signature' };
       stripeWebhookSignature: { type: 'apiKey'; in: 'header'; name: 'stripe-signature' };
     };
+    schemas: typeof apiContractOpenApiComponents;
   };
 };
 
@@ -2830,6 +3073,19 @@ const publicOperation = (summary: string): OpenApiOperation => ({ summary });
 const metricsOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ metricsToken: [] }] });
 const webhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ webhookSignature: [] }] });
 const billingWebhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ billingWebhookSignature: [] }, { stripeWebhookSignature: [] }] });
+const operationWithJsonResponse = (operation: OpenApiOperation, schemaName: keyof typeof apiContractOpenApiComponents): OpenApiOperation => ({
+  ...operation,
+  responses: {
+    '200': {
+      description: 'OK',
+      content: {
+        'application/json': {
+          schema: { $ref: `#/components/schemas/${schemaName}` }
+        }
+      }
+    }
+  }
+});
 
 export function buildOpenApiDocument(): OpenApiDocument {
   return {
@@ -2842,12 +3098,14 @@ export function buildOpenApiDocument(): OpenApiDocument {
         webhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' },
         billingWebhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-billing-signature' },
         stripeWebhookSignature: { type: 'apiKey', in: 'header', name: 'stripe-signature' }
-      }
+      },
+      schemas: apiContractOpenApiComponents
     },
     paths: {
       '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
       '/api/openapi.json': { get: publicOperation('Get the public OpenAPI document for developer price and nutrition API integrations.') },
       '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
+      '/api/fuel': { get: publicOperation('Get per-grade fuel price observations with operator and crowd-source provenance.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/nutrition/value': { get: publicOperation('Get nutrition per krona rankings with sugar and salt warning guardrails.') },
       '/api/meal-plans/suggestions': { get: protectedOperation('Get deal-based meal suggestions with cost, serving, and household guardrails.') },
@@ -2858,23 +3116,31 @@ export function buildOpenApiDocument(): OpenApiDocument {
       },
       '/api/loyalty/offers': { get: protectedOperation('Get account-scoped loyalty offers with savings, coupon actions, and membership guardrails.') },
       '/api/ads/disclosure': { get: protectedOperation('Get ad disclosure status with placement labels, premium removal, and ranking separation guardrails.') },
-      '/api/notifications/inbox': { get: protectedOperation('Get notification inbox delivery status, holds, suppressions, and alert guardrails.') },
+      '/api/notifications/inbox': {
+        get: operationWithJsonResponse(
+          protectedOperation('Get notification inbox delivery status, holds, suppressions, and alert guardrails.'),
+          'NotificationInboxResponse'
+        )
+      },
       '/api/receipts/review': { get: protectedOperation('Get receipt review budget impact, match confidence, and writeback guardrails.') },
+      '/api/categories': { get: publicOperation('List the category tree with product counts for navigation and filter sidebars.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
+      '/api/retailers': { get: publicOperation('List supported retailers with logo and website metadata.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
       '/api/billing/checkout-sessions': { post: protectedOperation('Create a provider-backed subscription checkout session for the signed-in account.') },
       '/api/billing/portal-sessions': { post: protectedOperation('Create a provider-backed billing portal session for the signed-in account.') },
       '/api/billing/subscription-events': { post: billingWebhookOperation('Accept signed billing subscription events and persist entitlement updates.') },
-      '/api/stores/{id}': { get: publicOperation('Get store profile.') },
+      '/api/stores/{id}': { get: publicOperation('Get store profile with opening hours and assortment overview.') },
       '/api/stores/{id}/category-coverage': { get: publicOperation('Get store price coverage grouped by product category.') },
       '/api/stores/{id}/deal-summary': { get: publicOperation('Get store deal summary with category leaders and score guardrails.') },
       '/api/stores/{id}/deals': { get: publicOperation('Get ranked in-store deals for one store.') },
       '/api/stores/{id}/discounts': { get: publicOperation('Get active weekly discounts captured for one branch.') },
       '/api/stores/{id}/flyer-offers': { get: publicOperation('Get active weekly flyer offers captured for one branch.') },
       '/api/stores/{id}/price-coverage': { get: publicOperation('Get store catalog price coverage with missing product guardrails.') },
+      '/api/products': { get: publicOperation('List products with cursor pagination.') },
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
       '/api/products/{id}/deal-score': { get: publicOperation('Get Deal Score v1 report with customer-facing reasons.') },
@@ -2892,7 +3158,11 @@ export function buildOpenApiDocument(): OpenApiDocument {
         get: protectedOperation('Get the signed-in user household plan.'),
         put: protectedOperation('Create or replace the signed-in user household plan and budget summary.')
       },
+      '/api/households/join': { post: protectedOperation('Join an existing household from a signed-in invite token.') },
+      '/api/households/current/basket/check': { post: protectedOperation('Check or uncheck a shared household shopping-list item with member attribution.') },
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
+      '/api/settings/account': { delete: protectedOperation('Delete the signed-in account after confirmation, wiping lists, alerts, preferences, and profile rows.') },
+      '/api/settings/data-export': { get: protectedOperation('Download my data JSON export with lists, alerts, preferences, and analytics event records.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/privacy/request-fulfillment': { post: protectedOperation('Classify privacy export, deletion, and ad opt-out requests by fulfillment deadline.') },
       '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },
@@ -2972,6 +3242,7 @@ export type RuntimeConfig = {
   sendgridApiKey?: string;
   sendgridFromEmail?: string;
   expoPushAccessToken?: string;
+  telegramBotToken?: string;
   metricsToken?: string;
   ocrSpaceApiKey?: string;
   ocrSpaceHealthcheckImageUrl?: string;
@@ -3081,6 +3352,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.SENDGRID_API_KEY) throw new Error('SENDGRID_API_KEY is required in production.');
     if (!env.SENDGRID_FROM_EMAIL) throw new Error('SENDGRID_FROM_EMAIL is required in production.');
     if (!env.EXPO_PUSH_ACCESS_TOKEN) throw new Error('EXPO_PUSH_ACCESS_TOKEN is required in production.');
+    if (!env.TELEGRAM_BOT_TOKEN) throw new Error('TELEGRAM_BOT_TOKEN is required in production.');
     if (!env.BILLING_WEBHOOK_SECRET) throw new Error('BILLING_WEBHOOK_SECRET is required in production.');
     if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
     if (!env.OCR_SPACE_API_KEY) throw new Error('OCR_SPACE_API_KEY is required in production.');
@@ -3114,6 +3386,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     ...(env.SENDGRID_API_KEY ? { sendgridApiKey: env.SENDGRID_API_KEY } : {}),
     ...(env.SENDGRID_FROM_EMAIL ? { sendgridFromEmail: env.SENDGRID_FROM_EMAIL } : {}),
     ...(env.EXPO_PUSH_ACCESS_TOKEN ? { expoPushAccessToken: env.EXPO_PUSH_ACCESS_TOKEN } : {}),
+    ...(env.TELEGRAM_BOT_TOKEN ? { telegramBotToken: env.TELEGRAM_BOT_TOKEN } : {}),
     billingWebhookSecret: env.BILLING_WEBHOOK_SECRET,
     ...(env.STRIPE_SECRET_KEY ? { stripeSecretKey: env.STRIPE_SECRET_KEY } : {}),
     ...(Object.keys(stripePriceIds).length > 0 ? { stripePriceIds } : {}),
@@ -3152,6 +3425,14 @@ function buildRuntimeNotificationProviders(config: RuntimeConfig, options: Runti
             ...(options.notificationProviderFetch ? { fetch: options.notificationProviderFetch } : {})
           })
         }
+      : {}),
+    ...(config.telegramBotToken
+      ? {
+          telegram: createTelegramBotProvider({
+            botToken: config.telegramBotToken,
+            ...(options.notificationProviderFetch ? { fetch: options.notificationProviderFetch } : {})
+          })
+        }
       : {})
   };
 }
@@ -3163,7 +3444,7 @@ function buildRuntimeNotificationWorkerRunner(
 ): (() => Promise<RepositoryNotificationWorkerCycleResult>) | undefined {
   if (!repository?.listDueNotificationTasks || !repository.listActiveNotificationSuppressions || !repository.upsertNotificationTask) return undefined;
   const providers = buildRuntimeNotificationProviders(config, options);
-  if (!providers.email && !providers.push) return undefined;
+  if (!providers.email && !providers.push && !providers.telegram) return undefined;
   return () => runRepositoryNotificationWorkerCycle({
     now: (options.now ?? new Date()).toISOString(),
     retryDelayMinutes: 15,
@@ -3282,6 +3563,7 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     runtimeConfig: config,
     authSecret: config.authSecret,
     now: options.now,
+    apiResponseCache: options.apiResponseCache,
     notificationWebhookSecret: config.notificationWebhookSecret,
     billingWebhookSecret: config.billingWebhookSecret,
     billingCheckoutPriceIds: config.stripePriceIds,
@@ -3346,6 +3628,13 @@ export function buildRepositoryBackedAuthOptions(
       upsertBudget: (userId, budget) => repository.upsertBudget(userId, budget),
       getBudget: (userId) => repository.getBudget(userId)
     },
+    ...(repository.deleteUserAccount
+      ? {
+          accountDeletionRepository: {
+            deleteUserAccount: (userId) => repository.deleteUserAccount!(userId)
+          }
+        }
+      : {}),
     humanReviewRepository: {
       getHumanReviewer: (reviewerId) => repository.getHumanReviewer(reviewerId),
       listOpenHumanReviewAssignments: () => repository.listOpenHumanReviewAssignments(),
@@ -3363,6 +3652,14 @@ export function buildRepositoryBackedAuthOptions(
     notificationSuppressionSink: {
       upsertNotificationSuppression: (suppression) => repository.upsertNotificationSuppression(suppression)
     },
+    ...(repository.listDueNotificationTasks && repository.listActiveNotificationSuppressions
+      ? {
+          notificationInboxRepository: {
+            listDueNotificationTasks: (now) => repository.listDueNotificationTasks!(now),
+            listActiveNotificationSuppressions: () => repository.listActiveNotificationSuppressions!()
+          }
+        }
+      : {}),
     billingSubscriptionSink: {
       upsertSubscriptionEntitlement: (entitlement) => repository.upsertSubscriptionEntitlement(entitlement)
     }

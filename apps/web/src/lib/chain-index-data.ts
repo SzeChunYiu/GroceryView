@@ -13,7 +13,8 @@ import { willysProducts, willysWeeklyDiscounts, type WillysIngestedWeeklyDiscoun
 import { hemkopProducts, hemkopWeeklyDiscounts, type HemkopIngestedWeeklyDiscount } from './ingested/hemkop';
 import { matpriskollenOffers } from './ingested/matpriskollen';
 import { axfoodProducts } from './axfood-products';
-import { calculateChainPriceIndex, type BrandTierPriceObservation, type ChainPriceObservation } from '@groceryview/core';
+import { dbSiteSnapshotChainPriceObservations } from './generated/db-site-chain-observations';
+import { calculateChainPriceIndex, type BrandTier, type BrandTierPriceObservation, type ChainPriceObservation } from '@groceryview/core';
 
 // ── unit canonicalisation ────────────────────────────────────────────────────
 type Canon = { factor: number; base: 'kg' | 'l' | 'st' };
@@ -95,6 +96,8 @@ function push(out: ChainPriceObservation[], chainId: string, rawCategory: string
 }
 
 export function buildChainPriceObservations(): ChainPriceObservation[] {
+  if (dbSiteSnapshotChainPriceObservations.length > 0) return dbSiteSnapshotChainPriceObservations;
+
   const out: ChainPriceObservation[] = [];
 
   for (const p of coopProducts) {
@@ -339,29 +342,66 @@ export function buildChainIndexTrendSeries(): ChainIndexTrendReport {
 }
 
 
-// Driver-backed brand-tier basket: visible Stockholm staples grouped by national,
-// premium, private-label and discount-chain labels. These rows power the brand
-// tier index panel on /chain-index and intentionally use the same coarse
-// category names as the route so shoppers can compare private-label savings
-// against the chain index without requiring a perfect matched basket yet.
-const BRAND_TIER_OBSERVATIONS: BrandTierPriceObservation[] = [
-  { category: 'Coffee & tea', brandTier: 'national', baseUnitPrice: 64.9, currentUnitPrice: 49.9 },
-  { category: 'Coffee & tea', brandTier: 'standard_private_label', baseUnitPrice: 52.9, currentUnitPrice: 43.5 },
-  { category: 'Coffee & tea', brandTier: 'discount_chain_label', baseUnitPrice: 47.9, currentUnitPrice: 39.9 },
-  { category: 'Dairy & eggs', brandTier: 'national', baseUnitPrice: 53.2, currentUnitPrice: 56.9 },
-  { category: 'Dairy & eggs', brandTier: 'standard_private_label', baseUnitPrice: 45.9, currentUnitPrice: 42.5 },
-  { category: 'Dairy & eggs', brandTier: 'organic_private_label', baseUnitPrice: 59.9, currentUnitPrice: 55.9 },
-  { category: 'Pantry & dry', brandTier: 'national', baseUnitPrice: 32.9, currentUnitPrice: 27.9 },
-  { category: 'Pantry & dry', brandTier: 'budget_private_label', baseUnitPrice: 24.9, currentUnitPrice: 18.9 },
-  { category: 'Pantry & dry', brandTier: 'standard_private_label', baseUnitPrice: 25.8, currentUnitPrice: 21.9 },
-  { category: 'Fruit & veg', brandTier: 'premium', baseUnitPrice: 34.9, currentUnitPrice: 29.9 },
-  { category: 'Fruit & veg', brandTier: 'standard_private_label', baseUnitPrice: 27.9, currentUnitPrice: 19.9 },
-  { category: 'Personal care', brandTier: 'national', baseUnitPrice: 39.9, currentUnitPrice: 29.9 },
-  { category: 'Personal care', brandTier: 'standard_private_label', baseUnitPrice: 33.9, currentUnitPrice: 26.9 },
-  { category: 'Plant-based', brandTier: 'premium', baseUnitPrice: 82.9, currentUnitPrice: 79.9 },
-  { category: 'Plant-based', brandTier: 'standard_private_label', baseUnitPrice: 79.9, currentUnitPrice: 64.9 }
-];
+function medianPrice(values: number[]) {
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
+}
+
+function brandTierForMatchedProduct(product: (typeof axfoodProducts)[number], categoryMedian: number): BrandTier {
+  const brand = product.brand.toLowerCase();
+  const labels = product.labels.map((label) => label.toLowerCase());
+  const isRetailerPrivateLabel =
+    brand.includes('garant') ||
+    brand.includes('eldorado') ||
+    brand.includes('ica') ||
+    brand.includes('coop') ||
+    brand.includes('änglamark') ||
+    brand.includes('x-tra');
+
+  if (
+    brand.includes('garant eko') ||
+    brand.includes('änglamark') ||
+    (isRetailerPrivateLabel && (labels.includes('ecological') || labels.includes('eu_ecological')))
+  ) {
+    return 'organic_private_label';
+  }
+  if (brand.includes('eldorado') || brand.includes('x-tra') || brand.includes('basic')) return 'budget_private_label';
+  if (isRetailerPrivateLabel) return 'standard_private_label';
+  if (brand.includes('willys') || brand.includes('lidl') || brand.includes('city gross')) return 'discount_chain_label';
+  if (product.lowestPrice >= categoryMedian * 1.25) return 'premium';
+  return 'national';
+}
 
 export function buildBrandTierPriceObservations(): BrandTierPriceObservation[] {
-  return BRAND_TIER_OBSERVATIONS.map((row) => ({ ...row }));
+  const matchedProducts = axfoodProducts.filter((product) => product.inChains.length > 1 && product.lowestPrice > 0);
+  const medianByCategory = new Map<string, number>();
+
+  for (const category of new Set(matchedProducts.map((product) => normaliseCategory(product.category, product.name)))) {
+    const prices = matchedProducts
+      .filter((product) => normaliseCategory(product.category, product.name) === category)
+      .map((product) => product.lowestPrice)
+      .filter((price) => Number.isFinite(price) && price > 0);
+    if (prices.length > 0) medianByCategory.set(category, medianPrice(prices));
+  }
+
+  return matchedProducts.flatMap((product) => {
+    const category = normaliseCategory(product.category, product.name);
+    const categoryMedian = medianByCategory.get(category) ?? product.lowestPrice;
+    const brandTier = brandTierForMatchedProduct(product, categoryMedian);
+    const chainPrices = product.inChains
+      .map((chainId) => ({ chainId, price: product.chains[chainId]?.price }))
+      .filter((row): row is { chainId: string; price: number } => typeof row.price === 'number' && Number.isFinite(row.price) && row.price > 0);
+
+    if (chainPrices.length < 2) return [];
+
+    const baseUnitPrice = chainPrices.reduce((sum, row) => sum + row.price, 0) / chainPrices.length;
+
+    return chainPrices.map((row) => ({
+      category: `${category} · ${row.chainId}`,
+      brandTier,
+      baseUnitPrice,
+      currentUnitPrice: row.price
+    }));
+  });
 }

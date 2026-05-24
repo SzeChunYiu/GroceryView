@@ -165,53 +165,99 @@ export const DEFAULT_MATHEM_SEARCH_QUERIES = [
   'hushallspapper',
   'toalettpapper',
   'fryspasar',
-  'aluminiumfolie'
+  'aluminiumfolie',
+  'havredryck',
+  'sojadryck',
+  'protein',
+  'risgryn',
+  'nudlar',
+  'couscous',
+  'matvete',
+  'risoni',
+  'pesto',
+  'pastasas',
+  'tacosas',
+  'grillost',
+  'halloumi',
+  'mozzarella',
+  'parmesan',
+  'oliver',
+  'kapris',
+  'kikartor',
+  'kidneybonor',
+  'kokosmjolk',
+  'bakpulver',
+  'vaniljsocker',
+  'kanel',
+  'oregano',
+  'basilika',
+  'curry',
+  'paprikapulver',
+  'soja',
+  'teriyaki',
+  'sesam',
+  'bulgur',
+  'risotto',
+  'polenta',
+  'ströbröd',
+  'sirap',
+  'agavesirap',
+  'jordnötssmör',
+  'mandelmjöl',
+  'chia',
+  'pumpakärnor'
 ] as const;
-export const DEFAULT_MATHEM_MAX_ROWS = 4200;
+export const DEFAULT_MATHEM_SEARCH_PAGES = [1, 2, 3] as const;
+export const DEFAULT_MATHEM_MAX_ROWS = 9000;
 
 export type FetchMathemProductsOptions = {
   fetchImpl?: typeof fetch;
   queries?: readonly string[];
+  pages?: readonly number[];
   maxRows?: number;
   retrievedAt?: string;
 };
 
-export function buildMathemSearchUrl(query: string): string {
+export function buildMathemSearchUrl(query: string, page = 1): string {
   const url = new URL(MATHEM_SEARCH_BASE_URL);
   url.searchParams.set('q', query);
+  if (page > 1) url.searchParams.set('page', String(page));
   return url.toString();
 }
 
 export async function fetchMathemProducts(options: FetchMathemProductsOptions = {}): Promise<MathemProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const queries = options.queries ?? DEFAULT_MATHEM_SEARCH_QUERIES;
+  const pages = options.pages ?? DEFAULT_MATHEM_SEARCH_PAGES;
   const maxRows = options.maxRows ?? DEFAULT_MATHEM_MAX_ROWS;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: MathemProduct[] = [];
   const seenCodes = new Set<string>();
 
   for (const query of queries) {
-    const sourceUrl = buildMathemSearchUrl(query);
-    const response = await fetchImpl(sourceUrl, {
-      headers: {
-        accept: 'text/html,application/xhtml+xml',
-        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-      }
-    });
+    for (const page of pages) {
+      const sourceUrl = buildMathemSearchUrl(query, page);
+      const response = await fetchImpl(sourceUrl, {
+        headers: {
+          accept: 'text/html,application/xhtml+xml',
+          'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+        }
+      });
 
-    if (!response.ok) {
-      throw new Error(`Mathem search request failed for ${query}: ${response.status}`);
-    }
-
-    for (const product of parseMathemSearchProducts(await response.text())) {
-      const row = normalizeMathemProduct(product, sourceUrl, retrievedAt);
-      if (!row || seenCodes.has(row.code)) {
-        continue;
+      if (!response.ok) {
+        throw new Error(`Mathem search request failed for ${query} page ${page}: ${response.status}`);
       }
-      seenCodes.add(row.code);
-      rows.push(row);
-      if (rows.length >= maxRows) {
-        return rows;
+
+      for (const product of parseMathemSearchProducts(await response.text())) {
+        const row = normalizeMathemProduct(product, sourceUrl, retrievedAt);
+        if (!row || seenCodes.has(row.code)) {
+          continue;
+        }
+        seenCodes.add(row.code);
+        rows.push(row);
+        if (rows.length >= maxRows) {
+          return rows;
+        }
       }
     }
   }

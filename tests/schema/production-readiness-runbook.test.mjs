@@ -12,6 +12,7 @@ describe('production daily ingestion readiness runbook', () => {
     );
 
     assert.doesNotMatch(requiredSecretsSection, /GROCERYVIEW_DAILY_CONNECTORS_JSON/);
+    assert.match(runbook, /production_config_preflight_diagnostic_missing/);
     assert.match(runbook, /daily ingestion workflow generates `GROCERYVIEW_DAILY_CONNECTORS_JSON`/);
     assert.match(runbook, /npm run --silent ops:daily-connectors/);
     assert.match(runbook, /npm run --silent ops:daily-connectors > \/tmp\/groceryview-daily-connectors\.json/);
@@ -35,9 +36,38 @@ describe('production daily ingestion readiness runbook', () => {
 
   it('documents source-run accepted-row thresholds for every required chain', () => {
     assert.match(runbook, /GROCERYVIEW_SOURCE_RUN_MIN_ACCEPTED_ROWS_BY_CHAIN/);
+    assert.match(runbook, /GitHub variable or secret/);
     assert.match(runbook, /source-run row thresholds/);
     assert.match(runbook, /positive integer threshold for all six required chains/);
     assert.match(runbook, /source_run_insufficient_accepted_rows/);
+    assert.match(runbook, /GROCERYVIEW_DAILY_DB_DIRECT_PROBE_ATTEMPTS/);
+    assert.match(runbook, /GROCERYVIEW_DAILY_DB_ALTERNATE_POOLER_PROBE_ATTEMPTS/);
+    assert.match(runbook, /supabase_direct_host/);
+    assert.match(runbook, /supabase_transaction_pooler/);
+    assert.match(runbook, /supabase_pooler_database_unavailable/);
+    assert.match(runbook, /supabase_pooler_circuit_breaker/);
+    assert.match(runbook, /alternateConnections/);
+    assert.match(runbook, /groceryview-production-db-recovery-packet/);
+    assert.match(runbook, /ops:db-recovery-packet/);
+    assert.match(runbook, /SUPABASE_ACCESS_TOKEN/);
+    assert.match(runbook, /SUPABASE_PROJECT_REF/);
+    assert.match(runbook, /sbp_/);
+    assert.match(runbook, /db_recovery_secret_invalid_format/);
+  });
+
+  it('documents daily DB IO hotspot delta comparison evidence', () => {
+    assert.match(runbook, /npm run --silent ops:db-io-hotspots/);
+    assert.match(runbook, /npm run --silent ops:compare-db-io-hotspots --/);
+    assert.match(runbook, /--before \/tmp\/groceryview-db-io-hotspots-before\.json/);
+    assert.match(runbook, /--after \/tmp\/groceryview-db-io-hotspots-after\.json/);
+    assert.match(runbook, /--out \/tmp\/groceryview-db-io-hotspots-delta\.json/);
+    assert.match(runbook, /\/tmp\/daily-db-io-hotspots-before\.json/);
+    assert.match(runbook, /\/tmp\/daily-db-io-hotspots-after\.json/);
+    assert.match(runbook, /\/tmp\/daily-db-io-hotspots-delta\.json/);
+    assert.match(runbook, /groceryview-daily-db-io-hotspots/);
+    assert.match(runbook, /daily_db_io_hotspots_delta_missing_before_or_after/);
+    assert.ok(runbook.includes('Empty `hotspots[]` rows are'));
+    assert.match(runbook, /zero-row delta/);
   });
 
 
@@ -51,15 +81,27 @@ describe('production daily ingestion readiness runbook', () => {
 
   it('documents production ingestion config evidence artifacts', () => {
     assert.match(runbook, /groceryview-production-ingestion-config/);
+    assert.match(runbook, /groceryview-db-unblocker-preflight/);
+    assert.match(runbook, /db-recovery/);
+    assert.match(runbook, /db-cutover/);
+    assert.match(runbook, /daily-db-unblocker-preflight\.json/);
+    assert.match(runbook, /db_recovery_secret_audit_diagnostic_missing/);
+    assert.match(runbook, /db_cutover_secret_audit_diagnostic_missing/);
     assert.match(runbook, /production-env-validation\.json/);
     assert.match(runbook, /groceryview-catalog-targets\.json/);
     assert.match(runbook, /groceryview-daily-connectors\.json/);
+    assert.match(runbook, /daily_db_connectivity_database_url_config_missing/);
+    assert.match(runbook, /production_db_migrations_database_url_config_missing/);
+    assert.match(runbook, /production_db_migrations_skipped_after_prior_failure/);
   });
 
 
   it('documents daily ingestion chain summary evidence', () => {
     assert.match(runbook, /chainSummaries/);
     assert.match(runbook, /groceryview-daily-ingestion-result/);
+    assert.match(runbook, /daily_ingestion_connectors_diagnostic_missing/);
+    assert.match(runbook, /daily_ingestion_database_url_config_missing/);
+    assert.match(runbook, /daily_ingestion_skipped_after_prior_failure/);
     assert.match(runbook, /daily_ingestion_missing_chain_summary/);
     assert.match(runbook, /daily_ingestion_chain_not_succeeded/);
     assert.match(runbook, /daily_ingestion_chain_without_observations/);
@@ -74,6 +116,12 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /postgres-readiness\.json/);
     assert.match(runbook, /source-run-readiness\.json/);
     assert.match(runbook, /catalog-coverage-readiness\.json/);
+    assert.match(runbook, /postgres_readiness_config_missing/);
+    assert.match(runbook, /postgres_readiness_diagnostic_missing/);
+    assert.match(runbook, /source_run_readiness_config_missing/);
+    assert.match(runbook, /source_run_readiness_diagnostic_missing/);
+    assert.match(runbook, /catalog_coverage_readiness_config_missing/);
+    assert.match(runbook, /catalog_coverage_readiness_diagnostic_missing/);
   });
 
   it('documents DB-to-site snapshot generation after daily ingestion writes latest_prices', () => {
@@ -93,12 +141,40 @@ describe('production daily ingestion readiness runbook', () => {
     assert.match(runbook, /db_site_snapshot_missing_required_store_price_types/);
     assert.match(runbook, /db_site_snapshot_missing_required_categories/);
     assert.match(runbook, /db_site_snapshot_stale_observations/);
+    assert.match(runbook, /db_site_snapshot_database_url_config_missing/);
+    assert.match(runbook, /db_site_snapshot_skipped_after_prior_failure/);
     assert.match(runbook, /missingRequiredChains/);
     assert.match(runbook, /missingRequiredStoreExternalRefs/);
     assert.match(runbook, /missingRequiredProductSlugs/);
     assert.match(runbook, /missingRequiredStorePriceTypes/);
     assert.match(runbook, /missingRequiredCategorySlugs/);
     assert.match(runbook, /staleObservationCount/);
+  });
+
+
+  it('documents replacement DB cutover validation before production DATABASE_URL changes', () => {
+    assert.match(runbook, /Replacement DB cutover validation/);
+    assert.match(runbook, /db-cutover-validation\.yml/);
+    assert.match(runbook, /REPLACEMENT_DATABASE_URL/);
+    assert.match(runbook, /CANDIDATE_DATABASE_URL/);
+    assert.match(runbook, /ops:validate-db-cutover/);
+    assert.match(runbook, /ops:apply-db-migrations/);
+    assert.match(runbook, /ingest:export-db-snapshot/);
+    assert.match(runbook, /groceryview-replacement-db-migrations/);
+    assert.match(runbook, /groceryview-replacement-db-ingestion/);
+    assert.match(runbook, /groceryview-replacement-db-site-snapshot/);
+    assert.match(runbook, /replacement_database_url_missing/);
+    assert.match(runbook, /replacement_database_url_matches_current_database_url/);
+    assert.match(runbook, /replacement_database_not_writable/);
+    assert.match(runbook, /replacement_database_url_config_missing/);
+    assert.match(runbook, /replacement_ingestion_database_url_config_missing/);
+    assert.match(runbook, /replacement_snapshot_database_url_config_missing/);
+    assert.match(runbook, /replacement_daily_connectors_diagnostic_missing/);
+    assert.match(runbook, /replacement_catalog_targets_diagnostic_missing/);
+    assert.match(runbook, /replacement_daily_ingestion_missing_chain_summary/);
+    assert.match(runbook, /replacement_daily_ingestion_chain_without_observations/);
+    assert.match(runbook, /replacement_db_site_snapshot_without_observations/);
+    assert.match(runbook, /Only after this workflow passes/);
   });
 
 });

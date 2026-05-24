@@ -59,6 +59,12 @@ const DATASETS = [
     key: ['sourceUrl', 'code', 'price']
   },
   {
+    file: 'apohem.ts',
+    rows: 'apohemProducts',
+    source: 'apohemSource',
+    key: ['sourceUrl', 'chain', 'code', 'ean', 'price']
+  },
+  {
     file: 'matpriskollen.ts',
     rows: 'matpriskollenOffers',
     source: 'matpriskollenSource',
@@ -108,7 +114,12 @@ for (const dataset of DATASETS) {
   const duplicateKeys = countDuplicates(rows.map((row) => rowKey(row, dataset.key)));
   const missingSourceUrl = rows.filter((row) => !hasText(row.sourceUrl)).length;
   const missingRetrievedAt = rows.filter((row) => !hasText(row.retrievedAt)).length;
+  const invalidSourceUrl = rows.filter((row) => hasText(row.sourceUrl) && !isHttpUrl(row.sourceUrl)).length;
+  const invalidRetrievedAt = rows.filter((row) => hasText(row.retrievedAt) && !isIsoDateTime(row.retrievedAt)).length;
   const missingSourceMetadata = sourceUrls(source).length === 0;
+  const invalidSourceMetadataUrl = sourceUrls(source).filter((url) => !isHttpUrl(url)).length;
+  const missingSourceRetrievedAt = sourceMetadataItems(source).filter((item) => !hasText(item.retrievedAt)).length;
+  const invalidSourceRetrievedAt = sourceMetadataItems(source).filter((item) => hasText(item.retrievedAt) && !isIsoDateTime(item.retrievedAt)).length;
 
   if (sourceRowCount !== rows.length) {
     failures.push(`${label} rowCount mismatch: source metadata=${sourceRowCount}, rows=${rows.length}`);
@@ -119,11 +130,26 @@ for (const dataset of DATASETS) {
   if (missingRetrievedAt > 0) {
     failures.push(`${label} has ${missingRetrievedAt} rows without retrievedAt`);
   }
+  if (invalidSourceUrl > 0) {
+    failures.push(`${label} has ${invalidSourceUrl} rows with non-HTTP sourceUrl`);
+  }
+  if (invalidRetrievedAt > 0) {
+    failures.push(`${label} has ${invalidRetrievedAt} rows with non-ISO retrievedAt`);
+  }
   if (duplicateKeys > 0) {
     failures.push(`${label} has ${duplicateKeys} duplicate provenance/content keys`);
   }
   if (missingSourceMetadata) {
     failures.push(`${label} source metadata does not cite a source URL`);
+  }
+  if (invalidSourceMetadataUrl > 0) {
+    failures.push(`${label} source metadata has ${invalidSourceMetadataUrl} non-HTTP URL values`);
+  }
+  if (missingSourceRetrievedAt > 0) {
+    failures.push(`${label} source metadata has ${missingSourceRetrievedAt} item(s) without retrievedAt`);
+  }
+  if (invalidSourceRetrievedAt > 0) {
+    failures.push(`${label} source metadata has ${invalidSourceRetrievedAt} item(s) with non-ISO retrievedAt`);
   }
 
   summaries.push({
@@ -132,8 +158,13 @@ for (const dataset of DATASETS) {
     sourceRowCount,
     missingSourceUrl,
     missingRetrievedAt,
+    invalidSourceUrl,
+    invalidRetrievedAt,
     duplicateKeys,
-    sourceMetadataUrlCount: sourceUrls(source).length
+    sourceMetadataUrlCount: sourceUrls(source).length,
+    invalidSourceMetadataUrl,
+    missingSourceRetrievedAt,
+    invalidSourceRetrievedAt
   });
 }
 
@@ -211,8 +242,7 @@ function rowCount(source, mode) {
 }
 
 function sourceUrls(source) {
-  const values = Array.isArray(source) ? source : [source];
-  return values.flatMap((item) => [
+  return sourceMetadataItems(source).flatMap((item) => [
     item.sourceUrl,
     item.sourceUrlPattern,
     item.storeSourceUrl,
@@ -225,8 +255,29 @@ function sourceUrls(source) {
   ]).filter(hasText);
 }
 
+function sourceMetadataItems(source) {
+  return Array.isArray(source) ? source : [source];
+}
+
 function hasText(value) {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+function isHttpUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' || url.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
+
+function isIsoDateTime(value) {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value)) {
+    return false;
+  }
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString() === value;
 }
 
 function rowKey(row, fields) {

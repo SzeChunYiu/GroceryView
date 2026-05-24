@@ -8,6 +8,7 @@ import {
   type ProductPriceHistoryReport
 } from '@groceryview/api';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
+import { localizedProductNameSql, type ProductNameLocale } from '../product-name-locale.js';
 
 export type ProductPriceHistoryFilter = {
   priceType?: ProductPriceHistoryPriceType;
@@ -78,17 +79,22 @@ const productPriceHistorySourceTables = ['products', 'observations', 'chains', '
 export class PriceHistoryService {
   constructor(private readonly postgres: PostgresQueryExecutorService) {}
 
-  async getProductPriceHistory(productIdentifier: string, filter: ProductPriceHistoryFilter): Promise<ProductPriceHistoryReport | null> {
+  async getProductPriceHistory(
+    productIdentifier: string,
+    filter: ProductPriceHistoryFilter,
+    productNameLocale?: ProductNameLocale
+  ): Promise<ProductPriceHistoryReport | null> {
     if (!this.postgres.isConfigured()) {
       throw new ServiceUnavailableException('DATABASE_URL is required for real price-history data.');
     }
 
+    const productName = localizedProductNameSql('$2');
     const productRows = await this.postgres.query<ProductRow>(
-      `select id, slug, canonical_name
+      `select id, slug, ${productName} as canonical_name
        from products
        where slug = $1 or id::text = $1
        limit 1`,
-      [productIdentifier]
+      [productIdentifier, productNameLocale ?? null]
     );
     const product = productRows[0];
     if (!product) return null;

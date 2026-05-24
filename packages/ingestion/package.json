@@ -5,12 +5,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npm run build -w @groceryview/db && npm run build -w @groceryview/catalog && tsc -p tsconfig.build.json",
-    "test": "npm run build -w @groceryview/db && npm run build -w @groceryview/catalog && tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
+    "build": "npm run build -w @groceryview/db && npm run build -w @groceryview/catalog && npm run build -w @groceryview/image-cache && tsc -p tsconfig.build.json",
+    "test": "npm run build -w @groceryview/db && npm run build -w @groceryview/catalog && npm run build -w @groceryview/image-cache && tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
   },
   "dependencies": {
     "@groceryview/catalog": "0.1.0",
     "@groceryview/db": "0.1.0",
+    "@groceryview/image-cache": "0.1.0",
     "pdfjs-dist": "^5.7.284",
     "pg": "^8.21.0"
   }

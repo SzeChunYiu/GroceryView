@@ -1,4 +1,13 @@
 import { createHash } from 'node:crypto';
+import { buildUserAccountDeletionQueries } from './queries/users.js';
+
+export * from './queries/categories.js';
+export * from './queries/favorites.js';
+export * from './queries/productSearch.js';
+export * from './queries/stores.js';
+export * from './queries/retailers.js';
+export * from './queries/users.js';
+export * from './seed/retailers.js';
 
 export type Migration = {
   version: string;
@@ -309,12 +318,16 @@ export type ReceiptUploadRecord = {
 export type HouseholdMemberRecord = {
   userId: string;
   displayName: string;
+  role?: 'owner' | 'editor' | 'viewer';
 };
 
 export type HouseholdBasketItemRecord = {
   productId: string;
   quantity: number;
   addedBy: string;
+  checked?: boolean;
+  checkedBy?: string;
+  checkedAt?: string;
 };
 
 export type HouseholdWatchlistItemRecord = {
@@ -362,7 +375,52 @@ export type ProductCatalogListFilter = {
   search?: string;
   categoryPath?: string[];
   limit?: number;
+  page?: number;
 };
+
+export type CategoryHierarchyNode = {
+  slug: string;
+  label: string;
+  parentSlug?: string;
+  routable: boolean;
+};
+
+export const groceryCategoryHierarchy: readonly CategoryHierarchyNode[] = [
+  { slug: 'grocery', label: 'Grocery', routable: false },
+  { slug: 'fresh-food', label: 'Fresh food', parentSlug: 'grocery', routable: false },
+  { slug: 'packaged-grocery', label: 'Packaged grocery', parentSlug: 'grocery', routable: false },
+  { slug: 'household-personal', label: 'Household & personal', parentSlug: 'grocery', routable: false },
+  { slug: 'dairy', label: 'Dairy', parentSlug: 'fresh-food', routable: true },
+  { slug: 'bread', label: 'Bread & Bakery', parentSlug: 'fresh-food', routable: true },
+  { slug: 'meat', label: 'Meat & Charcuterie', parentSlug: 'fresh-food', routable: true },
+  { slug: 'fish', label: 'Fish & Seafood', parentSlug: 'fresh-food', routable: true },
+  { slug: 'produce', label: 'Fruit & Vegetables', parentSlug: 'fresh-food', routable: true },
+  { slug: 'breakfast', label: 'Breakfast', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'beverages', label: 'Beverages', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'coffee-tea', label: 'Coffee & Tea', parentSlug: 'beverages', routable: true },
+  { slug: 'alcohol', label: 'Wine, Beer & Spirits', parentSlug: 'beverages', routable: true },
+  { slug: 'snacks', label: 'Snacks', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'sweets', label: 'Sweets & Ice cream', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'frozen', label: 'Frozen', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'pantry', label: 'Pantry', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'plant-based', label: 'Plant-based', parentSlug: 'packaged-grocery', routable: true },
+  { slug: 'baby', label: 'Baby', parentSlug: 'household-personal', routable: true },
+  { slug: 'pet', label: 'Pet', parentSlug: 'household-personal', routable: true },
+  { slug: 'household', label: 'Cleaning & Household', parentSlug: 'household-personal', routable: true },
+  { slug: 'personal-care', label: 'Personal care', parentSlug: 'household-personal', routable: true }
+] as const;
+
+export function categoryPathForSlug(slug: string): CategoryHierarchyNode[] {
+  const bySlug = new Map(groceryCategoryHierarchy.map((category) => [category.slug, category]));
+  const path: CategoryHierarchyNode[] = [];
+  let cursor = bySlug.get(slug);
+  if (!cursor) return [{ slug, label: slug.split('-').map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' '), routable: true }];
+  while (cursor) {
+    path.unshift(cursor);
+    cursor = cursor.parentSlug ? bySlug.get(cursor.parentSlug) : undefined;
+  }
+  return path;
+}
 
 export type StoreCatalogRecord = {
   storeId: string;
@@ -466,6 +524,7 @@ export type PriceObservationRecord = {
   promotionStartsOn?: string;
   promotionEndsOn?: string;
   memberRequired?: boolean;
+  isAvailable?: boolean;
   observedAt: string;
   validFrom?: string;
   validUntil?: string;
@@ -478,14 +537,20 @@ export type PriceObservationWriteResult = {
   status?: 'unchanged';
 };
 
+export type PriceObservationBatchWriteResult = {
+  observationIds: string[];
+};
+
 export type PostgresPriceObservationWriter = {
   recordPriceObservation(observation: PriceObservationRecord): Promise<PriceObservationWriteResult>;
+  upsertConnectorPriceObservations(observations: PriceObservationRecord[]): Promise<PriceObservationBatchWriteResult>;
 };
 
 export type PriceObservationHistoryRecord = PriceObservationRecord & {
   observationId: string;
   currency: string;
   memberRequired: boolean;
+  isAvailable: boolean;
 };
 
 export type PriceObservationHistoryFilter = {
@@ -509,6 +574,7 @@ export type LatestPriceRecord = {
   unitPrice: number;
   currency: string;
   observedAt: string;
+  isAvailable: boolean;
   confidence: number;
   provenance: Record<string, unknown>;
 };
@@ -518,10 +584,96 @@ export type PostgresPriceReader = {
   listPriceObservationHistory(filter: PriceObservationHistoryFilter): Promise<PriceObservationHistoryRecord[]>;
 };
 
+export type WeeklyPriceDropDigestFilter = {
+  since: string;
+  until: string;
+  limit?: number;
+};
+
+export type WeeklyPriceDropDigestItem = {
+  rank: number;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  brand?: string;
+  chainSlug: string;
+  chainName: string;
+  storeSlug?: string;
+  storeName?: string;
+  priceType: PriceType;
+  price: number;
+  regularPrice: number;
+  savingsAmount: number;
+  dropPercent: number;
+  currency: string;
+  observedAt: string;
+  confidence: number;
+  emailSubject: string;
+  emailPreview: string;
+};
+
+export type PostgresWeeklyPriceDropDigestReader = {
+  listWeeklyPriceDropDigest(filter: WeeklyPriceDropDigestFilter): Promise<WeeklyPriceDropDigestItem[]>;
+};
+
+export type TrendingPriceChangePoint = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+  brand?: string;
+  categoryLabel?: string;
+  price: number;
+  currency: string;
+  observedAt: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeSlug?: string;
+  storeName?: string;
+};
+
+export type TrendingProductPriceChange = {
+  rank: number;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  brand?: string;
+  categoryLabel?: string;
+  changeCount: number;
+  observationCount: number;
+  latestPrice: number;
+  previousPrice: number;
+  changeAmount: number;
+  changePercent: number;
+  currency: string;
+  latestObservedAt: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeSlug?: string;
+  storeName?: string;
+};
+
+export type TrendingPriceChangeInput = {
+  points: TrendingPriceChangePoint[];
+  asOf: string;
+  windowDays?: number;
+  limit?: number;
+};
+
+export type TrendingPriceChangeFilter = {
+  since: string;
+  until: string;
+  limit?: number;
+};
+
+export type PostgresTrendingPriceChangeReader = {
+  listTrendingPriceChanges(filter: TrendingPriceChangeFilter): Promise<TrendingProductPriceChange[]>;
+};
+
 export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
   productSlug: string;
   canonicalName: string;
   brand?: string;
+  imageUrl?: string;
   categoryPath: string[];
   packageSize?: number;
   packageUnit?: string;
@@ -532,6 +684,13 @@ export type SiteLatestPriceSnapshotRow = LatestPriceRecord & {
   storeExternalRef?: string;
   storeName?: string;
   city?: string;
+  promotionText?: string;
+  promotionStartsOn?: string;
+  promotionEndsOn?: string;
+  memberRequired: boolean;
+  validFrom?: string;
+  validUntil?: string;
+  retailerProductRef?: string;
 };
 
 export type SiteLatestPriceSnapshotFilter = {
@@ -752,7 +911,7 @@ export type CommunityReporterTrustRecord = {
 
 export type NotificationTaskRecord = {
   id: string;
-  channel: 'push' | 'email';
+  channel: 'push' | 'email' | 'telegram';
   type: string;
   title: string;
   body: string;
@@ -796,7 +955,7 @@ export type NotificationTaskAcknowledgement =
 export type NotificationSuppressionRecord = {
   id: string;
   recipient: string;
-  channel?: 'push' | 'email';
+  channel?: 'push' | 'email' | 'telegram';
   reason: 'unsubscribed' | 'bounce' | 'complaint';
   active: boolean;
   updatedAt: string;
@@ -831,6 +990,7 @@ export type HumanReviewAssignmentRecord = {
 
 export type GroceryViewRepository = {
   upsertUser(user: UserRecord): Promise<void>;
+  deleteUserAccount(userId: string): Promise<void>;
   addFavoriteStore(userId: string, storeId: string): Promise<void>;
   getFavoriteStoreIds(userId: string): Promise<string[]>;
   upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
@@ -1115,6 +1275,22 @@ export function createMemoryRepository(): GroceryViewRepository {
       users.set(user.id, { ...user });
     },
 
+    async deleteUserAccount(userId) {
+      users.delete(userId);
+      favoriteStores.delete(userId);
+      budgets.delete(userId);
+      subscriptionEntitlements.delete(userId);
+      watchlists.delete(userId);
+      baskets.delete(userId);
+      basketImportReviewItems.delete(userId);
+      for (const [itemId, item] of pantryItems) if (item.userId === userId) pantryItems.delete(itemId);
+      for (const [uploadId, upload] of receiptUploads) if (upload.userId === userId) receiptUploads.delete(uploadId);
+      for (const [planId, plan] of householdPlans) {
+        if (plan.members.some((member) => member.userId === userId)) householdPlans.delete(planId);
+      }
+      for (const [ruleId, rule] of alertRules) if (rule.userId === userId) alertRules.delete(ruleId);
+    },
+
     async addFavoriteStore(userId, storeId) {
       requireUser(users, userId);
       const stores = favoriteStores.get(userId) ?? new Set<string>();
@@ -1391,13 +1567,16 @@ type HouseholdPlanRow = {
   created_at: string | Date;
   updated_at: string | Date;
 };
-type HouseholdMemberRow = { household_id: string; user_id: string; display_name: string };
+type HouseholdMemberRow = { household_id: string; user_id: string; display_name: string; role?: HouseholdMemberRecord['role'] | null };
 type HouseholdBasketItemRow = {
   household_id: string;
   line_position: string | number;
   product_id: string;
   quantity: string | number;
   added_by: string;
+  checked?: boolean | null;
+  checked_by?: string | null;
+  checked_at?: string | Date | null;
 };
 type HouseholdWatchlistItemRow = {
   household_id: string;
@@ -1472,6 +1651,7 @@ type LatestPriceRow = {
   regular_price: string | number | null;
   unit_price: string | number;
   currency: string;
+  is_available: boolean;
   observed_at: string | Date;
   confidence: string | number;
   provenance: Record<string, unknown> | string | null;
@@ -1482,6 +1662,7 @@ type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
   product_slug: string;
   canonical_name: string;
   brand: string | null;
+  image_url: string | null;
   category_path: string[] | string | null;
   package_size: string | number | null;
   package_unit: string | null;
@@ -1492,6 +1673,51 @@ type SiteLatestPriceSnapshotRowSql = LatestPriceRow & {
   store_external_ref: string | null;
   store_name: string | null;
   city: string | null;
+  promotion_text: string | null;
+  promotion_starts_on: string | Date | null;
+  promotion_ends_on: string | Date | null;
+  member_required: boolean;
+  valid_from: string | Date | null;
+  valid_until: string | Date | null;
+  retailer_product_ref: string | null;
+};
+type WeeklyPriceDropDigestRow = {
+  product_id: string;
+  product_slug: string;
+  product_name: string;
+  brand: string | null;
+  chain_slug: string;
+  chain_name: string;
+  store_slug: string | null;
+  store_name: string | null;
+  price_type: PriceType;
+  price: string | number;
+  regular_price: string | number;
+  savings_amount: string | number;
+  drop_percent: string | number;
+  currency: string;
+  observed_at: string | Date;
+  confidence: string | number;
+};
+type TrendingPriceChangeRow = {
+  rank: string | number;
+  product_id: string;
+  product_slug: string;
+  product_name: string;
+  brand: string | null;
+  category_label: string | null;
+  change_count: string | number;
+  observation_count: string | number;
+  latest_price: string | number;
+  previous_price: string | number;
+  change_amount: string | number;
+  change_percent: string | number;
+  currency: string;
+  latest_observed_at: string | Date;
+  chain_slug: string | null;
+  chain_name: string | null;
+  store_slug: string | null;
+  store_name: string | null;
 };
 type PriceObservationHistoryRow = {
   id: string;
@@ -1512,6 +1738,7 @@ type PriceObservationHistoryRow = {
   promotion_starts_on: string | Date | null;
   promotion_ends_on: string | Date | null;
   member_required: boolean;
+  is_available: boolean;
   observed_at: string | Date;
   valid_from: string | Date | null;
   valid_until: string | Date | null;
@@ -1634,6 +1861,7 @@ function mapLatestPrice(row: LatestPriceRow): LatestPriceRecord {
     unitPrice: Number(row.unit_price),
     currency: row.currency,
     observedAt: asIso(row.observed_at),
+    isAvailable: row.is_available !== false,
     confidence: Number(row.confidence),
     provenance: asRecord(row.provenance)
   };
@@ -1657,7 +1885,8 @@ function latestPriceIsUnchanged(row: LatestPriceRow, observation: PriceObservati
   return samePriceValue(row.price, observation.price) &&
     samePriceValue(row.regular_price, observation.regularPrice ?? null) &&
     samePriceValue(row.unit_price, observation.unitPrice) &&
-    row.currency === (observation.currency ?? 'SEK');
+    row.currency === (observation.currency ?? 'SEK') &&
+    (row.is_available !== false) === (observation.isAvailable ?? true);
 }
 
 
@@ -1680,6 +1909,7 @@ function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): Site
     productSlug: row.product_slug,
     canonicalName: row.canonical_name,
     ...(row.brand ? { brand: row.brand } : {}),
+    ...(row.image_url ? { imageUrl: row.image_url } : {}),
     categoryPath: asStringArray(row.category_path),
     ...(optionalNumberFromDb(row.package_size) === undefined ? {} : { packageSize: optionalNumberFromDb(row.package_size) }),
     ...(row.package_unit ? { packageUnit: row.package_unit } : {}),
@@ -1689,7 +1919,165 @@ function mapSiteLatestPriceSnapshotRow(row: SiteLatestPriceSnapshotRowSql): Site
     ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
     ...(row.store_external_ref ? { storeExternalRef: row.store_external_ref } : {}),
     ...(row.store_name ? { storeName: row.store_name } : {}),
-    ...(row.city ? { city: row.city } : {})
+    ...(row.city ? { city: row.city } : {}),
+    ...(row.promotion_text ? { promotionText: row.promotion_text } : {}),
+    ...(row.promotion_starts_on ? { promotionStartsOn: asIso(row.promotion_starts_on) } : {}),
+    ...(row.promotion_ends_on ? { promotionEndsOn: asIso(row.promotion_ends_on) } : {}),
+    memberRequired: row.member_required,
+    ...(row.valid_from ? { validFrom: asIso(row.valid_from) } : {}),
+    ...(row.valid_until ? { validUntil: asIso(row.valid_until) } : {}),
+    ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {})
+  };
+}
+
+function formatDigestMoney(currency: string, value: number): string {
+  return `${currency} ${value.toFixed(2)}`;
+}
+
+function formatDigestPercent(value: number): string {
+  return `${Math.round(value)}%`;
+}
+
+function mapWeeklyPriceDropDigestRow(row: WeeklyPriceDropDigestRow, index: number): WeeklyPriceDropDigestItem {
+  const price = Number(row.price);
+  const regularPrice = Number(row.regular_price);
+  const savingsAmount = Number(row.savings_amount);
+  const dropPercent = Number(row.drop_percent);
+  const location = row.store_name ?? row.chain_name;
+
+  return {
+    rank: index + 1,
+    productId: row.product_id,
+    productSlug: row.product_slug,
+    productName: row.product_name,
+    ...(row.brand ? { brand: row.brand } : {}),
+    chainSlug: row.chain_slug,
+    chainName: row.chain_name,
+    ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
+    ...(row.store_name ? { storeName: row.store_name } : {}),
+    priceType: row.price_type,
+    price,
+    regularPrice,
+    savingsAmount,
+    dropPercent,
+    currency: row.currency,
+    observedAt: asIso(row.observed_at),
+    confidence: Number(row.confidence),
+    emailSubject: `${formatDigestPercent(dropPercent)} drop: ${row.product_name} at ${row.chain_name}`,
+    emailPreview: `Now ${formatDigestMoney(row.currency, price)}, down from ${formatDigestMoney(row.currency, regularPrice)}. Save ${formatDigestMoney(row.currency, savingsAmount)} at ${location}.`
+  };
+}
+
+function sortTrendingPriceChangePoints(left: TrendingPriceChangePoint, right: TrendingPriceChangePoint): number {
+  const dateDelta = Date.parse(left.observedAt) - Date.parse(right.observedAt);
+  if (dateDelta !== 0) return dateDelta;
+  const productDelta = left.productId.localeCompare(right.productId);
+  if (productDelta !== 0) return productDelta;
+  const leftLocation = `${left.chainSlug ?? ''}:${left.storeSlug ?? ''}`;
+  const rightLocation = `${right.chainSlug ?? ''}:${right.storeSlug ?? ''}`;
+  return leftLocation.localeCompare(rightLocation);
+}
+
+function sameObservedPrice(left: number, right: number): boolean {
+  return Math.abs(left - right) < 0.000001;
+}
+
+function rankTrendingPriceChanges(items: Omit<TrendingProductPriceChange, 'rank'>[], limit: number): TrendingProductPriceChange[] {
+  return items
+    .sort((left, right) => {
+      const changeDelta = right.changeCount - left.changeCount;
+      if (changeDelta !== 0) return changeDelta;
+      const observationDelta = right.observationCount - left.observationCount;
+      if (observationDelta !== 0) return observationDelta;
+      const magnitudeDelta = Math.abs(right.changeAmount) - Math.abs(left.changeAmount);
+      if (magnitudeDelta !== 0) return magnitudeDelta;
+      return left.productName.localeCompare(right.productName, 'sv');
+    })
+    .slice(0, limit)
+    .map((item, index) => ({ rank: index + 1, ...item }));
+}
+
+export function summarizeTrendingProductPriceChanges(input: TrendingPriceChangeInput): TrendingProductPriceChange[] {
+  const limit = Math.min(Math.max(input.limit ?? 10, 1), 10);
+  const windowDays = Math.min(Math.max(input.windowDays ?? 7, 1), 31);
+  const untilMs = Date.parse(input.asOf);
+  if (Number.isNaN(untilMs)) throw new Error(`Invalid trending price asOf date: ${input.asOf}`);
+  const sinceMs = untilMs - windowDays * 24 * 60 * 60 * 1000;
+  const byProduct = new Map<string, TrendingPriceChangePoint[]>();
+
+  for (const point of input.points) {
+    const observedMs = Date.parse(point.observedAt);
+    if (!Number.isFinite(point.price) || Number.isNaN(observedMs) || observedMs > untilMs) continue;
+    byProduct.set(point.productId, [...(byProduct.get(point.productId) ?? []), point]);
+  }
+
+  const ranked: Omit<TrendingProductPriceChange, 'rank'>[] = [];
+  for (const points of byProduct.values()) {
+    const sorted = [...points].sort(sortTrendingPriceChangePoints);
+    let previous: TrendingPriceChangePoint | undefined;
+    const windowChanges: Array<{ previous: TrendingPriceChangePoint; latest: TrendingPriceChangePoint }> = [];
+    let windowObservationCount = 0;
+
+    for (const point of sorted) {
+      const observedMs = Date.parse(point.observedAt);
+      if (observedMs >= sinceMs && observedMs <= untilMs) {
+        windowObservationCount += 1;
+        if (previous && !sameObservedPrice(previous.price, point.price)) {
+          windowChanges.push({ previous, latest: point });
+        }
+      }
+      previous = point;
+    }
+
+    const latestChange = windowChanges.at(-1);
+    if (!latestChange) continue;
+    const latestPoint = latestChange.latest;
+    const previousPoint = latestChange.previous;
+    const changeAmount = latestPoint.price - previousPoint.price;
+    ranked.push({
+      productId: latestPoint.productId,
+      productSlug: latestPoint.productSlug,
+      productName: latestPoint.productName,
+      ...(latestPoint.brand ? { brand: latestPoint.brand } : {}),
+      ...(latestPoint.categoryLabel ? { categoryLabel: latestPoint.categoryLabel } : {}),
+      changeCount: windowChanges.length,
+      observationCount: windowObservationCount,
+      latestPrice: latestPoint.price,
+      previousPrice: previousPoint.price,
+      changeAmount,
+      changePercent: previousPoint.price > 0 ? (changeAmount / previousPoint.price) * 100 : 0,
+      currency: latestPoint.currency,
+      latestObservedAt: latestPoint.observedAt,
+      ...(latestPoint.chainSlug ? { chainSlug: latestPoint.chainSlug } : {}),
+      ...(latestPoint.chainName ? { chainName: latestPoint.chainName } : {}),
+      ...(latestPoint.storeSlug ? { storeSlug: latestPoint.storeSlug } : {}),
+      ...(latestPoint.storeName ? { storeName: latestPoint.storeName } : {})
+    });
+  }
+
+  return rankTrendingPriceChanges(ranked, limit);
+}
+
+function mapTrendingPriceChangeRow(row: TrendingPriceChangeRow): TrendingProductPriceChange {
+  return {
+    rank: Number(row.rank),
+    productId: row.product_id,
+    productSlug: row.product_slug,
+    productName: row.product_name,
+    ...(row.brand ? { brand: row.brand } : {}),
+    ...(row.category_label ? { categoryLabel: row.category_label } : {}),
+    changeCount: Number(row.change_count),
+    observationCount: Number(row.observation_count),
+    latestPrice: Number(row.latest_price),
+    previousPrice: Number(row.previous_price),
+    changeAmount: Number(row.change_amount),
+    changePercent: Number(row.change_percent),
+    currency: row.currency,
+    latestObservedAt: asIso(row.latest_observed_at),
+    ...(row.chain_slug ? { chainSlug: row.chain_slug } : {}),
+    ...(row.chain_name ? { chainName: row.chain_name } : {}),
+    ...(row.store_slug ? { storeSlug: row.store_slug } : {}),
+    ...(row.store_name ? { storeName: row.store_name } : {})
   };
 }
 
@@ -1717,6 +2105,7 @@ function mapPriceObservationHistory(row: PriceObservationHistoryRow): PriceObser
     ...(optionalIso(row.promotion_starts_on) ? { promotionStartsOn: optionalIso(row.promotion_starts_on) } : {}),
     ...(optionalIso(row.promotion_ends_on) ? { promotionEndsOn: optionalIso(row.promotion_ends_on) } : {}),
     memberRequired: row.member_required,
+    isAvailable: row.is_available !== false,
     observedAt: asIso(row.observed_at),
     ...(optionalIso(row.valid_from) ? { validFrom: optionalIso(row.valid_from) } : {}),
     ...(optionalIso(row.valid_until) ? { validUntil: optionalIso(row.valid_until) } : {}),
@@ -2001,6 +2390,12 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         'insert into app_users(id, email) values ($1, $2) on conflict (id) do update set email = excluded.email',
         [user.id, user.email ?? null]
       );
+    },
+
+    async deleteUserAccount(userId) {
+      for (const query of buildUserAccountDeletionQueries(userId)) {
+        await executor.query(query.sql, query.values);
+      }
     },
 
     async addFavoriteStore(userId, storeId) {
@@ -2340,15 +2735,24 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
 
       for (const member of plan.members) {
         await executor.query(
-          'insert into household_members(household_id, user_id, display_name) values ($1, $2, $3)',
-          [plan.householdId, member.userId, member.displayName]
+          'insert into household_members(household_id, user_id, display_name, role) values ($1, $2, $3, $4)',
+          [plan.householdId, member.userId, member.displayName, member.role ?? 'editor']
         );
       }
       for (const [linePosition, item] of plan.basketItems.entries()) {
         await executor.query(
-          `insert into household_basket_items(household_id, line_position, product_id, quantity, added_by)
-           values ($1, $2, $3, $4, $5)`,
-          [plan.householdId, linePosition, item.productId, item.quantity, item.addedBy]
+          `insert into household_basket_items(household_id, line_position, product_id, quantity, added_by, checked, checked_by, checked_at)
+           values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [
+            plan.householdId,
+            linePosition,
+            item.productId,
+            item.quantity,
+            item.addedBy,
+            item.checked ?? false,
+            item.checkedBy ?? null,
+            item.checkedAt ?? null
+          ]
         );
       }
       for (const [linePosition, item] of plan.watchlistItems.entries()) {
@@ -2378,14 +2782,14 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       const householdId = plan.id;
       const [memberRows, basketRows, watchlistRows, favoriteStoreRows] = await Promise.all([
         executor.query<HouseholdMemberRow>(
-          `select household_id, user_id, display_name
+          `select household_id, user_id, display_name, role
            from household_members
            where household_id = $1
            order by user_id`,
           [householdId]
         ),
         executor.query<HouseholdBasketItemRow>(
-          `select household_id, line_position, product_id, quantity, added_by
+          `select household_id, line_position, product_id, quantity, added_by, checked, checked_by, checked_at
            from household_basket_items
            where household_id = $1
            order by line_position`,
@@ -2409,8 +2813,15 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
 
       return mapHouseholdPlan(
         plan,
-        memberRows.map((row) => ({ userId: row.user_id, displayName: row.display_name })),
-        basketRows.map((row) => ({ productId: row.product_id, quantity: Number(row.quantity), addedBy: row.added_by })),
+        memberRows.map((row) => ({ userId: row.user_id, displayName: row.display_name, ...(row.role ? { role: row.role } : {}) })),
+        basketRows.map((row) => ({
+          productId: row.product_id,
+          quantity: Number(row.quantity),
+          addedBy: row.added_by,
+          checked: row.checked ?? false,
+          ...(row.checked_by ? { checkedBy: row.checked_by } : {}),
+          ...(row.checked_at ? { checkedAt: asIso(row.checked_at) } : {})
+        })),
         watchlistRows.map((row) => ({
           productId: row.product_id,
           addedBy: row.added_by,
@@ -2912,7 +3323,10 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
     },
 
     async listProducts(filter = {}) {
-      const limit = Math.min(Math.max(filter.limit ?? 100, 1), 500);
+      const limit = Math.min(Math.max(filter.limit ?? 50, 1), 500);
+      const rawPage = Math.trunc(filter.page ?? 1);
+      const page = Number.isFinite(rawPage) ? Math.max(rawPage, 1) : 1;
+      const offset = (page - 1) * limit;
       const rows = await executor.query<ProductCatalogRow>(
         `select id,
                 slug,
@@ -2958,15 +3372,16 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
                       select 1
                       from aliases
                       where aliases.product_id = products.id
-                        and aliases.normalized_alias % lower(query.term)
+                      and aliases.normalized_alias % lower(query.term)
                     ) then 3
                     else 4
                   end,
                   greatest(similarity(products.canonical_name, coalesce(query.term, '')), similarity(products.slug, coalesce(query.term, ''))) desc,
                   canonical_name,
                   slug
-         limit $3`,
-        [filter.search ?? null, filter.categoryPath ?? null, limit]
+         limit $3
+         offset $4`,
+        [filter.search ?? null, filter.categoryPath ?? null, limit, offset]
       );
       return rows.map(mapProductCatalog);
     },
@@ -3170,6 +3585,33 @@ export type PostgresIntegrationProbe = {
   }>;
 };
 
+export type TimescaleDbEvaluationProbe = {
+  timescaleExtensionAvailable: boolean;
+  hypertables: string[];
+  compressionPolicies: string[];
+  retentionPolicies: string[];
+  fallbackTables: string[];
+  fallbackFunctions: string[];
+};
+
+export type TimescaleDbEvaluationReport = {
+  status: 'timescale_ready' | 'fallback_ready' | 'blocked';
+  blockers: string[];
+  timescaleGaps: string[];
+  evidence: string[];
+  recommendation: string;
+  summary: string;
+};
+
+export const TIMESCALEDB_EVALUATION_HYPERTABLES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_RETENTION_POLICIES = ['observations_v2'] as const;
+export const TIMESCALEDB_EVALUATION_FALLBACK_TABLES = ['observations_v2', 'price_daily', 'price_weekly'] as const;
+export const TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS = [
+  'create_observations_partitions',
+  'drop_observations_partitions_before'
+] as const;
+
 export type PostgresRepositoryProbe = {
   name: string;
   run(executor: QueryExecutor): Promise<void>;
@@ -3198,9 +3640,12 @@ export type CheckPostgresRepositoryIntegrationReadinessInput = Omit<CollectPostg
 export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'chains',
   'products',
+  'fuel_grades',
   'source_runs',
   'raw_records',
   'retailer_source_policies',
+  'fuel_price_sources',
+  'fuel_price_source_observations',
   'observations',
   'observations_v2',
   'latest_prices',
@@ -3244,7 +3689,12 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '010_commodity_taxonomy',
   '011_multi_vertical_domains',
   '012_price_rollups',
-  '013_observations_partitioning'
+  '013_observations_partitioning',
+  '014_fuel_price_sources',
+  '016_observation_connector_idempotency',
+  '017_observation_availability',
+  '018_household_collaboration_rls',
+  '019_price_snapshot_unique_index'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -3585,8 +4035,47 @@ type MigrationVersionRow = { version: string };
 type ProbeIdRow = { id: string };
 type LatestPriceProbeRow = { observation_id: string };
 type ObservationIdRow = { id: string };
+type BatchObservationIdRow = { ordinal: string | number; id: string };
 type SourceRunIdRow = { id: string };
 type RawRecordIdRow = { id: string };
+
+async function findExistingObservationId(executor: QueryExecutor, observation: PriceObservationRecord): Promise<string | undefined> {
+  const rows = await executor.query<ObservationIdRow>(
+    `select id
+     from observations
+     where product_id = $1
+       and chain_id = $2
+       and store_id is not distinct from $3
+       and domain = $4
+       and retailer_product_ref is not distinct from $5
+       and price_type = $6
+       and observed_at = $7
+       and price = $8
+       and unit_price = $9
+       and currency = $10
+       and is_available = $11
+       and confidence = $12
+       and provenance = $13::jsonb
+     order by id
+     limit 1`,
+    [
+      observation.productId,
+      observation.chainId,
+      observation.storeId ?? null,
+      observation.domain ?? 'grocery',
+      observation.retailerProductRef ?? null,
+      observation.priceType,
+      observation.observedAt,
+      observation.price,
+      observation.unitPrice,
+      observation.currency ?? 'SEK',
+      observation.isAvailable ?? true,
+      observation.confidence,
+      JSON.stringify(observation.provenance)
+    ]
+  );
+  return rows[0]?.id;
+}
 
 export function createPostgresSourceRecordWriter(executor: QueryExecutor): PostgresSourceRecordWriter {
   return {
@@ -3718,38 +4207,6 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
   return {
     async recordPriceObservation(observation) {
       const provenanceJson = JSON.stringify(observation.provenance);
-      const latestRows = await executor.query<LatestPriceRow>(
-        `select product_id,
-                chain_id,
-                store_id,
-                price_type,
-                observation_id,
-                price,
-                regular_price,
-                unit_price,
-                currency,
-                observed_at,
-                confidence,
-                provenance
-         from latest_prices
-         where product_id = $1
-           and chain_id = $2
-           and store_id is not distinct from $3::uuid
-           and price_type = $4
-         order by observed_at desc
-         limit 1`,
-        [
-          observation.productId,
-          observation.chainId,
-          observation.storeId ?? null,
-          observation.priceType
-        ]
-      );
-      const latestRow = latestRows.find((row) => sameLatestPriceKey(row, observation)) ?? latestRows[0];
-      if (latestRow && latestPriceIsUnchanged(latestRow, observation)) {
-        return { observationId: latestRow.observation_id, status: 'unchanged' };
-      }
-
       const rows = await executor.query<ObservationIdRow>(
         `insert into observations(
            product_id,
@@ -3770,6 +4227,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            promotion_starts_on,
            promotion_ends_on,
            member_required,
+           is_available,
            observed_at,
            valid_from,
            valid_until,
@@ -3777,8 +4235,23 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            provenance
          ) values (
            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
-           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23::jsonb
+           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24::jsonb
          )
+         on conflict (
+           product_id,
+           chain_id,
+           store_id,
+           domain,
+           retailer_product_ref,
+           price_type,
+           observed_at,
+           price,
+           unit_price,
+           currency,
+           is_available,
+           confidence,
+           provenance
+         ) do nothing
          returning id`,
         [
           observation.productId,
@@ -3799,6 +4272,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.promotionStartsOn ?? null,
           observation.promotionEndsOn ?? null,
           observation.memberRequired ?? false,
+          observation.isAvailable ?? true,
           observation.observedAt,
           observation.validFrom ?? observation.observedAt,
           observation.validUntil ?? null,
@@ -3806,7 +4280,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           provenanceJson
         ]
       );
-      const observationId = rows[0]?.id;
+      const observationId = rows[0]?.id ?? (await findExistingObservationId(executor, observation));
       if (!observationId) throw new Error('Price observation insert did not return an id');
 
       await executor.query(
@@ -3822,9 +4296,10 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            unit_price,
            currency,
            observed_at,
+           is_available,
            confidence,
            provenance
-         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::jsonb)
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::jsonb)
          on conflict (product_id, chain_id, store_id, price_type) do update set
            observation_id = excluded.observation_id,
            price = excluded.price,
@@ -3832,6 +4307,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
            unit_price = excluded.unit_price,
            currency = excluded.currency,
            observed_at = excluded.observed_at,
+           is_available = excluded.is_available,
            confidence = excluded.confidence,
            domain = excluded.domain,
            provenance = excluded.provenance,
@@ -3849,12 +4325,305 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.unitPrice,
           observation.currency ?? 'SEK',
           observation.observedAt,
+          observation.isAvailable ?? true,
           observation.confidence,
           provenanceJson
         ]
       );
 
       return { observationId };
+    },
+
+    async upsertConnectorPriceObservations(observations) {
+      if (observations.length === 0) return { observationIds: [] };
+      const rows = await executor.query<BatchObservationIdRow>(
+        `with input as (
+           select *
+           from jsonb_to_recordset($1::jsonb) as x(
+             ordinal int,
+             product_id uuid,
+             chain_id uuid,
+             store_id uuid,
+             domain text,
+             source_run_id uuid,
+             raw_record_id uuid,
+             retailer_product_ref text,
+             price_type text,
+             price numeric(12, 2),
+             regular_price numeric(12, 2),
+             unit_price numeric(12, 4),
+             currency char(3),
+             quantity numeric,
+             quantity_unit text,
+             promotion_text text,
+             promotion_starts_on date,
+             promotion_ends_on date,
+             member_required boolean,
+             is_available boolean,
+             observed_at timestamptz,
+             valid_from timestamptz,
+             valid_until timestamptz,
+             confidence numeric(5, 4),
+             provenance jsonb
+           )
+         ),
+         ranked_input as (
+           select input.*,
+                  row_number() over (
+                    partition by product_id, chain_id, store_id, domain, price_type, observed_at, retailer_product_ref, price, unit_price, currency, is_available, confidence, provenance
+                    order by ordinal
+                  ) as input_rank
+           from input
+         ),
+         existing as (
+           select distinct on (ranked_input.ordinal)
+                  ranked_input.ordinal,
+                  observations.id,
+                  observations.product_id,
+                  observations.chain_id,
+                  observations.store_id,
+                  observations.domain,
+                  observations.price_type,
+                  observations.price,
+                  observations.regular_price,
+                  observations.unit_price,
+                  observations.currency,
+                  observations.is_available,
+                  observations.observed_at,
+                  observations.confidence,
+                  observations.provenance
+           from ranked_input
+           join observations on observations.product_id = ranked_input.product_id
+             and observations.chain_id = ranked_input.chain_id
+             and observations.store_id is not distinct from ranked_input.store_id
+             and observations.domain = ranked_input.domain
+             and observations.price_type = ranked_input.price_type
+             and observations.observed_at = ranked_input.observed_at
+             and observations.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
+             and observations.price = ranked_input.price
+             and observations.unit_price = ranked_input.unit_price
+             and observations.currency = ranked_input.currency
+             and observations.is_available = ranked_input.is_available
+             and observations.confidence = ranked_input.confidence
+             and observations.provenance = ranked_input.provenance
+           order by ranked_input.ordinal, observations.created_at, observations.id
+         ),
+         inserted as (
+           insert into observations(
+             product_id,
+             chain_id,
+             store_id,
+             domain,
+             source_run_id,
+             raw_record_id,
+             retailer_product_ref,
+             price_type,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             quantity,
+             quantity_unit,
+             promotion_text,
+             promotion_starts_on,
+             promotion_ends_on,
+             member_required,
+             is_available,
+             observed_at,
+             valid_from,
+             valid_until,
+             confidence,
+             provenance
+           )
+           select
+             product_id,
+             chain_id,
+             store_id,
+             domain,
+             source_run_id,
+             raw_record_id,
+             retailer_product_ref,
+             price_type,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             quantity,
+             quantity_unit,
+             promotion_text,
+             promotion_starts_on,
+             promotion_ends_on,
+             member_required,
+             is_available,
+             observed_at,
+             valid_from,
+             valid_until,
+             confidence,
+             provenance
+           from ranked_input
+           where input_rank = 1
+             and not exists (
+               select 1
+               from existing
+               where existing.ordinal = ranked_input.ordinal
+             )
+           on conflict (
+             product_id,
+             chain_id,
+             store_id,
+             domain,
+             retailer_product_ref,
+             price_type,
+             observed_at,
+             price,
+             unit_price,
+             currency,
+             is_available,
+             confidence,
+             provenance
+           ) do nothing
+           returning id, product_id, chain_id, store_id, domain, retailer_product_ref, price_type, price, regular_price, unit_price, currency, is_available, observed_at, confidence, provenance
+         ),
+         written as (
+           select ranked_input.ordinal,
+                  coalesce(inserted.id, existing.id) as id,
+                  coalesce(inserted.product_id, existing.product_id) as product_id,
+                  coalesce(inserted.chain_id, existing.chain_id) as chain_id,
+                  coalesce(inserted.store_id, existing.store_id) as store_id,
+                  coalesce(inserted.domain, existing.domain) as domain,
+                  coalesce(inserted.price_type, existing.price_type) as price_type,
+                  coalesce(inserted.price, existing.price) as price,
+                  coalesce(inserted.regular_price, existing.regular_price) as regular_price,
+                  coalesce(inserted.unit_price, existing.unit_price) as unit_price,
+                  coalesce(inserted.currency, existing.currency) as currency,
+                  coalesce(inserted.is_available, existing.is_available) as is_available,
+                  coalesce(inserted.observed_at, existing.observed_at) as observed_at,
+                  coalesce(inserted.confidence, existing.confidence) as confidence,
+                  coalesce(inserted.provenance, existing.provenance) as provenance
+           from ranked_input
+           left join existing on existing.ordinal = ranked_input.ordinal
+           left join inserted on inserted.product_id = ranked_input.product_id
+             and inserted.chain_id = ranked_input.chain_id
+             and inserted.store_id is not distinct from ranked_input.store_id
+             and inserted.domain = ranked_input.domain
+             and inserted.price_type = ranked_input.price_type
+             and inserted.observed_at = ranked_input.observed_at
+             and inserted.retailer_product_ref is not distinct from ranked_input.retailer_product_ref
+             and inserted.price = ranked_input.price
+             and inserted.unit_price = ranked_input.unit_price
+             and inserted.currency = ranked_input.currency
+             and inserted.is_available = ranked_input.is_available
+             and inserted.confidence = ranked_input.confidence
+             and inserted.provenance = ranked_input.provenance
+           where inserted.id is not null or existing.id is not null
+         ),
+         latest_upsert as (
+           insert into latest_prices(
+             product_id,
+             chain_id,
+             store_id,
+             domain,
+             price_type,
+             observation_id,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             observed_at,
+             is_available,
+             confidence,
+             provenance
+           )
+           select
+             product_id,
+             chain_id,
+             store_id,
+             domain,
+             price_type,
+             id,
+             price,
+             regular_price,
+             unit_price,
+             currency,
+             observed_at,
+             is_available,
+             confidence,
+             provenance
+           from (
+             select distinct on (product_id, chain_id, store_id, price_type)
+               product_id,
+               chain_id,
+               store_id,
+               domain,
+               price_type,
+               id,
+               price,
+               regular_price,
+               unit_price,
+               currency,
+               observed_at,
+               is_available,
+               confidence,
+               provenance
+             from written
+             order by product_id, chain_id, store_id, price_type, observed_at desc, id desc
+           ) latest_input
+           on conflict (product_id, chain_id, store_id, price_type) do update set
+             observation_id = excluded.observation_id,
+             price = excluded.price,
+             regular_price = excluded.regular_price,
+             unit_price = excluded.unit_price,
+             currency = excluded.currency,
+             observed_at = excluded.observed_at,
+             is_available = excluded.is_available,
+             confidence = excluded.confidence,
+             domain = excluded.domain,
+             provenance = excluded.provenance,
+             updated_at = now()
+           where latest_prices.observed_at <= excluded.observed_at
+           returning 1
+         )
+         select ordinal, id
+         from written
+         order by ordinal`,
+        [JSON.stringify(observations.map((observation, ordinal) => ({
+          ordinal,
+          product_id: observation.productId,
+          chain_id: observation.chainId,
+          store_id: observation.storeId ?? null,
+          domain: observation.domain ?? 'grocery',
+          source_run_id: observation.sourceRunId ?? null,
+          raw_record_id: observation.rawRecordId ?? null,
+          retailer_product_ref: observation.retailerProductRef ?? null,
+          price_type: observation.priceType,
+          price: observation.price,
+          regular_price: observation.regularPrice ?? null,
+          unit_price: observation.unitPrice,
+          currency: observation.currency ?? 'SEK',
+          quantity: observation.quantity ?? null,
+          quantity_unit: observation.quantityUnit ?? null,
+          promotion_text: observation.promotionText ?? null,
+          promotion_starts_on: observation.promotionStartsOn ?? null,
+          promotion_ends_on: observation.promotionEndsOn ?? null,
+          member_required: observation.memberRequired ?? false,
+          is_available: observation.isAvailable ?? true,
+          observed_at: observation.observedAt,
+          valid_from: observation.validFrom ?? null,
+          valid_until: observation.validUntil ?? null,
+          confidence: observation.confidence,
+          provenance: observation.provenance
+        })))]
+      );
+      if (rows.length !== observations.length) throw new Error('Connector price observation upsert did not return an id for every input row');
+
+      const idsByOrdinal = new Map(rows.map((row) => [Number(row.ordinal), row.id]));
+      return {
+        observationIds: observations.map((_, ordinal) => {
+          const id = idsByOrdinal.get(ordinal);
+          if (!id) throw new Error(`Connector price observation upsert did not return an id for input row ${ordinal}`);
+          return id;
+        })
+      };
     }
   };
 }
@@ -3863,12 +4632,13 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
   return {
     async listLatestPriceSnapshotRows(filter = {}) {
       const minConfidence = Math.min(Math.max(filter.minConfidence ?? 0, 0), 1);
-      const limit = Math.min(Math.max(filter.limit ?? 1000, 1), 10000);
+      const limit = Math.min(Math.max(filter.limit ?? 10000, 1), 10000);
       const rows = await executor.query<SiteLatestPriceSnapshotRowSql>(
         `select latest_prices.product_id,
                 products.slug as product_slug,
                 products.canonical_name,
                 products.brand,
+                products.image_url,
                 products.category_path,
                 products.package_size,
                 products.package_unit,
@@ -3887,19 +4657,186 @@ export function createPostgresSiteSnapshotReader(executor: QueryExecutor): Postg
                 latest_prices.regular_price,
                 latest_prices.unit_price,
                 latest_prices.currency,
+                coalesce(observations.is_available, latest_prices.is_available) as is_available,
                 latest_prices.observed_at,
                 latest_prices.confidence,
-                latest_prices.provenance
+                observations.promotion_text,
+                observations.promotion_starts_on,
+                observations.promotion_ends_on,
+                observations.member_required,
+                observations.valid_from,
+                observations.valid_until,
+                observations.retailer_product_ref,
+                coalesce(observations.provenance, latest_prices.provenance) as provenance
          from latest_prices
+         join observations on observations.id = latest_prices.observation_id
          join products on products.id = latest_prices.product_id
          join chains on chains.id = latest_prices.chain_id
          left join stores on stores.id = latest_prices.store_id
          where latest_prices.confidence >= $1
+           and latest_prices.domain = 'grocery'
          order by latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
          limit $2`,
         [minConfidence, limit]
       );
       return rows.map(mapSiteLatestPriceSnapshotRow);
+    }
+  };
+}
+
+export function createPostgresWeeklyPriceDropDigestReader(executor: QueryExecutor): PostgresWeeklyPriceDropDigestReader {
+  return {
+    async listWeeklyPriceDropDigest(filter) {
+      const limit = Math.min(Math.max(filter.limit ?? 10, 1), 10);
+      const rows = await executor.query<WeeklyPriceDropDigestRow>(
+        `/* weekly_price_drop_digest */
+         select latest_prices.product_id,
+                products.slug as product_slug,
+                products.canonical_name as product_name,
+                products.brand,
+                chains.slug as chain_slug,
+                chains.name as chain_name,
+                stores.slug as store_slug,
+                stores.name as store_name,
+                latest_prices.price_type,
+                latest_prices.price,
+                latest_prices.regular_price,
+                round((latest_prices.regular_price - latest_prices.price)::numeric, 2) as savings_amount,
+                round((((latest_prices.regular_price - latest_prices.price) / nullif(latest_prices.regular_price, 0)) * 100)::numeric, 2) as drop_percent,
+                latest_prices.currency,
+                latest_prices.observed_at,
+                latest_prices.confidence
+         from latest_prices
+         join products on products.id = latest_prices.product_id
+         join chains on chains.id = latest_prices.chain_id
+         left join stores on stores.id = latest_prices.store_id
+         where latest_prices.domain = 'grocery'
+           and latest_prices.observed_at >= $1::timestamptz
+           and latest_prices.observed_at < $2::timestamptz
+           and latest_prices.regular_price is not null
+           and latest_prices.regular_price > latest_prices.price
+           and latest_prices.price >= 0
+         order by drop_percent desc, savings_amount desc, latest_prices.observed_at desc, products.slug, chains.slug, stores.slug nulls last, latest_prices.price_type
+         limit $3`,
+        [filter.since, filter.until, limit]
+      );
+      return rows.map(mapWeeklyPriceDropDigestRow);
+    }
+  };
+}
+
+export function createPostgresTrendingPriceChangeReader(executor: QueryExecutor): PostgresTrendingPriceChangeReader {
+  return {
+    async listTrendingPriceChanges(filter) {
+      const limit = Math.min(Math.max(filter.limit ?? 10, 1), 10);
+      const rows = await executor.query<TrendingPriceChangeRow>(
+        `/* trending_price_changes */
+         with observed as (
+           select observations.product_id,
+                  products.slug as product_slug,
+                  products.canonical_name as product_name,
+                  products.brand,
+                  products.category_path[1] as category_label,
+                  observations.chain_id,
+                  chains.slug as chain_slug,
+                  chains.name as chain_name,
+                  observations.store_id,
+                  stores.slug as store_slug,
+                  stores.name as store_name,
+                  observations.price,
+                  observations.currency,
+                  observations.observed_at,
+                  lag(observations.price) over (
+                    partition by observations.product_id, observations.chain_id, observations.store_id, observations.price_type
+                    order by observations.observed_at, observations.id
+                  ) as previous_price
+           from observations
+           join products on products.id = observations.product_id
+           join chains on chains.id = observations.chain_id
+           left join stores on stores.id = observations.store_id
+           where observations.domain = 'grocery'
+             and observations.observed_at >= ($1::timestamptz - interval '31 days')
+             and observations.observed_at < $2::timestamptz
+             and observations.price >= 0
+         ),
+         changed as (
+           select *
+           from observed
+           where observed_at >= $1::timestamptz
+             and previous_price is not null
+             and previous_price is distinct from price
+         ),
+         latest_change as (
+           select distinct on (product_id)
+                  product_id,
+                  product_slug,
+                  product_name,
+                  brand,
+                  category_label,
+                  chain_slug,
+                  chain_name,
+                  store_slug,
+                  store_name,
+                  price as latest_price,
+                  previous_price,
+                  round((price - previous_price)::numeric, 2) as change_amount,
+                  round((((price - previous_price) / nullif(previous_price, 0)) * 100)::numeric, 2) as change_percent,
+                  currency,
+                  observed_at as latest_observed_at
+           from changed
+           order by product_id, observed_at desc
+         ),
+         change_counts as (
+           select product_id, count(*) as change_count
+           from changed
+           group by product_id
+         ),
+         observation_counts as (
+           select product_id, count(*) as observation_count
+           from observed
+           where observed_at >= $1::timestamptz
+           group by product_id
+         ),
+         ranked as (
+           select latest_change.*,
+                  change_counts.change_count,
+                  observation_counts.observation_count
+           from latest_change
+           join change_counts on change_counts.product_id = latest_change.product_id
+           join observation_counts on observation_counts.product_id = latest_change.product_id
+         )
+         select dense_rank() over (
+                  order by change_count desc,
+                           observation_count desc,
+                           abs(change_amount) desc,
+                           product_name
+                ) as rank,
+                product_id,
+                product_slug,
+                product_name,
+                brand,
+                category_label,
+                change_count,
+                observation_count,
+                latest_price,
+                previous_price,
+                change_amount,
+                change_percent,
+                currency,
+                latest_observed_at,
+                chain_slug,
+                chain_name,
+                store_slug,
+                store_name
+         from ranked
+         group by product_id, product_slug, product_name, brand, category_label, change_count, observation_count,
+                  latest_price, previous_price, change_amount, change_percent, currency, latest_observed_at,
+                  chain_slug, chain_name, store_slug, store_name
+         order by rank, product_name
+         limit $3`,
+        [filter.since, filter.until, limit]
+      );
+      return rows.map(mapTrendingPriceChangeRow);
     }
   };
 }
@@ -3917,6 +4854,7 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
                 regular_price,
                 unit_price,
                 currency,
+                is_available,
                 observed_at,
                 confidence,
                 provenance
@@ -3949,6 +4887,7 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
                 promotion_starts_on,
                 promotion_ends_on,
                 member_required,
+                is_available,
                 observed_at,
                 valid_from,
                 valid_until,
@@ -4058,6 +4997,137 @@ export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrati
     evidence,
     summary: blockers.length === 0 ? 'PostgreSQL integration contract is ready.' : 'PostgreSQL integration contract is blocked.'
   };
+}
+
+export function buildTimescaleDbEvaluationReport(input: TimescaleDbEvaluationProbe): TimescaleDbEvaluationReport {
+  const hypertables = new Set(input.hypertables);
+  const compressionPolicies = new Set(input.compressionPolicies);
+  const retentionPolicies = new Set(input.retentionPolicies);
+  const fallbackTables = new Set(input.fallbackTables);
+  const fallbackFunctions = new Set(input.fallbackFunctions);
+  const timescaleGaps: string[] = [];
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+
+  if (input.timescaleExtensionAvailable) {
+    evidence.push('timescaledb_extension:available');
+  } else {
+    timescaleGaps.push('timescaledb_extension_not_installed');
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_HYPERTABLES) {
+    if (hypertables.has(table)) evidence.push(`hypertable:${table}`);
+    else timescaleGaps.push(`missing_hypertable:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES) {
+    if (compressionPolicies.has(table)) evidence.push(`compression_policy:${table}`);
+    else timescaleGaps.push(`missing_compression_policy:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_RETENTION_POLICIES) {
+    if (retentionPolicies.has(table)) evidence.push(`retention_policy:${table}`);
+    else timescaleGaps.push(`missing_retention_policy:${table}`);
+  }
+
+  for (const table of TIMESCALEDB_EVALUATION_FALLBACK_TABLES) {
+    if (fallbackTables.has(table)) evidence.push(`fallback_table:${table}`);
+    else blockers.push(`missing_fallback_table:${table}`);
+  }
+
+  for (const routine of TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS) {
+    if (fallbackFunctions.has(routine)) evidence.push(`fallback_function:${routine}`);
+    else blockers.push(`missing_fallback_function:${routine}`);
+  }
+
+  if (timescaleGaps.length === 0) {
+    return {
+      status: 'timescale_ready',
+      blockers,
+      timescaleGaps: [],
+      evidence,
+      recommendation: 'TimescaleDB is ready for observations_v2 hypertable compression and retention policies.',
+      summary: blockers.length === 0 ? 'TimescaleDB evaluation is ready.' : 'TimescaleDB evaluation is blocked by missing fallback evidence.'
+    };
+  }
+
+  if (blockers.length === 0) {
+    return {
+      status: 'fallback_ready',
+      blockers: [],
+      timescaleGaps,
+      evidence,
+      recommendation: 'Use declarative monthly partitions, BRIN pruning, price_daily/price_weekly rollups, and partition-drop retention until TimescaleDB is installed.',
+      summary: 'TimescaleDB is not fully configured; the declarative partition fallback is ready.'
+    };
+  }
+
+  return {
+    status: 'blocked',
+    blockers,
+    timescaleGaps,
+    evidence,
+    recommendation: 'Block price-tape scale claims until either TimescaleDB policies or the declarative partition fallback are fully present.',
+    summary: 'TimescaleDB evaluation is blocked.'
+  };
+}
+
+export async function collectTimescaleDbEvaluationProbe(executor: QueryExecutor): Promise<TimescaleDbEvaluationProbe> {
+  const extensionRows = await executor.query<{ installed_version: string | null }>(
+    "select installed_version from pg_available_extensions where name = 'timescaledb'"
+  );
+  const timescaleExtensionAvailable = Boolean(extensionRows[0]?.installed_version);
+  const fallbackTableRows = await executor.query<{ table_name: string }>(
+    'select table_name from information_schema.tables where table_schema = current_schema() and table_name = any($1)',
+    [[...TIMESCALEDB_EVALUATION_FALLBACK_TABLES]]
+  );
+  const fallbackFunctionRows = await executor.query<{ routine_name: string }>(
+    'select routine_name from information_schema.routines where routine_schema = current_schema() and routine_name = any($1)',
+    [[...TIMESCALEDB_EVALUATION_FALLBACK_FUNCTIONS]]
+  );
+
+  const probe: TimescaleDbEvaluationProbe = {
+    timescaleExtensionAvailable,
+    hypertables: [],
+    compressionPolicies: [],
+    retentionPolicies: [],
+    fallbackTables: fallbackTableRows.map((row) => row.table_name),
+    fallbackFunctions: fallbackFunctionRows.map((row) => row.routine_name)
+  };
+
+  if (!timescaleExtensionAvailable) return probe;
+
+  try {
+    const hypertableRows = await executor.query<{ hypertable_name: string }>(
+      'select hypertable_name from timescaledb_information.hypertables where hypertable_name = any($1)',
+      [[...TIMESCALEDB_EVALUATION_HYPERTABLES]]
+    );
+    probe.hypertables = hypertableRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.hypertables = [];
+  }
+
+  try {
+    const compressionRows = await executor.query<{ hypertable_name: string }>(
+      "select hypertable_name from timescaledb_information.jobs where proc_name = 'policy_compression' and hypertable_name = any($1)",
+      [[...TIMESCALEDB_EVALUATION_COMPRESSION_POLICIES]]
+    );
+    probe.compressionPolicies = compressionRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.compressionPolicies = [];
+  }
+
+  try {
+    const retentionRows = await executor.query<{ hypertable_name: string }>(
+      "select hypertable_name from timescaledb_information.jobs where proc_name = 'policy_retention' and hypertable_name = any($1)",
+      [[...TIMESCALEDB_EVALUATION_RETENTION_POLICIES]]
+    );
+    probe.retentionPolicies = retentionRows.map((row) => row.hypertable_name);
+  } catch {
+    probe.retentionPolicies = [];
+  }
+
+  return probe;
 }
 
 export function summarizePostgresIntegrationReadinessReport(

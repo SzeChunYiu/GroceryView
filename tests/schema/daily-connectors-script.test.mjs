@@ -26,7 +26,11 @@ describe('daily connectors export script', () => {
       'hemkop',
       'hemkop',
       'lidl',
-      'city_gross'
+      'city_gross',
+      'mathem',
+      'matspar',
+      'pharmacy',
+      'okq8'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.connectorId), [
       'ica-store-promotions-default-stores',
@@ -37,9 +41,34 @@ describe('daily connectors export script', () => {
       'hemkop-products-all-stores',
       'hemkop-weekly-all-stores',
       'lidl-public-offers-all-stores',
-      'city-gross-public-products-all-stores'
+      'city-gross-products-bulk',
+      'mathem-public-search',
+      'matspar-public-search',
+      'pharmacy-public-products',
+      'okq8-fuel-prices'
     ]);
-    assert.equal(connectors.every((connector) => Array.isArray(connector.stores) && connector.stores.length > 0), true);
+    assert.equal(
+      connectors
+        .filter((connector) => connector.requireStoreScopedPrices !== false)
+        .every((connector) => Array.isArray(connector.stores) && connector.stores.length > 0),
+      true
+    );
+    const okq8FuelConnector = connectors.find((connector) => connector.connectorId === 'okq8-fuel-prices');
+    assert.equal(okq8FuelConnector.domain, 'fuel');
+    assert.equal(okq8FuelConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(okq8FuelConnector.stores, []);
+    const matsparConnector = connectors.find((connector) => connector.connectorId === 'matspar-public-search');
+    assert.equal(matsparConnector.domain, 'grocery');
+    assert.equal(matsparConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(matsparConnector.stores, []);
+    const mathemConnector = connectors.find((connector) => connector.connectorId === 'mathem-public-search');
+    assert.equal(mathemConnector.domain, 'grocery');
+    assert.equal(mathemConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(mathemConnector.stores, []);
+    const pharmacyConnector = connectors.find((connector) => connector.connectorId === 'pharmacy-public-products');
+    assert.equal(pharmacyConnector.domain, 'pharmacy');
+    assert.equal(pharmacyConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(pharmacyConnector.stores, []);
     const coopProductConnector = connectors.find((connector) => connector.connectorId === 'coop-products-all-stores');
     const coopWeeklyConnector = connectors.find((connector) => connector.connectorId === 'coop-weekly-all-stores');
     assert.deepEqual(coopProductConnector.stores.map((store) => store.storeId), ['176110']);
@@ -53,7 +82,11 @@ describe('daily connectors export script', () => {
       'groceryview://daily/hemkop/products/all-stores',
       'groceryview://daily/hemkop/weekly-offers/all-stores',
       'groceryview://daily/lidl/public-offers/all-stores',
-      'groceryview://daily/city-gross/public-products/all-stores'
+      'groceryview://daily/city-gross/products/bulk',
+      'groceryview://daily/mathem/products/public-search',
+      'groceryview://daily/matspar/products/public-search',
+      'groceryview://daily/pharmacy/products/public',
+      'https://www.okq8.se/foretag/priser/'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.parserVersion), [
       'ica-store-promotions-native-v1',
@@ -64,7 +97,11 @@ describe('daily connectors export script', () => {
       'hemkop-products-native-v1',
       'hemkop-weekly-native-v1',
       'lidl-public-offers-native-v1',
-      'citygross-products-native-v1'
+      'citygross-bulk-native-v1',
+      'mathem-public-search-v1',
+      'matspar-public-search-v1',
+      'pharmacy-public-products-v1',
+      'okq8-fuel-prices-v1'
     ]);
   });
 });

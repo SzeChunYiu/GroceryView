@@ -32,12 +32,16 @@ describe('buildOpenApiDocument', () => {
       '/api/budget',
       '/api/budget/categories',
       '/api/budget/summary',
+      '/api/categories',
       '/api/categories/{category}/market',
       '/api/deals/discounts',
       '/api/deals/flyer-offers',
       '/api/expiry-deals/radar',
+      '/api/fuel',
       '/api/health',
       '/api/households/current',
+      '/api/households/current/basket/check',
+      '/api/households/join',
       '/api/human-review/assignments',
       '/api/human-review/assignments/{id}/decisions',
       '/api/indices',
@@ -56,6 +60,7 @@ describe('buildOpenApiDocument', () => {
       '/api/privacy/deletion-plan',
       '/api/privacy/export',
       '/api/privacy/request-fulfillment',
+      '/api/products',
       '/api/products/search',
       '/api/products/{id}',
       '/api/products/{id}/cheapest-now',
@@ -76,8 +81,11 @@ describe('buildOpenApiDocument', () => {
       '/api/readiness/scanning',
       '/api/readiness/source-runs',
       '/api/receipts/review',
+      '/api/retailers',
       '/api/scans/process',
       '/api/scans/upload-url',
+      '/api/settings/account',
+      '/api/settings/data-export',
       '/api/stores',
       '/api/stores/{id}',
       '/api/stores/{id}/category-coverage',
@@ -131,6 +139,8 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/watchlist/price-alerts'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/households/current'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/households/current'].put?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/households/current/basket/check'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/households/join'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/users/{userId}/favorite-stores/{storeId}'].delete?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/watchlist/items/{productId}'].delete?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/items/{productId}'].patch?.security, [{ bearerAuth: [] }]);
@@ -141,6 +151,10 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/privacy/export'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/privacy/deletion-plan'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/privacy/request-fulfillment'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/settings/account'].delete?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/settings/account'].delete?.summary ?? '', /delete.*account|account deletion/i);
+    assert.deepEqual(doc.paths['/api/settings/data-export'].get?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/settings/data-export'].get?.summary ?? '', /download my data|data export/i);
     assert.deepEqual(doc.paths['/api/pantry/replenishment'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/scans/process'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/scans/upload-url'].post?.security, [{ bearerAuth: [] }]);
@@ -162,6 +176,24 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/notifications/provider-suppression-events'].post?.security, [{ webhookSignature: [] }]);
     assert.deepEqual(doc.paths['/api/notifications/inbox'].get?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/notifications/inbox'].get?.summary ?? '', /notification inbox/i);
+    assert.deepEqual(doc.paths['/api/notifications/inbox'].get?.responses?.['200']?.content?.['application/json']?.schema, {
+      $ref: '#/components/schemas/NotificationInboxResponse'
+    });
+    assert.deepEqual(doc.components.schemas.NotificationInboxResponse.required, [
+      'userId',
+      'generatedAt',
+      'trackedItemCount',
+      'activeAlertCount',
+      'deliveredCount',
+      'heldCount',
+      'suppressedCount',
+      'summary',
+      'queue',
+      'quietHoursWindow',
+      'guardrails'
+    ]);
+    assert.equal(doc.components.schemas.NotificationInboxResponse.properties.generatedAt.format, 'date-time');
+    assert.equal(doc.components.schemas.NotificationInboxQueueItem.properties.sendAt.format, 'date-time');
     assert.match(doc.paths['/api/health'].get?.summary ?? '', /without exposing secrets/i);
     assert.equal(doc.paths['/api/products/{id}/terminal'].get?.security, undefined);
     assert.match(doc.paths['/api/products/{id}/terminal'].get?.summary ?? '', /price terminal/i);
@@ -178,6 +210,8 @@ describe('buildOpenApiDocument', () => {
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
     assert.equal(doc.paths['/api/openapi.json'].get?.security, undefined);
     assert.match(doc.paths['/api/openapi.json'].get?.summary ?? '', /openapi|developer/i);
+    assert.equal(doc.paths['/api/fuel'].get?.security, undefined);
+    assert.match(doc.paths['/api/fuel'].get?.summary ?? '', /fuel price observations/i);
     assert.equal(doc.paths['/api/nutrition/value'].get?.security, undefined);
     assert.match(doc.paths['/api/nutrition/value'].get?.summary ?? '', /nutrition.*krona/i);
     assert.deepEqual(doc.paths['/api/pantry/replenishment'].get?.security, [{ bearerAuth: [] }]);
@@ -186,8 +220,14 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/loyalty/offers'].get?.summary ?? '', /loyalty offers/i);
     assert.deepEqual(doc.paths['/api/receipts/review'].get?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/receipts/review'].get?.summary ?? '', /receipt review/i);
+    assert.equal(doc.paths['/api/categories'].get?.security, undefined);
+    assert.match(doc.paths['/api/categories'].get?.summary ?? '', /category tree/i);
     assert.equal(doc.paths['/api/categories/{category}/market'].get?.security, undefined);
     assert.match(doc.paths['/api/categories/{category}/market'].get?.summary ?? '', /category market/i);
+    assert.equal(doc.paths['/api/retailers'].get?.security, undefined);
+    assert.match(doc.paths['/api/retailers'].get?.summary ?? '', /supported retailers/i);
+    assert.equal(doc.paths['/api/stores/{id}'].get?.security, undefined);
+    assert.match(doc.paths['/api/stores/{id}'].get?.summary ?? '', /store profile.*assortment|assortment.*store profile/i);
     assert.equal(doc.paths['/api/stores/{id}/category-coverage'].get?.security, undefined);
     assert.match(doc.paths['/api/stores/{id}/category-coverage'].get?.summary ?? '', /category/i);
     assert.equal(doc.paths['/api/stores/{id}/deal-summary'].get?.security, undefined);
