@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { StorePriceMatrix } from '@/components/store-price-matrix';
 import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
@@ -67,6 +68,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
             </p>
           ) : null}
+          <StorePriceMatrix chains={COMPARE_CHAIN_ORDER} products={comparison.products} />
           {rowSections.map((section) => (
             <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm" key={section.id}>
               <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-3">
