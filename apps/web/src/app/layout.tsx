@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Providers } from './providers';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Footer } from '@/components/Footer';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -11,7 +13,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <ErrorBoundary>
+            <div className="flex min-h-screen flex-col">
+              <div className="flex-1">{children}</div>
+              <Footer />
+            </div>
+          </ErrorBoundary>
+        </Providers>
       </body>
     </html>
   );
