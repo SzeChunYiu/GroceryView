@@ -33,6 +33,21 @@ model Product {
   imageUrl       String?  @map("image_url")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
+  restockWatches RestockAlertWatch[]
 
   @@map("products")
+}
+
+model RestockAlertWatch {
+  id             String    @id @default(uuid()) @db.Uuid
+  userId         String    @map("user_id")
+  productId      String    @map("product_id") @db.Uuid
+  product        Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  lastNotifiedAt DateTime? @map("last_notified_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@unique([userId, productId])
+  @@index([productId])
+  @@map("restock_alert_watches")
 }
