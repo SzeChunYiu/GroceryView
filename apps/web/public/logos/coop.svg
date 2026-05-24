@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img" aria-label="COOP logo">
+  <rect width="160" height="80" rx="18" fill="#f8fafc"/>
+  <rect x="4" y="4" width="152" height="72" rx="14" fill="none" stroke="#0f172a" stroke-width="4"/>
+  <text x="80" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#0f172a">COOP</text>
+</svg>

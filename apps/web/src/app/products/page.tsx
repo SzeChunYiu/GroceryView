@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { ChainLogo } from '../../../../../packages/ui/src/ChainLogo';
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
@@ -212,7 +213,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Chain facets</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {chainFacets.map((facet) => (
-                <Link className="rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" href={searchFacetUrl({ chain: facet.value })} key={facet.value}>{facet.label} · {facet.count}</Link>
+                <Link className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" href={searchFacetUrl({ chain: facet.value })} key={facet.value}><ChainLogo chain={facet.value} className="h-5 w-10" />{facet.label} · {facet.count}</Link>
               ))}
             </div>
           </div>
@@ -244,7 +245,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
               </div>
               <div className="mt-4 grid gap-2 text-xs font-black text-slate-700">
                 <p>{product.cheapestPriceLabel} · {product.unitPriceLabel}</p>
-                <p>{product.chainLabel}</p>
+                <p className="flex items-center gap-2"><ChainLogo chain={product.chainLabel} className="h-5 w-10" />{product.chainLabel}</p>
                 <p className="text-violet-800">sourceTables: {product.sourceTables.join(' · ')}</p>
               </div>
             </Link>

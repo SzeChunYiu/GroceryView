@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
+import { ChainLogo } from '../../../../packages/ui/src/ChainLogo';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
 
@@ -177,7 +178,7 @@ export function ProductPriceCards({
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{card.productKind}</p>
                 <h3 className="mt-2 text-lg font-black text-slate-950">{card.name}</h3>
-                <p className="mt-1 text-sm text-slate-600">{card.brand}</p>
+                <p className="mt-1 flex items-center gap-2 text-sm text-slate-600"><ChainLogo chain={card.brand} />{card.brand}</p>
               </div>
               <div className="flex flex-col items-end gap-2">
                 {card.isAvailable === false ? (
