@@ -2,6 +2,22 @@
 
 import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
 
+/**
+ * Renders the interactive price-history terminal for a product, including
+ * timeframe controls, value summaries, series provenance, and a lazy-loaded
+ * lightweight-charts line chart.
+ *
+ * | Prop | Description |
+ * | --- | --- |
+ * | `chart` | Prepared chart view model containing availability, labels, windows, series, and caveat copy. |
+ *
+ * @example
+ * ```tsx
+ * <PriceChartTerminal chart={priceChartModel} />
+ * ```
+ *
+ * @param chart Prepared price chart model used to render terminal copy, windows, series, and fallback state.
+ */
 type LineStyleName = 'solid' | 'dashed' | 'dotted';
 type ChartLoadStatus = 'idle' | 'loading' | 'ready' | 'failed';
 type LightweightChartsModule = typeof import('lightweight-charts');
