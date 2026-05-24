@@ -1,9 +1,17 @@
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggerMiddleware } from './middleware/logger.js';
 
 export function configureApp(app: INestApplication) {
-  app.enableCors();
+  const configService = app.get(ConfigService);
+  const configuredCorsOrigins = configService.get<string[]>('CORS_ALLOWED_ORIGINS');
+  if (configuredCorsOrigins === undefined || configuredCorsOrigins.length === 0) {
+    app.enableCors();
+  } else {
+    app.enableCors({ origin: configuredCorsOrigins });
+  }
+
   const loggerMiddleware = new LoggerMiddleware();
   app.use(loggerMiddleware.use.bind(loggerMiddleware));
   app.useGlobalPipes(
