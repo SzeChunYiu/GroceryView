@@ -141,6 +141,7 @@ export const OPENFOODFACTS_FIELDS = [
 ] as const;
 
 export const OPENFOODFACTS_EXPORT_URL = 'https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz';
+export const DEFAULT_OPENFOODFACTS_SWEDEN_CATALOG_MAX_PAGES = 10;
 
 export const DEFAULT_OPENFOODFACTS_CODES = [
   '7340083494406',

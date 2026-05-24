@@ -13,8 +13,16 @@ import {
   DEFAULT_LIDL_OFFER_PATHS,
   DEFAULT_MATHEM_SEARCH_PAGES,
   DEFAULT_MATHEM_SEARCH_QUERIES,
+  DEFAULT_MATPRISKOLLEN_REGIONS,
+  DEFAULT_MATPRISKOLLEN_STORE_LIMIT,
+  DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE,
+  DEFAULT_MATPRISKOLLEN_MAX_ROWS,
   DEFAULT_MATSPAR_SEARCH_PAGES,
   DEFAULT_MATSPAR_SEARCH_QUERIES,
+  DEFAULT_MATSPAR_MAX_ROWS,
+  DEFAULT_OPENFOODFACTS_SWEDEN_CATALOG_MAX_PAGES,
+  DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS,
+  DEFAULT_ICA_REKLAMBLAD_MAX_ROWS,
   DEFAULT_WILLYS_SEARCH_QUERIES,
   DEFAULT_WILLYS_LIVE_PRODUCT_MAX_ROWS,
   DEFAULT_WILLYS_LIVE_WEEKLY_DISCOUNT_MAX_ROWS,
@@ -27,7 +35,11 @@ import {
   fetchHemkopWeeklyDiscountsForAllStores,
   fetchLidlOffersForAllStores,
   fetchMathemProducts,
+  fetchMatpriskollenOffers,
   fetchMatsparProducts,
+  fetchOpenFoodFactsSwedenCatalog,
+  buildOpenFoodFactsSwedenSearchUrl,
+  fetchIcaReklambladOffers,
   fetchPharmacyProducts,
   fetchWillysProducts,
   fetchWillysWeeklyDiscountsForAllStores
@@ -148,11 +160,45 @@ if (shouldRun('matspar')) {
   const matsparProducts = await fetchMatsparProducts({
     queries: MATSPAR_QUERIES,
     pages: MATSPAR_PAGES,
-    maxRows: 5000,
+    maxRows: DEFAULT_MATSPAR_MAX_ROWS,
     retrievedAt
   });
   await writeMatspar(matsparProducts);
   summary.matsparProducts = matsparProducts.length;
+}
+
+if (shouldRun('matpriskollen')) {
+  const matpriskollenOffers = await fetchMatpriskollenOffers({
+    regions: DEFAULT_MATPRISKOLLEN_REGIONS,
+    storeLimit: DEFAULT_MATPRISKOLLEN_STORE_LIMIT,
+    offerLimitPerStore: DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE,
+    maxRows: DEFAULT_MATPRISKOLLEN_MAX_ROWS,
+    retrievedAt
+  });
+  await writeMatpriskollen(matpriskollenOffers);
+  summary.matpriskollenOffers = matpriskollenOffers.length;
+}
+
+if (shouldRun('openfoodfacts')) {
+  const pageEvents = [];
+  const openFoodFactsProducts = await fetchOpenFoodFactsSwedenCatalog({
+    maxPages: DEFAULT_OPENFOODFACTS_SWEDEN_CATALOG_MAX_PAGES,
+    pageSize: 100,
+    retrievedAt,
+    onPage: (event) => pageEvents.push(event)
+  });
+  await writeOpenFoodFacts(openFoodFactsProducts, pageEvents);
+  summary.openFoodFactsProducts = openFoodFactsProducts.length;
+}
+
+if (shouldRun('ica-reklamblad')) {
+  const icaReklambladOffers = await fetchIcaReklambladOffers({
+    sourceUrls: DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS,
+    maxRows: DEFAULT_ICA_REKLAMBLAD_MAX_ROWS,
+    retrievedAt
+  });
+  await writeIcaReklamblad(icaReklambladOffers);
+  summary.icaReklambladOffers = icaReklambladOffers.length;
 }
 
 if (shouldRun('apohem')) {
@@ -616,6 +662,175 @@ async function writeMatspar(rows) {
     })} as const;`,
     '',
     `export const matsparProducts: MatsparIngestedProduct[] = ${literal(rows)};`,
+    ''
+  ]);
+}
+
+async function writeMatpriskollen(rows) {
+  const sourceUrls = unique(rows.map((row) => row.sourceUrl));
+  const stores = unique(rows.map((row) => row.storeKey));
+  await writeGeneratedFile('matpriskollen.ts', [
+    '// AUTO-GENERATED from Matpriskollen public stores and offers API.',
+    ' // Store source URL pattern: https://matpriskollen.se/api/v1/stores?lat={lat}&lon={lon}&limit={limit}'.trim(),
+    ' // Offer source URL pattern: https://matpriskollen.se/api/v1/stores/{storeKey}/offers?lat={lat}&lon={lon}&limit={limit}'.trim(),
+    `// Offer source URLs: ${sourceUrls.join('; ')}`,
+    `// Retrieved: ${retrievedAt}`,
+    `// Row count: ${rows.length} real grocery offer rows fetched from matpriskollen.se across ${stores.length} stores.`,
+    '',
+    'export type MatpriskollenIngestedOffer = {',
+    '  code: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  store: string;',
+    '  storeKey: string;',
+    '  storeId: string;',
+    '  category: string;',
+    '  priceText: string;',
+    '  comparePriceText: string;',
+    '  regularPriceText: string;',
+    '  packageText: string;',
+    '  condition: string;',
+    '  origin: string;',
+    '  requiresMembershipCard: boolean;',
+    '  requiresCoupon: boolean;',
+    '  validFrom: string;',
+    '  validTo: string;',
+    '  sourceUrl: string;',
+    '  productUrl: string;',
+    '  imageUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    `export const matpriskollenSource = ${literal({
+      source: 'matpriskollen.se public stores and offers API',
+      retrievedAt,
+      rowCount: rows.length,
+      regions: DEFAULT_MATPRISKOLLEN_REGIONS,
+      storeLimit: DEFAULT_MATPRISKOLLEN_STORE_LIMIT,
+      offerLimitPerStore: DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE,
+      stores,
+      sourceUrls
+    })} as const;`,
+    '',
+    `export const matpriskollenOffers: MatpriskollenIngestedOffer[] = ${literal(rows)};`,
+    ''
+  ]);
+}
+
+async function writeOpenFoodFacts(rows, pageEvents) {
+  const sourceUrls = unique(rows.map((row) => row.sourceUrl));
+  const pageSummaries = pageEvents
+    .filter((event) => !event.skipped)
+    .map((event, index, events) => {
+      const previousRows = index > 0 ? events[index - 1].rows : 0;
+      return {
+        page: event.page,
+        sourceUrl: buildOpenFoodFactsSwedenSearchUrl(event.page, 100),
+        fetchedProductCount: event.products,
+        normalizedRowCount: event.rows - previousRows
+      };
+    });
+  const reportedTotalPages = pageEvents.find((event) => Number.isFinite(event.totalPages))?.totalPages ?? null;
+  const ingestedRows = rows.map((row) => ({
+    barcode: row.code,
+    name: row.name,
+    brands: row.brands,
+    quantity: row.quantity,
+    categories: row.categories,
+    labels: row.labels,
+    allergens: row.allergens ?? [],
+    traces: row.traces ?? [],
+    additives: row.additives ?? [],
+    countries: row.countries ?? [],
+    stores: row.stores ?? [],
+    origins: row.origins ?? [],
+    manufacturingPlaces: row.manufacturingPlaces ?? [],
+    packaging: row.packaging ?? [],
+    ingredientsText: row.ingredientsText ?? '',
+    servingSize: row.servingSize ?? '',
+    nutriscoreGrade: row.nutriscoreGrade,
+    novaGroup: row.novaGroup ?? null,
+    ecoscoreGrade: row.ecoscoreGrade ?? '',
+    dataQualityTags: row.dataQualityTags ?? [],
+    nutritionPer100g: row.nutritionPer100g,
+    imageUrl: row.imageUrl,
+    productUrl: row.productUrl,
+    sourceUrl: row.sourceUrl,
+    retrievedAt: row.retrievedAt,
+    retailerMatches: []
+  }));
+
+  await writeGeneratedFile('openfoodfacts.ts', [
+    '// AUTO-GENERATED from OpenFoodFacts Sweden public product search API metadata.',
+    ...sourceUrls.map((sourceUrl) => `// Source URL: ${sourceUrl}`),
+    `// Retrieved: ${retrievedAt}`,
+    `// Row count: ${rows.length} real normalized Sweden API product metadata rows from ${pageSummaries.reduce((total, page) => total + page.fetchedProductCount, 0)} fetched products across ${pageSummaries.length} pages.`,
+    '// Metadata only; no GroceryView prices, retailer availability, or discounts are inferred from these rows.',
+    '',
+    'export type OpenFoodFactsNutritionPer100g = {',
+    '  energyKj: number | null;',
+    '  energyKcal: number | null;',
+    '  fat: number | null;',
+    '  saturatedFat: number | null;',
+    '  carbohydrates: number | null;',
+    '  sugars: number | null;',
+    '  fiber: number | null;',
+    '  proteins: number | null;',
+    '  salt: number | null;',
+    '  sodium: number | null;',
+    '};',
+    '',
+    'export type OpenFoodFactsRetailerMatch = {',
+    "  chain: 'citygross' | 'willys' | 'hemkop' | 'coop' | 'ica';",
+    '  productCode: string;',
+    '  name: string;',
+    '  brand: string;',
+    '  packageText: string;',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '};',
+    '',
+    'export type OpenFoodFactsIngestedProduct = {',
+    '  barcode: string;',
+    '  name: string;',
+    '  brands: string;',
+    '  quantity: string;',
+    '  categories: string[];',
+    '  labels: string[];',
+    '  allergens: string[];',
+    '  traces: string[];',
+    '  additives: string[];',
+    '  countries: string[];',
+    '  stores: string[];',
+    '  origins: string[];',
+    '  manufacturingPlaces: string[];',
+    '  packaging: string[];',
+    '  ingredientsText: string;',
+    '  servingSize: string;',
+    '  nutriscoreGrade: string;',
+    '  novaGroup: number | null;',
+    '  ecoscoreGrade: string;',
+    '  dataQualityTags: string[];',
+    '  nutritionPer100g: OpenFoodFactsNutritionPer100g;',
+    '  imageUrl: string;',
+    '  productUrl: string;',
+    '  sourceUrl: string;',
+    '  retrievedAt: string;',
+    '  retailerMatches: OpenFoodFactsRetailerMatch[];',
+    '};',
+    '',
+    `export const openFoodFactsSource = ${literal({
+      source: 'openfoodfacts.org Sweden public product search API metadata catalog',
+      retrievedAt,
+      rowCount: rows.length,
+      fetchedProductCount: pageSummaries.reduce((total, page) => total + page.fetchedProductCount, 0),
+      reportedTotalPages,
+      pageSize: 100,
+      pages: pageSummaries,
+      sourceUrls
+    })} as const;`,
+    '',
+    `export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = ${literal(ingestedRows)};`,
     ''
   ]);
 }
