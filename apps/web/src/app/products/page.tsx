@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
+import { brandPersonalizationSummary, isExcludedManufacturer, isPreferredBrand, personalizeProductResults, signedInUserBrandPreferences } from '@/lib/personalization';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
@@ -80,15 +81,19 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
-  const productCards = selectedBrand
+  const personalizedResultCards = personalizeProductResults(resultCards, signedInUserBrandPreferences);
+  const personalizationSummary = brandPersonalizationSummary(resultCards.length, personalizedResultCards.length, signedInUserBrandPreferences);
+  const baseProductCards = selectedBrand
     ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
     : adaptiveProductCards;
-  const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
+  const productCards = personalizeProductResults(baseProductCards, signedInUserBrandPreferences);
+  const brandFilterOptions = productBrandFilterOptions.filter((option) => !isExcludedManufacturer(option.value, signedInUserBrandPreferences) || option.value === selectedBrand);
+  const totalPages = Math.max(1, Math.ceil(personalizedResultCards.length / PRODUCTS_PER_PAGE));
   const currentPage = Math.min(requestedPage, totalPages);
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
-  const pagedResultCards = resultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
-  const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
-  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
+  const pagedResultCards = personalizedResultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
+  const rangeStart = personalizedResultCards.length === 0 ? 0 : pageStart + 1;
+  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, personalizedResultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
@@ -191,6 +196,9 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-violet-900 shadow-sm">No active URL filters</span>
           )}
         </div>
+        <div className="mt-4 rounded-2xl border border-amber-100 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950">
+          Account personalization promotes {personalizationSummary.preferredLabel} in search and sort, then hides {personalizationSummary.hiddenCount.toLocaleString('sv-SE')} product result{personalizationSummary.hiddenCount === 1 ? '' : 's'} from excluded manufacturer {personalizationSummary.excludedLabel}.
+        </div>
         <div className="mt-5 grid gap-3 lg:grid-cols-4">
           <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Category facets</p>
@@ -250,10 +258,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             </Link>
           ))}
         </div>
-        {resultCards.length > PRODUCTS_PER_PAGE ? (
+        {personalizedResultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">
-              Showing {rangeStart}-{rangeEnd} of {resultCards.length} instant products (page {currentPage}/{totalPages})
+              Showing {rangeStart}-{rangeEnd} of {personalizedResultCards.length} personalized instant products (page {currentPage}/{totalPages})
             </p>
             <div className="flex gap-3">
               {currentPage > 1 ? (
@@ -441,9 +449,9 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
                 name="brand"
               >
                 <option value="">All brands</option>
-                {productBrandFilterOptions.map((option) => (
+                {brandFilterOptions.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label} ({option.productCount})
+                    {option.label} ({option.productCount}){isPreferredBrand(option.value, signedInUserBrandPreferences) ? ' · preferred' : ''}
                   </option>
                 ))}
               </select>

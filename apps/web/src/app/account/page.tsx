@@ -3,6 +3,7 @@ import { AccountMutationActions } from '@/components/account-mutation-actions';
 import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { signedInUserBrandPreferences } from '@/lib/personalization';
 import { routeMetadata } from '@/lib/seo';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
@@ -27,6 +28,43 @@ export default function AccountPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         GroceryView now surfaces the real account API contract for saved shopping state while keeping private rows available to signed-in shoppers only. The public static build describes the production contract and stays closed when authenticated account records are absent.
       </p>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Brand personalization</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Preferred brands and blocked manufacturers</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              These account-bound controls are keyed to <code className="rounded bg-white/80 px-1 py-0.5 text-amber-900">{signedInUserBrandPreferences.userId}</code>. Product search hides excluded manufacturers and promotes preferred brands before catalogue sorting renders the cards.
+            </p>
+          </div>
+          <ConfidenceBadge level="high" label="Account preference preview" sampleSize={signedInUserBrandPreferences.preferredBrands.length + signedInUserBrandPreferences.excludedManufacturers.length} />
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm">
+            <p className="text-sm font-black text-slate-950">Preferred brands</p>
+            <div className="mt-3 space-y-2">
+              {signedInUserBrandPreferences.preferredBrands.map((brand) => (
+                <label className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-sm font-bold text-amber-950" key={brand}>
+                  <input defaultChecked name="preferredBrand" readOnly type="checkbox" value={brand} />
+                  {brand}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-rose-100 bg-white p-4 shadow-sm">
+            <p className="text-sm font-black text-slate-950">Excluded manufacturers</p>
+            <div className="mt-3 space-y-2">
+              {signedInUserBrandPreferences.excludedManufacturers.map((brand) => (
+                <label className="flex items-center gap-2 rounded-xl bg-rose-50 px-3 py-2 text-sm font-bold text-rose-950" key={brand}>
+                  <input defaultChecked name="excludedManufacturer" readOnly type="checkbox" value={brand} />
+                  {brand}
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Account-bound contract</p>
