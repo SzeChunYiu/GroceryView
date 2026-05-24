@@ -177,10 +177,31 @@ export const productPricesResponseSchema = z.object({
   prices: z.array(latestPriceSchema)
 });
 
+export const compareItemIdsSchema = z.array(idSchema);
+
+export const comparePriceSnapshotSchema = z.object({
+  price: moneyAmountSchema,
+  unitPrice: moneyAmountSchema.optional(),
+  priceType: priceTypeSchema,
+  confidence: confidenceSchema,
+  observedAt: isoDateTimeSchema
+});
+
+export const compareStoreItemPricesSchema = z.record(idSchema, comparePriceSnapshotSchema);
+export const compareStoresSchema = z.record(idSchema, compareStoreItemPricesSchema);
+export const compareMissingItemIdsSchema = z.array(idSchema);
+
+export const compareResponseSchema = z.object({
+  itemIds: compareItemIdsSchema,
+  stores: compareStoresSchema,
+  missingItemIds: compareMissingItemIdsSchema
+});
+
 export const apiContractSchemas = {
   alert: alertSchema,
   basket: basketSchema,
   basketItem: basketItemSchema,
+  compareResponse: compareResponseSchema,
   latestPrice: latestPriceSchema,
   fuelPriceObservation: fuelPriceObservationSchema,
   fuelPriceSource: fuelPriceSourceSchema,
@@ -197,6 +218,8 @@ export const apiContractSchemas = {
 export type AlertDto = z.infer<typeof alertSchema>;
 export type BasketDto = z.infer<typeof basketSchema>;
 export type BasketItemDto = z.infer<typeof basketItemSchema>;
+export type ComparePriceSnapshotDto = z.infer<typeof comparePriceSnapshotSchema>;
+export type CompareResponseDto = z.infer<typeof compareResponseSchema>;
 export type Confidence = z.infer<typeof confidenceSchema>;
 export type FuelGrade = z.infer<typeof fuelGradeSchema>;
 export type FuelPriceObservationDto = z.infer<typeof fuelPriceObservationSchema>;
