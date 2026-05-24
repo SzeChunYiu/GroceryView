@@ -6,7 +6,6 @@ import { ConfidenceBadge } from '@/components/confidence-badge';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts, type AxfoodProduct } from '@/lib/axfood-products';
 import { buildChainIndexTrendSeries, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
-import { formatPct, formatSek } from '@/lib/verified-data';
 
 type CategorySymbol = 'grocery' | 'dairy' | 'produce' | 'meat' | 'bakery';
 
@@ -65,6 +64,8 @@ const categoryDefinitions: CategoryDefinition[] = [
 const fixedBasketBaseDate = '2026-05-20';
 const fixedBasketCurrentDate = '2026-05-21';
 const chartWindowLabels = ['1W', '1M', '3M', '1Y', 'ALL'] as const;
+const sekFormatter = new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+const pctFormatter = new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1, minimumFractionDigits: 1 });
 
 const chainIndexReport = calculateChainPriceIndex([
   ...buildChainPriceObservations(),
@@ -162,6 +163,15 @@ function indexTone(value: number) {
 
 function confidenceLabel(level: 'high' | 'medium' | 'low') {
   return `${level} confidence`;
+}
+
+function formatSek(value: number) {
+  return `${sekFormatter.format(value)} kr`;
+}
+
+function formatPct(value: number) {
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${pctFormatter.format(value)}%`;
 }
 
 function fixedBasketForChain(chain: ChainPriceIndex): FixedBasketIndex {
