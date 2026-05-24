@@ -3,6 +3,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { facetedProductSearchEndpoint } from '@groceryview/api';
 import { allProducts, groceryApi } from '../demo-data.js';
 import { resolveProductNameLocale } from '../product-name-locale.js';
+import { apiRouteTraceSpans, traceApiRoute } from '../instrumentation.js';
 import { RealCatalogService } from '../real-catalog/real-catalog.service.js';
 
 @ApiTags('products')
@@ -13,7 +14,7 @@ export class ProductsController {
   @Get()
   @ApiOkResponse({ description: 'Searchable product list' })
   list(@Query('q') query = '') {
-    return allProducts(query);
+    return traceApiRoute(apiRouteTraceSpans.products, { route: 'products.list', hasQuery: Boolean(query) }, () => allProducts(query));
   }
 
   @Get(facetedProductSearchEndpoint.actionPath)
@@ -33,7 +34,7 @@ export class ProductsController {
     @Headers('accept-language') acceptLanguage?: string,
     @Headers('cookie') cookie?: string
   ) {
-    return this.realCatalog.facetedSearch({
+    return traceApiRoute(apiRouteTraceSpans.products, { route: 'products.facetedSearch', hasQuery: Boolean(q), category, chain, store }, () => this.realCatalog.facetedSearch({
       q,
       category,
       brand,
@@ -44,7 +45,7 @@ export class ProductsController {
       maxPrice,
       limit,
       productNameLocale: resolveProductNameLocale({ locale, groceryViewLocale, acceptLanguage, cookie })
-    });
+    }));
   }
 
   @Get(':id/terminal')
