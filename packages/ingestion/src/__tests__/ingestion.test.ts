@@ -35,6 +35,7 @@ import {
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
+  fetchObIsFuelPrices,
   fetchSt1FuelPrices,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
@@ -129,6 +130,7 @@ import {
   parseLidlStorePayload,
   parseOsmChainStores,
   parseOpenPricesSnapshot,
+  parseObIsFuelPriceJson,
   parseOkq8FuelPricePage,
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
@@ -179,6 +181,7 @@ import {
   stockholmStoreLocatorFixtures,
   validateStoreEnumerationResults,
   validateEnumeratedStores,
+  OB_IS_FUEL_PRICE_URL,
   ST1_FUEL_PRICE_URL,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
@@ -677,6 +680,98 @@ describe('St1 fuel price connector', () => {
 
     await assert.rejects(
       () => fetchSt1FuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
+      /blocked or unavailable/
+    );
+  });
+});
+
+describe('OB IS fuel price connector', () => {
+  const obFuelJson = JSON.stringify({
+    Success: true,
+    Message: '',
+    Items: [{
+      Name: 'Ketilas',
+      PricePetrol: 0,
+      PriceDiesel: 266.1,
+      PriceMetan: 0,
+      PriceDock: 0,
+      ColoredDiesel: 0,
+      Location: 29,
+      Type: 1,
+      BCSession: null
+    }, {
+      Name: 'PIERPUMP',
+      PricePetrol: 0,
+      PriceDiesel: 0,
+      PriceMetan: 0,
+      PriceDock: 255.3,
+      ColoredDiesel: 0,
+      Location: 0,
+      Type: 0,
+      BCSession: null
+    }, {
+      Name: 'Selfoss',
+      PricePetrol: 205.5,
+      PriceDiesel: 246.7,
+      PriceMetan: 0,
+      PriceDock: 0,
+      ColoredDiesel: 273.5,
+      Location: 87,
+      Type: 1,
+      BCSession: null
+    }, {
+      Name: 'Akureyri',
+      PricePetrol: 223.9,
+      PriceDiesel: 261.2,
+      PriceMetan: 0,
+      PriceDock: 0,
+      ColoredDiesel: 0,
+      Location: 37,
+      Type: 0,
+      BCSession: null
+    }]
+  });
+
+  it('parses public OB station rows into per-grade fuel observations', () => {
+    const rows = parseObIsFuelPriceJson(obFuelJson, {
+      sourceUrl: OB_IS_FUEL_PRICE_URL,
+      retrievedAt: '2026-05-24T18:55:00.000Z',
+      sourceRunId: 'run-ob-is-fuel-2026-05-24'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.stationName, row.grade, row.pricePerLitre, row.currency, row.litreBasis]), [
+      ['Ketilas', 'diesel', 266.1, 'ISK', 1],
+      ['Selfoss', 'petrol', 205.5, 'ISK', 1],
+      ['Selfoss', 'diesel', 246.7, 'ISK', 1],
+      ['Selfoss', 'colored-diesel', 273.5, 'ISK', 1]
+    ]);
+    assert.equal(rows[0].domain, 'fuel');
+    assert.equal(rows[0].chainId, 'ob-is');
+    assert.equal(rows[0].source.kind, 'operator');
+    assert.equal(rows[0].source.operatorName, 'Olisuverzlun Islands');
+    assert.equal(rows[0].provenance.sourceUrl, OB_IS_FUEL_PRICE_URL);
+    assert.equal(rows[0].provenance.parserVersion, 'ob-is-fuel-prices-v1');
+    assert.match(rows[0].provenance.contentDigest.value, /^[a-f0-9]{64}$/);
+  });
+
+  it('fetches the official OB JSON feed and fails closed on blocked source responses', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(obFuelJson, { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchObIsFuelPrices({
+      fetchImpl,
+      retrievedAt: '2026-05-24T18:55:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [OB_IS_FUEL_PRICE_URL]);
+    assert.equal(rows.length, 4);
+    assert.equal(rows.find((row) => row.stationName === 'Selfoss' && row.grade === 'petrol')?.pricePerLitre, 205.5);
+
+    await assert.rejects(
+      () => fetchObIsFuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
       /blocked or unavailable/
     );
   });
