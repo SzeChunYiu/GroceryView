@@ -5910,6 +5910,56 @@ describe('daily ingestion runner', () => {
     assert.equal(observationRows[0]?.domain, 'grocery');
     assert.equal(observationRows[0]?.is_available, false);
   });
+  it('persists ICA Stammis member promotions as separate list and member observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T08:28:14.000Z',
+      connectors: [{
+        connectorId: 'ica-store-promotions',
+        chainId: 'ica',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL}?maxStores=1&maxRows=1`,
+        parserVersion: 'ica-store-promotions-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '1004599', name: 'ICA Kvantum Kungsholmen', address: 'Fleminggatan', city: 'Stockholm' }]
+      }],
+      fetchImpl: async () => Response.json({
+        productGroups: [{
+          type: 'ON_OFFER',
+          decoratedProducts: [{
+            productId: 'ica-stammis-coffee',
+            retailerProductId: 'ica-1000',
+            name: 'Kaffe Mellanrost 500g ICA',
+            brand: 'ICA',
+            packSizeDescription: '500g',
+            price: { amount: 15, currency: 'SEK' },
+            promoPrice: { amount: 10, currency: 'SEK' },
+            promotions: [{ description: 'Stammispris 2 för 20 kr' }]
+          }]
+        }]
+      })
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 2);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into observations'));
+    const observations = JSON.parse(String(observationInsert?.params[0])) as Array<Record<string, unknown>>;
+    const listObservation = observations.find((row) => row.retailer_product_ref === 'ica-1000:list');
+    const memberObservation = observations.find((row) => row.retailer_product_ref === 'ica-1000:member');
+
+    assert.equal(listObservation?.price, 15);
+    assert.equal(listObservation?.price_type, 'online');
+    assert.equal(listObservation?.member_required, false);
+    assert.equal(memberObservation?.price, 10);
+    assert.equal(memberObservation?.regular_price, 15);
+    assert.equal(memberObservation?.price_type, 'member');
+    assert.equal(memberObservation?.member_required, true);
+    assert.equal(memberObservation?.promotion_text, 'Stammispris 2 för 20 kr');
+  });
+
 
   it('caches and rewrites product image URLs while persisting daily connector runs when enabled', async () => {
     const executor = new DailyIngestionExecutor();

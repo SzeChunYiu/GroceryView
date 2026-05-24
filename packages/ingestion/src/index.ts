@@ -1793,6 +1793,12 @@ function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerCon
   };
 }
 
+function isIcaMemberPromotion(row: IcaProduct) {
+  return row.promoPrice !== null
+    && row.price !== null
+    && /\b(?:stammispris|medlemspris)\b/i.test(row.promotionDescription ?? '');
+}
+
 function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageSize);
   const price = row.promoPrice ?? row.price;
@@ -1817,6 +1823,30 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
   };
+}
+
+function icaProductToDailyItems(row: IcaProduct): RetailerConnectorParsedProduct[] {
+  const item = icaProductToDailyItem(row);
+  if (!isIcaMemberPromotion(row) || row.price === null || row.promoPrice === null) return [item];
+
+  const retailerProductId = item.retailerProductId ?? row.retailerProductId ?? row.code;
+  return [
+    {
+      ...item,
+      retailerProductId: `${retailerProductId}:list`,
+      price: row.price,
+      regularPrice: undefined,
+      promoText: undefined,
+      memberOnly: false
+    },
+    {
+      ...item,
+      retailerProductId: `${retailerProductId}:member`,
+      price: row.promoPrice,
+      regularPrice: row.price,
+      memberOnly: true
+    }
+  ];
 }
 
 function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnectorParsedProduct {
@@ -2100,7 +2130,7 @@ export async function fetchDailyConnectorSnapshot(
       maxPageSize: dailyNativeNumberParam(url, 'maxPageSize'),
       retrievedAt
     });
-    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(icaProductToDailyItem) });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.flatMap(icaProductToDailyItems) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL}?`)) {
