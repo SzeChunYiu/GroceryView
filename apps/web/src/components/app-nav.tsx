@@ -69,6 +69,7 @@ const navGroups: NavGroup[] = [
       { href: '/savings-dashboard', label: 'Savings', icon: PiggyBank },
       { href: '/watchlist', label: 'Watchlist', icon: Heart },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
+      { href: '/recipes', label: 'Recipes', icon: Utensils },
       { href: '/meal-planner', label: 'Meal planner', icon: Utensils }
     ]
   }
