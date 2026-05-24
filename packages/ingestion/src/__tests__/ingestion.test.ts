@@ -44,6 +44,7 @@ import {
   buildSwedishCountyFuelOverpassQuery,
   buildSwedishCountyGroceryOverpassQuery,
   buildWillysCategoryUrl,
+  buildWillysPlusOffersUrl,
   buildWillysSearchUrl,
   buildWillysStoresUrl,
   buildWillysWeeklyDiscountsUrl,
@@ -92,6 +93,7 @@ import {
   fetchMatsparProducts,
   fetchWillysProducts,
   fetchWillysProductsForAllStores,
+  fetchWillysPlusOffers,
   fetchWillysStores,
   fetchWillysWeeklyDiscounts,
   fetchWillysWeeklyDiscountsForAllStores,
@@ -175,6 +177,7 @@ import {
   STORE_ENUMERATOR_CHAIN_IDS,
   storeEnumeratorSourceCitations,
   storeEnumeratorSources,
+  routeWillysPlusPromotion,
   runOpenFoodFactsProductMetadataEnrichment,
   stockholmStoreLocatorFixtures,
   validateStoreEnumerationResults,
@@ -4281,6 +4284,61 @@ describe('fetchWillysWeeklyDiscounts', () => {
       sourceUrl: buildWillysWeeklyDiscountsUrl('2110', 1),
       retrievedAt: '2026-05-22T08:25:03.000Z'
     }]);
+  });
+
+  it('routes Willys Plus member offers through the promotion router', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          manufacturer: 'Willys',
+          name: 'Pluskaffe 450g',
+          priceNoUnit: '69.90',
+          googleAnalyticsCategory: 'kaffe',
+          displayVolume: '450g',
+          image: { url: 'https://assets.axfood.se/pluskaffe.png' },
+          potentialPromotions: [{
+            code: 'plus-100',
+            mainProductCode: '101010_ST',
+            name: 'Pluskaffe 450g',
+            brands: ['Willys'],
+            campaignType: 'LOYALTY',
+            promotionType: 'WillysPlus',
+            price: 49.9,
+            cartLabel: 'Willys Plus 49,90/st',
+            rewardLabel: 'Endast för Plus-medlemmar',
+            weightVolume: '450g',
+            startDate: '20/05-2026',
+            endDate: '24/05-2026'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysPlusOffers({
+      storeId: '2110',
+      maxRows: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-24T15:00:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildWillysPlusOffersUrl('2110', 1)]);
+    assert.deepEqual(rows[0]?.promotion, {
+      priceType: 'member',
+      memberOnly: true,
+      promoPrice: 49.9,
+      regularPrice: 69.9,
+      promotionText: 'Willys Plus 49,90/st · Endast för Plus-medlemmar',
+      validFrom: '20/05-2026',
+      validUntil: '24/05-2026'
+    });
+    assert.equal(rows[0]?.code, 'plus-100');
+    assert.equal(rows[0]?.priceText, 'Willys Plus 49,90/st');
+  });
+
+  it('blocks malformed Willys Plus offers before promotion routing', () => {
+    assert.equal(routeWillysPlusPromotion({ name: 'No price' }, { code: 'bad' }), null);
   });
 
   it('paginates Willys Axfood weekly discounts until reported pages are exhausted', async () => {
