@@ -975,6 +975,26 @@ export type AlertRuleRecord = {
   updatedAt: string;
 };
 
+export type FriendShareSignalSource = 'friend' | 'household';
+
+export type FriendShareSignalMutation = {
+  signalId: string;
+  sharedByUserId: string;
+  source: FriendShareSignalSource;
+  productId: string;
+  storeId?: string;
+  dealScore?: number;
+  sharedAt: string;
+  expiresAt?: string;
+  note?: string;
+};
+
+export type FriendShareSignalRecord = FriendShareSignalMutation & {
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type HumanReviewAssignmentRecord = {
   id: string;
   reviewId: string;
@@ -1020,6 +1040,8 @@ export type GroceryViewRepository = {
   listActiveNotificationSuppressions(): Promise<NotificationSuppressionRecord[]>;
   upsertAlertRule(rule: AlertRuleRecord): Promise<void>;
   listActiveAlertRules(userId: string): Promise<AlertRuleRecord[]>;
+  upsertFriendShareSignals(userId: string, signals: FriendShareSignalMutation[]): Promise<void>;
+  listFriendShareSignals(userId: string): Promise<FriendShareSignalRecord[]>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignmentRecord): Promise<void>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignmentRecord[]>;
 };
@@ -1268,6 +1290,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const notificationTasks = new Map<string, NotificationTaskRecord>();
   const notificationSuppressions = new Map<string, NotificationSuppressionRecord>();
   const alertRules = new Map<string, AlertRuleRecord>();
+  const friendShareSignals = new Map<string, FriendShareSignalRecord[]>();
   const humanReviewAssignments = new Map<string, HumanReviewAssignmentRecord>();
 
   return {
@@ -1289,6 +1312,7 @@ export function createMemoryRepository(): GroceryViewRepository {
         if (plan.members.some((member) => member.userId === userId)) householdPlans.delete(planId);
       }
       for (const [ruleId, rule] of alertRules) if (rule.userId === userId) alertRules.delete(ruleId);
+      friendShareSignals.delete(userId);
     },
 
     async addFavoriteStore(userId, storeId) {
@@ -1493,6 +1517,30 @@ export function createMemoryRepository(): GroceryViewRepository {
         .filter((rule) => rule.userId === userId && rule.active)
         .sort((a, b) => a.productId.localeCompare(b.productId) || a.alertType.localeCompare(b.alertType) || a.id.localeCompare(b.id))
         .map((rule) => ({ ...rule }));
+    },
+
+    async upsertFriendShareSignals(userId, signals) {
+      requireUser(users, userId);
+      const now = new Date().toISOString();
+      const existingById = new Map((friendShareSignals.get(userId) ?? []).map((signal) => [signal.signalId, signal]));
+      for (const signal of signals) {
+        const existing = existingById.get(signal.signalId);
+        existingById.set(signal.signalId, {
+          ...signal,
+          userId,
+          createdAt: existing?.createdAt ?? now,
+          updatedAt: now
+        });
+      }
+      friendShareSignals.set(userId, [...existingById.values()].sort((a, b) => b.sharedAt.localeCompare(a.sharedAt) || a.signalId.localeCompare(b.signalId)));
+    },
+
+    async listFriendShareSignals(userId) {
+      requireUser(users, userId);
+      const now = new Date().toISOString();
+      return (friendShareSignals.get(userId) ?? [])
+        .filter((signal) => !signal.expiresAt || signal.expiresAt > now)
+        .map((signal) => ({ ...signal }));
     }
   };
 }
@@ -1618,6 +1666,20 @@ type AlertRuleRow = {
   target_price: string | number | null;
   deal_score_threshold: string | number | null;
   active: boolean;
+  created_at: string | Date;
+  updated_at: string | Date;
+};
+type FriendShareSignalRow = {
+  signal_id: string;
+  user_id: string;
+  shared_by_user_id: string;
+  source: FriendShareSignalSource;
+  product_id: string;
+  store_id: string | null;
+  deal_score: string | number | null;
+  shared_at: string | Date;
+  expires_at: string | Date | null;
+  note: string | null;
   created_at: string | Date;
   updated_at: string | Date;
 };
@@ -2383,6 +2445,23 @@ function mapAlertRule(row: AlertRuleRow): AlertRuleRecord {
   };
 }
 
+function mapFriendShareSignal(row: FriendShareSignalRow): FriendShareSignalRecord {
+  return {
+    signalId: row.signal_id,
+    userId: row.user_id,
+    sharedByUserId: row.shared_by_user_id,
+    source: row.source,
+    productId: row.product_id,
+    ...(row.store_id ? { storeId: row.store_id } : {}),
+    ...(row.deal_score === null ? {} : { dealScore: Number(row.deal_score) }),
+    sharedAt: asIso(row.shared_at),
+    ...(row.expires_at === null ? {} : { expiresAt: asIso(row.expires_at) }),
+    ...(row.note ? { note: row.note } : {}),
+    createdAt: asIso(row.created_at),
+    updatedAt: asIso(row.updated_at)
+  };
+}
+
 export function createPostgresRepository(executor: QueryExecutor): GroceryViewRepository {
   return {
     async upsertUser(user) {
@@ -3048,6 +3127,61 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         [userId]
       );
       return rows.map(mapAlertRule);
+    },
+
+    async upsertFriendShareSignals(userId, signals) {
+      for (const signal of signals) {
+        await executor.query(
+          `insert into friend_share_signals(
+             signal_id, user_id, shared_by_user_id, source, product_id, store_id, deal_score, shared_at, expires_at, note
+           ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+           on conflict (user_id, signal_id) do update set
+             shared_by_user_id = excluded.shared_by_user_id,
+             source = excluded.source,
+             product_id = excluded.product_id,
+             store_id = excluded.store_id,
+             deal_score = excluded.deal_score,
+             shared_at = excluded.shared_at,
+             expires_at = excluded.expires_at,
+             note = excluded.note,
+             updated_at = now()`,
+          [
+            signal.signalId,
+            userId,
+            signal.sharedByUserId,
+            signal.source,
+            signal.productId,
+            signal.storeId ?? null,
+            signal.dealScore ?? null,
+            signal.sharedAt,
+            signal.expiresAt ?? null,
+            signal.note ?? null
+          ]
+        );
+      }
+    },
+
+    async listFriendShareSignals(userId) {
+      const rows = await executor.query<FriendShareSignalRow>(
+        `select signal_id,
+                user_id,
+                shared_by_user_id,
+                source,
+                product_id,
+                store_id,
+                deal_score,
+                shared_at,
+                expires_at,
+                note,
+                created_at,
+                updated_at
+         from friend_share_signals
+         where user_id = $1
+           and (expires_at is null or expires_at > now())
+         order by shared_at desc, signal_id`,
+        [userId]
+      );
+      return rows.map(mapFriendShareSignal);
     }
   };
 }

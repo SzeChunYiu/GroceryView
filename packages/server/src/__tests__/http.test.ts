@@ -816,6 +816,63 @@ describe('createHttpHandler', () => {
     assert.equal((await json(index) as { label: string }).label, 'Stockholm Grocery Index');
   });
 
+  it('persists friend share signals through the configured repository', async () => {
+    const rows = new Map<string, Array<{
+      signalId: string;
+      userId: string;
+      sharedByUserId: string;
+      source: 'friend' | 'household';
+      productId: string;
+      storeId?: string;
+      dealScore?: number;
+      sharedAt: string;
+      expiresAt?: string;
+      note?: string;
+      createdAt: string;
+      updatedAt: string;
+    }>>();
+    const handle = createHttpHandler(undefined, {
+      friendShareSignalRepository: {
+        async upsertFriendShareSignals(userId, signals) {
+          rows.set(userId, signals.map((signal) => ({
+            ...signal,
+            userId,
+            createdAt: '2026-05-24T09:00:00.000Z',
+            updatedAt: '2026-05-24T09:00:00.000Z'
+          })));
+        },
+        async listFriendShareSignals(userId) {
+          return rows.get(userId) ?? [];
+        }
+      }
+    });
+
+    const saved = await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({
+        signals: [{
+          signalId: 'share-1',
+          sharedByUserId: 'friend-1',
+          source: 'friend',
+          productId: 'coffee',
+          storeId: 'willys-odenplan',
+          dealScore: 92,
+          sharedAt: '2026-05-24T08:30:00.000Z',
+          optedIn: true
+        }]
+      })
+    }));
+    assert.equal(saved.status, 201);
+
+    const read = await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1'));
+    assert.equal(read.status, 200);
+    const body = await json(read) as { userId: string; signals: Array<{ signalId: string; sharedByUserId: string; productId: string; dealScore: number }> };
+    assert.equal(body.userId, 'user-1');
+    assert.deepEqual(body.signals.map((signal) => [signal.signalId, signal.sharedByUserId, signal.productId, signal.dealScore]), [
+      ['share-1', 'friend-1', 'coffee', 92]
+    ]);
+  });
+
   it('caches hot public API endpoints through an injected response cache', async () => {
     const entries = new Map<string, string>();
     const writes: Array<{ key: string; ttlSeconds: number }> = [];

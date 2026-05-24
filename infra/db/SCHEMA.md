@@ -282,6 +282,16 @@ Legacy app repository watchlist rows used by existing package APIs.
 
 Key columns: `user_id`, `product_id`, `target_price`, `alert_deal_score_at`, `favorite_stores_only`, `allowed_price_types`.
 
+### `friend_share_signals`
+
+Private opted-in friend and household deal-share signals used as persisted inputs for friend-shared deal suggestions.
+
+Key columns: `user_id`, `signal_id`, `shared_by_user_id`, `source`, `product_id`, `store_id`, `deal_score`, `shared_at`, `expires_at`.
+
+Primary key: `(user_id, signal_id)`.
+
+Indexes: `friend_share_signals_user_shared_idx` for account reads, `friend_share_signals_product_idx` for product suggestions, and `friend_share_signals_store_idx` for store-scoped suggestions.
+
 ### `weekly_baskets`
 
 Legacy app repository basket headers.

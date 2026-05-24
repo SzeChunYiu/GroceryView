@@ -34,6 +34,8 @@ import {
   createPostgresSourceRecordReader,
   buildUserAccountDeletionQueries,
   type BudgetRecord,
+  type FriendShareSignalMutation,
+  type FriendShareSignalRecord,
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
   type QueryExecutor,
@@ -147,6 +149,10 @@ export type AuthOptions = {
     listDueNotificationTasks(now: string): Promise<PersistedNotificationTask[]>;
     listActiveNotificationSuppressions(): Promise<NotificationSuppression[]>;
   };
+  friendShareSignalRepository?: {
+    upsertFriendShareSignals(userId: string, signals: FriendShareSignalMutation[]): Promise<void>;
+    listFriendShareSignals(userId: string): Promise<FriendShareSignalRecord[]>;
+  };
   billingWebhookSecret?: string;
   billingPriceIdPlanMap?: Partial<Record<string, SubscriptionPlan>>;
   billingSubscriptionSink?: {
@@ -218,6 +224,8 @@ export type RuntimePersistenceRepository = {
   listDueNotificationTasks?(now: string): Promise<PersistedNotificationTask[]>;
   listActiveNotificationSuppressions?(): Promise<NotificationSuppression[]>;
   upsertNotificationTask?(task: PersistedNotificationTask): Promise<void>;
+  upsertFriendShareSignals?(userId: string, signals: FriendShareSignalMutation[]): Promise<void>;
+  listFriendShareSignals?(userId: string): Promise<FriendShareSignalRecord[]>;
 };
 
 type RuntimeWatchlistRepository = {
@@ -1117,6 +1125,37 @@ function householdBasketCheckRequestFromBody(body: JsonRecord): HouseholdBasketC
     checked: requiredBoolean(body.checked, 'checked'),
     ...(body.checkedAt === undefined ? {} : { checkedAt: requiredString(body.checkedAt, 'checkedAt') })
   };
+}
+
+function requiredFriendShareSignalSource(value: unknown, field: string): FriendShareSignalMutation['source'] {
+  if (value === 'friend' || value === 'household') return value;
+  throw new Error(`${field} must be friend or household.`);
+}
+
+function friendShareSignalsFromBody(body: JsonRecord): FriendShareSignalMutation[] {
+  return requiredRecordArray(body.signals, 'signals').map((signal, index) => {
+    const dealScore = optionalNumber(signal.dealScore, `signals[${index}].dealScore`);
+    if (dealScore !== undefined && (!Number.isFinite(dealScore) || dealScore < 0 || dealScore > 100)) {
+      throw new Error(`signals[${index}].dealScore must be between 0 and 100.`);
+    }
+    if (signal.optedIn !== undefined && requiredBoolean(signal.optedIn, `signals[${index}].optedIn`) !== true) {
+      throw new Error(`signals[${index}].optedIn must be true before persisting a friend share signal.`);
+    }
+    const storeId = optionalString(signal.storeId, `signals[${index}].storeId`);
+    const expiresAt = optionalIsoTimestamp(signal.expiresAt, `signals[${index}].expiresAt`);
+    const note = optionalString(signal.note, `signals[${index}].note`);
+    return {
+      signalId: requiredString(signal.signalId ?? signal.id, `signals[${index}].signalId`),
+      sharedByUserId: requiredString(signal.sharedByUserId, `signals[${index}].sharedByUserId`),
+      source: requiredFriendShareSignalSource(signal.source, `signals[${index}].source`),
+      productId: requiredString(signal.productId, `signals[${index}].productId`),
+      ...(storeId ? { storeId } : {}),
+      ...(dealScore === undefined ? {} : { dealScore }),
+      sharedAt: requiredIsoTimestamp(signal.sharedAt, `signals[${index}].sharedAt`),
+      ...(expiresAt ? { expiresAt } : {}),
+      ...(note ? { note } : {})
+    };
+  });
 }
 
 function privacyRequestsFromBody(body: JsonRecord, userId: string): PrivacyRequest[] {
@@ -2045,6 +2084,34 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         };
         if (!authOptions.flyerOffersProvider) return errorResponse(503, 'Discounts provider is not configured.');
         return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.flyerOffersProvider!(query));
+      }
+
+      if (path === '/api/deals/friend-share-signals') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const repository = authOptions.friendShareSignalRepository;
+        if (!repository) return errorResponse(503, 'Friend share signal repository is not configured.');
+        if (method === 'GET') {
+          return jsonResponse({
+            userId: user,
+            signals: await repository.listFriendShareSignals(user),
+            guardrails: [
+              'Friend-share signals are private, opt-in account data and are only returned for the requested authenticated user.',
+              'Expired signals are excluded from production friend-shared deal suggestion inputs.'
+            ]
+          });
+        }
+        if (method === 'POST' || method === 'PUT') {
+          const signals = friendShareSignalsFromBody(await readJson(request));
+          await repository.upsertFriendShareSignals(user, signals);
+          return jsonResponse({
+            userId: user,
+            signalCount: signals.length,
+            signals: await repository.listFriendShareSignals(user)
+          }, { status: 201 });
+        }
       }
 
       if (method === 'GET' && path === '/api/account/subscription-access') {
@@ -3127,6 +3194,11 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
+      '/api/deals/friend-share-signals': {
+        get: protectedOperation('Get persisted opted-in friend and household deal-share signals for suggestion inputs.'),
+        post: protectedOperation('Persist opted-in friend and household deal-share signals for suggestion inputs.'),
+        put: protectedOperation('Upsert opted-in friend and household deal-share signals for suggestion inputs.')
+      },
       '/api/retailers': { get: publicOperation('List supported retailers with logo and website metadata.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
@@ -3657,6 +3729,14 @@ export function buildRepositoryBackedAuthOptions(
           notificationInboxRepository: {
             listDueNotificationTasks: (now) => repository.listDueNotificationTasks!(now),
             listActiveNotificationSuppressions: () => repository.listActiveNotificationSuppressions!()
+          }
+        }
+      : {}),
+    ...(repository.upsertFriendShareSignals && repository.listFriendShareSignals
+      ? {
+          friendShareSignalRepository: {
+            upsertFriendShareSignals: (userId, signals) => repository.upsertFriendShareSignals!(userId, signals),
+            listFriendShareSignals: (userId) => repository.listFriendShareSignals!(userId)
           }
         }
       : {}),
