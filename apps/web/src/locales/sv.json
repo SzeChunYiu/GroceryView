@@ -1,0 +1,18 @@
+{
+  "errorBoundary": {
+    "title": "Något gick fel",
+    "message": "Sidan kunde inte laddas på grund av ett oväntat fel.",
+    "retryLabel": "Prova igen",
+    "homeLabel": "Till startsidan",
+    "detailsLabel": "Teknisk information"
+  },
+  "emptyState": {
+    "title": "Inget resultat att visa",
+    "message": "Det finns för närvarande inget innehåll i denna vy.",
+    "actionLabel": "Gå till startsidan"
+  },
+  "labels": {
+    "noData": "Ingen data",
+    "unknownError": "Okänt fel"
+  }
+}

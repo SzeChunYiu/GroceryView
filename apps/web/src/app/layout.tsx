@@ -3,6 +3,7 @@ import { Providers } from './providers';
 import './globals.css';
 import '../styles/header.css';
 import { Header } from '@/components/Header';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'GroceryView',
@@ -13,10 +14,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <Providers>
-          <Header />
-          {children}
-        </Providers>
+        <ErrorBoundary>
+          <Providers>
+            <Header />
+            {children}
+          </Providers>
+        </ErrorBoundary>
       </body>
     </html>
   );
