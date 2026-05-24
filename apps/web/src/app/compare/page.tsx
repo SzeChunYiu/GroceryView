@@ -4,6 +4,8 @@ import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-comp
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { STORE_FEATURE_FILTERS, chainMatchesStoreFeatureFilters, getStoreFeatureLabels } from '@/lib/store-features';
+import type { StoreFeatureFilterId } from '@/lib/store-features';
 
 export function generateMetadata() {
   return routeMetadata('/compare');
@@ -19,11 +21,45 @@ function formatComparableUnitPrice(value: number | null | undefined, unitLabel: 
 
 type SearchParams = {
   products?: string | string[];
+  coupons?: string | string[];
+  delivery?: string | string[];
+  pickup?: string | string[];
 };
+
+function isEnabledSearchParam(value: string | string[] | undefined) {
+  const raw = Array.isArray(value) ? value[0] : value;
+
+  return raw === '1' || raw === 'true' || raw === 'yes';
+}
 
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
+  const activeStoreFeatureFilters = STORE_FEATURE_FILTERS.filter((filter) => isEnabledSearchParam(resolvedSearchParams[filter.queryParam]));
+  const activeStoreFeatureFilterIds = activeStoreFeatureFilters.map((filter) => filter.id);
+  const visibleChains = COMPARE_CHAIN_ORDER.filter((chain) => chainMatchesStoreFeatureFilters(chain.id, activeStoreFeatureFilterIds));
+  const visibleChainIds = new Set(visibleChains.map((chain) => chain.id));
+  const productsQuery = Array.isArray(productsParam) ? productsParam.join(',') : productsParam;
+  const storeFilterHref = (filterId: StoreFeatureFilterId) => {
+    const nextParams = new URLSearchParams();
+
+    if (productsQuery) {
+      nextParams.set('products', productsQuery);
+    }
+
+    for (const filter of STORE_FEATURE_FILTERS) {
+      const isActive = activeStoreFeatureFilterIds.includes(filter.id);
+      const shouldEnable = filter.id === filterId ? !isActive : isActive;
+
+      if (shouldEnable) {
+        nextParams.set(filter.queryParam, '1');
+      }
+    }
+
+    const query = nextParams.toString();
+
+    return query ? `/compare?${query}` : '/compare';
+  };
   const comparison = buildChainComparisonTable(productsParam);
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
@@ -61,6 +97,28 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
             Try sample products
           </Link>
         </div>
+        <div className="mt-5 rounded-3xl border border-emerald-100 bg-white p-4 shadow-sm">
+          <p className="text-sm font-black text-slate-950">Store checkout filters</p>
+          <div className="mt-3 grid gap-2 md:grid-cols-3">
+            {STORE_FEATURE_FILTERS.map((filter) => {
+              const isActive = activeStoreFeatureFilterIds.includes(filter.id);
+
+              return (
+                <Link
+                  className={isActive ? 'rounded-2xl border border-emerald-700 bg-emerald-900 p-3 text-white' : 'rounded-2xl border border-slate-200 bg-slate-50 p-3 text-slate-700 hover:border-emerald-700'}
+                  href={storeFilterHref(filter.id)}
+                  key={filter.id}
+                >
+                  <span className="block text-sm font-black">{filter.label}</span>
+                  <span className={isActive ? 'mt-1 block text-xs font-semibold leading-5 text-emerald-50' : 'mt-1 block text-xs font-semibold leading-5 text-slate-500'}>{filter.description}</span>
+                </Link>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-xs font-semibold text-slate-500">
+            Showing {visibleChains.length} of {COMPARE_CHAIN_ORDER.length} chains{activeStoreFeatureFilters.length ? ` with ${activeStoreFeatureFilters.map((filter) => filter.label).join(', ')}` : ' before checkout-option filters'}.
+          </p>
+        </div>
         <div className="mt-5 grid gap-4">
           {comparison.products.length === 0 ? (
             <p className="rounded-3xl border border-emerald-100 bg-white p-5 text-sm font-semibold text-slate-600 shadow-sm">
@@ -73,17 +131,20 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
                 <h3 className="text-sm font-black text-emerald-950">{section.title}</h3>
                 <p className="mt-1 text-xs font-semibold leading-5 text-emerald-900">{section.description}</p>
               </div>
-              {section.rows.length > 0 ? (
+              {section.rows.length > 0 && visibleChains.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full border-collapse text-left text-sm">
                     <caption className="sr-only">{section.title} side-by-side prices across ICA, Willys, and Coop</caption>
                     <thead className="bg-slate-950 text-white">
                       <tr>
                         <th className="px-4 py-3 font-black">Product</th>
-                        {COMPARE_CHAIN_ORDER.map((chain) => (
-                          <th className="px-4 py-3 font-black" key={chain.id}>{chain.label}</th>
+                        {visibleChains.map((chain) => (
+                          <th className="px-4 py-3 font-black" key={chain.id}>
+                            <span className="block">{chain.label}</span>
+                            <span className="mt-1 block text-xs font-semibold text-emerald-100">{getStoreFeatureLabels(chain.id).join(' · ') || 'No checkout flags'}</span>
+                          </th>
                         ))}
-                        <th className="px-4 py-3 font-black">Best chain</th>
+                        <th className="px-4 py-3 font-black">Best overall chain</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -95,7 +156,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
                             <span className="mt-2 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">{product.matchLabel}</span>
                             <span className="mt-2 block text-xs font-semibold leading-5 text-slate-500">{product.confidenceLabel}</span>
                           </th>
-                          {product.cells.map((cell) => (
+                          {product.cells.filter((cell) => visibleChainIds.has(cell.chainId)).map((cell) => (
                             <td className="px-4 py-4" key={`${product.productSlug}-${cell.chainId}`}>
                               <p className={cell.status === 'priced' ? 'font-black text-emerald-900' : 'font-black text-slate-400'}>{cell.priceText}</p>
                               <p className="mt-1 text-xs font-semibold text-slate-500">{cell.unitLabel}</p>
@@ -119,7 +180,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
                   </table>
                 </div>
               ) : (
-                <p className="px-4 py-5 text-sm font-semibold text-slate-500">No requested rows used this match type.</p>
+                <p className="px-4 py-5 text-sm font-semibold text-slate-500">{visibleChains.length === 0 ? 'No chains match the selected store checkout filters.' : 'No requested rows used this match type.'}</p>
               )}
             </div>
           ))}
