@@ -90,6 +90,7 @@ import {
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
+  buildSparNoSearchUrl,
   fetchWillysProducts,
   fetchWillysProductsForAllStores,
   fetchWillysStores,
@@ -133,6 +134,7 @@ import {
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
+  normalizeSparNoProduct,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
   planIngestionBatch,
@@ -198,6 +200,36 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('SPAR NO connector', () => {
+  it('normalizes NorgesGruppen product payloads into connector rows', () => {
+    assert.equal(buildSparNoSearchUrl('melk'), 'https://spar.no/sok?search=melk');
+
+    const row = normalizeSparNoProduct({
+      gtin: '7038010000000',
+      title: 'Lettmelk 1 l',
+      brand: 'Tine',
+      categoryName: 'Meieri',
+      price: 24.9,
+      unitPriceText: '24,90 kr/l',
+      slug: '/varer/meieri/lettmelk-7038010000000'
+    }, 'https://spar.no/sok?search=melk', '2026-05-24T12:00:00.000Z');
+
+    assert.deepEqual(row, {
+      code: '7038010000000',
+      name: 'Lettmelk 1 l',
+      brand: 'Tine',
+      category: 'Meieri',
+      price: 24.9,
+      priceText: '24.90 NOK',
+      unitPriceText: '24,90 kr/l',
+      sourceUrl: 'https://spar.no/sok?search=melk',
+      productUrl: 'https://spar.no/varer/meieri/lettmelk-7038010000000',
+      imageUrl: 'https://bilder.ngdata.no/7038010000000/spar/medium.jpg',
+      retrievedAt: '2026-05-24T12:00:00.000Z'
+    });
   });
 });
 
