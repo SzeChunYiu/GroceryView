@@ -1,4 +1,4 @@
-export type PharmacyChain = 'apohem' | 'apotek-hjartat';
+export type PharmacyChain = 'apohem' | 'apotek-hjartat' | 'kronans-apotek-se';
 
 export type PharmacyProductCategory = 'otc' | 'supplement' | 'beauty';
 

@@ -79,6 +79,7 @@ import {
   fetchHemkopWeeklyDiscountsForAllStores,
   fetchIcaDefaultStoreProducts,
   fetchIcaProducts,
+  fetchKronansApotekProducts,
   ICA_MAXI_CATALOG_SEARCH_INVESTIGATION,
   ICA_PRODUCT_PAGE_SEARCH_PATH,
   fetchIcaReklambladOffers,
@@ -98,6 +99,7 @@ import {
   findPharmacyEanMatches,
   parseApohemProducts,
   parseApotekHjartatProducts,
+  parseKronansApotekProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -112,6 +114,7 @@ import {
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_KRONANS_APOTEK_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL,
@@ -7227,6 +7230,112 @@ describe('daily ingestion runner', () => {
       apohemSourceUrl,
       apotekHjartatSourceUrl
     ]);
+  });
+
+  it('parses and dispatches Kronans Apotek pharmacy search fixtures', async () => {
+    const executor = new DailyIngestionExecutor();
+    const retrievedAt = '2026-05-23T09:12:00.000Z';
+    const sourceUrl = 'https://www.kronansapotek.se/hitta-produkter/?q=alvedon';
+    const fixtureHtml = `
+      <script type="application/json">{
+        "pageContext": {
+          "products": [{
+            "url": "/alvedon-filmdragerad-tablett-500-mg-20-st/p/123456/",
+            "productName": "Alvedon filmdragerad tablett 500 mg 20 st",
+            "brand": "Alvedon",
+            "sku": "kronans-alvedon-20",
+            "ean": "70 46260 976108",
+            "price": { "current": { "inclVat": "48,90" } },
+            "previousPrice": { "inclVat": "59,00" },
+            "vatPercent": "12",
+            "image": { "url": "/images/alvedon-kronans.png" },
+            "stockStatus": "in_stock",
+            "isOtcMedicine": true,
+            "category": ["Läkemedel", "Receptfritt"],
+            "prescriptionRequired": false
+          }, {
+            "url": "/receptbelagd/p/999/",
+            "productName": "Receptbelagd vara 10 st",
+            "brand": "Guarded",
+            "sku": "kronans-rx",
+            "ean": "1234567890123",
+            "price": { "current": { "inclVat": 79 } },
+            "prescriptionRequired": true
+          }, {
+            "url": "/utan-ean/p/888/",
+            "productName": "Saknar EAN 10 st",
+            "sku": "kronans-missing-ean",
+            "price": { "current": { "inclVat": 10 } }
+          }]
+        }
+      }</script>
+    `;
+
+    const parsed = parseKronansApotekProducts(fixtureHtml, sourceUrl, retrievedAt);
+    assert.deepEqual(parsed, [{
+      chain: 'kronans-apotek-se',
+      code: 'kronans-alvedon-20',
+      ean: '7046260976108',
+      name: 'Alvedon filmdragerad tablett 500 mg 20 st',
+      brand: 'Alvedon',
+      category: 'otc',
+      price: 48.9,
+      priceText: '48.90 SEK',
+      originalPrice: 59,
+      originalPriceText: '59.00 SEK',
+      vatPercent: 12,
+      stockStatus: 'in_stock',
+      productUrl: 'https://www.kronansapotek.se/alvedon-filmdragerad-tablett-500-mg-20-st/p/123456/',
+      imageUrl: 'https://www.kronansapotek.se/images/alvedon-kronans.png',
+      isOtc: true,
+      sourceUrl,
+      retrievedAt
+    }]);
+
+    const fetched = await fetchKronansApotekProducts({
+      urls: [sourceUrl, 'https://www.kronansapotek.se/hitta-produkter/?q=vitamin'],
+      maxRows: 1,
+      retrievedAt,
+      fetchImpl: async () => new Response(fixtureHtml, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+    assert.deepEqual(fetched, parsed);
+    await assert.rejects(
+      fetchKronansApotekProducts({
+        urls: [sourceUrl],
+        fetchImpl: async () => new Response('unavailable', { status: 503 })
+      }),
+      /Kronans Apotek request failed.*503/
+    );
+
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: retrievedAt,
+      connectors: [{
+        connectorId: 'kronans-apotek-se-public-products',
+        chainId: 'kronans-apotek-se',
+        domain: 'pharmacy',
+        sourceType: 'retailer_online_page',
+        endpointUrl: `${GROCERYVIEW_DAILY_KRONANS_APOTEK_PRODUCTS_URL}?urls=${encodeURIComponent(sourceUrl)}`,
+        parserVersion: 'kronans-apotek-se-public-products-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async () => new Response(fixtureHtml, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.domain, 'pharmacy');
+    assert.equal(product.barcode, '7046260976108');
+    assert.equal(product.category_id, 'pharmacy-otc');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 48.9);
+    assert.equal(observation.regular_price, 59);
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
