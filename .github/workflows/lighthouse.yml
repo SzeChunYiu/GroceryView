@@ -26,7 +26,7 @@ jobs:
           run_preview=false
           while IFS= read -r name; do
             case "$name" in
-              .github/workflows/lighthouse.yml|docs/data-sources.md|docs/ingestion/*|apps/web/src/lib/ingested/*|packages/ingestion/*|scripts/ingestion/*)
+              .github/workflows/ci.yml|.github/workflows/lighthouse.yml|docs/data-sources.md|docs/ingestion/*|apps/web/src/lib/ingested/*|packages/ingestion/*|scripts/ingestion/*)
                 ;;
               *)
                 run_preview=true
