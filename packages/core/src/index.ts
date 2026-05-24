@@ -1,3 +1,4 @@
+export * from './lib/verified-data';
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
