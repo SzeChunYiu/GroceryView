@@ -8,6 +8,7 @@
     "perf:bundle:profile": "NODE_OPTIONS=--max-old-space-size=6144 next build --profile --webpack && size-limit --config ./size-limit.config.cjs",
     "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
     "perf:lighthouse:preview": "lhci autorun --config=./lighthouserc.preview.cjs",
+    "perf:lighthouse:heatmap": "lhci autorun --config=./lighthouserc.heatmap.cjs",
     "start": "next start",
     "test": "node --test scripts/*.test.mjs"
   },

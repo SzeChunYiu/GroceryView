@@ -1935,6 +1935,26 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(verified, /Math\.random/);
   });
 
+  it('ships a page-level Playwright smoke spec for the heatmap route', async () => {
+    const spec = await read('e2e/pages/heatmap.spec.ts');
+    const pkg = await read('package.json');
+    const lhci = await read('lighthouserc.heatmap.cjs');
+
+    assert.match(spec, /@playwright\/test/);
+    assert.match(spec, /\/heatmap/);
+    assert.match(spec, /page\.on\('console'/);
+    assert.match(spec, /page\.on\('pageerror'/);
+    assert.match(spec, /keyboard\.press\('Tab'\)/);
+    assert.match(spec, /brokenImages/);
+    assert.match(spec, /perf:lighthouse:heatmap/);
+    assert.match(spec, /LIGHTHOUSE_ACCESSIBILITY_MIN_SCORE = 0\.9/);
+    assert.match(spec, /Category x chain price index grid/);
+    assert.match(pkg, /"perf:lighthouse:heatmap"/);
+    assert.match(lhci, /\/heatmap/);
+    assert.match(lhci, /onlyCategories: \['accessibility'\]/);
+    assert.match(lhci, /minScore: 0\.9/);
+  });
+
   it('surfaces a chain price index trend chart from dated campaign tape on homepage and chain-index', async () => {
     const chainData = await read('src/lib/chain-index-data.ts');
     const shell = await read('src/components/market-shell.tsx');
