@@ -4,12 +4,10 @@ import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
-  Bell,
   ChevronDown,
   Database,
   Flame,
   Heart,
-  ListChecks,
   Map,
   PackageSearch,
   PiggyBank,
@@ -53,8 +51,7 @@ const navGroups: NavGroup[] = [
     icon: PackageSearch,
     items: [
       { href: '/products', label: 'Browse', icon: PackageSearch },
-      { href: '/compare', label: 'Compare', icon: ListChecks },
-      { href: '/compare-items', label: 'Compare items', icon: ListChecks }
+      { href: '/compare', label: 'Compare', icon: Tags }
     ]
   },
   {
@@ -70,12 +67,7 @@ const navGroups: NavGroup[] = [
     icon: Heart,
     items: [
       { href: '/savings-dashboard', label: 'Savings', icon: PiggyBank },
-      { href: '/alerts', label: 'Alerts', icon: Bell },
-      { href: '/favorites', label: 'Favorites', icon: Heart },
-      { href: '/favourites', label: 'Favourites', icon: Heart },
       { href: '/watchlist', label: 'Watchlist', icon: Heart },
-      { href: '/list', label: 'Shopping list', icon: ListChecks },
-      { href: '/basket', label: 'Basket', icon: ShoppingBasket },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
       { href: '/meal-planner', label: 'Meal planner', icon: Utensils }
     ]
