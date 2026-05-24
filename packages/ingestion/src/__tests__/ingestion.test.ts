@@ -7309,3 +7309,28 @@ describe('daily ingestion runner', () => {
     assert.equal(executor.calls.length, 0);
   });
 });
+
+describe('parseMustiSeProducts', () => {
+  it('emits online pet-supplies rows plus campaign and member prices', () => {
+    const rows = parseMustiSeProducts([
+      {
+        id: 'dog-food-12kg',
+        name: 'Hundfoder 12 kg',
+        brand: 'Musti',
+        category: 'dog-food',
+        price: 699,
+        campaignPrice: 649,
+        memberPrice: 629,
+        observedAt: '2026-05-24T12:00:00.000Z',
+        sourceUrl: MUSTI_SE_SOURCES.products,
+        comparePriceText: '58,25 kr/kg'
+      }
+    ]);
+
+    assert.deepEqual(rows.map((row) => row.vertical), ['pet_supplies', 'pet_supplies', 'pet_supplies']);
+    assert.deepEqual(rows.map((row) => row.channel), ['online', 'online', 'online']);
+    assert.equal(rows[1]?.is_campaign_price, true);
+    assert.equal(rows[2]?.is_member_price, true);
+    assert.equal(rows[0]?.compare_price_text, '58,25 kr/kg');
+  });
+});
