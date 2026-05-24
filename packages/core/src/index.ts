@@ -1,3 +1,5 @@
+export * from './lib/recipeCost.js';
+
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
