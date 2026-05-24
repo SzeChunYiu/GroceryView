@@ -29,6 +29,18 @@ export default function MealPlannerPage() {
   const extractedMealIngredients = extractIngredientsFromMealPlans(mealBudgetPlans);
   const budgetAlternatives = suggestBudgetAlternativesFromMealPlans(mealBudgetPlans);
 
+  if (dealBasedMeals.suggestions.length === 0) {
+    return (
+      <PageShell>
+        <Card className="text-center">
+          <p className="text-5xl" aria-hidden="true">🍲</p>
+          <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950">No deal-based meals yet</h1>
+          <p className="mt-3 font-semibold text-slate-700">Check back when products, deals, and stores are available to build a meal plan.</p>
+        </Card>
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell>
       <Eyebrow>Deal-based meals</Eyebrow>
