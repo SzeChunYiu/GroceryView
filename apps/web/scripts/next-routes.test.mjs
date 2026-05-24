@@ -3792,3 +3792,17 @@ ${seo}`;
     assert.match(screenerRoute, /formatLocalizedUnitPrice/);
   });
 });
+
+describe('my flyer navigation', () => {
+  it('links My Flyer from app and bottom navigation', async () => {
+    const appNav = await read('src/components/app-nav.tsx');
+    const bottomNav = await read('src/components/bottom-nav.tsx');
+
+    assert.match(appNav, /href: '\/se\/my-flyer'/);
+    assert.match(appNav, /label: 'My Flyer'/);
+    assert.match(appNav, /icon: Newspaper/);
+    assert.match(bottomNav, /href: '\/se\/my-flyer'/);
+    assert.match(bottomNav, /label: 'My Flyer'/);
+    assert.match(bottomNav, /pathname\.startsWith\(`\$\{item\.href\}\/`\)/);
+  });
+});

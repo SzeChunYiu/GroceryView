@@ -11,6 +11,7 @@ import {
   Heart,
   ListChecks,
   Map,
+  Newspaper,
   PackageSearch,
   PiggyBank,
   Search,
@@ -77,6 +78,7 @@ const navGroups: NavGroup[] = [
       { href: '/list', label: 'Shopping list', icon: ListChecks },
       { href: '/basket', label: 'Basket', icon: ShoppingBasket },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
+      { href: '/se/my-flyer', label: 'My Flyer', icon: Newspaper },
       { href: '/meal-planner', label: 'Meal planner', icon: Utensils }
     ]
   }
