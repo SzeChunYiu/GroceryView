@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "rootDirectory": "apps/web",
+  "buildCommand": "npm run build -w @groceryview/web",
+  "outputDirectory": "dist",
+  "installCommand": "npm ci"
+}

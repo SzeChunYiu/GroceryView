@@ -25,3 +25,28 @@ jobs:
         run: npm run build
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Validate Vercel monorepo config
+        run: node --input-type=module <<'EOF'
+          import fs from 'node:fs';
+          const config = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
+          const required = ['rootDirectory', 'buildCommand', 'outputDirectory'];
+          const missing = required.filter((key) => typeof config[key] !== 'string' || config[key].trim().length === 0);
+          if (missing.length > 0) {
+            console.error(`Missing Vercel config keys: ${missing.join(', ')}`);
+            process.exit(1);
+          }
+          if (config.rootDirectory !== 'apps/web') {
+            console.error(`Unexpected Vercel rootDirectory "${config.rootDirectory}"`);
+            process.exit(1);
+          }
+          if (!config.buildCommand.includes('-w @groceryview/web')) {
+            console.error(`Unexpected Vercel buildCommand "${config.buildCommand}"`);
+            process.exit(1);
+          }
+          if (!config.outputDirectory.startsWith('apps/web/') && config.outputDirectory !== 'dist') {
+            console.error(`Unexpected Vercel outputDirectory "${config.outputDirectory}"`);
+            process.exit(1);
+          }
+          console.log('Vercel configuration validated for monorepo web deployment.');
+        EOF
