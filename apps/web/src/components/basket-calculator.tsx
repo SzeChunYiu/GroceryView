@@ -131,6 +131,7 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
                 key={product.id}
               >
                 <input
+                  aria-label={`Toggle ${product.name}`}
                   checked={checked}
                   className="mt-1 h-5 w-5 accent-emerald-800"
                   onChange={() => toggleProduct(product.id)}
@@ -192,6 +193,7 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
           <div className="mt-4 space-y-2">
             {assignmentsWithProducts.length > 0 ? assignmentsWithProducts.map((assignment) => (
               <Link
+                aria-label={`Open ${assignment.product?.name ?? assignment.productId}`}
                 className="grid gap-2 rounded-2xl bg-slate-50 p-3 text-sm hover:bg-emerald-50 sm:grid-cols-[1fr_auto]"
                 href={`/products/${assignment.product?.slug ?? assignment.productId}`}
                 key={`${assignment.productId}-${assignment.storeId}`}
