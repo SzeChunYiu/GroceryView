@@ -39,6 +39,7 @@ import {
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
   BRANDED_FUEL_STATIONS_OVERPASS_URL,
+  buildSsbCpiNoQueryPayload,
   BRANDED_SWEDISH_FUEL_STATION_CHAINS,
   confidenceForSource,
   buildSwedishCountyFuelOverpassQuery,
@@ -135,6 +136,7 @@ import {
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
+  parseSsbCpiNoExternalIndexRows,
   planIngestionBatch,
   planOfferVisibilityBoundary,
   planRetailerConnectorRun,
@@ -149,6 +151,10 @@ import {
   SWEDEN_BRANDED_FUEL_STATIONS_OVERPASS_QUERY,
   SWEDEN_FUEL_OVERPASS_QUERY,
   SWEDEN_GROCERY_OVERPASS_QUERY,
+  SSB_CPI_NO_ENDPOINT,
+  SSB_CPI_NO_FOOD_CATEGORY_CODE,
+  SSB_CPI_NO_INDEX_CONTENT_CODE,
+  SSB_CPI_NO_SOURCE_URL,
   SWEDISH_COUNTY_ISO3166_2_CODES,
   buildAxfoodStoreSearchUrl,
   buildCoopStoreMapUrl,
@@ -4938,6 +4944,99 @@ describe('offer selector fixtures', () => {
     assert.ok(byChain.get('lidl')?.reviewFlags.includes('member_only_or_personalized'));
     assert.equal(byChain.get('city_gross')?.artifactFormat, 'react_shell');
     assert.ok(byChain.get('city_gross')?.reviewFlags.includes('skeleton_or_error_state'));
+  });
+});
+
+
+describe('SSB Norway CPI connector', () => {
+  it('builds the current Statistics Norway food CPI JSON-stat2 payload', () => {
+    assert.equal(SSB_CPI_NO_ENDPOINT, 'https://data.ssb.no/api/v0/en/table/14700');
+    assert.deepEqual(buildSsbCpiNoQueryPayload(), {
+      query: [
+        { code: 'VareTjenesteGrp', selection: { filter: 'item', values: [SSB_CPI_NO_FOOD_CATEGORY_CODE] } },
+        { code: 'ContentsCode', selection: { filter: 'item', values: [SSB_CPI_NO_INDEX_CONTENT_CODE] } },
+        { code: 'Tid', selection: { filter: 'top', values: ['12'] } }
+      ],
+      response: { format: 'JSON-stat2' }
+    });
+  });
+
+  it('maps SSB JSON-stat2 CPI values into external_index rows without store or SKU prices', () => {
+    const rows = parseSsbCpiNoExternalIndexRows({
+      version: '2.0',
+      class: 'dataset',
+      label: '14700: Consumer price index, by goods and services, contents and month',
+      source: 'Statistics Norway',
+      updated: '2026-05-11T06:00:00Z',
+      id: ['VareTjenesteGrp', 'ContentsCode', 'Tid'],
+      size: [1, 1, 2],
+      dimension: {
+        VareTjenesteGrp: {
+          label: 'goods and services',
+          category: {
+            index: { '01': 0 },
+            label: { '01': 'Food and non-alcoholic beverages' }
+          }
+        },
+        ContentsCode: {
+          label: 'contents',
+          category: {
+            index: { KpiIndMnd: 0 },
+            label: { KpiIndMnd: 'Consumer Price Index (2025=100)' },
+            unit: { KpiIndMnd: { base: 'index', decimals: 1 } }
+          }
+        },
+        Tid: {
+          label: 'month',
+          category: {
+            index: { '2026M03': 0, '2026M04': 1 },
+            label: { '2026M03': '2026M03', '2026M04': '2026M04' }
+          }
+        }
+      },
+      value: [99.4, 102.3]
+    }, { retrievedAt: '2026-05-25T00:28:06.000Z' });
+
+    assert.deepEqual(rows, [
+      {
+        source: 'SSB',
+        countryCode: 'NO',
+        tableId: '14700',
+        externalIndexId: 'ssb:14700:01:KpiIndMnd:2026M03',
+        categoryCode: '01',
+        categoryLabel: 'Food and non-alcoholic beverages',
+        contentCode: 'KpiIndMnd',
+        contentLabel: 'Consumer Price Index (2025=100)',
+        period: '2026M03',
+        value: 99.4,
+        unit: 'index',
+        basePeriod: '2025=100',
+        sourceUrl: SSB_CPI_NO_SOURCE_URL,
+        retrievedAt: '2026-05-25T00:28:06.000Z',
+        sourceUpdatedAt: '2026-05-11T06:00:00Z',
+        emitsStorePrices: false,
+        emitsSkuPrices: false
+      },
+      {
+        source: 'SSB',
+        countryCode: 'NO',
+        tableId: '14700',
+        externalIndexId: 'ssb:14700:01:KpiIndMnd:2026M04',
+        categoryCode: '01',
+        categoryLabel: 'Food and non-alcoholic beverages',
+        contentCode: 'KpiIndMnd',
+        contentLabel: 'Consumer Price Index (2025=100)',
+        period: '2026M04',
+        value: 102.3,
+        unit: 'index',
+        basePeriod: '2025=100',
+        sourceUrl: SSB_CPI_NO_SOURCE_URL,
+        retrievedAt: '2026-05-25T00:28:06.000Z',
+        sourceUpdatedAt: '2026-05-11T06:00:00Z',
+        emitsStorePrices: false,
+        emitsSkuPrices: false
+      }
+    ]);
   });
 });
 
