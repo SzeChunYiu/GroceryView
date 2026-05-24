@@ -15,6 +15,8 @@ describe('authenticated HTTP routes', () => {
 
     const unauthenticatedPrivacyExport = await handle(new Request('http://localhost/api/privacy/export?userId=user-1'));
     assert.equal(unauthenticatedPrivacyExport.status, 401);
+    const unauthenticatedSettingsExport = await handle(new Request('http://localhost/api/settings/data-export?userId=user-1'));
+    assert.equal(unauthenticatedSettingsExport.status, 401);
     const unauthenticatedPrivacyFulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
       method: 'POST',
       body: JSON.stringify({ requests: [] })
@@ -71,6 +73,10 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
     assert.equal(forbiddenPrivacyPlan.status, 403);
+    const forbiddenSettingsExport = await handle(new Request('http://localhost/api/settings/data-export?userId=user-1', {
+      headers: { authorization: `Bearer ${wrongUserToken}` }
+    }));
+    assert.equal(forbiddenSettingsExport.status, 403);
     const forbiddenPrivacyFulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
       method: 'POST',
       headers: { authorization: `Bearer ${wrongUserToken}` },
@@ -139,6 +145,10 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${token}` }
     }));
     assert.equal(authorizedPrivacyExport.status, 200);
+    const authorizedSettingsExport = await handle(new Request('http://localhost/api/settings/data-export?userId=user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(authorizedSettingsExport.status, 200);
     const authorizedPrivacyFulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
       method: 'POST',
       headers: { authorization: `Bearer ${token}` },
