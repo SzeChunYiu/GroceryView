@@ -1,0 +1,58 @@
+name: Nordic country ingestion
+
+on:
+  schedule:
+    # Stagger each country so scheduled ingestion jobs do not contend for Actions concurrency.
+    - cron: '7 1 * * *' # SE
+    - cron: '27 1 * * *' # NO
+    - cron: '47 1 * * *' # IS
+  workflow_dispatch:
+    inputs:
+      country:
+        description: 'Country ingestion target'
+        required: true
+        type: choice
+        options:
+          - SE
+          - NO
+          - IS
+
+concurrency:
+  group: nordic-ingestion-${{ github.event.schedule || github.event.inputs.country || 'manual' }}
+  cancel-in-progress: false
+
+jobs:
+  ingest-country:
+    name: Ingest ${{ github.event.inputs.country || 'scheduled country' }} catalog
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Resolve country from staggered schedule
+        id: country
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${{ github.event.schedule || github.event.inputs.country }}" in
+            '7 1 * * *'|'SE') country=SE ;;
+            '27 1 * * *'|'NO') country=NO ;;
+            '47 1 * * *'|'IS') country=IS ;;
+            *) echo "Unsupported Nordic ingestion schedule or country" >&2; exit 1 ;;
+          esac
+          echo "country=${country}" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run country ingestion
+        env:
+          GROCERYVIEW_COUNTRY: ${{ steps.country.outputs.country }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
+        run: npm run ops:daily-connectors -- --country "${GROCERYVIEW_COUNTRY}"
