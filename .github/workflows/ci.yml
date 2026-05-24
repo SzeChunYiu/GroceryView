@@ -12,6 +12,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Classify PR changes
+        id: changes
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_lighthouse=false
+          while IFS= read -r name; do
+            case "$name" in
+              .github/workflows/ci.yml|.github/workflows/lighthouse.yml|docs/data-sources.md|docs/ingestion/*|apps/web/src/lib/ingested/*|packages/ingestion/*|scripts/ingestion/*)
+                ;;
+              *)
+                run_lighthouse=true
+                break
+                ;;
+            esac
+          done < <(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}")
+          echo "run_lighthouse=$run_lighthouse" >> "$GITHUB_OUTPUT"
+          if [ "$run_lighthouse" = "false" ]; then
+            echo "Skipping CI Lighthouse budget for ingestion-data-only PR."
+          fi
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
@@ -26,6 +49,7 @@ jobs:
       - name: Next profile bundle budget
         run: npm run perf:bundle:profile -w @groceryview/web
       - name: Lighthouse performance budget
+        if: github.event_name != 'pull_request' || steps.changes.outputs.run_lighthouse == 'true'
         run: npm run perf:lighthouse:ci -w @groceryview/web
       - name: Typecheck
         run: npm run typecheck
