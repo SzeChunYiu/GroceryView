@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ConsentManager } from '@/components/consent-manager';
+import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
 import './globals.css';
 
@@ -34,9 +35,24 @@ function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
+const themeBootScript = `
+(function() {
+  try {
+    var preference = window.localStorage.getItem('groceryview:theme') || 'system';
+    var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var dark = preference === 'dark' || (preference === 'system' && systemDark);
+    document.documentElement.classList.toggle('dark', dark);
+    document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+  } catch (error) {}
+})();
+`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="sv">
+    <html lang="sv" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body>
         <script
           dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
@@ -44,6 +60,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
         <Providers>{children}</Providers>
         <ConsentManager />
+        <ServiceWorkerRegistrar />
       </body>
     </html>
   );
