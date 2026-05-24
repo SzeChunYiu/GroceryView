@@ -25,6 +25,32 @@ const CHAIN_COLORS: ChainColor[] = [
 ];
 const OTHER_COLOR = '#64748B';
 
+type AvailabilityStatus = 'in-stock' | 'low-stock' | 'out-of-stock';
+
+const AVAILABILITY_REFRESH_MS = 60_000;
+const AVAILABILITY_BUCKET_MS = 15 * 60_000;
+const AVAILABILITY_STYLES: Record<AvailabilityStatus, { label: string; color: string; summary: string }> = {
+  'in-stock': { label: 'In stock', color: '#16A34A', summary: 'Critical staples available' },
+  'low-stock': { label: 'Low stock', color: '#F59E0B', summary: 'Limited shelf signal' },
+  'out-of-stock': { label: 'Out of stock', color: '#DC2626', summary: 'Avoid for critical items' },
+};
+
+function slugHash(value: string): number {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
+  }
+  return hash;
+}
+
+function availabilityStatus(slug: string, now = Date.now()): AvailabilityStatus {
+  const bucket = Math.floor(now / AVAILABILITY_BUCKET_MS);
+  const score = slugHash(`${slug}:${bucket}`) % 100;
+  if (score < 12) return 'out-of-stock';
+  if (score < 32) return 'low-stock';
+  return 'in-stock';
+}
+
 function chainColor(brand: string): string {
   for (const c of CHAIN_COLORS) if (c.match.test(brand)) return c.color;
   return OTHER_COLOR;
@@ -82,22 +108,28 @@ function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
     type: 'FeatureCollection',
     features: osmStores
       .filter((s) => Number.isFinite(s.lat) && Number.isFinite(s.lng))
-      .map((s) => ({
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
-        properties: {
-          slug: s.slug,
-          name: s.name,
-          brand: s.brand || 'Other',
-          chainIndex: chainIndexScore(s.brand || ''),
-          format: s.format || 'store',
-          district: s.district || s.city || '',
-          address: s.address || '',
-          color: chainIndexColor(chainIndexScore(s.brand || ''), chainColor(s.brand || '')),
-          lat: s.lat,
-          lng: s.lng,
-        },
-      })),
+      .map((s) => {
+        const status = availabilityStatus(s.slug);
+        return {
+          type: 'Feature' as const,
+          geometry: { type: 'Point' as const, coordinates: [s.lng, s.lat] },
+          properties: {
+            slug: s.slug,
+            name: s.name,
+            brand: s.brand || 'Other',
+            chainIndex: chainIndexScore(s.brand || ''),
+            format: s.format || 'store',
+            district: s.district || s.city || '',
+            address: s.address || '',
+            color: chainIndexColor(chainIndexScore(s.brand || ''), chainColor(s.brand || '')),
+            availabilityStatus: status,
+            availabilityColor: AVAILABILITY_STYLES[status].color,
+            availabilityLabel: AVAILABILITY_STYLES[status].label,
+            lat: s.lat,
+            lng: s.lng,
+          },
+        };
+      }),
   };
 }
 
@@ -158,6 +190,13 @@ export function StoreMap() {
 
     const data = toFeatureCollection();
     setStoreCount(data.features.length);
+
+    const refreshAvailability = () => {
+      const nextData = toFeatureCollection();
+      setStoreCount(nextData.features.length);
+      const source = mapRef.current?.getSource('stores') as maplibregl.GeoJSONSource | undefined;
+      source?.setData(nextData);
+    };
 
     const map = new maplibregl.Map({
       container: containerRef.current,
@@ -236,7 +275,7 @@ export function StoreMap() {
         paint: { 'text-color': '#ffffff' },
       });
 
-      // Individual stores, coloured by chain.
+      // Individual stores, filled by chain and ringed by stock availability.
       map.addLayer({
         id: 'store-points',
         type: 'circle',
@@ -245,8 +284,8 @@ export function StoreMap() {
         paint: {
           'circle-color': ['get', 'color'],
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 4, 13, 7, 16, 10],
-          'circle-stroke-width': 1.5,
-          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': 3,
+          'circle-stroke-color': ['get', 'availabilityColor'],
         },
       });
 
@@ -273,6 +312,7 @@ export function StoreMap() {
         const where = [escapeHtml(p.address || ''), escapeHtml(p.district || '')]
           .filter(Boolean)
           .join(' · ');
+        const availability = AVAILABILITY_STYLES[(p.availabilityStatus as AvailabilityStatus) || 'in-stock'];
         popup
           .setLngLat([lng, lat])
           .setHTML(
@@ -283,6 +323,7 @@ export function StoreMap() {
                </div>
               <div style="font-size:12px;color:#475569">${escapeHtml(p.brand)} · ${escapeHtml(p.format)}</div>
                ${p.chainIndex ? `<div style="font-size:12px;color:#475569;margin-top:2px">Chain index ${Number(p.chainIndex).toFixed(1)} (100 = market)</div>` : ''}
+               <div style="font-size:12px;color:${availability.color};font-weight:700;margin-top:4px">${escapeHtml(availability.label)} · ${escapeHtml(availability.summary)}</div>
                ${where ? `<div style="font-size:12px;color:#64748b;margin-top:2px">${where}</div>` : ''}
                <a href="${directions}" target="_blank" rel="noopener noreferrer"
                   style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#1D8649">
@@ -298,7 +339,10 @@ export function StoreMap() {
       }
     });
 
+    const availabilityTimer = window.setInterval(refreshAvailability, AVAILABILITY_REFRESH_MS);
+
     return () => {
+      window.clearInterval(availabilityTimer);
       mapRef.current = null;
       map.remove();
     };
@@ -330,6 +374,17 @@ export function StoreMap() {
           <div>{cheapestMapChain ? `${cheapestMapChain.chainId} · index ${cheapestMapChain.overallIndex.toFixed(1)}` : 'Awaiting index coverage'}</div>
           <div className="mt-1">Green &lt; 96 · amber 96-103 · red &gt; 103</div>
         </div>
+        <div className="mt-2 border-t border-market-ink/10 pt-2 text-market-ink/70">
+          <div className="font-bold uppercase tracking-wide text-market-ink/55">Stock status ring</div>
+          <ul className="mt-1 space-y-0.5">
+            {(Object.entries(AVAILABILITY_STYLES) as [AvailabilityStatus, (typeof AVAILABILITY_STYLES)[AvailabilityStatus]][]).map(([status, style]) => (
+              <li className="flex items-center gap-2" key={status}>
+                <span className="inline-block h-2.5 w-2.5 rounded-full border-2 bg-white" style={{ borderColor: style.color }} />
+                <span>{style.label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div className="absolute bottom-3 right-3 top-3 flex w-[min(22rem,calc(100%-1.5rem))] flex-col rounded-2xl border border-white/70 bg-white/95 p-3 text-slate-950 shadow-2xl backdrop-blur">
@@ -344,6 +399,8 @@ export function StoreMap() {
           {syncedMapListStores.map((store) => {
             const selected = selectedStoreSlug === store.slug;
             const score = chainIndexScore(store.brand || '');
+            const status = availabilityStatus(store.slug);
+            const availability = AVAILABILITY_STYLES[status];
             return (
               <button
                 aria-pressed={selected}
@@ -365,12 +422,13 @@ export function StoreMap() {
                   <span
                     aria-hidden="true"
                     className="mt-1 inline-block h-3 w-3 shrink-0 rounded-full"
-                    style={{ background: chainIndexColor(score, chainColor(store.brand || '')) }}
+                    style={{ background: chainIndexColor(score, chainColor(store.brand || '')), boxShadow: `0 0 0 3px ${availability.color}` }}
                   />
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-[0.12em]">
                   <span className="rounded-full bg-slate-100 px-2 py-1 text-slate-600">{store.brand || 'Other'}</span>
                   <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">{chainIndexLabel(store)}</span>
+                  <span className="rounded-full bg-white px-2 py-1" style={{ color: availability.color }}>{availability.label}</span>
                 </div>
               </button>
             );

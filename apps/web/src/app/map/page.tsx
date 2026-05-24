@@ -131,7 +131,7 @@ export default function MapPage() {
       <Eyebrow>Map data</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Store coordinates with chain-index signals</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-        The website has verified latitude and longitude for OSM stores. Markers are colored by the chain-level price index only; branch-level prices, route times, and store quality scores are not invented.
+        The website has verified latitude and longitude for OSM stores. Markers are filled by the chain-level price index and ringed with periodically refreshed stock status; branch-level prices, route times, and store quality scores are not invented.
       </p>
 
       <Card className="mt-6 overflow-hidden border-slate-200 bg-slate-950 p-0 text-white">
@@ -140,7 +140,7 @@ export default function MapPage() {
             <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-300">Synced map + list</p>
             <h2 className="mt-2 text-3xl font-black">Interactive store map with linked list selection</h2>
             <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-200">
-              The map ↔ list sync uses verified OSM coordinates and chain-index proxy colors. Selecting a list row moves the map; selecting a marker updates the linked row without inventing branch-level basket prices.
+              The map ↔ list sync uses verified OSM coordinates, chain-index proxy colors, and periodic stock-status rings. Selecting a list row moves the map; selecting a marker updates the linked row without inventing branch-level basket prices.
             </p>
           </div>
           <div className="rounded-2xl bg-white/10 p-4 text-right">
