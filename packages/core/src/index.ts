@@ -4741,6 +4741,7 @@ export type PrivacyExportInput = {
   watchlistProductIds: string[];
   receiptIds: string[];
   householdIds: string[];
+  friendSharedDealSignals?: unknown[];
 };
 
 export type PrivacyExport = {
@@ -4762,7 +4763,8 @@ export function buildPrivacyExport(input: PrivacyExportInput, generatedAt = '202
       { name: 'favorite_stores', records: input.favoriteStoreIds.map((storeId) => ({ storeId })) },
       { name: 'watchlist', records: input.watchlistProductIds.map((productId) => ({ productId })) },
       { name: 'receipts', records: input.receiptIds.map((receiptId) => ({ receiptId })) },
-      { name: 'households', records: input.householdIds.map((householdId) => ({ householdId })) }
+      { name: 'households', records: input.householdIds.map((householdId) => ({ householdId })) },
+      { name: 'friend_shared_deal_signals', records: input.friendSharedDealSignals ?? [] }
     ]
   };
 }
@@ -4777,9 +4779,9 @@ export type AccountDeletionPlan = {
 export function planAccountDeletion(userId: string): AccountDeletionPlan {
   return {
     userId,
-    deleteFromTables: ['watchlist_items', 'favorite_stores', 'basket_items', 'weekly_baskets', 'receipt_items', 'receipt_uploads', 'user_preferences', 'app_users'],
+    deleteFromTables: ['watchlist_items', 'favorite_stores', 'basket_items', 'weekly_baskets', 'receipt_items', 'receipt_uploads', 'friend_shared_deal_signals', 'user_preferences', 'app_users'],
     anonymizeTables: ['community_price_reports'],
-    reason: 'Delete personal account, budget, basket, watchlist, and receipt data; anonymize community observations that may still support aggregate price quality.'
+    reason: 'Delete personal account, budget, basket, watchlist, receipt, and friend-shared deal signal data; anonymize community observations that may still support aggregate price quality.'
   };
 }
 

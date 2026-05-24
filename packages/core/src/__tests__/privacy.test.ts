@@ -10,6 +10,7 @@ describe('privacy controls', () => {
       watchlistProductIds: ['coffee'],
       receiptIds: ['receipt-1'],
       householdIds: ['house-1'],
+      friendSharedDealSignals: [{ signalId: 'friend-share-1', productId: 'coffee' }],
       lists: [{ id: 'current_basket', itemCount: 2 }],
       alerts: [{ id: 'target-price-coffee', productId: 'coffee' }],
       preferences: [{ name: 'budget', weeklyBudget: 800 }],
@@ -25,18 +26,20 @@ describe('privacy controls', () => {
       'favorite_stores',
       'watchlist',
       'receipts',
-      'households'
+      'households',
+      'friend_shared_deal_signals'
     ]);
     assert.deepEqual(exported.sections.find((section) => section.name === 'lists')?.records, [{ id: 'current_basket', itemCount: 2 }]);
     assert.deepEqual(exported.sections.find((section) => section.name === 'alerts')?.records, [{ id: 'target-price-coffee', productId: 'coffee' }]);
     assert.deepEqual(exported.sections.find((section) => section.name === 'preferences')?.records, [{ name: 'budget', weeklyBudget: 800 }]);
     assert.deepEqual(exported.sections.find((section) => section.name === 'analytics_events')?.records, [{ event: 'settings_export_clicked', occurredAt: '2026-05-20T12:00:00.000Z' }]);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'friend_shared_deal_signals')?.records, [{ signalId: 'friend-share-1', productId: 'coffee' }]);
   });
 
   it('plans account deletion across sensitive tables', () => {
     const plan = planAccountDeletion('user-1');
 
-    assert.deepEqual(plan.deleteFromTables, ['watchlist_items', 'favorite_stores', 'basket_items', 'weekly_baskets', 'receipt_items', 'receipt_uploads', 'user_preferences', 'app_users']);
+    assert.deepEqual(plan.deleteFromTables, ['watchlist_items', 'favorite_stores', 'basket_items', 'weekly_baskets', 'receipt_items', 'receipt_uploads', 'friend_shared_deal_signals', 'user_preferences', 'app_users']);
     assert.deepEqual(plan.anonymizeTables, ['community_price_reports']);
   });
 
