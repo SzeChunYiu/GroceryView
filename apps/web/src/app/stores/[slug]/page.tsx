@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { StoreMap } from '@/components/StoreMap';
+import { StoreRatingCard } from '@/components/store-rating-card';
 import { osmStores } from '@/lib/osm-stores';
 import {
   findStore,
@@ -159,6 +160,9 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
         {store.brand} · {store.format}
       </p>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="lg:col-span-2">
+          <StoreRatingCard storeId={store.slug} storeName={store.name} />
+        </div>
         <Card>
           <h2 className="text-2xl font-black">Location fields</h2>
           <dl className="mt-4 grid gap-3">

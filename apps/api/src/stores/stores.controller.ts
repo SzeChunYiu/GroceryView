@@ -1,15 +1,17 @@
-import { BadRequestException, Controller, Get, NotFoundException, Param, Query, ServiceUnavailableException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, Query, ServiceUnavailableException } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { allStores, groceryApi } from '../demo-data.js';
 import { DealsService } from '../deals/deals.service.js';
 import { NearestStoresService } from './nearest-stores.service.js';
+import { StoreRatingsService } from './store-ratings.service.js';
 
 @ApiTags('stores')
 @Controller('stores')
 export class StoresController {
   constructor(
     private readonly dealsService: DealsService,
-    private readonly nearestStoresService: NearestStoresService
+    private readonly nearestStoresService: NearestStoresService,
+    private readonly storeRatingsService: StoreRatingsService
   ) {}
 
   @Get()
@@ -96,6 +98,30 @@ export class StoresController {
     return { ...groceryApi.getStoreCategoryCoverage(id), demo: true };
   }
 
+
+  @Get(':id/rating')
+  @ApiOkResponse({ description: 'Average user rating and current user rating for one store' })
+  async rating(@Param('id') id: string, @Query('userId') userId?: string) {
+    if (!this.storeRatingsService.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required for store ratings.');
+    }
+    const storeId = parseRequiredPathString(id, 'id');
+    const normalizedUserId = userId?.trim() || undefined;
+    return this.storeRatingsService.summary(storeId, normalizedUserId);
+  }
+
+  @Post(':id/rating')
+  @ApiOkResponse({ description: 'Submit or update the current user rating for one store' })
+  async rate(@Param('id') id: string, @Body() body: Record<string, unknown> | undefined) {
+    if (!this.storeRatingsService.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required for store ratings.');
+    }
+    const storeId = parseRequiredPathString(id, 'id');
+    const userId = parseRequiredBodyString(body?.userId, 'userId');
+    const rating = parseRequiredIntegerRating(body?.rating);
+    return this.storeRatingsService.rate(storeId, userId, rating);
+  }
+
   @Get(':id')
   @ApiOkResponse({ description: 'Store detail with opening hours and assortment overview' })
   detail(@Param('id') id: string) {
@@ -112,6 +138,29 @@ function parseRequiredFiniteQueryNumber(value: string | undefined, name: string)
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) {
     throw new BadRequestException(`${name} query parameter must be a finite number.`);
+  }
+  return parsed;
+}
+
+
+function parseRequiredPathString(value: string | undefined, name: string): string {
+  if (value === undefined || value.trim().length === 0) {
+    throw new BadRequestException(`${name} path parameter is required.`);
+  }
+  return value.trim();
+}
+
+function parseRequiredBodyString(value: unknown, name: string): string {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    throw new BadRequestException(`${name} is required.`);
+  }
+  return value.trim();
+}
+
+function parseRequiredIntegerRating(value: unknown): number {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 5) {
+    throw new BadRequestException('rating must be an integer from 1 to 5.');
   }
   return parsed;
 }
