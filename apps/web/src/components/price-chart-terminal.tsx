@@ -6,6 +6,13 @@ type LineStyleName = 'solid' | 'dashed' | 'dotted';
 type ChartLoadStatus = 'idle' | 'loading' | 'ready' | 'failed';
 type LightweightChartsModule = typeof import('lightweight-charts');
 type LightweightChartsValues = Pick<LightweightChartsModule, 'ColorType' | 'LineSeries' | 'LineStyle' | 'createChart'>;
+type ChartPointReadout = {
+  dateLabel: string;
+  storeName: string;
+  valueLabel: string;
+  volatilityLowerLabel: string;
+  volatilityUpperLabel: string;
+};
 
 let lightweightChartsModulePromise: Promise<LightweightChartsModule> | null = null;
 
@@ -22,8 +29,13 @@ export type PriceChartTerminalSeries = {
   points: Array<{
     time: string;
     value: number;
+    valueLabel?: string;
     confidence: number;
     provenanceLabel?: string;
+    volatilityLower?: number;
+    volatilityUpper?: number;
+    volatilityLowerLabel?: string;
+    volatilityUpperLabel?: string;
   }>;
   markers: Array<{
     time: string;
@@ -67,17 +79,42 @@ function chartColorFor(index: number) {
   return ['#047857', '#0f766e', '#2563eb', '#7c3aed'][index % 4]!;
 }
 
+function timeKey(time: unknown): string | null {
+  if (typeof time === 'string') return time.slice(0, 10);
+  if (typeof time === 'object' && time && 'year' in time && 'month' in time && 'day' in time) {
+    const businessDay = time as { year: number; month: number; day: number };
+    return `${businessDay.year}-${String(businessDay.month).padStart(2, '0')}-${String(businessDay.day).padStart(2, '0')}`;
+  }
+  return null;
+}
+
+function readoutForPoint(series: PriceChartTerminalSeries, point: PriceChartTerminalSeries['points'][number]): ChartPointReadout {
+  return {
+    dateLabel: point.time.slice(0, 10),
+    storeName: series.storeName,
+    valueLabel: point.valueLabel ?? point.value.toLocaleString('sv-SE', { maximumFractionDigits: 2 }),
+    volatilityLowerLabel: point.volatilityLowerLabel ?? (typeof point.volatilityLower === 'number' ? point.volatilityLower.toLocaleString('sv-SE', { maximumFractionDigits: 2 }) : 'not reported'),
+    volatilityUpperLabel: point.volatilityUpperLabel ?? (typeof point.volatilityUpper === 'number' ? point.volatilityUpper.toLocaleString('sv-SE', { maximumFractionDigits: 2 }) : 'not reported')
+  };
+}
+
+function latestReadoutFor(activeWindow: PriceChartTerminalWindow | undefined): ChartPointReadout | null {
+  const series = activeWindow?.series[0];
+  const point = series?.points.at(-1);
+  return series && point ? readoutForPoint(series, point) : null;
+}
+
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
   const [activeWindowLabel, setActiveWindowLabel] = useState(chart.defaultWindow);
   const [chartLoadError, setChartLoadError] = useState<string | null>(null);
   const [chartLoadStatus, setChartLoadStatus] = useState<ChartLoadStatus>('idle');
+  const [crosshairReadout, setCrosshairReadout] = useState<ChartPointReadout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const activeWindow = useMemo(
     () => chart.windows.find((window) => window.label === activeWindowLabel) ?? chart.windows[0],
     [activeWindowLabel, chart.windows]
   );
-  const firstSeries = activeWindow?.series[0];
-  const latestPoint = firstSeries?.points.at(-1);
+  const activeReadout = crosshairReadout ?? latestReadoutFor(activeWindow);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -87,10 +124,12 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
     let removeChart: (() => void) | undefined;
     setChartLoadError(null);
     setChartLoadStatus('loading');
+    setCrosshairReadout(null);
 
     loadLightweightCharts()
       .then(({ ColorType, LineSeries, LineStyle, createChart }: LightweightChartsValues) => {
         if (isDisposed || !container.isConnected) return;
+        const readoutByTime = new Map<string, ChartPointReadout>();
         const chartApi = createChart(container, {
           autoSize: true,
           height: 280,
@@ -125,10 +164,26 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
             time: point.time.slice(0, 10),
             value: point.value
           })));
+          for (const point of series.points) {
+            readoutByTime.set(point.time.slice(0, 10), readoutForPoint(series, point));
+          }
         });
 
+        const handleCrosshairMove = (param: { time?: unknown; point?: { x: number; y: number } }) => {
+          if (!param.point || param.point.x < 0 || param.point.y < 0) {
+            setCrosshairReadout(null);
+            return;
+          }
+          const selectedTime = timeKey(param.time);
+          setCrosshairReadout(selectedTime ? readoutByTime.get(selectedTime) ?? null : null);
+        };
+
+        chartApi.subscribeCrosshairMove(handleCrosshairMove);
         chartApi.timeScale().fitContent();
-        removeChart = () => chartApi.remove();
+        removeChart = () => {
+          chartApi.unsubscribeCrosshairMove(handleCrosshairMove);
+          chartApi.remove();
+        };
         setChartLoadStatus('ready');
       })
       .catch((error: unknown) => {
@@ -152,7 +207,10 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{chart.caveat}</p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black text-emerald-100">
-          crosshair value readout: {latestPoint ? `${activeWindow.latestValueLabel} · ${latestPoint.time.slice(0, 10)}` : 'no point selected'}
+          <p>crosshair value readout: {activeReadout ? `${activeReadout.storeName} · ${activeReadout.valueLabel} · ${activeReadout.dateLabel}` : 'no point selected'}</p>
+          <p className="mt-1 text-xs text-emerald-200">
+            volatility bounds: {activeReadout ? `${activeReadout.volatilityLowerLabel} → ${activeReadout.volatilityUpperLabel}` : 'not reported'}
+          </p>
         </div>
       </div>
 

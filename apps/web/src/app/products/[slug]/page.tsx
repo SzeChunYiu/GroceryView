@@ -1031,6 +1031,23 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
     const points = result.series.flatMap((series) => series.points);
     const values = points.map((point) => point.value);
     const latestPoint = [...points].sort((a, b) => a.time.localeCompare(b.time)).at(-1);
+    const medianPrice = medianFor(values);
+    const standardDeviation = standardDeviationFor(values);
+    const volatilityLower = medianPrice !== null && standardDeviation !== null && values.length > 0
+      ? clamp(medianPrice - standardDeviation, Math.min(...values), Math.max(...values))
+      : null;
+    const volatilityUpper = medianPrice !== null && standardDeviation !== null && values.length > 0
+      ? clamp(medianPrice + standardDeviation, Math.min(...values), Math.max(...values))
+      : null;
+    const seriesWithVolatility = result.series.map((series) => ({
+      ...series,
+      points: series.points.map((point) => ({
+        ...point,
+        valueLabel: formatSek(point.value),
+        ...(volatilityLower !== null ? { volatilityLower, volatilityLowerLabel: formatSek(volatilityLower) } : {}),
+        ...(volatilityUpper !== null ? { volatilityUpper, volatilityUpperLabel: formatSek(volatilityUpper) } : {})
+      }))
+    }));
 
     return {
       label: window.label,
@@ -1043,7 +1060,7 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
       latestObservedAt: latestPoint?.time,
       lowValueLabel: values.length ? formatSek(Math.min(...values)) : 'Not reported',
       highValueLabel: values.length ? formatSek(Math.max(...values)) : 'Not reported',
-      series: result.series
+      series: seriesWithVolatility
     };
   });
 
