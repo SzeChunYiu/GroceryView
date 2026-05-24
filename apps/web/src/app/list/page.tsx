@@ -1,9 +1,9 @@
 'use client';
 
-import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
+import { ListGrid } from '@/components/list-grid';
 import { useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
@@ -59,11 +59,7 @@ export default function ShoppingListPage() {
             <div className="h-full rounded-full bg-emerald-700 transition-all" style={{ width: `${progress}%` }} />
           </div>
 
-          <ul className="mt-5 space-y-3">
-            {items.map((item) => (
-              <CheckableListItem item={item} key={item.id} onToggle={toggleItemChecked} />
-            ))}
-          </ul>
+          <ListGrid items={items} onToggle={toggleItemChecked} />
         </section>
       </main>
       <BottomNav />
