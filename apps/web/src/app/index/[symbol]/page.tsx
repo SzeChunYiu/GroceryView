@@ -98,9 +98,27 @@ export async function generateMetadata({ params }: Readonly<{ params: Promise<{ 
   if (!category && !chain) notFound();
 
   const label = category?.label ?? `${chain?.chainId ?? symbol} chain index`;
+  const title = `${label} | GroceryView`;
+  const description = 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.';
+  const openGraph = {
+    title,
+    description,
+    type: 'website' as const,
+    siteName: 'GroceryView',
+    url: `/index/${symbol}`,
+    images: [{ url: '/pwa-icon.svg', alt: `${label} GroceryView index preview` }]
+  };
+
   return {
-    title: `${label} | GroceryView`,
-    description: 'Observed GroceryView price index page with fixed-basket and chain-price index calculations.'
+    title,
+    description,
+    openGraph,
+    twitter: {
+      card: 'summary_large_image',
+      title: openGraph.title,
+      description: openGraph.description,
+      images: openGraph.images
+    }
   };
 }
 

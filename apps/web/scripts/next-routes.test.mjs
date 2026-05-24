@@ -1782,6 +1782,16 @@ describe('verified-data UI', () => {
     assert.match(source, /images:\s*openGraph\?\.images/);
   });
 
+  it('sets Twitter card metadata for category index pages from OpenGraph fields', async () => {
+    const source = await read('src/app/index/[symbol]/page.tsx');
+    assert.match(source, /const openGraph = \{/);
+    assert.match(source, /twitter:\s*\{/);
+    assert.match(source, /card:\s*'summary_large_image'/);
+    assert.match(source, /title:\s*openGraph\.title/);
+    assert.match(source, /description:\s*openGraph\.description/);
+    assert.match(source, /images:\s*openGraph\.images/);
+  });
+
   it('surfaces the dedicated screener route in navigation, metadata, and sitemap', async () => {
     const nav = await read('src/components/app-nav.tsx');
     const route = await read('src/app/screener/page.tsx');
