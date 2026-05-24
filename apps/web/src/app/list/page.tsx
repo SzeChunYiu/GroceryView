@@ -1,16 +1,69 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { PullRefreshWrapper } from '@/components/PullRefreshWrapper';
 import { useList } from '@/hooks/useList';
+import {
+  defaultRecurringListTemplates,
+  generateRecurringListInstance,
+  normalizeRecurringFrequency,
+  recurringListFrequencies,
+  recurringTemplateFromItems,
+  type RecurringListFrequency,
+  type RecurringListTemplate
+} from '@/lib/recurring-lists';
+
+const RECURRING_TEMPLATE_STORAGE_KEY = 'groceryview:shopping-list:recurring-templates:v1';
 
 export default function ShoppingListPage() {
   const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const [recurringTemplates, setRecurringTemplates] = useState<RecurringListTemplate[]>(defaultRecurringListTemplates);
+  const [templateName, setTemplateName] = useState('My recurring staples');
+  const [templateFrequency, setTemplateFrequency] = useState<RecurringListFrequency>('weekly');
+  const [lastGeneratedTemplate, setLastGeneratedTemplate] = useState<string | null>(null);
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const activeRecurringItems = useMemo(() => items.filter((item) => !item.checked), [items]);
+
+  useEffect(() => {
+    try {
+      const savedTemplates = JSON.parse(localStorage.getItem(RECURRING_TEMPLATE_STORAGE_KEY) ?? '[]') as RecurringListTemplate[];
+      if (Array.isArray(savedTemplates) && savedTemplates.length > 0) {
+        setRecurringTemplates([...savedTemplates, ...defaultRecurringListTemplates]);
+      }
+    } catch {
+      // Keep the shopping list usable if localStorage is unavailable.
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      const customTemplates = recurringTemplates.filter((template) => !defaultRecurringListTemplates.some((defaultTemplate) => defaultTemplate.id === template.id));
+      localStorage.setItem(RECURRING_TEMPLATE_STORAGE_KEY, JSON.stringify(customTemplates));
+    } catch {
+      // Keep recurring list generation usable even if template persistence fails.
+    }
+  }, [recurringTemplates]);
+
+  const saveCurrentListAsTemplate = useCallback(() => {
+    const template = recurringTemplateFromItems({
+      frequency: normalizeRecurringFrequency(templateFrequency),
+      items: activeRecurringItems.length > 0 ? activeRecurringItems : items,
+      name: templateName
+    });
+    setRecurringTemplates((currentTemplates) => [template, ...currentTemplates.filter((candidate) => candidate.id !== template.id)]);
+    setLastGeneratedTemplate(`Saved ${template.name}`);
+  }, [activeRecurringItems, items, templateFrequency, templateName]);
+
+  const generateTemplateInstance = useCallback((template: RecurringListTemplate) => {
+    const instance = generateRecurringListInstance(template);
+    addImportedItems(instance.items);
+    setLastGeneratedTemplate(`${template.name} generated · next ${new Date(instance.nextRunAt).toLocaleDateString('sv-SE')}`);
+  }, [addImportedItems]);
+
   const refreshLatestPrices = useCallback(async () => {
     const productUrls = items
       .map((item) => item.matchedProductSlug)
@@ -42,6 +95,76 @@ export default function ShoppingListPage() {
           </div>
 
           <BulkImportDialog onImportItems={addImportedItems} />
+
+          <section className="mt-6 overflow-hidden rounded-[1.75rem] border border-amber-200 bg-white shadow-sm">
+            <div className="grid gap-0 lg:grid-cols-[0.9fr_1.4fr]">
+              <div className="bg-amber-50 p-5">
+                <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Recurring templates</p>
+                <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Save this shop once, regenerate it in one click</h2>
+                <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                  Templates keep item names, quantities, matched product slugs, and either a weekly or biweekly cadence. Generated instances are added as fresh unchecked rows.
+                </p>
+                <div className="mt-4 grid gap-3">
+                  <label className="block">
+                    <span className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Template name</span>
+                    <input
+                      className="mt-1 w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 text-sm font-semibold outline-none ring-amber-200 transition focus:border-amber-700 focus:ring-4"
+                      onChange={(event) => setTemplateName(event.target.value)}
+                      value={templateName}
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Frequency</span>
+                    <select
+                      className="mt-1 w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 text-sm font-black"
+                      onChange={(event) => setTemplateFrequency(normalizeRecurringFrequency(event.target.value))}
+                      value={templateFrequency}
+                    >
+                      {(Object.keys(recurringListFrequencies) as RecurringListFrequency[]).map((frequency) => (
+                        <option key={frequency} value={frequency}>{recurringListFrequencies[frequency].label}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <button
+                    className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-amber-800"
+                    onClick={saveCurrentListAsTemplate}
+                    type="button"
+                  >
+                    Save current list as template
+                  </button>
+                  {lastGeneratedTemplate ? (
+                    <p className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-amber-900">{lastGeneratedTemplate}</p>
+                  ) : null}
+                </div>
+              </div>
+              <div className="grid gap-3 p-5 md:grid-cols-2">
+                {recurringTemplates.map((template) => (
+                  <article className="rounded-3xl border border-slate-200 bg-slate-50 p-4" key={template.id}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{recurringListFrequencies[template.frequency].label}</p>
+                        <h3 className="mt-1 text-lg font-black text-slate-950">{template.name}</h3>
+                      </div>
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-600">{template.items.length} rows</span>
+                    </div>
+                    <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">{recurringListFrequencies[template.frequency].description}</p>
+                    <ul className="mt-3 space-y-1 text-sm font-semibold text-slate-700">
+                      {template.items.slice(0, 3).map((item) => (
+                        <li key={item.id}>• {item.quantity} · {item.name}</li>
+                      ))}
+                    </ul>
+                    <button
+                      className="mt-4 w-full rounded-2xl border border-emerald-200 bg-white px-4 py-2 text-sm font-black text-emerald-900 transition hover:border-emerald-700 hover:bg-emerald-50"
+                      onClick={() => generateTemplateInstance(template)}
+                      type="button"
+                    >
+                      Generate this {template.frequency === 'weekly' ? 'week' : 'fortnight'}
+                    </button>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
 
           <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
