@@ -96,6 +96,8 @@ export const DEFAULT_LIDL_OFFER_PATHS = [
   '/c/veckans-frukt-groent/a10094782',
   '/c/lidl-plus-erbjudanden/a10094788'
 ] as const;
+export const DEFAULT_LIDL_LIVE_MAX_STORES = 65;
+export const DEFAULT_LIDL_LIVE_OFFER_MAX_ROWS = 300;
 
 export type FetchLidlStoresOptions = AllStoreTaskRunnerControls & {
   fetchImpl?: typeof fetch;

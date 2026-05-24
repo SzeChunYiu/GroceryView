@@ -418,6 +418,8 @@ export const DEFAULT_WILLYS_SEARCH_QUERIES = [
   'havredryck',
   'toalettpapper'
 ] as const;
+export const DEFAULT_WILLYS_LIVE_PRODUCT_MAX_ROWS = 1800;
+export const DEFAULT_WILLYS_LIVE_WEEKLY_DISCOUNT_MAX_ROWS = 65000;
 export const DEFAULT_WILLYS_PRODUCTS_MAX_ROWS = 500;
 export const DEFAULT_WILLYS_CATEGORY_PAGE_SIZE = 100;
 

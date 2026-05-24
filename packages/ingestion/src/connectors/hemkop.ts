@@ -431,6 +431,8 @@ export const DEFAULT_HEMKOP_SEARCH_QUERIES = [
   'havredryck',
   'toalettpapper'
 ] as const;
+export const DEFAULT_HEMKOP_LIVE_PRODUCT_MAX_ROWS = 7000;
+export const DEFAULT_HEMKOP_LIVE_WEEKLY_DISCOUNT_MAX_ROWS = 65000;
 
 export type FetchHemkopProductsOptions = {
   fetchImpl?: typeof fetch;

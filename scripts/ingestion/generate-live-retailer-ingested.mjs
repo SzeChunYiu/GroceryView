@@ -2,14 +2,22 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import {
   DEFAULT_COOP_PRODUCT_QUERIES,
   DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES,
+  DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_ROWS_PER_STORE,
+  DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_STORES,
   DEFAULT_CITY_GROSS_PRODUCT_QUERIES,
+  DEFAULT_HEMKOP_LIVE_PRODUCT_MAX_ROWS,
+  DEFAULT_HEMKOP_LIVE_WEEKLY_DISCOUNT_MAX_ROWS,
   DEFAULT_HEMKOP_SEARCH_QUERIES,
+  DEFAULT_LIDL_LIVE_MAX_STORES,
+  DEFAULT_LIDL_LIVE_OFFER_MAX_ROWS,
   DEFAULT_LIDL_OFFER_PATHS,
   DEFAULT_MATHEM_SEARCH_PAGES,
   DEFAULT_MATHEM_SEARCH_QUERIES,
   DEFAULT_MATSPAR_SEARCH_PAGES,
   DEFAULT_MATSPAR_SEARCH_QUERIES,
   DEFAULT_WILLYS_SEARCH_QUERIES,
+  DEFAULT_WILLYS_LIVE_PRODUCT_MAX_ROWS,
+  DEFAULT_WILLYS_LIVE_WEEKLY_DISCOUNT_MAX_ROWS,
   DEFAULT_APOHEM_SOURCE_PATHS,
   DEFAULT_APOTEK_HJARTAT_SEARCH_URLS,
   fetchCityGrossProductsForAllStores,
@@ -28,7 +36,13 @@ import {
 const REPO_ROOT = new URL('../../', import.meta.url);
 const INGESTED_DIR = new URL('apps/web/src/lib/ingested/', REPO_ROOT);
 
-const CITY_GROSS_QUERIES = [DEFAULT_CITY_GROSS_PRODUCT_QUERIES[0]];
+const requestedSources = new Set((process.env.GROCERYVIEW_INGEST_SOURCES ?? '')
+  .split(',')
+  .map((source) => source.trim().toLowerCase())
+  .filter(Boolean));
+const shouldRun = (source) => requestedSources.size === 0 || requestedSources.has(source);
+
+const CITY_GROSS_QUERIES = DEFAULT_CITY_GROSS_PRODUCT_QUERIES;
 const COOP_QUERIES = DEFAULT_COOP_PRODUCT_QUERIES;
 const COOP_WEEKLY_QUERIES = DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES;
 const WILLYS_QUERIES = DEFAULT_WILLYS_SEARCH_QUERIES;
@@ -45,100 +59,114 @@ const retrievedAt = new Date().toISOString();
 
 await mkdir(INGESTED_DIR, { recursive: true });
 
-const cityGrossProducts = await fetchCityGrossProductsForAllStores({
-  maxStores: 40,
-  queries: CITY_GROSS_QUERIES,
-  maxRowsPerStore: 180,
-  pageSize: 24,
-  retrievedAt
-});
-await writeCityGross(cityGrossProducts);
+const summary = { retrievedAt };
 
-const coopProducts = await fetchCoopProductsForAllStores({
-  queries: COOP_QUERIES,
-  maxStores: 11,
-  maxRowsPerStore: 260,
-  retrievedAt
-});
-const coopWeeklyDiscounts = await fetchCoopWeeklyDiscountsForAllStores({
-  productQueries: COOP_WEEKLY_QUERIES,
-  maxStores: 204,
-  maxRows: 4200,
-  retrievedAt
-});
-await writeCoop(coopProducts, coopWeeklyDiscounts);
+if (shouldRun('citygross')) {
+  const cityGrossProducts = await fetchCityGrossProductsForAllStores({
+    maxStores: DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_STORES,
+    queries: CITY_GROSS_QUERIES,
+    maxRowsPerStore: DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_ROWS_PER_STORE,
+    pageSize: 24,
+    retrievedAt
+  });
+  await writeCityGross(cityGrossProducts);
+  summary.cityGrossProducts = cityGrossProducts.length;
+}
 
-const willysProducts = await fetchWillysProducts({
-  queries: WILLYS_QUERIES,
-  maxRows: 1200,
-  retrievedAt
-});
-const willysWeeklyDiscounts = await fetchWillysWeeklyDiscountsForAllStores({
-  maxRows: 50000,
-  pageSize: 100,
-  retrievedAt
-});
-await writeWillys(willysProducts, willysWeeklyDiscounts);
+if (shouldRun('coop')) {
+  const coopProducts = await fetchCoopProductsForAllStores({
+    queries: COOP_QUERIES,
+    maxStores: 11,
+    maxRowsPerStore: 260,
+    retrievedAt
+  });
+  const coopWeeklyDiscounts = await fetchCoopWeeklyDiscountsForAllStores({
+    productQueries: COOP_WEEKLY_QUERIES,
+    maxStores: 204,
+    maxRows: 4200,
+    retrievedAt
+  });
+  await writeCoop(coopProducts, coopWeeklyDiscounts);
+  summary.coopProducts = coopProducts.length;
+  summary.coopWeeklyDiscounts = coopWeeklyDiscounts.length;
+}
 
-const hemkopProducts = await fetchHemkopProducts({
-  queries: HEMKOP_QUERIES,
-  maxRows: 4200,
-  pageSize: 100,
-  retrievedAt
-});
-const hemkopWeeklyDiscounts = await fetchHemkopWeeklyDiscountsForAllStores({
-  maxRows: 30000,
-  pageSize: 100,
-  retrievedAt
-});
-await writeHemkop(hemkopProducts, hemkopWeeklyDiscounts);
+if (shouldRun('willys')) {
+  const willysProducts = await fetchWillysProducts({
+    maxRows: DEFAULT_WILLYS_LIVE_PRODUCT_MAX_ROWS,
+    retrievedAt
+  });
+  const willysWeeklyDiscounts = await fetchWillysWeeklyDiscountsForAllStores({
+    maxRows: DEFAULT_WILLYS_LIVE_WEEKLY_DISCOUNT_MAX_ROWS,
+    pageSize: 100,
+    retrievedAt
+  });
+  await writeWillys(willysProducts, willysWeeklyDiscounts);
+  summary.willysProducts = willysProducts.length;
+  summary.willysWeeklyDiscounts = willysWeeklyDiscounts.length;
+}
 
-const lidlStoreOffers = await fetchLidlOffersForAllStores({
-  maxStores: 40,
-  offerPaths: LIDL_OFFER_PATHS,
-  maxRows: 216,
-  retrievedAt
-});
-await writeLidl(lidlStoreOffers);
+if (shouldRun('hemkop')) {
+  const hemkopProducts = await fetchHemkopProducts({
+    maxRows: DEFAULT_HEMKOP_LIVE_PRODUCT_MAX_ROWS,
+    pageSize: 100,
+    retrievedAt
+  });
+  const hemkopWeeklyDiscounts = await fetchHemkopWeeklyDiscountsForAllStores({
+    maxRows: DEFAULT_HEMKOP_LIVE_WEEKLY_DISCOUNT_MAX_ROWS,
+    pageSize: 100,
+    retrievedAt
+  });
+  await writeHemkop(hemkopProducts, hemkopWeeklyDiscounts);
+  summary.hemkopProducts = hemkopProducts.length;
+  summary.hemkopWeeklyDiscounts = hemkopWeeklyDiscounts.length;
+}
 
-const mathemProducts = await fetchMathemProducts({
-  queries: MATHEM_QUERIES,
-  pages: MATHEM_PAGES,
-  maxRows: 9000,
-  retrievedAt
-});
-await writeMathem(mathemProducts);
+if (shouldRun('lidl')) {
+  const lidlStoreOffers = await fetchLidlOffersForAllStores({
+    maxStores: DEFAULT_LIDL_LIVE_MAX_STORES,
+    offerPaths: LIDL_OFFER_PATHS,
+    maxRows: DEFAULT_LIDL_LIVE_OFFER_MAX_ROWS,
+    retrievedAt
+  });
+  await writeLidl(lidlStoreOffers);
+  summary.lidlStoreOffers = lidlStoreOffers.length;
+}
 
-const matsparProducts = await fetchMatsparProducts({
-  queries: MATSPAR_QUERIES,
-  pages: MATSPAR_PAGES,
-  maxRows: 5000,
-  retrievedAt
-});
-await writeMatspar(matsparProducts);
+if (shouldRun('mathem')) {
+  const mathemProducts = await fetchMathemProducts({
+    queries: MATHEM_QUERIES,
+    pages: MATHEM_PAGES,
+    maxRows: 9000,
+    retrievedAt
+  });
+  await writeMathem(mathemProducts);
+  summary.mathemProducts = mathemProducts.length;
+}
 
-const pharmacyProducts = await fetchPharmacyProducts({
-  sourcePaths: APOHEM_SOURCE_PATHS,
-  apotekHjartatUrls: APOTEK_HJARTAT_SEARCH_URLS,
-  maxRows: 900,
-  retrievedAt
-});
-await writeApohem(pharmacyProducts);
+if (shouldRun('matspar')) {
+  const matsparProducts = await fetchMatsparProducts({
+    queries: MATSPAR_QUERIES,
+    pages: MATSPAR_PAGES,
+    maxRows: 5000,
+    retrievedAt
+  });
+  await writeMatspar(matsparProducts);
+  summary.matsparProducts = matsparProducts.length;
+}
 
-console.log(JSON.stringify({
-  retrievedAt,
-  cityGrossProducts: cityGrossProducts.length,
-  coopProducts: coopProducts.length,
-  coopWeeklyDiscounts: coopWeeklyDiscounts.length,
-  willysProducts: willysProducts.length,
-  willysWeeklyDiscounts: willysWeeklyDiscounts.length,
-  hemkopProducts: hemkopProducts.length,
-  hemkopWeeklyDiscounts: hemkopWeeklyDiscounts.length,
-  lidlStoreOffers: lidlStoreOffers.length,
-  mathemProducts: mathemProducts.length,
-  matsparProducts: matsparProducts.length,
-  pharmacyProducts: pharmacyProducts.length
-}, null, 2));
+if (shouldRun('apohem')) {
+  const pharmacyProducts = await fetchPharmacyProducts({
+    sourcePaths: APOHEM_SOURCE_PATHS,
+    apotekHjartatUrls: APOTEK_HJARTAT_SEARCH_URLS,
+    maxRows: 900,
+    retrievedAt
+  });
+  await writeApohem(pharmacyProducts);
+  summary.pharmacyProducts = pharmacyProducts.length;
+}
+
+console.log(JSON.stringify(summary, null, 2));
 
 async function writeCityGross(rows) {
   const sourceUrls = unique(rows.map((row) => row.sourceUrl));
@@ -752,6 +780,7 @@ async function writeIcaReklamblad(rows) {
 }
 
 async function writeGeneratedFile(fileName, lines) {
+  while (lines.at(-1) === '') lines.pop();
   await writeFile(new URL(fileName, INGESTED_DIR), `${lines.join('\n')}\n`);
 }
 
