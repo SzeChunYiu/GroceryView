@@ -43,6 +43,7 @@ import {
   confidenceForSource,
   buildSwedishCountyFuelOverpassQuery,
   buildSwedishCountyGroceryOverpassQuery,
+  buildTankaSeStoreRows,
   buildWillysCategoryUrl,
   buildWillysSearchUrl,
   buildWillysStoresUrl,
@@ -180,6 +181,7 @@ import {
   validateStoreEnumerationResults,
   validateEnumeratedStores,
   ST1_FUEL_PRICE_URL,
+  tankaSeFuelCategories,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
   scbCoicopFoodCategoryCodes,
@@ -679,6 +681,26 @@ describe('St1 fuel price connector', () => {
       () => fetchSt1FuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
       /blocked or unavailable/
     );
+  });
+});
+
+describe('Tanka SE pricing quirk connector', () => {
+  it('emits only source-backed local station and CarPay member rows', () => {
+    const rows = buildTankaSeStoreRows({ storeId: 'tanka:stockholm:test', storeRegionTag: 'stockholm' });
+
+    assert.equal(rows.length, tankaSeFuelCategories.length * 2);
+    assert.deepEqual([...new Set(rows.map((row) => row.channel))], ['store']);
+    assert.deepEqual([...new Set(rows.map((row) => row.price_unavailable_reason))], ['local_station_sign_only']);
+    assert.equal(rows.every((row) => row.store_id === 'tanka:stockholm:test'), true);
+    assert.equal(rows.every((row) => row.store_region_tag === 'stockholm'), true);
+    assert.equal(rows.every((row) => row.is_subscription_price === false), true);
+    assert.equal(rows.every((row) => row.is_coupon_price === false), true);
+    assert.equal(rows.every((row) => row.is_clearance === false), true);
+
+    const carpayRows = rows.filter((row) => row.is_member_price);
+    assert.equal(carpayRows.length, tankaSeFuelCategories.length);
+    assert.equal(carpayRows.every((row) => row.member_program === 'CarPay'), true);
+    assert.equal(carpayRows.every((row) => row.price === null), true);
   });
 });
 
