@@ -8,6 +8,7 @@ import {
 import { axfoodProducts } from '@/lib/axfood-products';
 import { osmStores } from '@/lib/osm-stores';
 import { pricedProducts } from '@/lib/openprices-products';
+import { categorySummaries } from '@/lib/verified-data';
 import { seoLandingCities, seoLandingProducts } from '@/lib/seo-landing-pages';
 
 const siteUrl = 'https://grocery-web-mu.vercel.app';
@@ -77,6 +78,20 @@ export function buildCatalogSitemapEntries(): MetadataRoute.Sitemap {
   ];
 }
 
+function categoryFilterPath(categorySlug: string) {
+  const params = new URLSearchParams();
+  params.set('category', categorySlug);
+  return `/products?${params.toString()}`;
+}
+
+function buildFilteredCategorySitemapEntries(): MetadataRoute.Sitemap {
+  return categorySummaries
+    .filter((category) => category.openPriceRows > 0 || category.chainRows > 0)
+    .map((category) => categoryFilterPath(category.slug))
+    .slice(0, 120)
+    .map((path) => entry(path, 0.7, 'daily'));
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
     entry('/', 1, 'daily'),
@@ -97,6 +112,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/cookies', 0.68, 'weekly'),
     entry('/data-sources', 0.65, 'weekly'),
     entry('/openprices-depth', 0.65, 'daily'),
+    entry('/search', 0.95, 'daily'),
     entry('/store-coverage', 0.65, 'weekly'),
     entry('/chain-coverage', 0.65, 'weekly')
   ];
@@ -112,6 +128,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticRoutes,
     ...buildCatalogSitemapEntries(),
+    ...buildFilteredCategorySitemapEntries(),
     ...seoLandingRoutes
   ];
 }

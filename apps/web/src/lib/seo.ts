@@ -167,6 +167,10 @@ export const routeMetadataCatalog = {
     title: 'Verified deal screener | GroceryView',
     description: 'Sort and filter verified grocery deal rows by biggest price drop, cheapest SEK per kg, and widest cross-chain spread.'
   },
+  '/search': {
+    title: 'Product search and filters | GroceryView',
+    description: 'Search verified products, compare prices, and filter by category, label, chain, and confidence from real rows.'
+  },
   '/seasonal-calendar': {
     title: 'Seasonal produce price calendar | GroceryView',
     description: 'Find the best time to buy produce from historical monthly averages, with no forecasted prices and eco planning guardrails.'
