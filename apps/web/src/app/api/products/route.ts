@@ -1,5 +1,6 @@
 import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult } from '@groceryview/db';
 import { NextResponse } from 'next/server';
+import { parseProductsQueryParams, productsQueryValidationError } from './query-validation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -44,7 +45,16 @@ function responsePayload(query: string, results: ProductSearchResult[], error?: 
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const query = (searchParams.get('q') ?? '').trim();
+  const parsedQuery = parseProductsQueryParams(Object.fromEntries(searchParams));
+
+  if (!parsedQuery.success) {
+    return NextResponse.json(
+      productsQueryValidationError(parsedQuery.error),
+      { status: 400 }
+    );
+  }
+
+  const { q: query } = parsedQuery.data;
 
   if (query.length < 2) {
     return NextResponse.json({ query, results: [], source: 'postgres.products_tsvector' });
