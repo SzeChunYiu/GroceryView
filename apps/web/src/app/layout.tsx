@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Providers } from './providers';
 import './globals.css';
+import '../styles/footer.css';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'GroceryView',
@@ -11,7 +13,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
