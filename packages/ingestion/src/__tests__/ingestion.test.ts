@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
+  parseNkSeProducts,
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,
   buildCoopSearchUrl,
@@ -188,6 +189,24 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+describe('NK SE connector', () => {
+  it('parses selective NK beauty overlap and sale prices', () => {
+    const rows = parseNkSeProducts([
+      'Prisavdrag',
+      'Biotherm Lait solaire sun screen spf30 transparent 400 ml 273 kr 400 kr',
+      'Gåva på köpet',
+      'Rabanne Shimmer bomb copper doré 370 kr'
+    ].join('\n'), 'https://www.nk.se/skonhet', '2026-05-24T00:00:00.000Z');
+
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0]?.department, 'beauty');
+    assert.equal(rows[0]?.price, 273);
+    assert.equal(rows[0]?.originalPrice, 400);
+    assert.equal(rows[0]?.isSale, true);
+    assert.equal(rows[1]?.promotionLabel, 'Gåva på köpet');
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
