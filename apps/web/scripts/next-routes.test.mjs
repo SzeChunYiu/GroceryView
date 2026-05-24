@@ -6,6 +6,7 @@ const appFiles = [
   'src/app/page.tsx',
   'src/app/products/page.tsx',
   'src/app/products/[slug]/page.tsx',
+  'src/app/product/[id]/page.tsx',
   'src/app/stores/page.tsx',
   'src/app/stores/[slug]/page.tsx',
   'src/app/categories/page.tsx',
@@ -2612,6 +2613,25 @@ ${seo}`;
     assert.match(productRoute, /'@type': 'BreadcrumbList'/);
     assert.match(productRoute, /application\/ld\+json/);
     assert.doesNotMatch(productRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
+  it('ships a product detail alias with visible image, current chain prices, and full price-history chart', async () => {
+    const canonicalProductRoute = await read('src/app/products/[slug]/page.tsx');
+    const singularProductRoute = await read('src/app/product/[id]/page.tsx');
+
+    assert.match(singularProductRoute, /ProductPage/);
+    assert.match(singularProductRoute, /generateProductMetadata/);
+    assert.match(singularProductRoute, /params\.then\(\(\{ id \}\) => \(\{ slug: id \}\)\)/);
+
+    assert.match(canonicalProductRoute, /<img/);
+    assert.match(canonicalProductRoute, /src=\{product\.image/);
+    assert.match(canonicalProductRoute, /alt=\{product\.name\}/);
+    assert.match(canonicalProductRoute, /Primary price evidence/);
+    assert.match(canonicalProductRoute, /Chain price rows/);
+    assert.match(canonicalProductRoute, /chainPriceRows\(product\)/);
+    assert.match(canonicalProductRoute, /PriceChartTerminal/);
+    assert.match(canonicalProductRoute, /rangeDays: 90/);
+    assert.doesNotMatch(canonicalProductRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
   it('renders category pages with a DB hierarchy-backed breadcrumb component', async () => {
