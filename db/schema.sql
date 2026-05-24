@@ -110,8 +110,23 @@ create table if not exists promotion_observations (
 create table if not exists app_users (
   id text primary key,
   email text unique,
+  password_hash text,
+  email_verified_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists email_verification_tokens (
+  id uuid primary key default gen_random_uuid(),
+  user_id text not null references app_users(id) on delete cascade,
+  token_hash text not null unique,
+  expires_at timestamptz not null,
+  used_at timestamptz,
   created_at timestamptz not null default now()
 );
+
+create index if not exists email_verification_tokens_user_unused_idx on email_verification_tokens(user_id, used_at);
+create index if not exists email_verification_tokens_expires_idx on email_verification_tokens(expires_at);
 
 create table if not exists subscription_entitlements (
   user_id text primary key references app_users(id) on delete cascade,

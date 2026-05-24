@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { buildWatchlistAlerts, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
+import { assertVerifiedUserCanCreateUserContent } from '../routes/auth.js';
 
 type WatchlistRow = {
   product_id: string;
@@ -59,6 +60,7 @@ export class WatchlistsService {
   }
 
   async create(userId: string, item: WatchlistItem) {
+    await this.assertVerifiedForMutation(userId, 'lists');
     const product = await this.resolveProduct(item.productId);
     await this.postgres.query(
       `insert into watchlist_items(user_id, product_id, target_price, alert_deal_score_at, favorite_stores_only, allowed_price_types)
@@ -99,6 +101,7 @@ export class WatchlistsService {
     favoriteStoresOnly?: boolean;
     allowedPriceTypes?: WatchlistPriceType[];
   }) {
+    await this.assertVerifiedForMutation(userId, 'alerts');
     const product = await this.resolveProduct(alert.productId);
     const existing = await this.postgres.query<{ id: string }>(
       `select watchlist_items.id::text as id
@@ -179,6 +182,11 @@ export class WatchlistsService {
     );
     if (!rows[0]) throw new Error(`Watchlist item not found: ${productId}`);
     return { removed: true, watchlist: await this.list(userId) };
+  }
+
+  private async assertVerifiedForMutation(userId: string, contentType: 'alerts' | 'lists'): Promise<void> {
+    if (userId === 'demo') return;
+    await assertVerifiedUserCanCreateUserContent({ executor: this.postgres, userId, contentType });
   }
 
   private async resolveProduct(productId: string): Promise<ProductRow> {

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, ServiceUnavailableException } from '@nestjs/common';
+import { Body, Controller, Delete, ForbiddenException, Get, NotFoundException, Param, Patch, Post, ServiceUnavailableException } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { groceryApi } from '../demo-data.js';
@@ -70,6 +70,9 @@ class WatchlistPriceAlertDto {
 }
 
 function asProductNotFound(error: unknown) {
+  if (error instanceof Error && error.message.startsWith('email_not_verified:')) {
+    throw new ForbiddenException('Verify your email before creating alerts or shopping lists.');
+  }
   if (error instanceof Error && /Unknown productId|Watchlist item not found/.test(error.message)) {
     throw new NotFoundException('Product not found');
   }
