@@ -4096,3 +4096,72 @@ export const expiryDealReports = [
     photoCount: 1
   }
 ];
+
+export type WeeklyDeal = {
+  id: string;
+  productId: string;
+  slug: string;
+  productName: string;
+  category: string;
+  store: string;
+  currentPrice: number;
+  regularPrice: number;
+  discountPercent: number;
+  discountAmount: number;
+  expiresAt: string;
+};
+
+export const weeklyDeals: readonly WeeklyDeal[] = [
+  {
+    id: 'deal-weekly-zoegas-coffee-450g',
+    productId: 'zoegas-coffee-450g',
+    slug: 'zoegas-coffee-450g',
+    productName: 'Zoégas Coffee 450g',
+    category: 'coffee',
+    store: 'Willys Odenplan',
+    currentPrice: 49.9,
+    regularPrice: 64.9,
+    discountPercent: 23.11,
+    discountAmount: 15.0,
+    expiresAt: '2026-05-25T23:59:00.000Z'
+  },
+  {
+    id: 'deal-weekly-eldorado-basmati-rice-1kg',
+    productId: 'eldorado-basmati-rice-1kg',
+    slug: 'eldorado-basmati-rice-1kg',
+    productName: 'Eldorado Basmati Rice 1kg',
+    category: 'rice',
+    store: 'Matmissionen Hägersten',
+    currentPrice: 18.9,
+    regularPrice: 27.9,
+    discountPercent: 32.26,
+    discountAmount: 9.0,
+    expiresAt: '2026-05-25T23:59:00.000Z'
+  },
+  {
+    id: 'deal-weekly-felix-ketchup-1kg',
+    productId: 'felix-ketchup-1kg',
+    slug: 'felix-ketchup-1kg',
+    productName: 'Felix Tomatketchup 1kg',
+    category: 'pantry',
+    store: 'Hemköp Stockholm',
+    currentPrice: 32,
+    regularPrice: 39.9,
+    discountPercent: 19.8,
+    discountAmount: 7.9,
+    expiresAt: '2026-05-25T23:59:00.000Z'
+  },
+  {
+    id: 'deal-weekly-garant-havregryn-1kg',
+    productId: 'garant-havregryn-1kg',
+    slug: 'garant-havregryn-1kg',
+    productName: 'Garant Havregryn 1kg',
+    category: 'breakfast',
+    store: 'Tempo Hornstull',
+    currentPrice: 21.9,
+    regularPrice: 25.8,
+    discountPercent: 15.12,
+    discountAmount: 3.9,
+    expiresAt: '2026-05-25T23:59:00.000Z'
+  }
+] as const;

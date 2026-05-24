@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import { ProductPriceCards } from './product-price-cards';
+import { DealsCarousel } from './DealsCarousel';
 import { TrendingCarousel } from './TrendingCarousel';
 import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
+import { type WeeklyDeal, weeklyDeals as seedWeeklyDeals } from '@/lib/demo-data';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedShellCopy } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
@@ -134,7 +136,11 @@ function heatmapTileClass(heatScore: number) {
   return 'border-emerald-300 bg-emerald-50 text-emerald-950';
 }
 
-export function MarketShell() {
+type MarketShellProps = Readonly<{
+  weeklyDeals?: readonly WeeklyDeal[];
+}>;
+
+export function MarketShell({ weeklyDeals = seedWeeklyDeals }: MarketShellProps) {
   return (
     <PageShell>
       <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
@@ -170,6 +176,8 @@ export function MarketShell() {
       </section>
 
       <div className="mt-6"><MetricGrid /></div>
+
+      <DealsCarousel deals={weeklyDeals} />
 
       <TrendingCarousel items={homepageTrendingPriceChanges} />
 

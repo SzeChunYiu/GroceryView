@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../database/database.module.js';
 import { DealsController } from './deals.controller.js';
 import { DealsService } from './deals.service.js';
+import { WeeklyDealsController } from '../routes/deals.js';
 
 @Module({
   imports: [DatabaseModule],
-  controllers: [DealsController],
+  controllers: [DealsController, WeeklyDealsController],
   providers: [DealsService],
   exports: [DealsService]
 })
