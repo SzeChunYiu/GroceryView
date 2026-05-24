@@ -11,6 +11,7 @@ import { validateEnvironment } from './config/env.schema.js';
 import { DatabaseModule } from './database/database.module.js';
 import { DealsModule } from './deals/deals.module.js';
 import { ExpiryDealsModule } from './expiry-deals/expiry-deals.module.js';
+import { FavoritesModule } from './favorites/favorites.module.js';
 import { HealthModule } from './health/health.module.js';
 import { HouseholdsModule } from './households/households.module.js';
 import { LoyaltyModule } from './loyalty/loyalty.module.js';
@@ -35,6 +36,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     DatabaseModule,
     DealsModule,
     ExpiryDealsModule,
+    FavoritesModule,
     HealthModule,
     HouseholdsModule,
     LoyaltyModule,

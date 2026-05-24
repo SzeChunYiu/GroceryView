@@ -7,6 +7,7 @@ const appFiles = [
   'src/app/products/page.tsx',
   'src/app/products/[slug]/page.tsx',
   'src/app/product/[id]/page.tsx',
+  'src/app/favorites/page.tsx',
   'src/app/stores/page.tsx',
   'src/app/stores/[slug]/page.tsx',
   'src/app/categories/page.tsx',
@@ -352,6 +353,31 @@ describe('verified-data UI', () => {
     assert.match(actions, /No anonymous mutations/);
     assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
     assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
+  });
+
+  it('surfaces account-bound favorites sorted by name or cheapest price', async () => {
+    const page = await read('src/app/favorites/page.tsx');
+    const nav = await read('src/components/app-nav.tsx');
+    const apiRoute = await read('../../apps/api/src/routes/favorites.ts');
+    const dbQuery = await read('../../packages/db/src/queries/favorites.ts');
+
+    assert.match(page, /watchlistHeartProducts/);
+    assert.match(page, /favoriteItems/);
+    assert.match(page, /sort=price/);
+    assert.match(page, /sort=name/);
+    assert.match(page, /current cheapest price/i);
+    assert.match(page, /cheapestStoreName/);
+    assert.match(page, /signed-in/i);
+    assert.match(page, /No anonymous favorites/);
+    assert.match(nav, /href: '\/favorites'/);
+    assert.match(apiRoute, /favoritesRoutes/);
+    assert.match(apiRoute, /users\/\{userId\}\/favorites/);
+    assert.match(apiRoute, /sort: \['name', 'price'\]/);
+    assert.match(dbQuery, /watchlist_items/);
+    assert.match(dbQuery, /latest_prices/);
+    assert.match(dbQuery, /row_number\(\) over \(partition by latest_prices\.product_id/);
+    assert.match(dbQuery, /coalesce\(latest_prices\.is_available, true\) = true/);
+    assert.doesNotMatch(page, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
   it('ships account billing controls for signed-in checkout and subscription management', async () => {
@@ -2852,6 +2878,7 @@ ${seo}`;
       'src/app/data-sources/page.tsx',
       'src/app/deals/page.tsx',
       'src/app/fuel/page.tsx',
+      'src/app/favorites/page.tsx',
       'src/app/household/page.tsx',
       'src/app/login/page.tsx',
       'src/app/map/page.tsx',
