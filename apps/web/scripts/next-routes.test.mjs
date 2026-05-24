@@ -3216,6 +3216,23 @@ ${seo}`;
     assert.match(sitemap, /\/\$\{city\.slug\}\/billigaste\/\$\{product\.slug\}/);
   });
 
+  it('renders admin pending search alias review UI', async () => {
+    const route = await read('src/app/admin/search-aliases/page.tsx');
+    const review = await read('src/lib/search-alias-review.ts');
+
+    assert.match(route, /Pending search alias review/);
+    assert.match(route, /faceted-search:no-result/);
+    assert.match(route, /Select product match/);
+    assert.match(route, /confidence/);
+    assert.match(route, /freshnessLabel/);
+    assert.match(route, /Approve after endpoint lands/);
+    assert.match(review, /pendingSearchAliasReviews/);
+    assert.match(review, /endpointDependency/);
+    assert.match(review, /approve_pending_search_alias/);
+    assert.match(review, /adaptiveProductCards/);
+  });
+
+
   it('surfaces instant faceted product search from real catalogue price rows', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const products = await read('src/app/products/page.tsx');
