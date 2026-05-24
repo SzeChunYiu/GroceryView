@@ -8,11 +8,13 @@ async function read(relative) {
 
 describe('shopping list route', () => {
   it('ships the requested route, checkable row component, and localStorage-backed hook', async () => {
-    const [page, row, hook, bulkImport, searchRoute] = await Promise.all([
+    const [page, row, hook, bulkImport, listGrid, listSequencing, searchRoute] = await Promise.all([
       read('src/app/list/page.tsx'),
       read('src/components/CheckableListItem.tsx'),
       read('src/hooks/useList.ts'),
       read('src/components/BulkImportDialog.tsx'),
+      read('src/components/list-grid.tsx'),
+      read('src/lib/list-sequencing.ts'),
       read('../../apps/api/src/routes/search.ts')
     ]);
 
@@ -46,6 +48,16 @@ describe('shopping list route', () => {
     assert.match(bulkImport, /one item per line/i);
     assert.match(bulkImport, /matchedProductSlug/);
     assert.match(bulkImport, /unmatchedLines/);
+    assert.match(bulkImport, /getAisleConfidenceLabel/);
+    assert.match(bulkImport, /ListGrid/);
+
+    assert.match(listGrid, /aisleConfidenceLabel/);
+    assert.match(listGrid, /aisleConfidenceReason/);
+    assert.match(listGrid, /Aisle:/);
+
+    assert.match(listSequencing, /matchedKeyword/);
+    assert.match(listSequencing, /Fallback to Other/);
+    assert.match(listSequencing, /no catalog keyword matched/);
 
     assert.match(searchRoute, /searchRoutes/);
     assert.match(searchRoute, /products\/search\/list-import/);

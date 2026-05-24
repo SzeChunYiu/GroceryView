@@ -1,6 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { ListGrid } from '@/components/list-grid';
+import { getAisleConfidenceLabel, normalizeListText } from '@/lib/list-sequencing';
 import type { BulkImportedListItemInput } from '@/hooks/useList';
 
 type BulkImportDialogProps = {
@@ -59,12 +61,8 @@ export const productCatalogMatches: ProductCatalogMatch[] = [
   }
 ];
 
-function normalize(value: string) {
-  return value.toLocaleLowerCase('sv-SE').normalize('NFKD').replace(/\p{Diacritic}/gu, '');
-}
-
 function slugify(value: string) {
-  return normalize(value).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'item';
+  return normalizeListText(value).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'item';
 }
 
 export function parseBulkImportLines(value: string): string[] {
@@ -75,18 +73,27 @@ export function parseBulkImportLines(value: string): string[] {
 }
 
 export function matchBulkImportLineToCatalog(line: string): ProductCatalogMatch | null {
-  const normalizedLine = normalize(line);
+  const normalizedLine = normalizeListText(line);
   return productCatalogMatches.find((candidate) => {
-    const normalizedName = normalize(candidate.productName);
+    const normalizedName = normalizeListText(candidate.productName);
     return normalizedName.includes(normalizedLine)
       || normalizedLine.includes(normalizedName)
-      || candidate.keywords.some((keyword) => normalizedLine.includes(normalize(keyword)));
+      || candidate.keywords.some((keyword) => normalizedLine.includes(normalizeListText(keyword)));
   }) ?? null;
 }
 
-function itemForLine(line: string, index: number): BulkImportedListItemInput {
+type BulkImportPreviewItem = BulkImportedListItemInput & {
+  aisleConfidenceLabel: string;
+  aisleConfidenceReason: string;
+};
+
+function itemForLine(line: string, index: number): BulkImportPreviewItem {
   const match = matchBulkImportLineToCatalog(line);
+  const aisleConfidence = getAisleConfidenceLabel(line, match);
+
   return {
+    aisleConfidenceLabel: aisleConfidence.label,
+    aisleConfidenceReason: aisleConfidence.reason,
     id: `bulk-clipboard-${index}-${match?.productSlug ?? slugify(line)}`,
     importSource: 'bulk-clipboard',
     matchedProductName: match?.productName,
@@ -94,8 +101,8 @@ function itemForLine(line: string, index: number): BulkImportedListItemInput {
     name: line,
     quantity: '1 item',
     detail: match
-      ? `Matched product catalog: ${match.productName} (${match.category})`
-      : 'No catalog match yet — kept as plain text'
+      ? `Matched product catalog: ${match.productName} (${match.category}). ${aisleConfidence.reason}`
+      : aisleConfidence.reason
   };
 }
 
@@ -175,17 +182,7 @@ export function BulkImportDialog({ onImportItems }: Readonly<BulkImportDialogPro
         </button>
       </div>
 
-      {importItems.length > 0 ? (
-        <div className="mt-4 grid gap-2 md:grid-cols-2">
-          {importItems.map((item) => (
-            <div className="rounded-2xl border border-sky-100 bg-white p-3 text-sm font-semibold text-slate-700" key={item.id}>
-              <p className="font-black text-slate-950">{item.name}</p>
-              <p className="mt-1">{item.detail}</p>
-              <p className="mt-1 text-xs font-bold text-slate-500">matchedProductSlug: {item.matchedProductSlug ?? 'none'}</p>
-            </div>
-          ))}
-        </div>
-      ) : null}
+      <ListGrid items={importItems} />
     </section>
   );
 }
