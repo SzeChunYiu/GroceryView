@@ -780,6 +780,21 @@ type WatchlistProductIdentityRow = {
   product_slug: string;
 };
 
+type BestTimeToBuyAlertRuleRow = {
+  id: string;
+  category_id: string;
+  store_id: string;
+  minimum_confidence: string | number;
+  channel: DeliveryChannel;
+  recipient: string;
+};
+
+type CategorySignalRow = {
+  category_id: string;
+  store_id: string;
+  confidence: string | number;
+};
+
 function iso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
 }
@@ -3476,26 +3491,95 @@ function buildRuntimeNotificationProviders(config: RuntimeConfig, options: Runti
   };
 }
 
+export async function enqueueBestTimeToBuyAlertRulesFromPostgres(input: {
+  executor: QueryExecutor;
+  repository: Pick<RuntimePersistenceRepository, 'upsertNotificationTask'>;
+  now: string;
+}): Promise<PersistedNotificationTask[]> {
+  const rules = await input.executor.query<BestTimeToBuyAlertRuleRow>(
+    `select id::text,
+            category_id::text,
+            store_id::text,
+            minimum_confidence,
+            channel,
+            recipient
+     from alert_rules
+     where active = true
+       and rule_type = 'best_time_to_buy'
+       and category_id is not null
+       and store_id is not null
+       and minimum_confidence is not null`,
+    []
+  );
+  if (rules.length === 0) return [];
+
+  const signals = await input.executor.query<CategorySignalRow>(
+    `select distinct on (category_id::text, store_id::text)
+            category_id::text,
+            store_id::text,
+            confidence
+     from category_signals
+     where category_id::text = any($1::text[])
+       and store_id::text = any($2::text[])
+     order by category_id::text, store_id::text, observed_at desc`,
+    [
+      [...new Set(rules.map((rule) => rule.category_id))],
+      [...new Set(rules.map((rule) => rule.store_id))]
+    ]
+  );
+  const signalsByTarget = new Map(signals.map((signal) => [`${signal.category_id}:${signal.store_id}`, signal]));
+  const dueTasks: PersistedNotificationTask[] = [];
+
+  for (const rule of rules) {
+    const signal = signalsByTarget.get(`${rule.category_id}:${rule.store_id}`);
+    const confidence = signal ? Number(signal.confidence) : Number.NaN;
+    if (!Number.isFinite(confidence) || confidence < Number(rule.minimum_confidence)) continue;
+
+    const task: PersistedNotificationTask = {
+      id: `best-time-to-buy:${rule.id}:${rule.category_id}:${rule.store_id}`,
+      channel: rule.channel,
+      type: 'price_alert',
+      title: 'Best time to buy',
+      body: `A saved category signal at your target store reached ${Math.round(confidence * 100)}% confidence.`,
+      priority: 'high',
+      sendAt: input.now,
+      recipient: rule.recipient,
+      attemptCount: 0,
+      maxAttempts: 3,
+      status: 'queued'
+    };
+    await input.repository.upsertNotificationTask!(task);
+    dueTasks.push(task);
+  }
+
+  return dueTasks;
+}
+
 function buildRuntimeNotificationWorkerRunner(
   config: RuntimeConfig,
   repository: RuntimePersistenceRepository | undefined,
-  options: RuntimeHandlerOptions = {}
+  options: RuntimeHandlerOptions = {},
+  executor?: QueryExecutor
 ): (() => Promise<RepositoryNotificationWorkerCycleResult>) | undefined {
   if (!repository?.listDueNotificationTasks || !repository.listActiveNotificationSuppressions || !repository.upsertNotificationTask) return undefined;
   const providers = buildRuntimeNotificationProviders(config, options);
   if (!providers.email && !providers.push && !providers.telegram) return undefined;
-  return () => runRepositoryNotificationWorkerCycle({
-    now: (options.now ?? new Date()).toISOString(),
-    retryDelayMinutes: 15,
-    staleAfterMinutes: 60,
-    repository: {
-      listDueNotificationTasks: (now) => repository.listDueNotificationTasks!(now),
-      listActiveNotificationSuppressions: () => repository.listActiveNotificationSuppressions!(),
-      upsertNotificationTask: (task) => repository.upsertNotificationTask!(task)
-    },
-    providers,
-    alertRecipients: []
-  });
+  return async () => {
+    const now = (options.now ?? new Date()).toISOString();
+    if (executor) await enqueueBestTimeToBuyAlertRulesFromPostgres({ executor, repository, now });
+    return runRepositoryNotificationWorkerCycle({
+      now,
+      retryDelayMinutes: 15,
+      staleAfterMinutes: 60,
+      repository: {
+        listDueNotificationTasks: (now) => repository.listDueNotificationTasks!(now),
+        listActiveNotificationSuppressions: () => repository.listActiveNotificationSuppressions!(),
+        upsertNotificationTask: (task) => repository.upsertNotificationTask!(task)
+      },
+      providers,
+      alertRecipients: []
+    });
+  };
 }
 
 function hashHex(value: string): string {
@@ -3711,6 +3795,7 @@ export function buildRuntimeRequestAuthOptions(config: RuntimeConfig, options: R
 
 function createRuntimeRepositoryResource(config: RuntimeConfig, options: RuntimeHandlerOptions): {
   repository?: RuntimePersistenceRepository;
+  executor?: QueryExecutor;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
@@ -3729,6 +3814,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
   const repository = createPostgresRepository(executor);
   return {
     repository,
+    executor,
     postgresReadinessProvider: () => checkPostgresIntegrationReadiness({ executor, repositoryProbes: [] }),
     sourceRunHealthProvider: () =>
       checkSourceRunHealth({
@@ -3766,7 +3852,7 @@ function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: Runt
     ...(resource.repository ? { repository: resource.repository } : {}),
     postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider,
     sourceRunHealthProvider: options.sourceRunHealthProvider ?? resource.sourceRunHealthProvider,
-    notificationWorkerRunner: options.notificationWorkerRunner ?? buildRuntimeNotificationWorkerRunner(config, options.repository ?? resource.repository, options),
+    notificationWorkerRunner: options.notificationWorkerRunner ?? buildRuntimeNotificationWorkerRunner(config, options.repository ?? resource.repository, options, resource.executor),
     catalogCoverageProvider: options.catalogCoverageProvider ?? resource.catalogCoverageProvider,
     scanProviderReadinessProvider: options.scanProviderReadinessProvider,
     flyerOffersProvider: options.flyerOffersProvider ?? resource.flyerOffersProvider,
