@@ -22,6 +22,7 @@ import {
   type WatchlistPriceAlertReport,
   type WatchlistPriceAlertRequest
 } from '@groceryview/api';
+import { apiContractOpenApiComponents } from '@groceryview/api-contracts';
 import { createSessionToken, parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
 import { buildCatalogCoverageReport, type CatalogCoverageInput, type CatalogCoverageReport } from '@groceryview/catalog';
 import {
@@ -3005,6 +3006,12 @@ export function createNodeServer(handler: HttpHandler = createHttpHandler()) {
 export type OpenApiOperation = {
   summary: string;
   security?: OpenApiSecurityRequirement[];
+  responses?: Record<string, {
+    description: string;
+    content?: Record<string, {
+      schema: { $ref: string } | Record<string, unknown>;
+    }>;
+  }>;
 };
 
 export type OpenApiSecurityRequirement = {
@@ -3029,6 +3036,7 @@ export type OpenApiDocument = {
       billingWebhookSignature: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-billing-signature' };
       stripeWebhookSignature: { type: 'apiKey'; in: 'header'; name: 'stripe-signature' };
     };
+    schemas: typeof apiContractOpenApiComponents;
   };
 };
 
@@ -3037,6 +3045,19 @@ const publicOperation = (summary: string): OpenApiOperation => ({ summary });
 const metricsOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ metricsToken: [] }] });
 const webhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ webhookSignature: [] }] });
 const billingWebhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ billingWebhookSignature: [] }, { stripeWebhookSignature: [] }] });
+const operationWithJsonResponse = (operation: OpenApiOperation, schemaName: keyof typeof apiContractOpenApiComponents): OpenApiOperation => ({
+  ...operation,
+  responses: {
+    '200': {
+      description: 'OK',
+      content: {
+        'application/json': {
+          schema: { $ref: `#/components/schemas/${schemaName}` }
+        }
+      }
+    }
+  }
+});
 
 export function buildOpenApiDocument(): OpenApiDocument {
   return {
@@ -3049,7 +3070,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
         webhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' },
         billingWebhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-billing-signature' },
         stripeWebhookSignature: { type: 'apiKey', in: 'header', name: 'stripe-signature' }
-      }
+      },
+      schemas: apiContractOpenApiComponents
     },
     paths: {
       '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
@@ -3066,7 +3088,12 @@ export function buildOpenApiDocument(): OpenApiDocument {
       },
       '/api/loyalty/offers': { get: protectedOperation('Get account-scoped loyalty offers with savings, coupon actions, and membership guardrails.') },
       '/api/ads/disclosure': { get: protectedOperation('Get ad disclosure status with placement labels, premium removal, and ranking separation guardrails.') },
-      '/api/notifications/inbox': { get: protectedOperation('Get notification inbox delivery status, holds, suppressions, and alert guardrails.') },
+      '/api/notifications/inbox': {
+        get: operationWithJsonResponse(
+          protectedOperation('Get notification inbox delivery status, holds, suppressions, and alert guardrails.'),
+          'NotificationInboxResponse'
+        )
+      },
       '/api/receipts/review': { get: protectedOperation('Get receipt review budget impact, match confidence, and writeback guardrails.') },
       '/api/categories': { get: publicOperation('List the category tree with product counts for navigation and filter sidebars.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },

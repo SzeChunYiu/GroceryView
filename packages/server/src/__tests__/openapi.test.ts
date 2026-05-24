@@ -173,6 +173,24 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/notifications/provider-suppression-events'].post?.security, [{ webhookSignature: [] }]);
     assert.deepEqual(doc.paths['/api/notifications/inbox'].get?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/notifications/inbox'].get?.summary ?? '', /notification inbox/i);
+    assert.deepEqual(doc.paths['/api/notifications/inbox'].get?.responses?.['200']?.content?.['application/json']?.schema, {
+      $ref: '#/components/schemas/NotificationInboxResponse'
+    });
+    assert.deepEqual(doc.components.schemas.NotificationInboxResponse.required, [
+      'userId',
+      'generatedAt',
+      'trackedItemCount',
+      'activeAlertCount',
+      'deliveredCount',
+      'heldCount',
+      'suppressedCount',
+      'summary',
+      'queue',
+      'quietHoursWindow',
+      'guardrails'
+    ]);
+    assert.equal(doc.components.schemas.NotificationInboxResponse.properties.generatedAt.format, 'date-time');
+    assert.equal(doc.components.schemas.NotificationInboxQueueItem.properties.sendAt.format, 'date-time');
     assert.match(doc.paths['/api/health'].get?.summary ?? '', /without exposing secrets/i);
     assert.equal(doc.paths['/api/products/{id}/terminal'].get?.security, undefined);
     assert.match(doc.paths['/api/products/{id}/terminal'].get?.summary ?? '', /price terminal/i);

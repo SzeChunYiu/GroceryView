@@ -302,15 +302,17 @@ describe('createHttpHandler', () => {
     assert.equal(notificationInbox.status, 200);
     const notificationInboxBody = await json(notificationInbox) as {
       userId: string;
+      generatedAt: string;
       activeAlertCount: number;
       deliveredCount: number;
       heldCount: number;
       suppressedCount: number;
       summary: { total: number };
-      queue: Array<{ id: string; status: string; reason: string }>;
+      queue: Array<{ id: string; status: string; reason: string; sendAt: string }>;
       guardrails: string[];
     };
     assert.equal(notificationInboxBody.userId, 'user-1');
+    assert.equal(notificationInboxBody.generatedAt, '2026-05-20T08:00:00.000Z');
     assert.equal(notificationInboxBody.activeAlertCount, 0);
     assert.equal(notificationInboxBody.deliveredCount, 0);
     assert.equal(notificationInboxBody.heldCount, 1);
@@ -319,6 +321,8 @@ describe('createHttpHandler', () => {
     assert.deepEqual(notificationInboxTaskNowValues, ['2026-05-20T08:00:00.000Z']);
     assert.equal(notificationInboxBody.queue.some((item) => item.id === 'receipt-review-quiet-hours'), true);
     assert.equal(notificationInboxBody.queue.some((item) => item.id === 'suppression-provider-record-123'), true);
+    assert.equal(notificationInboxBody.queue.find((item) => item.id === 'receipt-review-quiet-hours')?.sendAt, '2026-05-20T07:00:00.000Z');
+    assert.equal(notificationInboxBody.queue.find((item) => item.id === 'suppression-provider-record-123')?.sendAt, '2026-05-20T08:00:00.000Z');
     assert.match(notificationInboxBody.queue.find((item) => item.status === 'held')?.reason ?? '', /Quiet hours/i);
     assert.match(notificationInboxBody.guardrails[0] ?? '', /Estimated prices never generate household alerts/i);
 

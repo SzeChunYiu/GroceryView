@@ -1140,9 +1140,10 @@ describe('createGroceryViewApi', () => {
       favoriteStoresOnly: true
     });
 
-    const report = api.getNotificationInboxReport('user-1');
+    const report = api.getNotificationInboxReport('user-1', { now: '2026-05-20T08:00:00.000Z' });
 
     assert.equal(report.userId, 'user-1');
+    assert.equal(report.generatedAt, '2026-05-20T08:00:00.000Z');
     assert.equal(report.trackedItemCount, 1);
     assert.equal(report.activeAlertCount, 3);
     assert.equal(report.deliveredCount, 3);
@@ -1155,6 +1156,7 @@ describe('createGroceryViewApi', () => {
       total: 5
     });
     assert.match(report.queue[0]?.title ?? '', /Zoégas Coffee 450g/);
+    assert.equal(report.queue.every((item) => item.sendAt === report.generatedAt), true);
     assert.match(report.queue.find((item) => item.status === 'held')?.reason ?? '', /Quiet hours/i);
     assert.match(report.queue.find((item) => item.status === 'suppressed')?.reason ?? '', /Provider token invalid/i);
     assert.match(report.guardrails[0], /Estimated prices never generate household alerts/i);
