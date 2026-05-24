@@ -34,6 +34,7 @@ import {
   createPostgresSourceRecordReader,
   buildUserAccountDeletionQueries,
   type BudgetRecord,
+  type UserHiddenPreferencesRecord,
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
   type QueryExecutor,
@@ -121,6 +122,10 @@ export type AuthOptions = {
     upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
     getBudget(userId: string): Promise<BudgetRecord | null>;
   };
+  hiddenPreferencesRepository?: {
+    upsertHiddenPreferences(userId: string, preferences: UserHiddenPreferencesRecord): Promise<void>;
+    getHiddenPreferences(userId: string): Promise<UserHiddenPreferencesRecord>;
+  };
   accountDeletionRepository?: {
     deleteUserAccount(userId: string): Promise<void>;
   };
@@ -202,6 +207,8 @@ export type RuntimePersistenceRepository = {
   upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
   getBudget(userId: string): Promise<BudgetRecord | null>;
+  upsertHiddenPreferences?(userId: string, preferences: UserHiddenPreferencesRecord): Promise<void>;
+  getHiddenPreferences?(userId: string): Promise<UserHiddenPreferencesRecord>;
   deleteUserAccount?(userId: string): Promise<void>;
   getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
@@ -1829,6 +1836,11 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     return null;
   };
 
+  const loadHiddenPreferences = async (userId: string): Promise<void> => {
+    const preferences = await authOptions.hiddenPreferencesRepository?.getHiddenPreferences(userId);
+    if (preferences) api.setHiddenPreferences(userId, preferences);
+  };
+
   const buildAccountDataExport = (user: string) => {
     const householdPlan = api.getHouseholdPlan(user);
     const watchlist = api.getWatchlist(user);
@@ -2020,7 +2032,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(report);
       }
       if (method === 'GET' && path === '/api/categories') return jsonResponse(api.getCategories());
-      if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
+      if (method === 'GET' && path === '/api/stores') {
+        const userId = url.searchParams.get('userId') ?? undefined;
+        if (userId) {
+          const authError = await authorizeUser(request, userId);
+          if (authError) return authError;
+          await loadHiddenPreferences(userId);
+        }
+        return jsonResponse(api.getStores(userId));
+      }
       if (method === 'GET' && path === '/api/retailers') return jsonResponse(api.getRetailers());
 
       if (method === 'GET' && path === '/api/deals/flyer-offers') {
@@ -2451,12 +2471,24 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       }
 
       if (method === 'GET' && (path === '/api/products' || path === '/api/products/search')) {
-        return jsonResponse(cursorPaginatedEnvelope(api.searchProducts(url.searchParams.get('q') ?? ''), url.searchParams));
+        const userId = url.searchParams.get('userId') ?? undefined;
+        if (userId) {
+          const authError = await authorizeUser(request, userId);
+          if (authError) return authError;
+          await loadHiddenPreferences(userId);
+        }
+        return jsonResponse(cursorPaginatedEnvelope(api.searchProducts(url.searchParams.get('q') ?? '', userId), url.searchParams));
       }
 
       const productMatch = path.match(/^\/api\/products\/([^/]+)$/);
       if (method === 'GET' && productMatch) {
-        const product = api.getProduct(decodeURIComponent(productMatch[1]));
+        const userId = url.searchParams.get('userId') ?? undefined;
+        if (userId) {
+          const authError = await authorizeUser(request, userId);
+          if (authError) return authError;
+          await loadHiddenPreferences(userId);
+        }
+        const product = api.getProduct(decodeURIComponent(productMatch[1]), userId);
         return product ? jsonResponse(product) : errorResponse(404, 'Product not found.');
       }
 
@@ -2530,6 +2562,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const routeUserId = decodeURIComponent(favoriteStoreMatch[1]);
         const authError = await authorizeUser(request, routeUserId);
         if (authError) return authError;
+        await loadHiddenPreferences(routeUserId);
         if (method === 'GET') return jsonResponse(api.getFavoriteStores(routeUserId));
         if (method === 'POST') {
           const body = await readJson(request);
@@ -2543,6 +2576,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const routeUserId = decodeURIComponent(favoriteStoreDeleteMatch[1]);
         const authError = await authorizeUser(request, routeUserId);
         if (authError) return authError;
+        await loadHiddenPreferences(routeUserId);
         api.removeFavoriteStore(routeUserId, decodeURIComponent(favoriteStoreDeleteMatch[2]));
         return jsonResponse(api.getFavoriteStores(routeUserId));
       }
@@ -2552,6 +2586,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
+        await loadHiddenPreferences(user);
         if (method === 'GET') return jsonResponse(api.getWatchlist(user));
         if (method === 'POST') {
           const body = await readJson(request);
@@ -2597,6 +2632,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
+        await loadHiddenPreferences(user);
         const productId = decodeURIComponent(watchlistItemMatch[1]);
         if (method === 'PATCH') {
           const body = await readJson(request);
@@ -2619,6 +2655,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
+        await loadHiddenPreferences(user);
         if (method === 'GET') return jsonResponse(api.getBasket(user));
       }
 
@@ -2627,6 +2664,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
+        await loadHiddenPreferences(user);
         if (method === 'POST') {
           const body = await readJson(request);
           api.addBasketItem(user, {
@@ -2643,6 +2681,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
+        await loadHiddenPreferences(user);
         const productId = decodeURIComponent(basketItemMatch[1]);
         if (method === 'PATCH') {
           const body = await readJson(request);
@@ -2660,6 +2699,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
+        await loadHiddenPreferences(user);
         if (method === 'POST') return jsonResponse(api.compareBasket(user));
       }
 
@@ -2668,6 +2708,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
+        await loadHiddenPreferences(user);
         if (method === 'GET') return jsonResponse(api.compareBasketReport(user));
       }
 
@@ -2676,6 +2717,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
+        await loadHiddenPreferences(user);
         if (method === 'GET') return jsonResponse(api.getLocalOfferBasketReport(user, url.searchParams.get('asOf') ?? undefined));
       }
 
@@ -2684,6 +2726,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
+        await loadHiddenPreferences(user);
         if (method === 'POST') {
           const body = await readJson(request);
           const report = api.importBasketFromRetailerPage(user, basketImportExportRequestFromBody(body));
@@ -2703,6 +2746,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
+        await loadHiddenPreferences(user);
         if (method === 'GET') {
           if (authOptions.basketImportReviewRepository) {
             const items = await authOptions.basketImportReviewRepository.listOpenBasketImportReviewItems(user);
@@ -2903,6 +2947,72 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
         if (method === 'GET') return jsonResponse(buildAccountDataExport(user));
+      }
+
+      if (path === '/api/settings/hidden') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          const preferences = await authOptions.hiddenPreferencesRepository?.getHiddenPreferences(user);
+          if (preferences) api.setHiddenPreferences(user, preferences);
+          return jsonResponse(api.getHiddenPreferences(user));
+        }
+        if (method === 'PUT') {
+          const body = await readJson(request);
+          const preferences = {
+            hiddenProductIds: optionalStringArray(body.hiddenProductIds, 'hiddenProductIds') ?? [],
+            hiddenStoreIds: optionalStringArray(body.hiddenStoreIds, 'hiddenStoreIds') ?? []
+          };
+          const updated = api.setHiddenPreferences(user, preferences);
+          await authOptions.hiddenPreferencesRepository?.upsertHiddenPreferences(user, updated);
+          return jsonResponse(updated);
+        }
+      }
+
+      if (path === '/api/settings/hidden/items' && method === 'POST') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const body = await readJson(request);
+        const updated = api.hideProduct(user, requiredString(body.productId, 'productId'));
+        await authOptions.hiddenPreferencesRepository?.upsertHiddenPreferences(user, updated);
+        return jsonResponse(updated, { status: 201 });
+      }
+
+      const hiddenItemMatch = path.match(/^\/api\/settings\/hidden\/items\/([^/]+)$/);
+      if (hiddenItemMatch && method === 'DELETE') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const updated = api.showProduct(user, decodeURIComponent(hiddenItemMatch[1]));
+        await authOptions.hiddenPreferencesRepository?.upsertHiddenPreferences(user, updated);
+        return jsonResponse(updated);
+      }
+
+      if (path === '/api/settings/hidden/stores' && method === 'POST') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const body = await readJson(request);
+        const updated = api.hideStore(user, requiredString(body.storeId, 'storeId'));
+        await authOptions.hiddenPreferencesRepository?.upsertHiddenPreferences(user, updated);
+        return jsonResponse(updated, { status: 201 });
+      }
+
+      const hiddenStoreMatch = path.match(/^\/api\/settings\/hidden\/stores\/([^/]+)$/);
+      if (hiddenStoreMatch && method === 'DELETE') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const updated = api.showStore(user, decodeURIComponent(hiddenStoreMatch[1]));
+        await authOptions.hiddenPreferencesRepository?.upsertHiddenPreferences(user, updated);
+        return jsonResponse(updated);
       }
 
       if (path === '/api/settings/account') {
@@ -3163,6 +3273,14 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
       '/api/settings/account': { delete: protectedOperation('Delete the signed-in account after confirmation, wiping lists, alerts, preferences, and profile rows.') },
       '/api/settings/data-export': { get: protectedOperation('Download my data JSON export with lists, alerts, preferences, and analytics event records.') },
+      '/api/settings/hidden': {
+        get: protectedOperation('Get hidden item and store preferences that exclude rows from comparisons and signed-in results.'),
+        put: protectedOperation('Replace hidden item and store preferences for the signed-in account.')
+      },
+      '/api/settings/hidden/items': { post: protectedOperation('Hide one product from signed-in comparisons and product results.') },
+      '/api/settings/hidden/items/{id}': { delete: protectedOperation('Show a previously hidden product again.') },
+      '/api/settings/hidden/stores': { post: protectedOperation('Hide one store from signed-in comparisons and store results.') },
+      '/api/settings/hidden/stores/{id}': { delete: protectedOperation('Show a previously hidden store again.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/privacy/request-fulfillment': { post: protectedOperation('Classify privacy export, deletion, and ad opt-out requests by fulfillment deadline.') },
       '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },
@@ -3628,6 +3746,14 @@ export function buildRepositoryBackedAuthOptions(
       upsertBudget: (userId, budget) => repository.upsertBudget(userId, budget),
       getBudget: (userId) => repository.getBudget(userId)
     },
+    ...(repository.upsertHiddenPreferences && repository.getHiddenPreferences
+      ? {
+          hiddenPreferencesRepository: {
+            upsertHiddenPreferences: (userId, preferences) => repository.upsertHiddenPreferences!(userId, preferences),
+            getHiddenPreferences: (userId) => repository.getHiddenPreferences!(userId)
+          }
+        }
+      : {}),
     ...(repository.deleteUserAccount
       ? {
           accountDeletionRepository: {

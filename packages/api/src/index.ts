@@ -124,6 +124,11 @@ export type ProductDetail = SearchableProduct & {
   };
 };
 
+export type HiddenPreferences = {
+  hiddenProductIds: string[];
+  hiddenStoreIds: string[];
+};
+
 
 
 export type BasketFulfillmentSlotsReport = BasketFulfillmentSlotsPlan & {
@@ -4297,6 +4302,7 @@ function notificationSuppressionInboxReason(reason: NotificationInboxSuppression
 
 export function createGroceryViewApi() {
   const favoriteStores = new Map<string, Set<string>>();
+  const hiddenPreferences = new Map<string, { productIds: Set<string>; storeIds: Set<string> }>();
   const watchlists = new Map<string, WatchlistItem[]>();
   const baskets = new Map<string, BasketItemRequest[]>();
   const budgets = new Map<string, UserBudgetPatch>();
@@ -4325,6 +4331,59 @@ export function createGroceryViewApi() {
         isNew52WeekLow: product.id === 'coffee'
       };
     });
+
+  function hiddenFor(userId: string) {
+    return hiddenPreferences.get(userId) ?? { productIds: new Set<string>(), storeIds: new Set<string>() };
+  }
+
+  function setHiddenFor(userId: string, preferences: HiddenPreferences): HiddenPreferences {
+    requireNonEmptyId(userId, 'userId');
+    for (const productId of preferences.hiddenProductIds) requireKnownProduct(productId);
+    for (const storeId of preferences.hiddenStoreIds) requireKnownStore(storeId);
+    const productIds = new Set(preferences.hiddenProductIds);
+    const storeIds = new Set(preferences.hiddenStoreIds);
+    hiddenPreferences.set(userId, { productIds, storeIds });
+    return {
+      hiddenProductIds: [...productIds].sort(),
+      hiddenStoreIds: [...storeIds].sort()
+    };
+  }
+
+  function visibleProductsFor(userId?: string): ProductDetail[] {
+    if (!userId) return products;
+    const hidden = hiddenFor(userId);
+    return products
+      .filter((product) => !hidden.productIds.has(product.id))
+      .map((product) => ({
+        ...product,
+        currentPrices: product.currentPrices.filter((price) => !hidden.storeIds.has(price.storeId))
+      }));
+  }
+
+  function visibleStoresFor(userId?: string): Store[] {
+    if (!userId) return stores;
+    const hidden = hiddenFor(userId);
+    return stores.filter((store) => !hidden.storeIds.has(store.id));
+  }
+
+  function visibleBasketItemsFor(userId: string): BasketItemRequest[] {
+    const hidden = hiddenFor(userId);
+    return (baskets.get(userId) ?? []).filter((item) => !hidden.productIds.has(item.productId));
+  }
+
+  function visibleBasketInputItems(userId: string): ReturnType<typeof basketInputItems> {
+    const hidden = hiddenFor(userId);
+    return basketInputItems(visibleBasketItemsFor(userId)).map((item) => ({
+      ...item,
+      prices: item.prices.filter((price) => !hidden.storeIds.has(price.storeId))
+    }));
+  }
+
+  function visibleFavoriteStoreIds(userId: string): string[] {
+    const hidden = hiddenFor(userId);
+    return [...(favoriteStores.get(userId) ?? new Set<string>())]
+      .filter((storeId) => !hidden.storeIds.has(storeId));
+  }
 
   return {
     getMarketOverview() {
@@ -4671,8 +4730,54 @@ export function createGroceryViewApi() {
       return categoryMarketFor(category);
     },
 
-    getStores() {
-      return stores;
+    getHiddenPreferences(userId: string): HiddenPreferences {
+      const hidden = hiddenFor(userId);
+      return {
+        hiddenProductIds: [...hidden.productIds].sort(),
+        hiddenStoreIds: [...hidden.storeIds].sort()
+      };
+    },
+
+    setHiddenPreferences(userId: string, preferences: HiddenPreferences): HiddenPreferences {
+      return setHiddenFor(userId, preferences);
+    },
+
+    hideProduct(userId: string, productId: string): HiddenPreferences {
+      const current = this.getHiddenPreferences(userId);
+      return setHiddenFor(userId, {
+        hiddenProductIds: [...new Set([...current.hiddenProductIds, productId])],
+        hiddenStoreIds: current.hiddenStoreIds
+      });
+    },
+
+    showProduct(userId: string, productId: string): HiddenPreferences {
+      requireKnownProduct(productId);
+      const current = this.getHiddenPreferences(userId);
+      return setHiddenFor(userId, {
+        hiddenProductIds: current.hiddenProductIds.filter((id) => id !== productId),
+        hiddenStoreIds: current.hiddenStoreIds
+      });
+    },
+
+    hideStore(userId: string, storeId: string): HiddenPreferences {
+      const current = this.getHiddenPreferences(userId);
+      return setHiddenFor(userId, {
+        hiddenProductIds: current.hiddenProductIds,
+        hiddenStoreIds: [...new Set([...current.hiddenStoreIds, storeId])]
+      });
+    },
+
+    showStore(userId: string, storeId: string): HiddenPreferences {
+      requireKnownStore(storeId);
+      const current = this.getHiddenPreferences(userId);
+      return setHiddenFor(userId, {
+        hiddenProductIds: current.hiddenProductIds,
+        hiddenStoreIds: current.hiddenStoreIds.filter((id) => id !== storeId)
+      });
+    },
+
+    getStores(userId?: string) {
+      return visibleStoresFor(userId);
     },
 
     getRetailers() {
@@ -4715,12 +4820,12 @@ export function createGroceryViewApi() {
       return buildStoreCategoryCoverage(storeId);
     },
 
-    searchProducts(query: string) {
-      return searchProducts(products, query);
+    searchProducts(query: string, userId?: string) {
+      return searchProducts(visibleProductsFor(userId), query);
     },
 
-    getProduct(id: string) {
-      const product = products.find((candidate) => candidate.id === id);
+    getProduct(id: string, userId?: string) {
+      const product = visibleProductsFor(userId).find((candidate) => candidate.id === id);
       if (!product) return null;
       return { ...product, currentPrices: sortPricesByValue(product.currentPrices) };
     },
@@ -4873,12 +4978,14 @@ export function createGroceryViewApi() {
 
     getFavoriteStores(userId: string) {
       const ids = favoriteStores.get(userId) ?? new Set<string>();
-      return stores.filter((store) => ids.has(store.id));
+      const hidden = hiddenFor(userId);
+      return stores.filter((store) => ids.has(store.id) && !hidden.storeIds.has(store.id));
     },
 
     deleteAccount(userId: string) {
       requireNonEmptyId(userId, 'userId');
       favoriteStores.delete(userId);
+      hiddenPreferences.delete(userId);
       watchlists.delete(userId);
       baskets.delete(userId);
       budgets.delete(userId);
@@ -4935,9 +5042,16 @@ export function createGroceryViewApi() {
     },
 
     getWatchlist(userId: string): { items: WatchlistItem[]; alerts: WatchlistAlert[] } {
-      const items = watchlists.get(userId) ?? [];
-      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
-      return { items, alerts: buildWatchlistAlerts({ watchlist: items, products: productSnapshots(), favoriteStoreIds }) };
+      const hidden = hiddenFor(userId);
+      const items = (watchlists.get(userId) ?? []).filter((item) => !hidden.productIds.has(item.productId));
+      const favoriteStoreIds = visibleFavoriteStoreIds(userId);
+      const snapshots = productSnapshots()
+        .filter((product) => !hidden.productIds.has(product.productId))
+        .map((product) => ({
+          ...product,
+          prices: product.prices.filter((price) => !hidden.storeIds.has(price.storeId))
+        }));
+      return { items, alerts: buildWatchlistAlerts({ watchlist: items, products: snapshots, favoriteStoreIds }) };
     },
 
     addWatchlistPriceAlert(userId: string, alert: WatchlistPriceAlertRequest): WatchlistPriceAlertReport {
@@ -5023,17 +5137,17 @@ export function createGroceryViewApi() {
     },
 
     getBasket(userId: string) {
-      return { items: baskets.get(userId) ?? [] };
+      return { items: visibleBasketItemsFor(userId) };
     },
 
     compareBasket(userId: string): BasketComparisonResult {
-      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
-      return compareBasketStrategies({ favoriteStoreIds, items: basketInputItems(baskets.get(userId) ?? []) });
+      const favoriteStoreIds = visibleFavoriteStoreIds(userId);
+      return compareBasketStrategies({ favoriteStoreIds, items: visibleBasketInputItems(userId) });
     },
 
     compareBasketReport(userId: string): BasketComparisonReport {
-      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
-      return buildBasketComparisonReport(userId, favoriteStoreIds, baskets.get(userId) ?? []);
+      const favoriteStoreIds = visibleFavoriteStoreIds(userId);
+      return buildBasketComparisonReport(userId, favoriteStoreIds, visibleBasketItemsFor(userId));
     },
 
 

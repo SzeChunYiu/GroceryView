@@ -1,10 +1,12 @@
 import { createHash } from 'node:crypto';
 import { buildUserAccountDeletionQueries } from './queries/users.js';
+import { buildGetHiddenPreferencesQuery, buildUpsertHiddenPreferencesQuery } from './queries/userPreferences.js';
 
 export * from './queries/categories.js';
 export * from './queries/stores.js';
 export * from './queries/retailers.js';
 export * from './queries/users.js';
+export * from './queries/userPreferences.js';
 
 export type Migration = {
   version: string;
@@ -221,6 +223,11 @@ export type UserRecord = {
 export type BudgetRecord = {
   weeklyBudget: number;
   monthlyBudget: number;
+};
+
+export type UserHiddenPreferencesRecord = {
+  hiddenProductIds: string[];
+  hiddenStoreIds: string[];
 };
 
 export type SubscriptionEntitlementRecord = {
@@ -992,6 +999,8 @@ export type GroceryViewRepository = {
   getFavoriteStoreIds(userId: string): Promise<string[]>;
   upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
   getBudget(userId: string): Promise<BudgetRecord | null>;
+  upsertHiddenPreferences(userId: string, preferences: UserHiddenPreferencesRecord): Promise<void>;
+  getHiddenPreferences(userId: string): Promise<UserHiddenPreferencesRecord>;
   upsertSubscriptionEntitlement(entitlement: SubscriptionEntitlementRecord): Promise<void>;
   getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementRecord | null>;
   addWatchlistItem(userId: string, item: WatchlistRecord): Promise<void>;
@@ -1253,6 +1262,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const users = new Map<string, UserRecord>();
   const favoriteStores = new Map<string, Set<string>>();
   const budgets = new Map<string, BudgetRecord>();
+  const hiddenPreferences = new Map<string, UserHiddenPreferencesRecord>();
   const subscriptionEntitlements = new Map<string, SubscriptionEntitlementRecord>();
   const watchlists = new Map<string, WatchlistRecord[]>();
   const baskets = new Map<string, BasketRecord[]>();
@@ -1276,6 +1286,7 @@ export function createMemoryRepository(): GroceryViewRepository {
       users.delete(userId);
       favoriteStores.delete(userId);
       budgets.delete(userId);
+      hiddenPreferences.delete(userId);
       subscriptionEntitlements.delete(userId);
       watchlists.delete(userId);
       baskets.delete(userId);
@@ -1309,6 +1320,25 @@ export function createMemoryRepository(): GroceryViewRepository {
       requireUser(users, userId);
       const budget = budgets.get(userId);
       return budget ? { ...budget } : null;
+    },
+
+    async upsertHiddenPreferences(userId, preferences) {
+      requireUser(users, userId);
+      hiddenPreferences.set(userId, {
+        hiddenProductIds: [...new Set(preferences.hiddenProductIds)].sort(),
+        hiddenStoreIds: [...new Set(preferences.hiddenStoreIds)].sort()
+      });
+    },
+
+    async getHiddenPreferences(userId) {
+      requireUser(users, userId);
+      const preferences = hiddenPreferences.get(userId);
+      return preferences
+        ? {
+          hiddenProductIds: [...preferences.hiddenProductIds],
+          hiddenStoreIds: [...preferences.hiddenStoreIds]
+        }
+        : { hiddenProductIds: [], hiddenStoreIds: [] };
     },
 
     async upsertSubscriptionEntitlement(entitlement) {
@@ -1500,6 +1530,7 @@ export type QueryExecutor = {
 
 type FavoriteStoreRow = { store_id: string };
 type BudgetRow = { weekly_budget: string | number; monthly_budget: string | number };
+type HiddenPreferencesRow = { hidden_product_ids: string[] | null; hidden_store_ids: string[] | null };
 type SubscriptionEntitlementRow = {
   user_id: string;
   tier: SubscriptionEntitlementRecord['tier'];
@@ -2419,6 +2450,26 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       const rows = await executor.query<BudgetRow>('select weekly_budget, monthly_budget from user_preferences where user_id = $1', [userId]);
       const row = rows[0];
       return row ? { weeklyBudget: Number(row.weekly_budget), monthlyBudget: Number(row.monthly_budget) } : null;
+    },
+
+    async upsertHiddenPreferences(userId, preferences) {
+      const query = buildUpsertHiddenPreferencesQuery(userId, {
+        hiddenProductIds: [...new Set(preferences.hiddenProductIds)].sort(),
+        hiddenStoreIds: [...new Set(preferences.hiddenStoreIds)].sort()
+      });
+      await executor.query(query.sql, query.values);
+    },
+
+    async getHiddenPreferences(userId) {
+      const query = buildGetHiddenPreferencesQuery(userId);
+      const rows = await executor.query<HiddenPreferencesRow>(query.sql, query.values);
+      const row = rows[0];
+      return row
+        ? {
+          hiddenProductIds: [...(row.hidden_product_ids ?? [])].sort(),
+          hiddenStoreIds: [...(row.hidden_store_ids ?? [])].sort()
+        }
+        : { hiddenProductIds: [], hiddenStoreIds: [] };
     },
 
     async upsertSubscriptionEntitlement(entitlement) {

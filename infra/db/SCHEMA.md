@@ -272,9 +272,9 @@ Primary key: `(user_id, store_id)`.
 
 ### `user_preferences`
 
-Legacy app repository budget preferences.
+Legacy app repository budget and hidden-result preferences.
 
-Key columns: `user_id`, `weekly_budget`, `monthly_budget`, `updated_at`.
+Key columns: `user_id`, `weekly_budget`, `monthly_budget`, `hidden_product_ids`, `hidden_store_ids`, `updated_at`.
 
 ### `watchlist_items`
 

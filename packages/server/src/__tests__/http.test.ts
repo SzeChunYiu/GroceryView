@@ -1387,6 +1387,61 @@ describe('createHttpHandler', () => {
     assert.equal(api.getBudgetSummary('user-1').monthlyBudget, 0);
   });
 
+  it('serves hidden settings and excludes hidden rows from signed-in results', async () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 1 });
+    const handle = createHttpHandler(api);
+
+    const saved = await json(await handle(new Request('http://localhost/api/settings/hidden?userId=user-1', {
+      method: 'PUT',
+      body: JSON.stringify({
+        hiddenProductIds: ['coffee'],
+        hiddenStoreIds: ['lidl-sveavagen']
+      })
+    }))) as { hiddenProductIds: string[]; hiddenStoreIds: string[] };
+    assert.deepEqual(saved, { hiddenProductIds: ['coffee'], hiddenStoreIds: ['lidl-sveavagen'] });
+
+    const products = await json(await handle(new Request('http://localhost/api/products/search?q=coffee&userId=user-1'))) as { items: Array<{ id: string }> };
+    assert.equal(products.items.some((product) => product.id === 'coffee'), false);
+    const stores = await json(await handle(new Request('http://localhost/api/stores?userId=user-1'))) as Array<{ id: string }>;
+    assert.equal(stores.some((store) => store.id === 'lidl-sveavagen'), false);
+    const comparison = await json(await handle(new Request('http://localhost/api/basket/compare?userId=user-1', { method: 'POST' }))) as {
+      cheapestByProduct: { assignments: Array<{ productId: string; storeId: string }> };
+    };
+    assert.equal(comparison.cheapestByProduct.assignments.some((assignment) => assignment.productId === 'coffee'), false);
+    assert.equal(comparison.cheapestByProduct.assignments.some((assignment) => assignment.storeId === 'lidl-sveavagen'), false);
+  });
+
+  it('hydrates repository-backed hidden settings before signed-in result reads', async () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 1 });
+    const handle = createHttpHandler(api, {
+      hiddenPreferencesRepository: {
+        async getHiddenPreferences(userId) {
+          assert.equal(userId, 'user-1');
+          return { hiddenProductIds: ['coffee'], hiddenStoreIds: ['lidl-sveavagen'] };
+        },
+        async upsertHiddenPreferences() {}
+      }
+    });
+
+    const products = await json(await handle(new Request('http://localhost/api/products/search?q=coffee&userId=user-1'))) as { items: Array<{ id: string }> };
+    assert.equal(products.items.some((product) => product.id === 'coffee'), false);
+    const stores = await json(await handle(new Request('http://localhost/api/stores?userId=user-1'))) as Array<{ id: string }>;
+    assert.equal(stores.some((store) => store.id === 'lidl-sveavagen'), false);
+    const comparison = await json(await handle(new Request('http://localhost/api/basket/compare?userId=user-1', { method: 'POST' }))) as {
+      cheapestByProduct: { assignments: Array<{ productId: string; storeId: string }> };
+    };
+    assert.equal(comparison.cheapestByProduct.assignments.some((assignment) => assignment.productId === 'coffee'), false);
+    assert.equal(comparison.cheapestByProduct.assignments.some((assignment) => assignment.storeId === 'lidl-sveavagen'), false);
+  });
+
   it('plans pantry replenishment from stock, usage, expiry, and deal candidates', async () => {
     const handle = createHttpHandler(undefined, { now: new Date('2026-05-20T12:00:00.000Z') });
 

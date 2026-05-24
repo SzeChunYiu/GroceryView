@@ -86,6 +86,11 @@ describe('buildOpenApiDocument', () => {
       '/api/scans/upload-url',
       '/api/settings/account',
       '/api/settings/data-export',
+      '/api/settings/hidden',
+      '/api/settings/hidden/items',
+      '/api/settings/hidden/items/{id}',
+      '/api/settings/hidden/stores',
+      '/api/settings/hidden/stores/{id}',
       '/api/stores',
       '/api/stores/{id}',
       '/api/stores/{id}/category-coverage',
@@ -155,6 +160,13 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/settings/account'].delete?.summary ?? '', /delete.*account|account deletion/i);
     assert.deepEqual(doc.paths['/api/settings/data-export'].get?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/settings/data-export'].get?.summary ?? '', /download my data|data export/i);
+    assert.deepEqual(doc.paths['/api/settings/hidden'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/settings/hidden'].put?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/settings/hidden/items'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/settings/hidden/items/{id}'].delete?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/settings/hidden/stores'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/settings/hidden/stores/{id}'].delete?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/settings/hidden'].get?.summary ?? '', /hidden item and store preferences/i);
     assert.deepEqual(doc.paths['/api/pantry/replenishment'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/scans/process'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/scans/upload-url'].post?.security, [{ bearerAuth: [] }]);

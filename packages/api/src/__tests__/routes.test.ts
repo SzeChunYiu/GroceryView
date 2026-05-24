@@ -1918,6 +1918,32 @@ describe('createGroceryViewApi', () => {
     assert.equal(api.removeWatchlistItem('user-1', 'coffee').removed, false);
   });
 
+  it('applies hidden products and stores to signed-in results and basket comparisons', () => {
+    const api = createGroceryViewApi();
+
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 1 });
+
+    assert.ok(api.searchProducts('coffee', 'user-1').some((product) => product.id === 'coffee'));
+    assert.ok(api.compareBasket('user-1').cheapestByProduct.assignments.some((assignment) => assignment.productId === 'coffee'));
+
+    assert.deepEqual(api.setHiddenPreferences('user-1', {
+      hiddenProductIds: ['coffee'],
+      hiddenStoreIds: ['lidl-sveavagen']
+    }), {
+      hiddenProductIds: ['coffee'],
+      hiddenStoreIds: ['lidl-sveavagen']
+    });
+
+    assert.equal(api.searchProducts('coffee', 'user-1').some((product) => product.id === 'coffee'), false);
+    assert.equal(api.getStores('user-1').some((store) => store.id === 'lidl-sveavagen'), false);
+    assert.deepEqual(api.getBasket('user-1').items, [{ productId: 'milk', quantity: 1 }]);
+    assert.equal(api.compareBasket('user-1').cheapestByProduct.assignments.some((assignment) => assignment.productId === 'coffee'), false);
+    assert.equal(api.compareBasket('user-1').cheapestByProduct.assignments.some((assignment) => assignment.storeId === 'lidl-sveavagen'), false);
+  });
+
   it('rejects invalid mutable route inputs before storing state', () => {
     const api = createGroceryViewApi();
 

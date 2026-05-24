@@ -486,6 +486,7 @@ class RecordingQueryExecutor implements QueryExecutor {
       }] as T[];
     }
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
+    if (sql.includes('hidden_product_ids')) return [{ hidden_product_ids: ['coffee'], hidden_store_ids: ['lidl-sveavagen'] }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
     if (sql.includes('insert into weekly_baskets')) return this.basketId === undefined ? ([] as T[]) : ([{ id: this.basketId }] as T[]);
     if (sql.includes('from human_reviewers')) {
@@ -571,6 +572,14 @@ describe('createPostgresRepository', () => {
     assert.deepEqual(await repo.getFavoriteStoreIds('user-1'), ['willys-odenplan']);
     await repo.upsertBudget('user-1', { weeklyBudget: 800, monthlyBudget: 3200 });
     assert.deepEqual(await repo.getBudget('user-1'), { weeklyBudget: 800, monthlyBudget: 3200 });
+    await repo.upsertHiddenPreferences('user-1', {
+      hiddenProductIds: ['coffee'],
+      hiddenStoreIds: ['lidl-sveavagen']
+    });
+    assert.deepEqual(await repo.getHiddenPreferences('user-1'), {
+      hiddenProductIds: ['coffee'],
+      hiddenStoreIds: ['lidl-sveavagen']
+    });
 
     assert.equal(executor.calls.every((call) => call.sql.includes('$') || call.sql.startsWith('select')), true);
     assert.deepEqual(executor.calls[0].params, ['user-1', 'shopper@example.com']);

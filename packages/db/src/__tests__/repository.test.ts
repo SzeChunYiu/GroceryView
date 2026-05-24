@@ -15,6 +15,10 @@ describe('createMemoryRepository', () => {
     await repo.upsertUser({ id: 'user-1', email: 'shopper@example.com' });
     await repo.addFavoriteStore('user-1', 'willys-odenplan');
     await repo.upsertBudget('user-1', { weeklyBudget: 800, monthlyBudget: 3200 });
+    await repo.upsertHiddenPreferences('user-1', {
+      hiddenProductIds: ['coffee'],
+      hiddenStoreIds: ['lidl-sveavagen']
+    });
     await repo.addWatchlistItem('user-1', {
       productId: 'coffee',
       targetPrice: 50,
@@ -26,6 +30,10 @@ describe('createMemoryRepository', () => {
 
     assert.deepEqual(await repo.getFavoriteStoreIds('user-1'), ['willys-odenplan']);
     assert.deepEqual(await repo.getBudget('user-1'), { weeklyBudget: 800, monthlyBudget: 3200 });
+    assert.deepEqual(await repo.getHiddenPreferences('user-1'), {
+      hiddenProductIds: ['coffee'],
+      hiddenStoreIds: ['lidl-sveavagen']
+    });
     assert.deepEqual(await repo.getWatchlist('user-1'), [
       {
         productId: 'coffee',

@@ -1,5 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { buildGetHiddenPreferencesQuery, buildUpsertHiddenPreferencesQuery } from '../queries/userPreferences.js';
 import { buildUserAccountDeletionQueries, buildUserDataExportQueries } from '../queries/users.js';
 
 describe('user data export queries', () => {
@@ -34,5 +35,21 @@ describe('user data export queries', () => {
     assert.match(queries.find((query) => query.table === 'watchlist_items')?.sql ?? '', /delete from watchlist_items/i);
     assert.match(queries.find((query) => query.table === 'user_preferences')?.sql ?? '', /delete from user_preferences/i);
     assert.match(queries.find((query) => query.table === 'app_users')?.sql ?? '', /delete from app_users/i);
+  });
+
+  it('builds parameterized hidden item and store preference queries', () => {
+    const readQuery = buildGetHiddenPreferencesQuery('user-1');
+    assert.deepEqual(readQuery.values, ['user-1']);
+    assert.match(readQuery.sql, /hidden_product_ids/i);
+    assert.match(readQuery.sql, /hidden_store_ids/i);
+    assert.match(readQuery.sql, /where user_id = \$1/i);
+
+    const writeQuery = buildUpsertHiddenPreferencesQuery('user-1', {
+      hiddenProductIds: ['coffee'],
+      hiddenStoreIds: ['lidl-sveavagen']
+    });
+    assert.deepEqual(writeQuery.values, ['user-1', ['coffee'], ['lidl-sveavagen']]);
+    assert.match(writeQuery.sql, /insert into user_preferences/i);
+    assert.match(writeQuery.sql, /on conflict \(user_id\) do update/i);
   });
 });
