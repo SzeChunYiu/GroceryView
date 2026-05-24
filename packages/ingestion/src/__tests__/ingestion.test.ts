@@ -164,6 +164,7 @@ import {
   parseIcaStoresHtml,
   extractLidlBulkOfferPaths,
   parseLidlCityStores,
+  parseLykoSeProducts,
   parseLidlOverviewLinks,
   parseOsmSupermarkets,
   parseOverpassFuelStations,
@@ -188,6 +189,48 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+describe('Lyko SE connector', () => {
+  it('normalizes Swedish cosmetics product rows with SEK pricing', () => {
+    const rows = parseLykoSeProducts({
+      products: [
+        {
+          id: 'lyko-123',
+          name: 'Hydrating Shampoo',
+          brand: 'Example Hair',
+          category: 'harvard',
+          price: '129 kr',
+          regularPrice: '149 kr',
+          inStock: true,
+          url: '/sv/example-hair/hydrating-shampoo'
+        }
+      ]
+    }, {
+      capturedAt: '2026-05-24T10:00:00.000Z'
+    });
+
+    assert.deepEqual(rows[0], {
+      id: 'lyko-123',
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'lyko',
+      retailer_type: 'cosmetics',
+      product_name: 'Hydrating Shampoo',
+      brand: 'Example Hair',
+      category: 'harvard',
+      price: 129,
+      regular_price: 149,
+      in_stock: true,
+      product_url: 'https://www.lyko.com/sv/example-hair/hydrating-shampoo',
+      captured_at: '2026-05-24T10:00:00.000Z',
+      provenance: {
+        source: 'lyko_se',
+        parser_version: 'lyko-se-products-v1',
+        raw_record_id: 'lyko-123'
+      }
+    });
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
