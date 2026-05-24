@@ -23,6 +23,7 @@ import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
+import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
 import { metadataForProduct } from '@/lib/seo';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
@@ -93,18 +94,6 @@ function standardDeviationFor(values: number[]) {
 
 function latestObservationFor(product: (typeof pricedProducts)[number]) {
   return [...product.observations].sort((a, b) => b.date.localeCompare(a.date))[0];
-}
-
-function packageEvidenceFrom(text: string) {
-  const match = text.toLowerCase().replace(',', '.').match(/(\d+(?:\.\d+)?)\s*(kg|g|l|ml|st)\b/);
-  if (!match) return null;
-  const amount = Number(match[1]);
-  const unit = match[2];
-  if (!Number.isFinite(amount) || amount <= 0) return null;
-  if (unit === 'kg') return { packageSize: amount * 1000, packageUnit: 'g' };
-  if (unit === 'l') return { packageSize: amount * 1000, packageUnit: 'ml' };
-  if (unit === 'st') return { packageSize: amount, packageUnit: 'piece' };
-  return { packageSize: amount, packageUnit: unit };
 }
 
 function productPackageText(product: NonNullable<ReturnType<typeof findProduct>>) {
@@ -216,7 +205,7 @@ function brandTierFor(brand: string, labels: string[] = []): BrandTier {
 }
 
 function productMatchInputFor(product: NonNullable<ReturnType<typeof findProduct>>) {
-  const packageEvidence = packageEvidenceFrom(productPackageText(product));
+  const packageEvidence = packageEvidenceFromText(productPackageText(product));
   const unitPrice = productUnitPrice(product);
   if (!packageEvidence || unitPrice <= 0) return null;
   const brand = productBrand(product);
@@ -1132,14 +1121,18 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
   const latestObservedAt = latestObservationFor(product)?.date ?? product.lastObservedAt;
   const asOf = `${latestObservedAt}T00:00:00.000Z`;
   const sourceConfidence = clamp(product.observationCount / 30, 0, 1);
+  const packageText = productPackageText(product);
+  const sampleNormalizedPrice = normalizeUnitPriceForPackageText(product.priceMedian, packageText);
+  const comparableUnit = sampleNormalizedPrice?.comparableUnit;
+  const formatTrendValue = (value: number) => comparableUnit ? formatComparableUnitPrice(value, comparableUnit) : formatSek(value);
   const observations = product.observations.map((observation) => ({
     observedAt: `${observation.date}T00:00:00.000Z`,
-    price: observation.price,
+    price: normalizeUnitPriceForPackageText(observation.price, packageText)?.value ?? observation.price,
     storeId: 'openprices-community',
     storeName: 'OpenPrices community',
     sourceType: 'online' as const,
     confidence: sourceConfidence,
-    provenanceLabel: `${product.observationCount} OpenPrices observations · ${product.code}`
+    provenanceLabel: `${product.observationCount} OpenPrices observations · ${product.code}${comparableUnit ? ` · normalized to ${comparableUnit}` : ''}`
   }));
 
   const windows = timeframeWindows.map((window): PriceChartTerminalWindow => {
@@ -1160,20 +1153,22 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
       windowEnd: result.windowEnd,
       pointCount: points.length,
       markerCount: result.series.reduce((total, series) => total + series.markers.length, 0),
-      latestValueLabel: latestPoint ? formatSek(latestPoint.value) : 'Not reported',
+      latestValueLabel: latestPoint ? formatTrendValue(latestPoint.value) : 'Not reported',
       latestObservedAt: latestPoint?.time,
-      lowValueLabel: values.length ? formatSek(Math.min(...values)) : 'Not reported',
-      highValueLabel: values.length ? formatSek(Math.max(...values)) : 'Not reported',
+      lowValueLabel: values.length ? formatTrendValue(Math.min(...values)) : 'Not reported',
+      highValueLabel: values.length ? formatTrendValue(Math.max(...values)) : 'Not reported',
       series: result.series
     };
   });
 
   return {
     available: windows.some((window) => window.pointCount > 0),
-    title: 'Multi-timeframe OpenPrices tape',
-    sourceLabel: 'buildPriceChartSeries · OpenPrices community observations',
+    title: comparableUnit ? `Multi-timeframe OpenPrices tape · normalized per ${comparableUnit}` : 'Multi-timeframe OpenPrices tape',
+    sourceLabel: comparableUnit ? `buildPriceChartSeries · OpenPrices community observations · normalized unit price per ${comparableUnit}` : 'buildPriceChartSeries · OpenPrices community observations',
     confidenceLabel: `${formatPct(sourceConfidence * 100)} chart confidence`,
-    caveat: 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred.',
+    caveat: comparableUnit
+      ? `Every plotted point comes from dated OpenPrices observations normalized by package size (${packageText}) to a unit price per ${comparableUnit}; missing shelf, flyer, and member prices are disclosed instead of inferred.`
+      : 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred.',
     defaultWindow: windows.find((window) => window.label === '1Y' && window.pointCount > 0)?.label ?? 'ALL',
     windows
   };
