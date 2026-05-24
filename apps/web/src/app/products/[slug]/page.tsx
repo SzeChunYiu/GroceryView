@@ -17,6 +17,7 @@ import {
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
+import { RecommendationStrip, type RecommendationStripItem } from '@/components/recommendation-strip';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
@@ -304,6 +305,7 @@ function smartSwapRecommendationsFor(product: NonNullable<ReturnType<typeof find
         ...swap,
         productName: swapProduct.name,
         productSlug: swapProduct.slug,
+        category: swapProduct.category,
         brand: productBrand(swapProduct),
         unitPrice: productUnitPrice(swapProduct)
       };
@@ -317,6 +319,21 @@ function smartSwapRecommendationsFor(product: NonNullable<ReturnType<typeof find
       ? 'Recommendations require same category, comparable package size, verified lower unit price, and the visible private-label preference.'
       : 'No same-size, lower-price substitute cleared recommendSmartSwaps for this product.'
   };
+}
+
+function recommendationStripItemsFor(rows: ReturnType<typeof smartSwapRecommendationsFor>['rows']): RecommendationStripItem[] {
+  return rows.map((swap) => ({
+    productId: swap.productId,
+    productName: swap.productName,
+    productSlug: swap.productSlug,
+    category: swap.category,
+    brand: swap.brand,
+    savingsLabel: formatPct(swap.savingsPercent),
+    priceLabel: formatSek(swap.unitPrice),
+    reason: swap.reason,
+    confidence: swap.confidence,
+    qualityRisk: swap.qualityRisk
+  }));
 }
 
 function itemSubstitutionSuggestionsFor(product: NonNullable<ReturnType<typeof findProduct>>) {
@@ -1215,21 +1232,11 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           </div>
           <p className="rounded-full bg-slate-100 px-4 py-2 text-sm font-black text-slate-700">{smartSwaps.rows.length} verified swaps</p>
         </div>
-        {smartSwaps.rows.length > 0 ? (
-          <div className="mt-5 grid gap-3 md:grid-cols-2">
-            {smartSwaps.rows.map((swap) => (
-              <Link className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-emerald-700" href={`/products/${swap.productSlug}`} key={swap.productId}>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Save {formatPct(swap.savingsPercent)}</p>
-                <h3 className="mt-2 text-lg font-black text-slate-950">{swap.productName}</h3>
-                <p className="mt-1 text-sm font-semibold text-slate-600">{swap.brand} · {formatSek(swap.unitPrice)}</p>
-                <p className="mt-3 text-sm leading-6 text-slate-700">{swap.reason}</p>
-                <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">confidence {swap.confidence} · qualityRisk {swap.qualityRisk}</p>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-950">{smartSwaps.caveat}</p>
-        )}
+        <RecommendationStrip
+          emptyMessage={smartSwaps.caveat}
+          items={recommendationStripItemsFor(smartSwaps.rows)}
+          sourceProductId={product.slug}
+        />
         <p className="mt-4 text-xs font-semibold text-slate-500">{smartSwaps.caveat}</p>
       </Card>
       <Card className="mt-6 border-amber-200 bg-amber-50/70">

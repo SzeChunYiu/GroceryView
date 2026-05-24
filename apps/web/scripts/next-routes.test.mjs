@@ -2298,6 +2298,23 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('persists disliked smart swaps in the per-user anti-recommendation list', async () => {
+    const route = await read('src/app/products/[slug]/page.tsx');
+    const strip = await read('src/components/recommendation-strip.tsx');
+    const preferences = await read('src/lib/user-preferences.ts');
+
+    assert.match(route, /RecommendationStrip/);
+    assert.match(route, /recommendationStripItemsFor/);
+    assert.match(strip, /createRecommendationDislikeSignal/);
+    assert.match(strip, /filterDislikedRecommendations/);
+    assert.match(strip, /Anti-recommendation list/);
+    assert.match(preferences, /USER_RECOMMENDATION_PREFERENCES_STORAGE_KEY/);
+    assert.match(preferences, /recommendationMatchesDislike/);
+    assert.match(preferences, /sourceProductId/);
+    assert.doesNotMatch(strip, /console\./);
+    assert.doesNotMatch(preferences, /console\./);
+  });
+
   it('surfaces a private-label dupe finder using the real smart-swap engine', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
