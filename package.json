@@ -28,10 +28,19 @@
     "ops:check-supabase-health": "node scripts/ops/check-supabase-project-health.mjs",
     "ops:db-recovery-packet": "node scripts/ops/print-production-db-recovery-packet.mjs",
     "ops:validate-db-cutover": "node scripts/ops/validate-db-cutover.mjs",
-    "db:check-retailer-seeds": "npm run test:retailer-seeds -w @groceryview/db && node --test tests/schema/stockholm-seed.test.mjs"
+    "db:check-retailer-seeds": "npm run test:retailer-seeds -w @groceryview/db && node --test tests/schema/stockholm-seed.test.mjs",
+    "db:seed:categories": "npm run build -w @groceryview/db && node packages/db/dist/seed/categories.js"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma",
+    "seed": "npm run db:seed:categories"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
+    "prisma": "^6.19.3",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3"
   }
 }
