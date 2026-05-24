@@ -6,6 +6,7 @@ import { buildBrandTierPriceObservations, buildChainIndexTrendSeries, buildChain
 import { buildGroceryIndexTickerWidget } from '@/lib/grocery-index-widget';
 import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, marketHeatmapTiles, matchedChainProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { FreshDisclaimer } from '@/components/fresh-disclaimer';
 
 export function generateMetadata() {
   return routeMetadata('/chain-index');
@@ -177,6 +178,7 @@ export default function ChainIndexPage() {
         <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
             <Eyebrow>Fresh food index</Eyebrow>
+            <div className="mt-3"><FreshDisclaimer /></div>
             <h2 className="mt-2 text-3xl font-black tracking-tight text-lime-950">Fresh-food staple basket index</h2>
             <p className="mt-3 text-sm leading-6 text-lime-950">
               This panel turns the commodity taxonomy STAPLE_BASKET into a per-chain fresh-food score using calculateChainPriceIndex. Rows are included only when is_staple is true and confidence-cleared unit prices are available as kr/kg, kr/l, or kr/st.

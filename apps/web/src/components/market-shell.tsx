@@ -8,6 +8,7 @@ import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedS
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
+import { FreshDisclaimer } from '@/components/fresh-disclaimer';
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
   chainSavingsLedger,
@@ -617,6 +618,7 @@ export function MarketShell() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <Eyebrow>Seasonal best time to buy produce calendar</Eyebrow>
+            <div className="mt-3"><FreshDisclaimer /></div>
             <h2 className="mt-2 text-3xl font-black tracking-tight">Best-buy months from historical price tape</h2>
             <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
               {seasonalProduceCalendar.methodology} The homepage shows the first visible calendar picks so unauthenticated shoppers can jump straight from the market terminal into produce seasonality.

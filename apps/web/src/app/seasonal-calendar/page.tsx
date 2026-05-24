@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { localSeasonalPicks, seasonalProduceCalendar } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { FreshDisclaimer } from '@/components/fresh-disclaimer';
 
 export function generateMetadata() {
   return routeMetadata('/seasonal-calendar');
@@ -15,6 +16,7 @@ export default function SeasonalCalendarPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         GroceryView turns dated OpenPrices rows into a produce planning calendar using historical monthly averages. Best time to buy means the cheapest observed month in the product&apos;s own history; No forecast or synthetic seasonal prediction is shown.
       </p>
+      <div className="mt-4"><FreshDisclaimer /></div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
         <Card>

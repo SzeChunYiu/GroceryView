@@ -7,6 +7,7 @@ import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
+import { FreshDisclaimer } from '@/components/fresh-disclaimer';
 
 const PRODUCTS_PER_PAGE = 50;
 
@@ -540,6 +541,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card><h2 className="text-2xl font-black">Chain matches rendered</h2><p className="mt-2 text-slate-600">{topChainSpreads.length} high-spread matched rows are highlighted from the generated Axfood module.</p></Card>
+        <FreshDisclaimer />
         <Card><h2 className="text-2xl font-black">Fresh OpenPrices rows</h2><p className="mt-2 text-slate-600">{freshestOpenPrices.length} recent community SEK observations are included with their observation dates.</p></Card>
       </div>
     </PageShell>

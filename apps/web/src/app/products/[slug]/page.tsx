@@ -25,6 +25,7 @@ import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, fin
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
 import { metadataForProduct } from '@/lib/seo';
+import { FreshDisclaimer } from '@/components/fresh-disclaimer';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
@@ -1292,6 +1293,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
             <div>
               <p className="text-xs font-black uppercase tracking-[0.22em] text-lime-800">Commodity / no-barcode price match</p>
               <h2 className="mt-2 text-2xl font-black text-slate-950">Cheapest chain for this commodity</h2>
+              <div className="mt-3"><FreshDisclaimer /></div>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
                 Calls compareCommodityUnitPrices for the canonical {commodityComparison.commodityName} commodity and compares only kr/{commodityComparison.comparableUnit} rows that clear sourceConfidence. Alias-matched loose produce and meat are labelled medium-confidence, never barcode-equivalent.
               </p>

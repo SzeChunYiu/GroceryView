@@ -5,6 +5,7 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
 import { categorySummaries } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { FreshDisclaimer } from '@/components/fresh-disclaimer';
 
 export function generateMetadata() {
   return routeMetadata({
@@ -104,6 +105,7 @@ export default function HeatmapPage() {
           <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
             Rows are verified categorySummaries, columns are calculateChainPriceIndex chains, and each covered cell links to its index symbol. Green is below 96, amber is 96-103, and red is above 103 on the 100-centred market scale.
           </p>
+          <div className="mt-4"><FreshDisclaimer /></div>
         </div>
         <div className="flex flex-wrap gap-2">
           <ConfidenceBadge level={coveredCellCount === totalCellCount ? 'high' : coveredCellCount > 0 ? 'medium' : 'low'} label="matrix coverage" sampleSize={coveredCellCount} />
