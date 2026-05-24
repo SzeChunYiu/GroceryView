@@ -22,6 +22,7 @@ import {
   dbSiteMatpriskollenSource
 } from './generated/db-site-ingested-overrides';
 import { categoryLabels, pricedProducts } from './openprices-products';
+import { allergenAvoidanceParam, allergenAvoidanceSummary, allergenRiskLabelsForText, isSearchToggleEnabled } from './search-filters';
 import { osmStores } from './osm-stores';
 import {
   currencyFromObservation,
@@ -517,6 +518,7 @@ export type ProductSearchUrlParams = {
   maxPrice?: SearchParamValue;
   inStockOnly?: SearchParamValue;
   minConfidence?: SearchParamValue;
+  excludeAllergenRisks?: SearchParamValue;
 };
 
 function firstSearchValue(value: SearchParamValue): string {
@@ -576,6 +578,15 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
   });
 }
 
+function allergenRiskTextForSearchRow(row: RealCatalogSearchPriceRow): string[] {
+  return [
+    row.canonicalName,
+    row.brand ?? '',
+    ...row.categoryPath,
+    ...(row.labels ?? [])
+  ];
+}
+
 export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}) {
   const query = firstSearchValue(searchParams.q);
   const categories = listSearchValues(searchParams.category);
@@ -587,8 +598,14 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
+  const excludeAllergenRisks = isSearchToggleEnabled(searchParams.excludeAllergenRisks);
+  const rowsWithAllergenRisk = facetedSearchRows.filter((row) => allergenRiskLabelsForText(allergenRiskTextForSearchRow(row)).length > 0);
+  const allergenFilteredRows = excludeAllergenRisks
+    ? facetedSearchRows.filter((row) => allergenRiskLabelsForText(allergenRiskTextForSearchRow(row)).length === 0)
+    : facetedSearchRows;
+  const excludedAllergenProductCount = new Set(rowsWithAllergenRisk.map((row) => row.productId)).size;
   const filters = { query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
-  const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
+  const searchResult = buildFacetedProductSearch({ rows: allergenFilteredRows, filters });
 
   const activeFilters = [
     query ? `q=${query}` : null,
@@ -602,7 +619,8 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     minPrice !== undefined ? `min unit ${formatSek(minPrice)}` : null,
     maxPrice !== undefined ? `max unit ${formatSek(maxPrice)}` : null,
     inStockOnly ? 'priced/in-stock only' : null,
-    minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null
+    minConfidence !== undefined ? `confidence ≥ ${pct.format(minConfidence * 100)}%` : null,
+    excludeAllergenRisks ? 'excludes common allergen-risk terms' : null
   ].filter((item): item is string => item !== null);
 
   return {
@@ -628,6 +646,12 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       latestPriceCount: searchResult.evidence.latestPriceCount,
       availableLatestPriceCount: searchResult.evidence.availableLatestPriceCount,
       outOfStockLatestPriceCount: searchResult.evidence.outOfStockLatestPriceCount
+    },
+    allergenAvoidance: {
+      enabled: excludeAllergenRisks,
+      param: allergenAvoidanceParam,
+      excludedProductCount: excludedAllergenProductCount,
+      summary: allergenAvoidanceSummary(excludedAllergenProductCount)
     },
     activeFilters,
     resultCards: productSearchResultCards(searchResult)

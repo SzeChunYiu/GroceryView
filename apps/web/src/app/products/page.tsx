@@ -5,6 +5,7 @@ import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { allergenAvoidanceParam, filterAllergenRiskItems } from '@/lib/search-filters';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
 const PRODUCTS_PER_PAGE = 50;
@@ -23,6 +24,7 @@ type SearchParams = {
   maxPrice?: string | string[];
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
+  excludeAllergenRisks?: string | string[];
   brand?: string | string[];
   page?: string | string[];
 };
@@ -63,6 +65,7 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'maxPrice', source.maxPrice);
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
+  setFirstParam(params, allergenAvoidanceParam, source.excludeAllergenRisks);
 }
 
 function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
@@ -80,9 +83,19 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
+  const allergenAwareAdaptiveProductCards = filterAllergenRiskItems(
+    adaptiveProductCards,
+    search.allergenAvoidance.enabled,
+    (card) => [card.name, card.brand, card.packageLabel, card.sourceLabel]
+  );
   const productCards = selectedBrand
-    ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
-    : adaptiveProductCards;
+    ? allergenAwareAdaptiveProductCards.filter((card) => card.brand === selectedBrand)
+    : allergenAwareAdaptiveProductCards;
+  const allergenAwareWatchlistProducts = filterAllergenRiskItems(
+    watchlistHeartProducts,
+    search.allergenAvoidance.enabled,
+    (product) => [product.productName, product.brand, product.categoryLabel, product.sourceLabel]
+  );
   const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
   const currentPage = Math.min(requestedPage, totalPages);
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
@@ -91,7 +104,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
 
-  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence' | 'excludeAllergenRisks', string>>) {
     const params = new URLSearchParams();
     copySearchParams(params, resolvedSearchParams);
     for (const [key, value] of Object.entries(overrides)) {
@@ -175,6 +188,16 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="mt-2 text-xs font-semibold leading-5 text-emerald-900">
               Gluten-free, lactose-free, and vegan filters require verified label metadata or explicit product text; GroceryView does not infer dietary status from shopper profiles.
             </p>
+          </div>
+          <div className="rounded-2xl border border-rose-100 bg-rose-50/80 p-3 lg:col-span-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-800">Household safety</p>
+            <label className="mt-2 flex items-start gap-2 rounded-2xl bg-white px-3 py-2 text-sm font-black text-rose-950 shadow-sm">
+              <input className="mt-1" defaultChecked={search.allergenAvoidance.enabled} name={allergenAvoidanceParam} type="checkbox" value="true" />
+              <span>
+                Exclude common allergen-risk items
+                <span className="block text-xs font-semibold leading-5 text-rose-700">{search.allergenAvoidance.summary}; matching uses product names, categories, and verified labels and is a cautionary filter, not a medical guarantee.</span>
+              </span>
+            </label>
           </div>
           <div className="flex flex-col justify-end gap-2">
             <label className="flex items-center gap-2 rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950">
@@ -284,10 +307,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
               Each card keeps the sourceProductSlug, target price, Deal Score, and alert summary wired to buildWatchlistAlerts output rather than anonymous local storage or demo rows.
             </p>
           </div>
-          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-rose-900 shadow-sm">{watchlistHeartProducts.length} verified save candidates</p>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-rose-900 shadow-sm">{allergenAwareWatchlistProducts.length} verified save candidates</p>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {watchlistHeartProducts.map((product) => (
+          {allergenAwareWatchlistProducts.map((product) => (
             <Link className="group rounded-2xl border border-rose-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-rose-700" href={`/products/${product.sourceProductSlug}`} key={product.sourceProductSlug}>
               <div className="flex items-start gap-3">
                 {product.imageUrl ? (
@@ -448,12 +471,14 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
                 ))}
               </select>
             </div>
+            {search.allergenAvoidance.enabled ? <input name={allergenAvoidanceParam} type="hidden" value="true" /> : null}
             <button className="rounded-xl bg-emerald-700 px-5 py-3 text-sm font-black text-white" type="submit">Apply brand</button>
           </form>
           <p className="mt-3 text-sm font-bold text-emerald-950">
             {selectedBrand
               ? `Showing ${productCards.length.toLocaleString('sv-SE')} verified product card${productCards.length === 1 ? '' : 's'} for ${selectedBrand}.`
               : 'Brand options are reused from the shared verified product option set so homepage and catalogue filters stay consistent.'}
+            {search.allergenAvoidance.enabled ? ` ${search.allergenAvoidance.summary} from recommendations.` : ''}
           </p>
         </Card>
         <ProductPriceCards
