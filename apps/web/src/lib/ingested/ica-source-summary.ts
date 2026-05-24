@@ -19,9 +19,17 @@ export type IcaStorePromotionSourceSummary = {
 export const icaStorePromotionSourceSummary: IcaStorePromotionSourceSummary = {
   sourceLabel: 'ICA handlaprivatkund store-scoped promotions endpoints',
   generatedFrom: 'apps/web/src/lib/ingested/ica.ts',
-  totalRowCount: 93084,
-  storeEndpointCount: 323,
+  totalRowCount: 93085,
+  storeEndpointCount: 324,
   latestStores: [
+    {
+      retrievedAt: '2026-05-23T19:35:14.000Z',
+      rowCount: 1,
+      storeAccountId: '1003566',
+      storeName: 'ICA Supermarket Vännäs',
+      regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d',
+      sourceUrl: 'https://handlaprivatkund.ica.se/stores/1003566/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=1&maxPageSize=1'
+    },
     {
       retrievedAt: '2026-05-23T13:26:35.000Z',
       rowCount: 10,
