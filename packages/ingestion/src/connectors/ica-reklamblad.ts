@@ -88,6 +88,7 @@ export const DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS = [
   'https://www.ica.se/erbjudanden/ica-nara-alsterhallen-1003653/',
   'https://www.ica.se/erbjudanden/ica-supermarket-alunda-1003654/'
 ] as const;
+export const DEFAULT_ICA_REKLAMBLAD_MAX_ROWS = 3000;
 export const EMAGIN_PDF_API_BASE_URL = 'https://api.e-magin.se/api/pdf/';
 
 export type FetchIcaReklambladOffersOptions = {
@@ -104,7 +105,7 @@ export async function fetchIcaReklambladOffers(
   const fetchImpl = options.fetchImpl ?? fetch;
   const sourceUrls = options.sourceUrls ?? (options.sourceUrl ? [options.sourceUrl] : DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS);
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
-  const maxRows = options.maxRows ?? 2000;
+  const maxRows = options.maxRows ?? DEFAULT_ICA_REKLAMBLAD_MAX_ROWS;
   const rows: IcaReklambladOffer[] = [];
 
   for (const sourceUrl of sourceUrls) {

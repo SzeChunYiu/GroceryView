@@ -84,7 +84,11 @@ export const DEFAULT_APOHEM_SOURCE_PATHS = [
   '/sok?q=munvard',
   '/vitaminer-kosttillskott',
   '/hudvard',
-  '/receptfritt'
+  '/receptfritt',
+  '/sok?q=omega',
+  '/sok?q=magnesium',
+  '/sok?q=forband',
+  '/sok?q=allergi'
 ] as const;
 
 export const DEFAULT_APOTEK_HJARTAT_SEARCH_URLS = [
@@ -93,7 +97,10 @@ export const DEFAULT_APOTEK_HJARTAT_SEARCH_URLS = [
   'https://www.apotekhjartat.se/search?q=solskydd',
   'https://www.apotekhjartat.se/search?q=tandkram',
   'https://www.apotekhjartat.se/search?q=munvard',
-  'https://www.apotekhjartat.se/search?q=pamol'
+  'https://www.apotekhjartat.se/search?q=pamol',
+  'https://www.apotekhjartat.se/search?q=omega',
+  'https://www.apotekhjartat.se/search?q=magnesium',
+  'https://www.apotekhjartat.se/search?q=allergi'
 ] as const;
 
 export async function fetchApohemProducts(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {
