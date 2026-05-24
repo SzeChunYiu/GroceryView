@@ -1,3 +1,13 @@
+/**
+ * Renders a compact badge that communicates the confidence level for a recommendation or metric.
+ *
+ * @example
+ * <ConfidenceBadge level="high" label="High confidence" sampleSize={42} />
+ *
+ * @param level - Visual confidence level used to select the badge color treatment.
+ * @param label - Text displayed inside the badge.
+ * @param sampleSize - Optional sample count shown as `n=<value>` when provided.
+ */
 type ConfidenceBadgeProps = {
   level: "high" | "medium" | "low";
   label: string;
