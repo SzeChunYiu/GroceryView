@@ -145,6 +145,19 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: false,
     requireStoreScopedPrices: false,
     stores: []
+  },
+  {
+    connectorId: 'preem-se-station-prices',
+    chainId: 'preem',
+    domain: 'fuel',
+    sourceType: 'retailer_online_page',
+    endpointUrl: 'groceryview://daily/preem/se/station-prices',
+    parserVersion: 'preem-se-prices-v1',
+    robotsTxtStatus: 'allow',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: false,
+    requireStoreScopedPrices: false,
+    stores: []
   }
 ];
 

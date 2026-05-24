@@ -30,7 +30,8 @@ describe('daily connectors export script', () => {
       'mathem',
       'matspar',
       'pharmacy',
-      'okq8'
+      'okq8',
+      'preem'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.connectorId), [
       'ica-store-promotions-default-stores',
@@ -45,7 +46,8 @@ describe('daily connectors export script', () => {
       'mathem-public-search',
       'matspar-public-search',
       'pharmacy-public-products',
-      'okq8-fuel-prices'
+      'okq8-fuel-prices',
+      'preem-se-station-prices'
     ]);
     assert.equal(
       connectors
@@ -57,6 +59,10 @@ describe('daily connectors export script', () => {
     assert.equal(okq8FuelConnector.domain, 'fuel');
     assert.equal(okq8FuelConnector.requireStoreScopedPrices, false);
     assert.deepEqual(okq8FuelConnector.stores, []);
+    const preemConnector = connectors.find((connector) => connector.connectorId === 'preem-se-station-prices');
+    assert.equal(preemConnector.domain, 'fuel');
+    assert.equal(preemConnector.requireStoreScopedPrices, false);
+    assert.deepEqual(preemConnector.stores, []);
     const matsparConnector = connectors.find((connector) => connector.connectorId === 'matspar-public-search');
     assert.equal(matsparConnector.domain, 'grocery');
     assert.equal(matsparConnector.requireStoreScopedPrices, false);
@@ -86,7 +92,8 @@ describe('daily connectors export script', () => {
       'groceryview://daily/mathem/products/public-search',
       'groceryview://daily/matspar/products/public-search',
       'groceryview://daily/pharmacy/products/public',
-      'https://www.okq8.se/foretag/priser/'
+      'https://www.okq8.se/foretag/priser/',
+      'groceryview://daily/preem/se/station-prices'
     ]);
     assert.deepEqual(connectors.map((connector) => connector.parserVersion), [
       'ica-store-promotions-native-v1',
@@ -101,7 +108,8 @@ describe('daily connectors export script', () => {
       'mathem-public-search-v1',
       'matspar-public-search-v1',
       'pharmacy-public-products-v1',
-      'okq8-fuel-prices-v1'
+      'okq8-fuel-prices-v1',
+      'preem-se-prices-v1'
     ]);
   });
 });

@@ -54,6 +54,7 @@ import {
   fetchOpenFoodFactsProducts,
   fetchOpenFoodFactsSwedenCatalog,
   fetchOkq8FuelPrices,
+  fetchPreemSePrices,
   fetchOpenFoodFactsRetailerEnrichments,
   fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
@@ -111,6 +112,7 @@ import {
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
+  GROCERYVIEW_DAILY_PREEM_SE_PRICES_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
@@ -131,6 +133,9 @@ import {
   parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
+  parsePreemConvenienceOfferPage,
+  parsePreemFuelListPricePage,
+  parsePreemStationsStore,
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
@@ -616,6 +621,145 @@ describe('OKQ8 fuel price connector', () => {
     ]);
     assert.equal(parsed.items.every((row) => row.sourceType === 'retailer_online_page'), true);
     assert.equal(parsed.items.every((row) => row.storeId === undefined), true);
+  });
+});
+
+describe('Preem SE fuel and convenience connector', () => {
+  const preemStationsJson = JSON.stringify({
+    name: 'stations',
+    data: [{
+      stationName: 'Preem Stockholm, Testgatan 1',
+      stationCode: '12345',
+      latitude: 59.33258,
+      longitude: 18.0649,
+      streetAddress: 'Testgatan 1',
+      postalCode: '111 22',
+      city: 'Stockholm',
+      municipality: 'Stockholm',
+      county: 'Stockholms län',
+      foodAndBeverages: true,
+      espressoHouse: false,
+      chain: 'Preem',
+      stationConcept: '01 Bemannad',
+      stationType: '01 Bemannad',
+      fuelTypes: [
+        { name: 'EvolutionBensin95' },
+        { name: 'Bensin98' },
+        { name: 'PreemEvolutionDiesel' }
+      ]
+    }, {
+      stationName: 'Uno-X Bergen',
+      stationCode: '78843',
+      latitude: 60.34760486,
+      longitude: 5.336201191,
+      city: 'BERGEN',
+      county: '',
+      chain: '',
+      fuelTypes: [{ name: 'Bensin95' }]
+    }]
+  });
+  const preemFuelHtml = `
+    <main>
+      <h2>Listpriser Företagskort och Transportkort</h2>
+      <p>Diesel Preem Evolution Diesel Pris inkl. moms 21,34 kr/l Gäller fr.om 2026-05-21</p>
+      <p>Diesel HVO100 Pris inkl. moms 29,89 kr/l Gäller fr.om 2026-05-21</p>
+      <p>Bensin Preem Evolution Bensin 95 Pris inkl. moms 18,89 kr/l Gäller fr.om 2026-05-22</p>
+      <p>Bensin Bensin 98 Pris inkl. moms 20,19 kr/l Gäller fr.om 2026-05-22</p>
+      <p>Alternativa drivmedel Etanol E85 Pris inkl. moms 15,84 kr/l Gäller fr.om 2026-05-22</p>
+      <h2>Prishistorik Företagskort och Transportkort</h2>
+    </main>
+  `;
+  const preemOffersHtml = `
+    <main>
+      <h1>Aktuella erbjudanden på station</h1>
+      <article><h2>Yalla & Fralla</h2><p>Yalla & Fralla för 47 kr - gäller för Preem medlem.</p></article>
+      <article><h2>Rengöringsdukar</h2><p>Rengöringsdukar för 49 kr (ord. pris 79 kr).</p></article>
+      <h2>Ta del av våra medlemserbjudanden</h2>
+    </main>
+  `;
+
+  it('parses Preem Swedish stations and national fuel list prices', () => {
+    const stations = parsePreemStationsStore({ body: preemStationsJson });
+    assert.equal(stations.length, 1);
+    assert.equal(stations[0]?.stationId, 'preem-12345');
+    assert.deepEqual(stations[0]?.fuelTypes, ['EvolutionBensin95', 'Bensin98', 'PreemEvolutionDiesel']);
+
+    const fuelRows = parsePreemFuelListPricePage({
+      body: preemFuelHtml,
+      capturedAt: '2026-05-24T08:00:00.000Z',
+      rawSnapshotRef: 'raw://preem-se/fuel/test'
+    });
+    assert.deepEqual(fuelRows.map((row) => [row.productId, row.pricePerLitre, row.unit]), [
+      ['fuel-95-e10', 18.89, 'l'],
+      ['fuel-98', 20.19, 'l'],
+      ['fuel-diesel', 21.34, 'l'],
+      ['fuel-hvo100', 29.89, 'l'],
+      ['fuel-e85', 15.84, 'l']
+    ]);
+  });
+
+  it('combines Preem station-scoped fuel rows with convenience offer prices', async () => {
+    const offers = parsePreemConvenienceOfferPage({
+      body: preemOffersHtml,
+      capturedAt: '2026-05-24T08:00:00.000Z',
+      rawSnapshotRef: 'raw://preem-se/offers/test'
+    });
+    assert.deepEqual(offers.map((row) => [row.offerTitle, row.price, row.regularPrice ?? null]), [
+      ['Yalla & Fralla', 47, null],
+      ['Rengöringsdukar', 49, 79]
+    ]);
+
+    const rows = await fetchPreemSePrices({
+      capturedAt: '2026-05-24T08:00:00.000Z',
+      fetchImpl: async (url) => {
+        if (String(url) === 'https://www.preem.se/stations-store.json') return new Response(preemStationsJson, { status: 200, headers: { 'content-type': 'application/json' } });
+        if (String(url) === 'https://www.preem.se/foretag/listpriser/') return new Response(preemFuelHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+        if (String(url) === 'https://www.preem.se/pa-stationen/erbjudanden/') return new Response(preemOffersHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+        return new Response('not found', { status: 404 });
+      }
+    });
+    assert.deepEqual(rows.map((row) => [row.storeId, row.domain, row.productId, row.domain === 'fuel' ? row.pricePerLitre : row.price]), [
+      ['preem-12345', 'fuel', 'fuel-95-e10', 18.89],
+      ['preem-12345', 'fuel', 'fuel-98', 20.19],
+      ['preem-12345', 'fuel', 'fuel-diesel', 21.34],
+      ['preem-12345', 'convenience', 'preem-offer-yalla-fralla-47-kr', 47],
+      ['preem-12345', 'convenience', 'preem-offer-rengoringsdukar-49-kr', 49]
+    ]);
+  });
+
+  it('adapts Preem rows into daily station-scoped fuel and convenience observations', async () => {
+    const snapshot = await fetchDailyConnectorSnapshot({
+      status: 'ready',
+      connectorId: 'preem-se-station-prices',
+      chainId: 'preem',
+      sourceType: 'retailer_online_page',
+      runKey: 'preem:retailer-online-page:preem-se-station-prices:2026-05-24',
+      sourceRunId: 'source-run:preem:retailer-online-page:preem-se-station-prices:2026-05-24',
+      provenance: {
+        sourceType: 'retailer_online_page',
+        sourceUrl: `${GROCERYVIEW_DAILY_PREEM_SE_PRICES_URL}?maxStations=1`,
+        capturedAt: '2026-05-24T08:00:00.000Z',
+        parserVersion: 'preem-se-prices-v1'
+      },
+      requiredActions: []
+    }, {
+      retrievedAt: '2026-05-24T08:00:00.000Z',
+      fetchImpl: async (url) => {
+        if (String(url) === 'https://www.preem.se/stations-store.json') return new Response(preemStationsJson, { status: 200, headers: { 'content-type': 'application/json' } });
+        if (String(url) === 'https://www.preem.se/foretag/listpriser/') return new Response(preemFuelHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+        if (String(url) === 'https://www.preem.se/pa-stationen/erbjudanden/') return new Response(preemOffersHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+        return new Response('not found', { status: 404 });
+      }
+    });
+
+    const parsed = JSON.parse(snapshot.body) as { items: Array<{ chainId: string; storeId: string; productId: string; categoryId: string; price: number; packageUnit: string }> };
+    assert.deepEqual(parsed.items.map((row) => [row.chainId, row.storeId, row.productId, row.categoryId, row.price, row.packageUnit]), [
+      ['preem', 'preem-12345', 'fuel-95-e10', 'fuel', 18.89, 'l'],
+      ['preem', 'preem-12345', 'fuel-98', 'fuel', 20.19, 'l'],
+      ['preem', 'preem-12345', 'fuel-diesel', 'fuel', 21.34, 'l'],
+      ['preem', 'preem-12345', 'preem-offer-yalla-fralla-47-kr', 'preem-food', 47, 'pce'],
+      ['preem', 'preem-12345', 'preem-offer-rengoringsdukar-49-kr', 'preem-car-care', 49, 'pce']
+    ]);
   });
 });
 
