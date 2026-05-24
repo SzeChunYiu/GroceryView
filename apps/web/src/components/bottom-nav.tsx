@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { Map, Search, Store, User, Watch } from 'lucide-react';
+import { Flame, Map, Search, Store, User, Watch } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 const bottomNavItems = [
   { href: '/', label: 'Markets', icon: Store, exact: true },
   { href: '/products', label: 'Search', icon: Search },
   { href: '/map', label: 'Map', icon: Map },
+  { href: '/heatmap', label: 'Heatmap', icon: Flame },
   { href: '/watchlist', label: 'Watchlist', icon: Watch },
   { href: '/account', label: 'Me', icon: User }
 ];
@@ -20,7 +21,7 @@ export function BottomNav() {
       aria-label="Primary mobile navigation"
       className="fixed inset-x-3 bottom-3 z-30 rounded-[1.5rem] border border-white/45 bg-white/72 px-2 py-2 shadow-[0_18px_45px_rgba(15,23,42,0.22)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/58 lg:hidden"
     >
-      <div className="grid grid-cols-5 gap-1">
+      <div className="grid grid-cols-6 gap-1">
         {bottomNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);

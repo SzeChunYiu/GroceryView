@@ -44,7 +44,7 @@ const navGroups: NavGroup[] = [
       { href: '/', label: 'Overview', icon: BarChart3 },
       { href: '/chain-index', label: 'Chain index', icon: Database },
       { href: '/categories', label: 'Categories', icon: Tags },
-      { href: '/heatmap', label: 'Heatmap', icon: Flame },
+      { href: '/heatmap', label: 'Price heatmap', icon: Flame },
       { href: '/screener', label: 'Screener', icon: Search }
     ]
   },

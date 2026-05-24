@@ -2031,6 +2031,8 @@ ${seo}`;
     assert.match(bottomNav, /Markets/);
     assert.match(bottomNav, /Search/);
     assert.match(bottomNav, /Map/);
+    assert.match(bottomNav, /Heatmap/);
+    assert.match(bottomNav, /\/heatmap/);
     assert.match(bottomNav, /Watchlist/);
     assert.match(bottomNav, /Me/);
     assert.match(dataUi, /import \{ BottomNav \} from '\.\/bottom-nav'/);
