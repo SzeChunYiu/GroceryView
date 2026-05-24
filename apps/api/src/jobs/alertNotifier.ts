@@ -31,6 +31,13 @@ export type NotifyTriggeredPriceAlertsResult = {
   skipped: TriggeredPriceAlertEmailSkipped[];
 };
 
+type PriceAlertTrigger = Omit<WatchlistAlert['trigger'], 'metric' | 'threshold' | 'value'> & {
+  baselineValue?: number;
+  metric?: string;
+  threshold?: number;
+  value?: number | string;
+};
+
 export async function notifyTriggeredPriceAlerts(
   input: NotifyTriggeredPriceAlertsInput
 ): Promise<NotifyTriggeredPriceAlertsResult> {
@@ -60,12 +67,12 @@ export async function notifyTriggeredPriceAlerts(
 }
 
 export function isEmailNotifiablePriceAlert(alert: WatchlistAlert): boolean {
-  return (
-    alert.type === 'target_price' &&
-    alert.trigger.metric === 'price' &&
-    typeof alert.trigger.value === 'number' &&
-    typeof alert.trigger.threshold === 'number'
-  );
+  if (alert.type !== 'target_price') {
+    return false;
+  }
+
+  const trigger = alert.trigger as PriceAlertTrigger;
+  return isAbsolutePriceTrigger(trigger) || isPercentageDropTrigger(trigger);
 }
 
 export function buildTriggeredPriceAlertEmail(
@@ -75,18 +82,18 @@ export function buildTriggeredPriceAlertEmail(
 ): TransactionalEmailMessage {
   const { alert } = notification;
   const itemUrl = notification.itemUrl ?? buildProductUrl(baseUrl, alert.productId);
-  const storeSuffix = alert.trigger.storeName ? ` at ${alert.trigger.storeName}` : '';
-  const threshold = typeof alert.trigger.threshold === 'number' ? alert.trigger.threshold : undefined;
+  const trigger = alert.trigger as PriceAlertTrigger;
+  const storeSuffix = trigger.storeName ? ` at ${trigger.storeName}` : '';
 
   const lines = [
     alert.message,
     '',
-    `Current price: ${formatPriceValue(alert.trigger.value)}${storeSuffix}`,
-    threshold === undefined ? undefined : `Alert threshold: ${formatSek(threshold)}`,
+    `${isPercentageDropTrigger(trigger) ? 'Current drop' : 'Current price'}: ${formatTriggerValue(trigger)}${storeSuffix}`,
+    `Alert threshold: ${formatAlertThreshold(trigger)}`,
     `Open item: ${itemUrl}`,
     '',
     `Sent at: ${now}`
-  ].filter((line): line is string => typeof line === 'string');
+  ];
 
   return {
     to: notification.recipientEmail,
@@ -100,14 +107,38 @@ export function buildTriggeredPriceAlertEmail(
   };
 }
 
+function isAbsolutePriceTrigger(trigger: PriceAlertTrigger): boolean {
+  return trigger.metric === 'price' && typeof trigger.value === 'number' && typeof trigger.threshold === 'number';
+}
+
+function isPercentageDropTrigger(trigger: PriceAlertTrigger): boolean {
+  return trigger.metric === 'price_drop_percent' && typeof trigger.value === 'number' && typeof trigger.threshold === 'number';
+}
+
 function buildProductUrl(baseUrl: string, productId: string): string {
   return `${baseUrl.replace(/\/+$/, '')}/product/${encodeURIComponent(productId)}`;
 }
 
-function formatSek(value: number): string {
-  return `${value.toFixed(2)} SEK`;
+function formatAlertThreshold(trigger: PriceAlertTrigger): string {
+  if (isPercentageDropTrigger(trigger)) {
+    return typeof trigger.threshold === 'number' ? `${formatPercent(trigger.threshold)} cheaper` : 'not set';
+  }
+
+  return typeof trigger.threshold === 'number' ? formatSek(trigger.threshold) : 'not set';
 }
 
-function formatPriceValue(value: number | string): string {
-  return typeof value === 'number' ? formatSek(value) : value;
+function formatTriggerValue(trigger: PriceAlertTrigger): string {
+  if (isPercentageDropTrigger(trigger) && typeof trigger.value === 'number') {
+    return formatPercent(trigger.value);
+  }
+
+  return typeof trigger.value === 'number' ? formatSek(trigger.value) : String(trigger.value);
+}
+
+function formatPercent(value: number): string {
+  return `${value.toFixed(0)}%`;
+}
+
+function formatSek(value: number): string {
+  return `${value.toFixed(2)} SEK`;
 }
