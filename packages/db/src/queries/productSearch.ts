@@ -46,23 +46,31 @@ export function buildProductSearchQuery(query: string, options: ProductSearchQue
   const normalizedQuery = normalizeSearchQuery(query);
   if (!normalizedQuery) return null;
 
-  const searchVector = "to_tsvector('simple', coalesce(products.canonical_name, '') || ' ' || coalesce(products.brand, ''))";
+  const searchDocument = "coalesce(products.canonical_name, '') || ' ' || coalesce(products.name_sv, '') || ' ' || coalesce(products.name_en, '') || ' ' || coalesce(products.brand, '')";
+  const normalizedSearchDocument = `lower(unaccent(${searchDocument}))`;
+  const searchVector = `to_tsvector('simple', unaccent(${searchDocument}))`;
+  const fuzzyRank = `similarity(${normalizedSearchDocument}, query.fuzzy_query)`;
 
   return {
     sql: `with query as (
-            select websearch_to_tsquery('simple', $1) as search_query
+            select websearch_to_tsquery('simple', unaccent($1)) as search_query,
+                   lower(unaccent($1)) as fuzzy_query
           )
           select products.id::text as id,
                  products.slug,
                  products.canonical_name as name,
                  products.brand,
                  products.image_url,
-                 ts_rank_cd(${searchVector}, query.search_query) as search_rank
+                 greatest(ts_rank_cd(${searchVector}, query.search_query), ${fuzzyRank}) as search_rank
             from products
             cross join query
            where products.domain = 'grocery'
-             and ${searchVector} @@ query.search_query
-           order by search_rank desc, products.canonical_name asc
+             and (
+               ${searchVector} @@ query.search_query
+               or ${normalizedSearchDocument} like '%' || query.fuzzy_query || '%'
+               or ${fuzzyRank} >= 0.2
+             )
+           order by search_rank desc, ${fuzzyRank} desc, products.canonical_name asc
            limit $2`,
     values: [normalizedQuery, clampLimit(options.limit)]
   };
