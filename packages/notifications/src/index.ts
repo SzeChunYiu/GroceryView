@@ -284,7 +284,113 @@ export type PersistedNotificationTask = {
   attemptCount: number;
   maxAttempts: number;
   status: 'queued' | 'delivered' | 'dead_lettered' | 'suppressed';
+  sourceUserId?: string;
+  sourceProductId?: string;
 };
+
+export type StalePriceWarning = {
+  userId: string;
+  productId: string;
+  recipient: string;
+  productName?: string;
+  staleSince?: string;
+};
+
+export type StalePriceWarningPushTaskSuppression = {
+  warning: StalePriceWarning;
+  reason: 'duplicate_input' | 'suppression_window';
+};
+
+export type PlanStalePriceWarningPushTasksInput = {
+  now: string;
+  stalePriceWarnings: StalePriceWarning[];
+  existingTasks?: PersistedNotificationTask[];
+  suppressionWindowHours?: number;
+  maxAttempts?: number;
+};
+
+export type PlanStalePriceWarningPushTasksResult = {
+  tasks: PersistedNotificationTask[];
+  suppressed: StalePriceWarningPushTaskSuppression[];
+};
+
+function requireStalePriceWarningString(value: string, field: keyof StalePriceWarning): string {
+  if (typeof value !== 'string' || value.trim().length === 0) throw new Error(`${field} is required.`);
+  return value.trim();
+}
+
+function stalePriceWarningTaskId(warning: StalePriceWarning, now: string): string {
+  const source = `${warning.userId}:${warning.productId}:${warning.recipient}:${now}`;
+  let hash = 0;
+  for (let index = 0; index < source.length; index += 1) hash = Math.imul(31, hash) + source.charCodeAt(index) | 0;
+  return `stale-price-warning-${Math.abs(hash).toString(36)}`;
+}
+
+function stalePriceWarningTaskBody(warning: StalePriceWarning): string {
+  const product = warning.productName?.trim() || warning.productId;
+  return warning.staleSince
+    ? `We have not seen a fresh price for ${product} since ${warning.staleSince}.`
+    : `We have not seen a fresh price for ${product} recently.`;
+}
+
+function isRecentStalePriceWarningTask(task: PersistedNotificationTask, warning: StalePriceWarning, cutoffMs: number, nowMs: number): boolean {
+  if (task.type !== 'stale_price_warning') return false;
+  if (task.sourceUserId !== warning.userId || task.sourceProductId !== warning.productId) return false;
+  const sendAtMs = Date.parse(task.sendAt);
+  return !Number.isNaN(sendAtMs) && sendAtMs >= cutoffMs && sendAtMs <= nowMs;
+}
+
+export function planStalePriceWarningPushTasks(input: PlanStalePriceWarningPushTasksInput): PlanStalePriceWarningPushTasksResult {
+  const nowMs = Date.parse(input.now);
+  if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
+  const suppressionWindowHours = input.suppressionWindowHours ?? 24;
+  if (!Number.isFinite(suppressionWindowHours) || suppressionWindowHours <= 0) throw new Error('suppressionWindowHours must be positive.');
+  const maxAttempts = input.maxAttempts ?? 3;
+  if (!Number.isInteger(maxAttempts) || maxAttempts <= 0) throw new Error('maxAttempts must be a positive integer.');
+
+  const cutoffMs = nowMs - suppressionWindowHours * 60 * 60 * 1000;
+  const seen = new Set<string>();
+  const tasks: PersistedNotificationTask[] = [];
+  const suppressed: StalePriceWarningPushTaskSuppression[] = [];
+
+  for (const warning of input.stalePriceWarnings) {
+    const normalized: StalePriceWarning = {
+      userId: requireStalePriceWarningString(warning.userId, 'userId'),
+      productId: requireStalePriceWarningString(warning.productId, 'productId'),
+      recipient: requireStalePriceWarningString(warning.recipient, 'recipient'),
+      ...(warning.productName?.trim() ? { productName: warning.productName.trim() } : {}),
+      ...(warning.staleSince?.trim() ? { staleSince: warning.staleSince.trim() } : {})
+    };
+    const key = `${normalized.userId}:${normalized.productId}`;
+    if (seen.has(key)) {
+      suppressed.push({ warning: normalized, reason: 'duplicate_input' });
+      continue;
+    }
+    seen.add(key);
+    if ((input.existingTasks ?? []).some((task) => isRecentStalePriceWarningTask(task, normalized, cutoffMs, nowMs))) {
+      suppressed.push({ warning: normalized, reason: 'suppression_window' });
+      continue;
+    }
+
+    tasks.push({
+      id: stalePriceWarningTaskId(normalized, input.now),
+      channel: 'push',
+      type: 'stale_price_warning',
+      title: 'Price data may be stale',
+      body: stalePriceWarningTaskBody(normalized),
+      priority: 'normal',
+      sendAt: input.now,
+      recipient: normalized.recipient,
+      attemptCount: 0,
+      maxAttempts,
+      status: 'queued',
+      sourceUserId: normalized.userId,
+      sourceProductId: normalized.productId
+    });
+  }
+
+  return { tasks, suppressed };
+}
 
 export type DeadLetterReplayPlanInput = {
   now: string;

@@ -921,6 +921,8 @@ export type NotificationTaskRecord = {
   attemptCount: number;
   maxAttempts: number;
   status: 'queued' | 'delivered' | 'dead_lettered' | 'suppressed';
+  sourceUserId?: string;
+  sourceProductId?: string;
 };
 
 export type NotificationTaskAcknowledgement =
@@ -951,6 +953,32 @@ export type NotificationTaskAcknowledgement =
       status: 'suppressed';
       reason: 'unsubscribed' | 'bounce' | 'complaint';
     };
+
+export type StalePriceWarningRecord = {
+  userId: string;
+  productId: string;
+  recipient: string;
+  productName?: string;
+  staleSince?: string;
+};
+
+export type StalePriceWarningTaskSuppression = {
+  warning: StalePriceWarningRecord;
+  reason: 'duplicate_input' | 'suppression_window';
+};
+
+export type PersistStalePriceWarningPushTasksInput = {
+  now: string;
+  stalePriceWarnings: StalePriceWarningRecord[];
+  suppressionWindowHours?: number;
+  maxAttempts?: number;
+};
+
+export type PersistStalePriceWarningPushTasksResult = {
+  tasks: NotificationTaskRecord[];
+  created: NotificationTaskRecord[];
+  suppressed: StalePriceWarningTaskSuppression[];
+};
 
 export type NotificationSuppressionRecord = {
   id: string;
@@ -1016,6 +1044,7 @@ export type GroceryViewRepository = {
   getCommunityReporterTrust(reporterId: string): Promise<CommunityReporterTrustRecord | null>;
   upsertNotificationTask(task: NotificationTaskRecord): Promise<void>;
   listDueNotificationTasks(now: string): Promise<NotificationTaskRecord[]>;
+  persistStalePriceWarningPushTasks(input: PersistStalePriceWarningPushTasksInput): Promise<PersistStalePriceWarningPushTasksResult>;
   upsertNotificationSuppression(suppression: NotificationSuppressionRecord): Promise<void>;
   listActiveNotificationSuppressions(): Promise<NotificationSuppressionRecord[]>;
   upsertAlertRule(rule: AlertRuleRecord): Promise<void>;
@@ -1252,6 +1281,86 @@ function watchlistRecordForStorage(item: WatchlistRecord): WatchlistRecord {
   return { ...item, allowedPriceTypes: normalizeWatchlistAllowedPriceTypes(item.allowedPriceTypes) };
 }
 
+const stalePriceWarningNotificationType = 'stale_price_warning';
+
+function requireTrimmedValue(value: string, field: keyof StalePriceWarningRecord): string {
+  if (typeof value !== 'string' || value.trim().length === 0) throw new Error(`${field} is required.`);
+  return value.trim();
+}
+
+function normalizeStalePriceWarning(warning: StalePriceWarningRecord): StalePriceWarningRecord {
+  return {
+    userId: requireTrimmedValue(warning.userId, 'userId'),
+    productId: requireTrimmedValue(warning.productId, 'productId'),
+    recipient: requireTrimmedValue(warning.recipient, 'recipient'),
+    ...(warning.productName?.trim() ? { productName: warning.productName.trim() } : {}),
+    ...(warning.staleSince?.trim() ? { staleSince: warning.staleSince.trim() } : {})
+  };
+}
+
+function stalePriceWarningSuppressionKey(warning: StalePriceWarningRecord): string {
+  return `${warning.userId}:${warning.productId}`;
+}
+
+function stalePriceWarningTaskId(warning: StalePriceWarningRecord, now: string): string {
+  return `stale-price-warning-${createHash('sha256')
+    .update(`${warning.userId}:${warning.productId}:${warning.recipient}:${now}`)
+    .digest('hex')
+    .slice(0, 24)}`;
+}
+
+function stalePriceWarningBody(warning: StalePriceWarningRecord): string {
+  const product = warning.productName ?? warning.productId;
+  return warning.staleSince
+    ? `We have not seen a fresh price for ${product} since ${warning.staleSince}.`
+    : `We have not seen a fresh price for ${product} recently.`;
+}
+
+function buildStalePriceWarningTask(warning: StalePriceWarningRecord, now: string, maxAttempts: number): NotificationTaskRecord {
+  return {
+    id: stalePriceWarningTaskId(warning, now),
+    channel: 'push',
+    type: stalePriceWarningNotificationType,
+    title: 'Price data may be stale',
+    body: stalePriceWarningBody(warning),
+    priority: 'normal',
+    sendAt: now,
+    recipient: warning.recipient,
+    attemptCount: 0,
+    maxAttempts,
+    status: 'queued',
+    sourceUserId: warning.userId,
+    sourceProductId: warning.productId
+  };
+}
+
+function stalePriceWarningTaskInWindow(task: NotificationTaskRecord, warning: StalePriceWarningRecord, cutoffMs: number, nowMs: number): boolean {
+  if (task.type !== stalePriceWarningNotificationType) return false;
+  if (task.sourceUserId !== warning.userId || task.sourceProductId !== warning.productId) return false;
+  const sendAtMs = Date.parse(task.sendAt);
+  return !Number.isNaN(sendAtMs) && sendAtMs >= cutoffMs && sendAtMs <= nowMs;
+}
+
+function normalizeStalePriceWarningPushTaskInput(input: PersistStalePriceWarningPushTasksInput): {
+  nowMs: number;
+  cutoffMs: number;
+  maxAttempts: number;
+  warnings: StalePriceWarningRecord[];
+} {
+  const nowMs = Date.parse(input.now);
+  if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
+  const suppressionWindowHours = input.suppressionWindowHours ?? 24;
+  if (!Number.isFinite(suppressionWindowHours) || suppressionWindowHours <= 0) throw new Error('suppressionWindowHours must be positive.');
+  const maxAttempts = input.maxAttempts ?? 3;
+  if (!Number.isInteger(maxAttempts) || maxAttempts <= 0) throw new Error('maxAttempts must be a positive integer.');
+  return {
+    nowMs,
+    cutoffMs: nowMs - suppressionWindowHours * 60 * 60 * 1000,
+    maxAttempts,
+    warnings: input.stalePriceWarnings.map(normalizeStalePriceWarning)
+  };
+}
+
 export function createMemoryRepository(): GroceryViewRepository {
   const users = new Map<string, UserRecord>();
   const favoriteStores = new Map<string, Set<string>>();
@@ -1471,6 +1580,33 @@ export function createMemoryRepository(): GroceryViewRepository {
         .map((task) => ({ ...task }));
     },
 
+    async persistStalePriceWarningPushTasks(input) {
+      const { nowMs, cutoffMs, maxAttempts, warnings } = normalizeStalePriceWarningPushTaskInput(input);
+      const seen = new Set<string>();
+      const tasks: NotificationTaskRecord[] = [];
+      const suppressed: StalePriceWarningTaskSuppression[] = [];
+
+      for (const warning of warnings) {
+        const key = stalePriceWarningSuppressionKey(warning);
+        if (seen.has(key)) {
+          suppressed.push({ warning, reason: 'duplicate_input' });
+          continue;
+        }
+        seen.add(key);
+
+        if ([...notificationTasks.values()].some((task) => stalePriceWarningTaskInWindow(task, warning, cutoffMs, nowMs))) {
+          suppressed.push({ warning, reason: 'suppression_window' });
+          continue;
+        }
+
+        const task = buildStalePriceWarningTask(warning, input.now, maxAttempts);
+        notificationTasks.set(task.id, { ...task });
+        tasks.push({ ...task });
+      }
+
+      return { tasks, created: tasks, suppressed };
+    },
+
     async upsertNotificationSuppression(suppression) {
       notificationSuppressions.set(suppression.id, { ...suppression });
     },
@@ -1599,6 +1735,8 @@ type NotificationTaskRow = {
   attempt_count: string | number;
   max_attempts: string | number;
   status: NotificationTaskRecord['status'];
+  source_user_id: string | null;
+  source_product_id: string | null;
 };
 type NotificationSuppressionRow = {
   id: string;
@@ -2284,7 +2422,9 @@ function mapNotificationTask(row: NotificationTaskRow): NotificationTaskRecord {
     recipient: row.recipient,
     attemptCount: Number(row.attempt_count),
     maxAttempts: Number(row.max_attempts),
-    status: row.status
+    status: row.status,
+    ...(row.source_user_id ? { sourceUserId: row.source_user_id } : {}),
+    ...(row.source_product_id ? { sourceProductId: row.source_product_id } : {})
   };
 }
 
@@ -2936,8 +3076,8 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
     async upsertNotificationTask(task) {
       await executor.query(
         `insert into notification_tasks(
-           id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status
-         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+           id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status, source_user_id, source_product_id
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
          on conflict (id) do update set
            channel = excluded.channel,
            type = excluded.type,
@@ -2949,6 +3089,8 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
            attempt_count = excluded.attempt_count,
            max_attempts = excluded.max_attempts,
            status = excluded.status,
+           source_user_id = excluded.source_user_id,
+           source_product_id = excluded.source_product_id,
            updated_at = now()`,
         [
           task.id,
@@ -2961,20 +3103,96 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
           task.recipient,
           task.attemptCount,
           task.maxAttempts,
-          task.status
+          task.status,
+          task.sourceUserId ?? null,
+          task.sourceProductId ?? null
         ]
       );
     },
 
     async listDueNotificationTasks(now) {
       const rows = await executor.query<NotificationTaskRow>(
-        `select id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status
+        `select id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status, source_user_id, source_product_id
          from notification_tasks
          where status = 'queued' and send_at <= $1
          order by send_at, id`,
         [now]
       );
       return rows.map(mapNotificationTask);
+    },
+
+    async persistStalePriceWarningPushTasks(input) {
+      const { nowMs, cutoffMs, maxAttempts, warnings } = normalizeStalePriceWarningPushTaskInput(input);
+      const cutoff = new Date(cutoffMs).toISOString();
+      const seen = new Set<string>();
+      const tasks: NotificationTaskRecord[] = [];
+      const suppressed: StalePriceWarningTaskSuppression[] = [];
+
+      for (const warning of warnings) {
+        const key = stalePriceWarningSuppressionKey(warning);
+        if (seen.has(key)) {
+          suppressed.push({ warning, reason: 'duplicate_input' });
+          continue;
+        }
+        seen.add(key);
+
+        const recent = await executor.query<{ id: string }>(
+          `select id
+           from notification_tasks
+           where type = $1
+             and source_user_id = $2
+             and source_product_id = $3
+             and send_at >= $4
+             and send_at <= $5
+           order by send_at desc, id
+           limit 1`,
+          [stalePriceWarningNotificationType, warning.userId, warning.productId, cutoff, input.now]
+        );
+        if (recent.length > 0) {
+          suppressed.push({ warning, reason: 'suppression_window' });
+          continue;
+        }
+
+        const task = buildStalePriceWarningTask(warning, input.now, maxAttempts);
+        await executor.query(
+          `insert into notification_tasks(
+             id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status, source_user_id, source_product_id
+           ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+           on conflict (id) do update set
+             channel = excluded.channel,
+             type = excluded.type,
+             title = excluded.title,
+             body = excluded.body,
+             priority = excluded.priority,
+             send_at = excluded.send_at,
+             recipient = excluded.recipient,
+             attempt_count = excluded.attempt_count,
+             max_attempts = excluded.max_attempts,
+             status = excluded.status,
+             source_user_id = excluded.source_user_id,
+             source_product_id = excluded.source_product_id,
+             updated_at = now()`,
+          [
+            task.id,
+            task.channel,
+            task.type,
+            task.title,
+            task.body,
+            task.priority,
+            task.sendAt,
+            task.recipient,
+            task.attemptCount,
+            task.maxAttempts,
+            task.status,
+            task.sourceUserId ?? null,
+            task.sourceProductId ?? null
+          ]
+        );
+        tasks.push(task);
+      }
+
+      void nowMs;
+      return { tasks, created: tasks, suppressed };
     },
 
     async upsertNotificationSuppression(suppression) {
@@ -3694,7 +3912,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '016_observation_connector_idempotency',
   '017_observation_availability',
   '018_household_collaboration_rls',
-  '019_price_snapshot_unique_index'
+  '019_price_snapshot_unique_index',
+  '019_stale_price_warning_notifications'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -3832,6 +4051,33 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
         });
         const suppressions = await repository.listActiveNotificationSuppressions();
         assertProbe(suppressions.some((suppression) => suppression.id === suppressionId), 'notification suppression probe row was not readable');
+      }
+    },
+    {
+      name: 'stale_price_warning_notification_task_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        const first = await repository.persistStalePriceWarningPushTasks({
+          now: input.now,
+          stalePriceWarnings: [{
+            userId,
+            productId: groceryProductId,
+            recipient: `ExponentPushToken[${safeId}]`,
+            productName: 'Postgres Probe Grocery',
+            staleSince: input.now
+          }]
+        });
+        assertProbe(first.tasks.length === 1, 'stale price warning task was not created');
+        const dueTasks = await repository.listDueNotificationTasks(input.now);
+        assertProbe(
+          dueTasks.some((task) => task.id === first.tasks[0]?.id && task.sourceUserId === userId && task.sourceProductId === groceryProductId),
+          'stale price warning task was not readable'
+        );
+        const second = await repository.persistStalePriceWarningPushTasks({
+          now: input.now,
+          stalePriceWarnings: [{ userId, productId: groceryProductId, recipient: `ExponentPushToken[${safeId}]` }]
+        });
+        assertProbe(second.tasks.length === 0 && second.suppressed[0]?.reason === 'suppression_window', 'stale price warning suppression window was not applied');
       }
     },
     {

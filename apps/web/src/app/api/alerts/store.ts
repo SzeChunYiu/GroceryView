@@ -96,6 +96,168 @@ function databaseUrl() {
   return process.env.DATABASE_URL;
 }
 
+export type StalePriceWarning = {
+  userEmail: string;
+  productId: string;
+  recipient: string;
+  userId?: string;
+  productName?: string;
+  staleSince?: string;
+};
+
+export type StalePriceWarningPushTask = {
+  id: string;
+  channel: 'push';
+  type: 'stale_price_warning';
+  title: string;
+  body: string;
+  priority: 'normal';
+  sendAt: string;
+  recipient: string;
+  attemptCount: number;
+  maxAttempts: number;
+  status: 'queued';
+  sourceUserId: string;
+  sourceProductId: string;
+};
+
+export type PersistStalePriceWarningPushTasksResult = {
+  tasks: StalePriceWarningPushTask[];
+  suppressed: Array<{ warning: StalePriceWarning; reason: 'duplicate_input' | 'suppression_window' }>;
+};
+
+const stalePriceWarningTasks = new Map<string, StalePriceWarningPushTask>();
+
+function normalizeStalePriceWarning(warning: StalePriceWarning): StalePriceWarning {
+  const userEmail = normalizeEmail(warning.userEmail);
+  if (!isNonEmptyString(warning.productId)) throw new Error('productId is required.');
+  if (!isNonEmptyString(warning.recipient)) throw new Error('recipient is required.');
+  return {
+    userEmail,
+    productId: warning.productId.trim(),
+    recipient: warning.recipient.trim(),
+    ...(warning.userId?.trim() ? { userId: warning.userId.trim() } : {}),
+    ...(warning.productName?.trim() ? { productName: warning.productName.trim() } : {}),
+    ...(warning.staleSince?.trim() ? { staleSince: warning.staleSince.trim() } : {})
+  };
+}
+
+function staleWarningSourceUser(warning: StalePriceWarning): string {
+  return warning.userId ?? warning.userEmail;
+}
+
+function staleWarningBody(warning: StalePriceWarning): string {
+  const product = warning.productName ?? warning.productId;
+  return warning.staleSince
+    ? `We have not seen a fresh price for ${product} since ${warning.staleSince}.`
+    : `We have not seen a fresh price for ${product} recently.`;
+}
+
+function staleWarningTask(warning: StalePriceWarning, now: string, maxAttempts: number): StalePriceWarningPushTask {
+  return {
+    id: crypto.randomUUID(),
+    channel: 'push',
+    type: 'stale_price_warning',
+    title: 'Price data may be stale',
+    body: staleWarningBody(warning),
+    priority: 'normal',
+    sendAt: now,
+    recipient: warning.recipient,
+    attemptCount: 0,
+    maxAttempts,
+    status: 'queued',
+    sourceUserId: staleWarningSourceUser(warning),
+    sourceProductId: warning.productId
+  };
+}
+
+export async function persistStalePriceWarningPushTasks(input: {
+  stalePriceWarnings: StalePriceWarning[];
+  now?: string;
+  suppressionWindowHours?: number;
+  maxAttempts?: number;
+}): Promise<PersistStalePriceWarningPushTasksResult> {
+  const now = input.now ?? new Date().toISOString();
+  const nowMs = Date.parse(now);
+  if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
+  const suppressionWindowHours = input.suppressionWindowHours ?? 24;
+  if (!Number.isFinite(suppressionWindowHours) || suppressionWindowHours <= 0) throw new Error('suppressionWindowHours must be positive.');
+  const maxAttempts = input.maxAttempts ?? 3;
+  if (!Number.isInteger(maxAttempts) || maxAttempts <= 0) throw new Error('maxAttempts must be a positive integer.');
+
+  const cutoff = new Date(nowMs - suppressionWindowHours * 60 * 60 * 1000).toISOString();
+  const configuredDatabaseUrl = databaseUrl();
+  const pool = configuredDatabaseUrl ? await poolForDatabaseUrl(configuredDatabaseUrl) : null;
+  const seen = new Set<string>();
+  const tasks: StalePriceWarningPushTask[] = [];
+  const suppressed: PersistStalePriceWarningPushTasksResult['suppressed'] = [];
+
+  for (const rawWarning of input.stalePriceWarnings) {
+    const warning = normalizeStalePriceWarning(rawWarning);
+    const sourceUserId = staleWarningSourceUser(warning);
+    const key = `${sourceUserId}:${warning.productId}`;
+    if (seen.has(key)) {
+      suppressed.push({ warning, reason: 'duplicate_input' });
+      continue;
+    }
+    seen.add(key);
+
+    if (pool) {
+      const recent = await pool.query(
+        `select id
+         from notification_tasks
+         where type = $1 and source_user_id = $2 and source_product_id = $3 and send_at >= $4 and send_at <= $5
+         limit 1`,
+        ['stale_price_warning', sourceUserId, warning.productId, cutoff, now]
+      );
+      if (recent.rows.length > 0) {
+        suppressed.push({ warning, reason: 'suppression_window' });
+        continue;
+      }
+    } else if ([...stalePriceWarningTasks.values()].some((task) => {
+      const sendAtMs = Date.parse(task.sendAt);
+      return task.sourceUserId === sourceUserId &&
+        task.sourceProductId === warning.productId &&
+        !Number.isNaN(sendAtMs) &&
+        sendAtMs >= Date.parse(cutoff) &&
+        sendAtMs <= nowMs;
+    })) {
+      suppressed.push({ warning, reason: 'suppression_window' });
+      continue;
+    }
+
+    const task = staleWarningTask(warning, now, maxAttempts);
+    if (pool) {
+      await pool.query(
+        `insert into notification_tasks(
+           id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status, source_user_id, source_product_id
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+         on conflict (id) do nothing`,
+        [
+          task.id,
+          task.channel,
+          task.type,
+          task.title,
+          task.body,
+          task.priority,
+          task.sendAt,
+          task.recipient,
+          task.attemptCount,
+          task.maxAttempts,
+          task.status,
+          task.sourceUserId,
+          task.sourceProductId
+        ]
+      );
+    } else {
+      stalePriceWarningTasks.set(task.id, task);
+    }
+    tasks.push(task);
+  }
+
+  return { tasks, suppressed };
+}
+
 export async function listPriceAlerts(userEmail: string): Promise<PriceAlert[]> {
   const normalizedEmail = normalizeEmail(userEmail);
   const configuredDatabaseUrl = databaseUrl();
