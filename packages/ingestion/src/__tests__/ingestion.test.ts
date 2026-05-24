@@ -18,6 +18,7 @@ import {
   createDailyIngestionQueryExecutor,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
+  detectPriceAnomaly,
   buildHemkopCategoryUrl,
   buildHemkopSearchUrl,
   buildHemkopStoresUrl,
@@ -4497,6 +4498,38 @@ describe('normalizeUnitPrice', () => {
   });
 });
 
+describe('detectPriceAnomaly', () => {
+  it('keeps stable price observations out of the review queue', () => {
+    const review = detectPriceAnomaly({
+      productId: 'coffee-zoegas-450g',
+      price: 51.9,
+      unitPrice: 115.3333,
+      historicalPrices: [49.9, 50.9, 52.9, 51.5],
+      historicalUnitPrices: [110.8889, 113.1111, 117.5556, 114.4444]
+    });
+
+    assert.equal(review.requiresHumanVerification, false);
+    assert.deepEqual(review.flags, []);
+  });
+
+  it('flags extreme statistical price swings for human verification', () => {
+    const review = detectPriceAnomaly({
+      productId: 'coffee-zoegas-450g',
+      price: 399,
+      unitPrice: 886.6667,
+      previousPrice: 49.9,
+      previousUnitPrice: 110.8889,
+      historicalPrices: [48.9, 49.9, 50.9, 51.5],
+      historicalUnitPrices: [108.6667, 110.8889, 113.1111, 114.4444]
+    });
+
+    assert.equal(review.requiresHumanVerification, true);
+    assert.ok(review.flags.includes('extreme_price_spike'));
+    assert.ok(review.flags.includes('statistical_price_outlier'));
+    assert.ok(review.flags.includes('extreme_unit_price_spike'));
+  });
+});
+
 describe('ingestRetailerProduct', () => {
   it('creates product, alias, price observation, and promotion records from retailer input', () => {
     const output = ingestRetailerProduct({
@@ -4517,6 +4550,8 @@ describe('ingestRetailerProduct', () => {
       packageSize: 450,
       packageUnit: 'g',
       price: 49.9,
+      previousPrice: 50.9,
+      historicalPrices: [48.9, 49.9, 50.9, 51.5],
       regularPrice: 69.9,
       promoText: 'Veckans erbjudande',
       memberOnly: false,
@@ -4528,6 +4563,8 @@ describe('ingestRetailerProduct', () => {
     assert.equal(output.alias.matchConfidence, 0.85);
     assert.equal(output.priceObservation.unitPrice, 110.8889);
     assert.equal(output.priceObservation.confidenceScore, 0.85);
+    assert.equal(output.priceObservation.requiresHumanVerification, false);
+    assert.deepEqual(output.priceObservation.sanityCheckFlags, []);
     assert.equal(output.priceObservation.priceType, 'online');
     assert.deepEqual(output.priceObservation.provenance, {
       sourceType: 'retailer_online_page',
@@ -4584,6 +4621,31 @@ describe('ingestRetailerProduct', () => {
     assert.equal(output.alias.matchConfidence, 0.68);
     assert.equal(output.priceObservation.confidenceScore, 0.68);
     assert.equal(output.priceObservation.unitPrice, 39.9);
+  });
+
+  it('marks anomalous accepted prices for human verification without dropping provenance', () => {
+    const output = ingestRetailerProduct({
+      sourceType: 'retailer_online_page',
+      observedAt: '2026-05-19T16:00:00.000Z',
+      parserVersion: 'retailer-page-parser-v1',
+      rawSnapshotRef: 's3://groceryview-raw/willys/coffee-2026-05-19.json',
+      chainId: 'willys',
+      rawName: 'Zoégas Skånerost 450g',
+      canonicalName: 'Zoégas Coffee 450g',
+      productId: 'coffee-zoegas-450g',
+      categoryId: 'coffee',
+      packageSize: 450,
+      packageUnit: 'g',
+      price: 399,
+      historicalPrices: [48.9, 49.9, 50.9, 51.5],
+      historicalUnitPrices: [108.6667, 110.8889, 113.1111, 114.4444],
+      sourceUrl: 'https://example.test/coffee'
+    });
+
+    assert.equal(output.priceObservation.requiresHumanVerification, true);
+    assert.ok(output.priceObservation.sanityCheckFlags.includes('extreme_price_spike'));
+    assert.equal(output.priceObservation.confidenceScore, 0.2);
+    assert.equal(output.priceObservation.provenance.rawSnapshotRef, 's3://groceryview-raw/willys/coffee-2026-05-19.json');
   });
 
   it('rejects records that cannot preserve parser and raw snapshot provenance', () => {

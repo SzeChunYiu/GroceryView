@@ -2666,6 +2666,10 @@ export type RetailerProductInput = {
   packageSize: number;
   packageUnit: string;
   price: number;
+  previousPrice?: number;
+  previousUnitPrice?: number;
+  historicalPrices?: number[];
+  historicalUnitPrices?: number[];
   regularPrice?: number;
   promoText?: string;
   memberOnly?: boolean;
@@ -2721,6 +2725,130 @@ export type IngestedAlias = {
   reviewedByHuman: boolean;
 };
 
+export type PriceAnomalyFlag =
+  | 'extreme_price_spike'
+  | 'extreme_price_drop'
+  | 'statistical_price_outlier'
+  | 'extreme_unit_price_spike'
+  | 'extreme_unit_price_drop'
+  | 'statistical_unit_price_outlier';
+
+export type PriceAnomalyDetectorInput = {
+  productId?: string;
+  price: number;
+  unitPrice?: number;
+  previousPrice?: number;
+  previousUnitPrice?: number;
+  historicalPrices?: number[];
+  historicalUnitPrices?: number[];
+};
+
+export type PriceAnomalyReview = {
+  productId?: string;
+  requiresHumanVerification: boolean;
+  flags: PriceAnomalyFlag[];
+  observedPrice: number;
+  baselinePrice?: number;
+  priceRelativeChange?: number;
+  priceRobustZScore?: number;
+  observedUnitPrice?: number;
+  baselineUnitPrice?: number;
+  unitPriceRelativeChange?: number;
+  unitPriceRobustZScore?: number;
+  sampleSize: number;
+};
+
+const PRICE_ANOMALY_MIN_HISTORY = 3;
+const PRICE_ANOMALY_EXTREME_MULTIPLIER = 3;
+const PRICE_ANOMALY_ROBUST_Z_SCORE = 8;
+const PRICE_ANOMALY_MIN_RELATIVE_CHANGE = 0.75;
+
+const finitePositiveNumbers = (values: Array<number | undefined> | undefined): number[] => (values ?? [])
+  .filter((value): value is number => Number.isFinite(value) && value > 0);
+
+function median(values: number[]): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  const midpoint = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[midpoint - 1]! + sorted[midpoint]!) / 2 : sorted[midpoint]!;
+}
+
+function robustZScore(value: number, samples: number[], baseline: number): number | undefined {
+  if (samples.length < PRICE_ANOMALY_MIN_HISTORY) return undefined;
+  const deviations = samples.map((sample) => Math.abs(sample - baseline));
+  const mad = median(deviations);
+  if (mad === 0) return value === baseline ? 0 : Number.POSITIVE_INFINITY;
+  return Math.abs(0.6745 * (value - baseline) / mad);
+}
+
+function appendMetricAnomaly(
+  flags: PriceAnomalyFlag[],
+  observed: number | undefined,
+  history: number[] | undefined,
+  previous: number | undefined,
+  spikeFlag: PriceAnomalyFlag,
+  dropFlag: PriceAnomalyFlag,
+  outlierFlag: PriceAnomalyFlag
+): { baseline?: number; relativeChange?: number; robustZ?: number; sampleSize: number } {
+  if (observed === undefined || !Number.isFinite(observed) || observed <= 0) return { sampleSize: 0 };
+  const samples = finitePositiveNumbers(history);
+  const previousSamples = finitePositiveNumbers([previous]);
+  const baselineSamples = samples.length >= PRICE_ANOMALY_MIN_HISTORY ? samples : previousSamples;
+  if (baselineSamples.length === 0) return { sampleSize: samples.length };
+
+  const baseline = median(baselineSamples);
+  const relativeChange = observed / baseline - 1;
+  const robustZ = robustZScore(observed, samples, baseline);
+
+  if (observed >= baseline * PRICE_ANOMALY_EXTREME_MULTIPLIER) flags.push(spikeFlag);
+  if (observed <= baseline / PRICE_ANOMALY_EXTREME_MULTIPLIER) flags.push(dropFlag);
+  if (
+    robustZ !== undefined
+    && robustZ >= PRICE_ANOMALY_ROBUST_Z_SCORE
+    && Math.abs(relativeChange) >= PRICE_ANOMALY_MIN_RELATIVE_CHANGE
+  ) {
+    flags.push(outlierFlag);
+  }
+
+  return { baseline, relativeChange, robustZ, sampleSize: Math.max(samples.length, baselineSamples.length) };
+}
+
+export function detectPriceAnomaly(input: PriceAnomalyDetectorInput): PriceAnomalyReview {
+  const flags: PriceAnomalyFlag[] = [];
+  const priceMetric = appendMetricAnomaly(
+    flags,
+    input.price,
+    input.historicalPrices,
+    input.previousPrice,
+    'extreme_price_spike',
+    'extreme_price_drop',
+    'statistical_price_outlier'
+  );
+  const unitPriceMetric = appendMetricAnomaly(
+    flags,
+    input.unitPrice,
+    input.historicalUnitPrices,
+    input.previousUnitPrice,
+    'extreme_unit_price_spike',
+    'extreme_unit_price_drop',
+    'statistical_unit_price_outlier'
+  );
+
+  return {
+    productId: input.productId,
+    requiresHumanVerification: flags.length > 0,
+    flags,
+    observedPrice: input.price,
+    baselinePrice: priceMetric.baseline,
+    priceRelativeChange: priceMetric.relativeChange,
+    priceRobustZScore: priceMetric.robustZ,
+    observedUnitPrice: input.unitPrice,
+    baselineUnitPrice: unitPriceMetric.baseline,
+    unitPriceRelativeChange: unitPriceMetric.relativeChange,
+    unitPriceRobustZScore: unitPriceMetric.robustZ,
+    sampleSize: Math.max(priceMetric.sampleSize, unitPriceMetric.sampleSize)
+  };
+}
+
 export type IngestedPriceObservation = {
   productId: string;
   retailerProductId?: string;
@@ -2744,6 +2872,9 @@ export type IngestedPriceObservation = {
   sourceRunId?: string;
   provenance: PriceProvenance;
   confidenceScore: number;
+  requiresHumanVerification: boolean;
+  sanityCheckFlags: PriceAnomalyFlag[];
+  priceAnomaly: PriceAnomalyReview;
   isOnlinePrice: boolean;
   isInstorePrice: boolean;
   isAvailable: boolean;
@@ -2859,8 +2990,18 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
   const classification = classifyRetailerProduct(input);
   const confidence = classification.matchConfidence;
   const normalized = normalizeUnitPrice(input);
+  const priceAnomaly = detectPriceAnomaly({
+    productId: input.productId,
+    price: input.price,
+    unitPrice: normalized.unitPrice,
+    previousPrice: input.previousPrice,
+    previousUnitPrice: input.previousUnitPrice,
+    historicalPrices: input.historicalPrices,
+    historicalUnitPrices: input.historicalUnitPrices
+  });
   const hasPromotion = input.regularPrice !== undefined && input.regularPrice > input.price;
   const priceType = priceTypeForSource(input, hasPromotion);
+  const observationConfidence = priceAnomaly.requiresHumanVerification ? Math.min(confidence, 0.2) : confidence;
   const provenance: PriceProvenance = {
     sourceType: input.sourceType,
     sourceUrl: input.sourceUrl,
@@ -2916,7 +3057,10 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       rawSnapshotRef: input.rawSnapshotRef,
       sourceRunId: input.sourceRunId,
       provenance,
-      confidenceScore: confidence,
+      confidenceScore: observationConfidence,
+      requiresHumanVerification: priceAnomaly.requiresHumanVerification,
+      sanityCheckFlags: priceAnomaly.flags,
+      priceAnomaly,
       isOnlinePrice: input.sourceType === 'official_api' || input.sourceType === 'retailer_online_page',
       isInstorePrice: input.sourceType === 'receipt_scan' || input.sourceType === 'shelf_photo' || input.sourceType === 'manual_user_report',
       isAvailable: input.isAvailable ?? true,
@@ -2936,7 +3080,7 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
           validUntil: input.validUntil,
           sourceType: input.sourceType,
           provenance,
-          confidenceScore: confidence
+          confidenceScore: observationConfidence
         }
       : null
   };
@@ -4160,7 +4304,9 @@ async function persistDailyConnectorOutput(input: {
         priceType: accepted.priceObservation.priceType,
         price: accepted.priceObservation.price,
         isAvailable: accepted.priceObservation.isAvailable,
-        observedAt: accepted.priceObservation.observedAt
+        observedAt: accepted.priceObservation.observedAt,
+        requiresHumanVerification: accepted.priceObservation.requiresHumanVerification,
+        sanityCheckFlags: accepted.priceObservation.sanityCheckFlags
       };
       const rawProvenance = {
         sourceType: accepted.priceObservation.provenance.sourceType,
