@@ -4,7 +4,7 @@ import { type INestApplication } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module.js';
-import { configureApp } from '../src/configure-app.js';
+import { configureApp } from '../src/app.js';
 
 describe('GroceryView API app', () => {
   let app: INestApplication;
@@ -122,5 +122,44 @@ describe('GroceryView API app', () => {
   it('returns 404 for missing product terminal data', async () => {
     await request(app.getHttpServer()).get('/products/missing-product/terminal').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/spread').expect(404);
+  });
+
+  it('rejects requests when API rate limit is exceeded', async () => {
+    const originalEnv = {
+      API_RATE_LIMIT_ENABLED: process.env.API_RATE_LIMIT_ENABLED,
+      API_RATE_LIMIT_LIMIT: process.env.API_RATE_LIMIT_LIMIT,
+      API_RATE_LIMIT_WINDOW_MS: process.env.API_RATE_LIMIT_WINDOW_MS,
+      API_RATE_LIMIT_MESSAGE: process.env.API_RATE_LIMIT_MESSAGE
+    };
+
+    process.env.API_RATE_LIMIT_ENABLED = 'true';
+    process.env.API_RATE_LIMIT_LIMIT = '1';
+    process.env.API_RATE_LIMIT_WINDOW_MS = '1000';
+    process.env.API_RATE_LIMIT_MESSAGE = 'Rate limit reached';
+
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule]
+    }).compile();
+
+    const appWithLimit = moduleFixture.createNestApplication();
+    configureApp(appWithLimit);
+    await appWithLimit.init();
+
+    try {
+      await request(appWithLimit.getHttpServer()).get('/health').expect(200);
+      await request(appWithLimit.getHttpServer()).get('/health').expect(429).expect({
+        error: 'Rate limit reached'
+      });
+    } finally {
+      await appWithLimit.close();
+
+      for (const [key, value] of Object.entries(originalEnv)) {
+        if (value === undefined) {
+          delete process.env[key];
+        } else {
+          process.env[key] = value;
+        }
+      }
+    }
   });
 });
