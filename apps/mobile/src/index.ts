@@ -395,12 +395,19 @@ export type MobileStoresViewModel = {
       price: number;
       dealScore: number;
       verdict: string;
+      stockStatusLabel: string;
     } | null;
     basketQuote: {
       subtotal: number;
       coveragePercent: number;
       savingsVsBaseline: number;
       freshnessLabel: 'fresh' | 'mixed' | 'stale';
+      confidenceLabel: 'high' | 'medium' | 'low';
+      matchedProductCount: number;
+      missingProductCount: number;
+      unavailableProductCount: number;
+      staleProductCount: number;
+      stockStatusLabel: string;
     } | null;
   }>;
   selectedStore: {
@@ -414,6 +421,7 @@ export type MobileStoresViewModel = {
       price: number;
       dealScore: number;
       verdict: string;
+      stockStatusLabel: string;
     }>;
   } | null;
   actions: Array<'open_store' | 'compare_basket' | 'scan_barcode'>;
@@ -558,6 +566,57 @@ function normalizeMobileStoresInput(input: MobileStoresInput): { userId: string;
   return typeof input === 'string' ? { userId: input } : input;
 }
 
+function formatMobileStockStatusLabel(input: {
+  available: boolean;
+  stale?: boolean;
+  confidenceLabel: 'high' | 'medium' | 'low';
+}): string {
+  const status = input.available ? 'in stock' : 'stock unavailable';
+  const freshness = input.stale ? ', stale evidence' : '';
+  return `${status}, ${input.confidenceLabel} confidence${freshness}`;
+}
+
+function mobileStockConfidenceLabel(confidence: number): 'high' | 'medium' | 'low' {
+  return confidence >= 0.8 ? 'high' : confidence >= 0.5 ? 'medium' : 'low';
+}
+
+function formatMobileDealStockLabel(input: {
+  storeConfidence: 'high' | 'medium' | 'low';
+  productId: string;
+  basketQuote: ReturnType<MobileApi['getLocalOfferBasketReport']>['stores'][number] | null;
+}): string {
+  const line = input.basketQuote?.lines.find((candidate) => candidate.productId === input.productId);
+  if (line) {
+    return formatMobileStockStatusLabel({
+      available: true,
+      stale: line.stale,
+      confidenceLabel: mobileStockConfidenceLabel(line.confidence)
+    });
+  }
+  if (input.basketQuote?.unavailableProductIds.includes(input.productId)) {
+    return formatMobileStockStatusLabel({ available: false, confidenceLabel: input.basketQuote.confidenceLabel });
+  }
+  return formatMobileStockStatusLabel({ available: true, confidenceLabel: input.storeConfidence });
+}
+
+function formatMobileBranchStockLabel(input: {
+  matchedProductCount: number;
+  totalProductCount: number;
+  missingProductCount: number;
+  unavailableProductCount: number;
+  staleProductCount: number;
+  confidenceLabel: 'high' | 'medium' | 'low';
+}): string {
+  if (input.totalProductCount === 0) return `stock unknown, ${input.confidenceLabel} confidence`;
+  const status = input.unavailableProductCount > 0
+    ? `${input.unavailableProductCount} unavailable`
+    : input.missingProductCount > 0
+      ? 'partial stock'
+      : 'in stock';
+  const stale = input.staleProductCount > 0 ? `, ${input.staleProductCount} stale` : '';
+  return `${status} (${input.matchedProductCount}/${input.totalProductCount}), ${input.confidenceLabel} confidence${stale}`;
+}
+
 export function createMobileStoresViewModel(input: MobileStoresInput, api: MobileApi = createGroceryViewApi()): MobileStoresViewModel {
   const { userId, selectedStoreId } = normalizeMobileStoresInput(input);
   const favoriteStoreIds = new Set(api.getFavoriteStores(userId).map((store) => store.id));
@@ -566,6 +625,9 @@ export function createMobileStoresViewModel(input: MobileStoresInput, api: Mobil
     const deals = api.getStoreDeals(store.id);
     const topDeal = deals[0] ?? null;
     const basketQuote = offerBasket.stores.find((candidate) => candidate.storeId === store.id) ?? null;
+    const quoteProductCount = basketQuote
+      ? basketQuote.matchedProductIds.length + basketQuote.missingProductIds.length + basketQuote.unavailableProductIds.length
+      : 0;
     return {
       id: store.id,
       name: store.name,
@@ -582,7 +644,8 @@ export function createMobileStoresViewModel(input: MobileStoresInput, api: Mobil
             productName: topDeal.productName,
             price: topDeal.price,
             dealScore: topDeal.dealScore,
-            verdict: topDeal.band.verdict
+            verdict: topDeal.band.verdict,
+            stockStatusLabel: formatMobileDealStockLabel({ storeConfidence: store.confidence, productId: topDeal.productId, basketQuote })
           }
         : null,
       basketQuote: basketQuote
@@ -590,12 +653,26 @@ export function createMobileStoresViewModel(input: MobileStoresInput, api: Mobil
             subtotal: basketQuote.subtotal,
             coveragePercent: basketQuote.coveragePercent,
             savingsVsBaseline: basketQuote.savingsVsBaseline ?? 0,
-            freshnessLabel: basketQuote.freshnessLabel
+            freshnessLabel: basketQuote.freshnessLabel,
+            confidenceLabel: basketQuote.confidenceLabel,
+            matchedProductCount: basketQuote.matchedProductIds.length,
+            missingProductCount: basketQuote.missingProductIds.length,
+            unavailableProductCount: basketQuote.unavailableProductIds.length,
+            staleProductCount: basketQuote.staleProductIds.length,
+            stockStatusLabel: formatMobileBranchStockLabel({
+              matchedProductCount: basketQuote.matchedProductIds.length,
+              totalProductCount: quoteProductCount,
+              missingProductCount: basketQuote.missingProductIds.length,
+              unavailableProductCount: basketQuote.unavailableProductIds.length,
+              staleProductCount: basketQuote.staleProductIds.length,
+              confidenceLabel: basketQuote.confidenceLabel
+            })
           }
         : null
     };
   });
   const selectedStore = selectedStoreId ? stores.find((store) => store.id === selectedStoreId) ?? null : null;
+  const selectedBasketQuote = selectedStore ? offerBasket.stores.find((candidate) => candidate.storeId === selectedStore.id) ?? null : null;
   const selectedDeals = selectedStore
     ? api.getStoreDeals(selectedStore.id).map((deal) => ({
         productId: deal.productId,
@@ -603,7 +680,8 @@ export function createMobileStoresViewModel(input: MobileStoresInput, api: Mobil
         productName: deal.productName,
         price: deal.price,
         dealScore: deal.dealScore,
-        verdict: deal.band.verdict
+        verdict: deal.band.verdict,
+        stockStatusLabel: formatMobileDealStockLabel({ storeConfidence: selectedStore.confidence, productId: deal.productId, basketQuote: selectedBasketQuote })
       }))
     : [];
 
@@ -1509,7 +1587,7 @@ export function composeMobileStoresScreen(
               type: 'row',
               key: `favorite-store:${store.id}`,
               label: store.name,
-              value: `${store.district}, ${store.dealCount} current deals`
+              value: `${store.district}, ${store.dealCount} current deals, stock ${store.basketQuote?.stockStatusLabel ?? formatMobileStockStatusLabel({ available: store.dealCount > 0, confidenceLabel: store.confidence })}`
             }))
           : [{ type: 'empty', key: 'no-favorite-stores', message: 'Save favorite stores to rank nearby offers.', action: 'scan_barcode' }]
       },
@@ -1522,8 +1600,8 @@ export function composeMobileStoresScreen(
           key: `store:${store.id}`,
           label: store.name,
           value: store.basketQuote
-            ? `${store.basketQuote.coveragePercent}% coverage, ${store.basketQuote.subtotal.toFixed(2)} SEK, ${store.basketQuote.freshnessLabel}`
-            : `${store.dealCount} current deals, top score ${store.topDeal?.dealScore ?? 'n/a'}`
+            ? `${store.basketQuote.coveragePercent}% coverage, ${store.basketQuote.subtotal.toFixed(2)} SEK, ${store.basketQuote.freshnessLabel}, stock ${store.basketQuote.stockStatusLabel}`
+            : `${store.dealCount} current deals, top score ${store.topDeal?.dealScore ?? 'n/a'}, stock ${formatMobileStockStatusLabel({ available: store.dealCount > 0, confidenceLabel: store.confidence })}`
         }))
       },
       {
@@ -1534,7 +1612,7 @@ export function composeMobileStoresScreen(
           type: 'row',
           key: `store-deal:${store.id}:${deal.productId}`,
           label: `${deal.ticker} at ${store.chain}`,
-          value: `${deal.price.toFixed(2)} SEK, score ${deal.dealScore}, ${deal.verdict}`
+          value: `${deal.price.toFixed(2)} SEK, score ${deal.dealScore}, ${deal.verdict}, stock ${deal.stockStatusLabel}`
         }))
       },
       ...(viewModel.selectedStore
@@ -1548,7 +1626,7 @@ export function composeMobileStoresScreen(
                 type: 'row' as const,
                 key: `selected-deal:${deal.productId}`,
                 label: deal.productName,
-                value: `${deal.price.toFixed(2)} SEK, score ${deal.dealScore}, ${deal.verdict}`
+                value: `${deal.price.toFixed(2)} SEK, score ${deal.dealScore}, ${deal.verdict}, stock ${deal.stockStatusLabel}`
               }))
             ]
           }]
