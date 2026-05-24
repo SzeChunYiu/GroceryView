@@ -14,6 +14,7 @@ import {
   buildCityGrossStoresUrl,
   buildDailyConnectorConfigsFromEnv,
   buildDailyIngestionPostgresPoolConfig,
+  CITY_GROSS_BULK_MINIMUM_ROWS,
   createDailyIngestionQueryExecutor,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
@@ -58,6 +59,7 @@ import {
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
+  fetchCityGrossBulkProducts,
   fetchCityGrossProducts,
   fetchCityGrossProductsForAllStores,
   fetchCityGrossStores,
@@ -99,7 +101,7 @@ import {
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
-  GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_PRODUCTS_URL,
@@ -3278,6 +3280,85 @@ describe('fetchCityGrossProducts', () => {
       ['21', 'citygross-full-1', 11]
     ]);
   });
+
+describe('fetchCityGrossBulkProducts', () => {
+  it('fetches City Gross full branch catalogs across stores and enforces the bulk row floor', async () => {
+    assert.equal(CITY_GROSS_BULK_MINIMUM_ROWS, 100);
+
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/PageData/stores')) {
+        return new Response(JSON.stringify([
+          { data: { storeName: 'City Gross Borås', siteId: 21, url: '/butiker/boras/', storeLocation: { coordinates: '57.7141742,12.8669819' } } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const skip = Number(new URL(String(url)).searchParams.get('skip') ?? '0');
+      return new Response(JSON.stringify({
+        items: [{
+          id: `citygross-bulk-${skip}`,
+          name: `City Gross bulk ${skip}`,
+          brand: 'Garant',
+          category: 'Pantry',
+          descriptiveSize: '1 st',
+          productStoreDetails: {
+            prices: { currentPrice: { price: skip === 0 ? 10 : 11, unit: 'PCE' } }
+          }
+        }],
+        totalCount: 2
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCityGrossBulkProducts({
+      fetchImpl,
+      maxStores: 1,
+      pageSize: 1,
+      minRows: 2,
+      retrievedAt: '2026-05-23T20:20:30.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.code, row.price]), [
+      ['21', 'citygross-bulk-0', 10],
+      ['21', 'citygross-bulk-1', 11]
+    ]);
+    assert.deepEqual(requestedUrls, [
+      buildCityGrossStoresUrl(),
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 0 }),
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 1 })
+    ]);
+  });
+
+  it('fails closed when the City Gross bulk fetch returns fewer than the required real rows', async () => {
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/PageData/stores')) {
+        return new Response(JSON.stringify([
+          { data: { storeName: 'City Gross Borås', siteId: 21, url: '/butiker/boras/' } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(JSON.stringify({
+        items: [{
+          id: 'too-small-citygross-bulk-row',
+          name: 'Too small City Gross bulk row',
+          productStoreDetails: {
+            prices: { currentPrice: { price: 10, unit: 'PCE' } }
+          }
+        }],
+        totalCount: 1
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    await assert.rejects(
+      () => fetchCityGrossBulkProducts({
+        fetchImpl,
+        maxStores: 1,
+        pageSize: 1,
+        minRows: 2,
+        retrievedAt: '2026-05-23T20:21:00.000Z'
+      }),
+      /City Gross bulk fetch returned only 1 rows; minimum required is 2/
+    );
+  });
+});
 
 describe('fetchLidlStores', () => {
   it('discovers Lidl public store detail pages and normalizes branch metadata', async () => {
@@ -6512,18 +6593,18 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.valid_until, '2026-05-24T23:59:59');
   });
 
-  it('materializes native City Gross all-store public product prices into daily database observations', async () => {
+  it('materializes native City Gross bulk public product prices into daily database observations', async () => {
     const executor = new DailyIngestionExecutor();
     const requestedUrls: string[] = [];
     const result = await runDailyIngestion({
       executor,
       requestedAt: '2026-05-22T12:45:00.000Z',
       connectors: [{
-        connectorId: 'city-gross-public-products-all-stores',
+        connectorId: 'city-gross-products-bulk',
         chainId: 'city_gross',
         sourceType: 'official_api',
-        endpointUrl: `${GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL}?queries=kaffe&maxStores=1&maxRowsPerStore=1`,
-        parserVersion: 'citygross-products-native-v1',
+        endpointUrl: `${GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL}?maxStores=1&maxRowsPerStore=1&minRows=1`,
+        parserVersion: 'citygross-bulk-native-v1',
         robotsTxtStatus: 'not_applicable',
         legalReviewStatus: 'approved',
         hasDataAgreement: true,
@@ -6561,7 +6642,7 @@ describe('daily ingestion runner', () => {
     assert.equal(result.acceptedCount, 1);
     assert.deepEqual(requestedUrls, [
       buildCityGrossStoresUrl(),
-      buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 })
+      buildCityGrossProductsUrl({ siteId: '21', take: 1, skip: 0 })
     ]);
     const observation = firstBatchObservation(executor);
     assert.equal(observation.store_id, 'store-db-2');
