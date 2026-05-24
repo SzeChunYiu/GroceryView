@@ -5,6 +5,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
+  BEST_NO_STATIONS_URL,
+  parseBestNoStationsHtml
+} from '../connectors/best-no.js';
+import {
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,
   buildCoopSearchUrl,
@@ -7307,5 +7311,31 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('Best NO connector', () => {
+  it('parses best.no JSON-LD station fixtures into Norwegian fuel stations', () => {
+    const rows = parseBestNoStationsHtml(`
+      <script type="application/ld+json">
+      {"@graph":[{"@type":"GasStation","name":"Best Stasjon Bergen","url":"/stasjoner/best-bergen/","telephone":"+47 55 00 00 00","address":{"streetAddress":"Nøstegaten 1","postalCode":"5011","addressLocality":"Bergen"},"geo":{"latitude":"60.39299","longitude":"5.32415"}}]}
+      </script>
+    `, BEST_NO_STATIONS_URL, '2026-05-24T11:00:00.000Z');
+
+    assert.deepEqual(rows, [{
+      stationId: 'best-no-best-stasjon-bergen-5011-https-best-no-stasjoner-best-bergen',
+      chain: 'Best',
+      countryCode: 'NO',
+      name: 'Best Stasjon Bergen',
+      address: 'Nøstegaten 1',
+      postalCode: '5011',
+      city: 'Bergen',
+      latitude: 60.39299,
+      longitude: 5.32415,
+      phone: '+47 55 00 00 00',
+      website: 'https://best.no/stasjoner/best-bergen/',
+      sourceUrl: BEST_NO_STATIONS_URL,
+      retrievedAt: '2026-05-24T11:00:00.000Z'
+    }]);
   });
 });
