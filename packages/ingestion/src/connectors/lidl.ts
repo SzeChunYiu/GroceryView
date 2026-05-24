@@ -16,6 +16,7 @@ export type LidlOffer = {
   code: string;
   name: string;
   brand: string;
+  channel: 'store';
   packageText: string;
   category: string;
   price: number;
@@ -24,6 +25,9 @@ export type LidlOffer = {
   unitPriceText: string;
   promotionText: string;
   memberOnly: boolean;
+  is_member_price: boolean;
+  is_coupon_price: boolean;
+  multi_buy: LidlMultiBuyPromotion | null;
   regions: string[];
   validFrom: string;
   validTo: string;
@@ -31,6 +35,13 @@ export type LidlOffer = {
   imageUrl: string;
   sourceUrl: string;
   retrievedAt: string;
+};
+
+export type LidlMultiBuyPromotion = {
+  price: number;
+  priceText: string;
+  quantity: number;
+  text: string;
 };
 
 export type LidlStoreOffer = LidlOffer & {
@@ -292,18 +303,24 @@ export function normalizeLidlOffer(
   const promotionText = text(currentPrice?.discount?.discountText)
     || text(regionEntry?.currentLidlPlusPrice?.highlightText)
     || text(regionEntry?.currentLidlPlusPrice?.lidlPlusText);
+  const priceText = `${price.toFixed(2)} ${currencyCode}`;
+  const memberOnly = Boolean(regionEntry?.currentLidlPlusPrice || payload.currentLidlPlusPrice);
   return {
     code,
     name,
     brand: typeof payload.brand === 'object' && payload.brand !== null ? text((payload.brand as { name?: unknown }).name) : text(payload.brand),
+    channel: 'store',
     packageText,
     category: 'lidl-public-offers',
     price,
     regularPrice,
-    priceText: `${price.toFixed(2)} ${currencyCode}`,
+    priceText,
     unitPriceText: basePriceText,
     promotionText,
-    memberOnly: Boolean(regionEntry?.currentLidlPlusPrice || payload.currentLidlPlusPrice),
+    memberOnly,
+    is_member_price: memberOnly,
+    is_coupon_price: /kupong/i.test(promotionText),
+    multi_buy: parseLidlMultiBuyPromotion(promotionText, price, priceText),
     regions: Array.isArray(payload.regions) ? payload.regions.map((region) => text(region) || String(region)).filter(Boolean) : Object.keys(payload.regionsPrices ?? {}),
     validFrom: text(currentPrice?.startDate),
     validTo: text(currentPrice?.endDate),
@@ -312,6 +329,13 @@ export function normalizeLidlOffer(
     sourceUrl,
     retrievedAt
   };
+}
+
+export function parseLidlMultiBuyPromotion(textValue: string, price: number, priceText: string): LidlMultiBuyPromotion | null {
+  const quantity = Number(textValue.match(/(\d+)\s*f[öo]r/i)?.[1]);
+  return Number.isFinite(quantity) && quantity > 1
+    ? { price, priceText, quantity, text: textValue }
+    : null;
 }
 
 function firstRegionPrice(value: Record<string, LidlRegionPrice> | undefined): LidlRegionPrice | undefined {
