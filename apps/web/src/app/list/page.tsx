@@ -7,7 +7,7 @@ import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, shareLink, toggleItemChecked, totalCount } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -28,6 +28,14 @@ export default function ShoppingListPage() {
             <p className="text-sm font-semibold text-slate-600">{remainingCount} left to collect</p>
           </div>
         </div>
+
+        {shareLink ? (
+          <section className={`mt-6 rounded-[1.5rem] border p-4 shadow-sm ${shareLink.isExpired ? 'border-rose-200 bg-rose-50 text-rose-950' : 'border-emerald-200 bg-emerald-50 text-emerald-950'}`}>
+            <p className="text-sm font-black uppercase tracking-[0.18em]">Shared list link</p>
+            <p className="mt-2 text-sm font-semibold leading-6">{shareLink.message}</p>
+            {shareLink.isExpired ? <p className="mt-2 text-sm font-bold">Expired links stay read-only and cannot be reused for household collaboration.</p> : null}
+          </section>
+        ) : null}
 
         <BulkImportDialog onImportItems={addImportedItems} />
 

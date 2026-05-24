@@ -8,10 +8,11 @@ async function read(relative) {
 
 describe('shopping list route', () => {
   it('ships the requested route, checkable row component, and localStorage-backed hook', async () => {
-    const [page, row, hook, bulkImport, searchRoute] = await Promise.all([
+    const [page, row, hook, shareRoute, bulkImport, searchRoute] = await Promise.all([
       read('src/app/list/page.tsx'),
       read('src/components/CheckableListItem.tsx'),
       read('src/hooks/useList.ts'),
+      read('src/app/api/list/share/route.ts'),
       read('src/components/BulkImportDialog.tsx'),
       read('../../apps/api/src/routes/search.ts')
     ]);
@@ -21,6 +22,8 @@ describe('shopping list route', () => {
     assert.match(page, /BulkImportDialog/);
     assert.match(page, /addImportedItems/);
     assert.match(page, /Shopping list/);
+    assert.match(page, /shareLink/);
+    assert.match(page, /Expired links stay read-only/);
 
     assert.match(row, /'use client'/);
     assert.match(row, /type="checkbox"/);
@@ -37,6 +40,14 @@ describe('shopping list route', () => {
     assert.match(hook, /addImportedItems/);
     assert.match(hook, /importSource: 'bulk-clipboard'/);
     assert.match(hook, /matchedProductSlug/);
+    assert.match(hook, /ShareLinkMetadata/);
+    assert.match(hook, /URLSearchParams\(search\)\.get\('share'\)/);
+    assert.match(hook, /expiresAt/);
+    assert.match(hook, /isExpired/);
+
+    assert.match(shareRoute, /expiresAt/);
+    assert.match(shareRoute, /shareUrl/);
+    assert.match(shareRoute, /base64url/);
 
     assert.match(bulkImport, /'use client'/);
     assert.match(bulkImport, /parseBulkImportLines/);

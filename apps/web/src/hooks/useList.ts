@@ -17,6 +17,13 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
+export type ShareLinkMetadata = {
+  token: string;
+  expiresAt: string | null;
+  isExpired: boolean;
+  message: string;
+};
+
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
@@ -107,6 +114,37 @@ function withCheckedState(checkedById: Record<string, boolean>, importedItems: B
   }));
 }
 
+function decodeBase64UrlJson(value: string): Record<string, unknown> | null {
+  try {
+    const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+    const parsed = JSON.parse(atob(padded));
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : null;
+  } catch {
+    return null;
+  }
+}
+
+function shareLinkMetadataFromSearch(search: string): ShareLinkMetadata | null {
+  const token = new URLSearchParams(search).get('share');
+  if (!token) return null;
+  const payload = decodeBase64UrlJson(token);
+  const expiresAt = typeof payload?.expiresAt === 'string' ? payload.expiresAt : null;
+  const expiresAtMs = expiresAt ? Date.parse(expiresAt) : Number.POSITIVE_INFINITY;
+  const isExpired = Number.isFinite(expiresAtMs) && expiresAtMs <= Date.now();
+
+  return {
+    token,
+    expiresAt,
+    isExpired,
+    message: isExpired
+      ? 'This read-only shopping list link has expired. Ask the household owner for a fresh share link.'
+      : expiresAt
+        ? `Read-only shared list link expires ${new Date(expiresAt).toLocaleString('sv-SE')}.`
+        : 'Read-only shared list link has no expiry metadata.'
+  };
+}
+
 function persistCheckedState(items: ShoppingListItem[]) {
   try {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
@@ -130,10 +168,12 @@ function persistCheckedState(items: ShoppingListItem[]) {
 export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
+  const [shareLink, setShareLink] = useState<ShareLinkMetadata | null>(null);
 
   useEffect(() => {
     try {
       const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
+      setShareLink(shareLinkMetadataFromSearch(window.location.search));
       setItems(withCheckedState(checkedById, importedItems));
     } finally {
       setHasLoadedBrowserState(true);
@@ -176,6 +216,7 @@ export function useList() {
     items,
     remainingCount,
     resetCheckedState,
+    shareLink,
     toggleItemChecked,
     totalCount
   };
