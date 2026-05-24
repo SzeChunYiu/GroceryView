@@ -17,12 +17,66 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
+export type BudgetHistorySnapshot = {
+  id: string;
+  label: string;
+  categories: {
+    budgetSek: number;
+    category: string;
+    spentSek: number;
+  }[];
+};
+
+export type BudgetHistoryTrend = {
+  category: string;
+  isRising: boolean;
+  latestSpendSek: number;
+  overspendCount: number;
+  points: {
+    budgetSek: number;
+    label: string;
+    overspent: boolean;
+    percentOfBudget: number;
+    spentSek: number;
+  }[];
+};
+
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
 };
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
+
+const budgetHistory: BudgetHistorySnapshot[] = [
+  {
+    id: 'budget-week-1',
+    label: '3 weeks ago',
+    categories: [
+      { category: 'Produce', spentSek: 315, budgetSek: 340 },
+      { category: 'Dairy', spentSek: 186, budgetSek: 210 },
+      { category: 'Pantry', spentSek: 420, budgetSek: 390 }
+    ]
+  },
+  {
+    id: 'budget-week-2',
+    label: '2 weeks ago',
+    categories: [
+      { category: 'Produce', spentSek: 342, budgetSek: 340 },
+      { category: 'Dairy', spentSek: 205, budgetSek: 210 },
+      { category: 'Pantry', spentSek: 438, budgetSek: 390 }
+    ]
+  },
+  {
+    id: 'budget-week-3',
+    label: 'Last week',
+    categories: [
+      { category: 'Produce', spentSek: 371, budgetSek: 340 },
+      { category: 'Dairy', spentSek: 219, budgetSek: 210 },
+      { category: 'Pantry', spentSek: 432, budgetSek: 390 }
+    ]
+  }
+];
 
 const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   {
@@ -107,6 +161,37 @@ function withCheckedState(checkedById: Record<string, boolean>, importedItems: B
   }));
 }
 
+function budgetHistoryTrendsFromSnapshots(snapshots: BudgetHistorySnapshot[]): BudgetHistoryTrend[] {
+  const categories = new Map<string, BudgetHistoryTrend['points']>();
+
+  for (const snapshot of snapshots) {
+    for (const categorySnapshot of snapshot.categories) {
+      const currentPoints = categories.get(categorySnapshot.category) ?? [];
+      currentPoints.push({
+        budgetSek: categorySnapshot.budgetSek,
+        label: snapshot.label,
+        overspent: categorySnapshot.spentSek > categorySnapshot.budgetSek,
+        percentOfBudget: Math.min(Math.round((categorySnapshot.spentSek / categorySnapshot.budgetSek) * 100), 100),
+        spentSek: categorySnapshot.spentSek
+      });
+      categories.set(categorySnapshot.category, currentPoints);
+    }
+  }
+
+  return [...categories.entries()].map(([category, points]) => {
+    const firstSpendSek = points[0]?.spentSek ?? 0;
+    const latestSpendSek = points[points.length - 1]?.spentSek ?? 0;
+
+    return {
+      category,
+      isRising: points.length > 1 && latestSpendSek > firstSpendSek,
+      latestSpendSek,
+      overspendCount: points.filter((point) => point.overspent).length,
+      points
+    };
+  });
+}
+
 function persistCheckedState(items: ShoppingListItem[]) {
   try {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
@@ -167,11 +252,14 @@ export function useList() {
   }, []);
 
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
+  const budgetHistoryTrends = useMemo(() => budgetHistoryTrendsFromSnapshots(budgetHistory), []);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
 
   return {
     addImportedItems,
+    budgetHistory,
+    budgetHistoryTrends,
     checkedCount,
     items,
     remainingCount,

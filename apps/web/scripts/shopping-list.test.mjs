@@ -21,6 +21,9 @@ describe('shopping list route', () => {
     assert.match(page, /BulkImportDialog/);
     assert.match(page, /addImportedItems/);
     assert.match(page, /Shopping list/);
+    assert.match(page, /budgetHistoryTrends/);
+    assert.match(page, /Category trend chart/);
+    assert.match(page, /Overspend marker/);
 
     assert.match(row, /'use client'/);
     assert.match(row, /type="checkbox"/);
@@ -37,6 +40,9 @@ describe('shopping list route', () => {
     assert.match(hook, /addImportedItems/);
     assert.match(hook, /importSource: 'bulk-clipboard'/);
     assert.match(hook, /matchedProductSlug/);
+    assert.match(hook, /budgetHistory/);
+    assert.match(hook, /budgetHistoryTrendsFromSnapshots/);
+    assert.match(hook, /overspent: categorySnapshot\.spentSek > categorySnapshot\.budgetSek/);
 
     assert.match(bulkImport, /'use client'/);
     assert.match(bulkImport, /parseBulkImportLines/);
