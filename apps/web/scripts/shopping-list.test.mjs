@@ -8,11 +8,12 @@ async function read(relative) {
 
 describe('shopping list route', () => {
   it('ships the requested route, checkable row component, and localStorage-backed hook', async () => {
-    const [page, row, hook, bulkImport, searchRoute] = await Promise.all([
+    const [page, row, hook, bulkImport, shareRoute, searchRoute] = await Promise.all([
       read('src/app/list/page.tsx'),
       read('src/components/CheckableListItem.tsx'),
       read('src/hooks/useList.ts'),
       read('src/components/BulkImportDialog.tsx'),
+      read('src/app/api/list/share/route.ts'),
       read('../../apps/api/src/routes/search.ts')
     ]);
 
@@ -21,6 +22,9 @@ describe('shopping list route', () => {
     assert.match(page, /BulkImportDialog/);
     assert.match(page, /addImportedItems/);
     assert.match(page, /Shopping list/);
+    assert.match(page, /Shareable read-only list/);
+    assert.match(page, /Copy read-only link/);
+    assert.match(page, /isReadOnlyShare/);
 
     assert.match(row, /'use client'/);
     assert.match(row, /type="checkbox"/);
@@ -37,6 +41,10 @@ describe('shopping list route', () => {
     assert.match(hook, /addImportedItems/);
     assert.match(hook, /importSource: 'bulk-clipboard'/);
     assert.match(hook, /matchedProductSlug/);
+    assert.match(hook, /LIST_SHARE_ENDPOINT/);
+    assert.match(hook, /sharedItemsFromToken/);
+    assert.match(hook, /createShareLink/);
+    assert.match(hook, /navigator\.clipboard/);
 
     assert.match(bulkImport, /'use client'/);
     assert.match(bulkImport, /parseBulkImportLines/);
@@ -46,6 +54,11 @@ describe('shopping list route', () => {
     assert.match(bulkImport, /one item per line/i);
     assert.match(bulkImport, /matchedProductSlug/);
     assert.match(bulkImport, /unmatchedLines/);
+
+    assert.match(shareRoute, /createHmac/);
+    assert.match(shareRoute, /shareUrl/);
+    assert.match(shareRoute, /readOnly: true/);
+    assert.match(shareRoute, /LIST_SHARE_SECRET/);
 
     assert.match(searchRoute, /searchRoutes/);
     assert.match(searchRoute, /products\/search\/list-import/);
