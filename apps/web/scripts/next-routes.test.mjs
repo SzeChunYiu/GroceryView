@@ -40,6 +40,14 @@ async function fileExists(relative) {
   }
 }
 
+async function loadMealCostEstimator() {
+  const source = (await read('src/lib/meal-cost-estimator.ts'))
+    .replace(/export type \w+ = [^{]*\{[\s\S]*?\};\n\n/g, '')
+    .replace(/: (?:unknown|string|number|boolean|void|MealBudgetRecipe|AdaptiveMealBudgetInput|AdaptiveMealBudgetEstimate|RankedMealRecipe)(?:\[\])?/g, '')
+    .replace(/ originalIndex: _originalIndex/g, ' originalIndex');
+  return import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+}
+
 describe('verified-data UI', () => {
   it('keeps core routes backed by generated verified datasets', async () => {
     for (const file of appFiles) assert.ok((await read(file)).length > 0, `${file} should not be empty`);
@@ -3790,5 +3798,65 @@ ${seo}`;
     assert.match(compareRoute, /formatComparableUnitPrice/);
     assert.match(productDetailRoute, /formatComparableUnitPrice/);
     assert.match(screenerRoute, /formatLocalizedUnitPrice/);
+  });
+
+  it('covers adaptive meal budget estimator edge cases', async () => {
+    const {
+      clampAdaptiveMealReserve,
+      estimateAdaptiveMealBudget,
+      rankRecipesForAdaptiveBudget
+    } = await loadMealCostEstimator();
+
+    const zeroRemaining = estimateAdaptiveMealBudget({
+      weeklyBudget: 80,
+      spentToDate: 100,
+      mealsRemaining: 4,
+      reserveTarget: 10,
+      recipes: [
+        { id: 'water', estimatedCost: 0 },
+        { id: 'lentil-soup', estimatedCost: 12 }
+      ]
+    });
+
+    assert.equal(zeroRemaining.remainingBudget, 0);
+    assert.equal(zeroRemaining.protectedReserve, 0);
+    assert.equal(zeroRemaining.perMealBudget, 0);
+    assert.deepEqual(zeroRemaining.recipes.map((recipe) => recipe.id), ['water', 'lentil-soup']);
+    assert.equal(zeroRemaining.recipes[0].overBudget, false);
+    assert.equal(zeroRemaining.recipes[1].overBudget, true);
+
+    assert.equal(clampAdaptiveMealReserve(12, 20), 12);
+    assert.deepEqual(
+      estimateAdaptiveMealBudget({
+        weeklyBudget: 50,
+        spentToDate: 30,
+        mealsRemaining: 2,
+        reserveTarget: 45
+      }),
+      {
+        weeklyBudget: 50,
+        spentToDate: 30,
+        mealsRemaining: 2,
+        remainingBudget: 20,
+        protectedReserve: 20,
+        spendableBudget: 0,
+        perMealBudget: 0,
+        recipes: []
+      }
+    );
+
+    assert.throws(() => estimateAdaptiveMealBudget({ weeklyBudget: -1, mealsRemaining: 1 }), RangeError);
+    assert.throws(() => estimateAdaptiveMealBudget({ weeklyBudget: 20, spentToDate: -1, mealsRemaining: 1 }), RangeError);
+    assert.throws(() => rankRecipesForAdaptiveBudget([{ id: 'bad', estimatedCost: -1 }], 10), RangeError);
+
+    const ranked = rankRecipesForAdaptiveBudget([
+      { id: 'expensive', estimatedCost: 12 },
+      { id: 'cheap', estimatedCost: 4 },
+      { id: 'ok', estimatedCost: 8 },
+      { id: 'exact', estimatedCost: 10 }
+    ], 10);
+
+    assert.deepEqual(ranked.map((recipe) => recipe.id), ['cheap', 'ok', 'exact', 'expensive']);
+    assert.deepEqual(ranked.map((recipe) => recipe.overBudget), [false, false, false, true]);
   });
 });
