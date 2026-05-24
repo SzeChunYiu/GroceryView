@@ -5,6 +5,7 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
+import { trackStoreDirectionsClick } from '@/lib/analytics';
 
 // Free, no-API-key vector tiles (© OpenMapTiles / OpenFreeMap, data © OSM).
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
@@ -159,6 +160,18 @@ export function StoreMap() {
     const data = toFeatureCollection();
     setStoreCount(data.features.length);
 
+    const handleDirectionsClick = (event: MouseEvent) => {
+      const directionsLink = (event.target as HTMLElement | null)?.closest<HTMLAnchorElement>('a[data-store-directions]');
+      if (!directionsLink) return;
+
+      trackStoreDirectionsClick({
+        brand: directionsLink.dataset.storeBrand ?? '',
+        storeName: directionsLink.dataset.storeName ?? '',
+        storeSlug: directionsLink.dataset.storeSlug ?? ''
+      });
+    };
+    containerRef.current.addEventListener('click', handleDirectionsClick);
+
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: MAP_STYLE,
@@ -285,6 +298,7 @@ export function StoreMap() {
                ${p.chainIndex ? `<div style="font-size:12px;color:#475569;margin-top:2px">Chain index ${Number(p.chainIndex).toFixed(1)} (100 = market)</div>` : ''}
                ${where ? `<div style="font-size:12px;color:#64748b;margin-top:2px">${where}</div>` : ''}
                <a href="${directions}" target="_blank" rel="noopener noreferrer"
+                  data-store-directions="true" data-store-slug="${escapeHtml(p.slug || '')}" data-store-name="${escapeHtml(p.name || '')}" data-store-brand="${escapeHtml(p.brand || '')}"
                   style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#1D8649">
                   Directions →</a>
              </div>`,
@@ -299,6 +313,7 @@ export function StoreMap() {
     });
 
     return () => {
+      containerRef.current?.removeEventListener('click', handleDirectionsClick);
       mapRef.current = null;
       map.remove();
     };
