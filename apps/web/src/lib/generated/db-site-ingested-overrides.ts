@@ -12,6 +12,46 @@ export const dbSiteLidlStoreOffers: LidlIngestedStoreOffer[] = [];
 export const dbSiteIcaReklambladOffers: IcaReklambladIngestedOffer[] = [];
 export const dbSiteMathemProducts: MathemIngestedProduct[] = [];
 
+export type DbSiteCompareStoreCapability = {
+  chainId: 'ica' | 'willys' | 'coop';
+  label: string;
+  coupons: boolean;
+  delivery: boolean;
+  pickup: boolean;
+  evidenceLabel: string;
+  evidenceUpdatedAt: string | null;
+};
+
+export const dbSiteCompareStoreCapabilities: DbSiteCompareStoreCapability[] = [
+  {
+    chainId: 'ica',
+    label: 'ICA',
+    coupons: true,
+    delivery: true,
+    pickup: true,
+    evidenceLabel: 'ICA store-scoped promotions and checkout capability evidence',
+    evidenceUpdatedAt: null
+  },
+  {
+    chainId: 'willys',
+    label: 'Willys',
+    coupons: true,
+    delivery: true,
+    pickup: true,
+    evidenceLabel: 'Willys online catalogue, coupon, delivery, and pickup capability evidence',
+    evidenceUpdatedAt: null
+  },
+  {
+    chainId: 'coop',
+    label: 'Coop',
+    coupons: false,
+    delivery: true,
+    pickup: false,
+    evidenceLabel: 'Coop delivery capability evidence; coupon and pickup rows not verified in this snapshot',
+    evidenceUpdatedAt: null
+  }
+];
+
 export const dbSiteMatpriskollenSource = {
   source: 'postgres.latest_prices/observations Matpriskollen-compatible fallback',
   retrievedAt: null,
