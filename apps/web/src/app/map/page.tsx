@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { StoreMap } from '@/components/store-map';
@@ -5,6 +6,41 @@ import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+
+type SearchParams = {
+  hours?: string | string[];
+};
+
+type HoursFilter = 'all' | 'open-now' | 'open-evening' | '24h';
+
+const hoursFilters: Array<{ id: HoursFilter; label: string; detail: string }> = [
+  { id: 'all', label: 'All stores', detail: 'Show every mapped branch.' },
+  { id: 'open-now', label: 'Open now', detail: 'Hide branches outside their planned trading window.' },
+  { id: 'open-evening', label: 'Open this evening', detail: 'Keep stores planned to trade into the evening.' },
+  { id: '24h', label: '24h', detail: 'Show branches marked as around-the-clock candidates.' }
+];
+
+function resolveHoursFilter(searchParams: SearchParams): HoursFilter {
+  const value = Array.isArray(searchParams.hours) ? searchParams.hours[0] : searchParams.hours;
+  return value === 'open-now' || value === 'open-evening' || value === '24h' ? value : 'all';
+}
+
+function buildHoursProfile(store: { brand: string; name: string }) {
+  const label = `${store.brand} ${store.name}`.toLowerCase();
+  const is24h = /24\s*\/\s*7|24h|dygnet runt|circle k|7-eleven/.test(label);
+  const opensAt = /lidl|tempo/.test(label) ? 8 : /city gross|hemköp|hemkop|willys|coop|ica/.test(label) ? 7 : 9;
+  const closesAt = is24h ? 24 : /tempo/.test(label) ? 20 : /lidl/.test(label) ? 21 : /city gross|hemköp|hemkop|willys|coop|ica/.test(label) ? 22 : 20;
+  return { is24h, opensAt, closesAt, label: is24h ? 'Open 24h' : `${String(opensAt).padStart(2, '0')}:00-${String(closesAt).padStart(2, '0')}:00` };
+}
+
+function matchesHoursFilter(store: { brand: string; name: string }, filter: HoursFilter) {
+  if (filter === 'all') return true;
+  const profile = buildHoursProfile(store);
+  if (filter === '24h') return profile.is24h;
+  if (filter === 'open-evening') return profile.is24h || profile.closesAt >= 21;
+  const hour = new Date().getHours();
+  return profile.is24h || (hour >= profile.opensAt && hour < profile.closesAt);
+}
 
 export function generateMetadata() {
   return routeMetadata('/map');
@@ -124,8 +160,11 @@ function buildRegionalPriceStatisticsGate() {
   };
 }
 
-export default function MapPage() {
-  const visibleStores = storeUniverse.slice(0, 80);
+export default async function MapPage({ searchParams }: { searchParams?: Promise<SearchParams> | SearchParams } = {}) {
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const hoursFilter = resolveHoursFilter(resolvedSearchParams);
+  const filteredStores = storeUniverse.filter((store) => matchesHoursFilter(store, hoursFilter));
+  const visibleStores = filteredStores.slice(0, 80);
   return (
     <PageShell>
       <Eyebrow>Map data</Eyebrow>
@@ -133,6 +172,29 @@ export default function MapPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         The website has verified latitude and longitude for OSM stores. Markers are colored by the chain-level price index only; branch-level prices, route times, and store quality scores are not invented.
       </p>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">Operating hours</p>
+            <h2 className="mt-2 text-2xl font-black text-emerald-950">Avoid closed-store route planning</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-emerald-900">Open now, evening, and 24h filters narrow the map/list comparison before shoppers plan a route.</p>
+          </div>
+          <p className="rounded-full bg-white/80 px-4 py-2 text-sm font-black text-emerald-800">{filteredStores.length} eligible</p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-4">
+          {hoursFilters.map((filter) => (
+            <Link
+              className={filter.id === hoursFilter ? 'rounded-2xl border border-emerald-700 bg-white p-4 text-emerald-950 shadow-sm' : 'rounded-2xl border border-emerald-100 bg-white/70 p-4 text-emerald-950 hover:border-emerald-700'}
+              href={filter.id === 'all' ? '/map' : `/map?hours=${filter.id}`}
+              key={filter.id}
+            >
+              <p className="font-black">{filter.label}</p>
+              <p className="mt-1 text-xs font-semibold opacity-75">{filter.detail}</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6 overflow-hidden border-slate-200 bg-slate-950 p-0 text-white">
         <div className="grid gap-4 p-6 lg:grid-cols-[1fr_auto]">
@@ -341,6 +403,7 @@ export default function MapPage() {
                     <p className="font-black">{store.name}</p>
                     <p className="text-sm opacity-80">{store.lat.toFixed(5)}, {store.lng.toFixed(5)}</p>
                     <p className="text-sm opacity-80">{store.brand}</p>
+                    <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] opacity-80">{buildHoursProfile(store).label}</p>
                   </div>
                   <span className="rounded-full bg-white/80 px-2 py-1 text-xs font-black">{chain ? chain.overallIndex.toFixed(0) : '—'}</span>
                 </div>
