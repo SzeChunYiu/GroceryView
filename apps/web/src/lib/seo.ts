@@ -330,6 +330,8 @@ export function metadataForStore(store: StoreSeoInput): Metadata {
   return routeMetadata({
     path: `/stores/${store.slug}`,
     title: `${store.name} store record | GroceryView`,
-    description: `Verified OpenStreetMap grocery store record for ${store.name}, ${store.brand}${place}. Prices are not inferred from store location.`
+    description: `Verified OpenStreetMap grocery store record for ${store.name}, ${store.brand}${place}. Prices are not inferred from store location.`,
+    imagePath: `/stores/${store.slug}/opengraph-image`,
+    imageAlt: `${store.name} verified GroceryView store record image`
   });
 }
