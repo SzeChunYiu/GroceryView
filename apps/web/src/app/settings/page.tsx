@@ -1,4 +1,5 @@
 import { buildPrivacyExport } from '@groceryview/core';
+import Link from 'next/link';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
@@ -37,6 +38,17 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Comparison preferences</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Hidden products and stores</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Use searchable product and store pickers instead of raw id textareas to maintain account-owned exclusions for signed-in comparisons, basket results, product search, and store lists.
+        </p>
+        <Link className="mt-4 inline-flex rounded-full bg-sky-800 px-4 py-2 text-sm font-black text-white transition hover:bg-sky-900" href="/settings/hidden">
+          Manage hidden preferences
+        </Link>
+      </Card>
 
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-900">Form error announcements</p>
