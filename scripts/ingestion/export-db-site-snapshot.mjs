@@ -485,6 +485,34 @@ export function buildDbSiteMathemProducts(rows) {
     .sort((left, right) => left.name.localeCompare(right.name, 'sv') || left.price - right.price);
 }
 
+export function buildDbSiteCompareStoreCapabilities(rows, generatedAt) {
+  if (!Array.isArray(rows) || rows.length === 0) return [];
+
+  const byChain = new Map();
+  for (const row of rows) {
+    if (!row.chainSlug || !Number.isFinite(row.price)) continue;
+    const chainId = slugPart(row.chainSlug);
+    if (!chainId) continue;
+    const current = byChain.get(chainId) ?? {
+      chainId,
+      chainName: chainDisplayName(row),
+      canCompare: false,
+      rowCount: 0,
+      evidenceUpdatedAt: null,
+      generatedAt,
+      source: 'postgres.latest_prices/observations compare store capability export'
+    };
+    current.rowCount += 1;
+    current.canCompare = current.rowCount > 0;
+    if (!current.evidenceUpdatedAt || String(row.observedAt).localeCompare(current.evidenceUpdatedAt) > 0) {
+      current.evidenceUpdatedAt = row.observedAt ?? generatedAt;
+    }
+    byChain.set(chainId, current);
+  }
+
+  return [...byChain.values()].sort((left, right) => left.chainName.localeCompare(right.chainName, 'sv'));
+}
+
 export function renderDbSiteProductsModule({ generatedAt, rows }) {
   const products = buildDbSiteAxfoodProducts(rows);
   return [
@@ -518,6 +546,7 @@ export function renderDbSiteIngestedOverridesModule({ generatedAt, rows }) {
   const lidlStoreOffers = buildDbSiteLidlStoreOffers(rows);
   const icaReklambladOffers = buildDbSiteIcaReklambladOffers(rows);
   const mathemProducts = buildDbSiteMathemProducts(rows);
+  const compareStoreCapabilities = buildDbSiteCompareStoreCapabilities(rows, generatedAt);
   return [
     '// AUTO-GENERATED from postgres.latest_prices/observations by scripts/ingestion/export-db-site-snapshot.mjs.',
     `// Generated at: ${generatedAt}`,
@@ -525,6 +554,7 @@ export function renderDbSiteIngestedOverridesModule({ generatedAt, rows }) {
     `// Lidl-compatible row count: ${lidlStoreOffers.length}`,
     `// ICA flyer-compatible row count: ${icaReklambladOffers.length}`,
     `// Mathem-compatible row count: ${mathemProducts.length}`,
+    `// Compare store capability row count: ${compareStoreCapabilities.length}`,
     "import type { IcaReklambladIngestedOffer } from '../ingested/ica-reklamblad';",
     "import type { LidlIngestedStoreOffer } from '../ingested/lidl';",
     "import type { MathemIngestedProduct } from '../ingested/mathem';",
@@ -536,6 +566,9 @@ export function renderDbSiteIngestedOverridesModule({ generatedAt, rows }) {
     `export const dbSiteLidlStoreOffers: LidlIngestedStoreOffer[] = ${JSON.stringify(lidlStoreOffers, null, 2)};`,
     `export const dbSiteIcaReklambladOffers: IcaReklambladIngestedOffer[] = ${JSON.stringify(icaReklambladOffers, null, 2)};`,
     `export const dbSiteMathemProducts: MathemIngestedProduct[] = ${JSON.stringify(mathemProducts, null, 2)};`,
+    '',
+    'export type DbSiteCompareStoreCapability = { chainId: string; chainName: string; canCompare: boolean; rowCount: number; evidenceUpdatedAt: string | null; generatedAt: string | null; source: string };',
+    `export const dbSiteCompareStoreCapabilities: DbSiteCompareStoreCapability[] = ${JSON.stringify(compareStoreCapabilities, null, 2)};`,
     '',
     `export const dbSiteMatpriskollenSource = ${JSON.stringify({ source: 'postgres.latest_prices/observations Matpriskollen-compatible export', retrievedAt: generatedAt, rowCount: matpriskollenOffers.length }, null, 2)} as const;`,
     `export const dbSiteLidlSource = ${JSON.stringify({ source: 'postgres.latest_prices/observations Lidl-compatible export', retrievedAt: generatedAt, rowCount: lidlStoreOffers.length }, null, 2)} as const;`,

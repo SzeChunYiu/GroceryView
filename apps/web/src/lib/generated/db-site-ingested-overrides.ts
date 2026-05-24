@@ -12,6 +12,18 @@ export const dbSiteLidlStoreOffers: LidlIngestedStoreOffer[] = [];
 export const dbSiteIcaReklambladOffers: IcaReklambladIngestedOffer[] = [];
 export const dbSiteMathemProducts: MathemIngestedProduct[] = [];
 
+export type DbSiteCompareStoreCapability = {
+  chainId: string;
+  chainName: string;
+  canCompare: boolean;
+  rowCount: number;
+  evidenceUpdatedAt: string | null;
+  generatedAt: string | null;
+  source: string;
+};
+
+export const dbSiteCompareStoreCapabilities: DbSiteCompareStoreCapability[] = [];
+
 export const dbSiteMatpriskollenSource = {
   source: 'postgres.latest_prices/observations Matpriskollen-compatible fallback',
   retrievedAt: null,

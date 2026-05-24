@@ -2508,6 +2508,8 @@ ${seo}`;
   it('surfaces query-driven chain comparison table on the compare route', async () => {
     const route = await read('src/app/compare/page.tsx');
     const compareLib = await read('src/lib/chain-compare.ts');
+    const dbOverrides = await read('src/lib/generated/db-site-ingested-overrides.ts');
+    const exportScript = await read('../../scripts/ingestion/export-db-site-snapshot.mjs');
 
     assert.match(route, /searchParams\?: Promise<SearchParams>/);
     assert.match(route, /buildChainComparisonTable/);
@@ -2528,6 +2530,13 @@ ${seo}`;
     assert.match(compareLib, /postgres\.latest_prices\/observations/);
     assert.match(compareLib, /productsParam\.split\(','\)/);
     assert.match(compareLib, /axfoodProducts/);
+    assert.match(dbOverrides, /dbSiteCompareStoreCapabilities/);
+    assert.match(dbOverrides, /canCompare: boolean/);
+    assert.match(exportScript, /buildDbSiteCompareStoreCapabilities/);
+    assert.match(exportScript, /chainId/);
+    assert.match(exportScript, /chainName/);
+    assert.match(exportScript, /evidenceUpdatedAt/);
+    assert.match(exportScript, /generatedAt/);
     assert.doesNotMatch(compareLib, /Math\.random|placeholder|synthetic/i);
   });
 
