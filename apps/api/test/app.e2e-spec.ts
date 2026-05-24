@@ -57,7 +57,7 @@ class RecordingPriceHistoryExecutor {
     if (sql.includes('select store_id from favorite_stores')) {
       return [...(this.favoriteStoreRows.get(params[0] as string) ?? [])].sort().map((store_id) => ({ store_id })) as T[];
     }
-    if (sql.includes('latest_prices.observation_id') && sql.includes(' as product_name')) {
+    if (sql.includes('latest_prices.observation_id') && sql.includes(' as product_name') && !sql.includes('with requested_items')) {
       if (params[0] === 'missing-product') return [] as T[];
       return [
         {
@@ -93,6 +93,73 @@ class RecordingPriceHistoryExecutor {
           confidence: '0.8200',
           observed_at: '2026-05-21T08:00:00.000Z',
           provenance: { sourceType: 'retailer_page', sourceRunId: 'run-latest-lidl' }
+        }
+      ] as T[];
+    }
+    if (sql.includes('with requested_items') && sql.includes('ranked_prices')) {
+      return [
+        {
+          requested_item_id: 'coffee',
+          product_id: 'product-coffee',
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          store_id: 'store-willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          chain_id: 'chain-willys',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          observation_id: 'obs-latest-coffee-willys',
+          price: '49.90',
+          regular_price: null,
+          unit_price: '110.89',
+          currency: 'SEK',
+          price_type: 'shelf',
+          observed_at: '2026-05-21T09:00:00.000Z',
+          confidence: '0.9400',
+          is_available: true
+        },
+        {
+          requested_item_id: 'milk',
+          product_id: 'product-milk',
+          product_slug: 'milk',
+          product_name: 'Standardmjölk 3% 1 l',
+          store_id: 'store-willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          chain_id: 'chain-willys',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          observation_id: 'obs-latest-milk-willys',
+          price: '14.90',
+          regular_price: null,
+          unit_price: '14.90',
+          currency: 'SEK',
+          price_type: 'shelf',
+          observed_at: '2026-05-21T09:05:00.000Z',
+          confidence: '0.9100',
+          is_available: true
+        },
+        {
+          requested_item_id: 'coffee',
+          product_id: 'product-coffee',
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          store_id: 'store-lidl',
+          store_slug: 'lidl-sveavagen',
+          store_name: 'Lidl Sveavagen',
+          chain_id: 'chain-lidl',
+          chain_slug: 'lidl',
+          chain_name: 'Lidl',
+          observation_id: 'obs-latest-coffee-lidl',
+          price: '54.90',
+          regular_price: '59.90',
+          unit_price: '122.00',
+          currency: 'SEK',
+          price_type: 'promotion',
+          observed_at: '2026-05-21T08:00:00.000Z',
+          confidence: '0.8200',
+          is_available: true
         }
       ] as T[];
     }
@@ -610,6 +677,7 @@ describe('GroceryView API app', () => {
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/categories']);
     assert.ok(docs.body.paths['/categories/{category}/market']);
+    assert.ok(docs.body.paths['/compare']);
     assert.ok(docs.body.paths['/users/demo/account/subscription-access']);
     assert.ok(docs.body.paths['/users/demo/account/subscription-entitlement']);
     assert.ok(docs.body.paths['/users/demo/budget/summary']);
@@ -978,6 +1046,20 @@ describe('GroceryView API app', () => {
     assert.equal(prices.body[0].demo, undefined);
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /from products/i);
     assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /latest_prices/i);
+
+    const compare = await request(app.getHttpServer()).get('/compare?itemIds=coffee,milk,missing-product').expect(200);
+    assert.deepEqual(compare.body.itemIds, ['coffee', 'milk', 'missing-product']);
+    assert.deepEqual(compare.body.missingItemIds, ['missing-product']);
+    assert.equal(compare.body.stores['store-willys'].coffee.price, 49.9);
+    assert.equal(compare.body.stores['store-willys'].milk.unitPrice, 14.9);
+    assert.equal(compare.body.stores['store-lidl'].coffee.priceType, 'promotion');
+    const compareCall = priceHistoryExecutor.calls.at(-1);
+    assert.match(compareCall?.sql ?? '', /with requested_items/i);
+    assert.deepEqual(compareCall?.params, [['coffee', 'milk', 'missing-product']]);
+
+    await request(app.getHttpServer()).get('/compare').expect(400);
+    await request(app.getHttpServer()).get('/compare?items=coffee').expect(400);
+    await request(app.getHttpServer()).get('/compare?itemIds=a,b,c,d,e').expect(400);
 
     const priceHistory = await request(app.getHttpServer())
       .get('/products/bryggkaffe-450g/price-history?priceType=shelf&chain=willys&store=willys-odenplan&sourceRun=run-open-prices-1&minConfidence=0.9&limit=5')
@@ -1698,6 +1780,7 @@ describe('GroceryView API real-only deal and alert endpoints', () => {
     await request(app.getHttpServer()).get('/stores/willys-odenplan/flyer-offers').expect(503);
     await request(app.getHttpServer()).get('/stores/nearest?lat=59.3293&lng=18.0686&radius=5').expect(503);
     await request(app.getHttpServer()).get('/screener?min_discount=10').expect(503);
+    await request(app.getHttpServer()).get('/compare?itemIds=coffee').expect(503);
     await request(app.getHttpServer()).get('/users/demo/watchlist/price-alerts').expect(503);
     await request(app.getHttpServer())
       .post('/users/demo/watchlist/price-alerts')

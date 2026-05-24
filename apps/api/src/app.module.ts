@@ -7,6 +7,7 @@ import { AppController } from './app.controller.js';
 import { BasketsModule } from './baskets/baskets.module.js';
 import { BudgetsModule } from './budgets/budgets.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
+import { CompareModule } from './compare/compare.module.js';
 import { validateEnvironment } from './config/env.schema.js';
 import { DatabaseModule } from './database/database.module.js';
 import { DealsModule } from './deals/deals.module.js';
@@ -57,7 +58,8 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     BasketsModule,
     BudgetsModule,
     CategoriesModule,
-    AlertsModule
+    AlertsModule,
+    CompareModule
   ],
   controllers: [AppController]
 })
