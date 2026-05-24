@@ -1,0 +1,42 @@
+.item-cards-section {
+  margin: 0 auto;
+  max-width: 72rem;
+  overflow-x: hidden;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.item-cards-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.item-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.item-card__eyebrow {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 640px) {
+  .item-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .item-cards-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
