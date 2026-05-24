@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
+import { lekiaSeProducts, lekiaSeSource } from '@/lib/ingested/lekia-se';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
@@ -90,6 +91,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
+  const lekiaDiscountProducts = lekiaSeProducts.filter((product) => product.discountPrice !== null).slice(0, 4);
+  const lekiaFeaturedProducts = lekiaSeProducts.slice(0, 4);
+  const lekiaCategoryLabel = lekiaSeSource.categories.join(' · ');
+  const lekiaSourceHostCount = new Set(lekiaSeSource.sourceUrls.map((url) => new URL(url).hostname)).size;
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
@@ -121,6 +126,56 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           <Link className="rounded-full bg-indigo-700 px-5 py-3 text-center text-sm font-black text-white" href="/pharmacy">
             Open pharmacy catalog
           </Link>
+        </div>
+      </Card>
+      <Card className="mt-8 border-cyan-200 bg-cyan-50/70">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-800">Specialty catalog</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Lekia SE public product rows</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              {lekiaSeSource.rowCount.toLocaleString('sv-SE')} real toy and game rows from Lekia SSR pages are now visible on the product catalog surface, including
+              {' '}{lekiaSeSource.discountRowCount.toLocaleString('sv-SE')} rows with explicit discount prices. Provenance stays attached through {lekiaSeSource.sourceUrls.length.toLocaleString('sv-SE')} source URLs from {lekiaSourceHostCount.toLocaleString('sv-SE')} public host.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-cyan-950 shadow-sm">
+            {lekiaCategoryLabel || 'category metadata pending'}
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-[0.8fr_1.2fr]">
+          <div className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">Source metadata</p>
+            <dl className="mt-3 grid gap-2 text-sm font-bold text-slate-700">
+              <div className="flex justify-between gap-3"><dt>Rows</dt><dd>{lekiaSeSource.rowCount.toLocaleString('sv-SE')}</dd></div>
+              <div className="flex justify-between gap-3"><dt>Discount rows</dt><dd>{lekiaSeSource.discountRowCount.toLocaleString('sv-SE')}</dd></div>
+              <div className="flex justify-between gap-3"><dt>Retrieved</dt><dd>{new Date(lekiaSeSource.retrievedAt).toLocaleDateString('sv-SE')}</dd></div>
+            </dl>
+            <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">
+              Source: {lekiaSeSource.source}. No fabricated products are added; preview rows below are sliced directly from the ingested Lekia export.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {lekiaDiscountProducts.map((product) => (
+              <a className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-700" href={product.productUrl} key={`lekia-discount-${product.code}`}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-700">Discount · {product.category}</p>
+                <h3 className="mt-2 line-clamp-2 text-lg font-black text-slate-950">{product.name}</h3>
+                <p className="mt-1 text-xs font-semibold text-slate-500">{product.brand || 'Brand not reported'} · {product.categories.join(' / ')}</p>
+                <p className="mt-3 text-sm font-black text-cyan-950">{formatSek(product.discountPrice ?? product.price)} now · shelf {formatSek(product.price)}</p>
+                <p className="mt-1 text-xs font-bold text-slate-600">Stores: {product.availableInStoresCount ?? 0} · stockStatus: {product.stockStatus || 'not reported'}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {lekiaFeaturedProducts.map((product) => (
+            <a className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-700" href={product.productUrl} key={`lekia-feature-${product.code}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-700">{product.category}</p>
+              <h3 className="mt-2 line-clamp-2 text-base font-black text-slate-950">{product.name}</h3>
+              <p className="mt-1 text-xs font-semibold text-slate-500">{product.brand || 'Brand not reported'}</p>
+              <p className="mt-3 text-sm font-black text-cyan-950">{formatSek(product.price)} · {product.priceCurrency}</p>
+              <p className="mt-1 text-xs font-bold text-slate-600">sourceUrl: {product.sourceUrl}</p>
+            </a>
+          ))}
         </div>
       </Card>
       <Card className="mt-8 border-violet-200 bg-violet-50/70">
