@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { buildUserAccountDeletionQueries } from './queries/users.js';
 
 export * from './queries/categories.js';
 export * from './queries/stores.js';
@@ -986,6 +987,7 @@ export type HumanReviewAssignmentRecord = {
 
 export type GroceryViewRepository = {
   upsertUser(user: UserRecord): Promise<void>;
+  deleteUserAccount(userId: string): Promise<void>;
   addFavoriteStore(userId: string, storeId: string): Promise<void>;
   getFavoriteStoreIds(userId: string): Promise<string[]>;
   upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
@@ -1268,6 +1270,22 @@ export function createMemoryRepository(): GroceryViewRepository {
   return {
     async upsertUser(user) {
       users.set(user.id, { ...user });
+    },
+
+    async deleteUserAccount(userId) {
+      users.delete(userId);
+      favoriteStores.delete(userId);
+      budgets.delete(userId);
+      subscriptionEntitlements.delete(userId);
+      watchlists.delete(userId);
+      baskets.delete(userId);
+      basketImportReviewItems.delete(userId);
+      for (const [itemId, item] of pantryItems) if (item.userId === userId) pantryItems.delete(itemId);
+      for (const [uploadId, upload] of receiptUploads) if (upload.userId === userId) receiptUploads.delete(uploadId);
+      for (const [planId, plan] of householdPlans) {
+        if (plan.members.some((member) => member.userId === userId)) householdPlans.delete(planId);
+      }
+      for (const [ruleId, rule] of alertRules) if (rule.userId === userId) alertRules.delete(ruleId);
     },
 
     async addFavoriteStore(userId, storeId) {
@@ -2369,6 +2387,12 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         'insert into app_users(id, email) values ($1, $2) on conflict (id) do update set email = excluded.email',
         [user.id, user.email ?? null]
       );
+    },
+
+    async deleteUserAccount(userId) {
+      for (const query of buildUserAccountDeletionQueries(userId)) {
+        await executor.query(query.sql, query.values);
+      }
     },
 
     async addFavoriteStore(userId, storeId) {

@@ -1357,6 +1357,36 @@ describe('createHttpHandler', () => {
     assert.equal(crossUser.status, 400);
   });
 
+  it('deletes signed-in settings account data after explicit confirmation', async () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, favoriteStoresOnly: true });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.updateBudget('user-1', { weeklyBudget: 100, monthlyBudget: 400 });
+    const handle = createHttpHandler(api, { now: new Date('2026-05-20T12:00:00.000Z') });
+
+    const unconfirmed = await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
+      method: 'DELETE',
+      body: JSON.stringify({ confirmation: 'delete' })
+    }));
+    assert.equal(unconfirmed.status, 400);
+
+    const deleted = await json(await handle(new Request('http://localhost/api/settings/account?userId=user-1', {
+      method: 'DELETE',
+      body: JSON.stringify({ confirmation: 'DELETE ACCOUNT' })
+    }))) as { userId: string; deleted: boolean; deletedTables: string[]; requiresReauthentication: boolean };
+
+    assert.equal(deleted.userId, 'user-1');
+    assert.equal(deleted.deleted, true);
+    assert.equal(deleted.requiresReauthentication, true);
+    assert.deepEqual(deleted.deletedTables, ['basket_items', 'weekly_baskets', 'watchlist_items', 'user_preferences', 'favorite_stores', 'app_users']);
+    assert.deepEqual(api.getFavoriteStores('user-1'), []);
+    assert.deepEqual(api.getWatchlist('user-1').items, []);
+    assert.deepEqual(api.getBasket('user-1').items, []);
+    assert.equal(api.getBudgetSummary('user-1').weeklyBudget, 0);
+    assert.equal(api.getBudgetSummary('user-1').monthlyBudget, 0);
+  });
+
   it('plans pantry replenishment from stock, usage, expiry, and deal candidates', async () => {
     const handle = createHttpHandler(undefined, { now: new Date('2026-05-20T12:00:00.000Z') });
 

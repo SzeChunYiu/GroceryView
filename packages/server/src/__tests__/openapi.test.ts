@@ -84,6 +84,7 @@ describe('buildOpenApiDocument', () => {
       '/api/retailers',
       '/api/scans/process',
       '/api/scans/upload-url',
+      '/api/settings/account',
       '/api/settings/data-export',
       '/api/stores',
       '/api/stores/{id}',
@@ -150,6 +151,8 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/privacy/export'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/privacy/deletion-plan'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/privacy/request-fulfillment'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/settings/account'].delete?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/settings/account'].delete?.summary ?? '', /delete.*account|account deletion/i);
     assert.deepEqual(doc.paths['/api/settings/data-export'].get?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/settings/data-export'].get?.summary ?? '', /download my data|data export/i);
     assert.deepEqual(doc.paths['/api/pantry/replenishment'].post?.security, [{ bearerAuth: [] }]);

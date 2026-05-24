@@ -484,6 +484,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/prices/freshness']);
     assert.ok(docs.body.paths['/users/demo/privacy/export']);
     assert.ok(docs.body.paths['/users/demo/privacy/deletion-plan']);
+    assert.ok(docs.body.paths['/users/demo/settings/account']);
     assert.ok(docs.body.paths['/users/demo/settings/data-export']);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
@@ -570,6 +571,13 @@ describe('GroceryView API app', () => {
       'receipts',
       'households'
     ]);
+
+    const settingsDeletion = await request(app.getHttpServer()).delete('/users/demo/settings/account').send({ confirmation: 'DELETE ACCOUNT' }).expect(200);
+    assert.equal(settingsDeletion.body.userId, 'demo');
+    assert.equal(settingsDeletion.body.deleted, false);
+    assert.equal(settingsDeletion.body.destructiveAction, false);
+    assert.equal(settingsDeletion.body.requiresConfirmation, 'DELETE ACCOUNT');
+    assert.equal(settingsDeletion.body.demo, true);
 
     const mealPlan = await request(app.getHttpServer())
       .get('/users/demo/meal-plans/suggestions?maxMealCost=120&servings=4')

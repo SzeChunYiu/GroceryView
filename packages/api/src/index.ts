@@ -4876,6 +4876,25 @@ export function createGroceryViewApi() {
       return stores.filter((store) => ids.has(store.id));
     },
 
+    deleteAccount(userId: string) {
+      requireNonEmptyId(userId, 'userId');
+      favoriteStores.delete(userId);
+      watchlists.delete(userId);
+      baskets.delete(userId);
+      budgets.delete(userId);
+      categoryBudgets.delete(userId);
+      subscriptionEntitlements.delete(userId);
+      basketImportReviews.delete(userId);
+      const householdId = householdIdByUserId.get(userId);
+      if (householdId) {
+        householdPlans.delete(householdId);
+        for (const [memberUserId, memberHouseholdId] of householdIdByUserId) {
+          if (memberHouseholdId === householdId) householdIdByUserId.delete(memberUserId);
+        }
+      }
+      return { deleted: true };
+    },
+
     addWatchlistItem(userId: string, item: WatchlistItem) {
       requireNonEmptyId(userId, 'userId');
       requireKnownProduct(item.productId);
