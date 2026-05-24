@@ -44,9 +44,9 @@ const timeframeWindows = [
   { label: 'ALL', rangeDays: undefined, rangeLabel: 'all observed points' }
 ] as const;
 const historyWindowDefinitions = [
-  { label: '30-day', rangeDays: 30, title: 'Observed 30-day low/high' },
-  { label: '90-day', rangeDays: 90, title: 'Observed 90-day low/high' },
-  { label: '365-day', rangeDays: 365, title: 'Observed 365-day low/high' }
+  { label: '1M', rangeDays: 30, title: 'Observed 1M low/high' },
+  { label: '3M', rangeDays: 90, title: 'Observed 3M low/high' },
+  { label: '1Y', rangeDays: 365, title: 'Observed 1Y low/high' }
 ] as const;
 const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
 
@@ -376,11 +376,14 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
     observationCount: 0,
     lowValueLabel: 'Not reported',
     highValueLabel: 'Not reported',
+    volatilityLowerLabel: 'Not reported',
+    volatilityUpperLabel: 'Not reported',
     lowObservedAt: null as string | null,
     highObservedAt: null as string | null,
     canClaimLowestInWindow: false,
     claimLabel: 'observed range withheld',
-    detailCopy: 'No dated observation tape is available for this range.'
+    detailCopy: 'No dated observation tape is available for this range.',
+    volatilityCopy: 'No buildPriceChartSeries points are available for an observed volatility band.'
   }));
 
   if ('lowestPrice' in product || product.observations.length === 0) {
@@ -402,10 +405,36 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
     }))
     .filter((observation) => Number.isFinite(observation.observedTime))
     .sort((a, b) => a.observedTime - b.observedTime);
+  const chartObservations = observations.map((observation) => ({
+    observedAt: `${observation.observedAt}T00:00:00.000Z`,
+    price: observation.price,
+    storeId: 'openprices-community',
+    storeName: 'OpenPrices community',
+    sourceType: 'online' as const,
+    confidence: 1,
+    provenanceLabel: 'OpenPrices observed product history'
+  }));
 
   const windows = historyWindowDefinitions.map((window) => {
     const windowStart = latestTime - window.rangeDays * 24 * 60 * 60 * 1000;
     const windowPoints = observations.filter((observation) => observation.observedTime >= windowStart && observation.observedTime <= latestTime);
+    const chartResult = buildPriceChartSeries({
+      observations: chartObservations,
+      asOf: `${latestObservedAt}T00:00:00.000Z`,
+      rangeDays: window.rangeDays,
+      markerLimitPerSeries: 0
+    });
+    const chartValues = chartResult.series.flatMap((series) => series.points.map((point) => point.value));
+    const chartMedian = medianFor(chartValues);
+    const chartStandardDeviation = standardDeviationFor(chartValues);
+    const chartObservedLow = chartValues.length ? Math.min(...chartValues) : null;
+    const chartObservedHigh = chartValues.length ? Math.max(...chartValues) : null;
+    const volatilityLower = chartMedian === null || chartStandardDeviation === null || chartObservedLow === null || chartObservedHigh === null
+      ? null
+      : clamp(chartMedian - chartStandardDeviation, chartObservedLow, chartObservedHigh);
+    const volatilityUpper = chartMedian === null || chartStandardDeviation === null || chartObservedLow === null || chartObservedHigh === null
+      ? null
+      : clamp(chartMedian + chartStandardDeviation, chartObservedLow, chartObservedHigh);
 
     if (windowPoints.length === 0) {
       return {
@@ -413,11 +442,14 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
         observationCount: 0,
         lowValueLabel: 'Not reported',
         highValueLabel: 'Not reported',
+        volatilityLowerLabel: 'Not reported',
+        volatilityUpperLabel: 'Not reported',
         lowObservedAt: null,
         highObservedAt: null,
         canClaimLowestInWindow: false,
         claimLabel: 'observed range withheld',
-        detailCopy: 'No dated OpenPrices observations fall inside this range.'
+        detailCopy: 'No dated OpenPrices observations fall inside this range.',
+        volatilityCopy: `buildPriceChartSeries returned no ${window.label} points for an observed volatility band; no forecast is shown.`
       };
     }
 
@@ -439,17 +471,20 @@ function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findP
       observationCount: windowPoints.length,
       lowValueLabel: formatSek(lowPoint.price),
       highValueLabel: formatSek(highPoint.price),
+      volatilityLowerLabel: volatilityLower === null ? 'Not reported' : formatSek(volatilityLower),
+      volatilityUpperLabel: volatilityUpper === null ? 'Not reported' : formatSek(volatilityUpper),
       lowObservedAt: lowPoint.observedAt,
       highObservedAt: highPoint.observedAt,
       canClaimLowestInWindow: disclosure.canClaimLowestInWindow,
       claimLabel: disclosure.canClaimLowestInWindow ? `lowest in observed ${window.rangeDays}-day window` : 'observed range only',
-      detailCopy: disclosure.detailCopy
+      detailCopy: disclosure.detailCopy,
+      volatilityCopy: `Latest ${window.label} volatility band comes from buildPriceChartSeries observed points as median ± one standard deviation; it is an observed band, not a forecast.`
     };
   });
 
   return {
     available: windows.some((window) => window.observationCount > 0),
-    caveat: 'Every low/high badge is calculated only from dated OpenPrices observations. Missing shelf, flyer, and member prices keep claims labelled as observed ranges.',
+    caveat: 'Every low/high badge is calculated only from dated OpenPrices observations. Latest 1M/3M/1Y volatility bands come from buildPriceChartSeries points and are labelled as observed bands, not forecasts.',
     windows
   };
 }
@@ -1541,11 +1576,17 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                     High: <span className="text-lg font-black text-rose-800">{window.highValueLabel}</span>
                     {window.highObservedAt ? ` · ${window.highObservedAt}` : ''}
                   </p>
+                  <p className="text-sm font-bold text-slate-600">
+                    Volatility lower: <span className="text-lg font-black text-indigo-900">{window.volatilityLowerLabel}</span>
+                  </p>
+                  <p className="text-sm font-bold text-slate-600">
+                    Volatility upper: <span className="text-lg font-black text-indigo-900">{window.volatilityUpperLabel}</span>
+                  </p>
                   <p className="rounded-xl bg-indigo-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-indigo-900">
                     {window.observationCount} points · canClaimLowestInWindow {String(window.canClaimLowestInWindow)}
                   </p>
                 </div>
-                <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">{window.claimLabel} · {window.detailCopy}</p>
+                <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">{window.claimLabel} · {window.detailCopy} {window.volatilityCopy}</p>
               </div>
             ))}
           </div>
