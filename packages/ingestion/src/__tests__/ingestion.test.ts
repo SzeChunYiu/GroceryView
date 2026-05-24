@@ -116,6 +116,7 @@ import {
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL,
   WILLYS_BULK_MINIMUM_ROWS,
+  extractDiaperPackageDetails,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
   normaliseUnitPrice,
@@ -4494,6 +4495,42 @@ describe('normalizeUnitPrice', () => {
     assert.deepEqual(normaliseUnitPrice(49.9, '500g'), { unitPrice: 99.8, comparableUnit: 'kg' });
     assert.deepEqual(normaliseUnitPrice(22.5, '1.5L'), { unitPrice: 15, comparableUnit: 'l' });
     assert.deepEqual(normaliseUnitPrice(29.94, '6-pack'), { unitPrice: 4.99, comparableUnit: 'piece' });
+  });
+
+  it('normalises diaper count strings before child-weight ranges', () => {
+    assert.deepEqual(normaliseUnitPrice(117, 'Byxblöjor Baby Dry Pants Strl 5 11-17kg VP 37p'), { unitPrice: 3.1622, comparableUnit: 'piece' });
+    assert.deepEqual(normaliseUnitPrice(117, '37 per frp'), { unitPrice: 3.1622, comparableUnit: 'piece' });
+    assert.deepEqual(normaliseUnitPrice(109, 'Comfort2 3-6kg + 47p'), { unitPrice: 2.3191, comparableUnit: 'piece' });
+    assert.deepEqual(normaliseUnitPrice(117, 'Strl 4 + 39p'), { unitPrice: 3, comparableUnit: 'piece' });
+    assert.deepEqual(normaliseUnitPrice(189, '2x37p'), { unitPrice: 2.5541, comparableUnit: 'piece' });
+  });
+
+  it('extracts diaper size classes while leaving unsupported sizes unmapped', () => {
+    assert.deepEqual(extractDiaperPackageDetails('Strl 4 + 39p'), {
+      diaperSize: 4,
+      diaperCount: 39,
+      diaperSizeClassId: 'diapers-size-4'
+    });
+    assert.deepEqual(extractDiaperPackageDetails('Comfort2 3-6kg + 47p'), {
+      diaperSize: 2,
+      diaperCount: 47,
+      diaperSizeClassId: 'diapers-size-2'
+    });
+    assert.deepEqual(extractDiaperPackageDetails('37 per frp'), {
+      diaperSize: null,
+      diaperCount: 37,
+      diaperSizeClassId: null
+    });
+    assert.deepEqual(extractDiaperPackageDetails('Byxblöjor Baby Dry Pants Strl 7 15+kg 29p Pampers'), {
+      diaperSize: 7,
+      diaperCount: 29,
+      diaperSizeClassId: null
+    });
+    assert.deepEqual(extractDiaperPackageDetails('Up&go 8 19-30kg Byxblöjor, 20p'), {
+      diaperSize: 8,
+      diaperCount: 20,
+      diaperSizeClassId: null
+    });
   });
 });
 
