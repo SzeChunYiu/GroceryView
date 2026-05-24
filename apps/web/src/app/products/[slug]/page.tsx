@@ -16,6 +16,7 @@ import {
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
@@ -625,6 +626,60 @@ function priceTypicalRangeBandFor(product: NonNullable<ReturnType<typeof findPro
   };
 }
 
+function bestTimeToBuyCardsFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceIntelligenceScoreCard[] {
+  if ('lowestPrice' in product || product.observations.length < 3) return [];
+
+  const latest = latestObservationFor(product);
+  if (!latest) return [];
+
+  const latestTime = Date.parse(`${latest.date}T00:00:00.000Z`);
+  const windows = [
+    { id: '30d', title: 'Short-term window', rangeDays: 30 },
+    { id: '90d', title: 'Seasonal window', rangeDays: 90 },
+    { id: '365d', title: 'Annual window', rangeDays: 365 }
+  ];
+
+  return windows
+    .map((window) => {
+      const windowStart = latestTime - window.rangeDays * 24 * 60 * 60 * 1000;
+      const points = product.observations
+        .map((observation) => ({
+          observedAt: observation.date,
+          observedTime: Date.parse(`${observation.date}T00:00:00.000Z`),
+          price: observation.price
+        }))
+        .filter((observation) => Number.isFinite(observation.observedTime) && observation.observedTime >= windowStart && observation.observedTime <= latestTime)
+        .sort((a, b) => a.observedTime - b.observedTime);
+
+      if (points.length < 3) return null;
+
+      const baseline = points[0]!;
+      const latestPoint = points.at(-1)!;
+      const prices = points.map((point) => point.price);
+      const averagePrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+      const medianPrice = medianFor(prices) ?? latestPoint.price;
+      const volatility = standardDeviationFor(prices) ?? 0;
+      const volatilityPercent = averagePrice > 0 ? (volatility / averagePrice) * 100 : 0;
+      const trendSlopePercent = baseline.price > 0 ? ((latestPoint.price - baseline.price) / baseline.price) * 100 : 0;
+      const belowMedianPercent = medianPrice > 0 ? ((medianPrice - latestPoint.price) / medianPrice) * 100 : 0;
+      const score = Math.round(clamp(58 + belowMedianPercent * 2 - Math.max(trendSlopePercent, 0) * 1.2 - volatilityPercent * 0.9, 0, 100));
+      const actionLabel = score >= 75 ? 'Buy now' : score >= 55 ? 'Watch closely' : 'Wait';
+
+      return {
+        id: window.id,
+        title: window.title,
+        score,
+        scoreLabel: score >= 75 ? 'strong buy window' : score >= 55 ? 'fair buy window' : 'weak buy window',
+        actionLabel,
+        windowLabel: `${window.rangeDays}-day observed window`,
+        trendSlopeLabel: formatPct(trendSlopePercent),
+        volatilityLabel: formatPct(volatilityPercent),
+        detail: `Latest price ${formatSek(latestPoint.price)} on ${latestPoint.observedAt}; score blends trend slope, median discount, and volatility from ${points.length} dated observations.`
+      };
+    })
+    .filter((card): card is PriceIntelligenceScoreCard => card !== null);
+}
+
 function priceChangeEventLogFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   if ('lowestPrice' in product || product.observations.length < 2) {
     return {
@@ -1074,6 +1129,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceHistoryRangeBadges = priceHistoryRangeBadgesFor(product);
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
   const typicalRangeBand = priceTypicalRangeBandFor(product);
+  const bestTimeToBuyCards = bestTimeToBuyCardsFor(product);
   const priceChangeLog = priceChangeEventLogFor(product);
   const priceMoveNotes = priceMoveNotesFor(product);
   const monthlySeasonality = seasonalMonthlyAveragesFor(product);
@@ -1204,6 +1260,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{dealVerdict.evidence}</p>
         </div>
       </Card>
+      <PriceIntelligenceCard cards={bestTimeToBuyCards} />
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
