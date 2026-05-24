@@ -58,6 +58,7 @@ import {
   fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
+  fetchTooGoodToGoSeSurplusListings,
   fetchRetailerConnectorSnapshot,
   fetchCityGrossBulkProducts,
   fetchCityGrossProducts,
@@ -135,6 +136,7 @@ import {
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
+  parseTooGoodToGoSeListingPage,
   planIngestionBatch,
   planOfferVisibilityBoundary,
   planRetailerConnectorRun,
@@ -198,6 +200,82 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('Too Good To Go Sweden connector', () => {
+  const listingUrl = 'https://www.toogoodtogo.com/sv/find/stockholm/circlekstockholmroslagstull/other/overraskningskasse-845701';
+  const listingHtml = `
+    <html>
+      <head><title>Circle K Stockholm Roslagstull (Överraskningskasse) | Too Good To Go i Stockholm</title></head>
+      <body>
+        <h1>Circle K Stockholm Roslagstull</h1>
+        <p>120,00&nbsp;kr 39,00&nbsp;kr</p>
+        <p>Birger Jarlsgatan 120, 114 20 Stockholm, Sverige</p>
+        <p>Hjälp oss att bekämpa matsvinnet genom att rädda en överraskningskasse.</p>
+        <p>OTHER</p>
+      </body>
+    </html>
+  `;
+
+  it('parses public city listing pages into surplus price observations', () => {
+    const row = parseTooGoodToGoSeListingPage(listingHtml, {
+      sourceUrl: listingUrl,
+      capturedAt: '2026-05-24T16:30:00.000Z'
+    });
+
+    assert.equal(row.domain, 'surplus_food');
+    assert.equal(row.chainId, 'toogoodtogo_se');
+    assert.equal(row.country, 'SE');
+    assert.equal(row.city, 'stockholm');
+    assert.equal(row.storeName, 'Circle K Stockholm Roslagstull');
+    assert.equal(row.storeSlug, 'circlekstockholmroslagstull');
+    assert.equal(row.bagName, 'Överraskningskasse');
+    assert.equal(row.category, 'OTHER');
+    assert.equal(row.address, 'Birger Jarlsgatan 120, 114 20 Stockholm, Sverige');
+    assert.equal(row.originalPrice, 120);
+    assert.equal(row.discountedPrice, 39);
+    assert.equal(row.price, 39);
+    assert.equal(row.currency, 'SEK');
+    assert.equal(row.unit, 'magic_bag');
+    assert.equal(row.is_surplus, true);
+    assert.equal(row.sourceUrl, listingUrl);
+    assert.equal(row.capturedAt, '2026-05-24T16:30:00.000Z');
+    assert.equal(row.provenance.source, 'toogoodtogo_public_listing');
+    assert.equal(row.provenance.parserVersion, 'toogoodtogo-se-listing-v1');
+    assert.equal(row.provenance.originalPriceText, '120,00 kr');
+    assert.equal(row.provenance.discountedPriceText, '39,00 kr');
+  });
+
+  it('fetches configured listing URLs and blocks anti-bot checkpoints', async () => {
+    const rows = await fetchTooGoodToGoSeSurplusListings({
+      capturedAt: '2026-05-24T16:30:00.000Z',
+      listingUrls: [listingUrl],
+      fetchImpl: async (url) => {
+        assert.equal(String(url), listingUrl);
+        return {
+          ok: true,
+          status: 200,
+          text: async () => listingHtml
+        } as Response;
+      }
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.is_surplus, true);
+
+    await assert.rejects(
+      fetchTooGoodToGoSeSurplusListings({
+        capturedAt: '2026-05-24T16:30:00.000Z',
+        listingUrls: [listingUrl],
+        fetchImpl: async () => ({
+          ok: true,
+          status: 200,
+          text: async () => '<title>Vercel Security Checkpoint</title>'
+        } as Response)
+      }),
+      /anti-bot checkpoint/
+    );
   });
 });
 
