@@ -150,6 +150,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-300">Price chart terminal</p>
           <h2 className="mt-2 text-3xl font-black tracking-tight">{chart.title}</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{chart.caveat}</p>
+          <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-200">{chart.sourceLabel}</p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black text-emerald-100">
           crosshair value readout: {latestPoint ? `${activeWindow.latestValueLabel} · ${latestPoint.time.slice(0, 10)}` : 'no point selected'}
