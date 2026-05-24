@@ -1,46 +1,33 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
-import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
+import { fetchComparePriceSnapshots, parseCompareItemIdsParam, type ComparePriceSnapshot } from '@/lib/compare-price-snapshots';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+
+export const dynamic = 'force-dynamic';
 
 export function generateMetadata() {
   return routeMetadata('/compare');
 }
 
-function formatComparableUnitPrice(value: number | null | undefined, unitLabel: string | null | undefined) {
-  return formatLocalizedUnitPrice(value, {
-    locale: defaultLocale,
-    currency: 'SEK',
-    unit: unitLabel?.replace(/^kr\//, '') ?? null
-  });
-}
-
 type SearchParams = {
+  itemIds?: string | string[];
   products?: string | string[];
 };
 
+function formatSnapshotPrice(snapshot: ComparePriceSnapshot) {
+  return new Intl.NumberFormat('sv-SE', { currency: snapshot.currency ?? 'SEK', style: 'currency' }).format(snapshot.price);
+}
+
+function formatSnapshotUnitPrice(snapshot: ComparePriceSnapshot) {
+  if (snapshot.unitPrice === null) return 'No unit price';
+  return `${snapshot.unitPrice.toLocaleString('sv-SE')} ${snapshot.currency ?? 'SEK'}/unit`;
+}
+
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
-  const productsParam = resolvedSearchParams.products;
-  const comparison = buildChainComparisonTable(productsParam);
-  const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
-  const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
-  const rowSections = [
-    {
-      id: 'commodity-alias',
-      title: 'Commodity/alias unit-price matches',
-      description: 'Loose produce, meat-style commodities, and other canonical commodity rows rank chains by comparable kr/kg, kr/l, or kr/st evidence. Confidence and coverage stay visible when inputs are partial.',
-      rows: commodityRows
-    },
-    {
-      id: 'packaged-barcode',
-      title: 'Packaged/barcode matches',
-      description: 'Branded or exact packaged rows stay separate and rank by the reported pack price for that product code.',
-      rows: packagedRows
-    }
-  ];
+  const itemIds = parseCompareItemIdsParam(resolvedSearchParams.itemIds ?? resolvedSearchParams.products);
+  const comparison = await fetchComparePriceSnapshots(itemIds);
 
   return (
     <PageShell>
@@ -50,87 +37,102 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
       <Card className="mt-6 overflow-hidden border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-sky-50">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">?products=id1,id2</p>
-            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Chain comparison table</h2>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">?itemIds=id1,id2</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Store price snapshot table</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-              Enter product slugs or retailer product ids in the query string to compare side-by-side prices across ICA, Willys, and Coop.
-              The table uses packages/db snapshot rows when production exports are present and marks missing chain rows explicitly.
+              Enter product slugs or product ids in the query string to compare endpoint-backed latest price snapshots by store.
+              Missing requested item ids stay visible instead of being inferred from product names.
             </p>
           </div>
-          <Link className="rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white shadow-sm" href="/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st">
+          <Link className="rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white shadow-sm" href="/compare?itemIds=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st">
             Try sample products
           </Link>
         </div>
         <div className="mt-5 grid gap-4">
-          {comparison.products.length === 0 ? (
+          {comparison.itemIds.length === 0 ? (
             <p className="rounded-3xl border border-emerald-100 bg-white p-5 text-sm font-semibold text-slate-600 shadow-sm">
-              Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
+              Add ?itemIds=product-slug-1,product-slug-2 to render store-level comparison rows from the compare endpoint. Missing item ids: none yet.
             </p>
           ) : null}
-          {rowSections.map((section) => (
-            <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm" key={section.id}>
+          {comparison.itemIds.length > 0 ? (
+            <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm">
               <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-3">
-                <h3 className="text-sm font-black text-emerald-950">{section.title}</h3>
-                <p className="mt-1 text-xs font-semibold leading-5 text-emerald-900">{section.description}</p>
+                <h3 className="text-sm font-black text-emerald-950">Endpoint-backed store snapshots</h3>
+                <p className="mt-1 text-xs font-semibold leading-5 text-emerald-900">
+                  Rows are keyed by storeId from GET /api/compare?itemIds=... and columns preserve each requested item id.
+                </p>
               </div>
-              {section.rows.length > 0 ? (
+              {comparison.storeRows.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full border-collapse text-left text-sm">
-                    <caption className="sr-only">{section.title} side-by-side prices across ICA, Willys, and Coop</caption>
+                    <caption className="sr-only">Store-level price snapshots for requested compare items</caption>
                     <thead className="bg-slate-950 text-white">
                       <tr>
-                        <th className="px-4 py-3 font-black">Product</th>
-                        {COMPARE_CHAIN_ORDER.map((chain) => (
-                          <th className="px-4 py-3 font-black" key={chain.id}>{chain.label}</th>
+                        <th className="px-4 py-3 font-black">Store</th>
+                        {comparison.itemIds.map((itemId) => (
+                          <th className="px-4 py-3 font-black" key={itemId}>{itemId}</th>
                         ))}
-                        <th className="px-4 py-3 font-black">Best chain</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {section.rows.map((product) => (
-                        <tr className="border-t border-slate-100 align-top" key={`${section.id}-${product.productSlug}`}>
+                      {comparison.storeRows.map((store) => (
+                        <tr className="border-t border-slate-100 align-top" key={store.storeId}>
                           <th className="px-4 py-4 font-black text-slate-950">
-                            <Link className="underline decoration-emerald-300 underline-offset-4" href={`/products/${product.productSlug}`}>{product.productName}</Link>
-                            <span className="mt-1 block text-xs font-semibold text-slate-500">{product.brand || 'Brand not reported'} · {product.packageLabel}</span>
-                            <span className="mt-2 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">{product.matchLabel}</span>
-                            <span className="mt-2 block text-xs font-semibold leading-5 text-slate-500">{product.confidenceLabel}</span>
+                            {store.storeName}
+                            <span className="mt-1 block text-xs font-semibold text-slate-500">{store.chainName} · storeId {store.storeId}</span>
                           </th>
-                          {product.cells.map((cell) => (
-                            <td className="px-4 py-4" key={`${product.productSlug}-${cell.chainId}`}>
-                              <p className={cell.status === 'priced' ? 'font-black text-emerald-900' : 'font-black text-slate-400'}>{cell.priceText}</p>
-                              <p className="mt-1 text-xs font-semibold text-slate-500">{cell.unitLabel}</p>
-                              {cell.productSlug ? (
-                                <Link className="mt-2 block text-xs font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={`/products/${cell.productSlug}`}>
-                                  {cell.productName ?? cell.productSlug}
-                                </Link>
-                              ) : null}
-                              {cell.sourceConfidence !== null ? (
-                                <p className="mt-1 text-xs font-semibold text-slate-500">sourceConfidence {formatPct(cell.sourceConfidence * 100)}</p>
-                              ) : null}
-                            </td>
-                          ))}
-                          <td className="px-4 py-4">
-                            <p className="rounded-2xl bg-emerald-50 px-3 py-2 font-black text-emerald-950">{product.bestChainName}</p>
-                            <p className="mt-1 text-xs font-semibold text-slate-500">{product.bestPriceText}</p>
-                          </td>
+                          {comparison.itemIds.map((itemId) => {
+                            const snapshot = store.snapshots[itemId];
+                            return (
+                              <td className="px-4 py-4" key={`${store.storeId}-${itemId}`}>
+                                {snapshot ? (
+                                  <>
+                                    <p className="font-black text-emerald-900">{formatSnapshotPrice(snapshot)}</p>
+                                    <p className="mt-1 text-xs font-semibold text-slate-500">{formatSnapshotUnitPrice(snapshot)}</p>
+                                    <Link className="mt-2 block text-xs font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={`/products/${snapshot.productSlug}`}>
+                                      {snapshot.productName}
+                                    </Link>
+                                    <p className="mt-1 text-xs font-semibold text-slate-500">
+                                      {snapshot.priceType ?? 'latest'} · {snapshot.observedAt ? snapshot.observedAt.slice(0, 10) : 'observed date unavailable'}
+                                    </p>
+                                    {snapshot.confidence !== null ? (
+                                      <p className="mt-1 text-xs font-semibold text-slate-500">confidence {formatPct(snapshot.confidence * 100)}</p>
+                                    ) : null}
+                                  </>
+                                ) : (
+                                  <>
+                                    <p className="font-black text-slate-400">No store price row</p>
+                                    <p className="mt-1 text-xs font-semibold text-slate-500">Requested item id remains visible.</p>
+                                  </>
+                                )}
+                              </td>
+                            );
+                          })}
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               ) : (
-                <p className="px-4 py-5 text-sm font-semibold text-slate-500">No requested rows used this match type.</p>
+                <p className="px-4 py-5 text-sm font-semibold text-slate-500">
+                  No store snapshot rows returned for the requested item ids.
+                </p>
               )}
             </div>
-          ))}
+          ) : null}
+          {comparison.missingItemIds.length > 0 ? (
+            <p className="rounded-2xl bg-amber-50 p-3 text-sm font-bold text-amber-950">
+              Missing item ids: {comparison.missingItemIds.join(', ')}. The compare route does not infer products from names.
+            </p>
+          ) : null}
+          {comparison.error ? (
+            <p className="rounded-2xl bg-rose-50 p-3 text-sm font-bold text-rose-950">
+              Compare endpoint unavailable: {comparison.error}. Requested item ids remain visible on this page.
+            </p>
+          ) : null}
         </div>
-        {comparison.missingProductIds.length > 0 ? (
-          <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-bold text-amber-950">
-            Missing product ids: {comparison.missingProductIds.join(', ')}. The compare route does not infer products from names.
-          </p>
-        ) : null}
         <p className="mt-3 text-xs font-semibold text-slate-500">
-          Source: {comparison.sourceLabel}{comparison.generatedAt ? ` · generated ${comparison.generatedAt}` : ''}.
+          Source: {comparison.sourceLabel}.
         </p>
       </Card>
       <Card className="mt-6">

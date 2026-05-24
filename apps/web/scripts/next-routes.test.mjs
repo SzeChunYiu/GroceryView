@@ -941,9 +941,6 @@ describe('verified-data UI', () => {
     assert.match(chainCompare, /unitLabel: `commodity\/alias kr\/\$\{comparableUnit\}`/);
     assert.match(compare, /commodityComparisons/);
     assert.match(compare, /Cross-chain commodity comparison/);
-    assert.match(compare, /Commodity\/alias unit-price matches/);
-    assert.match(compare, /Packaged\/barcode matches/);
-    assert.match(compare, /sourceConfidence \{formatPct\(cell\.sourceConfidence \* 100\)\}/);
     assert.match(compare, /kr\/\{comparison\.comparableUnit\}/);
     assert.match(product, /commodityComparisonForProduct/);
     assert.match(product, /Cheapest chain for this commodity/);
@@ -2505,29 +2502,26 @@ ${seo}`;
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
-  it('surfaces query-driven chain comparison table on the compare route', async () => {
+  it('surfaces endpoint-backed store price snapshots on the compare route', async () => {
     const route = await read('src/app/compare/page.tsx');
-    const compareLib = await read('src/lib/chain-compare.ts');
+    const compareLib = await read('src/lib/compare-price-snapshots.ts');
 
     assert.match(route, /searchParams\?: Promise<SearchParams>/);
-    assert.match(route, /buildChainComparisonTable/);
-    assert.match(route, /productsParam/);
-    assert.match(route, /Chain comparison table/);
+    assert.match(route, /fetchComparePriceSnapshots/);
+    assert.match(route, /parseCompareItemIdsParam/);
+    assert.match(route, /Store price snapshot table/);
     assert.match(route, /<table/);
-    assert.match(route, /comparison\.products\.filter/);
-    assert.match(route, /rowSections\.map/);
-    assert.match(route, /section\.rows\.map/);
-    assert.match(route, /ICA/);
-    assert.match(route, /Willys/);
-    assert.match(route, /Coop/);
-    assert.match(compareLib, /COMPARE_CHAIN_ORDER = \[/);
-    assert.match(compareLib, /id: 'ica'/);
-    assert.match(compareLib, /id: 'willys'/);
-    assert.match(compareLib, /id: 'coop'/);
-    assert.match(compareLib, /dbSiteSnapshotGeneratedAt/);
-    assert.match(compareLib, /postgres\.latest_prices\/observations/);
-    assert.match(compareLib, /productsParam\.split\(','\)/);
-    assert.match(compareLib, /axfoodProducts/);
+    assert.match(route, /comparison\.storeRows\.map/);
+    assert.match(route, /store\.snapshots\[itemId\]/);
+    assert.match(route, /missingItemIds/);
+    assert.match(route, /GET \/api\/compare\?itemIds=/);
+    assert.match(compareLib, /ComparePriceSnapshotsReport/);
+    assert.match(compareLib, /stores: Record<string, Record<string, ComparePriceSnapshot>>/);
+    assert.match(compareLib, /new URL\('\/api\/compare'/);
+    assert.match(compareLib, /url\.searchParams\.set\('itemIds'/);
+    assert.match(compareLib, /parseCompareItemIdsParam/);
+    assert.match(compareLib, /itemIdsParam\.split\(','\)/);
+    assert.match(compareLib, /GROCERYVIEW_API_BASE_URL/);
     assert.doesNotMatch(compareLib, /Math\.random|placeholder|synthetic/i);
   });
 
