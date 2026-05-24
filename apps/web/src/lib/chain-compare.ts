@@ -1,4 +1,5 @@
 import { axfoodProducts, type AxfoodProduct, type ChainPrice } from './axfood-products';
+import { dbSiteCompareStoreCapabilities, dbSiteCompareStoreCapabilitiesGeneratedAt } from './generated/db-site-compare-store-capabilities';
 import { dbSiteSnapshotGeneratedAt } from './generated/db-site-products';
 import { commodityComparisonForProduct } from './verified-data';
 
@@ -44,10 +45,100 @@ export type ChainComparisonTable = {
   products: ChainCompareProductRow[];
   sourceLabel: string;
   generatedAt: string | null;
+  noChainState: ChainCompareNoChainState;
+};
+
+export type CompareStoreCapabilityInput = {
+  chainId: string;
+  chainName?: string;
+  label?: string;
+  canCompare?: boolean;
+  evidenceUpdatedAt?: string | null;
+  capabilitySource?: string;
+  source?: string;
+};
+
+export type CompareStoreCapability = {
+  chainId: CompareChainId;
+  chainName: string;
+  canCompare: boolean;
+  evidenceUpdatedAt: string | null;
+  capabilitySource: string;
+};
+
+export type ChainCompareNoChainState = {
+  activeFilters: string[];
+  evidenceUpdatedAt: string | null;
+  capabilitySource: string;
+  missingProductIds: string[];
+  guardrail: string;
+  storeCapabilities: CompareStoreCapability[];
 };
 
 function normalizeCompareId(value: string): string {
   return value.trim().toLowerCase();
+}
+
+function isCompareChainId(value: string): value is CompareChainId {
+  return COMPARE_CHAIN_ORDER.some((chain) => chain.id === value);
+}
+
+function compareChainRank(chainId: CompareChainId): number {
+  return COMPARE_CHAIN_ORDER.findIndex((chain) => chain.id === chainId);
+}
+
+function fallbackStoreCapabilities(): CompareStoreCapability[] {
+  return COMPARE_CHAIN_ORDER.map((chain) => ({
+    chainId: chain.id,
+    chainName: chain.label,
+    canCompare: true,
+    evidenceUpdatedAt: dbSiteSnapshotGeneratedAt,
+    capabilitySource: 'local fallback compare store capabilities'
+  }));
+}
+
+function latestEvidenceTimestamp(rows: readonly CompareStoreCapability[]): string | null {
+  return rows
+    .map((row) => row.evidenceUpdatedAt)
+    .filter((value): value is string => typeof value === 'string' && value.length > 0)
+    .sort()
+    .at(-1) ?? null;
+}
+
+function normalizeCompareStoreCapabilities(
+  capabilities: readonly CompareStoreCapabilityInput[] = dbSiteCompareStoreCapabilities,
+  generatedAt: string | null = dbSiteCompareStoreCapabilitiesGeneratedAt
+): CompareStoreCapability[] {
+  const normalized = capabilities
+    .map((row) => {
+      const chainId = normalizeCompareId(row.chainId);
+      if (!isCompareChainId(chainId)) return null;
+      const chain = COMPARE_CHAIN_ORDER.find((candidate) => candidate.id === chainId);
+      if (!chain) return null;
+      return {
+        chainId,
+        chainName: row.chainName ?? row.label ?? chain.label,
+        canCompare: row.canCompare !== false,
+        evidenceUpdatedAt: row.evidenceUpdatedAt ?? generatedAt,
+        capabilitySource: row.capabilitySource ?? row.source ?? 'postgres.latest_prices/observations store capability snapshot'
+      };
+    })
+    .filter((row): row is CompareStoreCapability => row !== null)
+    .sort((left, right) => compareChainRank(left.chainId) - compareChainRank(right.chainId));
+
+  return normalized.length > 0 ? normalized : fallbackStoreCapabilities();
+}
+
+function buildNoChainState(requestedIds: string[], missingProductIds: string[]): ChainCompareNoChainState {
+  const storeCapabilities = normalizeCompareStoreCapabilities();
+  return {
+    activeFilters: requestedIds.map((requestedId) => `product=${requestedId}`),
+    evidenceUpdatedAt: latestEvidenceTimestamp(storeCapabilities),
+    capabilitySource: storeCapabilities[0]?.capabilitySource ?? 'local fallback compare store capabilities',
+    missingProductIds,
+    guardrail: 'The compare route does not infer products from names.',
+    storeCapabilities
+  };
 }
 
 export function parseCompareProductsParam(input: string | string[] | null | undefined): string[] {
@@ -214,6 +305,7 @@ export function buildChainComparisonTable(
     sourceLabel: dbSiteSnapshotGeneratedAt
       ? 'postgres.latest_prices/observations via packages/db site snapshot'
       : 'local bundled chain catalogue; production builds prefer packages/db snapshot rows',
-    generatedAt: dbSiteSnapshotGeneratedAt
+    generatedAt: dbSiteSnapshotGeneratedAt,
+    noChainState: buildNoChainState(requestedIds, missingProductIds)
   };
 }
