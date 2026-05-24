@@ -66,6 +66,18 @@ jobs:
 
             core.notice(`No successful Vercel Preview deployment found for ${ref}; skipping preview-only Lighthouse budget.`);
 
+      - name: Expand Lighthouse route budget matrix
+        if: env.LHCI_PREVIEW_URL != ''
+        run: |
+          node <<'NODE'
+          const { readFileSync, writeFileSync } = require('node:fs');
+          const baseUrl = process.env.LHCI_PREVIEW_URL.replace(/\/$/, '');
+          const config = JSON.parse(readFileSync('.lighthouserc.json', 'utf8'));
+          config.ci.collect.url = config.ci.collect.url.map((url) => url.replace('__LHCI_PREVIEW_URL__', baseUrl));
+          writeFileSync('.lighthouserc.json', `${JSON.stringify(config, null, 2)}\n`);
+          console.log(`Prepared Lighthouse budgets for ${config.ci.collect.url.length} preview routes.`);
+          NODE
+
       - name: Run Lighthouse CI against Vercel preview
         if: env.LHCI_PREVIEW_URL != ''
         run: npm run perf:lighthouse:preview -w @groceryview/web
