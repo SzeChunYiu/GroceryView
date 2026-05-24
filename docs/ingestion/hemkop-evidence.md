@@ -405,3 +405,23 @@ Sample newly added rows:
 3. 2500298172 | 4797 | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4797&type=PERSONAL_GENERAL&page=0&size=100
 4. 2500298127 | 4797 | Smörgåspålägg | 2 för 28 kr | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4797&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500299506 | 4797 | Kaffe | 59,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4797&type=PERSONAL_GENERAL&page=0&size=100
+
+## Hemköp weekly discounts full public-store refresh 2026-05-24
+
+- Source: www.hemkop.se public Axfood campaign JSON
+- Store catalog source: https://www.hemkop.se/axfood/rest/store
+- Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-24T11:23:37.652Z
+- Public store IDs with wired rows: 205
+- Source URLs fetched and cited in metadata: 615
+- Real weekly discount rows fetched and wired: 51058
+- Web wire: apps/web/src/lib/ingested/hemkop.ts
+- Connector: packages/ingestion/src/connectors/hemkop.ts
+- Verification: `node scripts/ingestion/verify-ingested-provenance.mjs` reported rowCount 51058, 0 missing sourceUrl, 0 missing retrievedAt, and 0 duplicate provenance/content keys for `hemkopWeeklyDiscounts`.
+
+Sample source inspection on 2026-05-24:
+- `curl -A "GroceryView/0.1" https://www.hemkop.se/axfood/rest/store` returned public JSON with 206 store rows; first row inspected was store 4798, Hemköp Alfta Västanågatan.
+- `curl -A "GroceryView/0.1" "https://www.hemkop.se/search/campaigns/offline?q=4102&type=PERSONAL_GENERAL&page=0&size=100"` returned public JSON with 100 result rows and 3 pages.
+
+Sample campaign row from the inspected endpoint:
+1. 2500309493 | 4102 | Läsk | 6 kr/st | https://www.hemkop.se/search/campaigns/offline?q=4102&type=PERSONAL_GENERAL&page=0&size=100
