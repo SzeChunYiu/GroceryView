@@ -7,6 +7,19 @@ import type { MatpriskollenIngestedOffer } from '../ingested/matpriskollen';
 
 export const dbSiteIngestedOverridesGeneratedAt = null;
 
+
+export type DbSiteCompareStoreCapability = {
+  chainId: string;
+  chainName: string;
+  canCompare: boolean;
+  evidenceUpdatedAt: string | null;
+  generatedAt: string | null;
+  rowCount: number;
+  source: string;
+};
+
+export const dbSiteCompareStoreCapabilities: DbSiteCompareStoreCapability[] = [];
+
 export const dbSiteMatpriskollenOffers: MatpriskollenIngestedOffer[] = [];
 export const dbSiteLidlStoreOffers: LidlIngestedStoreOffer[] = [];
 export const dbSiteIcaReklambladOffers: IcaReklambladIngestedOffer[] = [];

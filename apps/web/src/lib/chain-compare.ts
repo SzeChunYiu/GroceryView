@@ -1,5 +1,6 @@
 import { axfoodProducts, type AxfoodProduct, type ChainPrice } from './axfood-products';
 import { dbSiteSnapshotGeneratedAt } from './generated/db-site-products';
+import { dbSiteCompareStoreCapabilities, dbSiteIngestedOverridesGeneratedAt } from './generated/db-site-ingested-overrides';
 import { commodityComparisonForProduct } from './verified-data';
 
 export const COMPARE_CHAIN_ORDER = [
@@ -38,12 +39,34 @@ export type ChainCompareProductRow = {
   bestPriceText: string;
 };
 
+export type ChainCompareStoreCapability = {
+  chainId: string;
+  chainName: string;
+  canCompare: boolean;
+  evidenceUpdatedAt: string | null;
+  generatedAt: string | null;
+  rowCount: number;
+  source: string;
+};
+
+export type NoChainCompareState = {
+  title: string;
+  description: string;
+  activeFilters: string;
+  capabilitySource: string;
+  evidenceUpdatedAt: string | null;
+  generatedAt: string | null;
+  capabilities: ChainCompareStoreCapability[];
+  guardrails: string[];
+};
+
 export type ChainComparisonTable = {
   requestedIds: string[];
   missingProductIds: string[];
   products: ChainCompareProductRow[];
   sourceLabel: string;
   generatedAt: string | null;
+  noChainState: NoChainCompareState;
 };
 
 function normalizeCompareId(value: string): string {
@@ -189,6 +212,60 @@ function compareProductRow(requestedId: string, product: AxfoodProduct): ChainCo
   return comparePackagedProductRow(requestedId, product);
 }
 
+function newestTimestamp(values: Array<string | null | undefined>): string | null {
+  return values.filter((value): value is string => typeof value === 'string' && value.length > 0).sort().at(-1) ?? null;
+}
+
+function compareStoreCapabilities(): ChainCompareStoreCapability[] {
+  if (dbSiteCompareStoreCapabilities.length > 0) {
+    return dbSiteCompareStoreCapabilities.map((capability) => ({
+      chainId: capability.chainId,
+      chainName: capability.chainName,
+      canCompare: capability.canCompare,
+      evidenceUpdatedAt: capability.evidenceUpdatedAt,
+      generatedAt: capability.generatedAt,
+      rowCount: capability.rowCount,
+      source: capability.source
+    }));
+  }
+
+  return COMPARE_CHAIN_ORDER.map((chain) => ({
+    chainId: chain.id,
+    chainName: chain.label,
+    canCompare: false,
+    evidenceUpdatedAt: dbSiteSnapshotGeneratedAt,
+    generatedAt: dbSiteIngestedOverridesGeneratedAt ?? dbSiteSnapshotGeneratedAt,
+    rowCount: 0,
+    source: 'fallback compare chain order; production builds can replace dbSiteCompareStoreCapabilities from packages/db evidence'
+  }));
+}
+
+function buildNoChainCompareState(requestedIds: string[], missingProductIds: string[]): NoChainCompareState {
+  const capabilities = compareStoreCapabilities();
+  const hasGeneratedCapabilities = dbSiteCompareStoreCapabilities.length > 0;
+  const evidenceUpdatedAt = newestTimestamp(capabilities.map((capability) => capability.evidenceUpdatedAt));
+  const generatedAt = newestTimestamp(capabilities.map((capability) => capability.generatedAt)) ?? dbSiteIngestedOverridesGeneratedAt ?? dbSiteSnapshotGeneratedAt;
+  const coveredChains = capabilities.filter((capability) => capability.canCompare && capability.rowCount > 0);
+  return {
+    title: coveredChains.length > 0 ? 'No requested products matched comparable chain rows' : 'No chain clears compare coverage yet',
+    description: hasGeneratedCapabilities
+      ? 'Generated compare-store capabilities were loaded, but the active product filters did not match a chain-comparable row.'
+      : 'Local fallback capabilities are active; production DB exports can add chain evidence timestamps before the compare page renders.',
+    activeFilters: requestedIds.length > 0 ? requestedIds.join(', ') : 'No product filters supplied',
+    capabilitySource: hasGeneratedCapabilities ? 'dbSiteCompareStoreCapabilities' : 'fallback compare chain order',
+    evidenceUpdatedAt,
+    generatedAt,
+    capabilities,
+    guardrails: [
+      'No-chain states do not infer product matches from names or missing chain rows.',
+      'Capability timestamps come from generated DB evidence when dbSiteCompareStoreCapabilities is present.',
+      missingProductIds.length > 0
+        ? `Unmatched requested ids stay explicit: ${missingProductIds.join(', ')}`
+        : 'Add product slugs or retailer product ids to evaluate chain coverage.'
+    ]
+  };
+}
+
 export function buildChainComparisonTable(
   productsParam: string | string[] | null | undefined,
   products: readonly AxfoodProduct[] = axfoodProducts
@@ -214,6 +291,7 @@ export function buildChainComparisonTable(
     sourceLabel: dbSiteSnapshotGeneratedAt
       ? 'postgres.latest_prices/observations via packages/db site snapshot'
       : 'local bundled chain catalogue; production builds prefer packages/db snapshot rows',
-    generatedAt: dbSiteSnapshotGeneratedAt
+    generatedAt: dbSiteIngestedOverridesGeneratedAt ?? dbSiteSnapshotGeneratedAt,
+    noChainState: buildNoChainCompareState(requestedIds, missingProductIds)
   };
 }

@@ -2531,6 +2531,21 @@ ${seo}`;
     assert.doesNotMatch(compareLib, /Math\.random|placeholder|synthetic/i);
   });
 
+  it('surfaces generated no-chain compare capability evidence', async () => {
+    const route = await read('src/app/compare/page.tsx');
+    const compareLib = await read('src/lib/chain-compare.ts');
+    const generated = await read('src/lib/generated/db-site-ingested-overrides.ts');
+
+    assert.match(generated, /dbSiteCompareStoreCapabilities/);
+    assert.match(generated, /evidenceUpdatedAt/);
+    assert.match(compareLib, /buildNoChainCompareState/);
+    assert.match(compareLib, /capabilitySource: hasGeneratedCapabilities \? 'dbSiteCompareStoreCapabilities'/);
+    assert.match(compareLib, /Capability timestamps come from generated DB evidence/);
+    assert.match(route, /No-chain match state/);
+    assert.match(route, /noChainState\.evidenceUpdatedAt/);
+    assert.match(route, /capability\.evidenceUpdatedAt/);
+  });
+
   it('surfaces an item comparison route with four-item nutrition, store price, and trend coverage', async () => {
     const route = await read('src/app/compare-items/page.tsx');
     const table = await read('src/components/ItemComparisonTable.tsx');
