@@ -1,9 +1,9 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
+import { ProductImage } from '@/components/product-image';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -161,7 +161,7 @@ export function ProductPriceCards({
             >
             {card.imageUrl && card.imageAlt ? (
               <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-white bg-white p-3 shadow-sm">
-                <Image
+                <ProductImage
                   alt={card.imageAlt}
                   className="max-h-full max-w-full object-contain"
                   height={144}

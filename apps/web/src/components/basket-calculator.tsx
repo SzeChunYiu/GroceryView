@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
+import { ProductImage } from '@/components/product-image';
 
 export type BasketCalculatorPriceRow = {
   chainId: string;
@@ -137,12 +138,15 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
                   type="checkbox"
                 />
                 {product.image ? (
-                  <img
+                  <ProductImage
                     alt=""
                     className="h-14 w-14 rounded-xl object-contain"
+                    height={56}
                     loading="lazy"
                     referrerPolicy="no-referrer"
+                    sizes="56px"
                     src={product.image}
+                    width={56}
                   />
                 ) : (
                   <span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-slate-100 text-xs font-black text-slate-500">No img</span>

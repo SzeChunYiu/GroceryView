@@ -1,9 +1,9 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { FavouriteProductToggle } from '@/components/favourite-product-toggle';
+import { ProductImage } from '@/components/product-image';
 import {
   FAVOURITES_STORAGE_KEY,
   FAVOURITES_UPDATED_EVENT,
@@ -120,7 +120,7 @@ export function FavouriteProductsPageClient({ productCatalogue }: Readonly<{ pro
               <Link className="group block pr-24" href={`/products/${liveProduct.slug}`}>
                 {liveProduct.imageUrl && liveProduct.imageAlt ? (
                   <div className="mb-4 flex h-32 items-center justify-center rounded-3xl border border-rose-50 bg-rose-50/60 p-3">
-                    <Image alt={liveProduct.imageAlt} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={128} sizes="(min-width: 1280px) 18vw, (min-width: 768px) 34vw, 80vw" src={liveProduct.imageUrl} width={128} />
+                    <ProductImage alt={liveProduct.imageAlt} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={128} sizes="(min-width: 1280px) 18vw, (min-width: 768px) 34vw, 80vw" src={liveProduct.imageUrl} width={128} />
                   </div>
                 ) : null}
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-700">saved product · {liveProduct.productKind}</p>

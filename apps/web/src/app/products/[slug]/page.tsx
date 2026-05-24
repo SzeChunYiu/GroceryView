@@ -16,6 +16,7 @@ import {
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { ProductImage } from '@/components/product-image';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
@@ -1095,13 +1096,16 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card>
           {product.image ? (
-            <img
+            <ProductImage
               alt={product.name}
               className="mb-5 aspect-square w-full rounded-[2rem] border border-slate-100 bg-slate-50 object-contain p-4 shadow-inner"
               decoding="async"
+              height={640}
               loading="lazy"
               referrerPolicy="no-referrer"
+              sizes="(min-width: 1024px) 40vw, 100vw"
               src={product.image}
+              width={640}
             />
           ) : (
             <div className="mb-5 rounded-[2rem] border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm font-bold text-slate-500">
