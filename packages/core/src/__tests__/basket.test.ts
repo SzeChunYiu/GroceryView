@@ -613,6 +613,50 @@ describe('compareBasketStrategies', () => {
       'bread@coop-medborgarplatsen'
     ]);
   });
+
+  it('compares only prices from the requested country currency', () => {
+    const result = compareBasketStrategies({
+      country: 'NO',
+      favoriteStoreIds: ['willys-odenplan', 'rema-oslo'],
+      items: [
+        {
+          productId: 'coffee',
+          quantity: 1,
+          prices: [
+            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', country: 'SE', currency: 'SEK', price: 39.9 },
+            { storeId: 'rema-oslo', storeName: 'Rema Oslo', country: 'NO', currency: 'EUR', price: 3.9 },
+            { storeId: 'rema-oslo', storeName: 'Rema Oslo', country: 'NO', currency: 'NOK', price: 49.9 }
+          ]
+        },
+        {
+          productId: 'milk',
+          quantity: 2,
+          prices: [
+            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', country: 'SE', currency: 'SEK', price: 13.9 },
+            { storeId: 'rema-oslo', storeName: 'Rema Oslo', country: 'NO', currency: 'EUR', price: 1.4 }
+          ]
+        }
+      ]
+    });
+
+    assert.equal(result.cheapestByProduct.total, 49.9);
+    assert.deepEqual(result.cheapestByProduct.assignments.map((assignment) => ({
+      productId: assignment.productId,
+      storeId: assignment.storeId,
+      unitPrice: assignment.unitPrice
+    })), [
+      { productId: 'coffee', storeId: 'rema-oslo', unitPrice: 49.9 }
+    ]);
+    assert.deepEqual(result.missingProductIds, ['milk']);
+    assert.deepEqual(result.singleStoreOptions, [
+      {
+        storeId: 'rema-oslo',
+        storeName: 'Rema Oslo',
+        total: 49.9,
+        itemCount: 1
+      }
+    ]);
+  });
 });
 
 describe('summarizeStoreBasketCoverage', () => {

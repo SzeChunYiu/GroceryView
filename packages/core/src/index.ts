@@ -260,6 +260,8 @@ export function rankDealOpportunities(input: {
 export type StorePrice = {
   storeId: string;
   storeName: string;
+  country?: BasketComparisonCountry;
+  currency?: BasketComparisonCurrency;
   price: number;
   priceType?: WatchlistPriceType;
   distanceKm?: number;
@@ -272,10 +274,14 @@ export type BasketInputItem = {
 };
 
 export type BasketComparisonInput = {
+  country?: BasketComparisonCountry;
   favoriteStoreIds: string[];
   enabledMemberStoreIds?: string[];
   items: BasketInputItem[];
 };
+
+export type BasketComparisonCountry = 'SE' | 'NO' | 'DK' | 'FI' | 'IS';
+export type BasketComparisonCurrency = 'SEK' | 'NOK' | 'DKK' | 'EUR' | 'ISK';
 
 export type MultiWeekStockUpHistoryPoint = {
   observedAt: string;
@@ -422,6 +428,14 @@ export type BasketComparisonResult = {
   memberSavingsTotal: number;
   memberPriceStoreIds: string[];
   excludedMemberPriceProductIds: string[];
+};
+
+const basketComparisonCurrencyByCountry: Record<BasketComparisonCountry, BasketComparisonCurrency> = {
+  SE: 'SEK',
+  NO: 'NOK',
+  DK: 'DKK',
+  FI: 'EUR',
+  IS: 'ISK'
 };
 
 export type StoreBasketCoverage = {
@@ -1189,6 +1203,8 @@ export type RecurringBasketDigest = {
 };
 
 export function compareBasketStrategies(input: BasketComparisonInput): BasketComparisonResult {
+  const country = input.country ?? 'SE';
+  const currency = basketComparisonCurrencyByCountry[country];
   const favoriteSet = new Set(input.favoriteStoreIds);
   const enabledMemberSet = new Set(input.enabledMemberStoreIds ?? []);
   const missingProductIds: string[] = [];
@@ -1199,7 +1215,11 @@ export function compareBasketStrategies(input: BasketComparisonInput): BasketCom
   let memberSavingsTotal = 0;
 
   for (const item of input.items) {
-    const favoritePrices = item.prices.filter((price) => favoriteSet.has(price.storeId));
+    const favoritePrices = item.prices.filter((price) =>
+      favoriteSet.has(price.storeId)
+      && (price.country ?? country) === country
+      && (price.currency ?? currency) === currency
+    );
     const eligiblePrices = favoritePrices.filter((price) => {
       if (price.priceType !== 'member') return true;
       const isEnabled = enabledMemberSet.has(price.storeId);
