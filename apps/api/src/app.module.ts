@@ -8,6 +8,7 @@ import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
 import { PricesModule } from './prices/prices.module.js';
 import { ProductsModule } from './products/products.module.js';
+import { ImagesModule } from './routes/images.module.js';
 import { StoresModule } from './stores/stores.module.js';
 import { UsersModule } from './users/users.module.js';
 import { WatchlistsModule } from './watchlists/watchlists.module.js';
@@ -23,6 +24,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     UsersModule,
     WatchlistsModule,
     BasketsModule,
+    ImagesModule,
     AlertsModule
   ],
   controllers: [AppController]

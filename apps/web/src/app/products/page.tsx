@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ItemCard } from '@/components/ItemCard';
 import { pricedProducts, categoryLabels } from '@/lib/openprices-products';
 import { coopProducts, coopSource } from '@/lib/ingested/coop';
 import { hemkopProducts, hemkopSource } from '@/lib/ingested/hemkop';
@@ -83,6 +84,23 @@ export default function ProductsIndexPage() {
             </p>
           </Link>
         ))}
+      </section>
+
+      <section className="mb-8">
+        <h2 className="mb-4 text-lg font-black">Popular OpenFoodFacts products</h2>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {openFoodFactsProducts.slice(0, 6).map((product) => (
+            <ItemCard
+              key={product.code}
+              href={product.productUrl}
+              imageUrl={product.imageUrl}
+              title={product.name}
+              subtitle={product.brands || 'Unknown brand'}
+              actionLabel={product.nutriscoreGrade}
+              meta={`${product.quantity || 'unknown size'} · ${product.categories[0] || 'uncategorized'}`}
+            />
+          ))}
+        </div>
       </section>
 
       <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
