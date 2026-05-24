@@ -42,27 +42,22 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
       confidenceLabel: matchedRank.confidenceLabel,
       matchedPerBranchObservationCount: matchedRank.matchedPerBranchObservationCount,
       confidenceLevel: confidenceLevelForRank(matchedRank),
-      detail:
-        `Ranked from ${matchedRank.matchedPerBranchObservationCount.toLocaleString('sv-SE')} per-branch Lidl offer observations matched to ${matchedRank.externalStoreId}. Lower index means the branch has deeper public offer prices versus regular-price baselines.`,
+      detail: matchedRank.detailLabel,
       cohorts: [
         {
           label: 'kommun cohort',
           value: matchedRank.kommun,
           storeCount: matchedRank.kommunCohortSize,
-          detail: `Kommun derived from ${matchedRank.kommunDerivedFrom}; price percentile ${matchedRank.kommunPricePercentileLabel}, cheaper than ${matchedRank.cheaperThanKommunLabel} of matched Lidl branches in the cohort.`
+          detail: matchedRank.kommunDetailLabel
         },
         {
           label: 'national cohort',
           value: 'Sweden',
           storeCount: matchedRank.nationalCohortSize,
-          detail: `National price percentile ${matchedRank.nationalPricePercentileLabel}, cheaper than ${matchedRank.cheaperThanNationalLabel} of matched Lidl branches.`
+          detail: matchedRank.nationalDetailLabel
         }
       ],
-      requiredEvidence: [
-        'per-branch Lidl offer observations with regular-price baselines',
-        'an OSM store match to a Lidl external store id before rendering a percentile',
-        'confidence/coverage labels beside every percentile badge'
-      ]
+      requiredEvidence: matchedRank.requiredEvidence
     };
   }
 
@@ -83,7 +78,7 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
     cheaperThanNationalLabel: 'Not reported',
     cheaperThanKommunLabel: 'Not reported',
     averageRelativeIndexLabel: 'Not reported',
-    coverageLabel: `${storePricePercentileRanks.length.toLocaleString('sv-SE')} matched Lidl stores have per-branch offer ranks; this OSM record is not matched.`,
+    coverageLabel: `${storePricePercentileRanks.length.toLocaleString('sv-SE')} stores have verified price-percentile coverage (Lidl branch-offer rows or Willys/Hemköp matched-chain index); this OSM record is not matched.`,
     sourceLabel: 'No matched branch-offer price index row for this OSM store.',
     confidenceLabel: 'coverage blocker',
     confidenceLevel,

@@ -2386,7 +2386,7 @@ const lidlStoreOfferSummaries = lidlOfferGroupsByStore
 
 const nationalLidlPriceIndices = lidlStoreOfferSummaries.map((summary) => summary.averageRelativeIndex);
 
-export const storePricePercentileRanks = lidlStoreOfferSummaries
+const lidlStorePricePercentileRanks = lidlStoreOfferSummaries
   .map((summary) => {
     if (!summary.matchedStore) return null;
     const kommun = summary.matchedStore.city || summary.matchedStore.district || summary.city;
@@ -2426,10 +2426,106 @@ export const storePricePercentileRanks = lidlStoreOfferSummaries
       statusLabel: 'Ranked from per-branch Lidl offer observations',
       confidenceLabel: summary.offers.length >= 30 && summary.regularPriceObservationCount >= 12 ? 'high confidence branch-offer coverage' : 'limited branch-offer coverage',
       coverageLabel: `${summary.offers.length} per-branch Lidl offer observations; ${summary.regularPriceObservationCount} include regular-price baselines`,
-      source: 'lidlStoreOffers public branch offer rows'
+      source: 'lidlStoreOffers public branch offer rows',
+      detailLabel:
+        `Ranked from ${summary.offers.length.toLocaleString('sv-SE')} per-branch Lidl offer observations matched to ${summary.externalStoreId}. Lower index means the branch has deeper public offer prices versus regular-price baselines.`,
+      kommunDetailLabel:
+        `Kommun derived from ${summary.matchedStore.city ? 'OSM city field matched to Lidl city' : 'OSM district fallback matched to Lidl city'}; price percentile ${formatPct(kommunPricePercentile)}, cheaper than ${formatPct(cheaperThanKommunPct)} of matched Lidl branches in the cohort.`,
+      nationalDetailLabel:
+        `National price percentile ${formatPct(nationalPricePercentile)}, cheaper than ${formatPct(cheaperThanNationalPct)} of matched Lidl branches.`,
+      requiredEvidence: [
+        'per-branch Lidl offer observations with regular-price baselines',
+        'an OSM store match to a Lidl external store id before rendering a percentile',
+        'confidence/coverage labels beside every percentile badge'
+      ]
     };
   })
   .filter((rank): rank is Exclude<typeof rank, null> => rank !== null)
+  .sort((left, right) => left.nationalPricePercentile! - right.nationalPricePercentile!);
+
+const axfoodChainIndexObservations: ChainPriceObservation[] = matchedChainProducts.flatMap((product) =>
+  chainPriceRows(product).map((row) => ({
+    chainId: String(row.chain),
+    category: product.category,
+    unitPrice: row.price
+  }))
+);
+
+const axfoodStorePriceIndexReport = calculateChainPriceIndex(axfoodChainIndexObservations);
+const axfoodStorePriceIndexByChain = new Map(axfoodStorePriceIndexReport.chains.map((chain) => [chain.chainId, chain]));
+
+function axfoodChainKeyForStore(store: (typeof storeUniverse)[number]) {
+  const brand = normalizeStoreText(store.brand);
+  if (brand.includes('willys')) return 'willys';
+  if (brand.includes('hemkop')) return 'hemkop';
+  return null;
+}
+
+const axfoodIndexedStores = storeUniverse
+  .map((store) => {
+    const chainKey = axfoodChainKeyForStore(store);
+    const priceIndex = chainKey ? axfoodStorePriceIndexByChain.get(chainKey) : null;
+    return chainKey && priceIndex ? { store, chainKey, priceIndex } : null;
+  })
+  .filter((row): row is Exclude<typeof row, null> => row !== null);
+
+const nationalAxfoodStorePriceIndices = axfoodIndexedStores.map((row) => row.priceIndex.overallIndex);
+
+const axfoodStorePricePercentileRanks = axfoodIndexedStores.map(({ store, chainKey, priceIndex }) => {
+  const kommun = store.city || store.district || 'kommun not reported';
+  const kommunPriceIndices = axfoodIndexedStores
+    .filter((candidate) => (candidate.store.city || candidate.store.district || 'kommun not reported') === kommun)
+    .map((candidate) => candidate.priceIndex.overallIndex);
+  const nationalPricePercentile = percentileRank(priceIndex.overallIndex, nationalAxfoodStorePriceIndices);
+  const kommunPricePercentile = percentileRank(priceIndex.overallIndex, kommunPriceIndices);
+  const cheaperThanNationalPct = cheaperThanPct(priceIndex.overallIndex, nationalAxfoodStorePriceIndices);
+  const cheaperThanKommunPct = cheaperThanPct(priceIndex.overallIndex, kommunPriceIndices);
+  const categoryRows = categorySummaries.filter((category) => category.chainRows > 0);
+  return {
+    osmSlug: store.slug,
+    externalStoreId: `matchedChainProducts:${chainKey}`,
+    chain: chainKey === 'hemkop' ? 'Hemköp' : 'Willys',
+    storeName: store.name,
+    sourceStoreName: store.brand,
+    kommun,
+    kommunDerivedFrom: 'OSM city/district field for indexed Willys/Hemköp store cohort',
+    matchedPerBranchObservationCount: priceIndex.observations,
+    regularPriceObservationCount: priceIndex.observations,
+    nationalCohortSize: nationalAxfoodStorePriceIndices.length,
+    kommunCohortSize: kommunPriceIndices.length,
+    averageOfferPrice: null,
+    averageOfferPriceLabel: 'Not reported',
+    averageRegularPrice: null,
+    averageRegularPriceLabel: 'Not reported',
+    averageRelativeIndex: priceIndex.overallIndex,
+    averageRelativeIndexLabel: formatPct(priceIndex.overallIndex),
+    nationalPricePercentile,
+    nationalPricePercentileLabel: formatPct(nationalPricePercentile),
+    kommunPricePercentile,
+    kommunPricePercentileLabel: formatPct(kommunPricePercentile),
+    cheaperThanNationalPct,
+    cheaperThanNationalLabel: formatPct(cheaperThanNationalPct),
+    cheaperThanKommunPct,
+    cheaperThanKommunLabel: formatPct(cheaperThanKommunPct),
+    statusLabel: 'Ranked from matched Willys/Hemköp chain price index',
+    confidenceLabel: `${priceIndex.confidence} confidence matched-chain coverage`,
+    coverageLabel: `${priceIndex.observations} matchedChainProducts rows across ${priceIndex.categoriesCovered} categories; ${categoryRows.length} categorySummaries have chain rows`,
+    source: 'matchedChainProducts/categorySummaries via calculateChainPriceIndex',
+    detailLabel:
+      `Ranked from ${priceIndex.observations.toLocaleString('sv-SE')} real matchedChainProducts price rows for ${store.brand}. Lower index means the chain is cheaper than the matched Willys/Hemköp market baseline; no branch-specific price is inferred.`,
+    kommunDetailLabel:
+      `Kommun cohort uses OSM city/district "${kommun}" for stores whose brand has a real matchedChainProducts price index; price percentile ${formatPct(kommunPricePercentile)}, cheaper than ${formatPct(cheaperThanKommunPct)} of indexed stores in the cohort.`,
+    nationalDetailLabel:
+      `National cohort uses ${nationalAxfoodStorePriceIndices.length.toLocaleString('sv-SE')} OSM Willys/Hemköp stores backed by matchedChainProducts/categorySummaries; price percentile ${formatPct(nationalPricePercentile)}, cheaper than ${formatPct(cheaperThanNationalPct)} nationally.`,
+    requiredEvidence: [
+      'matchedChainProducts rows with observed Willys/Hemköp prices',
+      'categorySummaries chain-row coverage before chain price index labels render',
+      'confidence/coverage labels beside every percentile badge'
+    ]
+  };
+});
+
+export const storePricePercentileRanks = [...lidlStorePricePercentileRanks, ...axfoodStorePricePercentileRanks]
   .sort((left, right) => left.nationalPricePercentile! - right.nationalPricePercentile!);
 
 export function storePricePercentileRankForStore(slug: string) {
