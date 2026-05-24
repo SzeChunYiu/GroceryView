@@ -1,3 +1,6 @@
+export { extractCutPreparation, extractMeatCut, normalizeCutInput, parseCutPreparation, parseMeatCut } from './lib/extractors/cut.js';
+export type { CutPreparation, MeatAnimal, MeatCut, MeatPreparation } from './lib/extractors/cut.js';
+
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
