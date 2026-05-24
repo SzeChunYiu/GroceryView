@@ -36,3 +36,18 @@ model Product {
 
   @@map("products")
 }
+
+model PriceChange {
+  id            String   @id @default(uuid()) @db.Uuid
+  productSlug   String   @map("product_slug")
+  storeId       String?  @map("store_id")
+  previousPrice Decimal  @map("previous_price") @db.Decimal(10, 2)
+  currentPrice  Decimal  @map("current_price") @db.Decimal(10, 2)
+  delta         Decimal  @db.Decimal(10, 2)
+  direction     String
+  source        String?
+  detectedAt    DateTime @default(now()) @map("detected_at")
+
+  @@index([productSlug, detectedAt])
+  @@map("price_change")
+}
