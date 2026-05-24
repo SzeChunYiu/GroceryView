@@ -3123,6 +3123,29 @@ export function buildOpenApiDocument(): OpenApiDocument {
         )
       },
       '/api/receipts/review': { get: protectedOperation('Get receipt review budget impact, match confidence, and writeback guardrails.') },
+      '/api/scans/history': {
+        get: {
+          ...protectedOperation('Get premium OCR scan history rows with redacted metadata and correction status.'),
+          responses: {
+            '200': {
+              description: 'Premium scan history rows.',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/ScanHistoryResponse' }
+                }
+              }
+            },
+            '403': {
+              description: 'Premium entitlement is required for scan history.',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/PremiumScanHistoryEntitlementError' }
+                }
+              }
+            }
+          }
+        }
+      },
       '/api/categories': { get: publicOperation('List the category tree with product counts for navigation and filter sidebars.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },

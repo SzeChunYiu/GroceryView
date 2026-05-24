@@ -6,8 +6,11 @@ import {
   fuelPriceObservationSchema,
   notificationInboxResponseSchema,
   priceObservationSchema,
+  premiumScanHistoryEntitlementErrorSchema,
+  scanHistoryResponseSchema,
   type NotificationInboxResponseDto,
-  type PriceObservationDto
+  type PriceObservationDto,
+  type ScanHistoryResponseDto
 } from '../index.js';
 
 const validPrice: PriceObservationDto = {
@@ -65,6 +68,30 @@ const validNotificationInbox: NotificationInboxResponseDto = {
   guardrails: ['Quiet-hours holds wait for the morning digest unless the alert is critical.']
 };
 
+const validScanHistory: ScanHistoryResponseDto = {
+  generatedAt: '2026-05-24T08:00:00.000Z',
+  rows: [
+    {
+      id: 'scan-history-row-1',
+      scanId: 'scan-1',
+      uploadedAt: '2026-05-23T18:30:00.000Z',
+      status: 'completed',
+      correctionStatus: 'pending',
+      itemCount: 12,
+      matchedItemCount: 10,
+      total: { amount: 482.4, currency: 'SEK' },
+      metadata: {
+        retailerName: 'Willys',
+        storeName: 'Odenplan',
+        receiptIssuedAt: '2026-05-23T18:22:00.000Z',
+        imageSha256Prefix: 'a1b2c3d4',
+        redactedFields: ['rawImageUrl', 'ocrText', 'paymentCardLast4', 'loyaltyId']
+      }
+    }
+  ],
+  nextCursor: 'scan-1'
+};
+
 describe('api contract schemas', () => {
   it('exports DTO schemas for the Phase 1 API resources', () => {
     assert.deepEqual(Object.keys(apiContractSchemas).sort(), [
@@ -76,10 +103,13 @@ describe('api contract schemas', () => {
       'fuelPricesResponse',
       'latestPrice',
       'notificationInboxResponse',
+      'premiumScanHistoryEntitlementError',
       'priceObservation',
       'product',
       'productPricesResponse',
       'provenance',
+      'scanHistoryResponse',
+      'scanHistoryRow',
       'store',
       'watchlist'
     ]);
@@ -182,6 +212,28 @@ describe('api contract schemas', () => {
     );
   });
 
+  it('models premium scan history rows with redacted metadata and correction status', () => {
+    const parsed = scanHistoryResponseSchema.parse(validScanHistory);
+
+    assert.equal(parsed.rows[0]?.correctionStatus, 'pending');
+    assert.deepEqual(parsed.rows[0]?.metadata.redactedFields, ['rawImageUrl', 'ocrText', 'paymentCardLast4', 'loyaltyId']);
+    assert.equal(
+      scanHistoryResponseSchema.safeParse({
+        ...validScanHistory,
+        rows: validScanHistory.rows.map(({ correctionStatus: _correctionStatus, metadata: _metadata, ...row }) => row)
+      }).success,
+      false
+    );
+    assert.deepEqual(
+      premiumScanHistoryEntitlementErrorSchema.parse({
+        code: 'premium_required',
+        message: 'Premium is required to view scan history.',
+        requiredEntitlement: 'premium_scan_history'
+      }).requiredEntitlement,
+      'premium_scan_history'
+    );
+  });
+
   it('publishes OpenAPI-compatible component metadata for price provenance', () => {
     const price = apiContractOpenApiComponents.PriceObservation;
     const fuel = apiContractOpenApiComponents.FuelPriceObservation;
@@ -212,5 +264,10 @@ describe('api contract schemas', () => {
       'guardrails'
     ]);
     assert.equal(apiContractOpenApiComponents.NotificationInboxQueueItem.properties.sendAt.format, 'date-time');
+    assert.deepEqual(apiContractOpenApiComponents.ScanHistoryRow.properties.correctionStatus.enum, ['none', 'pending', 'accepted', 'rejected']);
+    assert.deepEqual(apiContractOpenApiComponents.ScanHistoryResponse.properties.rows.items, {
+      $ref: '#/components/schemas/ScanHistoryRow'
+    });
+    assert.deepEqual(apiContractOpenApiComponents.PremiumScanHistoryEntitlementError.required, ['code', 'message', 'requiredEntitlement']);
   });
 });
