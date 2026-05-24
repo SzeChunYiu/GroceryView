@@ -1,7 +1,6 @@
 {
   "name": "@groceryview/web",
   "version": "0.1.0",
-  "type": "module",
   "scripts": {
     "build": "NODE_OPTIONS=--max-old-space-size=6144 next build --webpack",
     "dev": "next dev",

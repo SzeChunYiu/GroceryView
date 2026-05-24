@@ -10,6 +10,10 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.openbeautyfacts.org' }
     ]
   },
+  webpack: (config) => {
+    config.cache = false;
+    return config;
+  },
   reactStrictMode: true
 };
 
