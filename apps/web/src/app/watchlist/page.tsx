@@ -4,8 +4,8 @@ import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/componen
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
-import { confidenceForProduct, priceRowCount, priceSource, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
 import { routeMetadata } from '@/lib/seo';
+import { confidenceForProduct, priceRowCount, priceSource, watchlistAlertBoard, watchlistItemForAlert } from '@/lib/watchlist-data';
 
 export function generateMetadata() {
   return routeMetadata('/watchlist');
