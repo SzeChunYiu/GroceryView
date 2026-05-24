@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   compareBasketStrategies,
+  effectiveUnitPrice,
   planBasketFulfillmentSlots,
   planBasketImportExport,
   planBasketTripCost,
@@ -13,6 +14,42 @@ import {
   summarizeStoreBasketCoverage,
   validateBasketComparisonLineFixtures
 } from '../index.js';
+
+describe('effectiveUnitPrice', () => {
+  it('honors multi-buy minimum eligible quantity per paid unit', () => {
+    assert.deepEqual(effectiveUnitPrice({
+      listing: { price: 15 },
+      promotion: { type: 'multi_buy', quantity: 2, price: 20 }
+    }), {
+      effective_price: 10,
+      eligible_quantity: 2,
+      savings_vs_list: 5
+    });
+  });
+
+  it('applies percentage discounts to the listed unit price', () => {
+    assert.deepEqual(effectiveUnitPrice({
+      listing: { price: 40 },
+      promotion: { type: 'percentage_off', percentOff: 30 }
+    }), {
+      effective_price: 28,
+      eligible_quantity: 1,
+      savings_vs_list: 12
+    });
+  });
+
+  it('keeps threshold-spend item price unchanged and surfaces the threshold separately', () => {
+    assert.deepEqual(effectiveUnitPrice({
+      listing: { price: 35 },
+      promotion: { type: 'threshold_spend', thresholdSpend: 200 }
+    }), {
+      effective_price: 35,
+      eligible_quantity: 1,
+      savings_vs_list: 0,
+      threshold_spend: 200
+    });
+  });
+});
 
 describe('validateBasketComparisonLineFixtures', () => {
   it('accepts every basket comparison line status with explicit inclusion or exclusion fields', () => {

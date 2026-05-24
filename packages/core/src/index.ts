@@ -1,3 +1,5 @@
+export * from './lib/effectiveUnitPrice.js';
+
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
