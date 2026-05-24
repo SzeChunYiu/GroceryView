@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import { ProductPriceCards } from './product-price-cards';
-import { TrendingCarousel } from './TrendingCarousel';
+import { PreferenceAwareProductGrid, TrendingCarousel, type PreferenceAwareProductCard } from './TrendingCarousel';
 import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedShellCopy } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
@@ -55,6 +55,25 @@ const homepageAllStoreDailyRunner = {
   connectorUrls: allStoreDailyRunnerReadiness.allStoreConnectorUrls.slice(0, 4)
 };
 const homepageFreshOpenPrices = freshestOpenPrices.slice(3, 9);
+const homepageFreshOpenPriceCards: PreferenceAwareProductCard[] = homepageFreshOpenPrices.map((product) => ({
+  id: product.slug,
+  productSlug: product.slug,
+  href: `/products/${product.slug}`,
+  eyebrow: 'Fresh OpenPrices arrival',
+  title: product.name,
+  subtitle: product.brands || 'Brand not reported',
+  metric: formatSek(product.priceMedian),
+  detail: `${product.observationCount.toLocaleString('sv-SE')} observations · latest ${product.lastObservedAt}`
+}));
+const homepageCategoryDealCards: PreferenceAwareProductCard[] = categoryDealLeaders.slice(0, 8).map((leader) => ({
+  id: `${leader.categorySlug}-${leader.productSlug}`,
+  productSlug: leader.productSlug,
+  href: `/categories/${leader.categorySlug}`,
+  eyebrow: leader.categoryLabel,
+  title: leader.productName,
+  metric: leader.signal,
+  detail: leader.evidenceLabel
+}));
 const homepageMapChainIndex = mapChainIndexScores.slice(0, 3);
 const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
 const homepageMarketHeatmap = marketHeatmapTiles.slice(0, 6);
@@ -882,20 +901,7 @@ export function MarketShell() {
             Calls summarizeCategoryDealLeaders with deal scores derived from visible Willys/Hemköp matched prices. Missing promo history stays covered by sourceConfidence labels.
           </p>
         </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {categoryDealLeaders.slice(0, 8).map((leader) => (
-            <Link
-              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
-              href={`/categories/${leader.categorySlug}`}
-              key={`${leader.categorySlug}-${leader.productSlug}`}
-            >
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{leader.categoryLabel}</p>
-              <p className="mt-2 font-black text-slate-950">{leader.productName}</p>
-              <p className="mt-3 text-2xl font-black text-emerald-800">{leader.signal}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-600">{leader.evidenceLabel}</p>
-            </Link>
-          ))}
-        </div>
+        <PreferenceAwareProductGrid items={homepageCategoryDealCards} />
       </Card>
 
       <Card className="mt-6">
@@ -936,23 +942,7 @@ export function MarketShell() {
             Browse verified products
           </Link>
         </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {homepageFreshOpenPrices.map((product) => (
-            <Link
-              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
-              data-product-slug={product.slug}
-              href={`/products/${product.slug}`}
-              key={product.slug}
-            >
-              <p className="font-black text-slate-950">{product.name}</p>
-              <p className="mt-1 text-sm text-slate-600">{product.brands || 'Brand not reported'}</p>
-              <p className="mt-3 text-2xl font-black text-emerald-800">{formatSek(product.priceMedian)}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-700">
-                {product.observationCount.toLocaleString('sv-SE')} observations · latest {product.lastObservedAt}
-              </p>
-            </Link>
-          ))}
-        </div>
+        <PreferenceAwareProductGrid items={homepageFreshOpenPriceCards} columnsClassName="md:grid-cols-2 xl:grid-cols-3" />
       </Card>
 
       <Card className="mt-6">
