@@ -21,6 +21,7 @@ import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
+import { predictShortWindowPriceTrend } from '@/lib/price-trend-predictions';
 import { metadataForProduct } from '@/lib/seo';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
@@ -984,6 +985,19 @@ function intraChainBranchSpreadFor(product: NonNullable<ReturnType<typeof findPr
   };
 }
 
+function priceTrendPredictionFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product) {
+    return predictShortWindowPriceTrend([]);
+  }
+
+  return predictShortWindowPriceTrend(
+    product.observations.map((observation) => ({
+      observedAt: observation.date,
+      price: observation.price
+    }))
+  );
+}
+
 function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceChartTerminalModel {
   const emptyWindows: PriceChartTerminalWindow[] = timeframeWindows.map((window) => ({
     label: window.label,
@@ -1076,6 +1090,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const typicalRangeBand = priceTypicalRangeBandFor(product);
   const priceChangeLog = priceChangeEventLogFor(product);
   const priceMoveNotes = priceMoveNotesFor(product);
+  const priceTrendPrediction = priceTrendPredictionFor(product);
   const monthlySeasonality = seasonalMonthlyAveragesFor(product);
   const seasonalSalePattern = seasonalSalePatternFor(product);
   const crossChainHistoryOverlay = crossChainHistoryOverlayFor(product);
@@ -1202,6 +1217,25 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{dealVerdict.percentileLabel}</p>
           <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">confidence {formatPct(dealVerdict.confidence * 100)}</p>
           <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{dealVerdict.evidence}</p>
+        </div>
+      </Card>
+      <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-800">Price trend prediction</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Short-window direction snapshot</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">{priceTrendPrediction.detail}</p>
+          </div>
+          <div className="rounded-3xl bg-white p-5 text-right shadow-sm">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-cyan-800">{priceTrendPrediction.available ? priceTrendPrediction.direction : 'withheld'}</p>
+            <p className="mt-2 text-2xl font-black text-slate-950">{priceTrendPrediction.headline}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">{priceTrendPrediction.recommendation}</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{priceTrendPrediction.confidenceLabel}</p>
+          <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{priceTrendPrediction.observationCount} observations</p>
+          <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">7-day expected move {priceTrendPrediction.expectedChangePercent === null ? 'withheld' : formatPct(priceTrendPrediction.expectedChangePercent)}</p>
         </div>
       </Card>
       <Card className="mt-6">
