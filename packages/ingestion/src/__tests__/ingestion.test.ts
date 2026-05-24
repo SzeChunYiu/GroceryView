@@ -2616,7 +2616,7 @@ describe('fetchIcaProducts', () => {
           unitPrice: { price: { amount: 75.8, currency: 'SEK' }, unit: 'fop.price.per.kg' },
           promoPrice: { amount: 28, currency: 'SEK' },
           promoUnitPrice: { price: { amount: 56, currency: 'SEK' }, unit: 'fop.price.per.kg' },
-          promotions: [{ description: '28 kr/st' }],
+          promotions: [{ description: 'Stammispris 2 för 56kr' }],
           image: { src: 'https://handlaprivatkund.ica.se/images-v3/example/300x300.jpg' }
         }]
       }]
@@ -2654,7 +2654,11 @@ describe('fetchIcaProducts', () => {
       promoUnitPrice: 56,
       promoUnitPriceCurrency: 'SEK',
       promoUnitPriceUnit: 'fop.price.per.kg',
-      promotionDescription: '28 kr/st',
+      promotionDescription: 'Stammispris 2 för 56kr',
+      channel: 'online',
+      format: 'kvantum',
+      isMemberPrice: true,
+      multiBuy: { quantity: 2, price: 56, currency: 'SEK' },
       storeAccountId: '1004599',
       storeName: 'ICA Kvantum Kungsholmen',
       regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d',

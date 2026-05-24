@@ -1,5 +1,9 @@
 import { runAllStoreTasks, type AllStoreTaskRunnerControls } from './all-store-runner.js';
 
+export type IcaPriceChannel = 'online';
+export type IcaStoreFormat = 'maxi' | 'kvantum' | 'supermarket' | 'nara' | 'other';
+export type IcaMultiBuyPromotion = { quantity: number; price: number; currency: string };
+
 export type IcaProduct = {
   code: string;
   productId: string;
@@ -22,6 +26,10 @@ export type IcaProduct = {
   promoUnitPriceCurrency: string;
   promoUnitPriceUnit: string;
   promotionDescription: string;
+  channel: IcaPriceChannel;
+  format: IcaStoreFormat;
+  isMemberPrice: boolean;
+  multiBuy?: IcaMultiBuyPromotion;
   soldByWeight?: boolean;
   storeAccountId: string;
   storeName: string;
@@ -1807,6 +1815,8 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
       const promoPrice = money(product.promoPrice);
       const promoUnitPrice = nestedMoney(product.promoUnitPrice);
       const promotion = arrayOfRecords(product.promotions)[0];
+      const promotionDescription = text(promotion?.description);
+      const multiBuy = parseIcaMultiBuyPromotion(promotionDescription);
       const packSizeDescription = text(product.packSizeDescription);
       const soldByWeight = hasIcaCounterPriceEvidence({
         name,
@@ -1837,7 +1847,11 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
         promoUnitPrice: promoUnitPrice.amount,
         promoUnitPriceCurrency: promoUnitPrice.currency,
         promoUnitPriceUnit: promoUnitPrice.unit,
-        promotionDescription: text(promotion?.description),
+        promotionDescription,
+        channel: 'online',
+        format: formatForIcaStoreName(options.storeName),
+        isMemberPrice: isIcaMemberPrice(promotionDescription),
+        ...(multiBuy ? { multiBuy } : {}),
         ...(soldByWeight ? { soldByWeight: true } : {}),
         storeAccountId: options.storeAccountId,
         storeName: options.storeName,
@@ -1853,6 +1867,33 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
   }
 
   return rows;
+}
+
+const ICA_MULTI_BUY_PROMOTION_PATTERN = /\b(\d+)\s*(?:för|for)\s*(\d+(?:[,:.]\d{1,2})?)\s*(?:kr|:-)?\b/i;
+const ICA_MEMBER_PRICE_PATTERN = /\bstammis(?:pris|erbjudande|rabatt)?\b/i;
+
+export function formatForIcaStoreName(storeName: string): IcaStoreFormat {
+  const normalized = storeName.toLowerCase();
+  if (normalized.includes('maxi')) return 'maxi';
+  if (normalized.includes('kvantum')) return 'kvantum';
+  if (normalized.includes('supermarket')) return 'supermarket';
+  if (normalized.includes('nära') || normalized.includes('nara')) return 'nara';
+  return 'other';
+}
+
+export function isIcaMemberPrice(promotionDescription: string): boolean {
+  return ICA_MEMBER_PRICE_PATTERN.test(promotionDescription);
+}
+
+export function parseIcaMultiBuyPromotion(promotionDescription: string): IcaMultiBuyPromotion | undefined {
+  const normalized = promotionDescription.normalize('NFKD').replace(/[^\x00-\x7F]/gu, '');
+  const match = normalized.match(ICA_MULTI_BUY_PROMOTION_PATTERN);
+  if (!match) return undefined;
+  return {
+    quantity: Number(match[1]),
+    price: Number(match[2].replace(',', '.').replace(':', '.')),
+    currency: 'SEK'
+  };
 }
 
 const ICA_COUNTER_CATEGORY_PATTERN = /\b(kött|koett|fisk|skaldjur|chark|delikatess|deli)\b/i;

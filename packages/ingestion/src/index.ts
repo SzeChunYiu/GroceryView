@@ -1812,7 +1812,7 @@ function icaProductToDailyItem(row: IcaProduct): RetailerConnectorParsedProduct 
     price,
     regularPrice: row.promoPrice !== null && row.price !== null && row.price > row.promoPrice ? row.price : undefined,
     promoText: row.promotionDescription || undefined,
-    memberOnly: false,
+    memberOnly: row.isMemberPrice,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl,
     imageUrl: row.imageUrl || undefined
