@@ -13,19 +13,53 @@ jobs:
     name: Vercel preview performance budget
     runs-on: ubuntu-latest
     steps:
+      - name: Detect preview-required changes
+        id: preview_changes
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = context.payload.pull_request.number;
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number,
+              per_page: 100
+            });
+            const isDocsOnly = (filename) =>
+              filename.endsWith('.md') ||
+              filename.startsWith('docs/') ||
+              filename === '.github/workflows/lighthouse.yml';
+            const previewRequired = files.some((file) => !isDocsOnly(file.filename));
+            core.setOutput('required', previewRequired ? 'true' : 'false');
+            if (previewRequired) {
+              core.info('Preview-impacting files changed; Lighthouse will wait for Vercel.');
+            } else {
+              core.notice('Only documentation or Lighthouse workflow files changed; skipping Vercel preview Lighthouse.');
+            }
+
+      - name: Skip Vercel preview Lighthouse
+        if: steps.preview_changes.outputs.required != 'true'
+        run: echo "No preview-impacting files changed."
+
       - name: Checkout
+        if: steps.preview_changes.outputs.required == 'true'
         uses: actions/checkout@v5
 
       - name: Setup Node
+        if: steps.preview_changes.outputs.required == 'true'
         uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: npm
 
       - name: Install dependencies
+        if: steps.preview_changes.outputs.required == 'true'
         run: npm ci
 
       - name: Resolve Vercel preview URL
+        if: steps.preview_changes.outputs.required == 'true'
         uses: actions/github-script@v8
         with:
           script: |
@@ -67,4 +101,5 @@ jobs:
             throw new Error(`Timed out waiting for a successful Vercel Preview deployment for ${ref}.`);
 
       - name: Run Lighthouse CI against Vercel preview
+        if: steps.preview_changes.outputs.required == 'true'
         run: npm run perf:lighthouse:preview -w @groceryview/web
