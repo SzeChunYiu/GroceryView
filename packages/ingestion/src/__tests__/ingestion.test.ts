@@ -5,6 +5,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
+  buildEurostatHicpUrl,
+  parseEurostatHicpJsonStat,
   buildCoopCategoryProductsUrl,
   buildCoopCategoryTreeUrl,
   buildCoopSearchUrl,
@@ -188,6 +190,27 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+describe('Eurostat HICP benchmark connector', () => {
+  it('parses JSON-stat fixture rows without fabricating missing values', () => {
+    const rows = parseEurostatHicpJsonStat({
+      value: { '0': 144.95, '2': 148.74 },
+      dimension: { time: { category: { index: { '2025-01': 0, '2025-02': 1, '2025-03': 2 } } } }
+    }, { country: 'SE', vertical: 'grocery', ecoicopCode: 'CP01' }, '2026-05-24T00:00:00.000Z');
+
+    assert.deepEqual(rows.map((row) => [row.country, row.vertical, row.ecoicop_code, row.period, row.value]), [
+      ['SE', 'grocery', 'CP01', '2025-01', 144.95],
+      ['SE', 'grocery', 'CP01', '2025-03', 148.74]
+    ]);
+  });
+
+  it('builds the official SDMX query URL for Nordic HICP verticals', () => {
+    assert.equal(
+      buildEurostatHicpUrl({ country: 'NO', vertical: 'fuel', ecoicopCode: 'CP0722' }, '2025-01'),
+      'https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/prc_hicp_midx/M.I15.CP0722.NO?format=JSON&compressed=false&startPeriod=2025-01'
+    );
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
