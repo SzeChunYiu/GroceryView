@@ -2742,6 +2742,22 @@ ${seo}`;
     assert.match(cmp, /\/privacy/);
   });
 
+  it('gates analytics writes on consent state and aligns consent keys with the CMP', async () => {
+    const cmp = await read('src/components/consent-manager.tsx');
+    const analytics = await read('src/lib/analytics.ts');
+
+    assert.match(cmp, /CONSENT_STORAGE_KEY/);
+    assert.match(cmp, /CONSENT_POLICY_VERSION/);
+    assert.match(cmp, /groceryview:consent:state/);
+    assert.match(analytics, /CONSENT_STORAGE_KEY/);
+    assert.match(analytics, /CONSENT_POLICY_VERSION/);
+    assert.match(analytics, /hasAnalyticsConsent/);
+    assert.match(analytics, /if \(!hasAnalyticsConsent\(\)\) return;/);
+    assert.match(analytics, /if \(!hasAnalyticsConsent\(\)\)/);
+    assert.match(analytics, /localStorage\.getItem\(CONSENT_STORAGE_KEY\)/);
+    assert.match(analytics, /policyVersion.*CONSENT_POLICY_VERSION/);
+  });
+
   it('ships Swedish and English privacy plus cookie policy pages for consent compliance', async () => {
     const privacy = await read('src/app/privacy/page.tsx');
     const cookies = await read('src/app/cookies/page.tsx');

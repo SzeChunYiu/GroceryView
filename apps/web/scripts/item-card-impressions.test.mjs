@@ -36,6 +36,21 @@ test('analytics batches item card impressions without console output', async () 
   assert.match(source, /navigator\.sendBeacon/);
   assert.match(source, /keepalive: true/);
   assert.doesNotMatch(source, /console\./);
+  assert.match(source, /if \(!hasAnalyticsConsent\(\)\)/);
+  assert.match(source, /trackItemCardImpression/);
+});
+
+test('analytics waits for storage consent before tracking item card impressions', async () => {
+  const source = await readFile(analytics, 'utf8');
+
+  assert.match(source, /const CONSENT_STORAGE_KEY = 'groceryview:consent:state'/);
+  assert.match(source, /const CONSENT_POLICY_VERSION = '2026-05-22-consent-v1'/);
+  assert.match(source, /export function hasAnalyticsConsent\(\): boolean/);
+  assert.match(source, /localStorage\.getItem\(CONSENT_STORAGE_KEY\)/);
+  assert.match(source, /parsed\?\.policyVersion === CONSENT_POLICY_VERSION/);
+  assert.match(source, /parsed\?\.categories\?\.analytics/);
+  assert.match(source, /if \(!hasAnalyticsConsent\(\)\) return;/);
+  assert.match(source, /sendImpressionBatch\(events: ItemCardImpression\[\]\)/);
 });
 
 test('intersection hook uses IntersectionObserver and disconnects cleanly', async () => {

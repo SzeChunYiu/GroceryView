@@ -10,6 +10,30 @@ export type ItemCardImpression = {
 const impressionEndpoint = '/api/analytics/item-card-impressions';
 const maxBatchSize = 20;
 const flushDelayMs = 1200;
+const CONSENT_STORAGE_KEY = 'groceryview:consent:state';
+const CONSENT_POLICY_VERSION = '2026-05-22-consent-v1';
+
+type ConsentCategoryState = {
+  necessary: boolean;
+  analytics: boolean;
+  ads: boolean;
+  personalisation: boolean;
+};
+
+type StoredConsent = {
+  policyVersion?: string;
+  categories?: Partial<ConsentCategoryState>;
+};
+
+export function hasAnalyticsConsent(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CONSENT_STORAGE_KEY) || 'null') as StoredConsent | null;
+    return Boolean(parsed?.policyVersion === CONSENT_POLICY_VERSION && parsed?.categories?.analytics);
+  } catch {
+    return false;
+  }
+}
 
 let pendingImpressions: ItemCardImpression[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
@@ -27,6 +51,7 @@ function payloadFor(events: ItemCardImpression[]) {
 
 function sendImpressionBatch(events: ItemCardImpression[]) {
   if (events.length === 0 || typeof window === 'undefined') return;
+  if (!hasAnalyticsConsent()) return;
 
   const payload = payloadFor(events);
   if (navigator.sendBeacon) {
@@ -56,6 +81,7 @@ function scheduleFlush() {
 
 export function trackItemCardImpression(event: Omit<ItemCardImpression, 'observedAt'>) {
   if (typeof window === 'undefined') return;
+  if (!hasAnalyticsConsent()) return;
 
   pendingImpressions.push({
     ...event,
