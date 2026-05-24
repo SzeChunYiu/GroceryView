@@ -1658,6 +1658,16 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
+    storeAccountId: '1004281',
+    storeName: 'ICA Supermarket Vagnhärad',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004397',
+    storeName: 'ICA Supermarket Kvarnen, Huddinge',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
     storeAccountId: '1003801',
     storeName: 'ICA Kvantum Tidaholm',
     regionId: DEFAULT_ICA_REGION_ID
