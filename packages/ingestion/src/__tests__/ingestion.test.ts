@@ -98,6 +98,7 @@ import {
   findPharmacyEanMatches,
   parseApohemProducts,
   parseApotekHjartatProducts,
+  parseTianTianProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -130,6 +131,7 @@ import {
   parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
+  TIAN_TIAN_CHAIN_STATUS,
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
@@ -7030,6 +7032,56 @@ describe('daily ingestion runner', () => {
       apohemSourceUrl,
       apotekHjartatSourceUrl
     ]);
+  });
+
+  it('parses Asian Express / Tian Tian Stockholm rows with ethnic Asian overlap categories only', () => {
+    const retrievedAt = '2026-05-24T15:55:00.000Z';
+    const sourceUrl = TIAN_TIAN_CHAIN_STATUS.evidenceUrl;
+    const rows = parseTianTianProducts(`
+      <script type="application/json">{
+        "venue": "Asian Express Supermarket",
+        "categories": [
+          {
+            "name": "Kött & Chark",
+            "items": [
+              {
+                "id": "sedir-kofte-400g",
+                "name": "Köfte 400g - Sedir Food",
+                "priceText": "118,95 kr",
+                "subtitle": "400 g 297,38 kr/kg",
+                "url": "/sv/swe/stockholm/venue/asian-express-supermarket/item/sedir-kofte-400g",
+                "imageUrl": "https://imageproxy.wolt.com/menu/menu-images/kofte.png"
+              }
+            ]
+          },
+          {
+            "name": "Skönhet & Hygien",
+            "items": [
+              { "id": "soap", "name": "Soap", "priceText": "29,00 kr" }
+            ]
+          }
+        ]
+      }</script>
+    `, sourceUrl, retrievedAt);
+
+    assert.equal(TIAN_TIAN_CHAIN_STATUS.qualifies, true);
+    assert.deepEqual(rows, [{
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'tian-tian',
+      retailer_type: 'ethnic_asian',
+      code: 'sedir-kofte-400g',
+      name: 'Köfte 400g - Sedir Food',
+      brand: 'Sedir Food',
+      category: 'Kött & Chark',
+      price: 118.95,
+      priceText: '118,95 kr',
+      packageText: '400 g 297,38 kr/kg',
+      productUrl: 'https://wolt.com/sv/swe/stockholm/venue/asian-express-supermarket/item/sedir-kofte-400g',
+      imageUrl: 'https://imageproxy.wolt.com/menu/menu-images/kofte.png',
+      sourceUrl,
+      retrievedAt
+    }]);
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
