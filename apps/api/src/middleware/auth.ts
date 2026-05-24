@@ -1,5 +1,11 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
+import { parseBearerToken, verifySessionToken, type SessionPayload } from '../lib/jwt';
+
+export const userSpecificApiPrefixes = ['/api/lists', '/api/alerts', '/api/settings'];
+
+export function isUserSpecificApiRoute(pathname: string) {
+  return userSpecificApiPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(prefix + '/'));
+}
 
 export type AuthenticatedRequest = {
   headers: {
