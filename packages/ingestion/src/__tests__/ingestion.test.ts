@@ -36,6 +36,10 @@ import {
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
   fetchSt1FuelPrices,
+  buildScbCpiSeFoodPayload,
+  fetchScbCpiSeFoodIndices,
+  parseScbCpiSeJsonStat,
+  SCB_CPI_SE_FOOD_ENDPOINT,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
   BRANDED_FUEL_STATIONS_OVERPASS_URL,
@@ -4891,6 +4895,71 @@ describe('SCB PxWeb query fixtures', () => {
       'scb:pxweb:v1:sv:PR/PR0101/PR0101A:KPI2020COICOP2M:json-stat2:VaruTjanstegrupp=item(01):ContentsCode=item(0000080C):Tid=top(12)'
     );
   });
+
+  it('parses SCB CPI food JSON-stat responses into external_index rows', async () => {
+    const fetchedAt = '2026-05-24T10:00:00.000Z';
+    const rows = parseScbCpiSeJsonStat({
+      fetchedAt,
+      dataset: {
+        id: ['VaruTjanstegrupp', 'ContentsCode', 'Tid'],
+        size: [2, 1, 2],
+        updated: '2026-05-13T06:00:00Z',
+        dimension: {
+          VaruTjanstegrupp: { category: { index: { '01': 0, '01.1': 1 }, label: { '01': 'Livsmedel och alkoholfria drycker', '01.1': 'Livsmedel' } } },
+          ContentsCode: { category: { index: { '0000080H': 0 }, label: { '0000080H': 'Index' } } },
+          Tid: { category: { index: { '2026M03': 0, '2026M04': 1 }, label: { '2026M03': '2026M03', '2026M04': '2026M04' } } }
+        },
+        value: [131.2, 132.4, 129.8, 130.1]
+      }
+    });
+
+    assert.equal(rows.length, 4);
+    assert.deepEqual(rows[0], {
+      rowType: 'external_index',
+      provider: 'SCB',
+      country: 'SE',
+      indexFamily: 'KPI',
+      tableId: 'KPI2020COICOPM',
+      categoryCode: '01',
+      categoryLabel: 'Livsmedel och alkoholfria drycker',
+      period: '2026-03',
+      observedAt: '2026-03-01T00:00:00.000Z',
+      value: 131.2,
+      unit: 'index',
+      cadence: 'monthly',
+      sourceUrl: SCB_CPI_SE_FOOD_ENDPOINT,
+      fetchedAt,
+      updatedAt: '2026-05-13T06:00:00Z',
+      provenance: { source: 'api.scb.se', api: 'PxWeb v1', contentCode: '0000080H', responseFormat: 'JSON-stat2' }
+    });
+    assert.equal(buildScbCpiSeFoodPayload().query[2].selection.values[0], '12');
+  });
+
+  it('posts the monthly SCB CPI food PxWeb payload without emitting price observations', async () => {
+    const rows = await fetchScbCpiSeFoodIndices({
+      fetchedAt: '2026-05-24T10:00:00.000Z',
+      fetchImpl: async (url, init) => {
+        assert.equal(url, SCB_CPI_SE_FOOD_ENDPOINT);
+        assert.equal(init?.method, 'POST');
+        assert.match(String(init?.body), /0000080H|JSON-stat2/);
+        return new Response(JSON.stringify({
+          id: ['VaruTjanstegrupp', 'ContentsCode', 'Tid'],
+          size: [1, 1, 1],
+          dimension: {
+            VaruTjanstegrupp: { category: { index: { '01.1.1': 0 }, label: { '01.1.1': 'Bröd och spannmålsprodukter' } } },
+            ContentsCode: { category: { index: { '0000080H': 0 } } },
+            Tid: { category: { index: { '2026M04': 0 } } }
+          },
+          value: [128.7]
+        }), { status: 200 });
+      }
+    });
+
+    assert.equal(rows[0].rowType, 'external_index');
+    assert.equal(rows[0].categoryCode, '01.1.1');
+    assert.equal(rows[0].period, '2026-04');
+  });
+
 });
 
 describe('Grocery category COICOP mappings', () => {
