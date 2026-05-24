@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
+import { FeatureExperimentPanel } from './feature-experiment-panel';
 import { ProductPriceCards } from './product-price-cards';
 import { TrendingCarousel } from './TrendingCarousel';
 import { TrendingPriceDropCards } from '@/app/page-sections/trending';
@@ -170,6 +171,8 @@ export function MarketShell() {
           </div>
         </Card>
       </section>
+
+      <FeatureExperimentPanel />
 
       <div className="mt-6"><MetricGrid /></div>
 
