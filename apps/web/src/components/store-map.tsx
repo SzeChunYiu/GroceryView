@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { type KeyboardEvent, useEffect, useId, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStores, type OsmStore } from '@/lib/osm-stores';
@@ -141,16 +141,26 @@ function districtHeatCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
 export function StoreMap() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const descriptionId = useId();
+  const statusId = useId();
   const [storeCount, setStoreCount] = useState(0);
+  const [mapStatus, setMapStatus] = useState('Loading interactive store map.');
   const [selectedStoreSlug, setSelectedStoreSlug] = useState(syncedMapListStores[0]?.slug ?? '');
 
   function focusStore(store: OsmStore) {
     setSelectedStoreSlug(store.slug);
+    setMapStatus(`Selected ${store.name} on the map.`);
     mapRef.current?.easeTo({
       center: [store.lng, store.lat],
       zoom: 14,
       duration: 700,
     });
+  }
+
+  function handleStoreKeyDown(event: KeyboardEvent<HTMLButtonElement>, store: OsmStore) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    focusStore(store);
   }
 
   useEffect(() => {
@@ -185,6 +195,7 @@ export function StoreMap() {
     const popup = new maplibregl.Popup({ closeButton: true, closeOnClick: true, maxWidth: '280px' });
 
     map.on('load', () => {
+      setMapStatus(`Interactive store map loaded with ${data.features.length.toLocaleString()} stores.`);
       map.addSource('district-heat', {
         type: 'geojson',
         data: districtHeatCollection(),
@@ -268,6 +279,7 @@ export function StoreMap() {
         if (!f) return;
         const p = f.properties as Record<string, string>;
         setSelectedStoreSlug(String(p.slug ?? ''));
+        setMapStatus(`${String(p.name ?? 'Store')} marker selected.`);
         const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
         const directions = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
         const where = [escapeHtml(p.address || ''), escapeHtml(p.district || '')]
@@ -306,10 +318,23 @@ export function StoreMap() {
 
   return (
     <div className="relative h-full w-full">
-      <div ref={containerRef} className="h-full w-full" />
+      <p className="sr-only" id={descriptionId}>
+        Interactive Stockholm grocery store map. Use the linked store selection buttons to focus map locations by keyboard.
+      </p>
+      <div
+        ref={containerRef}
+        aria-describedby={`${descriptionId} ${statusId}`}
+        aria-label="Interactive grocery store map"
+        className="h-full w-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"
+        role="application"
+        tabIndex={0}
+      />
+      <div className="sr-only" id={statusId} role="status" aria-live="polite" aria-atomic="true">
+        {mapStatus}
+      </div>
 
       {/* Chain legend */}
-      <div className="pointer-events-none absolute left-3 top-3 rounded-lg border border-market-ink/10 bg-white/95 px-3 py-2 text-xs shadow-sm backdrop-blur">
+      <div aria-label="Store chain color legend" className="pointer-events-none absolute left-3 top-3 rounded-lg border border-market-ink/10 bg-white/95 px-3 py-2 text-xs shadow-sm backdrop-blur" role="img">
         <div className="mb-1 font-bold uppercase tracking-wide text-market-ink/55">
           {storeCount.toLocaleString()} stores
         </div>
@@ -332,7 +357,7 @@ export function StoreMap() {
         </div>
       </div>
 
-      <div className="absolute bottom-3 right-3 top-3 flex w-[min(22rem,calc(100%-1.5rem))] flex-col rounded-2xl border border-white/70 bg-white/95 p-3 text-slate-950 shadow-2xl backdrop-blur">
+      <div aria-describedby={descriptionId} aria-label="Linked store selection" className="absolute bottom-3 right-3 top-3 flex w-[min(22rem,calc(100%-1.5rem))] flex-col rounded-2xl border border-white/70 bg-white/95 p-3 text-slate-950 shadow-2xl backdrop-blur" role="region">
         <div className="rounded-xl bg-slate-950 px-4 py-3 text-white">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-200">Synced map + list</p>
           <h3 className="mt-1 text-lg font-black">Linked store selection</h3>
@@ -346,8 +371,10 @@ export function StoreMap() {
             const score = chainIndexScore(store.brand || '');
             return (
               <button
+                aria-describedby={statusId}
+                aria-label={`Focus the map on ${store.name} at ${storeLocationLabel(store)}`}
                 aria-pressed={selected}
-                className={`w-full rounded-2xl border p-3 text-left transition ${
+                className={`w-full rounded-2xl border p-3 text-left transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300 ${
                   selected
                     ? 'border-emerald-400 bg-emerald-50 shadow-sm ring-2 ring-emerald-200'
                     : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
@@ -355,6 +382,7 @@ export function StoreMap() {
                 data-store-slug={store.slug}
                 key={store.slug}
                 onClick={() => focusStore(store)}
+                onKeyDown={(event) => handleStoreKeyDown(event, store)}
                 type="button"
               >
                 <div className="flex items-start justify-between gap-3">
