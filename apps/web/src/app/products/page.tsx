@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
-import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
+import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts, priceVolatilityPredictionPreview } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
@@ -461,6 +461,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           eyebrow="Product-card display"
           title={selectedBrand ? `${selectedBrand} adaptive total ⇄ per-unit price cards` : 'Adaptive total ⇄ per-unit price cards'}
           intro="Branded products lead with the actual pack price, commodity-like produce leads with comparable unit price, and the toggle flips the sort key across every card."
+          volatilityPredictions={priceVolatilityPredictionPreview.rows}
         />
       </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

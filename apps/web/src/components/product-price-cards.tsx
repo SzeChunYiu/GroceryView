@@ -4,11 +4,13 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
+import type { ProductStoreVolatilityPrediction } from '@/lib/price-intelligence';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
 
 const storageKey = 'groceryview:product-card-compare-mode';
+const volatilityEndpoint = '/api/pricing/volatility';
 const compareModes: Array<{ label: string; value: CompareMode; help: string }> = [
   { label: 'Adaptive', value: 'adaptive', help: 'Commodity cards lead with unit price; branded cards lead with total price.' },
   { label: 'Total', value: 'total', help: 'Sort and lead every card by the observed pack price.' },
@@ -54,6 +56,20 @@ function sparklinePath(points: AdaptiveProductCard['sparklinePoints'], width = 1
     .join(' ');
 }
 
+function isVolatilityPrediction(value: unknown): value is ProductStoreVolatilityPrediction {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const candidate = value as Partial<ProductStoreVolatilityPrediction>;
+  return typeof candidate.productSlug === 'string'
+    && typeof candidate.shortTermVolatilityScore === 'number'
+    && (candidate.signal === 'stable' || candidate.signal === 'watch' || candidate.signal === 'volatile');
+}
+
+function volatilityBadgeClass(signal: ProductStoreVolatilityPrediction['signal']) {
+  if (signal === 'volatile') return 'bg-rose-100 text-rose-950';
+  if (signal === 'watch') return 'bg-amber-100 text-amber-950';
+  return 'bg-emerald-100 text-emerald-950';
+}
+
 function PriceHistorySparkline({ card }: Readonly<{ card: AdaptiveProductCard }>) {
   const path = sparklinePath(card.sparklinePoints);
   const latest = card.sparklinePoints.at(-1);
@@ -89,14 +105,17 @@ export function ProductPriceCards({
   cards,
   eyebrow = 'Adaptive product cards',
   title = 'Total and comparable unit prices together',
-  intro = 'Every card shows the actual observed pack price plus a comparable unit price when package size evidence exists.'
+  intro = 'Every card shows the actual observed pack price plus a comparable unit price when package size evidence exists.',
+  volatilityPredictions = []
 }: Readonly<{
   cards: AdaptiveProductCard[];
   eyebrow?: string;
   title?: string;
   intro?: string;
+  volatilityPredictions?: ProductStoreVolatilityPrediction[];
 }>) {
   const [compareMode, setCompareMode] = useState<CompareMode>('adaptive');
+  const [liveVolatilityPredictions, setLiveVolatilityPredictions] = useState<ProductStoreVolatilityPrediction[] | null>(null);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(storageKey);
@@ -104,6 +123,26 @@ export function ProductPriceCards({
       setCompareMode(stored);
     }
   }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(volatilityEndpoint, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() as Promise<{ predictions?: unknown[] }> : Promise.reject(new Error('volatility endpoint unavailable'))))
+      .then((payload) => {
+        const predictions = Array.isArray(payload.predictions) ? payload.predictions.filter(isVolatilityPrediction) : [];
+        setLiveVolatilityPredictions(predictions);
+      })
+      .catch((error: unknown) => {
+        if (error instanceof Error && error.name === 'AbortError') return;
+        setLiveVolatilityPredictions(null);
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  const volatilityBySlug = useMemo(() => new Map(
+    (liveVolatilityPredictions ?? volatilityPredictions).map((prediction) => [prediction.productSlug, prediction])
+  ), [liveVolatilityPredictions, volatilityPredictions]);
 
   const sortedCards = useMemo(() => [...cards].sort((left, right) => {
     const delta = sortValue(left, compareMode) - sortValue(right, compareMode);
@@ -124,6 +163,7 @@ export function ProductPriceCards({
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{intro}</p>
           <p className="mt-2 text-xs font-bold text-amber-800">No synthetic unit prices: unit rows are derived only from observed price plus reported package size.</p>
           <p className="mt-1 text-xs font-bold text-amber-800">No synthetic product images: cards render only source image URLs from Axfood, OpenPrices, or OpenFoodFacts rows.</p>
+          <p className="mt-1 text-xs font-bold text-violet-800">Volatility risk badges refresh from {volatilityEndpoint} and fall back to the generated preview when offline.</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2">
           <p className="px-2 pb-2 text-xs font-black uppercase tracking-[0.18em] text-slate-500">Compare by:</p>
@@ -144,7 +184,9 @@ export function ProductPriceCards({
         </div>
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {sortedCards.map((card, index) => (
+        {sortedCards.map((card, index) => {
+          const volatility = volatilityBySlug.get(card.slug);
+          return (
           <div className="relative" key={card.slug}>
             <FavouriteProductToggle
               className="absolute right-3 top-3 z-10"
@@ -183,6 +225,15 @@ export function ProductPriceCards({
                 {card.isAvailable === false ? (
                   <span className="rounded-full bg-rose-100 px-3 py-1 text-[0.7rem] font-black text-rose-900">Out of stock</span>
                 ) : null}
+                {volatility ? (
+                  <span
+                    aria-label={`${card.name} ${volatility.signal} volatility risk score ${volatility.shortTermVolatilityScore} of 100`}
+                    className={`rounded-full px-3 py-1 text-[0.7rem] font-black ${volatilityBadgeClass(volatility.signal)}`}
+                    title={`Observed volatility from ${volatilityEndpoint}; ${volatility.observationCount} historical points through ${volatility.latestObservedAt}`}
+                  >
+                    {volatility.signal} volatility · {volatility.shortTermVolatilityScore}/100
+                  </span>
+                ) : null}
                 {card.priceDropBadge ? (
                   <span
                     aria-label={`${card.name} ${card.priceDropLabel ?? '30-day price drop from price_history'}`}
@@ -207,7 +258,8 @@ export function ProductPriceCards({
             )}
             </LazyItemCard>
           </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

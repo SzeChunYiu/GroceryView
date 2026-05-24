@@ -3337,6 +3337,8 @@ ${seo}`;
     assert.match(verified, /priceDropBadge/);
     assert.match(verified, /isAvailable/);
     assert.match(products, /ProductPriceCards/);
+    assert.match(products, /priceVolatilityPredictionPreview/);
+    assert.match(products, /volatilityPredictions=\{priceVolatilityPredictionPreview\.rows\}/);
     assert.match(products, /adaptiveProductCards/);
     assert.match(products, /searchParams/);
     assert.match(products, /resolvedSearchParams\.brand/);
