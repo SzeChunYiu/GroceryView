@@ -226,6 +226,23 @@ export type DealOpportunity = DealOpportunityInput & {
   reason: string;
 };
 
+export type DealShareRelationship = 'household' | 'friend';
+
+export type DealShareSignalInput = {
+  productId: string;
+  sharedByDisplayName: string;
+  relationship: DealShareRelationship;
+  sharedAt: string;
+  sourceConfidence: number;
+  optedIn: boolean;
+};
+
+export type FriendSharedDealSuggestion = DealOpportunity & {
+  socialSignals: DealShareSignalInput[];
+  socialProofScore: number;
+  suggestedReason: string;
+};
+
 export function rankDealOpportunities(input: {
   deals: DealOpportunityInput[];
   minimumDealScore?: number;
@@ -254,6 +271,62 @@ export function rankDealOpportunities(input: {
     .sort((a, b) => {
       if (b.dealScore !== a.dealScore) return b.dealScore - a.dealScore;
       if (b.discountPercent !== a.discountPercent) return b.discountPercent - a.discountPercent;
+      return a.productName.localeCompare(b.productName);
+    });
+}
+
+export function suggestFriendSharedDeals(input: {
+  deals: DealOpportunityInput[];
+  shares: DealShareSignalInput[];
+  minimumDealScore?: number;
+  minimumSourceConfidence?: number;
+  asOf?: string;
+  maxAgeDays?: number;
+}): FriendSharedDealSuggestion[] {
+  const asOfMs = Date.parse(input.asOf ?? new Date().toISOString());
+  if (Number.isNaN(asOfMs)) throw new Error('asOf must be an ISO date.');
+  const maxAgeMs = (input.maxAgeDays ?? 14) * 24 * 60 * 60 * 1000;
+  const minimumSourceConfidence = input.minimumSourceConfidence ?? 0.5;
+  const sharesByProductId = new Map<string, DealShareSignalInput[]>();
+
+  for (const share of input.shares) {
+    requireNonBlank(share.productId, 'productId');
+    requireNonBlank(share.sharedByDisplayName, 'sharedByDisplayName');
+    const sharedAtMs = Date.parse(share.sharedAt);
+    if (Number.isNaN(sharedAtMs)) throw new Error('sharedAt must be an ISO date.');
+    if (!share.optedIn) continue;
+    if (share.sourceConfidence < minimumSourceConfidence) continue;
+    if (sharedAtMs > asOfMs || asOfMs - sharedAtMs > maxAgeMs) continue;
+    const productShares = sharesByProductId.get(share.productId) ?? [];
+    productShares.push(share);
+    sharesByProductId.set(share.productId, productShares);
+  }
+
+  return rankDealOpportunities({
+    deals: input.deals,
+    minimumDealScore: input.minimumDealScore,
+    minimumSourceConfidence
+  })
+    .flatMap((deal) => {
+      const socialSignals = sharesByProductId.get(deal.productId) ?? [];
+      if (socialSignals.length === 0) return [];
+      const householdSignals = socialSignals.filter((share) => share.relationship === 'household').length;
+      const latestSharedAtMs = Math.max(...socialSignals.map((share) => Date.parse(share.sharedAt)));
+      const recencyBoost = Math.max(0, 5 - Math.floor((asOfMs - latestSharedAtMs) / (24 * 60 * 60 * 1000)));
+      const socialProofScore = Math.min(100, deal.dealScore + householdSignals * 8 + (socialSignals.length - householdSignals) * 5 + Math.min(6, socialSignals.length * 2) + recencyBoost);
+      const firstShare = socialSignals
+        .slice()
+        .sort((left, right) => Date.parse(right.sharedAt) - Date.parse(left.sharedAt))[0]!;
+      return [{
+        ...deal,
+        socialSignals,
+        socialProofScore,
+        suggestedReason: `${firstShare.sharedByDisplayName} shared this ${firstShare.relationship} deal; Deal Score ${deal.dealScore} and social proof ${socialProofScore}.`
+      }];
+    })
+    .sort((a, b) => {
+      if (b.socialProofScore !== a.socialProofScore) return b.socialProofScore - a.socialProofScore;
+      if (b.dealScore !== a.dealScore) return b.dealScore - a.dealScore;
       return a.productName.localeCompare(b.productName);
     });
 }
