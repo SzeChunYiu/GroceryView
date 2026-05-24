@@ -734,7 +734,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     labelFilters,
     originFilters: originCountries,
     originFacets: supportedOriginCountries.map((country) => {
-      const facet = searchResult.facets.origins.find((candidate) => candidate.value.toUpperCase() === country);
+      const facet = (searchResult.facets.origins ?? []).find((candidate) => candidate.value.toUpperCase() === country);
       return {
         value: country,
         label: originCountryLabels[country],
