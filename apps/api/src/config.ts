@@ -1,4 +1,5 @@
 import { type RequestLoggingConfig } from './middleware/logger.js';
+import { loadDatabaseConfig, type ApiDatabaseConfig } from './lib/db.js';
 
 export type ApiCorsConfig = {
   allowedOrigins: string[];
@@ -7,6 +8,7 @@ export type ApiCorsConfig = {
 
 export type ApiConfig = {
   cors: ApiCorsConfig;
+  database: ApiDatabaseConfig;
   requestLogging: RequestLoggingConfig;
 };
 
@@ -59,6 +61,7 @@ function parseBooleanFlag(value: string | undefined, defaultValue: boolean): boo
 export function loadApiConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
   return {
     cors: loadCorsConfig(env),
+    database: loadDatabaseConfig(env),
     requestLogging: {
       enabled: parseBooleanFlag(env.REQUEST_LOGGING_ENABLED, true),
       serviceName: env.API_SERVICE_NAME?.trim() || 'groceryview-api'
