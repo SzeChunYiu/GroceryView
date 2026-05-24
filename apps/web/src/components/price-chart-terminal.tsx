@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type { ShelfOccupancyDropContext } from '@/lib/price-events';
 
 type LineStyleName = 'solid' | 'dashed' | 'dotted';
 type ChartLoadStatus = 'idle' | 'loading' | 'ready' | 'failed';
@@ -44,6 +45,7 @@ export type PriceChartTerminalWindow = {
   latestObservedAt?: string;
   lowValueLabel: string;
   highValueLabel: string;
+  shelfOccupancyContext?: ShelfOccupancyDropContext;
   series: PriceChartTerminalSeries[];
 };
 
@@ -189,6 +191,16 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
               Points/markers: <span className="text-white">{activeWindow.pointCount}/{activeWindow.markerCount}</span>
             </p>
           </div>
+          {activeWindow.shelfOccupancyContext ? (
+            <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
+              <p className="rounded-2xl border border-emerald-300/30 bg-emerald-300/10 p-4 text-sm font-bold text-emerald-100">
+                Drop context: <span className="text-white">{activeWindow.shelfOccupancyContext.label}</span>
+              </p>
+              <p className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-semibold leading-6 text-slate-200">
+                {activeWindow.shelfOccupancyContext.detail} {activeWindow.shelfOccupancyContext.purchaseTiming}
+              </p>
+            </div>
+          ) : null}
           <p aria-live="polite" className="sr-only">Chart renderer status: {chartLoadStatus}</p>
           <div ref={containerRef} className="mt-5 h-[280px] overflow-hidden rounded-3xl border border-white/10 bg-white" />
           {chartLoadStatus === 'loading' ? (

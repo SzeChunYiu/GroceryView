@@ -21,6 +21,7 @@ import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
+import { shelfOccupancyContextForDrop } from '@/lib/price-events';
 import { metadataForProduct } from '@/lib/seo';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
@@ -1043,6 +1044,7 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
       latestObservedAt: latestPoint?.time,
       lowValueLabel: values.length ? formatSek(Math.min(...values)) : 'Not reported',
       highValueLabel: values.length ? formatSek(Math.max(...values)) : 'Not reported',
+      shelfOccupancyContext: shelfOccupancyContextForDrop(result.series),
       series: result.series
     };
   });
