@@ -21,6 +21,7 @@ import {
   dbSiteMatpriskollenOffers,
   dbSiteMatpriskollenSource
 } from './generated/db-site-ingested-overrides';
+import { runVolatilityPredictionJob, volatilityPredictionMethodology } from './price-intelligence';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { osmStores } from './osm-stores';
 import {
@@ -2912,6 +2913,12 @@ export const priceDropMoversBoard = pricedProducts
   .filter((mover) => mover.changeFromPrevious < 0)
   .sort((a, b) => a.changeFromPrevious - b.changeFromPrevious || b.observedCount - a.observedCount || a.productName.localeCompare(b.productName, 'sv'))
   .slice(0, 8);
+
+export const priceVolatilityPredictionPreview = {
+  methodology: volatilityPredictionMethodology,
+  endpoint: '/api/pricing/volatility',
+  rows: runVolatilityPredictionJob({ limit: 6, minObservations: 4 })
+};
 
 export const categoryDealLeaderCandidates = matchedChainProducts.map((product) => {
   const sourceConfidence = clamp(product.inChains.length / 2, 0, 1);
