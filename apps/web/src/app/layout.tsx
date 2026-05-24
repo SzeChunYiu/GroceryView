@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { BottomNav } from '@/components/BottomNav';
 import { ConsentManager } from '@/components/consent-manager';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
 import { Providers } from './providers';
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           type="application/ld+json"
         />
         <Providers>{children}</Providers>
+        <BottomNav />
         <ConsentManager />
         <ServiceWorkerRegistrar />
       </body>
