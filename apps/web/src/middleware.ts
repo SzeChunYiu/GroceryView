@@ -16,9 +16,11 @@ export function middleware(request: NextRequest) {
   const blockedLocaleRoute = blockedLocaleFromPathname(request.nextUrl.pathname);
   const cookieLocale = normalizeLocale(request.cookies.get(nextLocaleCookieName)?.value);
   const resolvedLocale = routeLocale ?? cookieLocale ?? resolveLocaleFromAcceptLanguage(request.headers.get('accept-language')) ?? defaultLocale;
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-groceryview-pathname', request.nextUrl.pathname);
   const response = NextResponse.next({
     request: {
-      headers: request.headers
+      headers: requestHeaders
     }
   });
 
