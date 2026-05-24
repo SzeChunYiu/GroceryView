@@ -3,9 +3,11 @@ import assert from 'node:assert/strict';
 import {
   apiContractOpenApiComponents,
   apiContractSchemas,
+  alertRuleSchema,
   fuelPriceObservationSchema,
   notificationInboxResponseSchema,
   priceObservationSchema,
+  type AlertRuleDto,
   type NotificationInboxResponseDto,
   type PriceObservationDto
 } from '../index.js';
@@ -65,10 +67,24 @@ const validNotificationInbox: NotificationInboxResponseDto = {
   guardrails: ['Quiet-hours holds wait for the morning digest unless the alert is critical.']
 };
 
+const validBestTimeToBuyRule: AlertRuleDto = {
+  id: 'rule-produce-best-buy',
+  userId: 'user-1',
+  storeId: 'willys-odenplan',
+  categoryId: 'produce',
+  channel: 'push',
+  alertType: 'best_time_to_buy',
+  minimumConfidence: 'medium',
+  active: true,
+  createdAt: '2026-05-20T08:00:00.000Z',
+  updatedAt: '2026-05-20T08:00:00.000Z'
+};
+
 describe('api contract schemas', () => {
   it('exports DTO schemas for the Phase 1 API resources', () => {
     assert.deepEqual(Object.keys(apiContractSchemas).sort(), [
       'alert',
+      'alertRule',
       'basket',
       'basketItem',
       'fuelPriceObservation',
@@ -167,6 +183,35 @@ describe('api contract schemas', () => {
     );
   });
 
+  it('models best-time-to-buy alert rules by target store, category, and confidence threshold', () => {
+    const parsed = alertRuleSchema.parse(validBestTimeToBuyRule);
+
+    assert.equal(parsed.alertType, 'best_time_to_buy');
+    assert.equal(parsed.storeId, 'willys-odenplan');
+    assert.equal(parsed.categoryId, 'produce');
+    assert.equal(parsed.minimumConfidence, 'medium');
+    assert.equal(alertRuleSchema.safeParse({
+      ...validBestTimeToBuyRule,
+      storeId: undefined,
+      categoryId: undefined,
+      minimumConfidence: undefined
+    }).success, false);
+    assert.equal(alertRuleSchema.safeParse({
+      ...validBestTimeToBuyRule,
+      alertType: 'target_price',
+      productId: undefined
+    }).success, false);
+    assert.equal(apiContractSchemas.alert.parse({
+      id: 'alert-produce-best-buy',
+      userId: 'user-1',
+      storeId: 'willys-odenplan',
+      categoryId: 'produce',
+      kind: 'best_time_to_buy',
+      message: 'Produce is in a strong observed buy window at Willys Odenplan.',
+      triggeredAt: '2026-05-20T08:30:00.000Z'
+    }).kind, 'best_time_to_buy');
+  });
+
   it('requires notification inbox timing fields for API and server contracts', () => {
     const parsed = notificationInboxResponseSchema.parse(validNotificationInbox);
 
@@ -212,5 +257,13 @@ describe('api contract schemas', () => {
       'guardrails'
     ]);
     assert.equal(apiContractOpenApiComponents.NotificationInboxQueueItem.properties.sendAt.format, 'date-time');
+    assert.deepEqual(apiContractOpenApiComponents.AlertRule.properties.alertType.enum, [
+      'target_price',
+      'deal_score',
+      'back_in_stock',
+      'price_drop',
+      'best_time_to_buy'
+    ]);
+    assert.deepEqual(apiContractOpenApiComponents.AlertRule.properties.minimumConfidence.enum, ['high', 'medium', 'low', 'unverified']);
   });
 });

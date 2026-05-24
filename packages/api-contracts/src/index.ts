@@ -118,6 +118,41 @@ export const watchlistSchema = z.object({
   favoriteStoresOnly: z.boolean().default(false)
 });
 
+export const alertRuleSchema = z
+  .object({
+    id: idSchema,
+    userId: idSchema,
+    productId: idSchema.optional(),
+    storeId: idSchema.optional(),
+    categoryId: idSchema.optional(),
+    channel: z.enum(['push', 'email']),
+    alertType: z.enum(['target_price', 'deal_score', 'back_in_stock', 'price_drop', 'best_time_to_buy']),
+    targetPrice: moneyAmountSchema.optional(),
+    dealScoreThreshold: z.number().int().min(0).max(100).optional(),
+    minimumConfidence: confidenceSchema.optional(),
+    active: z.boolean().default(true),
+    createdAt: isoDateTimeSchema,
+    updatedAt: isoDateTimeSchema
+  })
+  .superRefine((rule, context) => {
+    if (rule.alertType === 'best_time_to_buy') {
+      if (rule.storeId === undefined) {
+        context.addIssue({ code: z.ZodIssueCode.custom, path: ['storeId'], message: 'Best-time-to-buy alerts require a target store.' });
+      }
+      if (rule.categoryId === undefined) {
+        context.addIssue({ code: z.ZodIssueCode.custom, path: ['categoryId'], message: 'Best-time-to-buy alerts require a category.' });
+      }
+      if (rule.minimumConfidence === undefined) {
+        context.addIssue({ code: z.ZodIssueCode.custom, path: ['minimumConfidence'], message: 'Best-time-to-buy alerts require a confidence threshold.' });
+      }
+      return;
+    }
+
+    if (rule.productId === undefined) {
+      context.addIssue({ code: z.ZodIssueCode.custom, path: ['productId'], message: 'Product alerts require a product.' });
+    }
+  });
+
 export const basketItemSchema = z.object({
   productId: idSchema,
   quantity: z.number().positive()
@@ -132,8 +167,10 @@ export const basketSchema = z.object({
 export const alertSchema = z.object({
   id: idSchema,
   userId: idSchema,
-  productId: idSchema,
-  kind: z.enum(['target_price', 'deal_score', 'back_in_stock']),
+  productId: idSchema.optional(),
+  storeId: idSchema.optional(),
+  categoryId: idSchema.optional(),
+  kind: z.enum(['target_price', 'deal_score', 'back_in_stock', 'best_time_to_buy']),
   message: idSchema,
   triggeredAt: isoDateTimeSchema,
   price: priceObservationSchema.optional()
@@ -179,6 +216,7 @@ export const productPricesResponseSchema = z.object({
 
 export const apiContractSchemas = {
   alert: alertSchema,
+  alertRule: alertRuleSchema,
   basket: basketSchema,
   basketItem: basketItemSchema,
   latestPrice: latestPriceSchema,
@@ -195,6 +233,7 @@ export const apiContractSchemas = {
 } as const;
 
 export type AlertDto = z.infer<typeof alertSchema>;
+export type AlertRuleDto = z.infer<typeof alertRuleSchema>;
 export type BasketDto = z.infer<typeof basketSchema>;
 export type BasketItemDto = z.infer<typeof basketItemSchema>;
 export type Confidence = z.infer<typeof confidenceSchema>;
@@ -217,6 +256,25 @@ export type StoreDto = z.infer<typeof storeSchema>;
 export type WatchlistDto = z.infer<typeof watchlistSchema>;
 
 export const apiContractOpenApiComponents = {
+  AlertRule: {
+    type: 'object',
+    required: ['id', 'userId', 'channel', 'alertType', 'active', 'createdAt', 'updatedAt'],
+    properties: {
+      id: { type: 'string' },
+      userId: { type: 'string' },
+      productId: { type: 'string' },
+      storeId: { type: 'string' },
+      categoryId: { type: 'string' },
+      channel: { type: 'string', enum: ['push', 'email'] },
+      alertType: { type: 'string', enum: ['target_price', 'deal_score', 'back_in_stock', 'price_drop', 'best_time_to_buy'] },
+      targetPrice: { $ref: '#/components/schemas/MoneyAmount' },
+      dealScoreThreshold: { type: 'integer', minimum: 0, maximum: 100 },
+      minimumConfidence: { type: 'string', enum: confidenceSchema.options },
+      active: { type: 'boolean' },
+      createdAt: { type: 'string', format: 'date-time' },
+      updatedAt: { type: 'string', format: 'date-time' }
+    }
+  },
   PriceObservation: {
     type: 'object',
     required: ['id', 'productId', 'storeId', 'price', 'priceType', 'confidence', 'observedAt', 'sourceType', 'provenance'],

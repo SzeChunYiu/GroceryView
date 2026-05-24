@@ -309,6 +309,9 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('alert_rules'), /user_id text not null references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('alert_rules'), /alert_type text not null check/);
     assert.match(repositoryTableDefinition('alert_rules'), /deal_score_threshold integer check/);
+    assert.match(repositoryTableDefinition('alert_rules'), /category_id text/);
+    assert.match(repositoryTableDefinition('alert_rules'), /minimum_confidence text check/);
+    assert.match(repositoryTableDefinition('alert_rules'), /best_time_to_buy/);
     assert.match(repositoryTableDefinition('watchlist_items'), /allowed_price_types text\[\] not null default array\['shelf'\]::text\[\]/);
     assert.match(repositoryTableDefinition('watchlist_items'), /allowed_price_types <@ array\['shelf', 'member', 'promotion', 'estimated'\]::text\[\]/);
     assert.match(tableDefinition('watchlists'), /allowed_price_types text\[\] not null default array\['shelf'\]::text\[\]/);
@@ -359,7 +362,8 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryMigration, /notification_tasks_due_idx on notification_tasks \(status, send_at, id\)/);
     assert.match(repositoryMigration, /notification_suppressions_active_idx on notification_suppressions \(active, recipient, channel, id\)/);
     assert.match(telegramNotificationsMigration, /notification_subscriptions_active_product_idx on notification_subscriptions \(active, product_id, channel\)/);
-    assert.match(alertRulesMigration, /alert_rules_active_user_idx on alert_rules \(user_id, active, product_id, alert_type, id\)/);
+    assert.match(alertRulesMigration, /alert_rules_active_user_idx on alert_rules \(user_id, active, product_id, category_id, alert_type, id\)/);
+    assert.match(alertRulesMigration, /alert_rules_category_store_idx on alert_rules \(category_id, store_id, minimum_confidence\)/);
     assert.match(pantryInventoryMigration, /pantry_items_user_idx on pantry_items \(user_id, product_id\)/);
     assert.match(pantryInventoryMigration, /pantry_items_expiry_idx on pantry_items \(expires_on\) where expires_on is not null/);
     assert.match(receiptUploadsMigration, /receipt_uploads_user_purchased_idx on receipt_uploads \(user_id, purchased_at desc, id\)/);

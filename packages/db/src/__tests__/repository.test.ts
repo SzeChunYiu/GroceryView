@@ -371,8 +371,32 @@ describe('createMemoryRepository', () => {
       createdAt: '2026-05-20T08:01:00.000Z',
       updatedAt: '2026-05-20T08:01:00.000Z'
     });
+    await repo.upsertAlertRule({
+      id: 'alert-produce-best-buy',
+      userId: 'user-1',
+      storeId: 'willys-odenplan',
+      categoryId: 'produce',
+      channel: 'email',
+      alertType: 'best_time_to_buy',
+      minimumConfidence: 'medium',
+      active: true,
+      createdAt: '2026-05-20T08:02:00.000Z',
+      updatedAt: '2026-05-20T08:02:00.000Z'
+    });
 
     assert.deepEqual(await repo.listActiveAlertRules('user-1'), [
+      {
+        id: 'alert-produce-best-buy',
+        userId: 'user-1',
+        storeId: 'willys-odenplan',
+        categoryId: 'produce',
+        channel: 'email',
+        alertType: 'best_time_to_buy',
+        minimumConfidence: 'medium',
+        active: true,
+        createdAt: '2026-05-20T08:02:00.000Z',
+        updatedAt: '2026-05-20T08:02:00.000Z'
+      },
       {
         id: 'alert-coffee-target',
         userId: 'user-1',

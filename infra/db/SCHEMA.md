@@ -250,11 +250,11 @@ Indexes: `webhook_subscriptions_active_product_idx` for product and chain fanout
 
 ### `alert_rules`
 
-Application repository alert rules keyed by the text `app_users` identity used by current API and worker packages.
+Application repository alert rules keyed by the text `app_users` identity used by current API and worker packages. Best-time-to-buy rules are category and store scoped so the worker can notify when a category reaches the configured confidence threshold at a target store.
 
-Key columns: `user_id`, `product_id`, `store_id`, `channel`, `alert_type`, `target_price`, `deal_score_threshold`, `active`.
+Key columns: `user_id`, `product_id`, `store_id`, `category_id`, `channel`, `alert_type`, `target_price`, `deal_score_threshold`, `minimum_confidence`, `active`.
 
-Indexes: `alert_rules_active_user_idx` for account alert-center reads and `alert_rules_store_idx` for store-scoped alert fanout.
+Indexes: `alert_rules_active_user_idx` for account alert-center reads, `alert_rules_store_idx` for store-scoped alert fanout, and `alert_rules_category_store_idx` for best-time-to-buy category evaluation.
 
 ### `app_users`
 

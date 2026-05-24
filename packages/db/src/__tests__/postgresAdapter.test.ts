@@ -244,10 +244,12 @@ class RecordingQueryExecutor implements QueryExecutor {
       user_id: 'user-1',
       product_id: 'coffee',
       store_id: 'willys-odenplan',
+      category_id: null,
       channel: 'push',
       alert_type: 'target_price',
       target_price: '49.90',
       deal_score_threshold: null,
+      minimum_confidence: null,
       active: true,
       created_at: new Date('2026-05-20T08:00:00.000Z'),
       updated_at: '2026-05-20T08:00:00.000Z'
@@ -257,13 +259,30 @@ class RecordingQueryExecutor implements QueryExecutor {
       user_id: 'user-1',
       product_id: 'coffee',
       store_id: null,
+      category_id: null,
       channel: 'email',
       alert_type: 'deal_score',
       target_price: null,
       deal_score_threshold: 80,
+      minimum_confidence: null,
       active: true,
       created_at: '2026-05-20T08:01:00.000Z',
       updated_at: '2026-05-20T08:01:00.000Z'
+    },
+    {
+      id: 'alert-produce-best-buy',
+      user_id: 'user-1',
+      product_id: null,
+      store_id: 'willys-odenplan',
+      category_id: 'produce',
+      channel: 'push',
+      alert_type: 'best_time_to_buy',
+      target_price: null,
+      deal_score_threshold: null,
+      minimum_confidence: 'medium',
+      active: true,
+      created_at: '2026-05-20T08:02:00.000Z',
+      updated_at: '2026-05-20T08:02:00.000Z'
     }
   ];
   observationHistoryRows: unknown[] = [
@@ -944,6 +963,18 @@ describe('createPostgresRepository', () => {
         active: true,
         createdAt: '2026-05-20T08:01:00.000Z',
         updatedAt: '2026-05-20T08:01:00.000Z'
+      },
+      {
+        id: 'alert-produce-best-buy',
+        userId: 'user-1',
+        storeId: 'willys-odenplan',
+        categoryId: 'produce',
+        channel: 'push',
+        alertType: 'best_time_to_buy',
+        minimumConfidence: 'medium',
+        active: true,
+        createdAt: '2026-05-20T08:02:00.000Z',
+        updatedAt: '2026-05-20T08:02:00.000Z'
       }
     ]);
     assert.deepEqual(executor.calls[0].params, [
@@ -951,9 +982,11 @@ describe('createPostgresRepository', () => {
       'user-1',
       'coffee',
       'willys-odenplan',
+      null,
       'push',
       'target_price',
       49.9,
+      null,
       null,
       true,
       '2026-05-20T08:00:00.000Z',

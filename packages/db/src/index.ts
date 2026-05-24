@@ -964,12 +964,14 @@ export type NotificationSuppressionRecord = {
 export type AlertRuleRecord = {
   id: string;
   userId: string;
-  productId: string;
+  productId?: string;
   storeId?: string;
+  categoryId?: string;
   channel: 'push' | 'email';
-  alertType: 'target_price' | 'deal_score' | 'back_in_stock' | 'price_drop';
+  alertType: 'target_price' | 'deal_score' | 'back_in_stock' | 'price_drop' | 'best_time_to_buy';
   targetPrice?: number;
   dealScoreThreshold?: number;
+  minimumConfidence?: 'high' | 'medium' | 'low' | 'unverified';
   active: boolean;
   createdAt: string;
   updatedAt: string;
@@ -1491,7 +1493,7 @@ export function createMemoryRepository(): GroceryViewRepository {
       requireUser(users, userId);
       return [...alertRules.values()]
         .filter((rule) => rule.userId === userId && rule.active)
-        .sort((a, b) => a.productId.localeCompare(b.productId) || a.alertType.localeCompare(b.alertType) || a.id.localeCompare(b.id))
+        .sort((a, b) => (a.productId ?? '').localeCompare(b.productId ?? '') || a.alertType.localeCompare(b.alertType) || a.id.localeCompare(b.id))
         .map((rule) => ({ ...rule }));
     }
   };
@@ -1611,12 +1613,14 @@ type NotificationSuppressionRow = {
 type AlertRuleRow = {
   id: string;
   user_id: string;
-  product_id: string;
+  product_id: string | null;
   store_id: string | null;
+  category_id: string | null;
   channel: AlertRuleRecord['channel'];
   alert_type: AlertRuleRecord['alertType'];
   target_price: string | number | null;
   deal_score_threshold: string | number | null;
+  minimum_confidence: AlertRuleRecord['minimumConfidence'] | null;
   active: boolean;
   created_at: string | Date;
   updated_at: string | Date;
@@ -2371,12 +2375,14 @@ function mapAlertRule(row: AlertRuleRow): AlertRuleRecord {
   return {
     id: row.id,
     userId: row.user_id,
-    productId: row.product_id,
+    ...(row.product_id ? { productId: row.product_id } : {}),
     ...(row.store_id ? { storeId: row.store_id } : {}),
+    ...(row.category_id ? { categoryId: row.category_id } : {}),
     channel: row.channel,
     alertType: row.alert_type,
     ...(row.target_price === null ? {} : { targetPrice: Number(row.target_price) }),
     ...(row.deal_score_threshold === null ? {} : { dealScoreThreshold: Number(row.deal_score_threshold) }),
+    ...(row.minimum_confidence === null ? {} : { minimumConfidence: row.minimum_confidence }),
     active: row.active,
     createdAt: asIso(row.created_at),
     updatedAt: asIso(row.updated_at)
@@ -3011,27 +3017,31 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
     async upsertAlertRule(rule) {
       await executor.query(
         `insert into alert_rules(
-           id, user_id, product_id, store_id, channel, alert_type, target_price, deal_score_threshold, active, created_at, updated_at
-         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+           id, user_id, product_id, store_id, category_id, channel, alert_type, target_price, deal_score_threshold, minimum_confidence, active, created_at, updated_at
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
          on conflict (id) do update set
            user_id = excluded.user_id,
            product_id = excluded.product_id,
            store_id = excluded.store_id,
+           category_id = excluded.category_id,
            channel = excluded.channel,
            alert_type = excluded.alert_type,
            target_price = excluded.target_price,
            deal_score_threshold = excluded.deal_score_threshold,
+           minimum_confidence = excluded.minimum_confidence,
            active = excluded.active,
            updated_at = excluded.updated_at`,
         [
           rule.id,
           rule.userId,
-          rule.productId,
+          rule.productId ?? null,
           rule.storeId ?? null,
+          rule.categoryId ?? null,
           rule.channel,
           rule.alertType,
           rule.targetPrice ?? null,
           rule.dealScoreThreshold ?? null,
+          rule.minimumConfidence ?? null,
           rule.active,
           rule.createdAt,
           rule.updatedAt
@@ -3041,7 +3051,7 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
 
     async listActiveAlertRules(userId) {
       const rows = await executor.query<AlertRuleRow>(
-        `select id, user_id, product_id, store_id, channel, alert_type, target_price, deal_score_threshold, active, created_at, updated_at
+        `select id, user_id, product_id, store_id, category_id, channel, alert_type, target_price, deal_score_threshold, minimum_confidence, active, created_at, updated_at
          from alert_rules
          where user_id = $1 and active = true
          order by product_id, alert_type, id`,
