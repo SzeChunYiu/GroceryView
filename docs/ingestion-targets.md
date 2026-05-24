@@ -13,7 +13,7 @@ Pick the highest unblocked P0/P1. Apply A1→A12 from the playbook. As soon as a
 | **P1** | Matspar public search aggregator | ✅ shipped | no — aggregate public search prices, not branch-specific | `packages/ingestion/src/connectors/matspar.ts` now fetches public `__PAGEDATA__` rows and the daily native endpoint `groceryview://daily/matspar/products/public-search` upserts at least 100 chain-level observations with `requireStoreScopedPrices:false`. |
 | **P1** | MatPiraten | ⏳ pending | unknown | matpiraten.se HTML scrape; small but real per-product prices. |
 | **P1** | Hemglass | ⏳ pending | per-postcode (delivery) | hemglass.se Next.js? Full frozen-food catalog probable. |
-| **P1** | Apohem | ⏳ pending | online-only | apohem.se REST API; pharmacy + select grocery. |
+| **P1** | Apohem / Apotek Hjärtat / Apotek 1 NO pharmacy lane | 🟡 partial | online-only | Swedish pharmacy connector exists for Apohem/Apotek Hjärtat; Apotek 1 NO public search evidence is documented after PR #2429. Next: keep prescription/account flows excluded and promote Apotek 1 to daily pharmacy ingestion only when public OTC rows, NOK prices, source URLs, and robots posture are covered by fixtures. |
 | **P1** | City Gross | 🟡 partial | unknown | citygross.se/sok HTML __NEXT_DATA__ inspection. |
 | **P1** | Lidl Sverige | ⏳ pending | chain-wide | Weekly flyer PDF at lidl.se/c/erbjudanden; web anti-bot — try mobile app. |
 | **P2** | Tempo | ❌ blocked | n/a | Static Sitevision site, no API; rely on weekly flyer PDFs. |
@@ -39,3 +39,8 @@ Operator directive 2026-05-21: **finer data = better site.** Beyond
 7. **out-of-stock signal** (when chain catalogs return `inStock:false` — proxy for popularity)
 
 Each of these is its own column / route. Add them as you uncover signals.
+
+## Nordic pharmacy source notes
+
+- **Apotek 1 NO**: public search/detail evidence is tracked in [`data-sources.md`](data-sources.md). Treat `https://www.apotek1.no/search?query={query}` and public `/produkter/...` pages as online pharmacy catalog evidence, not store-level grocery evidence. Robots allow these public catalog paths but disallow login/legacy private areas; connectors must avoid prescription, account, and checkout flows.
+- **Connector status**: PR #2429 is the code-side Apotek 1 pharmacy ingestion landing point; this target queue now records the docs-only follow-up so future workers know the endpoint evidence, legal posture, and fixture requirements before widening Nordic pharmacy coverage.

@@ -16,6 +16,7 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 | ⏳ pending | known but not yet probed |
 | ❌ blocked | requires login/captcha/auth we don't have |
 
+
 ---
 
 ## 1. Stores (where shops physically are)
@@ -92,6 +93,16 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 - **Matpriskollen:** still useful for schema comparison, but not yet part of the daily DB connector set.
 
 ---
+
+
+### 2.9 Apotek 1 Norway public search 🧪 verified (PR #2429 follow-up docs)
+- **Endpoint:** `https://www.apotek1.no/search?query={query}` for public search result pages. Product detail pages use the public slug/id form, for example `https://www.apotek1.no/produkter/paracet-500mg-tabletter-20stk-533766p`.
+- **Client evidence:** the static Angular shell (observed 2026-05-24) loads `main-FP5EVHLV.js` and lazy chunks that reference `cms-search/:term`, `/cmsapi/`, and `/productview/byIds/`; those calls are browser-facing and do not require a logged-in prescription session for ordinary OTC/catalog discovery.
+- **Robots posture:** `https://www.apotek1.no/robots.txt` allows the public search and `/produkter/...` catalog paths while disallowing legacy login/admin-style paths (`/webapp/wcs/stores/servlet/LogonForm`, `/lmg`, `/ListApotek.asp`, `/Apotekside.asp`, `/p/`, etc.).
+- **What it returns:** HTML/SPA-backed public Norwegian pharmacy catalog evidence: product names, product ids in URL slugs, product detail URLs, availability/offer metadata once the connector follows the browser API calls, and NOK prices for public OTC/non-prescription catalog rows.
+- **Per-branch granularity:** ❌ no for the public search lane — treat as online pharmacy/catalog price evidence, not physical Apotek 1 branch inventory.
+- **Source posture:** Public, read-only pharmacy source. Keep request rates conservative, keep source URLs/raw snapshot refs, and exclude prescription/account flows.
+- **Lands in:** pharmacy daily ingestion lane after PR #2429; document this as a Nordic pharmacy source alongside Apohem/Apotek Hjärtat rather than as grocery store stock.
 
 ## 2F. Fuel prices
 
