@@ -352,12 +352,12 @@ describe('mobile app foundation', () => {
     const ranked = screen.children.find((section) => section.key === 'ranked-stores');
     if (!ranked || ranked.type !== 'section') throw new Error('ranked stores section missing');
     assert.equal(ranked.children[0]?.key, 'store:willys-odenplan');
-    assert.equal('value' in ranked.children[0]! ? ranked.children[0]!.value : null, '100% coverage, 79.70 SEK, fresh');
+    assert.equal('value' in ranked.children[0]! ? ranked.children[0]!.value : null, '100% coverage, 79.70 SEK, fresh, stock in stock (2/2), high confidence');
 
     const deals = screen.children.find((section) => section.key === 'top-store-deals');
     if (!deals || deals.type !== 'section') throw new Error('top store deals section missing');
     assert.equal(deals.children[0]?.key, 'store-deal:willys-odenplan:coffee');
-    assert.equal('value' in deals.children[0]! ? deals.children[0]!.value : null, '49.90 SEK, score 82, Buy');
+    assert.equal('value' in deals.children[0]! ? deals.children[0]!.value : null, '49.90 SEK, score 82, Buy, stock in stock, high confidence');
 
     const actions = screen.children.find((section) => section.key === 'actions');
     assert.equal(actions?.type, 'section');
