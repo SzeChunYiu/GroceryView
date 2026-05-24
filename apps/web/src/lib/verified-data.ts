@@ -280,19 +280,41 @@ function findItemComparisonProduct(id: string): ItemComparisonProduct | undefine
 }
 
 function storePricesForItemComparison(product: ItemComparisonProduct) {
+  const normalizedPriceFor = (price: number, packageText: string) => {
+    const normalized = normalizeComparableUnitPrice(price, packageText);
+    if (!normalized) {
+      return {
+        normalizedUnitPrice: null,
+        normalizedUnitPriceLabel: unknownUnitPriceLabel,
+        normalizationLabel: 'Package quantity unavailable for per-unit normalization'
+      };
+    }
+
+    return {
+      normalizedUnitPrice: normalized.unitPrice,
+      normalizedUnitPriceLabel: formatLocalizedUnitPrice(normalized.unitPrice, {
+        locale: defaultLocale,
+        currency: observedSnapshotCurrency,
+        unit: normalized.unitLabel.replace('kr/', '')
+      }),
+      normalizationLabel: `Normalized from ${normalized.packageLabel}`
+    };
+  };
+
   if (isOpenPricesProduct(product)) {
     return [
       { storeName: 'OpenPrices observed low', price: product.priceMin, priceLabel: formatSek(product.priceMin), unitLabel: 'SEK observed price' },
       { storeName: 'OpenPrices observed median', price: product.priceMedian, priceLabel: formatSek(product.priceMedian), unitLabel: 'SEK observed price' },
       { storeName: 'OpenPrices observed high', price: product.priceMax, priceLabel: formatSek(product.priceMax), unitLabel: 'SEK observed price' }
-    ];
+    ].map((row) => ({ ...row, ...normalizedPriceFor(row.price, product.quantity) }));
   }
 
   return chainPriceRows(product).map((row) => ({
     storeName: String(row.chain),
     price: row.price,
     priceLabel: row.priceText,
-    unitLabel: row.priceUnit
+    unitLabel: row.priceUnit,
+    ...normalizedPriceFor(row.price, product.subline)
   }));
 }
 

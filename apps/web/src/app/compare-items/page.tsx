@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ItemComparisonTable } from '@/components/ItemComparisonTable';
+import { StorePriceMatrix } from '@/components/StorePriceMatrix';
 import { buildItemComparisonView, MAX_ITEM_COMPARISON_ITEMS } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -54,6 +55,7 @@ export default async function CompareItemsPage({ searchParams }: { searchParams?
           <button className="self-end rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white" type="submit">Compare items</button>
         </form>
       </Card>
+      <StorePriceMatrix items={comparison.items} sourceLabel={comparison.sourceLabel} />
       <ItemComparisonTable {...comparison} />
     </PageShell>
   );
