@@ -2,15 +2,19 @@
 
 - Source: ICA public store-scoped promotions JSON
 - Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C
-- Store locator retrieved: 2026-05-23T00:16:08.083Z
+- Store locator retrieved: 2026-05-24T08:02:07.000Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 93109
-- Stores fetched: 324
+- Real rows fetched: 93003
+- Stores fetched: 326
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
-- Live verification: the latest newly added source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-23 Europe/Stockholm; the wired source row count is recorded below.
+- Live verification: the latest newly added source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-24 Europe/Stockholm; the wired source row count is recorded below.
 
 ## Source URLs
+
+- Source URL (1003390 ICA Kvantum Jätten, retrieved 2026-05-24T08:02:37.000Z, rows 19): https://handlaprivatkund.ica.se/stores/1003390/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=19&maxPageSize=19
+
+- Source URL (1003829 ICA Kvantum Tranås, retrieved 2026-05-24T07:28:45.000Z, rows 25): https://handlaprivatkund.ica.se/stores/1003829/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=25&maxPageSize=25
 
 - Source URL (1003822 ICA Supermarket Toria, retrieved 2026-05-23T20:42:39.000Z, rows 25): https://handlaprivatkund.ica.se/stores/1003822/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=25&maxPageSize=25
 
@@ -34,7 +38,7 @@
 - Source URL (1004251 ICA Nära Sälen, retrieved 2026-05-22T19:37:53.105Z, rows 1): https://handlaprivatkund.ica.se/stores/1004251/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=1&maxPageSize=1
 - Source URL (1003740 ICA Kvantum Strömstad, retrieved 2026-05-22T17:14:10.709Z, rows 100): https://handlaprivatkund.ica.se/stores/1003740/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
 
-- Source URL (1004599 ICA Kvantum Kungsholmen, retrieved 2026-05-22T12:58:25.267Z, rows 300): https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004599 ICA Kvantum Kungsholmen, retrieved 2026-05-22T12:58:25.267Z, rows 150): https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=150&maxPageSize=150
 - Source URL (1004247 ICA Focus, retrieved 2026-05-22T12:58:25.267Z, rows 300): https://handlaprivatkund.ica.se/stores/1004247/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Source URL (1003714 ICA Karlaplan, retrieved 2026-05-22T12:58:25.267Z, rows 300): https://handlaprivatkund.ica.se/stores/1003714/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Source URL (1004228 ICA Supermarket Fältöversten, retrieved 2026-05-22T12:58:25.267Z, rows 300): https://handlaprivatkund.ica.se/stores/1004228/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
@@ -354,14 +358,14 @@ Every emitted row came from a live store-scoped promotions response for the sele
 
 ## Sample Retrieved Rows
 
-1. 1004599 ICA Kvantum Kungsholmen | ff3ce59d-323e-42ae-b433-26953b77c7e7 | Babyplommontomater 500g Klass 1 ICA | price=37.9 SEK | promo=28 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-2. 1004599 ICA Kvantum Kungsholmen | 3e77f4bb-9092-4a94-b29e-d63dbf880e45 | Ätmogen Avokado 3-pack Klass 1 ICA | price=40.6 SEK | promo=17.5 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-3. 1004599 ICA Kvantum Kungsholmen | 32c1d908-5329-43fb-823e-a2652ff8c6af | Falukorv Klassikern 800g Scan | price=39.7 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-4. 1004599 ICA Kvantum Kungsholmen | 2da48d84-e9b2-4037-bc5d-799217df2ba5 | Röd spetsig paprika 200g Klass 1 ICA | price=19.9 SEK | promo=15 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-5. 1004599 ICA Kvantum Kungsholmen | 44e6253f-0090-4523-aa80-2cf4ad60e138 | Druvor Crimson Röda kärnfria 500g Klass 1  ICA | price=40.6 SEK | promo=28 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-6. 1004599 ICA Kvantum Kungsholmen | 1553101d-6194-4e54-b3be-fe450c4d7128 | Majs 3-p 480g Green Giant | price=28.6 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-7. 1004599 ICA Kvantum Kungsholmen | 15d3b4c0-d781-4b4b-b58f-10edcb96d7ae | Juice Apelsin 1l God Morgon® | price=27.4 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
-8. 1004599 ICA Kvantum Kungsholmen | 0dfec5c5-f80e-49df-a0a9-787c16b0cd37 | Yoghurt Grekisk Naturell 10% 1000g Salakis | price=40.7 SEK | promo=25 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+1. 1004599 ICA Kvantum Kungsholmen | ff3ce59d-323e-42ae-b433-26953b77c7e7 | Babyplommontomater 500g Klass 1 ICA | price=37.9 SEK | promo=28 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=150&maxPageSize=150
+2. 1004599 ICA Kvantum Kungsholmen | 3e77f4bb-9092-4a94-b29e-d63dbf880e45 | Ätmogen Avokado 3-pack Klass 1 ICA | price=40.6 SEK | promo=17.5 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=150&maxPageSize=150
+3. 1004599 ICA Kvantum Kungsholmen | 32c1d908-5329-43fb-823e-a2652ff8c6af | Falukorv Klassikern 800g Scan | price=39.7 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=150&maxPageSize=150
+4. 1004599 ICA Kvantum Kungsholmen | 2da48d84-e9b2-4037-bc5d-799217df2ba5 | Röd spetsig paprika 200g Klass 1 ICA | price=19.9 SEK | promo=15 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=150&maxPageSize=150
+5. 1004599 ICA Kvantum Kungsholmen | 44e6253f-0090-4523-aa80-2cf4ad60e138 | Druvor Crimson Röda kärnfria 500g Klass 1  ICA | price=40.6 SEK | promo=28 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=150&maxPageSize=150
+6. 1004599 ICA Kvantum Kungsholmen | 1553101d-6194-4e54-b3be-fe450c4d7128 | Majs 3-p 480g Green Giant | price=28.6 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=150&maxPageSize=150
+7. 1004599 ICA Kvantum Kungsholmen | 15d3b4c0-d781-4b4b-b58f-10edcb96d7ae | Juice Apelsin 1l God Morgon® | price=27.4 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=150&maxPageSize=150
+8. 1004599 ICA Kvantum Kungsholmen | 0dfec5c5-f80e-49df-a0a9-787c16b0cd37 | Yoghurt Grekisk Naturell 10% 1000g Salakis | price=40.7 SEK | promo=25 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=150&maxPageSize=150
 9. 1004164 ICA Supermarket Esplanad, Sthlm | ff3ce59d-323e-42ae-b433-26953b77c7e7 | Babyplommontomater 500g Klass 1 ICA | price=37.9 SEK | promo=28 SEK | https://handlaprivatkund.ica.se/stores/1004164/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 10. 1004164 ICA Supermarket Esplanad, Sthlm | 3e77f4bb-9092-4a94-b29e-d63dbf880e45 | Ätmogen Avokado 3-pack Klass 1 ICA | price=40.6 SEK | promo=17.5 SEK | https://handlaprivatkund.ica.se/stores/1004164/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 11. 1004164 ICA Supermarket Esplanad, Sthlm | 32c1d908-5329-43fb-823e-a2652ff8c6af | Falukorv Klassikern 800g Scan | price=39.7 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004164/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
