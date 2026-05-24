@@ -97,6 +97,7 @@ export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
 export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
+export * from './connectors/yara-market-se.js';
 export * from './connectors/lidl.js';
 export * from './connectors/mathem.js';
 export * from './connectors/matpriskollen.js';
