@@ -26,7 +26,8 @@
       "@groceryview/notifications": ["packages/notifications/src/index.ts"],
       "@groceryview/ops": ["packages/ops/src/index.ts"],
       "@groceryview/scanning": ["packages/scanning/src/index.ts"],
-      "@groceryview/server": ["packages/server/src/index.ts"]
+      "@groceryview/server": ["packages/server/src/index.ts"],
+      "@groceryview/ui": ["packages/ui/src/index.ts"]
     }
   },
   "include": ["apps/**/*.ts", "packages/**/*.ts"],

@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Pagination } from '@groceryview/ui';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
@@ -25,14 +26,8 @@ type SearchParams = {
   minConfidence?: string | string[];
   brand?: string | string[];
   page?: string | string[];
+  cursor?: string | string[];
 };
-
-function toPageNumber(value: string | string[] | undefined): number {
-  const raw = Array.isArray(value) ? value[0] : value;
-  const parsed = Number.parseInt(raw ?? '1', 10);
-  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) return 1;
-  return parsed;
-}
 
 function normalizeSelectedBrand(brand: string | string[] | undefined) {
   const requested = (Array.isArray(brand) ? brand[0] : brand)?.trim();
@@ -65,11 +60,17 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'minConfidence', source.minConfidence);
 }
 
-function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
+function cursorFromOffset(offset: number) {
+  return offset > 0 ? `offset_${offset}` : '';
+}
+
+function productsPageUrl(cursor: string | null, selectedBrand = '', searchParams: SearchParams = {}) {
   const params = new URLSearchParams();
   copySearchParams(params, searchParams);
+  params.delete('page');
+  params.delete('cursor');
   if (selectedBrand) params.set('brand', selectedBrand);
-  if (page > 1) params.set('page', String(page));
+  if (cursor) params.set('cursor', cursor);
   const query = params.toString();
   return query ? `/products?${query}` : '/products';
 }
@@ -78,18 +79,18 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const search = buildProductSearchView(resolvedSearchParams);
   const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
-  const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
   const productCards = selectedBrand
     ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
     : adaptiveProductCards;
-  const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
-  const currentPage = Math.min(requestedPage, totalPages);
-  const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
-  const pagedResultCards = resultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
-  const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
-  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
-  const defaultSearchCount = facetedProductSearch.resultCards.length;
+  const pagedResultCards = resultCards;
+  const rangeStart = resultCards.length === 0 ? 0 : search.pagination.offset + 1;
+  const rangeEnd = search.pagination.offset + resultCards.length;
+  const previousCursor = search.pagination.offset > 0 ? cursorFromOffset(Math.max(0, search.pagination.offset - PRODUCTS_PER_PAGE)) : null;
+  const previousHref = previousCursor === null ? null : productsPageUrl(previousCursor, selectedBrand, resolvedSearchParams);
+  const nextHref = search.pagination.nextCursor ? productsPageUrl(search.pagination.nextCursor, selectedBrand, resolvedSearchParams) : null;
+  const totalSearchCount = search.totalCount ?? Math.max(rangeEnd, resultCards.length);
+  const defaultSearchCount = facetedProductSearch.totalCount ?? facetedProductSearch.resultCards.length;
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
@@ -99,6 +100,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       else params.delete(key);
     }
     params.delete('page');
+    params.delete('cursor');
     const query = params.toString();
     return query ? `/products?${query}` : '/products';
   }
@@ -250,29 +252,12 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             </Link>
           ))}
         </div>
-        {resultCards.length > PRODUCTS_PER_PAGE ? (
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
-            <p className="font-black text-slate-700">
-              Showing {rangeStart}-{rangeEnd} of {resultCards.length} instant products (page {currentPage}/{totalPages})
-            </p>
-            <div className="flex gap-3">
-              {currentPage > 1 ? (
-                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1, selectedBrand, resolvedSearchParams)}>
-                  Previous
-                </Link>
-              ) : (
-                <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Previous</span>
-              )}
-              {currentPage < totalPages ? (
-                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1, selectedBrand, resolvedSearchParams)}>
-                  Next
-                </Link>
-              ) : (
-                <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Next</span>
-              )}
-            </div>
-          </div>
-        ) : null}
+        <Pagination
+          ariaLabel="Search result pagination"
+          nextHref={nextHref}
+          previousHref={previousHref}
+          summary={`Showing ${rangeStart}-${rangeEnd} of ${totalSearchCount.toLocaleString('sv-SE')} server-paginated instant products`}
+        />
       </Card>
       <Card className="mt-8 border-rose-200 bg-rose-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">

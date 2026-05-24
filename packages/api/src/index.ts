@@ -1358,6 +1358,7 @@ export type FacetedProductSearchFilters = {
   inStockOnly?: boolean;
   minConfidence?: number;
   limit?: number;
+  cursor?: string;
 };
 
 export const facetedProductSearchEndpoint = {
@@ -1365,7 +1366,7 @@ export const facetedProductSearchEndpoint = {
   controllerPath: 'products',
   actionPath: 'search/faceted',
   path: '/products/search/faceted',
-  queryParams: ['q', 'category', 'brand', 'label', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit']
+  queryParams: ['q', 'category', 'brand', 'label', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit', 'cursor']
 } as const;
 
 export type FacetedProductSearchResult = {
@@ -1376,8 +1377,17 @@ export type FacetedProductSearchResult = {
     inStockOnly: boolean;
     minConfidence: number | null;
     limit: number;
+    cursor: string | null;
   };
   count: number;
+  totalCount: number | null;
+  pagination: {
+    limit: number;
+    cursor: string | null;
+    nextCursor: string | null;
+    hasMore: boolean;
+    offset: number;
+  };
   products: Array<{
     productId: string;
     slug: string;
@@ -1516,6 +1526,18 @@ function money(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
+export function encodeFacetedSearchCursor(offset: number): string {
+  return `offset_${Math.max(0, Math.trunc(offset))}`;
+}
+
+export function facetedSearchCursorOffset(cursor: string | null | undefined): number {
+  if (!cursor?.trim()) return 0;
+  const match = cursor.trim().match(/^offset_(\d+)$/);
+  if (!match) return 0;
+  const parsed = Number.parseInt(match[1]!, 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
 function rowSearchHaystack(row: RealCatalogSearchPriceRow): string {
   return [
     row.productId,
@@ -1530,9 +1552,11 @@ function rowSearchHaystack(row: RealCatalogSearchPriceRow): string {
 export function buildFacetedProductSearch(input: {
   rows: RealCatalogSearchPriceRow[];
   filters?: FacetedProductSearchFilters;
+  pageOffset?: number;
 }): FacetedProductSearchResult {
   const filters = input.filters ?? {};
   const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
+  const cursorOffset = input.pageOffset ?? facetedSearchCursorOffset(filters.cursor);
   const query = filters.query?.trim().toLocaleLowerCase('sv-SE') ?? '';
   const categoryFilters = normalizedFilterSet(filters.categories);
   const labelFilters = normalizedFilterSet(filters.labels);
@@ -1643,7 +1667,7 @@ export function buildFacetedProductSearch(input: {
     }
   }
 
-  const products = [...productMap.values()]
+  const allProducts = [...productMap.values()]
     .map((product) => ({
       ...product,
       isAvailable: product.currentPrices.length === 0 ? null : product.currentPrices.some((price) => price.isAvailable),
@@ -1654,8 +1678,12 @@ export function buildFacetedProductSearch(input: {
       if (a.cheapestPrice !== null && b.cheapestPrice === null) return -1;
       if (a.cheapestPrice !== null && b.cheapestPrice !== null && a.cheapestPrice !== b.cheapestPrice) return a.cheapestPrice - b.cheapestPrice;
       return a.canonicalName.localeCompare(b.canonicalName);
-    })
-    .slice(0, limit);
+    });
+
+  const pageStart = input.pageOffset === undefined ? cursorOffset : 0;
+  const products = allProducts.slice(pageStart, pageStart + limit);
+  const hasMore = input.pageOffset === undefined ? cursorOffset + limit < allProducts.length : allProducts.length > limit;
+  const nextCursor = hasMore ? encodeFacetedSearchCursor(cursorOffset + limit) : null;
 
   return {
     query: filters.query?.trim() ?? '',
@@ -1670,9 +1698,18 @@ export function buildFacetedProductSearch(input: {
       maxPrice: filters.maxPrice ?? null,
       inStockOnly,
       minConfidence: filters.minConfidence ?? null,
-      limit
+      limit,
+      cursor: filters.cursor?.trim() || null
     },
     count: products.length,
+    totalCount: input.pageOffset === undefined ? allProducts.length : null,
+    pagination: {
+      limit,
+      cursor: filters.cursor?.trim() || null,
+      nextCursor,
+      hasMore,
+      offset: cursorOffset
+    },
     products,
     facets: {
       categories: sortedFacet(categoryFacet),
@@ -1690,7 +1727,7 @@ export function buildFacetedProductSearch(input: {
       priceRange: { min: minObservedUnitPrice, max: maxObservedUnitPrice }
     },
     evidence: {
-      pricedProductCount: products.filter((product) => product.currentPrices.length > 0).length,
+      pricedProductCount: allProducts.filter((product) => product.currentPrices.length > 0).length,
       latestPriceCount,
       availableLatestPriceCount,
       outOfStockLatestPriceCount,

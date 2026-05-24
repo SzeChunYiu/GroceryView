@@ -4,6 +4,7 @@ import {
   assertPriceObservationDto,
   basketCompareEndpoint,
   buildFacetedProductSearch,
+  facetedSearchCursorOffset,
   buildFlyerOfferReport,
   buildProductLatestPrices,
   buildProductCheapestNowReport,
@@ -241,7 +242,7 @@ describe('createGroceryViewApi', () => {
       controllerPath: 'products',
       actionPath: 'search/faceted',
       path: '/products/search/faceted',
-      queryParams: ['q', 'category', 'brand', 'label', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit']
+      queryParams: ['q', 'category', 'brand', 'label', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'inStockOnly', 'minConfidence', 'limit', 'cursor']
     });
 
     const result = buildFacetedProductSearch({
@@ -260,6 +261,29 @@ describe('createGroceryViewApi', () => {
     assert.deepEqual(result.facets.chains.find((facet) => facet.value === 'willys'), { value: 'willys', label: 'Willys', count: 1 });
     assert.deepEqual(result.facets.priceRange, { min: 14.9, max: 14.9 });
     assert.deepEqual(result.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores']);
+  });
+
+  it('paginates faceted search with opaque cursors', () => {
+    const firstPage = buildFacetedProductSearch({
+      rows: realRows,
+      filters: { limit: 1 }
+    });
+
+    assert.equal(firstPage.count, 1);
+    assert.equal(firstPage.totalCount, 2);
+    assert.equal(firstPage.pagination.hasMore, true);
+    assert.equal(firstPage.pagination.nextCursor, 'offset_1');
+    assert.equal(facetedSearchCursorOffset(firstPage.pagination.nextCursor), 1);
+
+    const secondPage = buildFacetedProductSearch({
+      rows: realRows,
+      filters: { limit: 1, cursor: firstPage.pagination.nextCursor ?? undefined }
+    });
+
+    assert.equal(secondPage.count, 1);
+    assert.equal(secondPage.products[0]?.productId, 'product-butter');
+    assert.equal(secondPage.pagination.hasMore, false);
+    assert.equal(secondPage.pagination.nextCursor, null);
   });
 
   it('applies label, unit-price, in-stock, and confidence filters for faceted search', () => {

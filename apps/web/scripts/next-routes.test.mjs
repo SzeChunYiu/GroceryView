@@ -3235,6 +3235,7 @@ ${seo}`;
     assert.match(products, /kr\/kg|kr\/l|per-unit/i);
     assert.match(products, /latest_prices/);
     assert.match(packageJson, /@groceryview\/api/);
+    assert.match(packageJson, /@groceryview\/ui/);
   });
 
   it('uses crawlable URL query params for instant product search facets', async () => {
@@ -3343,7 +3344,10 @@ ${seo}`;
     assert.match(products, /productBrandFilterOptions/);
     assert.match(products, /name="brand"/);
     assert.match(products, /defaultValue=\{selectedBrand\}/);
-    assert.match(products, /productsPageUrl\(currentPage \+ 1, selectedBrand, resolvedSearchParams\)/);
+    assert.match(products, /import \{ Pagination \} from '@groceryview\/ui'/);
+    assert.match(products, /cursor\?: string \| string\[\]/);
+    assert.match(products, /productsPageUrl\(search\.pagination\.nextCursor/);
+    assert.match(products, /server-paginated instant products/);
     assert.match(shell, /ProductPriceCards/);
     assert.match(shell, /homepageAdaptiveProductCards/);
     assert.match(cards, /next\/image/);

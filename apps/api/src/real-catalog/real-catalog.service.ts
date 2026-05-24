@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException, ServiceUnavailableE
 import {
   buildFacetedProductSearch,
   buildRealBasketComparison,
+  facetedSearchCursorOffset,
   type FacetedProductSearchFilters,
   type RealBasketCompareItem,
   type RealCatalogPriceType,
@@ -55,6 +56,11 @@ function numberQuery(value: string | undefined, label: string): number | undefin
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) throw new BadRequestException(`${label} must be a number.`);
   return parsed;
+}
+
+function booleanQuery(value: string | undefined): boolean | undefined {
+  if (value === undefined || value.trim() === '') return undefined;
+  return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
 }
 
 function limitQuery(value: string | undefined): number {
@@ -118,7 +124,10 @@ export class RealCatalogService {
     priceType?: string;
     minPrice?: string;
     maxPrice?: string;
+    inStockOnly?: string;
+    minConfidence?: string;
     limit?: string;
+    cursor?: string;
     productNameLocale?: ProductNameLocale;
   }) {
     const filters: FacetedProductSearchFilters = {
@@ -130,7 +139,10 @@ export class RealCatalogService {
       priceTypes: priceTypes(query.priceType),
       minPrice: numberQuery(query.minPrice, 'minPrice'),
       maxPrice: numberQuery(query.maxPrice, 'maxPrice'),
-      limit: limitQuery(query.limit)
+      inStockOnly: booleanQuery(query.inStockOnly),
+      minConfidence: numberQuery(query.minConfidence, 'minConfidence'),
+      limit: limitQuery(query.limit),
+      cursor: query.cursor?.trim() || undefined
     };
     if (filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.minPrice > filters.maxPrice) {
       throw new BadRequestException('minPrice must be less than or equal to maxPrice.');
@@ -141,6 +153,8 @@ export class RealCatalogService {
     const chains = filters.chains ?? [];
     const stores = filters.stores ?? [];
     const priceTypeFilters = filters.priceTypes ?? [];
+    const pageLimit = filters.limit ?? 50;
+    const cursorOffset = facetedSearchCursorOffset(filters.cursor);
     const rows = await this.database.query<CatalogPriceSqlRow>(this.searchSql(), [
       filters.query,
       categories.length > 0 ? categories.map((value) => value.toLowerCase()) : null,
@@ -150,10 +164,11 @@ export class RealCatalogService {
       priceTypeFilters.length > 0 ? priceTypeFilters : null,
       filters.minPrice ?? null,
       filters.maxPrice ?? null,
-      filters.limit,
-      query.productNameLocale ?? null
+      pageLimit + 1,
+      query.productNameLocale ?? null,
+      cursorOffset
     ]);
-    return buildFacetedProductSearch({ rows: rows.map(mapCatalogRow), filters });
+    return buildFacetedProductSearch({ rows: rows.map(mapCatalogRow), filters, pageOffset: cursorOffset });
   }
 
   async compareBasket(input: {
@@ -257,7 +272,7 @@ export class RealCatalogService {
             )
           )
         order by ${productName}, products.slug
-        limit $9
+        limit $9 offset $11
       )
       select products.id::text as product_id,
              products.slug,

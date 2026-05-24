@@ -5,4 +5,6 @@ export function generateMetadata() {
   return routeMetadata('/search');
 }
 
+export const searchPaginationMode = 'cursor';
+
 export default ProductsPage;

@@ -517,6 +517,7 @@ export type ProductSearchUrlParams = {
   maxPrice?: SearchParamValue;
   inStockOnly?: SearchParamValue;
   minConfidence?: SearchParamValue;
+  cursor?: SearchParamValue;
 };
 
 function firstSearchValue(value: SearchParamValue): string {
@@ -587,7 +588,8 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const maxPrice = numericSearchValue(searchParams.maxPrice);
   const inStockOnly = booleanSearchValue(searchParams.inStockOnly);
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
-  const filters = { query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
+  const cursor = firstSearchValue(searchParams.cursor);
+  const filters = { query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 50, cursor };
   const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
 
   const activeFilters = [
@@ -630,6 +632,7 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
       outOfStockLatestPriceCount: searchResult.evidence.outOfStockLatestPriceCount
     },
     activeFilters,
+    pagination: searchResult.pagination,
     resultCards: productSearchResultCards(searchResult)
   };
 }
