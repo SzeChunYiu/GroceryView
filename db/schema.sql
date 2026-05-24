@@ -66,6 +66,15 @@ create table if not exists product_aliases (
   created_at timestamptz not null default now()
 );
 
+create table if not exists product_match (
+  id bigserial primary key,
+  canonical_id text not null references products(id) on delete cascade,
+  listing_id bigint not null references product_aliases(id) on delete cascade,
+  score numeric(5, 4) not null check (score between 0 and 1),
+  method text not null check (method in ('ean', 'brand+name', 'fuzzy', 'manual')),
+  matched_at timestamptz not null default now()
+);
+
 create table if not exists price_observations (
   id bigserial primary key,
   product_id text not null references products(id),
@@ -398,6 +407,9 @@ create unique index if not exists price_observations_product_store_date_uidx on 
 create index if not exists promotion_observations_product_dates_idx on promotion_observations(product_id, promo_start, promo_end);
 create index if not exists products_category_idx on products(category_id);
 create index if not exists products_fuel_grade_idx on products(fuel_grade_id) where domain = 'fuel';
+create index if not exists product_match_canonical_idx on product_match(canonical_id, matched_at desc);
+create index if not exists product_match_listing_idx on product_match(listing_id, matched_at desc);
+create index if not exists product_match_method_idx on product_match(method, matched_at desc);
 create index if not exists subscription_entitlements_status_idx on subscription_entitlements (status, updated_at desc);
 create unique index if not exists subscription_entitlements_provider_subscription_idx on subscription_entitlements (provider, provider_subscription_id) where provider_subscription_id is not null;
 create index if not exists community_reporter_trust_pending_idx on community_reporter_trust(pending_reports desc);
