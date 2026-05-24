@@ -17,6 +17,15 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
+export type ListImpactEstimate = {
+  driftPercent: number;
+  driftSek: number;
+  historicalBaselineSek: number;
+  importedItemCount: number;
+  projectedSpendSek: number;
+  timingLabel: string;
+};
+
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
@@ -56,6 +65,26 @@ const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
     detail: 'Snack and lunchbox item'
   }
 ];
+
+const estimatedItemSpendSek: Record<string, number> = {
+  'coffee-weekly-top-up': 54,
+  'oats-breakfast-staple': 28,
+  'milk-dairy-run': 34,
+  'frozen-vegetables': 31,
+  'fresh-fruit': 46
+};
+
+const importedKeywordEstimates: { keyword: string; spendSek: number }[] = [
+  { keyword: 'coffee', spendSek: 54 },
+  { keyword: 'kaffe', spendSek: 54 },
+  { keyword: 'milk', spendSek: 34 },
+  { keyword: 'fil', spendSek: 34 },
+  { keyword: 'fruit', spendSek: 46 },
+  { keyword: 'vegetable', spendSek: 31 },
+  { keyword: 'oat', spendSek: 28 }
+];
+
+const historicalBaselineSek = baseListItems.reduce((sum, item) => sum + (estimatedItemSpendSek[item.id] ?? 0), 0);
 
 function listStateFromStorage(value: string | null): Required<PersistedListState> {
   const empty = { checkedById: {}, importedItems: [] };
@@ -127,6 +156,34 @@ function persistCheckedState(items: ShoppingListItem[]) {
   }
 }
 
+function estimatedSpendForItem(item: ShoppingListItem) {
+  const directEstimate = estimatedItemSpendSek[item.id];
+  if (directEstimate) return directEstimate;
+
+  const normalizedName = item.name.toLowerCase();
+  return importedKeywordEstimates.find((estimate) => normalizedName.includes(estimate.keyword))?.spendSek ?? 39;
+}
+
+function impactEstimateFor(items: ShoppingListItem[]): ListImpactEstimate {
+  const projectedSpendSek = items.reduce((sum, item) => sum + estimatedSpendForItem(item), 0);
+  const driftSek = projectedSpendSek - historicalBaselineSek;
+  const driftPercent = historicalBaselineSek > 0 ? (driftSek / historicalBaselineSek) * 100 : 0;
+  const timingLabel = driftSek > 25
+    ? 'above baseline — review timing'
+    : driftSek < -10
+      ? 'below baseline'
+      : 'near baseline';
+
+  return {
+    driftPercent,
+    driftSek,
+    historicalBaselineSek,
+    importedItemCount: items.filter((item) => item.importSource === 'bulk-clipboard').length,
+    projectedSpendSek,
+    timingLabel
+  };
+}
+
 export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
@@ -167,6 +224,7 @@ export function useList() {
   }, []);
 
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
+  const listImpactEstimate = useMemo(() => impactEstimateFor(items), [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
 
@@ -174,6 +232,7 @@ export function useList() {
     addImportedItems,
     checkedCount,
     items,
+    listImpactEstimate,
     remainingCount,
     resetCheckedState,
     toggleItemChecked,

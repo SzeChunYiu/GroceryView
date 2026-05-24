@@ -6,8 +6,12 @@ import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
 
+function formatEstimateSek(value: number) {
+  return new Intl.NumberFormat('sv-SE', { currency: 'SEK', maximumFractionDigits: 0, style: 'currency' }).format(value);
+}
+
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const { addImportedItems, checkedCount, items, listImpactEstimate, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -30,6 +34,28 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+
+        <section className="mt-6 rounded-[1.75rem] border border-amber-200 bg-white/95 p-5 shadow-sm" aria-labelledby="list-impact-heading">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-800">Budget-aware impact</p>
+              <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950" id="list-impact-heading">List-level spend drift estimate</h2>
+              <p className="mt-1 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+                Estimated spend updates as imported items are added, comparing this list against the historical starter-basket baseline for quick price timing tradeoffs.
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] bg-amber-50 p-4 text-right">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-900">{listImpactEstimate.timingLabel}</p>
+              <p className="mt-1 text-3xl font-black text-slate-950">{formatEstimateSek(listImpactEstimate.driftSek)}</p>
+              <p className="text-sm font-semibold text-slate-600">{Math.round(listImpactEstimate.driftPercent)}% vs baseline</p>
+            </div>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <p className="rounded-2xl bg-slate-50 p-4 text-sm font-bold text-slate-700">Estimated list spend <span className="block text-xl font-black text-slate-950">{formatEstimateSek(listImpactEstimate.projectedSpendSek)}</span></p>
+            <p className="rounded-2xl bg-slate-50 p-4 text-sm font-bold text-slate-700">Historical baseline <span className="block text-xl font-black text-slate-950">{formatEstimateSek(listImpactEstimate.historicalBaselineSek)}</span></p>
+            <p className="rounded-2xl bg-slate-50 p-4 text-sm font-bold text-slate-700">Added imports <span className="block text-xl font-black text-slate-950">{listImpactEstimate.importedItemCount}</span></p>
+          </div>
+        </section>
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
