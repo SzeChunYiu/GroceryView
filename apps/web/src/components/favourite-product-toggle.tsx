@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import {
-  FAVOURITES_STORAGE_KEY,
   FAVOURITES_UPDATED_EVENT,
   isFavouriteProduct,
-  parseFavouriteProductEntries,
-  serializeFavouriteProductEntries,
+  readFavouriteProductEntries,
+  saveFavouriteProductEntries,
   toggleFavouriteProduct,
   type FavouriteProductInput
 } from '@/lib/favourites';
@@ -24,7 +23,7 @@ export function FavouriteProductToggle({
   useEffect(() => {
     function syncFromStorage() {
       try {
-        const entries = parseFavouriteProductEntries(localStorage.getItem(FAVOURITES_STORAGE_KEY));
+        const entries = readFavouriteProductEntries();
         setIsFavourite(isFavouriteProduct(entries, product.slug));
       } catch {
         setIsFavourite(false);
@@ -44,9 +43,13 @@ export function FavouriteProductToggle({
 
   function handleToggle() {
     try {
-      const current = parseFavouriteProductEntries(localStorage.getItem(FAVOURITES_STORAGE_KEY));
+      const current = readFavouriteProductEntries();
       const next = toggleFavouriteProduct(current, product);
-      localStorage.setItem(FAVOURITES_STORAGE_KEY, serializeFavouriteProductEntries(next.entries));
+      if (!saveFavouriteProductEntries(next.entries)) {
+        setIsFavourite(false);
+        setIsReady(true);
+        return;
+      }
       setIsFavourite(next.isFavourite);
       window.dispatchEvent(new CustomEvent(FAVOURITES_UPDATED_EVENT, { detail: { slug: product.slug, isFavourite: next.isFavourite } }));
     } catch {
