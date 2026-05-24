@@ -423,6 +423,53 @@ class RecordingPriceHistoryExecutor {
         }
       ] as T[];
     }
+    if (sql.includes('screener_discount_history')) {
+      const minDiscount = Number(params[0]);
+      const category = params[1] as string | null;
+      const limit = Number(params[2]);
+      const rows = [
+        {
+          product_id: 'product-private-label-milk',
+          product_slug: 'private-label-milk',
+          product_name: 'Garant Milk 1L',
+          brand: 'Garant',
+          category_label: 'dairy',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          latest_price: '12.90',
+          previous_price: '19.90',
+          savings_amount: '7.00',
+          discount_percent: '35.18',
+          currency: 'SEK',
+          latest_observed_at: '2026-05-21T10:00:00.000Z',
+          observation_count: '4'
+        },
+        {
+          product_id: 'product-coffee',
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          brand: 'Zoégas',
+          category_label: 'coffee',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          latest_price: '49.90',
+          previous_price: '59.90',
+          savings_amount: '10.00',
+          discount_percent: '16.69',
+          currency: 'SEK',
+          latest_observed_at: '2026-05-21T09:00:00.000Z',
+          observation_count: '3'
+        }
+      ];
+      return rows
+        .filter((row) => Number(row.discount_percent) >= minDiscount)
+        .filter((row) => category === null || row.category_label === category)
+        .slice(0, limit) as T[];
+    }
     if (sql.includes('from observations')) {
       return [
         {
@@ -549,6 +596,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/nutrition/value']);
     assert.ok(docs.body.paths['/users/demo/pantry/replenishment']);
     assert.ok(docs.body.paths['/prices/freshness']);
+    assert.ok(docs.body.paths['/screener']);
     assert.ok(docs.body.paths['/users/demo/privacy/export']);
     assert.ok(docs.body.paths['/users/demo/privacy/deletion-plan']);
     assert.ok(docs.body.paths['/users/demo/settings/account']);
@@ -839,6 +887,23 @@ describe('GroceryView API app', () => {
     ]);
     assert.equal(discounts.body.offers[0].sourceType, 'weekly_flyer');
     assert.equal(discounts.body.demo, undefined);
+
+
+    const screener = await request(app.getHttpServer())
+      .get('/screener?min_discount=20&category=dairy')
+      .expect(200);
+    assert.equal(screener.body.minDiscountPercent, 20);
+    assert.equal(screener.body.category, 'dairy');
+    assert.equal(screener.body.source, 'price_history');
+    assert.deepEqual(screener.body.items.map((item: { productSlug: string }) => item.productSlug), ['private-label-milk']);
+    assert.equal(screener.body.items[0].discountPercent, 35.18);
+    assert.match(screener.body.guardrails[0], /price_history/i);
+    const screenerCall = priceHistoryExecutor.calls.find((call) => call.sql.includes('screener_discount_history'));
+    assert.ok(screenerCall, 'screener API should query price_history discount history');
+    assert.match(screenerCall.sql, /with price_history as/i);
+    assert.match(screenerCall.sql, /from observations/i);
+    assert.match(screenerCall.sql, /discount_percent >= \$1/i);
+    assert.deepEqual(screenerCall.params, [20, 'dairy', 25]);
 
     const storeDiscounts = await request(app.getHttpServer())
       .get('/stores/willys-odenplan/discounts?asOf=2026-05-20T12:00:00.000Z')
@@ -1597,6 +1662,7 @@ describe('GroceryView API real-only deal and alert endpoints', () => {
     await request(app.getHttpServer()).get('/stores/willys-odenplan/discounts').expect(503);
     await request(app.getHttpServer()).get('/stores/willys-odenplan/flyer-offers').expect(503);
     await request(app.getHttpServer()).get('/stores/nearest?lat=59.3293&lng=18.0686&radius=5').expect(503);
+    await request(app.getHttpServer()).get('/screener?min_discount=10').expect(503);
     await request(app.getHttpServer()).get('/users/demo/watchlist/price-alerts').expect(503);
     await request(app.getHttpServer())
       .post('/users/demo/watchlist/price-alerts')

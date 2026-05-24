@@ -1322,8 +1322,33 @@ describe('verified-data UI', () => {
     assert.match(route, /normalizeScreenerCategory\(requestedCategory, categoryOptions\.map\(\(option\) => option\.slug\)\)/);
     assert.match(route, /categoryOptions/);
     assert.match(route, /const requestedCategory = paramValue\(params\.category\) \?\? SCREENER_DEFAULT_CATEGORY;/);
-    assert.match(route, /href={modeHref\(option\.mode, category\)}/);
-    assert.match(route, /href={categoryHref\(SCREENER_DEFAULT_CATEGORY, mode\)}/);
+    assert.match(route, /href={modeHref\(option\.mode, category, minDiscount\)}/);
+    assert.match(route, /href={categoryHref\(SCREENER_DEFAULT_CATEGORY, mode, minDiscount\)}/);
+  });
+
+
+  it('adds a min_discount screener slider backed by the screener API contract', async () => {
+    const route = await read('src/app/screener/page.tsx');
+    const query = await read('src/lib/screener-query.ts');
+    const apiRoute = await read('../../apps/api/src/routes/screener.ts');
+
+    assert.match(query, /SCREENER_MIN_DISCOUNT_PARAM = 'min_discount'/);
+    assert.match(query, /SCREENER_MAX_DISCOUNT = 50/);
+    assert.match(query, /normalizeScreenerMinDiscount/);
+    assert.match(query, /screenerDiscountHref/);
+    assert.match(route, /normalizeScreenerMinDiscount/);
+    assert.match(route, /const minDiscount = normalizeScreenerMinDiscount\(paramValue\(params\.min_discount\)\);/);
+    assert.match(route, /sortedRows\(mode, category, minDiscount\)/);
+    assert.match(route, /name=\{SCREENER_MIN_DISCOUNT_PARAM\}/);
+    assert.match(route, /type="range"/);
+    assert.match(route, /min=\{SCREENER_MIN_DISCOUNT\}/);
+    assert.match(route, /max=\{SCREENER_MAX_DISCOUNT\}/);
+    assert.match(route, /Minimum discount/);
+    assert.match(route, /discountPercent/);
+    assert.match(apiRoute, /screenerRoutes/);
+    assert.match(apiRoute, /minDiscountParam: 'min_discount'/);
+    assert.match(apiRoute, /sourceCte: 'price_history'/);
+    assert.match(apiRoute, /discountPercent/);
   });
 
   it('ships the weekly price-drop digest API from PostgreSQL latest_prices rows', async () => {
