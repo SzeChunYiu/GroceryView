@@ -35,6 +35,8 @@ import {
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
+  buildOrkanEvPriceRows,
+  buildOrkanLowestPriceStationRows,
   fetchSt1FuelPrices,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
@@ -130,6 +132,8 @@ import {
   parseOsmChainStores,
   parseOpenPricesSnapshot,
   parseOkq8FuelPricePage,
+  applyOrkanMemberDiscountRows,
+  parseOrkanLowestPriceStationPage,
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
@@ -198,6 +202,62 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('Orkan Iceland connector pricing quirks', () => {
+  const retrievedAt = '2026-05-24T12:00:00.000Z';
+
+  it('parses lowest-price station rows with store channel, format, and region-tagged store ids', () => {
+    const rows = parseOrkanLowestPriceStationPage(`
+      Lægsta verðið
+      Brúartorg, Bústaðavegur, Dalvegur, Einhella, Furuvellir, Hörgárbraut, Kleppsvegur, Mýrarvegur, Reykjavíkurvegur, Salavegur, Skógarhlíð, Suðurfell, Suðurlandsvegur
+      95 okt:
+      Dísel:
+      219,0
+      267,3
+    `, { retrievedAt });
+
+    const skogarhlidPetrol = rows.find((row) => row.store_id === 'orkan-is:reykjavik:skogarhlid' && row.product_id === 'petrol_95');
+    assert.equal(skogarhlidPetrol?.channel, 'store');
+    assert.equal(skogarhlidPetrol?.format, 'lowest_price_station');
+    assert.equal(skogarhlidPetrol?.region, 'reykjavik');
+    assert.equal(skogarhlidPetrol?.is_member_price, false);
+    assert.equal(skogarhlidPetrol?.price, 219);
+    assert.equal(rows.some((row) => row.store_id === 'orkan-is:selfoss:sudurlandsvegur' && row.product_id === 'diesel'), true);
+  });
+
+  it('adds member rows only for standard stations and preserves EV low-price station exclusions', () => {
+    const standardRows = buildOrkanLowestPriceStationRows([], { retrievedAt });
+    const [standardStoreRow] = applyOrkanMemberDiscountRows([{
+      chain: 'orkan',
+      country: 'IS',
+      store_id: 'orkan-is:north_iceland:standard-akureyri',
+      station: 'Standard Akureyri',
+      region: 'north_iceland',
+      product_id: 'diesel',
+      product_name: 'Diesel',
+      price: 300,
+      currency: 'ISK',
+      unit: 'liter',
+      channel: 'store',
+      format: 'standard_self_service',
+      is_member_price: false,
+      source_url: 'https://www.orkan.is/english/',
+      retrieved_at: retrievedAt,
+      evidence: 'fixture'
+    }]).filter((row) => row.is_member_price);
+
+    assert.equal(standardRows.length, 0);
+    assert.equal(standardStoreRow?.is_member_price, true);
+    assert.equal(standardStoreRow?.channel, 'store');
+    assert.equal(standardStoreRow?.format, 'standard_self_service');
+    assert.equal(standardStoreRow?.price, 288);
+
+    const evRows = buildOrkanEvPriceRows({ retrievedAt });
+    assert.equal(evRows.find((row) => row.store_id === 'orkan-is:capital_area:vesturlandsvegur')?.format, 'lowest_price_ev_station');
+    assert.equal(evRows.some((row) => row.store_id === 'orkan-is:capital_area:vesturlandsvegur' && row.is_member_price), false);
+    assert.equal(evRows.some((row) => row.store_id === 'orkan-is:iceland:ev-fast-charging' && row.is_member_price), true);
   });
 });
 
