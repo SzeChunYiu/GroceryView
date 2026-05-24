@@ -428,6 +428,10 @@ describe('createHttpHandler', () => {
       ['butter', 'willys-odenplan']
     ]);
 
+    const deals = await handle(new Request('http://localhost/api/deals?category=dairy'));
+    assert.equal(deals.status, 503);
+    assert.deepEqual(await json(deals), { error: 'Deals provider is not configured.' });
+
     const flyerOffers = await handle(new Request('http://localhost/api/deals/flyer-offers?chain=willys&asOf=2026-05-20T12:00:00.000Z'));
     assert.equal(flyerOffers.status, 503);
     assert.deepEqual(await json(flyerOffers), { error: 'Flyer offers provider is not configured.' });
@@ -841,6 +845,46 @@ describe('createHttpHandler', () => {
     assert.equal(second.status, 200);
     assert.equal(second.headers.get('x-groceryview-cache'), 'hit');
     assert.deepEqual(await json(second), firstBody);
+  });
+
+  it('serves provider-backed rolling-average deals', async () => {
+    const handle = createHttpHandler(undefined, {
+      dealsProvider: async (query) => ({
+        asOf: '2026-05-24T12:00:00.000Z',
+        filters: query.category ? { category: query.category } : {},
+        dealCount: 1,
+        sortedBy: 'discount_percentage_desc',
+        windowDays: 30,
+        deals: [
+          {
+            productId: 'product-private-label-milk',
+            productSlug: 'private-label-milk',
+            productName: 'Garant Milk 1L',
+            category: 'dairy',
+            categoryPath: ['dairy'],
+            storeId: 'store-willys',
+            storeSlug: 'willys-odenplan',
+            storeName: 'Willys Odenplan',
+            chainId: 'chain-willys',
+            chainSlug: 'willys',
+            chainName: 'Willys',
+            currentPrice: 12.9,
+            rollingAveragePrice: 19.9,
+            discountPercentage: 35.18,
+            currency: 'SEK',
+            observedAt: '2026-05-21T10:00:00.000Z'
+          }
+        ]
+      })
+    });
+
+    const response = await handle(new Request('http://localhost/api/deals?category=dairy'));
+    assert.equal(response.status, 200);
+    const body = await json(response) as { filters: { category: string }; deals: Array<{ productId: string; discountPercentage: number }> };
+    assert.deepEqual(body.filters, { category: 'dairy' });
+    assert.deepEqual(body.deals.map((deal) => [deal.productId, deal.discountPercentage]), [
+      ['product-private-label-milk', 35.18]
+    ]);
   });
 
   it('returns cursor-paginated product envelopes for public product listing and search', async () => {

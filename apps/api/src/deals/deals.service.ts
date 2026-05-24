@@ -5,6 +5,12 @@ import {
   type FlyerOfferReport,
   type StoreFlyerOfferReport
 } from '@groceryview/api';
+import {
+  buildRollingAverageDealsQuery,
+  mapRollingAverageDealRow,
+  type RollingAverageDeal,
+  type RollingAverageDealRow
+} from '@groceryview/db';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
 
 type FlyerOfferSqlRow = {
@@ -167,6 +173,34 @@ export class DealsService {
       },
       observations: rows.map(mapRow)
     });
+  }
+
+  async rollingAverageDeals(query: { category?: string } = {}): Promise<{
+    asOf: string;
+    filters: { category?: string };
+    dealCount: number;
+    sortedBy: 'discount_percentage_desc';
+    windowDays: 30;
+    deals: RollingAverageDeal[];
+  }> {
+    if (!this.postgres.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required for real deal data.');
+    }
+    const asOf = new Date().toISOString();
+    const dealQuery = buildRollingAverageDealsQuery(asOf, query.category);
+    const rows = await this.postgres.query<RollingAverageDealRow>(dealQuery.sql, dealQuery.values);
+    const deals = rows.map(mapRollingAverageDealRow);
+
+    return {
+      asOf,
+      filters: {
+        ...(query.category?.trim() ? { category: query.category.trim() } : {})
+      },
+      dealCount: deals.length,
+      sortedBy: 'discount_percentage_desc',
+      windowDays: 30,
+      deals
+    };
   }
 
   async storeFlyerOffers(storeId: string, query: { asOf?: string }): Promise<StoreFlyerOfferReport | null> {

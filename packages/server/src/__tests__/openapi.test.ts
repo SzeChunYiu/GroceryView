@@ -34,6 +34,7 @@ describe('buildOpenApiDocument', () => {
       '/api/budget/summary',
       '/api/categories',
       '/api/categories/{category}/market',
+      '/api/deals',
       '/api/deals/discounts',
       '/api/deals/flyer-offers',
       '/api/expiry-deals/radar',
@@ -236,6 +237,8 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/stores/{id}/flyer-offers'].get?.summary ?? '', /flyer offers/i);
     assert.equal(doc.paths['/api/stores/{id}/discounts'].get?.security, undefined);
     assert.match(doc.paths['/api/stores/{id}/discounts'].get?.summary ?? '', /discounts/i);
+    assert.equal(doc.paths['/api/deals'].get?.security, undefined);
+    assert.match(doc.paths['/api/deals'].get?.summary ?? '', /30-day rolling average/i);
     assert.equal(doc.paths['/api/deals/flyer-offers'].get?.security, undefined);
     assert.match(doc.paths['/api/deals/flyer-offers'].get?.summary ?? '', /flyer offers/i);
     assert.equal(doc.paths['/api/deals/discounts'].get?.security, undefined);

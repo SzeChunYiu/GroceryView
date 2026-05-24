@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { buildUserAccountDeletionQueries } from './queries/users.js';
 
 export * from './queries/categories.js';
+export * from './queries/deals.js';
 export * from './queries/favorites.js';
 export * from './queries/stores.js';
 export * from './queries/retailers.js';

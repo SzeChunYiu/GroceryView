@@ -183,6 +183,44 @@ class RecordingPriceHistoryExecutor {
         }
       ] as T[];
     }
+    if (sql.includes('with current_prices as') && sql.includes('rolling_averages')) {
+      return [
+        {
+          product_id: 'product-private-label-milk',
+          product_slug: 'private-label-milk',
+          product_name: 'Garant Milk 1L',
+          category_path: ['dairy'],
+          store_id: 'store-willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          chain_id: 'chain-willys',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          current_price: '12.90',
+          currency: 'SEK',
+          observed_at: '2026-05-21T10:00:00.000Z',
+          rolling_average_price: '19.90',
+          discount_percentage: '35.18'
+        },
+        {
+          product_id: 'product-coffee',
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          category_path: ['coffee'],
+          store_id: 'store-willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          chain_id: 'chain-willys',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          current_price: '49.90',
+          currency: 'SEK',
+          observed_at: '2026-05-21T09:00:00.000Z',
+          rolling_average_price: '64.90',
+          discount_percentage: '23.11'
+        }
+      ] as T[];
+    }
     if (sql.includes('current_unit_price') && sql.includes('current_chain_prices') && !sql.includes('base_prices')) {
       return [
         {
@@ -506,6 +544,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/budget/categories']);
     assert.ok(docs.body.paths['/users/demo/ads/disclosure']);
     assert.ok(docs.body.paths['/users/demo/expiry-deals/radar']);
+    assert.ok(docs.body.paths['/deals']);
     assert.ok(docs.body.paths['/deals/discounts']);
     assert.ok(docs.body.paths['/deals/flyer-offers']);
     assert.ok(docs.body.paths['/health']);
@@ -730,6 +769,7 @@ describe('GroceryView API app', () => {
       ['hemkop', 'Hemköp', '/retailers/hemkop.svg', 'https://www.hemkop.se/'],
       ['ica', 'ICA', '/retailers/ica.svg', 'https://www.ica.se/'],
       ['lidl', 'Lidl', '/retailers/lidl.svg', 'https://www.lidl.se/'],
+      ['netto', 'Netto', '/retailers/netto.svg', 'https://www.coop.se/'],
       ['willys', 'Willys', '/retailers/willys.svg', 'https://www.willys.se/']
     ]);
 
@@ -760,6 +800,25 @@ describe('GroceryView API app', () => {
         { productId: 'butter', storeId: 'willys-odenplan', dealScore: 40, demo: true }
       ]
     );
+
+    const rollingDeals = await request(app.getHttpServer()).get('/deals?category=dairy').expect(200);
+    assert.equal(rollingDeals.body.sortedBy, 'discount_percentage_desc');
+    assert.equal(rollingDeals.body.windowDays, 30);
+    assert.deepEqual(rollingDeals.body.filters, { category: 'dairy' });
+    assert.deepEqual(
+      rollingDeals.body.deals.map((deal: { productId: string; discountPercentage: number; currentPrice: number; rollingAveragePrice: number }) => [
+        deal.productId,
+        deal.discountPercentage,
+        deal.currentPrice,
+        deal.rollingAveragePrice
+      ]),
+      [
+        ['product-private-label-milk', 35.18, 12.9, 19.9],
+        ['product-coffee', 23.11, 49.9, 64.9]
+      ]
+    );
+    assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /interval '30 days'/i);
+    assert.deepEqual(priceHistoryExecutor.calls.at(-1)?.params[1], 'dairy');
 
     const flyerOffers = await request(app.getHttpServer())
       .get('/deals/flyer-offers?chain=willys&asOf=2026-05-20T12:00:00.000Z')
@@ -1553,6 +1612,7 @@ describe('GroceryView API real-only deal and alert endpoints', () => {
   });
 
   it('fails closed instead of serving demo flyer offers or price alerts without PostgreSQL', async () => {
+    await request(app.getHttpServer()).get('/deals').expect(503);
     await request(app.getHttpServer()).get('/deals/discounts').expect(503);
     await request(app.getHttpServer()).get('/deals/flyer-offers').expect(503);
     await request(app.getHttpServer()).get('/stores/willys-odenplan/discounts').expect(503);
