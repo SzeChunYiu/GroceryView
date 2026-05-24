@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AlertsModule } from './alerts/alerts.module.js';
 import { AppController } from './app.controller.js';
 import { BasketsModule } from './baskets/baskets.module.js';
-import { validateEnvironment } from './config/env.schema.js';
+import { validateEnvironment } from './config.js';
 import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
 import { PricesModule } from './prices/prices.module.js';
