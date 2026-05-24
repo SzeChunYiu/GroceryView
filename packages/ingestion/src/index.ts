@@ -106,6 +106,7 @@ export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/st1-fuel.js';
+export * from './connectors/middle-eastern-no.js';
 export * from './connectors/willys.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';

@@ -115,8 +115,12 @@ import {
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL,
+  IMS_DRAMMEN_SOURCE_URL,
+  IMS_HILLEVAAG_SOURCE_URL,
   WILLYS_BULK_MINIMUM_ROWS,
+  fetchMiddleEasternNoMarketLocations,
   ingestRetailerProduct,
+  listMiddleEasternNoChains,
   locatorFixturesCanAffectDealScore,
   normaliseUnitPrice,
   normalizeUnitPrice,
@@ -679,6 +683,32 @@ describe('St1 fuel price connector', () => {
       () => fetchSt1FuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
       /blocked or unavailable/
     );
+  });
+});
+
+describe('Middle Eastern NO markets connector', () => {
+  it('surfaces only chains with multiple verified Norwegian market locations', () => {
+    const chains = listMiddleEasternNoChains();
+
+    assert.deepEqual(chains.map((chain) => [chain.chainId, chain.categoryId, chain.locationCount]), [
+      ['ims_internasjonalt_matsenter_no', 'ethnic_middle_eastern', 2]
+    ]);
+    assert.deepEqual(chains[0]?.sourceUrls, [IMS_HILLEVAAG_SOURCE_URL, IMS_DRAMMEN_SOURCE_URL]);
+    assert.equal(chains[0]?.productSignals.includes('halal kjøtt'), true);
+    assert.equal(chains[0]?.clearsBar, true);
+  });
+
+  it('emits branch rows with source-backed store ids and provenance', async () => {
+    const rows = await fetchMiddleEasternNoMarketLocations({ retrievedAt: '2026-05-24T12:00:00.000Z' });
+
+    assert.deepEqual(rows.map((row) => [row.chainId, row.storeId, row.city, row.categoryId]), [
+      ['ims_internasjonalt_matsenter_no', 'ims-hillevaag', 'Stavanger', 'ethnic_middle_eastern'],
+      ['ims_internasjonalt_matsenter_no', 'ims-drammen-torget-vest', 'Drammen', 'ethnic_middle_eastern']
+    ]);
+    assert.equal(rows[0]?.sourceUrl, IMS_HILLEVAAG_SOURCE_URL);
+    assert.equal(rows[1]?.sourceUrl, IMS_DRAMMEN_SOURCE_URL);
+    assert.equal(rows.every((row) => row.retrievedAt === '2026-05-24T12:00:00.000Z'), true);
+    assert.equal(rows.every((row) => row.provenance.parserVersion === 'middle-eastern-no-v1'), true);
   });
 });
 
