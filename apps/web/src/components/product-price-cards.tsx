@@ -85,6 +85,12 @@ function PriceHistorySparkline({ card }: Readonly<{ card: AdaptiveProductCard }>
   );
 }
 
+const freshnessStyles: Record<AdaptiveProductCard['priceFreshnessTone'], string> = {
+  fresh: 'bg-emerald-50 text-emerald-950 ring-emerald-200',
+  aging: 'bg-amber-50 text-amber-950 ring-amber-200',
+  stale: 'bg-rose-50 text-rose-950 ring-rose-200'
+};
+
 export function ProductPriceCards({
   cards,
   eyebrow = 'Adaptive product cards',
@@ -198,6 +204,10 @@ export function ProductPriceCards({
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+            <p className={`mt-2 rounded-xl p-3 text-xs font-black ring-1 ${freshnessStyles[card.priceFreshnessTone]}`}>
+              {card.priceFreshnessLabel}
+              <span className="mt-1 block font-bold">{card.priceRefreshHint}</span>
+            </p>
             <PriceHistorySparkline card={card} />
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
             {card.cheapestUnitBadge ? (

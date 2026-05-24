@@ -52,6 +52,7 @@ export const snapshot = {
 };
 
 const observedSnapshotCurrency = currencyFromObservation({ currency: 'SEK' });
+const axfoodSnapshotObservedAt = '2026-05-21T00:00:00.000Z';
 const pct = new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 });
 
 export function formatSek(value: number | null | undefined) {
@@ -1901,6 +1902,9 @@ export type AdaptiveProductCard = {
   unitPriceLabel: string;
   packageLabel: string;
   sourceLabel: string;
+  priceFreshnessLabel: string;
+  priceFreshnessTone: 'fresh' | 'aging' | 'stale';
+  priceRefreshHint: string;
   confidenceLabel: string;
   totalSortPrice: number;
   unitSortPrice: number | null;
@@ -1919,6 +1923,29 @@ export type AdaptiveProductCard = {
   sparklineLabel: string;
   isAvailable: boolean;
 };
+
+function priceFreshness(observedAt: string, sourceLabel: string): Pick<AdaptiveProductCard, 'priceFreshnessLabel' | 'priceFreshnessTone' | 'priceRefreshHint'> {
+  const observedTime = Date.parse(observedAt);
+  const ageDays = Number.isFinite(observedTime)
+    ? Math.max(0, Math.floor((Date.now() - observedTime) / 86_400_000))
+    : null;
+  const ageLabel = ageDays === null
+    ? 'unknown scrape age'
+    : ageDays === 0
+      ? 'scraped today'
+      : `scraped ${ageDays}d ago`;
+  const tone = ageDays === null || ageDays > 7 ? 'stale' : ageDays > 2 ? 'aging' : 'fresh';
+
+  return {
+    priceFreshnessLabel: `${tone === 'fresh' ? 'Fresh' : tone === 'aging' ? 'Check soon' : 'Stale'} · ${ageLabel}`,
+    priceFreshnessTone: tone,
+    priceRefreshHint: tone === 'stale'
+      ? `Refresh ${sourceLabel} before promoting this price.`
+      : tone === 'aging'
+        ? `Re-scrape ${sourceLabel} before time-sensitive deal copy.`
+        : `No refresh needed for ${sourceLabel}.`
+  };
+}
 
 function isOpenPricesProduct(product: ItemComparisonProduct): product is (typeof pricedProducts)[number] {
   return 'observations' in product;
@@ -1964,6 +1991,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     : [];
   const sparklinePoints = sevenDaySparklinePoints(product);
   const priceDrop = priceDropFromThirtyDayHistory(product);
+  const freshness = priceFreshness(isChainProduct ? axfoodSnapshotObservedAt : product.lastObservedAt, isChainProduct ? product.lowestChain : 'OpenPrices');
 
   return {
     slug: product.slug,
@@ -1980,6 +2008,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     }) : unknownUnitPriceLabel,
     packageLabel: normalizedUnit?.packageLabel || packageText || 'Package size not reported',
     sourceLabel: isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
+    ...freshness,
     confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
     totalSortPrice: totalPrice,
     unitSortPrice: normalizedUnit?.unitSortPrice ?? null,
