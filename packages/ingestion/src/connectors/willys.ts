@@ -10,6 +10,14 @@ export type WillysProduct = {
   priceText: string;
   unitPriceText: string;
   unitPriceUnit: string;
+  channel: 'online' | 'store';
+  format: 'willys' | 'willys_hemma';
+  region: string;
+  is_member_price: boolean;
+  is_subscription_price: boolean;
+  is_coupon_price: boolean;
+  is_clearance: boolean;
+  multi_buy: { quantity: number; price: number } | null;
   imageUrl: string;
   labels: string[];
   online: boolean;
@@ -36,6 +44,14 @@ export type WillysWeeklyDiscount = {
   promotionType: string;
   price: number;
   priceText: string;
+  channel: 'store';
+  format: 'willys' | 'willys_hemma';
+  region: string;
+  is_member_price: boolean;
+  is_subscription_price: boolean;
+  is_coupon_price: boolean;
+  is_clearance: boolean;
+  multi_buy: { quantity: number; price: number } | null;
   comparePriceText: string;
   regularPriceText: string;
   savePriceText: string;
@@ -659,6 +675,8 @@ export async function fetchWillysProductsForAllStores(
       });
       return products.map((product) => ({
         ...product,
+        format: formatForWillysStore(store.name),
+        region: regionTagForWillysStore(store.city),
         storeId: store.storeId,
         storeName: store.name,
         city: store.city
@@ -759,6 +777,8 @@ export async function fetchWillysWeeklyDiscountsForAllStores(
       });
       return discounts.map((discount) => ({
         ...discount,
+        format: formatForWillysStore(store.name),
+        region: regionTagForWillysStore(store.city),
         storeName: store.name,
         city: store.city
       }));
@@ -819,6 +839,14 @@ export function normalizeWillysProduct(
     priceText: text(product.price),
     unitPriceText: text(product.comparePrice),
     unitPriceUnit: text(product.comparePriceUnit),
+    channel: product.online === true ? 'online' : 'store',
+    format: 'willys',
+    region: '',
+    is_member_price: includesWillysPlus(text(product.price), stringArray(product.labels).join(' ')),
+    is_subscription_price: false,
+    is_coupon_price: false,
+    is_clearance: false,
+    multi_buy: null,
     imageUrl: text(product.image?.url),
     labels: stringArray(product.labels),
     online: product.online === true,
@@ -855,6 +883,14 @@ export function normalizeWillysWeeklyDiscount(
     promotionType: text(promotion.promotionType),
     price,
     priceText: text(promotion.cartLabel) || text(promotion.rewardLabel),
+    channel: 'store',
+    format: 'willys',
+    region: '',
+    is_member_price: includesWillysPlus(text(promotion.campaignType), text(promotion.promotionType), text(promotion.cartLabel), text(promotion.rewardLabel), stringArray(product.labels).join(' ')),
+    is_subscription_price: false,
+    is_coupon_price: includesCouponSignal(text(promotion.conditionLabel), text(promotion.redeemLimitLabel), text(promotion.cartLabel), text(promotion.rewardLabel)),
+    is_clearance: false,
+    multi_buy: multiBuyFromPromotionText(text(promotion.conditionLabel) || text(promotion.cartLabel) || text(promotion.rewardLabel), price),
     comparePriceText: text(promotion.comparePrice),
     regularPriceText: text(product.priceNoUnit),
     savePriceText: text(promotion.savePrice),
@@ -879,6 +915,32 @@ function epochMillisToIso(value: unknown): string {
 
 function firstString(value: unknown): string {
   return Array.isArray(value) ? text(value.find((item) => typeof item === 'string')) : '';
+}
+
+function formatForWillysStore(storeName: string): 'willys' | 'willys_hemma' {
+  return /willys\s+hemma/i.test(storeName) ? 'willys_hemma' : 'willys';
+}
+
+function regionTagForWillysStore(city: string): string {
+  return city.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function includesWillysPlus(...values: string[]): boolean {
+  return values.some((value) => /willys\s*plus|\bplus\b|loyalty/i.test(value));
+}
+
+function includesCouponSignal(...values: string[]): boolean {
+  return values.some((value) => /kupong|coupon|rabattkod|kod\b/i.test(value));
+}
+
+function multiBuyFromPromotionText(value: string, price: number): { quantity: number; price: number } | null {
+  const match = value.match(/(\d+)\s*(?:för|for)\s*(\d+(?:[,.]\d+)?)/i);
+  if (!match) return null;
+  const quantity = Number(match[1]);
+  const multiBuyPrice = Number(match[2]!.replace(',', '.'));
+  return Number.isFinite(quantity) && quantity > 1 && Number.isFinite(multiBuyPrice)
+    ? { quantity, price: multiBuyPrice }
+    : null;
 }
 
 function text(value: unknown): string {

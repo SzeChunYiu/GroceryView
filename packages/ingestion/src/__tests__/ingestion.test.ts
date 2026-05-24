@@ -3770,7 +3770,7 @@ describe('fetchWillysProductsForAllStores', () => {
       requestedUrls.push(String(url));
       if (String(url).includes('/axfood/rest/store')) {
         return new Response(JSON.stringify([
-          { storeId: '2149', name: 'Willys Alingsås Hagaplan', address: { line1: 'Hagaplan 1', town: 'Alingsås', postalCode: '44131' }, onlineStore: true },
+          { storeId: '2149', name: 'Willys Hemma Alingsås Hagaplan', address: { line1: 'Hagaplan 1', town: 'Alingsås', postalCode: '44131' }, onlineStore: true },
           { storeId: '2268', name: 'Willys Avesta', address: { line1: 'Köpmangatan 1', town: 'Avesta', postalCode: '77430' }, onlineStore: true }
         ]), { status: 200, headers: { 'content-type': 'application/json' } });
       }
@@ -3797,6 +3797,7 @@ describe('fetchWillysProductsForAllStores', () => {
 
     assert.equal(rows.length, 2);
     assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['2149', 70.88], ['2268', 71.9]]);
+    assert.deepEqual(rows.map((row) => [row.format, row.region]), [['willys_hemma', 'alingsas'], ['willys', 'avesta']]);
     assert.deepEqual(requestedUrls.filter((url) => url.includes('/search?')), [
       buildWillysSearchUrl('kaffe', '2149'),
       buildWillysSearchUrl('kaffe', '2268')
@@ -4181,6 +4182,14 @@ describe('fetchWillysProducts', () => {
       priceText: '12,20 kr',
       unitPriceText: '16,27 kr',
       unitPriceUnit: 'kg',
+      channel: 'online',
+      format: 'willys',
+      region: '',
+      is_member_price: false,
+      is_subscription_price: false,
+      is_coupon_price: false,
+      is_clearance: false,
+      multi_buy: null,
       imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
       labels: ['keyhole'],
       online: true,
@@ -4236,7 +4245,7 @@ describe('fetchWillysWeeklyDiscounts', () => {
             comparePrice: '119:60 kr/kg',
             savePrice: 'Spara 5,00 kr',
             weightVolume: 'Styck',
-            conditionLabel: null,
+            conditionLabel: '3 för 79 kr med kupong',
             redeemLimitLabel: 'Max 5 köp',
             startDate: '20/05-2026',
             endDate: '24/05-2026',
@@ -4266,11 +4275,19 @@ describe('fetchWillysWeeklyDiscounts', () => {
       promotionType: 'MixMatchPricePromotion',
       price: 29.9,
       priceText: '29,90/st',
+      channel: 'store',
+      format: 'willys',
+      region: '',
+      is_member_price: true,
+      is_subscription_price: false,
+      is_coupon_price: true,
+      is_clearance: false,
+      multi_buy: { quantity: 3, price: 79 },
       comparePriceText: '119:60 kr/kg',
       regularPriceText: '34.9',
       savePriceText: 'Spara 5,00 kr',
       packageText: 'Styck',
-      conditionText: '',
+      conditionText: '3 för 79 kr med kupong',
       redeemLimitText: 'Max 5 köp',
       startDate: '20/05-2026',
       endDate: '24/05-2026',
@@ -4369,7 +4386,7 @@ describe('fetchWillysWeeklyDiscounts', () => {
       requestedUrls.push(String(url));
       if (String(url).includes('/axfood/rest/store')) {
         return new Response(JSON.stringify([
-          { storeId: '2110', name: 'Willys Kungsbacka Hede', address: { line1: 'Tölöleden 3', town: 'Kungsbacka' } },
+          { storeId: '2110', name: 'Willys Hemma Kungsbacka Hede', address: { line1: 'Tölöleden 3', town: 'Kungsbacka' } },
           { storeId: '2187', name: 'Willys Oskarshamn Snickeriet', address: { line1: 'Snickerivägen 1', town: 'Oskarshamn' } }
         ]), { status: 200, headers: { 'content-type': 'application/json' } });
       }
@@ -4405,9 +4422,10 @@ describe('fetchWillysWeeklyDiscounts', () => {
     ]);
     assert.deepEqual(rows.map((row) => row.storeId), ['2110', '2187']);
     assert.deepEqual(rows.map((row) => [row.storeName, row.city]), [
-      ['Willys Kungsbacka Hede', 'Kungsbacka'],
+      ['Willys Hemma Kungsbacka Hede', 'Kungsbacka'],
       ['Willys Oskarshamn Snickeriet', 'Oskarshamn']
     ]);
+    assert.deepEqual(rows.map((row) => [row.format, row.region]), [['willys_hemma', 'kungsbacka'], ['willys', 'oskarshamn']]);
   });
 
 
