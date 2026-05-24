@@ -146,7 +146,7 @@ Write policy: daily ingestion uses change-only writes. Before inserting a new im
 
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
-Indexes: product/time, store/time, price type/time, provenance GIN, and `observations_connector_idempotency_idx` for exact connector replay idempotency without updating stored history.
+Indexes: product/time, store/time, price type/time, provenance GIN, and `observations_connector_idempotency_idx` as the compound unique price snapshot guard for scraper upserts and exact connector replay idempotency without updating stored history.
 
 ### `observations_v2`
 

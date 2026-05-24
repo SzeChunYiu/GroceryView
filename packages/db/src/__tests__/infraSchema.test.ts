@@ -122,6 +122,11 @@ describe('infra/db PostgreSQL schema contract', () => {
   });
 
   it('keeps connector observation writes idempotent without overwriting history', () => {
+    assert.equal(
+      readdirSync(migrationsDir).includes('019_price_snapshot_unique_index.sql'),
+      true,
+      'price snapshot unique index migration missing'
+    );
     assert.match(allMigrations, /create unique index if not exists observations_connector_idempotency_idx/);
     for (const column of [
       'product_id',
@@ -141,7 +146,9 @@ describe('infra/db PostgreSQL schema contract', () => {
       assert.match(allMigrations, new RegExp(`\\b${column}\\b`), `idempotency index missing ${column}`);
     }
     assert.match(allMigrations, /nulls not distinct/);
+    assert.match(allMigrations, /comment on index observations_connector_idempotency_idx is 'compound unique price snapshot guard/i);
     assert.match(schemaDoc, /exact connector replay idempotency/);
+    assert.match(schemaDoc, /scraper upserts/i);
   });
 
   it('tracks observation availability through immutable rows, rollups, and static snapshots', () => {

@@ -3690,7 +3690,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '014_fuel_price_sources',
   '016_observation_connector_idempotency',
   '017_observation_availability',
-  '018_household_collaboration_rls'
+  '018_household_collaboration_rls',
+  '019_price_snapshot_unique_index'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -4463,6 +4464,21 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
                from existing
                where existing.ordinal = ranked_input.ordinal
              )
+           on conflict (
+             product_id,
+             chain_id,
+             store_id,
+             domain,
+             retailer_product_ref,
+             price_type,
+             observed_at,
+             price,
+             unit_price,
+             currency,
+             is_available,
+             confidence,
+             provenance
+           ) do nothing
            returning id, product_id, chain_id, store_id, domain, retailer_product_ref, price_type, price, regular_price, unit_price, currency, is_available, observed_at, confidence, provenance
          ),
          written as (
