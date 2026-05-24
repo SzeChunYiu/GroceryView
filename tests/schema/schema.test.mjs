@@ -117,4 +117,8 @@ describe('db/schema.sql', () => {
     assert.match(schema, /on price_observations\s*\(\s*product_id,\s*chain_id,\s*store_id,\s*observed_at,\s*source_type\s*\)/);
     assert.match(schema, /nulls not distinct/);
   });
+
+  it('deduplicates barcoded products by canonical barcode when present', () => {
+    assert.match(schema, /create unique index if not exists products_barcode_unique_idx on products\s*\(\s*barcode\s*\) where barcode is not null/);
+  });
 });

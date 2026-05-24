@@ -395,6 +395,7 @@ create index if not exists price_observations_domain_time_idx on price_observati
 create unique index if not exists price_observations_product_store_date_uidx on price_observations(product_id, chain_id, store_id, observed_at, source_type) nulls not distinct;
 create index if not exists promotion_observations_product_dates_idx on promotion_observations(product_id, promo_start, promo_end);
 create index if not exists products_category_idx on products(category_id);
+create unique index if not exists products_barcode_unique_idx on products (barcode) where barcode is not null;
 create index if not exists products_fuel_grade_idx on products(fuel_grade_id) where domain = 'fuel';
 create index if not exists subscription_entitlements_status_idx on subscription_entitlements (status, updated_at desc);
 create unique index if not exists subscription_entitlements_provider_subscription_idx on subscription_entitlements (provider, provider_subscription_id) where provider_subscription_id is not null;
