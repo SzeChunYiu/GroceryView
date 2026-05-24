@@ -17,6 +17,8 @@
 "use client";
 
 import { useState } from "react";
+import { BasketActions } from "./basket-actions";
+import { BasketTotals } from "./basket-totals";
 
 export type BasketBuilderProduct = {
   id: string;
@@ -49,23 +51,8 @@ export function BasketBuilder<T extends BasketBuilderProduct>({
 
   return (
     <section aria-label="Basket builder">
-      <ul>
-        {products.map((product) => (
-          <li key={product.id}>
-            <span>{product.name}</span>
-            <button type="button" onClick={() => add(product)}>
-              Add
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      <h2>Basket</h2>
-      <ul>
-        {basketProducts.map((product) => (
-          <li key={product.id}>{product.name}</li>
-        ))}
-      </ul>
+      <BasketActions products={products} onAdd={add} />
+      <BasketTotals products={basketProducts} />
     </section>
   );
 }
