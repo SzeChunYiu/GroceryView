@@ -1,4 +1,13 @@
 export {
+  createTransactionalEmailClient,
+  type CreateTransactionalEmailClientOptions,
+  type TransactionalEmailClient,
+  type TransactionalEmailFetch,
+  type TransactionalEmailMessage,
+  type TransactionalEmailProvider
+} from './transactionalEmail.js';
+
+export {
   createTelegramBotProvider,
   planTelegramPriceAlertNotifications,
   type PlanTelegramPriceAlertNotificationsInput,

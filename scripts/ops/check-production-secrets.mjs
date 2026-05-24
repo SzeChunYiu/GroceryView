@@ -11,6 +11,8 @@ export const requiredGithubActionSecrets = [
   'VERCEL_ORG_ID',
   'VERCEL_PROJECT_ID',
   'METRICS_TOKEN',
+  'RESEND_API_KEY',
+  'WEEKLY_DIGEST_FROM_EMAIL',
   'GROCERYVIEW_SCANNER_BEARER_TOKEN'
 ];
 
