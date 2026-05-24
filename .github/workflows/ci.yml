@@ -20,12 +20,34 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run tests
+        id: tests
         run: npm test
       - name: Build workspaces
+        id: build
         run: npm run build
       - name: Next profile bundle budget
+        id: bundle
         run: npm run perf:bundle:profile -w @groceryview/web
       - name: Lighthouse performance budget
+        id: lighthouse
         run: npm run perf:lighthouse:ci -w @groceryview/web
       - name: Typecheck
+        id: typecheck
         run: npm run typecheck
+      - name: Generate dated test report
+        if: always()
+        env:
+          TEST_STEP_OUTCOME: ${{ steps.tests.outcome }}
+          BUILD_STEP_OUTCOME: ${{ steps.build.outcome }}
+          BUNDLE_STEP_OUTCOME: ${{ steps.bundle.outcome }}
+          LIGHTHOUSE_STEP_OUTCOME: ${{ steps.lighthouse.outcome }}
+          TYPECHECK_STEP_OUTCOME: ${{ steps.typecheck.outcome }}
+        run: node --experimental-strip-types scripts/test-report.ts
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            docs/test-results/*.md
+            docs/testing/INDEX.md
