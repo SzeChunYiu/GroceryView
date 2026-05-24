@@ -53,6 +53,7 @@ REQUIRED_TABLES=(
   chains
   stores
   products
+  produce_classes
   fuel_grades
   aliases
   source_runs

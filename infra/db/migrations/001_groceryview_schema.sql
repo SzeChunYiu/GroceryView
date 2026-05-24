@@ -54,6 +54,18 @@ create table if not exists products (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists produce_classes (
+  id text primary key,
+  parent_id text references produce_classes(id) on delete restrict,
+  label text not null,
+  segment text not null check (segment in ('fruit', 'vegetable', 'herb', 'mushroom', 'other')),
+  depth integer not null check (depth >= 0),
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  check ((depth = 0 and parent_id is null) or (depth > 0 and parent_id is not null))
+);
+
 create table if not exists aliases (
   id uuid primary key default gen_random_uuid(),
   product_id uuid references products(id) on delete cascade,
@@ -211,6 +223,8 @@ create index if not exists stores_slug_trgm_idx on stores using gin (slug gin_tr
 create unique index if not exists products_barcode_unique_idx on products (barcode) where barcode is not null;
 create index if not exists products_name_trgm_idx on products using gin (canonical_name gin_trgm_ops);
 create index if not exists products_slug_trgm_idx on products using gin (slug gin_trgm_ops);
+create index if not exists produce_classes_parent_sort_idx on produce_classes (parent_id, sort_order, id);
+create index if not exists produce_classes_segment_depth_idx on produce_classes (segment, depth, sort_order, id);
 create index if not exists aliases_normalized_trgm_idx on aliases using gin (normalized_alias gin_trgm_ops);
 create index if not exists observations_product_observed_idx on observations (product_id, observed_at desc);
 create index if not exists observations_store_observed_idx on observations (store_id, observed_at desc);

@@ -18,6 +18,7 @@ const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/mi
 const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/010_basket_import_reviews.sql'), 'utf8').toLowerCase();
 const priceAlertsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/011_price_alerts.sql'), 'utf8').toLowerCase();
 const telegramNotificationsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/018_telegram_notifications.sql'), 'utf8').toLowerCase();
+const produceClassesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/022_produce_classes.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql') && !entry.startsWith('._'))
@@ -33,6 +34,7 @@ const requiredTables = [
   'chains',
   'stores',
   'products',
+  'produce_classes',
   'aliases',
   'source_runs',
   'raw_records',
@@ -257,6 +259,22 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(allMigrations, /products_fuel_grade_domain_check/);
     assert.match(schemaDoc, /fuel prices are always price per litre/);
     assert.match(schemaDoc, /community_reporter_trust/);
+  });
+
+  it('bootstraps produce classes before produce label seeds run', () => {
+    const produceClasses = allMigrations.match(/create table if not exists produce_classes \(([\s\S]*?)\n\);/)?.[1] ?? '';
+    assert.match(allMigrations, /create table if not exists produce_classes\b/);
+    for (const column of ['id text primary key', 'parent_id text references produce_classes(id) on delete restrict', 'segment text not null', 'depth integer not null', 'sort_order integer not null default 0']) {
+      assert.match(produceClasses, new RegExp(column.replace(/[()]/g, '\\\\$&')), `produce_classes missing ${column}`);
+    }
+    assert.match(produceClasses, /check \(segment in \('fruit', 'vegetable', 'herb', 'mushroom', 'other'\)\)/);
+    assert.match(produceClasses, /check \(depth >= 0\)/);
+    assert.match(produceClasses, /check \(\(depth = 0 and parent_id is null\) or \(depth > 0 and parent_id is not null\)\)/);
+    assert.match(produceClassesMigration, /produce_classes_parent_sort_idx on produce_classes \(parent_id, sort_order, id\)/);
+    assert.match(produceClassesMigration, /produce_classes_segment_depth_idx on produce_classes \(segment, depth, sort_order, id\)/);
+    assert.match(schemaDoc, /### `produce_classes`/);
+    assert.match(schemaDoc, /before produce class seeds run/);
+    assert.match(migrationVerifier, /\bproduce_classes\b/);
   });
 
   it('persists retailer source policy decisions before ingestion fetches run', () => {

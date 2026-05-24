@@ -31,6 +31,18 @@ create table if not exists categories (
   name text not null
 );
 
+create table if not exists produce_classes (
+  id text primary key,
+  parent_id text references produce_classes(id) on delete restrict,
+  label text not null,
+  segment text not null check (segment in ('fruit', 'vegetable', 'herb', 'mushroom', 'other')),
+  depth integer not null check (depth >= 0),
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  check ((depth = 0 and parent_id is null) or (depth > 0 and parent_id is not null))
+);
+
 create table if not exists products (
   id text primary key,
   barcode text,
@@ -397,6 +409,8 @@ create index if not exists price_observations_domain_time_idx on price_observati
 create unique index if not exists price_observations_product_store_date_uidx on price_observations(product_id, chain_id, store_id, observed_at, source_type) nulls not distinct;
 create index if not exists promotion_observations_product_dates_idx on promotion_observations(product_id, promo_start, promo_end);
 create index if not exists products_category_idx on products(category_id);
+create index if not exists produce_classes_parent_sort_idx on produce_classes (parent_id, sort_order, id);
+create index if not exists produce_classes_segment_depth_idx on produce_classes (segment, depth, sort_order, id);
 create index if not exists products_fuel_grade_idx on products(fuel_grade_id) where domain = 'fuel';
 create index if not exists subscription_entitlements_status_idx on subscription_entitlements (status, updated_at desc);
 create unique index if not exists subscription_entitlements_provider_subscription_idx on subscription_entitlements (provider, provider_subscription_id) where provider_subscription_id is not null;

@@ -72,6 +72,14 @@ Key columns: `slug`, `canonical_name`, localized display names (`name_sv`, `name
 
 Indexes: `products_name_trgm_idx`, `products_name_sv_trgm_idx`, `products_name_en_trgm_idx`, and `products_slug_trgm_idx` for fuzzy product search; `products_commodity_idx` and `products_kind_idx` for commodity matching.
 
+### `produce_classes`
+
+Canonical hierarchy for fresh produce classification. Production bootstrap creates this table before produce class seeds run so raw produce labels can map to stable class ids.
+
+Key columns: `id`, `parent_id`, `label`, `segment` (`fruit`|`vegetable`|`herb`|`mushroom`|`other`), `depth`, and `sort_order`.
+
+Indexes: `produce_classes_parent_sort_idx` for hierarchy reads and `produce_classes_segment_depth_idx` for segment-level browse and matching.
+
 ### `commodities`
 
 Canonical generic products for unbranded / loose items (meat, vegetables, fruit, bakery, bulk) that have no EAN and are sold by weight. Chain loose items map here via `products.commodity_id`; cross-chain comparison is on `unit_price` (kr/kg, kr/l, kr/st), not barcode. `is_staple` marks the representative basket behind the per-chain fresh-food index. Starter taxonomy: `packages/catalog/src/commodities.ts`.
