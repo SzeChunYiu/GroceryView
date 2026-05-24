@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, Home, ScanLine, ShieldCheck, ShoppingBasket, Users } from "lucide-react";
+import { Bell, Home, MessageSquare, ScanLine, ShieldCheck, ShoppingBasket, Users } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Market", icon: Home },
@@ -8,6 +8,7 @@ const navItems = [
   { href: "/household", label: "Household", icon: Users },
   { href: "/privacy", label: "Privacy", icon: ShieldCheck },
   { href: "/account", label: "Alerts", icon: Bell },
+  { href: "/feedback", label: "Feedback", icon: MessageSquare },
 ];
 
 export function AppNav() {

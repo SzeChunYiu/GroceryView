@@ -10,6 +10,7 @@ import { PricesModule } from './prices/prices.module.js';
 import { ProductsModule } from './products/products.module.js';
 import { AdminRoutesController } from './routes/admin.js';
 import { StoresModule } from './stores/stores.module.js';
+import { FeedbackRoutesController } from './routes/feedback.js';
 import { UsersModule } from './users/users.module.js';
 import { WatchlistsModule } from './watchlists/watchlists.module.js';
 
@@ -26,6 +27,6 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     BasketsModule,
     AlertsModule
   ],
-  controllers: [AppController, AdminRoutesController]
+  controllers: [AppController, AdminRoutesController, FeedbackRoutesController]
 })
 export class AppModule {}
