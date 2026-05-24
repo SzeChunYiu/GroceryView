@@ -17,12 +17,26 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
+export type ShareLinkState = {
+  error: string | null;
+  expiresAt: string | null;
+  isExpired: boolean;
+  isValid: boolean;
+  token: string;
+};
+
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
 };
 
+type SignedSharePayload = {
+  expiresAt?: string | null;
+  listId?: string;
+};
+
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
+const LIST_SHARE_PUBLIC_SECRET = process.env.NEXT_PUBLIC_LIST_SHARE_SECRET || 'local-list-share-development-secret';
 
 const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   {
@@ -107,6 +121,55 @@ function withCheckedState(checkedById: Record<string, boolean>, importedItems: B
   }));
 }
 
+function decodeBase64Url(value: string) {
+  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  return atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '='));
+}
+
+function encodeSignature(buffer: ArrayBuffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+async function hmacSignature(encodedPayload: string) {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(LIST_SHARE_PUBLIC_SECRET),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(encodedPayload));
+  return encodeSignature(signature);
+}
+
+async function verifyShareToken(token: string): Promise<ShareLinkState> {
+  const [encodedPayload, signature, extra] = token.split('.');
+  if (!encodedPayload || !signature || extra !== undefined) {
+    return { token, expiresAt: null, isExpired: false, isValid: false, error: 'Invalid read-only list link signature.' };
+  }
+
+  const expectedSignature = await hmacSignature(encodedPayload);
+  if (signature !== expectedSignature) {
+    return { token, expiresAt: null, isExpired: false, isValid: false, error: 'Invalid read-only list link signature.' };
+  }
+
+  const payload = JSON.parse(decodeBase64Url(encodedPayload)) as SignedSharePayload;
+  const expiresAt = typeof payload.expiresAt === 'string' ? payload.expiresAt : null;
+  const expiresAtMs = expiresAt ? Date.parse(expiresAt) : Number.POSITIVE_INFINITY;
+  const isExpired = Number.isFinite(expiresAtMs) && expiresAtMs <= Date.now();
+
+  return {
+    token,
+    expiresAt,
+    isExpired,
+    isValid: !isExpired,
+    error: isExpired ? 'This read-only shopping list link has expired.' : null
+  };
+}
+
 function persistCheckedState(items: ShoppingListItem[]) {
   try {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
@@ -130,20 +193,37 @@ function persistCheckedState(items: ShoppingListItem[]) {
 export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
+  const [shareLink, setShareLink] = useState<ShareLinkState | null>(null);
 
   useEffect(() => {
-    try {
-      const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
-      setItems(withCheckedState(checkedById, importedItems));
-    } finally {
-      setHasLoadedBrowserState(true);
+    let cancelled = false;
+
+    async function loadBrowserState() {
+      try {
+        const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
+        const token = new URLSearchParams(window.location.search).get('share');
+        if (token) {
+          const verifiedShare = await verifyShareToken(token);
+          if (!cancelled) setShareLink(verifiedShare);
+          if (!verifiedShare.isValid) return;
+        }
+        if (!cancelled) setItems(withCheckedState(checkedById, importedItems));
+      } finally {
+        if (!cancelled) setHasLoadedBrowserState(true);
+      }
     }
+
+    void loadBrowserState();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
-    if (!hasLoadedBrowserState) return;
+    if (!hasLoadedBrowserState || shareLink?.isValid) return;
     persistCheckedState(items);
-  }, [hasLoadedBrowserState, items]);
+  }, [hasLoadedBrowserState, items, shareLink?.isValid]);
 
   const toggleItemChecked = useCallback((itemId: string) => {
     setItems((currentItems) => currentItems.map((item) => (
@@ -176,6 +256,7 @@ export function useList() {
     items,
     remainingCount,
     resetCheckedState,
+    shareLink,
     toggleItemChecked,
     totalCount
   };
