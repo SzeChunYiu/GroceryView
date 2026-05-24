@@ -46,6 +46,7 @@ create table if not exists products (
   gluten_free boolean not null default false,
   vegan boolean not null default false,
   image_url text,
+  view_count integer not null default 0,
   nutrition_source text,
   created_at timestamptz not null default now()
 );
@@ -305,6 +306,7 @@ create index if not exists price_observations_product_time_idx on price_observat
 create index if not exists price_observations_store_time_idx on price_observations(store_id, observed_at desc);
 create index if not exists promotion_observations_product_dates_idx on promotion_observations(product_id, promo_start, promo_end);
 create index if not exists products_category_idx on products(category_id);
+create index if not exists products_view_count_idx on products(view_count desc);
 create index if not exists subscription_entitlements_status_idx on subscription_entitlements (status, updated_at desc);
 create unique index if not exists subscription_entitlements_provider_subscription_idx on subscription_entitlements (provider, provider_subscription_id) where provider_subscription_id is not null;
 create index if not exists community_reporter_trust_pending_idx on community_reporter_trust(pending_reports desc);

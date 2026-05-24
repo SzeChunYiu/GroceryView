@@ -1,6 +1,7 @@
 import { createGroceryViewApi, type ProductDetail, type Store } from '@groceryview/api';
 
 export const groceryApi = createGroceryViewApi();
+const productViewCounts = new Map<string, number>();
 
 export type ProductPriceDto = ProductDetail['currentPrices'][number] & {
   productId: string;
@@ -34,6 +35,20 @@ export function allProducts(query = '') {
     currentPrices: productPrices(product.id),
     demo: true
   }));
+}
+
+export function productById(id: string) {
+  return groceryApi.getProduct(id);
+}
+
+export function incrementProductViewCount(id: string): number {
+  const nextCount = (productViewCounts.get(id) ?? 0) + 1;
+  productViewCounts.set(id, nextCount);
+  return nextCount;
+}
+
+export function getProductViewCount(id: string): number {
+  return productViewCounts.get(id) ?? 0;
 }
 
 export function allStores(): Array<Store & { demo: true }> {

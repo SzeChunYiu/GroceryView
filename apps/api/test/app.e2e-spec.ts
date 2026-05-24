@@ -33,6 +33,7 @@ describe('GroceryView API app', () => {
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/health']);
     assert.ok(docs.body.paths['/products']);
+    assert.ok(docs.body.paths['/products/{id}']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
     assert.ok(docs.body.paths['/stores']);
@@ -45,7 +46,15 @@ describe('GroceryView API app', () => {
     assert.equal(products.body[0].currentPrices[0].sourceType, 'demo_seed');
     assert.ok(products.body[0].currentPrices[0].provenance);
 
-    await request(app.getHttpServer()).get('/products/coffee').expect(200);
+    const firstDetail = await request(app.getHttpServer()).get('/products/coffee').expect(200);
+    assert.equal(firstDetail.body.id, 'coffee');
+    assert.equal(firstDetail.body.viewCount, 1);
+    assert.equal(firstDetail.body.views, 1);
+
+    const secondDetail = await request(app.getHttpServer()).get('/products/coffee').expect(200);
+    assert.equal(secondDetail.body.id, 'coffee');
+    assert.equal(secondDetail.body.viewCount, 2);
+    assert.equal(secondDetail.body.views, 2);
     await request(app.getHttpServer()).get('/stores/willys-odenplan').expect(200);
 
     const prices = await request(app.getHttpServer()).get('/products/coffee/prices').expect(200);

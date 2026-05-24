@@ -328,6 +328,7 @@ export type ProductCatalogRecord = {
   comparableUnit: string;
   nutrition: Record<string, unknown>;
   imageUrl?: string;
+  viewCount?: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -404,6 +405,18 @@ export type PostgresCatalogReader = {
   listProducts(filter?: ProductCatalogListFilter): Promise<ProductCatalogRecord[]>;
   getStoreBySlug(slug: string): Promise<StoreCatalogRecord | null>;
   listStores(filter?: StoreCatalogListFilter): Promise<StoreCatalogRecord[]>;
+};
+
+export type ProductViewCounterQueryFilter = {
+  limit?: number;
+};
+
+export type PostgresProductViewRepository = {
+  incrementProductViewCountById(productId: string): Promise<number>;
+  incrementProductViewCountBySlug(productSlug: string): Promise<number>;
+  getProductViewCountById(productId: string): Promise<number>;
+  getProductViewCountBySlug(productSlug: string): Promise<number>;
+  listMostViewedProducts(filter?: ProductViewCounterQueryFilter): Promise<ProductCatalogRecord[]>;
 };
 
 export type PostgresProductAliasRepository = {
@@ -1396,10 +1409,12 @@ type ProductCatalogRow = {
   package_unit: string | null;
   comparable_unit: string;
   nutrition: Record<string, unknown> | string | null;
+  view_count?: string | number | null;
   image_url: string | null;
   created_at: string | Date;
   updated_at: string | Date;
 };
+type ProductViewCountRow = { view_count: string | number };
 type StoreCatalogRow = {
   id: string;
   chain_id: string;
@@ -1536,6 +1551,7 @@ function mapProductCatalog(row: ProductCatalogRow): ProductCatalogRecord {
     comparableUnit: row.comparable_unit,
     nutrition: asRecord(row.nutrition),
     ...(row.image_url ? { imageUrl: row.image_url } : {}),
+    ...(row.view_count === undefined ? {} : { viewCount: Number(row.view_count) }),
     createdAt: asIso(row.created_at),
     updatedAt: asIso(row.updated_at)
   };
@@ -2579,6 +2595,7 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
                 package_unit,
                 comparable_unit,
                 nutrition,
+                view_count,
                 image_url,
                 created_at,
                 updated_at
@@ -2605,6 +2622,7 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
                 package_unit,
                 comparable_unit,
                 nutrition,
+                view_count,
                 image_url,
                 created_at,
                 updated_at
@@ -2734,6 +2752,80 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
         [filter.search ?? null, filter.chainSlug ?? null, filter.city ?? null, limit]
       );
       return rows.map(mapStoreCatalog);
+    }
+  };
+}
+
+function mapViewCount(value: string | number | null | undefined): number {
+  if (value === null || value === undefined) return 0;
+  return Number(value);
+}
+
+export function createPostgresProductViewRepository(executor: QueryExecutor): PostgresProductViewRepository {
+  const coerceLimit = (value: number | undefined) => Math.min(Math.max(value ?? 25, 1), 500);
+
+  const readCount = async (field: 'id' | 'slug', value: string): Promise<number> => {
+    const rows = await executor.query<ProductViewCountRow>(
+      `select view_count from products where ${field} = $1`,
+      [value]
+    );
+    return mapViewCount(rows[0]?.view_count);
+  };
+
+  const incrementCount = async (field: 'id' | 'slug', value: string): Promise<number> => {
+    const rows = await executor.query<ProductViewCountRow>(
+      `update products
+       set view_count = coalesce(view_count, 0) + 1,
+           updated_at = now()
+       where ${field} = $1
+       returning view_count`,
+      [value]
+    );
+    return mapViewCount(rows[0]?.view_count);
+  };
+
+  return {
+    async incrementProductViewCountById(productId) {
+      return incrementCount('id', productId);
+    },
+
+    async incrementProductViewCountBySlug(productSlug) {
+      return incrementCount('slug', productSlug);
+    },
+
+    async getProductViewCountById(productId) {
+      return readCount('id', productId);
+    },
+
+    async getProductViewCountBySlug(productSlug) {
+      return readCount('slug', productSlug);
+    },
+
+    async listMostViewedProducts(filter = {}) {
+      const limit = coerceLimit(filter.limit);
+      const rows = await executor.query<ProductCatalogRow>(
+        `select id,
+                slug,
+                canonical_name,
+                brand,
+                brand_owner,
+                private_label_owner,
+                barcode,
+                category_path,
+                package_size,
+                package_unit,
+                comparable_unit,
+                nutrition,
+                image_url,
+                view_count,
+                created_at,
+                updated_at
+         from products
+         order by coalesce(view_count, 0) desc, updated_at desc, canonical_name
+         limit $1`,
+        [limit]
+      );
+      return rows.map(mapProductCatalog);
     }
   };
 }

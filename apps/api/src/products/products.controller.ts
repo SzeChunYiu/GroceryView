@@ -26,12 +26,4 @@ export class ProductsController {
     if (!spread) throw new NotFoundException('Product not found');
     return { ...spread, demo: true };
   }
-
-  @Get(':id')
-  @ApiOkResponse({ description: 'Product detail data' })
-  detail(@Param('id') id: string) {
-    const product = groceryApi.getProduct(id);
-    if (!product) throw new NotFoundException('Product not found');
-    return { ...product, demo: true };
-  }
 }
