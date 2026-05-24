@@ -25,9 +25,12 @@ model Product {
   id             String   @id @default(uuid()) @db.Uuid
   slug           String   @unique
   canonicalName  String   @map("canonical_name")
+  name           String?
   nameSv         String?  @map("name_sv")
   nameEn         String?  @map("name_en")
   brand          String?
+  ean            String?  @unique
+  categoryId     String?  @map("category_id")
   categoryPath   String[] @default([]) @map("category_path")
   comparableUnit String   @map("comparable_unit")
   imageUrl       String?  @map("image_url")
