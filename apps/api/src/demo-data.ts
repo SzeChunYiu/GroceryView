@@ -1,4 +1,5 @@
 import { createGroceryViewApi, type ProductDetail, type Store } from '@groceryview/api';
+import { randomUUID } from 'node:crypto';
 
 export const groceryApi = createGroceryViewApi();
 const productViewCounts = new Map<string, number>();
@@ -53,4 +54,50 @@ export function getProductViewCount(id: string): number {
 
 export function allStores(): Array<Store & { demo: true }> {
   return groceryApi.getStores().map((store) => ({ ...store, demo: true }));
+}
+
+export type RecipeIngredientMap = {
+  ingredient: string;
+  amount: string;
+  unit: string;
+  mappedProductId: string;
+};
+
+export type RecipeUpload = {
+  id: string;
+  title: string;
+  instructions: string;
+  ingredientsText: string;
+  ingredientMappings: RecipeIngredientMap[];
+  createdAt: string;
+};
+
+const recipeCatalog: Map<string, RecipeUpload> = new Map();
+
+export function saveRecipeUpload(payload: {
+  title: string;
+  instructions: string;
+  ingredientsText: string;
+  ingredientMappings: RecipeIngredientMap[];
+}) {
+  const id = randomUUID();
+  const recipe: RecipeUpload = {
+    id,
+    title: payload.title.trim(),
+    instructions: payload.instructions.trim(),
+    ingredientsText: payload.ingredientsText.trim(),
+    ingredientMappings: payload.ingredientMappings.map((mapping) => ({
+      ingredient: mapping.ingredient.trim(),
+      amount: mapping.amount.trim(),
+      unit: mapping.unit.trim(),
+      mappedProductId: mapping.mappedProductId.trim()
+    })),
+    createdAt: new Date().toISOString()
+  };
+  recipeCatalog.set(id, recipe);
+  return recipe;
+}
+
+export function listRecipeUploads(): RecipeUpload[] {
+  return [...recipeCatalog.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
