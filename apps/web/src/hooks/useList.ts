@@ -1,10 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { matchedCatalogPriceForListItem } from '@/lib/product-price-helpers';
 
 export type ShoppingListItem = {
   checked: boolean;
   detail: string;
+  estimatedPrice?: number;
+  estimatedPriceLabel?: string;
+  estimatedPriceSource?: string;
   id: string;
   importSource?: 'starter' | 'bulk-clipboard';
   matchedProductName?: string;
@@ -24,6 +28,20 @@ type PersistedListState = {
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
 
+function withMatchedCatalogPrice<T extends Omit<ShoppingListItem, 'checked'>>(item: T): T {
+  const matchedPrice = matchedCatalogPriceForListItem(item.matchedProductSlug ?? item.name);
+  if (!matchedPrice) return item;
+
+  return {
+    ...item,
+    estimatedPrice: matchedPrice.price,
+    estimatedPriceLabel: `${matchedPrice.priceText} at ${matchedPrice.chainName}`,
+    estimatedPriceSource: matchedPrice.sourceLabel,
+    matchedProductName: item.matchedProductName ?? matchedPrice.productName,
+    matchedProductSlug: item.matchedProductSlug ?? matchedPrice.productSlug
+  };
+}
+
 const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   {
     id: 'coffee-weekly-top-up',
@@ -35,13 +53,17 @@ const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
     id: 'oats-breakfast-staple',
     name: 'Oats',
     quantity: '1 bag',
-    detail: 'Breakfast staple'
+    detail: 'Breakfast staple',
+    matchedProductName: 'Havregryn Extra Fylliga',
+    matchedProductSlug: 'havregryn-extra-fylliga-101758934-st'
   },
   {
     id: 'milk-dairy-run',
     name: 'Milk or fil',
     quantity: '2 cartons',
-    detail: 'Dairy aisle check'
+    detail: 'Dairy aisle check',
+    matchedProductName: 'Mjölk 3%',
+    matchedProductSlug: 'mj-lk-3-101205891-st'
   },
   {
     id: 'frozen-vegetables',
@@ -53,9 +75,11 @@ const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
     id: 'fresh-fruit',
     name: 'Fresh fruit',
     quantity: '1 basket',
-    detail: 'Snack and lunchbox item'
+    detail: 'Snack and lunchbox item',
+    matchedProductName: 'Äpple Royal Gala Eko Klass 1',
+    matchedProductSlug: 'pple-royal-gala-eko-klass-1-100475291-kg'
   }
-];
+].map(withMatchedCatalogPrice);
 
 function listStateFromStorage(value: string | null): Required<PersistedListState> {
   const empty = { checkedById: {}, importedItems: [] };
@@ -99,7 +123,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
 function withCheckedState(checkedById: Record<string, boolean>, importedItems: BulkImportedListItemInput[] = []): ShoppingListItem[] {
   const uniqueItems = new Map<string, Omit<ShoppingListItem, 'checked'>>();
   for (const item of baseListItems) uniqueItems.set(item.id, item);
-  for (const item of importedItems) uniqueItems.set(item.id, item);
+  for (const item of importedItems) uniqueItems.set(item.id, withMatchedCatalogPrice(item));
 
   return [...uniqueItems.values()].map((item) => ({
     ...item,
@@ -114,6 +138,9 @@ function persistCheckedState(items: ShoppingListItem[]) {
       .filter((item) => item.importSource === 'bulk-clipboard')
       .map((item) => ({
         detail: item.detail,
+        estimatedPrice: item.estimatedPrice,
+        estimatedPriceLabel: item.estimatedPriceLabel,
+        estimatedPriceSource: item.estimatedPriceSource,
         id: item.id,
         importSource: 'bulk-clipboard' as const,
         matchedProductName: item.matchedProductName,
@@ -160,7 +187,7 @@ export function useList() {
       const existingIds = new Set(currentItems.map((item) => item.id));
       const nextImportedItems = importedItems
         .filter((item) => !existingIds.has(item.id))
-        .map((item) => ({ ...item, importSource: 'bulk-clipboard' as const, checked: false }));
+        .map((item) => ({ ...withMatchedCatalogPrice(item), importSource: 'bulk-clipboard' as const, checked: false }));
 
       return [...currentItems, ...nextImportedItems];
     });

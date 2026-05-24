@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import type { BulkImportedListItemInput } from '@/hooks/useList';
+import { matchedCatalogPriceForListItem } from '@/lib/product-price-helpers';
 
 type BulkImportDialogProps = {
   onImportItems: (items: BulkImportedListItemInput[]) => void;
@@ -42,14 +43,14 @@ export const productCatalogMatches: ProductCatalogMatch[] = [
   {
     category: 'dairy',
     keywords: ['milk', 'mjölk', 'fil'],
-    productName: 'Mjölk',
-    productSlug: 'mjolk'
+    productName: 'Mjölk 3%',
+    productSlug: 'mj-lk-3-101205891-st'
   },
   {
     category: 'produce',
     keywords: ['fruit', 'frukt', 'apple', 'äpple', 'banana', 'banan'],
-    productName: 'Fresh fruit',
-    productSlug: 'fresh-fruit'
+    productName: 'Äpple Royal Gala Eko Klass 1',
+    productSlug: 'pple-royal-gala-eko-klass-1-100475291-kg'
   },
   {
     category: 'frozen',
@@ -86,15 +87,20 @@ export function matchBulkImportLineToCatalog(line: string): ProductCatalogMatch 
 
 function itemForLine(line: string, index: number): BulkImportedListItemInput {
   const match = matchBulkImportLineToCatalog(line);
+  const matchedPrice = matchedCatalogPriceForListItem(match?.productSlug);
+
   return {
     id: `bulk-clipboard-${index}-${match?.productSlug ?? slugify(line)}`,
     importSource: 'bulk-clipboard',
+    estimatedPrice: matchedPrice?.price,
+    estimatedPriceLabel: matchedPrice ? `${matchedPrice.priceText} at ${matchedPrice.chainName}` : undefined,
+    estimatedPriceSource: matchedPrice?.sourceLabel,
     matchedProductName: match?.productName,
     matchedProductSlug: match?.productSlug,
     name: line,
     quantity: '1 item',
     detail: match
-      ? `Matched product catalog: ${match.productName} (${match.category})`
+      ? `Matched product catalog: ${match.productName} (${match.category})${matchedPrice ? ` · ${matchedPrice.priceText} at ${matchedPrice.chainName}` : ''}`
       : 'No catalog match yet — kept as plain text'
   };
 }
@@ -182,6 +188,7 @@ export function BulkImportDialog({ onImportItems }: Readonly<BulkImportDialogPro
               <p className="font-black text-slate-950">{item.name}</p>
               <p className="mt-1">{item.detail}</p>
               <p className="mt-1 text-xs font-bold text-slate-500">matchedProductSlug: {item.matchedProductSlug ?? 'none'}</p>
+              {item.estimatedPriceLabel ? <p className="mt-1 text-xs font-bold text-emerald-700">estimatedPrice: {item.estimatedPriceLabel}</p> : null}
             </div>
           ))}
         </div>

@@ -8,11 +8,12 @@ async function read(relative) {
 
 describe('shopping list route', () => {
   it('ships the requested route, checkable row component, and localStorage-backed hook', async () => {
-    const [page, row, hook, bulkImport, searchRoute] = await Promise.all([
+    const [page, row, hook, bulkImport, priceHelper, searchRoute] = await Promise.all([
       read('src/app/list/page.tsx'),
       read('src/components/CheckableListItem.tsx'),
       read('src/hooks/useList.ts'),
       read('src/components/BulkImportDialog.tsx'),
+      read('src/lib/product-price-helpers.ts'),
       read('../../apps/api/src/routes/search.ts')
     ]);
 
@@ -37,15 +38,24 @@ describe('shopping list route', () => {
     assert.match(hook, /addImportedItems/);
     assert.match(hook, /importSource: 'bulk-clipboard'/);
     assert.match(hook, /matchedProductSlug/);
+    assert.match(hook, /matchedCatalogPriceForListItem/);
+    assert.match(hook, /estimatedPrice/);
+    assert.match(hook, /estimatedPriceLabel/);
 
     assert.match(bulkImport, /'use client'/);
     assert.match(bulkImport, /parseBulkImportLines/);
     assert.match(bulkImport, /matchBulkImportLineToCatalog/);
     assert.match(bulkImport, /productCatalogMatches/);
+    assert.match(bulkImport, /matchedCatalogPriceForListItem/);
     assert.match(bulkImport, /navigator\.clipboard\.readText/);
     assert.match(bulkImport, /one item per line/i);
     assert.match(bulkImport, /matchedProductSlug/);
+    assert.match(bulkImport, /estimatedPriceLabel/);
     assert.match(bulkImport, /unmatchedLines/);
+
+    assert.match(priceHelper, /matchedCatalogPriceForListItem/);
+    assert.match(priceHelper, /cheapest-chain price/);
+    assert.match(priceHelper, /lowestPrice fallback/);
 
     assert.match(searchRoute, /searchRoutes/);
     assert.match(searchRoute, /products\/search\/list-import/);
