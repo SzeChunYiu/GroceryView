@@ -112,6 +112,7 @@ import {
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_WILLYS_BULK_PRODUCTS_URL,
@@ -6779,6 +6780,64 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.store_id, 'store-db-2');
     assert.equal(observation.price, 31.5);
     assert.equal(observation.regular_price, 39.9);
+  });
+
+  it('materializes native Snabbgross all-store products with store metadata and regular prices', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-24T06:30:00.000Z',
+      connectors: [{
+        connectorId: 'snabbgross-products-all-stores',
+        chainId: 'snabbgross',
+        sourceType: 'official_api',
+        endpointUrl: GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL,
+        parserVersion: 'snabbgross-daily-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{
+          storeId: 'sg-arsta',
+          name: 'Snabbgross Årsta',
+          address: 'Partihandlarvägen 50',
+          city: 'Årsta',
+          district: 'Stockholm',
+          storeType: 'cash_and_carry'
+        }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(JSON.stringify({
+          items: [{
+            storeId: 'sg-arsta',
+            retailerProductId: 'sg-halloumi-1kg',
+            rawName: 'Halloumi 1kg',
+            canonicalName: 'Halloumi 1kg',
+            productId: 'snabbgross-halloumi-1kg',
+            categoryId: 'cheese',
+            brand: 'Snabbgross',
+            packageSize: 1,
+            packageUnit: 'kg',
+            price: 89,
+            regularPrice: 119,
+            observedAt: '2026-05-24T06:25:00.000Z'
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL]);
+    const storeInsert = executor.calls.find((call) => call.sql.includes('insert into stores'));
+    assert.equal(storeInsert?.params[0], 'sg-arsta');
+    assert.equal(storeInsert?.params[6], 'Stockholm');
+    assert.equal(storeInsert?.params[10], 'cash_and_carry');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 89);
+    assert.equal(observation.regular_price, 119);
   });
 
   it('materializes native OKQ8 fuel prices into domain=fuel litre observations', async () => {

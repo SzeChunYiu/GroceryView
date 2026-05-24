@@ -1915,6 +1915,17 @@ function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorPa
   };
 }
 
+function snabbgrossDailyItem(row: RetailerConnectorParsedProduct): RetailerConnectorParsedProduct {
+  const regularPrice = row.regularPrice !== undefined && row.regularPrice > row.price ? row.regularPrice : undefined;
+  return {
+    ...row,
+    chainId: 'snabbgross',
+    regularPrice,
+    promoText: regularPrice ? row.promoText ?? 'Snabbgross regular price' : row.promoText,
+    memberOnly: row.memberOnly ?? false
+  };
+}
+
 function matsparCategoryId(row: MatsparProduct): string {
   try {
     const query = new URL(row.sourceUrl).searchParams.get('q');
@@ -2228,6 +2239,13 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(cityGrossProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL}?`)) {
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const snapshot = await fetchRetailerConnectorSnapshot(plan, { ...options, retrievedAt });
+    const rows = parseRetailerProductJsonSnapshot(snapshot).map(snabbgrossDailyItem);
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL}?`)) {
@@ -3110,6 +3128,7 @@ export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview:/
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
 export const GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL = 'groceryview://daily/city-gross/products/bulk';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
+export const GROCERYVIEW_DAILY_SNABBGROSS_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/snabbgross/products/all-stores';
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
