@@ -91,6 +91,10 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 - **Lands in:** `packages/ingestion/src/connectors/matspar.ts`, daily DB observations through `groceryview://daily/matspar/products/public-search`, and the generated web artifact `apps/web/src/lib/ingested/matspar.ts`.
 - **Matpriskollen:** still useful for schema comparison, but not yet part of the daily DB connector set.
 
+### 2.9 International chain-study connector notes 🧪 verified docs
+- **Index:** `docs/research/chain-study.md` links connector notes for international chain-study sources.
+- **Hagkaup Iceland:** `docs/connectors/hagkaup-is.md` documents the public `hagkaup.is` Next API surfaces (`/api/search?search={term}` and `/api/products/{slug}`), extracted fields, online-catalog granularity, quirks, and 2026-05-25 verification notes.
+
 ---
 
 ## 2F. Fuel prices
