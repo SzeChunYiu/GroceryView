@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/db && npm run build -w @groceryview/api && npm run build -w @groceryview/auth && tsc -p tsconfig.build.json",
-    "test": "npm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.js"
+    "test": "npm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.js dist-test/src/__tests__/*.js"
   },
   "dependencies": {
     "@groceryview/api": "0.1.0",

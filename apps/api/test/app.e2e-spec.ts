@@ -730,6 +730,7 @@ describe('GroceryView API app', () => {
       ['hemkop', 'Hemköp', '/retailers/hemkop.svg', 'https://www.hemkop.se/'],
       ['ica', 'ICA', '/retailers/ica.svg', 'https://www.ica.se/'],
       ['lidl', 'Lidl', '/retailers/lidl.svg', 'https://www.lidl.se/'],
+      ['netto', 'Netto', '/retailers/netto.svg', 'https://www.coop.se/'],
       ['willys', 'Willys', '/retailers/willys.svg', 'https://www.willys.se/']
     ]);
 
