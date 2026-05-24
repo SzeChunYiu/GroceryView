@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
+import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholders';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -163,8 +164,11 @@ export function ProductPriceCards({
               <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-white bg-white p-3 shadow-sm">
                 <Image
                   alt={card.imageAlt}
+                  blurDataURL={IMAGE_BLUR_DATA_URL}
                   className="max-h-full max-w-full object-contain"
                   height={144}
+                  loading="lazy"
+                  placeholder="blur"
                   sizes="(min-width: 1280px) 16vw, (min-width: 768px) 33vw, 80vw"
                   src={card.imageUrl}
                   width={144}

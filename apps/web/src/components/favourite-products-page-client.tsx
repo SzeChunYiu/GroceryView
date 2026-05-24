@@ -10,6 +10,7 @@ import {
   parseFavouriteProductEntries,
   type FavouriteProductEntry
 } from '@/lib/favourites';
+import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholders';
 
 export type FavouriteProductCatalogItem = {
   slug: string;
@@ -120,7 +121,7 @@ export function FavouriteProductsPageClient({ productCatalogue }: Readonly<{ pro
               <Link className="group block pr-24" href={`/products/${liveProduct.slug}`}>
                 {liveProduct.imageUrl && liveProduct.imageAlt ? (
                   <div className="mb-4 flex h-32 items-center justify-center rounded-3xl border border-rose-50 bg-rose-50/60 p-3">
-                    <Image alt={liveProduct.imageAlt} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={128} sizes="(min-width: 1280px) 18vw, (min-width: 768px) 34vw, 80vw" src={liveProduct.imageUrl} width={128} />
+                    <Image alt={liveProduct.imageAlt} blurDataURL={IMAGE_BLUR_DATA_URL} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={128} loading="lazy" placeholder="blur" sizes="(min-width: 1280px) 18vw, (min-width: 768px) 34vw, 80vw" src={liveProduct.imageUrl} width={128} />
                   </div>
                 ) : null}
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-700">saved product · {liveProduct.productKind}</p>

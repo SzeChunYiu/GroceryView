@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholders';
 import { formatSek, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -125,7 +126,7 @@ export default async function FavoritesPage({ searchParams }: { searchParams?: P
                       <Link className="flex min-w-72 items-start gap-3 hover:text-emerald-900" href={product.productHref}>
                         {product.imageUrl ? (
                           <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-slate-200">
-                            <Image alt={`${product.productName} favorite product image`} className="max-h-full max-w-full object-contain" height={64} sizes="64px" src={product.imageUrl} width={64} />
+                            <Image alt={`${product.productName} favorite product image`} blurDataURL={IMAGE_BLUR_DATA_URL} className="max-h-full max-w-full object-contain" height={64} loading="lazy" placeholder="blur" sizes="64px" src={product.imageUrl} width={64} />
                           </span>
                         ) : null}
                         <span>

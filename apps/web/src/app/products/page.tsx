@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
+import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholders';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -228,7 +229,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
               <div className="flex gap-3">
                 {product.imageUrl ? (
                   <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-violet-100">
-                    <Image alt={`${product.name} product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} sizes="80px" src={product.imageUrl} width={80} />
+                    <Image alt={`${product.name} product image`} blurDataURL={IMAGE_BLUR_DATA_URL} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={80} loading="lazy" placeholder="blur" sizes="80px" src={product.imageUrl} width={80} />
                   </div>
                 ) : null}
                 <div>
@@ -292,7 +293,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
               <div className="flex items-start gap-3">
                 {product.imageUrl ? (
                   <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white p-2 ring-1 ring-rose-100">
-                    <Image alt={`${product.productName} watchlist product image`} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={64} sizes="64px" src={product.imageUrl} width={64} />
+                    <Image alt={`${product.productName} watchlist product image`} blurDataURL={IMAGE_BLUR_DATA_URL} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={64} loading="lazy" placeholder="blur" sizes="64px" src={product.imageUrl} width={64} />
                   </div>
                 ) : null}
                 <div className="min-w-0 flex-1">
@@ -414,7 +415,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           {immigrantImageFirstBrowsing.map((item) => (
             <Link className="group overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-amber-700" href={`/products/${item.verifiedProductSlug}`} key={item.verifiedProductSlug}>
               <div className="flex aspect-square items-center justify-center bg-white p-3">
-                <Image alt={item.visualAlt} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={160} sizes="(min-width: 768px) 20vw, 50vw" src={item.imageUrl} width={160} />
+                <Image alt={item.visualAlt} blurDataURL={IMAGE_BLUR_DATA_URL} className="max-h-full max-w-full object-contain transition group-hover:scale-105" height={160} loading="lazy" placeholder="blur" sizes="(min-width: 768px) 20vw, 50vw" src={item.imageUrl} width={160} />
               </div>
               <div className="border-t border-amber-100 p-3">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{item.reportedBrand}</p>
