@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ConsentManager } from '@/components/consent-manager';
 import { ServiceWorkerRegistrar } from '@/lib/swRegister';
+import { ToastProvider } from '@/components/Toast';
 import { Providers } from './providers';
 import './globals.css';
 
@@ -43,7 +44,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}
           type="application/ld+json"
         />
-        <Providers>{children}</Providers>
+        <ToastProvider>
+          <Providers>{children}</Providers>
+        </ToastProvider>
         <ConsentManager />
         <ServiceWorkerRegistrar />
       </body>
