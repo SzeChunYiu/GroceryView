@@ -2597,12 +2597,66 @@ describe('fetchIcaProducts', () => {
       promoUnitPriceCurrency: 'SEK',
       promoUnitPriceUnit: 'fop.price.per.kg',
       promotionDescription: '28 kr/st',
+      memberOnly: false,
       storeAccountId: '1004599',
       storeName: 'ICA Kvantum Kungsholmen',
       regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d',
       sourceUrl: buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1),
       retrievedAt: '2026-05-22T08:28:14.000Z'
     }]);
+  });
+
+  it('emits separate ICA list and member-price rows for public Stammis prices', async () => {
+    const payload = {
+      productGroups: [{
+        type: 'ON_OFFER',
+        decoratedProducts: [{
+          productId: 'ica-member-product',
+          retailerProductId: 'ica-member-retailer',
+          name: 'Yoghurt Naturell 1kg ICA',
+          brand: 'ICA',
+          packSizeDescription: '1kg',
+          price: { amount: 40.7, currency: 'SEK' },
+          unitPrice: { price: { amount: 40.7, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promoPrice: { amount: 25, currency: 'SEK' },
+          promoUnitPrice: { price: { amount: 25, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: [{ description: '25 kr/st -- Max 2 erbj/hushåll, Stammispris' }]
+        }]
+      }]
+    };
+
+    const rows = await fetchIcaProducts({
+      fetchImpl: async () => Response.json(payload),
+      retrievedAt: '2026-05-24T15:30:00.000Z',
+      maxRows: 10
+    });
+
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows.map((row) => ({
+      code: row.code,
+      price: row.price,
+      promoPrice: row.promoPrice,
+      promoUnitPrice: row.promoUnitPrice,
+      promotionDescription: row.promotionDescription,
+      memberOnly: row.memberOnly
+    })), [
+      {
+        code: 'ica-member-retailer',
+        price: 40.7,
+        promoPrice: null,
+        promoUnitPrice: null,
+        promotionDescription: '',
+        memberOnly: false
+      },
+      {
+        code: 'ica-member-retailer',
+        price: 40.7,
+        promoPrice: 25,
+        promoUnitPrice: 25,
+        promotionDescription: '25 kr/st -- Max 2 erbj/hushåll, Stammispris',
+        memberOnly: true
+      }
+    ]);
   });
 
   it('deduplicates repeated ICA store products', async () => {

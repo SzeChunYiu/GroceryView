@@ -22,6 +22,7 @@ export type IcaProduct = {
   promoUnitPriceCurrency: string;
   promoUnitPriceUnit: string;
   promotionDescription: string;
+  memberOnly: boolean;
   storeAccountId: string;
   storeName: string;
   regionId: string;
@@ -1806,8 +1807,10 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
       const promoPrice = money(product.promoPrice);
       const promoUnitPrice = nestedMoney(product.promoUnitPrice);
       const promotion = arrayOfRecords(product.promotions)[0];
+      const promotionDescription = text(promotion?.description);
+      const memberOnly = isIcaMemberPromotion(product, promotionDescription);
 
-      rows.push({
+      const baseRow: IcaProduct = {
         code: retailerProductId,
         productId,
         retailerProductId,
@@ -1823,18 +1826,38 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
         unitPrice: unitPrice.amount,
         unitPriceCurrency: unitPrice.currency,
         unitPriceUnit: unitPrice.unit,
-        promoPrice: promoPrice.amount,
-        promoPriceCurrency: promoPrice.currency,
-        promoUnitPrice: promoUnitPrice.amount,
-        promoUnitPriceCurrency: promoUnitPrice.currency,
-        promoUnitPriceUnit: promoUnitPrice.unit,
-        promotionDescription: text(promotion?.description),
+        promoPrice: memberOnly ? null : promoPrice.amount,
+        promoPriceCurrency: memberOnly ? '' : promoPrice.currency,
+        promoUnitPrice: memberOnly ? null : promoUnitPrice.amount,
+        promoUnitPriceCurrency: memberOnly ? '' : promoUnitPrice.currency,
+        promoUnitPriceUnit: memberOnly ? '' : promoUnitPrice.unit,
+        promotionDescription: memberOnly ? '' : promotionDescription,
+        memberOnly: false,
         storeAccountId: options.storeAccountId,
         storeName: options.storeName,
         regionId: options.regionId,
         sourceUrl: options.sourceUrl,
         retrievedAt: options.retrievedAt
-      });
+      };
+
+      rows.push(baseRow);
+
+      if (options.maxRows && rows.length >= options.maxRows) {
+        return rows;
+      }
+
+      if (memberOnly && promoPrice.amount !== null) {
+        rows.push({
+          ...baseRow,
+          promoPrice: promoPrice.amount,
+          promoPriceCurrency: promoPrice.currency,
+          promoUnitPrice: promoUnitPrice.amount,
+          promoUnitPriceCurrency: promoUnitPrice.currency,
+          promoUnitPriceUnit: promoUnitPrice.unit,
+          promotionDescription,
+          memberOnly: true
+        });
+      }
 
       if (options.maxRows && rows.length >= options.maxRows) {
         return rows;
@@ -1884,4 +1907,22 @@ function imageUrl(value: unknown): string {
     return '';
   }
   return text(value.src);
+}
+
+function isIcaMemberPromotion(product: Record<string, unknown>, promotionDescription: string): boolean {
+  const haystack = [
+    promotionDescription,
+    text(product.promotionDescription),
+    text(product.promoDescription),
+    text(product.priceLabel),
+    text(product.promoLabel),
+    ...arrayOfRecords(product.promotions).flatMap((promotion) => [
+      text(promotion.description),
+      text(promotion.name),
+      text(promotion.type),
+      text(promotion.offerType)
+    ])
+  ].join(' ').toLowerCase();
+
+  return ['stammis', 'medlem', 'medlemspris', 'member'].some((marker) => haystack.includes(marker));
 }
