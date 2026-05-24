@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { StoreMap } from '@/components/store-map';
@@ -5,6 +6,18 @@ import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
 import { formatPct, storePricePercentileRanks, storeUniverse } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+
+export const dynamic = 'force-dynamic';
+
+type SearchParams = Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>;
+type OperatingHoursFilter = 'all' | 'open-now' | 'open-evening' | '24h';
+
+const operatingHoursFilters: { href: string; label: string; value: OperatingHoursFilter }[] = [
+  { href: '/map', label: 'All stores', value: 'all' },
+  { href: '/map?hours=open-now', label: 'Open now', value: 'open-now' },
+  { href: '/map?hours=open-evening', label: 'Open this evening', value: 'open-evening' },
+  { href: '/map?hours=24h', label: '24h', value: '24h' }
+];
 
 export function generateMetadata() {
   return routeMetadata('/map');
@@ -27,6 +40,73 @@ function normaliseBrand(brand: string) {
   if (lower.includes('city gross')) return 'city gross';
   if (lower.includes('tempo')) return 'tempo';
   return lower;
+}
+
+function getHoursParam(searchParams: Record<string, string | string[] | undefined>): OperatingHoursFilter {
+  const hours = searchParams.hours;
+  const value = Array.isArray(hours) ? hours[0] : hours;
+  return value === 'open-now' || value === 'open-evening' || value === '24h' ? value : 'all';
+}
+
+function getBranchHours(store: (typeof storeUniverse)[number]) {
+  const withHours = store as (typeof storeUniverse)[number] & { openingHours?: string; opening_hours?: string; hours?: string };
+  return withHours.openingHours ?? withHours.opening_hours ?? withHours.hours ?? '';
+}
+
+function is24HourBranch(hours: string) {
+  return /24\s*\/\s*7|00:00\s*-\s*24:00|00:00\s*-\s*00:00/i.test(hours);
+}
+
+function dayMatches(dayPart: string, date: Date) {
+  if (!dayPart || /^(PH|SH)$/i.test(dayPart)) return true;
+  const days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  const today = days[date.getDay()];
+  return dayPart.split(',').some((part) => {
+    const token = part.trim();
+    const range = token.match(/^(Mo|Tu|We|Th|Fr|Sa|Su)\s*-\s*(Mo|Tu|We|Th|Fr|Sa|Su)$/);
+    if (range) {
+      const start = days.indexOf(range[1]);
+      const end = days.indexOf(range[2]);
+      const current = days.indexOf(today);
+      return start <= end ? current >= start && current <= end : current >= start || current <= end;
+    }
+    return token === today;
+  });
+}
+
+function minutesFromClock(clock: string) {
+  const [hours, minutes] = clock.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+function timeMatches(startClock: string, endClock: string, date: Date) {
+  const current = date.getHours() * 60 + date.getMinutes();
+  const start = minutesFromClock(startClock);
+  const end = endClock.startsWith('24:') ? 24 * 60 : minutesFromClock(endClock);
+  return start <= end ? current >= start && current <= end : current >= start || current <= end;
+}
+
+function isOpenAt(hours: string, date: Date) {
+  if (!hours) return false;
+  if (is24HourBranch(hours)) return true;
+  return hours.split(';').some((rule) => {
+    if (/\boff\b/i.test(rule)) return false;
+    const firstTime = rule.search(/\d{1,2}:\d{2}/);
+    if (firstTime === -1) return false;
+    const dayPart = rule.slice(0, firstTime).replace(/,$/, '').trim();
+    if (!dayMatches(dayPart, date)) return false;
+    return [...rule.matchAll(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/g)].some(([, start, end]) => timeMatches(start, end, date));
+  });
+}
+
+function branchMatchesHoursFilter(store: (typeof storeUniverse)[number], filter: OperatingHoursFilter, now = new Date()) {
+  if (filter === 'all') return true;
+  const hours = getBranchHours(store);
+  if (filter === '24h') return is24HourBranch(hours);
+  if (filter === 'open-now') return isOpenAt(hours, now);
+  const evening = new Date(now);
+  evening.setHours(19, 0, 0, 0);
+  return isOpenAt(hours, evening);
 }
 
 function markerTone(index?: number) {
@@ -124,8 +204,16 @@ function buildRegionalPriceStatisticsGate() {
   };
 }
 
-export default function MapPage() {
-  const visibleStores = storeUniverse.slice(0, 80);
+export default async function MapPage({ searchParams = {} }: { searchParams?: SearchParams }) {
+  const resolvedSearchParams = await searchParams;
+  const activeHoursFilter = getHoursParam(resolvedSearchParams);
+  const visibleStores = storeUniverse.filter((store) => branchMatchesHoursFilter(store, activeHoursFilter)).slice(0, 80);
+  const hoursCoverageCount = storeUniverse.filter((store) => getBranchHours(store)).length;
+  const branchCounts = {
+    openNow: storeUniverse.filter((store) => branchMatchesHoursFilter(store, 'open-now')).length,
+    openEvening: storeUniverse.filter((store) => branchMatchesHoursFilter(store, 'open-evening')).length,
+    twentyFourHour: storeUniverse.filter((store) => branchMatchesHoursFilter(store, '24h')).length
+  };
   return (
     <PageShell>
       <Eyebrow>Map data</Eyebrow>
@@ -133,6 +221,35 @@ export default function MapPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         The website has verified latitude and longitude for OSM stores. Markers are colored by the chain-level price index only; branch-level prices, route times, and store quality scores are not invented.
       </p>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">Operating-hours filter</p>
+            <h2 className="mt-2 text-3xl font-black text-emerald-950">Compare branches that are open when you shop</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-emerald-900">
+              The branch comparison cards below can be filtered by OSM opening-hours metadata for open now, open this evening, or 24h branches so route planning does not point at closed stores.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/80 p-4 text-right">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">Visible comparison rows</p>
+            <p className="mt-2 text-4xl font-black text-emerald-950">{visibleStores.length}</p>
+            <p className="mt-2 text-sm font-semibold text-emerald-900">{hoursCoverageCount} branches include hours metadata</p>
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {operatingHoursFilters.map((filter) => (
+            <Link className={`rounded-full px-3 py-2 text-sm font-black transition ${activeHoursFilter === filter.value ? 'bg-emerald-700 text-white' : 'bg-white/80 text-emerald-950 hover:bg-white'}`} href={filter.href} key={filter.value}>
+              {filter.label}
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-2 text-sm font-bold text-emerald-950 md:grid-cols-3">
+          <p className="rounded-2xl bg-white/80 p-3">Open now: {branchCounts.openNow}</p>
+          <p className="rounded-2xl bg-white/80 p-3">Open this evening: {branchCounts.openEvening}</p>
+          <p className="rounded-2xl bg-white/80 p-3">24h: {branchCounts.twentyFourHour}</p>
+        </div>
+      </Card>
 
       <Card className="mt-6 overflow-hidden border-slate-200 bg-slate-950 p-0 text-white">
         <div className="grid gap-4 p-6 lg:grid-cols-[1fr_auto]">
@@ -332,7 +449,7 @@ export default function MapPage() {
 
       <Card className="mt-6">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {visibleStores.map((store) => {
+          {visibleStores.length > 0 ? visibleStores.map((store) => {
             const chain = chainIndexByBrand.get(normaliseBrand(store.brand));
             return (
               <div className={`rounded-2xl border p-4 ${markerTone(chain?.overallIndex)}`} key={store.slug}>
@@ -347,7 +464,7 @@ export default function MapPage() {
                 <p className="mt-3 text-xs font-semibold opacity-80">{chain ? `${formatPct(chain.overallIndex - 100)} vs market index · ${chain.confidence} confidence` : 'No chain-index coverage for this brand'}</p>
               </div>
             );
-          })}
+          }) : <p className="rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-950">No branches match this operating-hours filter with the verified metadata currently available.</p>}
         </div>
       </Card>
     </PageShell>
