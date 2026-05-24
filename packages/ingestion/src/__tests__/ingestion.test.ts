@@ -97,6 +97,10 @@ import {
   fetchWillysWeeklyDiscountsForAllStores,
   findPharmacyEanMatches,
   parseApohemProducts,
+  fetchApotekGardabaerAssortment,
+  fetchApotekGardabaerContact,
+  parseApotekGardabaerAssortment,
+  parseApotekGardabaerContact,
   parseApotekHjartatProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
@@ -7136,6 +7140,71 @@ describe('daily ingestion runner', () => {
       apotekHjartatSourceUrl
     ]);
   });
+  it('parses Apótek Garðabæjar local pharmacy assortment and contact evidence', async () => {
+    const retrievedAt = '2026-05-24T22:30:00.000Z';
+    const productsUrl = 'https://apotekgb.is/vorur/';
+    const homeUrl = 'https://apotekgb.is/';
+    const productHtml = `
+      <main>
+        <h1>Vörur</h1>
+        <p>Apótek Garðabæjar býður upp á gott vöruúrval. Við erum að sjálfsögðu með öll helstu lyf og lausasölulyf.
+        Gott úrval af hjúkrunarvörum, mikið af vítamínum og fæðubótarefnum og snyrtivörur á góðu verði.</p>
+        <a href="welada.is">welada.is</a>
+        <a href="www.eucerin.com">www.eucerin.com</a>
+        <a href="heilsa.is">heilsa.is</a>
+        <a href="yggdrasill.is">yggdrasill.is</a>
+      </main>
+    `;
+    const homeHtml = `
+      <footer>Litlatún 3 &#8211; 210 Garðabær &#8211; Phone 577 5010 &#8211; Business hours: 9-18: 30 every working day, 10-16 on Saturdays
+        <a href="mailto:apotek@apotekgb.is">apotek@apotekgb.is</a>
+      </footer>
+    `;
+
+    const rows = parseApotekGardabaerAssortment(productHtml, productsUrl, retrievedAt);
+    assert.deepEqual(rows.map((row) => [row.category, row.name]), [
+      ['medicine', 'Helstu lyf'],
+      ['otc', 'Lausasölulyf'],
+      ['healthcare', 'Hjúkrunarvörur'],
+      ['supplement', 'Vítamín og fæðubótarefni'],
+      ['supplement', 'Yggdrasill'],
+      ['beauty', 'Snyrtivörur'],
+      ['beauty', 'Weleda'],
+      ['beauty', 'Eucerin']
+    ]);
+    assert.equal(rows[0].chain, 'apotek-gardabaer');
+    assert.equal(rows[0].countryCode, 'IS');
+    assert.equal(rows[0].sourceUrl, productsUrl);
+    assert.equal(rows.find((row) => row.name === 'Eucerin')?.productUrl, 'https://www.eucerin.com/');
+
+    assert.deepEqual(parseApotekGardabaerContact(homeHtml, homeUrl, retrievedAt), {
+      chain: 'apotek-gardabaer',
+      countryCode: 'IS',
+      pharmacyName: 'Apótek Garðabæjar',
+      address: 'Litlatún 3',
+      postalCode: '210',
+      locality: 'Garðabær',
+      phone: '577 5010',
+      email: 'apotek@apotekgb.is',
+      businessHoursText: '9-18: 30 every working day, 10-16 on Saturdays',
+      sourceUrl: homeUrl,
+      retrievedAt
+    });
+
+    const requestedUrls: string[] = [];
+    const fetchImpl = async (url: string | URL | Request) => {
+      requestedUrls.push(url.toString());
+      return {
+        ok: true,
+        text: async () => url.toString() === homeUrl ? homeHtml : productHtml
+      } as Response;
+    };
+
+    assert.equal((await fetchApotekGardabaerAssortment({ fetchImpl, retrievedAt, maxRows: 2 })).length, 2);
+    assert.equal((await fetchApotekGardabaerContact({ fetchImpl, retrievedAt })).email, 'apotek@apotekgb.is');
+    assert.deepEqual(requestedUrls, [productsUrl, homeUrl]);
+  });
+
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
     const executor = new DailyIngestionExecutor();
