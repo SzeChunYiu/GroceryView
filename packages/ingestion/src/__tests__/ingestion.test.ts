@@ -1409,6 +1409,63 @@ describe('fetchCoopProducts', () => {
       ['7310865005168', 'Svenskt Smör', 45]
     ]);
   });
+
+  it('flags only source-backed Coop counter-price catalog rows as sold by weight', async () => {
+    const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({
+      results: {
+        count: 3,
+        items: [{
+          id: '2385912200006',
+          ean: '2385912200006',
+          name: 'Entrecôte i bit',
+          manufacturerName: 'Coop',
+          packageSizeInformation: 'ca 1000 gram/bit ungefärlig vikt',
+          salesPriceData: { b2cPrice: 219 },
+          comparativePriceData: { b2cPrice: 219 },
+          comparativePriceText: 'kr/kg',
+          availableOnline: true,
+          navCategories: [{ name: 'Nötkött', superCategories: [{ name: 'Kött', superCategories: [] }] }]
+        }, {
+          id: '7300206718000',
+          ean: '7300206718000',
+          name: 'Bacon 3-pack',
+          manufacturerName: 'Scan',
+          packageSizeInformation: '420 g',
+          salesPriceData: { b2cPrice: 37.9 },
+          comparativePriceData: { b2cPrice: 90.24 },
+          comparativePriceText: 'kr/kg',
+          availableOnline: true,
+          navCategories: [{ name: 'Chark', superCategories: [{ name: 'Kött', superCategories: [] }] }]
+        }, {
+          id: '2383471000006',
+          ean: '2383471000006',
+          name: 'Laxfilé Harbour',
+          manufacturerName: 'Harbour',
+          packageSizeInformation: '',
+          salesPriceData: { b2cPrice: 269 },
+          comparativePriceData: { b2cPrice: 269 },
+          comparativePriceText: 'kr/kg',
+          availableOnline: true,
+          navCategories: [{ name: 'Fisk', superCategories: [] }]
+        }]
+      }
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+
+    const rows = await fetchCoopProductCatalog({
+      fetchImpl,
+      storeId: '251300',
+      subscriptionKey: 'coop-key',
+      categoryIds: ['meat-counter'],
+      maxRowsPerCategory: 10,
+      retrievedAt: '2026-05-23T09:10:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.code, row.soldByWeight]), [
+      ['2385912200006', true],
+      ['7300206718000', undefined],
+      ['2383471000006', undefined]
+    ]);
+  });
 });
 
 describe('fetchCoopWeeklyDiscounts', () => {
@@ -2603,6 +2660,54 @@ describe('fetchIcaProducts', () => {
       sourceUrl: buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1),
       retrievedAt: '2026-05-22T08:28:14.000Z'
     }]);
+  });
+
+  it('flags only source-backed ICA counter-price promotion rows as sold by weight', async () => {
+    const fetchImpl: typeof fetch = async () => Response.json({
+      productGroups: [{
+        type: 'Fisk',
+        decoratedProducts: [{
+          productId: 'ica-counter-fish',
+          retailerProductId: '2383471',
+          name: 'Färsk laxfilé',
+          brand: 'ICA Fiskdisken',
+          packSizeDescription: 'ca 1200 g ungefärlig vikt',
+          price: { amount: 249, currency: 'SEK' },
+          unitPrice: { price: { amount: 249, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: []
+        }, {
+          productId: 'ica-packaged-fish',
+          retailerProductId: '5740301203124',
+          name: 'Torskryggfilé 3-pack',
+          brand: 'Royal Greenland',
+          packSizeDescription: '375g',
+          price: { amount: 119, currency: 'SEK' },
+          unitPrice: { price: { amount: 317.33, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: []
+        }, {
+          productId: 'ica-missing-evidence',
+          retailerProductId: '2385912',
+          name: 'Entrecôte',
+          brand: 'ICA',
+          packSizeDescription: '',
+          price: { amount: 199, currency: 'SEK' },
+          unitPrice: { price: { amount: 199, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: []
+        }]
+      }]
+    });
+
+    const rows = await fetchIcaProducts({
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:35:00.000Z',
+      maxRows: 3
+    });
+
+    assert.deepEqual(rows.map((row) => [row.retailerProductId, row.soldByWeight]), [
+      ['2383471', true],
+      ['5740301203124', undefined],
+      ['2385912', undefined]
+    ]);
   });
 
   it('deduplicates repeated ICA store products', async () => {
