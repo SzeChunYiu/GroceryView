@@ -11,6 +11,8 @@ export type ApohemProduct = {
   category: PharmacyProductCategory;
   price: number;
   priceText: string;
+  channel: 'online';
+  is_member_price: boolean;
   originalPrice: number | null;
   originalPriceText: string;
   vatPercent: number | null;
@@ -32,6 +34,8 @@ type ApohemSearchProduct = {
   price?: {
     current?: { inclVat?: unknown; vatPercent?: unknown };
     previous?: { inclVat?: unknown };
+    member?: { inclVat?: unknown };
+    nonMember?: { inclVat?: unknown };
   };
   images?: Array<{ url?: unknown }>;
   stock?: { status?: unknown; stockStatus?: unknown };
@@ -160,9 +164,7 @@ export function parseApohemProducts(html: string, sourceUrl: string, retrievedAt
     }
   });
 
-  return products
-    .map((product) => normalizeApohemProduct(product, sourceUrl, retrievedAt))
-    .filter((product): product is ApohemProduct => product !== null);
+  return products.flatMap((product) => normalizeApohemProductRows(product, sourceUrl, retrievedAt));
 }
 
 export function parseApotekHjartatProducts(html: string, sourceUrl: string, retrievedAt: string): ApohemProduct[] {
@@ -180,23 +182,23 @@ export function parseApotekHjartatProducts(html: string, sourceUrl: string, retr
     .filter((product): product is ApohemProduct => product !== null);
 }
 
-export function normalizeApohemProduct(
+export function normalizeApohemProductRows(
   product: ApohemSearchProduct,
   sourceUrl: string,
   retrievedAt: string
-): ApohemProduct | null {
+): ApohemProduct[] {
   if (product.isPrescriptionProduct === true) {
-    return null;
+    return [];
   }
   const ean = eanText(product.variationEAN);
   const price = numberFromText(product.price?.current?.inclVat);
   const name = text(product.displayName);
   if (!ean || !name || price === null) {
-    return null;
+    return [];
   }
 
   const originalPrice = numberFromText(product.price?.previous?.inclVat);
-  return {
+  const baseRow: ApohemProduct = {
     chain: 'apohem',
     code: text(product.variationCode) || text(product.code) || ean,
     ean,
@@ -205,6 +207,8 @@ export function normalizeApohemProduct(
     category: apohemCategory(product, sourceUrl),
     price,
     priceText: `${price.toFixed(2)} SEK`,
+    channel: 'online' as const,
+    is_member_price: false,
     originalPrice,
     originalPriceText: originalPrice === null ? '' : `${originalPrice.toFixed(2)} SEK`,
     vatPercent: numberFromText(product.price?.current?.vatPercent),
@@ -215,6 +219,23 @@ export function normalizeApohemProduct(
     sourceUrl,
     retrievedAt
   };
+  const memberPrice = numberFromText(product.price?.member?.inclVat);
+  const nonMemberPrice = numberFromText(product.price?.nonMember?.inclVat);
+  if (memberPrice !== null && nonMemberPrice !== null && memberPrice !== nonMemberPrice) {
+    return [
+      { ...baseRow, price: memberPrice, priceText: `${memberPrice.toFixed(2)} SEK`, is_member_price: true },
+      { ...baseRow, price: nonMemberPrice, priceText: `${nonMemberPrice.toFixed(2)} SEK`, is_member_price: false }
+    ];
+  }
+  return [baseRow];
+}
+
+export function normalizeApohemProduct(
+  product: ApohemSearchProduct,
+  sourceUrl: string,
+  retrievedAt: string
+): ApohemProduct | null {
+  return normalizeApohemProductRows(product, sourceUrl, retrievedAt)[0] ?? null;
 }
 
 export function normalizeApotekHjartatProduct(
@@ -242,6 +263,8 @@ export function normalizeApotekHjartatProduct(
     category: apotekHjartatCategory(product, sourceUrl),
     price,
     priceText: `${price.toFixed(2)} SEK`,
+    channel: 'online' as const,
+    is_member_price: false,
     originalPrice,
     originalPriceText: originalPrice === null ? '' : `${originalPrice.toFixed(2)} SEK`,
     vatPercent: numberFromText(product.price?.current?.vatPercent),
