@@ -7,9 +7,23 @@ import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
 
 const sekFormatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 });
+const snapshotDateFormatter = new Intl.DateTimeFormat('sv-SE', { dateStyle: 'medium', timeStyle: 'short' });
 
 export default function ShoppingListPage() {
-  const { addImportedItems, budgetAlerts, budgetBuckets, checkedCount, estimatedTotal, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const {
+    addImportedItems,
+    budgetAlerts,
+    budgetBuckets,
+    budgetHistory,
+    checkedCount,
+    estimatedTotal,
+    items,
+    remainingCount,
+    resetCheckedState,
+    saveBudgetSnapshot,
+    toggleItemChecked,
+    totalCount
+  } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -46,6 +60,13 @@ export default function ShoppingListPage() {
               <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Estimated list total</p>
               <p className="mt-1 text-3xl font-black text-slate-950">{sekFormatter.format(estimatedTotal)}</p>
               <p className="mt-1 text-sm font-semibold text-slate-600">{budgetAlerts.length} overspend alert(s)</p>
+              <button
+                className="mt-3 inline-flex items-center justify-center rounded-full bg-amber-800 px-4 py-2 text-sm font-black text-white transition hover:bg-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2"
+                onClick={saveBudgetSnapshot}
+                type="button"
+              >
+                Save budget snapshot
+              </button>
             </div>
           </div>
           <div aria-live="polite" className={budgetAlerts.length > 0 ? 'mt-4 rounded-2xl bg-rose-50 p-3 text-sm font-black text-rose-900' : 'mt-4 rounded-2xl bg-emerald-50 p-3 text-sm font-black text-emerald-900'} role="status">
@@ -63,6 +84,31 @@ export default function ShoppingListPage() {
               </div>
             ))}
           </div>
+          {budgetHistory.length > 0 ? (
+            <div className="mt-5 rounded-2xl border border-amber-100 bg-amber-50/70 p-4" aria-label="Recent budget snapshots">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <h3 className="text-lg font-black text-slate-950">Recent budget snapshots</h3>
+                  <p className="text-sm font-semibold text-slate-600">Saved in this browser so repeated category overspends are easier to spot before checkout.</p>
+                </div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">Last {budgetHistory.length}</p>
+              </div>
+              <ol className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {budgetHistory.map((snapshot) => (
+                  <li className="rounded-2xl border border-white bg-white p-4 shadow-sm" key={snapshot.capturedAt}>
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{snapshotDateFormatter.format(new Date(snapshot.capturedAt))}</p>
+                    <p className="mt-1 text-2xl font-black text-slate-950">{sekFormatter.format(snapshot.estimatedTotal)}</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-600">{snapshot.buckets.length} category bucket(s)</p>
+                    <p className={snapshot.overspendCategories.length > 0 ? 'mt-2 text-sm font-black text-rose-800' : 'mt-2 text-sm font-black text-emerald-800'}>
+                      {snapshot.overspendCategories.length > 0
+                        ? `Overspent: ${snapshot.overspendCategories.join(', ')}`
+                        : 'No overspend categories'}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
         </section>
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
