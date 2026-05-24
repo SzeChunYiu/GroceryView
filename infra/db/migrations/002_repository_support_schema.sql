@@ -17,8 +17,10 @@ create table if not exists favorite_stores (
 
 create table if not exists user_preferences (
   user_id text primary key references app_users(id) on delete cascade,
-  weekly_budget numeric(12, 2) not null check (weekly_budget >= 0),
-  monthly_budget numeric(12, 2) not null check (monthly_budget >= 0),
+  weekly_budget numeric(12, 2) not null default 0 check (weekly_budget >= 0),
+  monthly_budget numeric(12, 2) not null default 0 check (monthly_budget >= 0),
+  preferred_currency text not null default 'SEK' check (preferred_currency in ('SEK', 'EUR', 'NOK', 'DKK')),
+  notification_channels text[] not null default array[]::text[] check (notification_channels <@ array['push', 'email', 'telegram']::text[]),
   updated_at timestamptz not null default now()
 );
 

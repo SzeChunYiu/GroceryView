@@ -15,6 +15,7 @@ export function configureApp(app: INestApplication) {
     .setTitle('GroceryView API')
     .setDescription('HTTP API for GroceryView products, stores, prices, users, watchlists, baskets, and alerts.')
     .setVersion('0.1.0')
+    .addBearerAuth()
     .build();
   SwaggerModule.setup('api', app, SwaggerModule.createDocument(app, config));
 }
