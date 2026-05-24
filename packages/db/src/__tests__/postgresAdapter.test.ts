@@ -1992,7 +1992,10 @@ describe('createPostgresPriceObservationWriter', () => {
       executor.calls[0]!.sql.indexOf('insert into observations'),
       executor.calls[0]!.sql.indexOf('),\n         written as')
     );
-    assert.doesNotMatch(observationsInsertSql, /on conflict/);
+    assert.match(
+      observationsInsertSql,
+      /on conflict \(\s*product_id,\s*chain_id,\s*store_id,\s*domain,\s*retailer_product_ref,\s*price_type,\s*observed_at,\s*price,\s*unit_price,\s*currency,\s*is_available,\s*confidence,\s*provenance\s*\) do nothing/
+    );
     assert.match(executor.calls[0]!.sql, /insert into latest_prices/);
     assert.match(executor.calls[0]!.sql, /where latest_prices\.observed_at <= excluded\.observed_at/);
 

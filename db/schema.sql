@@ -392,6 +392,7 @@ create table if not exists grocery_index_components (
 create index if not exists price_observations_product_time_idx on price_observations(product_id, observed_at desc);
 create index if not exists price_observations_store_time_idx on price_observations(store_id, observed_at desc);
 create index if not exists price_observations_domain_time_idx on price_observations(domain, observed_at desc);
+create unique index if not exists price_observations_product_store_date_uidx on price_observations(product_id, chain_id, store_id, observed_at, source_type) nulls not distinct;
 create index if not exists promotion_observations_product_dates_idx on promotion_observations(product_id, promo_start, promo_end);
 create index if not exists products_category_idx on products(category_id);
 create index if not exists products_fuel_grade_idx on products(fuel_grade_id) where domain = 'fuel';

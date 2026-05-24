@@ -111,4 +111,10 @@ describe('db/schema.sql', () => {
     assert.match(schema, /reporter_id text references community_reporter_trust/);
     assert.match(schema, /price_observation_id bigint not null references price_observations/);
   });
+
+  it('deduplicates scraper price snapshots by product, store, and observed date', () => {
+    assert.match(schema, /create unique index if not exists price_observations_product_store_date_uidx/);
+    assert.match(schema, /on price_observations\s*\(\s*product_id,\s*chain_id,\s*store_id,\s*observed_at,\s*source_type\s*\)/);
+    assert.match(schema, /nulls not distinct/);
+  });
 });

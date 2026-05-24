@@ -109,7 +109,8 @@ class RecordingPgPool {
           '014_fuel_price_sources',
           '016_observation_connector_idempotency',
           '017_observation_availability',
-          '018_household_collaboration_rls'
+          '018_household_collaboration_rls',
+          '019_price_snapshot_unique_index'
         ].map((version) => ({ version }))
       };
     }
@@ -1475,6 +1476,7 @@ describe('runtime config', () => {
       assert.equal(body.evidence.includes('migration:016_observation_connector_idempotency'), true);
       assert.equal(body.evidence.includes('migration:017_observation_availability'), true);
       assert.equal(body.evidence.includes('migration:018_household_collaboration_rls'), true);
+      assert.equal(body.evidence.includes('migration:019_price_snapshot_unique_index'), true);
       assert.equal(JSON.stringify(body).includes('runtime-password'), false);
     } finally {
       await service.close();
