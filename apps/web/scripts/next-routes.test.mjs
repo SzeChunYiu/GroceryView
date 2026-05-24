@@ -3791,4 +3791,18 @@ ${seo}`;
     assert.match(productDetailRoute, /formatComparableUnitPrice/);
     assert.match(screenerRoute, /formatLocalizedUnitPrice/);
   });
+  it('surfaces stale compare chain capability warnings', async () => {
+    const chainCompare = await read('src/lib/chain-compare.ts');
+    const compareRoute = await read('src/app/compare/page.tsx');
+    const dataSources = await read('src/app/data-sources/page.tsx');
+
+    assert.match(chainCompare, /export const noChainState/);
+    assert.match(chainCompare, /evidenceUpdatedAt/);
+    assert.match(chainCompare, /isStale/);
+    assert.match(compareRoute, /noChainFreshness\.isStale/);
+    assert.match(compareRoute, /Compare chain evidence stale/);
+    assert.match(dataSources, /id="compare-chain-capabilities"/);
+    assert.match(dataSources, /noChainState\.evidenceUpdatedAt/);
+  });
+
 });

@@ -46,6 +46,51 @@ export type ChainComparisonTable = {
   generatedAt: string | null;
 };
 
+export type NoChainStateFreshness = {
+  evidenceUpdatedAt: string | null;
+  staleAfterDays: number;
+  ageDays: number | null;
+  isStale: boolean;
+  warningLabel: string;
+};
+
+const NO_CHAIN_STALE_AFTER_DAYS = 7;
+
+export const noChainState = {
+  title: 'Compare chain capability',
+  evidenceUpdatedAt: dbSiteSnapshotGeneratedAt,
+  staleAfterDays: NO_CHAIN_STALE_AFTER_DAYS,
+  missingLabel: 'No generated chain snapshot is available, so missing chain rows may be genuinely absent or simply not exported yet.',
+  staleLabel: 'Compare chain evidence is stale: refresh generated exports before treating missing chain rows as genuinely unavailable.',
+  freshLabel: 'Compare chain evidence is fresh enough to distinguish missing chain coverage from outdated exports.'
+} as const;
+
+export function getNoChainStateFreshness(referenceDate: Date = new Date()): NoChainStateFreshness {
+  if (!noChainState.evidenceUpdatedAt) {
+    return {
+      evidenceUpdatedAt: null,
+      staleAfterDays: noChainState.staleAfterDays,
+      ageDays: null,
+      isStale: true,
+      warningLabel: noChainState.missingLabel
+    };
+  }
+
+  const evidenceTime = Date.parse(noChainState.evidenceUpdatedAt);
+  const ageDays = Number.isFinite(evidenceTime)
+    ? Math.floor((referenceDate.getTime() - evidenceTime) / 86_400_000)
+    : null;
+  const isStale = ageDays === null || ageDays > noChainState.staleAfterDays;
+
+  return {
+    evidenceUpdatedAt: noChainState.evidenceUpdatedAt,
+    staleAfterDays: noChainState.staleAfterDays,
+    ageDays,
+    isStale,
+    warningLabel: isStale ? noChainState.staleLabel : noChainState.freshLabel
+  };
+}
+
 function normalizeCompareId(value: string): string {
   return value.trim().toLowerCase();
 }

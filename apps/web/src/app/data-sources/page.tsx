@@ -18,6 +18,7 @@ import {
   storeBrandLedger,
   timescaleDbEvaluation
 } from '@/lib/verified-data';
+import { getNoChainStateFreshness, noChainState } from '@/lib/chain-compare';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -27,6 +28,8 @@ export function generateMetadata() {
 export const dynamic = 'force-static';
 
 export default function DataSourcesPage() {
+  const noChainFreshness = getNoChainStateFreshness();
+
   return (
     <PageShell>
       <Eyebrow>Data sources</Eyebrow>
@@ -40,6 +43,28 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+      <section id="compare-chain-capabilities">
+        <Card className="mt-6 border-amber-200 bg-amber-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-800">Compare chain capabilities</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{noChainState.title}</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
+              {noChainFreshness.warningLabel} Evidence updated at {noChainState.evidenceUpdatedAt ?? 'not yet exported'} so no-chain cards can distinguish absent chain support from stale generated exports.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-amber-900 shadow-sm">
+            {noChainFreshness.isStale ? 'Stale warning' : 'Fresh evidence'}
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <Metric label="Evidence timestamp" value={noChainState.evidenceUpdatedAt ?? 'missing'} />
+          <Metric label="Stale after" value={`${noChainState.staleAfterDays} days`} />
+          <Metric label="Current age" value={noChainFreshness.ageDays === null ? 'unknown' : `${noChainFreshness.ageDays} days`} />
+        </div>
+        </Card>
+      </section>
 
       <Card className="mt-6 border-lime-200 bg-lime-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">

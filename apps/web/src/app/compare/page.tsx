@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
+import { COMPARE_CHAIN_ORDER, buildChainComparisonTable, getNoChainStateFreshness, noChainState } from '@/lib/chain-compare';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
@@ -25,6 +25,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
   const comparison = buildChainComparisonTable(productsParam);
+  const noChainFreshness = getNoChainStateFreshness();
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
   const rowSections = [
@@ -56,6 +57,11 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               Enter product slugs or retailer product ids in the query string to compare side-by-side prices across ICA, Willys, and Coop.
               The table uses packages/db snapshot rows when production exports are present and marks missing chain rows explicitly.
             </p>
+            {noChainFreshness.isStale ? (
+              <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold leading-6 text-amber-950">
+                Compare chain evidence stale: {noChainFreshness.warningLabel} Evidence updated {noChainState.evidenceUpdatedAt ?? 'not yet exported'}.
+              </p>
+            ) : null}
           </div>
           <Link className="rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white shadow-sm" href="/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st">
             Try sample products
