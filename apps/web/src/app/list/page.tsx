@@ -5,10 +5,12 @@ import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
+import { estimateListBudgetImpact } from '@/lib/budget-forecast';
 
 export default function ShoppingListPage() {
   const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const budgetImpact = estimateListBudgetImpact(totalCount);
 
   return (
     <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
@@ -30,6 +32,24 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+
+        <section className="mt-6 grid gap-3 rounded-[1.75rem] border border-amber-200 bg-amber-50 p-5 shadow-sm md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Budget impact estimate</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-950">
+              {budgetImpact.estimatedSpend} kr estimated trip spend
+            </h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">
+              {budgetImpact.summary}. Updates as list items are added before checkout.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white px-4 py-3 text-right shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Spend drift</p>
+            <p className={`mt-1 text-3xl font-black ${budgetImpact.status === 'over' ? 'text-rose-700' : budgetImpact.status === 'under' ? 'text-emerald-800' : 'text-slate-950'}`}>
+              {budgetImpact.driftPercent > 0 ? '+' : ''}{budgetImpact.driftPercent}%
+            </p>
+          </div>
+        </section>
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
