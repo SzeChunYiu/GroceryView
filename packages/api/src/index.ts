@@ -1170,6 +1170,65 @@ export type HouseholdBasketCheckRequest = {
   checkedAt?: string;
 };
 
+export const friendDealShareScopes = ['household', 'friend'] as const;
+export type FriendDealShareScope = typeof friendDealShareScopes[number];
+
+export const friendDealShareSignalKinds = ['spotted_deal', 'price_drop', 'coupon', 'expiry_markdown'] as const;
+export type FriendDealShareSignalKind = typeof friendDealShareSignalKinds[number];
+
+export type FriendDealShareSignalRequest = {
+  productId: string;
+  scope: FriendDealShareScope;
+  signal: FriendDealShareSignalKind;
+  consented: boolean;
+  sourceUserId?: string;
+  sourceDisplayName?: string;
+  note?: string;
+  sharedAt?: string;
+  expiresAt?: string;
+};
+
+export type FriendDealShareSignal = {
+  id: string;
+  userId: string;
+  sourceUserId: string;
+  productId: string;
+  productName: string;
+  scope: FriendDealShareScope;
+  signal: FriendDealShareSignalKind;
+  consented: true;
+  createdAt: string;
+  sourceDisplayName?: string;
+  note?: string;
+  expiresAt?: string;
+};
+
+export type FriendDealShareSignalReport = {
+  userId: string;
+  signalCount: number;
+  signals: FriendDealShareSignal[];
+  suggestionProductIds: string[];
+  guardrails: string[];
+};
+
+export type FriendSharedDealSuggestion = {
+  productId: string;
+  productName: string;
+  signalCount: number;
+  scopes: FriendDealShareScope[];
+  latestSignalAt: string;
+  bestPrice: number | null;
+  bestStoreName: string | null;
+  dealScore: number;
+};
+
+export type FriendSharedDealSuggestionsReport = {
+  userId: string;
+  suggestionCount: number;
+  suggestions: FriendSharedDealSuggestion[];
+  guardrails: string[];
+};
+
 export type HouseholdApprovalPolicy = {
   approvalLimit: number;
   reviewer: string;
@@ -3415,6 +3474,95 @@ function householdPlanRequestFromPlan(plan: HouseholdPlan): HouseholdPlanRequest
   };
 }
 
+const friendDealShareSignalGuardrails = [
+  'Friend-shared deal signals are stored only for signed-in users who explicitly opt in.',
+  'Anonymous or non-consented deal shares are blocked before they can affect recommendations.',
+  'Friend and household scopes remain account-bound inputs for suggestFriendSharedDeals, not public social posts.'
+];
+
+function productNameFor(productId: string): string {
+  const product = products.find((candidate) => candidate.id === productId);
+  if (!product) throw new Error(`Unknown productId: ${productId}`);
+  return product.name;
+}
+
+function signalIdPart(value: string): string {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'signal';
+}
+
+function normalizeFriendDealShareSignal(userId: string, input: FriendDealShareSignalRequest, sequence: number): FriendDealShareSignal {
+  requireNonEmptyId(userId, 'userId');
+  requireKnownProduct(input.productId);
+  const scope = requireOneOf(input.scope, 'scope', friendDealShareScopes);
+  const signal = requireOneOf(input.signal, 'signal', friendDealShareSignalKinds);
+  if (input.consented !== true) throw new Error('Friend-shared deal signals require explicit opt-in consent');
+  const sourceUserId = input.sourceUserId ?? userId;
+  requireNonEmptyId(sourceUserId, 'sourceUserId');
+  if (sourceUserId !== userId) throw new Error('sourceUserId must match the signed-in user');
+  const createdAt = input.sharedAt === undefined ? new Date().toISOString() : requireIsoTimestamp(input.sharedAt, 'sharedAt');
+  const expiresAt = optionalIsoTimestamp(input.expiresAt, 'expiresAt');
+  const sourceDisplayName = input.sourceDisplayName?.trim();
+  const note = input.note?.trim();
+  if (note && note.length > 280) throw new Error('note must be 280 characters or fewer');
+  return {
+    id: `friend-deal-${signalIdPart(userId)}-${sequence}`,
+    userId,
+    sourceUserId,
+    productId: input.productId,
+    productName: productNameFor(input.productId),
+    scope,
+    signal,
+    consented: true,
+    createdAt,
+    ...(sourceDisplayName ? { sourceDisplayName } : {}),
+    ...(note ? { note } : {}),
+    ...(expiresAt === undefined ? {} : { expiresAt })
+  };
+}
+
+function activeFriendDealSignals(signals: FriendDealShareSignal[], now = Date.now()): FriendDealShareSignal[] {
+  return signals.filter((signal) => signal.expiresAt === undefined || Date.parse(signal.expiresAt) > now);
+}
+
+function buildFriendDealShareSignalReport(userId: string, signals: FriendDealShareSignal[]): FriendDealShareSignalReport {
+  const activeSignals = activeFriendDealSignals(signals);
+  return {
+    userId,
+    signalCount: signals.length,
+    signals: [...signals].sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt) || left.id.localeCompare(right.id)),
+    suggestionProductIds: Array.from(new Set(activeSignals.map((signal) => signal.productId))).sort(),
+    guardrails: friendDealShareSignalGuardrails
+  };
+}
+
+function buildFriendSharedDealSuggestions(userId: string, signals: FriendDealShareSignal[]): FriendSharedDealSuggestionsReport {
+  const byProduct = new Map<string, FriendDealShareSignal[]>();
+  for (const signal of activeFriendDealSignals(signals)) {
+    byProduct.set(signal.productId, [...(byProduct.get(signal.productId) ?? []), signal]);
+  }
+  const suggestions = [...byProduct.entries()].map(([productId, productSignals]) => {
+    const product = products.find((candidate) => candidate.id === productId);
+    if (!product) throw new Error(`Unknown productId: ${productId}`);
+    const bestPrice = bestPriceFor(product);
+    return {
+      productId,
+      productName: product.name,
+      signalCount: productSignals.length,
+      scopes: Array.from(new Set(productSignals.map((signal) => signal.scope))).sort(),
+      latestSignalAt: productSignals.map((signal) => signal.createdAt).sort().at(-1)!,
+      bestPrice: bestPrice?.price ?? null,
+      bestStoreName: bestPrice?.storeName ?? null,
+      dealScore: product.dealScore
+    } satisfies FriendSharedDealSuggestion;
+  }).sort((left, right) => right.signalCount - left.signalCount || right.dealScore - left.dealScore || left.productName.localeCompare(right.productName));
+  return {
+    userId,
+    suggestionCount: suggestions.length,
+    suggestions,
+    guardrails: friendDealShareSignalGuardrails
+  };
+}
+
 function householdStateFromPlan(plan: HouseholdPlan) {
   const household = createHouseholdState({
     id: plan.household.id,
@@ -4306,6 +4454,7 @@ export function createGroceryViewApi() {
   const householdPlans = new Map<string, HouseholdPlan>();
   const householdIdByUserId = new Map<string, string>();
   const basketImportReviews = new Map<string, BasketImportReviewItem[]>();
+  const friendDealShareSignals = new Map<string, FriendDealShareSignal[]>();
 
   const productSnapshots = () =>
     products.map((product) => {
@@ -4886,6 +5035,7 @@ export function createGroceryViewApi() {
       categoryBudgets.delete(userId);
       subscriptionEntitlements.delete(userId);
       basketImportReviews.delete(userId);
+      friendDealShareSignals.delete(userId);
       const householdId = householdIdByUserId.get(userId);
       if (householdId) {
         householdPlans.delete(householdId);
@@ -4977,6 +5127,25 @@ export function createGroceryViewApi() {
           'Estimated prices are excluded unless the watcher explicitly allows estimated price types.'
         ]
       };
+    },
+
+    createFriendDealShareSignal(userId: string, input: FriendDealShareSignalRequest): FriendDealShareSignalReport {
+      requireNonEmptyId(userId, 'userId');
+      const existing = friendDealShareSignals.get(userId) ?? [];
+      const signal = normalizeFriendDealShareSignal(userId, input, existing.length + 1);
+      const next = [...existing, signal];
+      friendDealShareSignals.set(userId, next);
+      return buildFriendDealShareSignalReport(userId, next);
+    },
+
+    listFriendDealShareSignals(userId: string): FriendDealShareSignalReport {
+      requireNonEmptyId(userId, 'userId');
+      return buildFriendDealShareSignalReport(userId, friendDealShareSignals.get(userId) ?? []);
+    },
+
+    suggestFriendSharedDeals(userId: string): FriendSharedDealSuggestionsReport {
+      requireNonEmptyId(userId, 'userId');
+      return buildFriendSharedDealSuggestions(userId, friendDealShareSignals.get(userId) ?? []);
     },
 
     addBasketItem(userId: string, item: BasketItemRequest) {

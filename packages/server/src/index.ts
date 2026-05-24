@@ -15,6 +15,7 @@ import {
   type FlyerOfferObservationInput,
   type FlyerOfferReport,
   type FlyerOfferStoreSummary,
+  type FriendDealShareSignalRequest,
   type HouseholdBasketCheckRequest,
   type HouseholdJoinRequest,
   type HouseholdPlanRequest,
@@ -569,6 +570,16 @@ function optionalHouseholdJoinRole(value: unknown): HouseholdJoinRequest['role']
   throw new Error('role must be editor or viewer.');
 }
 
+function requiredFriendDealShareScope(value: unknown): FriendDealShareSignalRequest['scope'] {
+  if (value === 'household' || value === 'friend') return value;
+  throw new Error('scope must be household or friend.');
+}
+
+function requiredFriendDealShareSignal(value: unknown): FriendDealShareSignalRequest['signal'] {
+  if (value === 'spotted_deal' || value === 'price_drop' || value === 'coupon' || value === 'expiry_markdown') return value;
+  throw new Error('signal must be spotted_deal, price_drop, coupon, or expiry_markdown.');
+}
+
 const isoTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
 function requiredIsoTimestamp(value: unknown, field: string): string {
@@ -1116,6 +1127,20 @@ function householdBasketCheckRequestFromBody(body: JsonRecord): HouseholdBasketC
     productId: requiredString(body.productId, 'productId'),
     checked: requiredBoolean(body.checked, 'checked'),
     ...(body.checkedAt === undefined ? {} : { checkedAt: requiredString(body.checkedAt, 'checkedAt') })
+  };
+}
+
+function friendDealShareSignalRequestFromBody(body: JsonRecord): FriendDealShareSignalRequest {
+  return {
+    productId: requiredString(body.productId, 'productId'),
+    scope: requiredFriendDealShareScope(body.scope),
+    signal: requiredFriendDealShareSignal(body.signal),
+    consented: requiredBoolean(body.consented, 'consented'),
+    ...(body.sourceUserId === undefined ? {} : { sourceUserId: requiredString(body.sourceUserId, 'sourceUserId') }),
+    ...(body.sourceDisplayName === undefined ? {} : { sourceDisplayName: requiredString(body.sourceDisplayName, 'sourceDisplayName') }),
+    ...(body.note === undefined ? {} : { note: requiredString(body.note, 'note') }),
+    ...(body.sharedAt === undefined ? {} : { sharedAt: requiredIsoTimestamp(body.sharedAt, 'sharedAt') }),
+    ...(body.expiresAt === undefined ? {} : { expiresAt: requiredIsoTimestamp(body.expiresAt, 'expiresAt') })
   };
 }
 
@@ -2897,6 +2922,18 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      if (path === '/api/deals/friend-share-signals') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.listFriendDealShareSignals(user));
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse(api.createFriendDealShareSignal(user, friendDealShareSignalRequestFromBody(body)), { status: 201 });
+        }
+      }
+
       if (path === '/api/privacy/export' || path === '/api/settings/data-export') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -3127,6 +3164,16 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
+      '/api/deals/friend-share-signals': {
+        get: operationWithJsonResponse(
+          protectedOperation('List opted-in household and friend deal share signals for the signed-in account.'),
+          'FriendDealShareSignalResponse'
+        ),
+        post: operationWithJsonResponse(
+          protectedOperation('Create an opted-in household or friend deal share signal for suggestFriendSharedDeals.'),
+          'FriendDealShareSignalResponse'
+        )
+      },
       '/api/retailers': { get: publicOperation('List supported retailers with logo and website metadata.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },

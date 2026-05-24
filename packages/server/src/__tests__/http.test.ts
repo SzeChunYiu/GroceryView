@@ -1533,6 +1533,67 @@ describe('createHttpHandler', () => {
     assert.equal(partnerRead.household.id, 'house-join-1');
   });
 
+  it('creates and lists authenticated opt-in friend-shared deal signals', async () => {
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'friend-signal-secret');
+    const handle = createHttpHandler(undefined, { authSecret: 'friend-signal-secret' });
+
+    const anonymous = await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1'));
+    assert.equal(anonymous.status, 401);
+
+    const created = await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        productId: 'coffee',
+        scope: 'friend',
+        signal: 'price_drop',
+        consented: true,
+        sourceDisplayName: 'Alex',
+        sharedAt: '2026-05-23T10:00:00.000Z'
+      })
+    }));
+    assert.equal(created.status, 201);
+    const createdBody = await json(created) as {
+      userId: string;
+      signalCount: number;
+      suggestionProductIds: string[];
+      signals: Array<{ productId: string; scope: string; signal: string; consented: boolean; sourceUserId: string }>;
+      guardrails: string[];
+    };
+    assert.equal(createdBody.userId, 'user-1');
+    assert.equal(createdBody.signalCount, 1);
+    assert.deepEqual(createdBody.suggestionProductIds, ['coffee']);
+    assert.deepEqual(createdBody.signals.map((signal) => [signal.productId, signal.scope, signal.signal, signal.consented, signal.sourceUserId]), [
+      ['coffee', 'friend', 'price_drop', true, 'user-1']
+    ]);
+    assert.match(createdBody.guardrails[1], /Anonymous or non-consented/i);
+
+    const listed = await json(await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }))) as { signalCount: number; signals: unknown[] };
+    assert.equal(listed.signalCount, 1);
+    assert.equal(listed.signals.length, 1);
+
+    const nonConsented = await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ productId: 'coffee', scope: 'household', signal: 'spotted_deal', consented: false })
+    }));
+    assert.equal(nonConsented.status, 400);
+    assert.match(JSON.stringify(await json(nonConsented)), /explicit opt-in consent/);
+
+    const spoofedSource = await handle(new Request('http://localhost/api/deals/friend-share-signals?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ productId: 'coffee', scope: 'friend', signal: 'coupon', consented: true, sourceUserId: 'user-2' })
+    }));
+    assert.equal(spoofedSource.status, 400);
+    assert.match(JSON.stringify(await json(spoofedSource)), /sourceUserId must match/);
+  });
+
   it('creates private scan upload tickets before scan processing', async () => {
     const handle = createHttpHandler(undefined, {
       now: new Date('2026-05-20T08:00:00.000Z'),

@@ -945,6 +945,56 @@ describe('createGroceryViewApi', () => {
     assert.throws(() => api.getMealPlanSuggestionsReport('user-1', { servings: 0 }), /servings must be positive/);
   });
 
+  it('persists only opted-in friend-shared deal signals for recommendations', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.createFriendDealShareSignal('user-1', {
+      productId: 'coffee',
+      scope: 'friend',
+      signal: 'price_drop',
+      consented: true,
+      sourceDisplayName: 'Alex',
+      note: 'Willys shelf dropped today',
+      sharedAt: '2026-05-23T10:00:00.000Z'
+    });
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.signalCount, 1);
+    assert.deepEqual(report.suggestionProductIds, ['coffee']);
+    assert.deepEqual(report.signals[0], {
+      id: 'friend-deal-user-1-1',
+      userId: 'user-1',
+      sourceUserId: 'user-1',
+      productId: 'coffee',
+      productName: 'Zoégas Coffee 450g',
+      scope: 'friend',
+      signal: 'price_drop',
+      consented: true,
+      createdAt: '2026-05-23T10:00:00.000Z',
+      sourceDisplayName: 'Alex',
+      note: 'Willys shelf dropped today'
+    });
+
+    const suggestions = api.suggestFriendSharedDeals('user-1');
+    assert.equal(suggestions.suggestionCount, 1);
+    assert.deepEqual(suggestions.suggestions.map((suggestion) => suggestion.productId), ['coffee']);
+    assert.match(suggestions.guardrails[1], /Anonymous or non-consented/i);
+
+    assert.throws(() => api.createFriendDealShareSignal('user-1', {
+      productId: 'coffee',
+      scope: 'household',
+      signal: 'spotted_deal',
+      consented: false
+    }), /explicit opt-in consent/);
+    assert.throws(() => api.createFriendDealShareSignal('user-1', {
+      productId: 'coffee',
+      scope: 'friend',
+      signal: 'coupon',
+      consented: true,
+      sourceUserId: 'user-2'
+    }), /sourceUserId must match/);
+  });
+
   it('serves expiry markdown radar scoped by favorite store and category filters', () => {
     const api = createGroceryViewApi();
     api.addFavoriteStore('user-1', 'coop-odenplan');

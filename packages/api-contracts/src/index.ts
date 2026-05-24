@@ -172,6 +172,44 @@ export const notificationInboxResponseSchema = z.object({
   guardrails: z.array(idSchema)
 });
 
+export const friendDealShareScopeSchema = z.enum(['household', 'friend']);
+export const friendDealShareSignalKindSchema = z.enum(['spotted_deal', 'price_drop', 'coupon', 'expiry_markdown']);
+
+export const friendDealShareSignalRequestSchema = z.object({
+  productId: idSchema,
+  scope: friendDealShareScopeSchema,
+  signal: friendDealShareSignalKindSchema,
+  consented: z.literal(true),
+  sourceUserId: idSchema.optional(),
+  sourceDisplayName: idSchema.optional(),
+  note: z.string().trim().min(1).max(280).optional(),
+  sharedAt: isoDateTimeSchema.optional(),
+  expiresAt: isoDateTimeSchema.optional()
+});
+
+export const friendDealShareSignalSchema = z.object({
+  id: idSchema,
+  userId: idSchema,
+  sourceUserId: idSchema,
+  productId: idSchema,
+  productName: idSchema,
+  scope: friendDealShareScopeSchema,
+  signal: friendDealShareSignalKindSchema,
+  consented: z.literal(true),
+  createdAt: isoDateTimeSchema,
+  sourceDisplayName: idSchema.optional(),
+  note: z.string().trim().min(1).max(280).optional(),
+  expiresAt: isoDateTimeSchema.optional()
+});
+
+export const friendDealShareSignalResponseSchema = z.object({
+  userId: idSchema,
+  signalCount: z.number().int().nonnegative(),
+  signals: z.array(friendDealShareSignalSchema),
+  suggestionProductIds: z.array(idSchema),
+  guardrails: z.array(idSchema)
+});
+
 export const productPricesResponseSchema = z.object({
   product: productSchema,
   prices: z.array(latestPriceSchema)
@@ -185,6 +223,9 @@ export const apiContractSchemas = {
   fuelPriceObservation: fuelPriceObservationSchema,
   fuelPriceSource: fuelPriceSourceSchema,
   fuelPricesResponse: fuelPricesResponseSchema,
+  friendDealShareSignal: friendDealShareSignalSchema,
+  friendDealShareSignalRequest: friendDealShareSignalRequestSchema,
+  friendDealShareSignalResponse: friendDealShareSignalResponseSchema,
   priceObservation: priceObservationSchema,
   product: productSchema,
   notificationInboxResponse: notificationInboxResponseSchema,
@@ -202,6 +243,11 @@ export type FuelGrade = z.infer<typeof fuelGradeSchema>;
 export type FuelPriceObservationDto = z.infer<typeof fuelPriceObservationSchema>;
 export type FuelPriceSourceDto = z.infer<typeof fuelPriceSourceSchema>;
 export type FuelPricesResponseDto = z.infer<typeof fuelPricesResponseSchema>;
+export type FriendDealShareScopeDto = z.infer<typeof friendDealShareScopeSchema>;
+export type FriendDealShareSignalDto = z.infer<typeof friendDealShareSignalSchema>;
+export type FriendDealShareSignalKindDto = z.infer<typeof friendDealShareSignalKindSchema>;
+export type FriendDealShareSignalRequestDto = z.infer<typeof friendDealShareSignalRequestSchema>;
+export type FriendDealShareSignalResponseDto = z.infer<typeof friendDealShareSignalResponseSchema>;
 export type LatestPriceDto = z.infer<typeof latestPriceSchema>;
 export type NotificationInboxQueueItemDto = z.infer<typeof notificationInboxQueueItemSchema>;
 export type NotificationInboxResponseDto = z.infer<typeof notificationInboxResponseSchema>;
@@ -333,6 +379,59 @@ export const apiContractOpenApiComponents = {
         items: { $ref: '#/components/schemas/NotificationInboxQueueItem' }
       },
       quietHoursWindow: { type: 'string' },
+      guardrails: {
+        type: 'array',
+        items: { type: 'string' }
+      }
+    }
+  },
+  FriendDealShareSignal: {
+    type: 'object',
+    required: ['id', 'userId', 'sourceUserId', 'productId', 'productName', 'scope', 'signal', 'consented', 'createdAt'],
+    properties: {
+      id: { type: 'string' },
+      userId: { type: 'string' },
+      sourceUserId: { type: 'string' },
+      productId: { type: 'string' },
+      productName: { type: 'string' },
+      scope: { type: 'string', enum: friendDealShareScopeSchema.options },
+      signal: { type: 'string', enum: friendDealShareSignalKindSchema.options },
+      consented: { type: 'boolean', const: true },
+      createdAt: { type: 'string', format: 'date-time' },
+      sourceDisplayName: { type: 'string' },
+      note: { type: 'string', maxLength: 280 },
+      expiresAt: { type: 'string', format: 'date-time' }
+    }
+  },
+  FriendDealShareSignalRequest: {
+    type: 'object',
+    required: ['productId', 'scope', 'signal', 'consented'],
+    properties: {
+      productId: { type: 'string' },
+      scope: { type: 'string', enum: friendDealShareScopeSchema.options },
+      signal: { type: 'string', enum: friendDealShareSignalKindSchema.options },
+      consented: { type: 'boolean', const: true },
+      sourceUserId: { type: 'string' },
+      sourceDisplayName: { type: 'string' },
+      note: { type: 'string', maxLength: 280 },
+      sharedAt: { type: 'string', format: 'date-time' },
+      expiresAt: { type: 'string', format: 'date-time' }
+    }
+  },
+  FriendDealShareSignalResponse: {
+    type: 'object',
+    required: ['userId', 'signalCount', 'signals', 'suggestionProductIds', 'guardrails'],
+    properties: {
+      userId: { type: 'string' },
+      signalCount: { type: 'integer', minimum: 0 },
+      signals: {
+        type: 'array',
+        items: { $ref: '#/components/schemas/FriendDealShareSignal' }
+      },
+      suggestionProductIds: {
+        type: 'array',
+        items: { type: 'string' }
+      },
       guardrails: {
         type: 'array',
         items: { type: 'string' }

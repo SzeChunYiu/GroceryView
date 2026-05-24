@@ -4,6 +4,8 @@ import {
   apiContractOpenApiComponents,
   apiContractSchemas,
   fuelPriceObservationSchema,
+  friendDealShareSignalRequestSchema,
+  friendDealShareSignalResponseSchema,
   notificationInboxResponseSchema,
   priceObservationSchema,
   type NotificationInboxResponseDto,
@@ -71,6 +73,9 @@ describe('api contract schemas', () => {
       'alert',
       'basket',
       'basketItem',
+      'friendDealShareSignal',
+      'friendDealShareSignalRequest',
+      'friendDealShareSignalResponse',
       'fuelPriceObservation',
       'fuelPriceSource',
       'fuelPricesResponse',
@@ -182,6 +187,43 @@ describe('api contract schemas', () => {
     );
   });
 
+
+  it('contracts friend-shared deal signals as opt-in account-bound inputs', () => {
+    const parsedRequest = friendDealShareSignalRequestSchema.parse({
+      productId: 'coffee',
+      scope: 'friend',
+      signal: 'price_drop',
+      consented: true,
+      sourceUserId: 'user-1',
+      sourceDisplayName: 'Alex',
+      sharedAt: '2026-05-23T10:00:00.000Z'
+    });
+
+    assert.equal(parsedRequest.consented, true);
+    assert.equal(parsedRequest.scope, 'friend');
+    assert.equal(friendDealShareSignalRequestSchema.safeParse({ ...parsedRequest, consented: false }).success, false);
+    assert.equal(friendDealShareSignalRequestSchema.safeParse({ ...parsedRequest, scope: 'public' }).success, false);
+
+    const response = friendDealShareSignalResponseSchema.parse({
+      userId: 'user-1',
+      signalCount: 1,
+      signals: [{
+        id: 'friend-deal-user-1-1',
+        userId: 'user-1',
+        sourceUserId: 'user-1',
+        productId: 'coffee',
+        productName: 'Zoégas Coffee 450g',
+        scope: 'friend',
+        signal: 'price_drop',
+        consented: true,
+        createdAt: '2026-05-23T10:00:00.000Z'
+      }],
+      suggestionProductIds: ['coffee'],
+      guardrails: ['Anonymous or non-consented deal shares are blocked.']
+    });
+    assert.deepEqual(response.suggestionProductIds, ['coffee']);
+  });
+
   it('publishes OpenAPI-compatible component metadata for price provenance', () => {
     const price = apiContractOpenApiComponents.PriceObservation;
     const fuel = apiContractOpenApiComponents.FuelPriceObservation;
@@ -212,5 +254,8 @@ describe('api contract schemas', () => {
       'guardrails'
     ]);
     assert.equal(apiContractOpenApiComponents.NotificationInboxQueueItem.properties.sendAt.format, 'date-time');
+    assert.deepEqual(apiContractOpenApiComponents.FriendDealShareSignalRequest.properties.scope.enum, ['household', 'friend']);
+    assert.deepEqual(apiContractOpenApiComponents.FriendDealShareSignalRequest.properties.signal.enum, ['spotted_deal', 'price_drop', 'coupon', 'expiry_markdown']);
+    assert.equal(apiContractOpenApiComponents.FriendDealShareSignalResponse.properties.signals.items.$ref, '#/components/schemas/FriendDealShareSignal');
   });
 });
