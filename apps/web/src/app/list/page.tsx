@@ -4,10 +4,25 @@ import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
+import { ListSwitcher } from '@/components/ListSwitcher';
 import { useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const {
+    activeListId,
+    activeListName,
+    addImportedItems,
+    checkedCount,
+    createList,
+    deleteList,
+    items,
+    listSummaries,
+    remainingCount,
+    resetCheckedState,
+    switchList,
+    toggleItemChecked,
+    totalCount
+  } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -19,7 +34,7 @@ export default function ShoppingListPage() {
           <div>
             <h1 className="text-4xl font-black tracking-tight text-slate-950">Shopping list</h1>
             <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
-              Check items off while you shop. Checked state is saved in this browser with localStorage, so the same list stays crossed off after a refresh.
+              Active list: <span className="font-black text-emerald-900">{activeListName}</span>. Checked state is saved per list in this browser with localStorage.
             </p>
           </div>
           <div className="rounded-[1.5rem] border border-emerald-200 bg-white p-4 shadow-sm">
@@ -29,12 +44,20 @@ export default function ShoppingListPage() {
           </div>
         </div>
 
+        <ListSwitcher
+          activeListId={activeListId}
+          lists={listSummaries}
+          onCreateList={createList}
+          onDeleteList={deleteList}
+          onSwitchList={switchList}
+        />
+
         <BulkImportDialog onImportItems={addImportedItems} />
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-2xl font-black tracking-tight text-slate-950">Today&apos;s basket</h2>
+              <h2 className="text-2xl font-black tracking-tight text-slate-950">{activeListName}</h2>
               <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">
                 Tap the checkbox once an item is in your basket. Completed rows are struck through immediately and restored from localStorage on reload.
               </p>

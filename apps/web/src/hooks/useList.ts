@@ -17,12 +17,26 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
-type PersistedListState = {
+export type ShoppingListSummary = {
+  id: string;
+  name: string;
+};
+
+type PersistedSingleListState = {
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
 };
 
+type PersistedShoppingList = ShoppingListSummary & Required<PersistedSingleListState>;
+
+type PersistedListState = {
+  activeListId?: string;
+  lists?: PersistedShoppingList[];
+} & PersistedSingleListState;
+
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
+export const DEFAULT_LIST_ID = 'weekly-basics';
+export const DEFAULT_LIST_NAME = 'Weekly basics';
 
 const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   {
@@ -57,8 +71,57 @@ const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   }
 ];
 
-function listStateFromStorage(value: string | null): Required<PersistedListState> {
-  const empty = { checkedById: {}, importedItems: [] };
+function emptySingleListState(): Required<PersistedSingleListState> {
+  return { checkedById: {}, importedItems: [] };
+}
+
+function defaultList(overrides: Partial<PersistedShoppingList> = {}): PersistedShoppingList {
+  return {
+    id: DEFAULT_LIST_ID,
+    name: DEFAULT_LIST_NAME,
+    ...emptySingleListState(),
+    ...overrides
+  };
+}
+
+function validCheckedById(value: unknown) {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? Object.fromEntries(
+      Object.entries(value)
+        .filter((entry): entry is [string, boolean] => typeof entry[1] === 'boolean')
+    )
+    : {};
+}
+
+function validImportedItems(value: unknown) {
+  return Array.isArray(value)
+    ? value.filter((item): item is BulkImportedListItemInput => (
+      item !== null
+      && typeof item === 'object'
+      && item.importSource === 'bulk-clipboard'
+      && typeof item.id === 'string'
+      && typeof item.name === 'string'
+      && typeof item.quantity === 'string'
+      && typeof item.detail === 'string'
+    ))
+    : [];
+}
+
+function normalizeList(value: unknown): PersistedShoppingList | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const maybeList = value as Partial<PersistedShoppingList>;
+  if (typeof maybeList.id !== 'string' || typeof maybeList.name !== 'string') return null;
+
+  return {
+    id: maybeList.id,
+    name: maybeList.name,
+    checkedById: validCheckedById(maybeList.checkedById),
+    importedItems: validImportedItems(maybeList.importedItems)
+  };
+}
+
+function listStateFromStorage(value: string | null): { activeListId: string; lists: PersistedShoppingList[] } {
+  const empty = { activeListId: DEFAULT_LIST_ID, lists: [defaultList()] };
   if (!value) return empty;
 
   try {
@@ -68,29 +131,26 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       return empty;
     }
 
+    if (Array.isArray((parsed as PersistedListState).lists)) {
+      const lists = (parsed as PersistedListState).lists?.map(normalizeList).filter((list): list is PersistedShoppingList => list !== null) ?? [];
+      if (lists.length === 0) return empty;
+      const activeListId = typeof (parsed as PersistedListState).activeListId === 'string'
+        && lists.some((list) => list.id === (parsed as PersistedListState).activeListId)
+        ? (parsed as PersistedListState).activeListId as string
+        : lists[0].id;
+      return { activeListId, lists };
+    }
+
     const maybeCheckedById = 'checkedById' in parsed ? parsed.checkedById : parsed;
     const maybeImportedItems = 'importedItems' in parsed ? parsed.importedItems : [];
 
-    const checkedById = maybeCheckedById && typeof maybeCheckedById === 'object' && !Array.isArray(maybeCheckedById)
-      ? Object.fromEntries(
-        Object.entries(maybeCheckedById)
-          .filter((entry): entry is [string, boolean] => typeof entry[1] === 'boolean')
-      )
-      : {};
-
-    const importedItems = Array.isArray(maybeImportedItems)
-      ? maybeImportedItems.filter((item): item is BulkImportedListItemInput => (
-        item !== null
-        && typeof item === 'object'
-        && item.importSource === 'bulk-clipboard'
-        && typeof item.id === 'string'
-        && typeof item.name === 'string'
-        && typeof item.quantity === 'string'
-        && typeof item.detail === 'string'
-      ))
-      : [];
-
-    return { checkedById, importedItems };
+    return {
+      activeListId: DEFAULT_LIST_ID,
+      lists: [defaultList({
+        checkedById: validCheckedById(maybeCheckedById),
+        importedItems: validImportedItems(maybeImportedItems)
+      })]
+    };
   } catch {
     return empty;
   }
@@ -107,10 +167,10 @@ function withCheckedState(checkedById: Record<string, boolean>, importedItems: B
   }));
 }
 
-function persistCheckedState(items: ShoppingListItem[]) {
-  try {
-    const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
-    const importedItems = items
+function stateForItems(items: ShoppingListItem[]): Required<PersistedSingleListState> {
+  return {
+    checkedById: Object.fromEntries(items.map((item) => [item.id, item.checked])),
+    importedItems: items
       .filter((item) => item.importSource === 'bulk-clipboard')
       .map((item) => ({
         detail: item.detail,
@@ -120,21 +180,32 @@ function persistCheckedState(items: ShoppingListItem[]) {
         matchedProductSlug: item.matchedProductSlug,
         name: item.name,
         quantity: item.quantity
-      }));
-    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({ checkedById, importedItems }));
+      }))
+  };
+}
+
+function persistListState(activeListId: string, lists: PersistedShoppingList[]) {
+  try {
+    localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({ activeListId, lists }));
   } catch {
     // Keep the check-off UI usable even when a browser blocks localStorage.
   }
 }
 
+function slugFromName(name: string) {
+  return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'shopping-list';
+}
+
 export function useList() {
-  const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
+  const [activeListId, setActiveListId] = useState(DEFAULT_LIST_ID);
+  const [lists, setLists] = useState<PersistedShoppingList[]>(() => [defaultList()]);
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
 
   useEffect(() => {
     try {
-      const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
-      setItems(withCheckedState(checkedById, importedItems));
+      const storedState = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
+      setActiveListId(storedState.activeListId);
+      setLists(storedState.lists);
     } finally {
       setHasLoadedBrowserState(true);
     }
@@ -142,21 +213,31 @@ export function useList() {
 
   useEffect(() => {
     if (!hasLoadedBrowserState) return;
-    persistCheckedState(items);
-  }, [hasLoadedBrowserState, items]);
+    persistListState(activeListId, lists);
+  }, [activeListId, hasLoadedBrowserState, lists]);
+
+  const activeList = lists.find((list) => list.id === activeListId) ?? lists[0] ?? defaultList();
+  const items = useMemo(() => withCheckedState(activeList.checkedById, activeList.importedItems), [activeList]);
+
+  const updateActiveListItems = useCallback((updater: (items: ShoppingListItem[]) => ShoppingListItem[]) => {
+    setLists((currentLists) => currentLists.map((list) => {
+      if (list.id !== activeListId) return list;
+      return { ...list, ...stateForItems(updater(withCheckedState(list.checkedById, list.importedItems))) };
+    }));
+  }, [activeListId]);
 
   const toggleItemChecked = useCallback((itemId: string) => {
-    setItems((currentItems) => currentItems.map((item) => (
+    updateActiveListItems((currentItems) => currentItems.map((item) => (
       item.id === itemId ? { ...item, checked: !item.checked } : item
     )));
-  }, []);
+  }, [updateActiveListItems]);
 
   const resetCheckedState = useCallback(() => {
-    setItems((currentItems) => currentItems.map((item) => ({ ...item, checked: false })));
-  }, []);
+    updateActiveListItems((currentItems) => currentItems.map((item) => ({ ...item, checked: false })));
+  }, [updateActiveListItems]);
 
   const addImportedItems = useCallback((importedItems: BulkImportedListItemInput[]) => {
-    setItems((currentItems) => {
+    updateActiveListItems((currentItems) => {
       const existingIds = new Set(currentItems.map((item) => item.id));
       const nextImportedItems = importedItems
         .filter((item) => !existingIds.has(item.id))
@@ -164,18 +245,41 @@ export function useList() {
 
       return [...currentItems, ...nextImportedItems];
     });
+  }, [updateActiveListItems]);
+
+  const createList = useCallback((name: string) => {
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+    const id = `${slugFromName(trimmedName)}-${Date.now().toString(36)}`;
+    setLists((currentLists) => [...currentLists, defaultList({ id, name: trimmedName })]);
+    setActiveListId(id);
   }, []);
+
+  const deleteList = useCallback((listId: string) => {
+    setLists((currentLists) => {
+      if (currentLists.length <= 1) return currentLists;
+      const nextLists = currentLists.filter((list) => list.id !== listId);
+      if (listId === activeListId && nextLists.length > 0) setActiveListId(nextLists[0].id);
+      return nextLists.length > 0 ? nextLists : currentLists;
+    });
+  }, [activeListId]);
 
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
 
   return {
+    activeListId,
+    activeListName: activeList.name,
     addImportedItems,
     checkedCount,
+    createList,
+    deleteList,
     items,
+    listSummaries: lists.map(({ id, name }) => ({ id, name })),
     remainingCount,
     resetCheckedState,
+    switchList: setActiveListId,
     toggleItemChecked,
     totalCount
   };
