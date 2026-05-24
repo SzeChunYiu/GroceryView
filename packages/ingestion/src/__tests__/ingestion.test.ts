@@ -36,6 +36,7 @@ import {
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
   fetchSt1FuelPrices,
+  fetchUnoXNoFuelPrices,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
   BRANDED_FUEL_STATIONS_OVERPASS_URL,
@@ -135,6 +136,7 @@ import {
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
+  parseUnoXNoFuelPriceHtml,
   planIngestionBatch,
   planOfferVisibilityBoundary,
   planRetailerConnectorRun,
@@ -180,6 +182,7 @@ import {
   validateStoreEnumerationResults,
   validateEnumeratedStores,
   ST1_FUEL_PRICE_URL,
+  UNO_X_NO_FUEL_PRICE_URL,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
   scbCoicopFoodCategoryCodes,
@@ -677,6 +680,58 @@ describe('St1 fuel price connector', () => {
 
     await assert.rejects(
       () => fetchSt1FuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
+      /blocked or unavailable/
+    );
+  });
+});
+
+describe('Uno-X NO fuel price connector', () => {
+  const unoXNoFuelHtml = `
+    <main>
+      <h1>Drivstoffpriser</h1>
+      <p>Gyldig fra 24. mai 2026</p>
+      <table>
+        <tr><td>Bensin 95</td><td>21,19 kr/l</td></tr>
+        <tr><td>Diesel</td><td>20,49 kr/l</td></tr>
+      </table>
+    </main>
+  `;
+
+  it('parses Norwegian Uno-X per-litre fuel prices with operator provenance', () => {
+    const rows = parseUnoXNoFuelPriceHtml(unoXNoFuelHtml, {
+      sourceUrl: UNO_X_NO_FUEL_PRICE_URL,
+      retrievedAt: '2026-05-24T09:15:00.000Z',
+      sourceRunId: 'run-uno-x-no-fuel-2026-05-24'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.countryCode, row.chainId, row.grade, row.pricePerLitre, row.currency, row.litreBasis]), [
+      ['NO', 'uno-x-no', '95', 21.19, 'NOK', 1],
+      ['NO', 'uno-x-no', 'diesel', 20.49, 'NOK', 1]
+    ]);
+    assert.equal(rows[0].observedAt, '2026-05-23T22:01:00.000Z');
+    assert.equal(rows[0].source.operatorName, 'Uno-X Norge AS');
+    assert.equal(rows[0].provenance.parserVersion, 'uno-x-no-fuel-prices-v1');
+    assert.match(rows[0].provenance.contentDigest.value, /^[a-f0-9]{64}$/);
+  });
+
+  it('fetches the public Uno-X NO page and fails closed on blocked responses', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(unoXNoFuelHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+    };
+
+    const rows = await fetchUnoXNoFuelPrices({
+      fetchImpl,
+      retrievedAt: '2026-05-24T09:15:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [UNO_X_NO_FUEL_PRICE_URL]);
+    assert.equal(rows.length, 2);
+    assert.equal(rows.find((row) => row.grade === 'diesel')?.pricePerLitre, 20.49);
+
+    await assert.rejects(
+      () => fetchUnoXNoFuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
       /blocked or unavailable/
     );
   });
