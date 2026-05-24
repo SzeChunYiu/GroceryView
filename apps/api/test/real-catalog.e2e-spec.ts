@@ -346,6 +346,7 @@ class FakePostgresQueryExecutorService {
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
+    if (sql.includes('insert into aliases')) return [] as T[];
     if (sql.includes('from weekly_baskets')) return [{ product_id: 'product-milk', quantity: '2' }] as T[];
     if (sql.includes('where (products.id::text = any($1::text[]) or products.slug = any($1::text[]))')) {
       const [productRefs, storeSlugs] = params as [string[], string[] | null];
@@ -393,6 +394,17 @@ class FakePostgresQueryExecutorService {
         .slice(0, Number(limit)) as T[];
     }
     if (sql.includes('where slug = $1 or id::text = $1')) return productRows.map((row) => localizedCanonicalRow(row, requestedLocale(params))) as T[];
+    if (sql.includes('with matched_products')) {
+      const expandedTerms = params[10] as string[] | null;
+      const terms = expandedTerms ?? [];
+      if (terms.some((term) => ['mjolk', 'mjölk', 'milk', 'melk'].includes(term))) {
+        return priceRows.map((row) => localizedCanonicalRow(row, requestedLocale(params))) as T[];
+      }
+      if (terms.some((term) => ['smor', 'smör', 'butter'].includes(term))) {
+        return priceRows.filter((row) => row.product_id === 'product-butter').map((row) => localizedCanonicalRow(row, requestedLocale(params))) as T[];
+      }
+      return [] as T[];
+    }
     return priceRows.map((row) => localizedCanonicalRow(row, requestedLocale(params))) as T[];
   }
 }
@@ -440,12 +452,30 @@ describe('real catalog API endpoints', () => {
     assert.equal(response.body.products[0].productId, 'product-milk');
     assert.equal(response.body.products[0].cheapestPrice, 14.9);
     assert.equal(response.body.products[0].currentPrices[0].observationId, 'obs-milk-willys');
-    assert.deepEqual(response.body.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores']);
+    assert.deepEqual(response.body.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores', 'aliases']);
+    assert.equal(response.body.evidence.aliasExpansionTerms.includes('milk'), true);
     assert.equal('demo' in response.body, false);
     assert.match(database.calls[0]?.sql ?? '', /from products/i);
     assert.match(database.calls[0]?.sql ?? '', /latest_prices/i);
+    assert.match(database.calls[0]?.sql ?? '', /unnest\(coalesce\(\$11::text\[\]/i);
+    assert.equal((database.calls[0]?.params[10] as string[]).includes('milk'), true);
     assert.match(database.calls[0]?.sql ?? '', /from latest_prices filter_prices/i);
     assert.ok((database.calls[0]?.sql ?? '').indexOf('from latest_prices filter_prices') < (database.calls[0]?.sql ?? '').indexOf('limit $9'));
+  });
+
+  it('persists no-result product searches as pending alias review candidates', async () => {
+    const response = await request(app.getHttpServer()).get('/products/search/faceted?q=havredrykkk&limit=10').expect(200);
+
+    assert.equal(response.body.count, 0);
+    assert.deepEqual(response.body.evidence.aliasReviewCandidate, {
+      alias: 'havredrykkk',
+      normalizedAlias: 'havredrykkk',
+      sourceType: 'community'
+    });
+    const insertCall = database.calls.find((call) => call.sql.includes('insert into aliases'));
+    assert.ok(insertCall);
+    assert.deepEqual(insertCall.params, ['havredrykkk', 'havredrykkk']);
+    assert.match(insertCall.sql, /on conflict \(normalized_alias, source_type, source_ref\) do nothing/i);
   });
 
   it('serves product names in the requested user language when product locale columns are present', async () => {

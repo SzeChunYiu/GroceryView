@@ -1423,7 +1423,9 @@ export type FacetedProductSearchResult = {
     latestPriceCount: number;
     availableLatestPriceCount: number;
     outOfStockLatestPriceCount: number;
-    sourceTables: ['products', 'latest_prices', 'chains', 'stores'];
+    aliasExpansionTerms: string[];
+    aliasReviewCandidate: { alias: string; normalizedAlias: string; sourceType: 'community' } | null;
+    sourceTables: ['products', 'latest_prices', 'chains', 'stores', 'aliases'];
   };
 };
 
@@ -1516,6 +1518,89 @@ function money(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
+const PRODUCT_SEARCH_SYNONYMS: Record<string, readonly string[]> = {
+  brod: ['bread', 'bröd', 'pain', 'pan', 'khobz', 'naan'],
+  'bröd': ['brod', 'bread', 'pain', 'pan', 'khobz', 'naan'],
+  bread: ['brod', 'bröd', 'limpa', 'rostbrod', 'toast'],
+  cheese: ['ost', 'queso', 'fromage', 'sir', 'peynir'],
+  eggs: ['agg', 'ägg', 'egg'],
+  fisk: ['fish', 'fiskur', 'pesce', 'ryba'],
+  fish: ['fisk', 'fiskur', 'pesce', 'ryba'],
+  gradde: ['grädde', 'cream', 'flote', 'fløte', 'rjomi', 'rjómi'],
+  'grädde': ['gradde', 'cream', 'flote', 'fløte', 'rjomi', 'rjómi'],
+  kaffe: ['coffee', 'kaffi', 'cafe', 'kafe'],
+  coffee: ['kaffe', 'kaffi', 'bryggkaffe', 'cafe', 'kafe'],
+  kyckling: ['chicken', 'kylling', 'kjuklingur', 'pollo', 'digaag'],
+  chicken: ['kyckling', 'kylling', 'kjuklingur', 'pollo', 'digaag'],
+  meat: ['kott', 'kött', 'kjott', 'kjøtt', 'carne', 'hilib'],
+  milk: ['mjolk', 'mjölk', 'melk', 'mjólk', 'leche', 'halib', 'doodh'],
+  mjolk: ['mjölk', 'milk', 'melk', 'mjólk', 'leche', 'halib', 'doodh'],
+  'mjölk': ['mjolk', 'milk', 'melk', 'mjólk', 'leche', 'halib', 'doodh'],
+  doodh: ['milk', 'mjolk', 'mjölk'],
+  halib: ['milk', 'mjolk', 'mjölk'],
+  leche: ['milk', 'mjolk', 'mjölk'],
+  olja: ['oil', 'olje', 'aceite', 'zeit'],
+  oil: ['olja', 'olje', 'aceite', 'zeit'],
+  ost: ['cheese', 'queso', 'fromage', 'sir', 'peynir'],
+  pasta: ['makaroner', 'spaghetti', 'makaronur'],
+  potato: ['potatis', 'poteter', 'kartoffel', 'batata'],
+  potatis: ['potato', 'poteter', 'kartoffel', 'batata'],
+  rice: ['ris', 'hrisgrjon', 'hrísgrjón', 'arroz', 'bariis', 'chawal'],
+  ris: ['rice', 'hrisgrjon', 'hrísgrjón', 'arroz', 'bariis', 'chawal'],
+  smor: ['smör', 'butter', 'smør', 'smjor', 'smjör', 'mantequilla'],
+  'smör': ['smor', 'butter', 'smør', 'smjor', 'smjör', 'mantequilla'],
+  butter: ['smor', 'smör', 'smør', 'smjor', 'smjör', 'mantequilla'],
+  socker: ['sugar', 'sukker', 'sykur', 'azucar', 'azúcar'],
+  sugar: ['socker', 'sukker', 'sykur', 'azucar', 'azúcar'],
+  tea: ['te', 'té', 'chai', 'shaah'],
+  tomat: ['tomato', 'tomater', 'tomatoes', 'pomidor', 'pomodoro'],
+  tomato: ['tomat', 'tomater', 'tomatoes', 'pomidor', 'pomodoro'],
+  pomidor: ['tomat', 'tomato', 'tomater'],
+  pomodoro: ['tomat', 'tomato', 'tomater'],
+  yoghurt: ['yogurt', 'jogurt', 'skyr'],
+  yogurt: ['yoghurt', 'jogurt', 'skyr'],
+  arla: ['arla foods', 'arla ko', 'arla ekologisk'],
+  eldorado: ['eldaorado', 'eldorando'],
+  garant: ['garant eko', 'garant ekologisk'],
+  kungsornen: ['kungsörnen', 'kungs ornen', 'kungs örnen'],
+  'kungsörnen': ['kungsornen', 'kungs ornen', 'kungs örnen'],
+  willys: ['willy', 'willis', 'willys hemma']
+};
+
+export function normalizeProductSearchTerm(value: string): string {
+  return value
+    .trim()
+    .toLocaleLowerCase('sv-SE')
+    .normalize('NFKD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9åäöæøðþ\s-]/giu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function expandProductSearchTerms(query: string | undefined): string[] {
+  const normalized = normalizeProductSearchTerm(query ?? '');
+  if (!normalized) return [];
+  const terms = new Set<string>([normalized]);
+  const rawLower = (query ?? '').trim().toLocaleLowerCase('sv-SE');
+  if (rawLower && rawLower !== normalized) terms.add(rawLower);
+
+  const addSynonyms = (term: string) => {
+    for (const synonym of PRODUCT_SEARCH_SYNONYMS[term] ?? []) {
+      terms.add(normalizeProductSearchTerm(synonym));
+      terms.add(synonym.toLocaleLowerCase('sv-SE'));
+    }
+  };
+
+  addSynonyms(normalized);
+  for (const part of normalized.split(/\s+/).filter(Boolean)) {
+    terms.add(part);
+    addSynonyms(part);
+  }
+
+  return [...terms].filter(Boolean).sort((a, b) => a.localeCompare(b, 'sv-SE'));
+}
+
 function rowSearchHaystack(row: RealCatalogSearchPriceRow): string {
   return [
     row.productId,
@@ -1534,6 +1619,7 @@ export function buildFacetedProductSearch(input: {
   const filters = input.filters ?? {};
   const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
   const query = filters.query?.trim().toLocaleLowerCase('sv-SE') ?? '';
+  const aliasExpansionTerms = expandProductSearchTerms(query);
   const categoryFilters = normalizedFilterSet(filters.categories);
   const labelFilters = normalizedFilterSet(filters.labels);
   const brandFilters = normalizedFilterSet(filters.brands);
@@ -1560,7 +1646,9 @@ export function buildFacetedProductSearch(input: {
   for (const row of input.rows) {
     const rowCategories = row.categoryPath.map((category) => category.toLocaleLowerCase('sv-SE'));
     const rowLabels = (row.labels ?? []).map((label) => label.toLocaleLowerCase('sv-SE'));
-    if (query && !rowSearchHaystack(row).includes(query)) continue;
+    const haystack = rowSearchHaystack(row);
+    const normalizedHaystack = normalizeProductSearchTerm(haystack);
+    if (query && !aliasExpansionTerms.some((term) => haystack.includes(term) || normalizedHaystack.includes(normalizeProductSearchTerm(term)))) continue;
     if (categoryFilters.size > 0 && !rowCategories.some((category) => categoryFilters.has(category))) continue;
     if (labelFilters.size > 0 && ![...labelFilters].every((label) => rowLabels.includes(label))) continue;
     if (brandFilters.size > 0 && (!row.brand || !brandFilters.has(row.brand.toLocaleLowerCase('sv-SE')))) continue;
@@ -1694,7 +1782,12 @@ export function buildFacetedProductSearch(input: {
       latestPriceCount,
       availableLatestPriceCount,
       outOfStockLatestPriceCount,
-      sourceTables: ['products', 'latest_prices', 'chains', 'stores']
+      aliasExpansionTerms,
+      aliasReviewCandidate:
+        query && products.length === 0
+          ? { alias: filters.query?.trim() ?? query, normalizedAlias: normalizeProductSearchTerm(query), sourceType: 'community' }
+          : null,
+      sourceTables: ['products', 'latest_prices', 'chains', 'stores', 'aliases']
     }
   };
 }

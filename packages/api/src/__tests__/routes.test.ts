@@ -8,6 +8,7 @@ import {
   buildProductLatestPrices,
   buildProductCheapestNowReport,
   buildProductPriceHistoryReport,
+  expandProductSearchTerms,
   facetedProductSearchEndpoint,
   productCheapestNowEndpoint,
   buildRealBrandPriceIndices,
@@ -259,7 +260,56 @@ describe('createGroceryViewApi', () => {
     assert.deepEqual(result.facets.categories.find((facet) => facet.value === 'Dairy'), { value: 'Dairy', count: 1 });
     assert.deepEqual(result.facets.chains.find((facet) => facet.value === 'willys'), { value: 'willys', label: 'Willys', count: 1 });
     assert.deepEqual(result.facets.priceRange, { min: 14.9, max: 14.9 });
-    assert.deepEqual(result.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores']);
+    assert.deepEqual(result.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores', 'aliases']);
+  });
+
+  it('expands multilingual grocery aliases and spelling variants for high-value search terms', () => {
+    const result = buildFacetedProductSearch({
+      rows: [
+        ...realRows,
+        {
+          productId: 'product-tomato',
+          slug: 'tomater-500g',
+          canonicalName: 'Tomater 500 g',
+          brand: 'Garant',
+          categoryPath: ['Produce', 'Vegetables'],
+          packageSize: 500,
+          packageUnit: 'g',
+          comparableUnit: 'kg',
+          observationId: 'obs-tomato-willys',
+          price: 24.9,
+          unitPrice: 49.8,
+          currency: 'SEK',
+          priceType: 'shelf',
+          confidence: 0.93,
+          observedAt: '2026-05-21T09:00:00.000Z',
+          chainId: 'chain-willys',
+          chainSlug: 'willys',
+          chainName: 'Willys'
+        }
+      ],
+      filters: { query: 'pomidor', limit: 10 }
+    });
+
+    assert.equal(result.count, 1);
+    assert.equal(result.products[0]?.productId, 'product-tomato');
+    assert.equal(result.evidence.aliasExpansionTerms.includes('tomat'), true);
+    assert.equal(result.evidence.aliasReviewCandidate, null);
+  });
+
+  it('surfaces no-result search terms as pending alias review candidates', () => {
+    const result = buildFacetedProductSearch({
+      rows: realRows,
+      filters: { query: 'havredrykkk', limit: 10 }
+    });
+
+    assert.equal(result.count, 0);
+    assert.deepEqual(result.evidence.aliasReviewCandidate, {
+      alias: 'havredrykkk',
+      normalizedAlias: 'havredrykkk',
+      sourceType: 'community'
+    });
+    assert.deepEqual(expandProductSearchTerms('mjölk').includes('milk'), true);
   });
 
   it('applies label, unit-price, in-stock, and confidence filters for faceted search', () => {

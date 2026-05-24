@@ -2,6 +2,8 @@ import { BadRequestException, Injectable, NotFoundException, ServiceUnavailableE
 import {
   buildFacetedProductSearch,
   buildRealBasketComparison,
+  expandProductSearchTerms,
+  normalizeProductSearchTerm,
   type FacetedProductSearchFilters,
   type RealBasketCompareItem,
   type RealCatalogPriceType,
@@ -141,6 +143,7 @@ export class RealCatalogService {
     const chains = filters.chains ?? [];
     const stores = filters.stores ?? [];
     const priceTypeFilters = filters.priceTypes ?? [];
+    const expandedSearchTerms = expandProductSearchTerms(filters.query);
     const rows = await this.database.query<CatalogPriceSqlRow>(this.searchSql(), [
       filters.query,
       categories.length > 0 ? categories.map((value) => value.toLowerCase()) : null,
@@ -151,8 +154,12 @@ export class RealCatalogService {
       filters.minPrice ?? null,
       filters.maxPrice ?? null,
       filters.limit,
-      query.productNameLocale ?? null
+      query.productNameLocale ?? null,
+      expandedSearchTerms.length > 0 ? expandedSearchTerms : null
     ]);
+    if (rows.length === 0 && filters.query) {
+      await this.recordNoResultAliasCandidate(filters.query);
+    }
     return buildFacetedProductSearch({ rows: rows.map(mapCatalogRow), filters });
   }
 
@@ -228,15 +235,23 @@ export class RealCatalogService {
         where (
             search.term is null
             or products.barcode = search.term
-            or products.canonical_name ilike '%' || search.term || '%'
-            or products.name_sv ilike '%' || search.term || '%'
-            or products.name_en ilike '%' || search.term || '%'
-            or products.slug ilike '%' || search.term || '%'
+            or exists (
+              select 1
+              from unnest(coalesce($11::text[], array[search.term])) expanded_terms(term)
+              where products.canonical_name ilike '%' || expanded_terms.term || '%'
+                or products.name_sv ilike '%' || expanded_terms.term || '%'
+                or products.name_en ilike '%' || expanded_terms.term || '%'
+                or products.slug ilike '%' || expanded_terms.term || '%'
+            )
             or exists (
               select 1
               from aliases
               where aliases.product_id = products.id
-                and aliases.normalized_alias ilike '%' || lower(search.term) || '%'
+                and exists (
+                  select 1
+                  from unnest(coalesce($11::text[], array[lower(search.term)])) expanded_terms(term)
+                  where aliases.normalized_alias ilike '%' || expanded_terms.term || '%'
+                )
             )
           )
           and ($2::text[] is null or exists (select 1 from unnest(products.category_path) category where lower(category) = any($2::text[])))
@@ -293,6 +308,18 @@ export class RealCatalogService {
         and ($7::numeric is null or latest_prices.price >= $7::numeric)
         and ($8::numeric is null or latest_prices.price <= $8::numeric)
       order by ${productName}, latest_prices.price nulls last, stores.name nulls last`;
+  }
+
+  private async recordNoResultAliasCandidate(query: string): Promise<void> {
+    const alias = query.trim();
+    const normalizedAlias = normalizeProductSearchTerm(alias);
+    if (!alias || !normalizedAlias) return;
+    await this.database.query(
+      `insert into aliases (alias, normalized_alias, source_type, source_ref, match_confidence)
+       values ($1, $2, 'community', 'faceted-search:no-result', 0)
+       on conflict (normalized_alias, source_type, source_ref) do nothing`,
+      [alias, normalizedAlias]
+    );
   }
 
   private requireDatabase(): void {
