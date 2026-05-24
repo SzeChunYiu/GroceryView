@@ -103,6 +103,7 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 - **Source posture:** Operator source. Legal review status in this PR is `approved` for read-only public page capture; crowd fuel reports are modeled separately and require reporter provenance.
 - **Lands in:** `packages/ingestion/src/connectors/st1-fuel.ts`, `infra/db/migrations/010_fuel_price_observations.sql`, and public route `/api/fuel` (also `/fuel` alias).
 - **Evidence:** `docs/ingestion/st1-fuel-evidence.md`.
+- **Connector research:** `docs/connectors/preem-se.md` records why Preem Sweden is currently blocked for automated station-level price ingestion.
 
 ---
 
