@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
 
 export type BasketCalculatorPriceRow = {
@@ -41,11 +41,35 @@ function initialBasketIds(products: BasketCalculatorProduct[]) {
 
 export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalculatorProps>) {
   const [selectedProductIds, setSelectedProductIds] = useState(() => initialBasketIds(products));
+  const [sharedListError, setSharedListError] = useState('');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sharedItems = params.get('items');
+    if (sharedItems === null) return;
+
+    const productIds = new Set(products.map((product) => product.id));
+    const validSharedIds = sharedItems
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => productIds.has(item));
+
+    setSelectedProductIds(new Set(validSharedIds));
+    setSharedListError(validSharedIds.length === 0
+      ? 'This shared basket link has no valid product ids. Select at least one product to calculate cheapest sources.'
+      : '');
+  }, [products]);
 
   const selectedProducts = useMemo(
     () => products.filter((product) => selectedProductIds.has(product.id)),
     [products, selectedProductIds]
   );
+
+  const shareHref = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set('items', [...selectedProductIds].sort().join(','));
+    return `/basket?${params.toString()}`;
+  }, [selectedProductIds]);
 
   const chains = useMemo(() => {
     const byId = new Map<string, { id: string; name: string }>();
@@ -96,6 +120,7 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
   }));
 
   function toggleProduct(productId: string) {
+    setSharedListError('');
     setSelectedProductIds((current) => {
       const next = new Set(current);
       if (next.has(productId)) next.delete(productId);
@@ -121,6 +146,12 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
             {selectedProducts.length} selected
           </p>
         </div>
+
+        {selectedProducts.length === 0 || sharedListError ? (
+          <p className="mt-4 rounded-2xl bg-amber-50 p-3 text-sm font-black text-amber-950" data-testid="basket-selection-error" role="alert">
+            {sharedListError || 'Select at least one product to calculate cheapest sources for the shopping list.'}
+          </p>
+        ) : null}
 
         <div className="mt-5 space-y-3">
           {products.map((product) => {
@@ -189,10 +220,29 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
           <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
             compareBasketStrategies picks the cheapest observed chain for each selected line, then shows savings against the best complete one-chain shop when one exists.
           </p>
+          <div className="mt-4 rounded-2xl border border-emerald-100 bg-white/80 p-3">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Share this shopping list</p>
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+              <input
+                aria-label="Share basket link URL"
+                className="min-w-0 flex-1 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-950"
+                readOnly
+                value={shareHref}
+              />
+              <Link
+                className="inline-flex items-center justify-center rounded-full bg-emerald-700 px-4 py-2 text-sm font-black text-white"
+                data-testid="share-basket-link"
+                href={shareHref}
+              >
+                Share basket link
+              </Link>
+            </div>
+          </div>
           <div className="mt-4 space-y-2">
             {assignmentsWithProducts.length > 0 ? assignmentsWithProducts.map((assignment) => (
               <Link
                 className="grid gap-2 rounded-2xl bg-slate-50 p-3 text-sm hover:bg-emerald-50 sm:grid-cols-[1fr_auto]"
+                data-testid="cheapest-source-row"
                 href={`/products/${assignment.product?.slug ?? assignment.productId}`}
                 key={`${assignment.productId}-${assignment.storeId}`}
               >
