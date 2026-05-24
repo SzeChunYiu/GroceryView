@@ -21,4 +21,18 @@ describe('robots.txt crawl policy', () => {
     assert.match(robots, /^Disallow: \/users\/?$/m);
     assert.match(robots, /^Sitemap: \/sitemap\.xml$/m);
   });
+
+  it('keeps generated Next robots metadata aligned with static robots.txt', async () => {
+    const robotsRoute = await read('src/app/robots.ts');
+
+    for (const route of ['/', '/products', '/categories']) {
+      assert.match(robotsRoute, new RegExp(`['"]${route.replace('/', '\/')}['"]`));
+    }
+    for (const privateRoute of ['/account', '/login', '/api', '/admin', '/users']) {
+      assert.match(robotsRoute, new RegExp(`['"]${privateRoute.replace('/', '\/')}['"]`));
+    }
+    assert.match(robotsRoute, /sitemapUrl/);
+    assert.match(robotsRoute, /host: siteUrl/);
+  });
+
 });
