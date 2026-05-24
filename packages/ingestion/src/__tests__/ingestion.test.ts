@@ -10,6 +10,7 @@ import {
   buildCoopSearchUrl,
   buildCoopStoreInfoUrl,
   buildCoopStoresUrl,
+  buildCoopExtraNoDiscountsUrl,
   buildCityGrossProductsUrl,
   buildCityGrossStoresUrl,
   buildDailyConnectorConfigsFromEnv,
@@ -71,6 +72,8 @@ import {
   fetchCoopStores,
   fetchCoopWeeklyDiscounts,
   fetchCoopWeeklyDiscountsForAllStores,
+  fetchCoopExtraNoDiscounts,
+  parseCoopExtraNoDiscounts,
   fetchDailyConnectorSnapshot,
   fetchHemkopProducts,
   fetchHemkopProductsForAllStores,
@@ -7307,5 +7310,68 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('fetchCoopExtraNoDiscounts', () => {
+  const fixture = `<!doctype html><html><head><script id="__NEXT_DATA__" type="application/json">
+    {"props":{"pageProps":{"offers":[{
+      "id":"extra-1001",
+      "name":"Norvegia ost",
+      "brand":"Tine",
+      "packageSize":"1 kg",
+      "priceText":"89,90 kr",
+      "ordinaryPriceText":"119,00 kr",
+      "unitPriceText":"89,90/kg",
+      "promotionText":"Extra-kupp",
+      "memberOnly":true,
+      "validFrom":"2026-05-20",
+      "validTo":"2026-05-25",
+      "url":"/extra/tilbud/norvegia",
+      "imageUrl":"/globalassets/norvegia.png"
+    }]}}}
+  </script></head><body></body></html>`;
+
+  it('builds the Coop Extra NO discounts URL', () => {
+    assert.equal(buildCoopExtraNoDiscountsUrl(), 'https://www.coop.no/extra/tilbud/');
+  });
+
+  it('parses embedded Coop Extra NO discount offers', () => {
+    const rows = parseCoopExtraNoDiscounts(fixture, {
+      sourceUrl: 'https://www.coop.no/extra/tilbud/',
+      retrievedAt: '2026-05-24T00:00:00.000Z'
+    });
+    assert.deepEqual(rows, [{
+      code: 'extra-1001',
+      name: 'Norvegia ost',
+      brand: 'Tine',
+      packageText: '1 kg',
+      price: 89.9,
+      priceText: '89,90 kr',
+      regularPrice: 119,
+      regularPriceText: '119,00 kr',
+      unitPriceText: '89,90/kg',
+      promotionText: 'Extra-kupp',
+      memberOnly: true,
+      validFrom: '2026-05-20',
+      validTo: '2026-05-25',
+      productUrl: 'https://www.coop.no/extra/tilbud/norvegia',
+      imageUrl: 'https://www.coop.no/globalassets/norvegia.png',
+      sourceUrl: 'https://www.coop.no/extra/tilbud/',
+      retrievedAt: '2026-05-24T00:00:00.000Z'
+    }]);
+  });
+
+  it('fetches Coop Extra NO discount offers', async () => {
+    const fetchImpl = async (url: string) => {
+      assert.equal(url, 'https://www.coop.no/extra/tilbud/');
+      return new Response(fixture, { status: 200 });
+    };
+    const rows = await fetchCoopExtraNoDiscounts({
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      retrievedAt: '2026-05-24T00:00:00.000Z'
+    });
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.name, 'Norvegia ost');
   });
 });
