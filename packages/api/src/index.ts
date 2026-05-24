@@ -1269,6 +1269,7 @@ export type NotificationInboxQueueItem = {
   reason: string;
   action: string;
   priority: 'normal' | 'high';
+  sendAt: string;
   productId?: string;
 };
 
@@ -1298,6 +1299,7 @@ export type NotificationInboxReportOptions = {
 
 export type NotificationInboxReport = {
   userId: string;
+  generatedAt: string;
   trackedItemCount: number;
   activeAlertCount: number;
   deliveredCount: number;
@@ -4533,6 +4535,7 @@ export function createGroceryViewApi() {
 
     getNotificationInboxReport(userId: string, options: NotificationInboxReportOptions = {}): NotificationInboxReport {
       requireNonEmptyId(userId, 'userId');
+      const generatedAt = options.now ?? new Date().toISOString();
       const watchlist = this.getWatchlist(userId);
       const deliveredRows: NotificationInboxQueueItem[] = watchlist.alerts.map((alert, index) => ({
         id: `alert-${alert.productId}-${alert.type}-${index}`,
@@ -4542,6 +4545,7 @@ export function createGroceryViewApi() {
         reason: alert.trigger.metric === 'price_history' ? 'Verified 52-week low signal' : 'Verified shelf price or Deal Score trigger',
         action: alert.trigger.metric === 'deal_score' ? 'Open deal' : 'Open price history',
         priority: alert.severity === 'urgent' ? 'high' : 'normal',
+        sendAt: generatedAt,
         productId: alert.productId
       }));
       const heldRows: NotificationInboxQueueItem[] = (options.tasks ?? [])
@@ -4554,7 +4558,8 @@ export function createGroceryViewApi() {
           status: 'held',
           reason: task.type === 'receipt_review' ? 'Quiet hours 21:00-07:00' : `Held until ${task.sendAt}`,
           action: task.type === 'receipt_review' ? 'Send in morning digest' : 'Resume notification delivery',
-          priority: task.priority
+          priority: task.priority,
+          sendAt: task.sendAt
         }));
       const suppressedRows: NotificationInboxQueueItem[] = (options.suppressions ?? [])
         .filter((suppression) => suppression.active)
@@ -4570,7 +4575,8 @@ export function createGroceryViewApi() {
           status: 'suppressed',
           reason: notificationSuppressionInboxReason(suppression.reason),
           action: suppression.channel === 'email' ? 'Request email refresh' : 'Request device refresh',
-          priority: 'normal'
+          priority: 'normal',
+          sendAt: generatedAt
         }));
       const queue: NotificationInboxQueueItem[] = [
         ...deliveredRows,
@@ -4581,7 +4587,8 @@ export function createGroceryViewApi() {
           status: 'held' as const,
           reason: 'Quiet hours 21:00-07:00',
           action: 'Send in morning digest',
-          priority: 'normal' as const
+          priority: 'normal' as const,
+          sendAt: generatedAt
         }]),
         ...(options.suppressions ? suppressedRows : [{
           id: 'butter-provider-suppression',
@@ -4591,6 +4598,7 @@ export function createGroceryViewApi() {
           reason: 'Provider token invalid',
           action: 'Request device refresh',
           priority: 'normal' as const,
+          sendAt: generatedAt,
           productId: 'butter'
         }])
       ];
@@ -4599,6 +4607,7 @@ export function createGroceryViewApi() {
       const suppressedCount = queue.filter((item) => item.status === 'suppressed').length;
       return {
         userId,
+        generatedAt,
         trackedItemCount: watchlist.items.length,
         activeAlertCount: watchlist.alerts.length,
         deliveredCount,
