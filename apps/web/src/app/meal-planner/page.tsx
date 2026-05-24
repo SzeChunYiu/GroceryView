@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, studentDealRecipes } from '@/lib/demo-data';
+import { extractIngredientsFromMealPlans, suggestBudgetAlternativesFromMealPlans } from '@/lib/meal-budgets';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -19,6 +20,14 @@ function confidenceLevel(value: string): 'high' | 'medium' | 'low' {
 
 export default function MealPlannerPage() {
   const dealMealConfidenceLevel = confidenceLevel(dealBasedMeals.coverage.confidence);
+  const mealBudgetPlans = [
+    ...dealBasedMeals.suggestions,
+    ...studentDealRecipes.recipes,
+    ...familyMealPlannerFromDeals.meals,
+    ...freezerBatchCookPlanner.meals
+  ];
+  const extractedMealIngredients = extractIngredientsFromMealPlans(mealBudgetPlans);
+  const budgetAlternatives = suggestBudgetAlternativesFromMealPlans(mealBudgetPlans);
 
   return (
     <PageShell>
@@ -72,6 +81,26 @@ export default function MealPlannerPage() {
                   </Link>
                 ) : null)}
               </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Budget alternatives</p>
+        <h2 className="mt-2 text-2xl font-black">Meal kit extraction</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          The meal budget service extracts {extractedMealIngredients.length} ingredients from saved meal plans and automatically compares prices inside each category before suggesting cheaper swaps.
+        </p>
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
+          {budgetAlternatives.slice(0, 3).map((alternative) => (
+            <div className="rounded-3xl border border-amber-200 bg-white p-5" key={`${alternative.mealTitle}-${alternative.ingredientName}`}>
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-amber-800">{alternative.mealTitle}</p>
+              <p className="mt-2 font-black text-slate-950">{alternative.ingredientName} → {alternative.alternativeName}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">
+                Save {formatSek(alternative.estimatedSavings)} by switching from {formatSek(alternative.currentPrice)} to {formatSek(alternative.alternativePrice)}.
+              </p>
+              <p className="mt-2 text-sm text-slate-600">{alternative.reason}</p>
             </div>
           ))}
         </div>
