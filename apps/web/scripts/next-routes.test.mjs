@@ -4,6 +4,7 @@ import { access, readFile } from 'node:fs/promises';
 
 const appFiles = [
   'src/app/page.tsx',
+  'src/app/pricing/page.tsx',
   'src/app/products/page.tsx',
   'src/app/products/[slug]/page.tsx',
   'src/app/product/[id]/page.tsx',
@@ -399,8 +400,26 @@ describe('verified-data UI', () => {
     assert.match(billingActions, /window\.location\.assign/);
     assert.match(billingActions, /Sign in first/);
     assert.match(billingActions, /No anonymous billing sessions/);
+    assert.match(account, /href="\/pricing"/);
+    assert.match(account, /Premium OCR history pricing plan/);
+    assert.match(billingActions, /href="\/pricing"/);
+    assert.match(billingActions, /Premium OCR history plan/);
+    assert.match(billingActions, /Start Premium OCR monthly checkout/);
+    assert.match(billingActions, /Start Premium OCR yearly checkout/);
     assert.doesNotMatch(billingActions, /STRIPE_SECRET_KEY|sk_test|clientSecret/);
     assert.doesNotMatch(billingActions, /localStorage\.setItem\('groceryview:userId'/);
+  });
+
+  it('highlights Premium OCR history pricing before account checkout', async () => {
+    const pricing = await read('src/app/pricing/page.tsx');
+
+    assert.match(pricing, /routeMetadata\('\/pricing'\)/);
+    assert.match(pricing, /Premium OCR history/);
+    assert.match(pricing, /premium_monthly/);
+    assert.match(pricing, /premium_yearly/);
+    assert.match(pricing, /href="\/account"/);
+    assert.match(pricing, /Open account billing controls/);
+    assert.match(pricing, /Anonymous visitors can review the Premium OCR history plan/);
   });
 
   it('surfaces busy-professional saved basket auto-reorder planning without anonymous checkout', async () => {
@@ -3021,6 +3040,7 @@ ${seo}`;
       'src/app/pharmacy/page.tsx',
       'src/app/price-reports/page.tsx',
       'src/app/privacy/page.tsx',
+      'src/app/pricing/page.tsx',
       'src/app/prisjamforelse/[slug]/page.tsx',
       'src/app/products/page.tsx',
       'src/app/products/[slug]/page.tsx',

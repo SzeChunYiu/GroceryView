@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 
 type BillingStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'redirecting' | 'error';
@@ -123,10 +124,17 @@ export function AccountBillingActions() {
         These controls call the protected subscription, Stripe checkout, and Stripe billing portal endpoints with the sessionStorage bearer token. They fail closed without a production session so public visitors cannot create anonymous billing sessions.
       </p>
 
+      <div className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 p-4">
+        <p className="text-sm font-black text-violet-950">Premium OCR history plan</p>
+        <p className="mt-2 text-sm leading-6 text-violet-950">
+          Review the highlighted OCR scan history upgrade on the <Link className="font-black underline" href="/pricing">pricing page</Link> before starting account-bound checkout.
+        </p>
+      </div>
+
       <div className="mt-4 flex flex-wrap gap-2">
         <button className="rounded-full bg-violet-700 px-4 py-2 text-sm font-black text-white" onClick={loadSubscriptionAccess} type="button">Load subscription status</button>
-        <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_monthly')} type="button">Start monthly checkout</button>
-        <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_yearly')} type="button">Start yearly checkout</button>
+        <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_monthly')} type="button">Start Premium OCR monthly checkout</button>
+        <button className="rounded-full border border-violet-300 px-4 py-2 text-sm font-black text-violet-900" onClick={() => startCheckout('premium_yearly')} type="button">Start Premium OCR yearly checkout</button>
         <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-800" onClick={manageSubscription} type="button">Manage subscription</button>
       </div>
 

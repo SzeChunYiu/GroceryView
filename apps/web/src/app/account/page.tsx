@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { AccountBillingActions } from '@/components/account-billing-actions';
 import { AccountMutationActions } from '@/components/account-mutation-actions';
 import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
@@ -147,6 +148,9 @@ export default function AccountPage() {
       </Card>
 
       <AccountMutationActions />
+      <p className="mt-6 rounded-2xl border border-violet-200 bg-violet-50 p-4 text-sm font-bold text-violet-950">
+        Compare the <Link className="underline" href="/pricing">Premium OCR history pricing plan</Link> before starting signed-in checkout below.
+      </p>
       <AccountBillingActions />
       <AdDisclosureActions />
 
