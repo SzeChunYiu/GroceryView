@@ -13,6 +13,7 @@ import {
 
 const REPO_ROOT = new URL('../../', import.meta.url);
 const INGESTED_DIR = new URL('apps/web/src/lib/ingested/', REPO_ROOT);
+const GENERATED_DIR = new URL('apps/web/src/lib/generated/', REPO_ROOT);
 
 const CITY_GROSS_QUERIES = [DEFAULT_CITY_GROSS_PRODUCT_QUERIES[0]];
 const HEMKOP_QUERIES = DEFAULT_HEMKOP_SEARCH_QUERIES;
@@ -21,6 +22,7 @@ const LIDL_OFFER_PATHS = DEFAULT_LIDL_OFFER_PATHS;
 const retrievedAt = new Date().toISOString();
 
 await mkdir(INGESTED_DIR, { recursive: true });
+await mkdir(GENERATED_DIR, { recursive: true });
 
 const cityGrossProducts = await fetchCityGrossProductsForAllStores({
   maxStores: 40,
@@ -62,6 +64,33 @@ const lidlStoreOffers = await fetchLidlOffersForAllStores({
   retrievedAt
 });
 await writeLidl(lidlStoreOffers);
+
+await writeDbSiteIngestedOverrides([
+  buildCompareStoreCapability({
+    chainId: 'city_gross',
+    productRows: cityGrossProducts,
+    pickupRows: cityGrossProducts
+  }),
+  buildCompareStoreCapability({
+    chainId: 'willys',
+    productRows: willysProducts,
+    couponRows: willysWeeklyDiscounts,
+    deliveryRows: willysProducts.filter((row) => row.online === true),
+    pickupRows: willysWeeklyDiscounts
+  }),
+  buildCompareStoreCapability({
+    chainId: 'hemkop',
+    productRows: hemkopProducts,
+    couponRows: hemkopWeeklyDiscounts,
+    deliveryRows: hemkopProducts.filter((row) => row.online === true),
+    pickupRows: hemkopWeeklyDiscounts
+  }),
+  buildCompareStoreCapability({
+    chainId: 'lidl',
+    couponRows: lidlStoreOffers.filter((row) => row.memberOnly === true),
+    pickupRows: lidlStoreOffers
+  })
+]);
 
 console.log(JSON.stringify({
   retrievedAt,
@@ -437,6 +466,67 @@ async function writeIcaReklamblad(rows) {
 
 async function writeGeneratedFile(fileName, lines) {
   await writeFile(new URL(fileName, INGESTED_DIR), `${lines.join('\n')}\n`);
+}
+
+async function writeDbSiteIngestedOverrides(compareStoreCapabilities) {
+  await writeFile(new URL('db-site-ingested-overrides.ts', GENERATED_DIR), `${[
+    '// AUTO-GENERATED from live retailer ingestion by scripts/ingestion/generate-live-retailer-ingested.mjs.',
+    `// Generated at: ${retrievedAt}`,
+    `// Compare store capability row count: ${compareStoreCapabilities.length}`,
+    "import type { IcaReklambladIngestedOffer } from '../ingested/ica-reklamblad';",
+    "import type { LidlIngestedStoreOffer } from '../ingested/lidl';",
+    "import type { MathemIngestedProduct } from '../ingested/mathem';",
+    "import type { MatpriskollenIngestedOffer } from '../ingested/matpriskollen';",
+    '',
+    'export type DbSiteCompareStoreCapability = {',
+    '  chainId: string;',
+    '  coupon: boolean;',
+    '  delivery: boolean;',
+    '  pickup: boolean;',
+    '  evidenceLabel: string;',
+    '  evidenceUpdatedAt: string | null;',
+    '};',
+    '',
+    `export const dbSiteIngestedOverridesGeneratedAt = ${literal(retrievedAt)};`,
+    '',
+    'export const dbSiteMatpriskollenOffers: MatpriskollenIngestedOffer[] = [];',
+    'export const dbSiteLidlStoreOffers: LidlIngestedStoreOffer[] = [];',
+    'export const dbSiteIcaReklambladOffers: IcaReklambladIngestedOffer[] = [];',
+    'export const dbSiteMathemProducts: MathemIngestedProduct[] = [];',
+    `export const dbSiteCompareStoreCapabilities: DbSiteCompareStoreCapability[] = ${literal(compareStoreCapabilities)};`,
+    '',
+    `export const dbSiteMatpriskollenSource = ${literal({ source: 'postgres.latest_prices/observations Matpriskollen-compatible fallback', retrievedAt: null, rowCount: 0 })} as const;`,
+    `export const dbSiteLidlSource = ${literal({ source: 'postgres.latest_prices/observations Lidl-compatible fallback', retrievedAt: null, rowCount: 0 })} as const;`,
+    `export const dbSiteIcaReklambladSource = ${literal({ source: 'postgres.latest_prices/observations ICA flyer-compatible fallback', retrievedAt: null, rowCount: 0 })} as const;`,
+    `export const dbSiteMathemSource = ${literal({ source: 'postgres.latest_prices/observations Mathem-compatible fallback', retrievedAt: null, rowCount: 0 })} as const;`,
+    ''
+  ].join('\n')}\n`);
+}
+
+function buildCompareStoreCapability({ chainId, productRows = [], couponRows = [], deliveryRows = [], pickupRows = [] }) {
+  const evidenceRows = [...productRows, ...couponRows, ...deliveryRows, ...pickupRows];
+  const evidenceUpdatedAt = latestRetrievedAt(evidenceRows);
+  return {
+    chainId,
+    coupon: couponRows.length > 0,
+    delivery: deliveryRows.length > 0,
+    pickup: pickupRows.length > 0,
+    evidenceLabel: [
+      productRows.length > 0 ? `${productRows.length} product rows` : null,
+      couponRows.length > 0 ? `${couponRows.length} coupon/offer rows` : null,
+      deliveryRows.length > 0 ? `${deliveryRows.length} online rows` : null,
+      pickupRows.length > 0 ? `${pickupRows.length} store rows` : null
+    ].filter(Boolean).join(' · ') || 'no live retailer rows',
+    evidenceUpdatedAt
+  };
+}
+
+function latestRetrievedAt(rows) {
+  return rows
+    .map((row) => row.retrievedAt)
+    .filter(Boolean)
+    .sort()
+    .at(-1) ?? null;
 }
 
 function unique(values) {
