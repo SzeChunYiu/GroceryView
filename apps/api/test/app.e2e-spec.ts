@@ -565,6 +565,40 @@ describe('GroceryView API app', () => {
     }
   });
 
+  it('handles CORS preflight for production and local development origins with credentials', async () => {
+    const productionPreflight = await request(app.getHttpServer())
+      .options('/health')
+      .set('Origin', 'https://groceryview.se')
+      .set('Access-Control-Request-Method', 'GET')
+      .set('Access-Control-Request-Headers', 'authorization,content-type')
+      .expect(204);
+
+    assert.equal(productionPreflight.headers['access-control-allow-origin'], 'https://groceryview.se');
+    assert.equal(productionPreflight.headers['access-control-allow-credentials'], 'true');
+    assert.match(productionPreflight.headers['access-control-allow-methods'] ?? '', /GET/);
+    assert.match(productionPreflight.headers['access-control-allow-headers'] ?? '', /authorization/i);
+    assert.match(productionPreflight.headers['access-control-allow-headers'] ?? '', /content-type/i);
+
+    const localResponse = await request(app.getHttpServer())
+      .get('/health')
+      .set('Origin', 'http://localhost:3000')
+      .expect(200);
+
+    assert.equal(localResponse.headers['access-control-allow-origin'], 'http://localhost:3000');
+    assert.equal(localResponse.headers['access-control-allow-credentials'], 'true');
+  });
+
+  it('does not expose CORS trust headers to blocked origins', async () => {
+    const blockedPreflight = await request(app.getHttpServer())
+      .options('/health')
+      .set('Origin', 'https://evil.example')
+      .set('Access-Control-Request-Method', 'GET')
+      .expect(404);
+
+    assert.equal(blockedPreflight.headers['access-control-allow-origin'], undefined);
+    assert.equal(blockedPreflight.headers['access-control-allow-credentials'], undefined);
+  });
+
   it('serves health and OpenAPI docs', async () => {
     await request(app.getHttpServer())
       .get('/health')
