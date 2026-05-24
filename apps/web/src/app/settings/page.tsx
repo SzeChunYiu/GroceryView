@@ -1,4 +1,5 @@
 import { buildPrivacyExport } from '@groceryview/core';
+import Link from 'next/link';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
@@ -32,6 +33,21 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Store order</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Preferred stores picker</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Set the 1-5 stores you visit most often so comparison rows and maps can show them first on this device.
+            </p>
+          </div>
+          <Link className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" href="/settings/stores">
+            Open store picker
+          </Link>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">

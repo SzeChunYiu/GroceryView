@@ -486,6 +486,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/privacy/deletion-plan']);
     assert.ok(docs.body.paths['/users/demo/settings/account']);
     assert.ok(docs.body.paths['/users/demo/settings/data-export']);
+    assert.ok(docs.body.paths['/users/demo/settings/preferred-stores']);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
@@ -578,6 +579,26 @@ describe('GroceryView API app', () => {
     assert.equal(settingsDeletion.body.destructiveAction, false);
     assert.equal(settingsDeletion.body.requiresConfirmation, 'DELETE ACCOUNT');
     assert.equal(settingsDeletion.body.demo, true);
+
+    const preferredStores = await request(app.getHttpServer()).get('/users/demo/settings/preferred-stores').expect(200);
+    assert.deepEqual(preferredStores.body.storeIds, ['willys-odenplan', 'lidl-sveavagen', 'coop-odenplan']);
+    assert.equal(preferredStores.body.maxStores, 5);
+
+    const updatedPreferredStores = await request(app.getHttpServer())
+      .put('/users/demo/settings/preferred-stores')
+      .send({ storeIds: ['coop-odenplan', 'willys-odenplan', 'coop-odenplan'] })
+      .expect(200);
+    assert.deepEqual(updatedPreferredStores.body.storeIds, ['coop-odenplan', 'willys-odenplan']);
+
+    await request(app.getHttpServer())
+      .put('/users/demo/settings/preferred-stores')
+      .send({ storeIds: [] })
+      .expect(400);
+
+    await request(app.getHttpServer())
+      .put('/users/demo/settings/preferred-stores')
+      .send({ storeIds: ['one', 'two', 'three', 'four', 'five', 'six'] })
+      .expect(400);
 
     const mealPlan = await request(app.getHttpServer())
       .get('/users/demo/meal-plans/suggestions?maxMealCost=120&servings=4')

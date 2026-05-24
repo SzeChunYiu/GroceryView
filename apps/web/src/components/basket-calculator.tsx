@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
+import { preferredStoresChangedEvent, readPreferredStoreIds } from './StoreSelector';
 
 export type BasketCalculatorPriceRow = {
   chainId: string;
@@ -41,6 +42,7 @@ function initialBasketIds(products: BasketCalculatorProduct[]) {
 
 export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalculatorProps>) {
   const [selectedProductIds, setSelectedProductIds] = useState(() => initialBasketIds(products));
+  const [preferredStoreIds, setPreferredStoreIds] = useState<string[]>([]);
 
   const selectedProducts = useMemo(
     () => products.filter((product) => selectedProductIds.has(product.id)),
@@ -52,8 +54,14 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
     for (const product of products) {
       for (const price of product.prices) byId.set(price.chainId, { id: price.chainId, name: price.chainName });
     }
-    return [...byId.values()].sort((left, right) => left.name.localeCompare(right.name, 'sv'));
-  }, [products]);
+    return [...byId.values()].sort((left, right) => {
+      const leftPreferred = preferredStoreIds.findIndex((storeId) => storeId.toLowerCase().includes(left.id.toLowerCase()));
+      const rightPreferred = preferredStoreIds.findIndex((storeId) => storeId.toLowerCase().includes(right.id.toLowerCase()));
+      const leftRank = leftPreferred === -1 ? Number.MAX_SAFE_INTEGER : leftPreferred;
+      const rightRank = rightPreferred === -1 ? Number.MAX_SAFE_INTEGER : rightPreferred;
+      return leftRank - rightRank || left.name.localeCompare(right.name, 'sv');
+    });
+  }, [preferredStoreIds, products]);
 
   const basketInput = useMemo(() => ({
     favoriteStoreIds: chains.map((chain) => chain.id),
@@ -94,6 +102,21 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
     ...assignment,
     product: selectedProducts.find((product) => product.id === assignment.productId)
   }));
+
+  useEffect(() => {
+    function syncPreferredStores(event?: Event) {
+      const detail = event instanceof CustomEvent && Array.isArray(event.detail) ? event.detail : readPreferredStoreIds();
+      setPreferredStoreIds(detail.filter((storeId): storeId is string => typeof storeId === 'string'));
+    }
+
+    syncPreferredStores();
+    window.addEventListener(preferredStoresChangedEvent, syncPreferredStores);
+    window.addEventListener('storage', syncPreferredStores);
+    return () => {
+      window.removeEventListener(preferredStoresChangedEvent, syncPreferredStores);
+      window.removeEventListener('storage', syncPreferredStores);
+    };
+  }, []);
 
   function toggleProduct(productId: string) {
     setSelectedProductIds((current) => {

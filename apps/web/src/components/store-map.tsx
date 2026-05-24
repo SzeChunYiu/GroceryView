@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
+import { orderByPreferredStores, preferredStoresChangedEvent, readPreferredStoreIds } from './StoreSelector';
 
 // Free, no-API-key vector tiles (© OpenMapTiles / OpenFreeMap, data © OSM).
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
@@ -47,7 +48,7 @@ function chainIndexColor(score: number | null, fallback: string): string {
   return '#D94F3D';
 }
 
-const syncedMapListStores = osmStores
+const mapListStores = osmStores
   .filter((store) => Number.isFinite(store.lat) && Number.isFinite(store.lng))
   .slice(0, 8);
 
@@ -142,7 +143,16 @@ export function StoreMap() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [storeCount, setStoreCount] = useState(0);
-  const [selectedStoreSlug, setSelectedStoreSlug] = useState(syncedMapListStores[0]?.slug ?? '');
+  const [preferredStoreIds, setPreferredStoreIds] = useState<string[]>([]);
+  const syncedMapListStores = useMemo(() => {
+    const preferredStores = orderByPreferredStores(
+      osmStores.filter((store) => Number.isFinite(store.lat) && Number.isFinite(store.lng)),
+      preferredStoreIds,
+      (store) => store.slug,
+    ).filter((store, index) => index < 8 || preferredStoreIds.includes(store.slug));
+    return preferredStores.slice(0, 8);
+  }, [preferredStoreIds]);
+  const [selectedStoreSlug, setSelectedStoreSlug] = useState(mapListStores[0]?.slug ?? '');
 
   function focusStore(store: OsmStore) {
     setSelectedStoreSlug(store.slug);
@@ -301,6 +311,21 @@ export function StoreMap() {
     return () => {
       mapRef.current = null;
       map.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    function syncPreferredStores(event?: Event) {
+      const detail = event instanceof CustomEvent && Array.isArray(event.detail) ? event.detail : readPreferredStoreIds();
+      setPreferredStoreIds(detail.filter((storeId): storeId is string => typeof storeId === 'string'));
+    }
+
+    syncPreferredStores();
+    window.addEventListener(preferredStoresChangedEvent, syncPreferredStores);
+    window.addEventListener('storage', syncPreferredStores);
+    return () => {
+      window.removeEventListener(preferredStoresChangedEvent, syncPreferredStores);
+      window.removeEventListener('storage', syncPreferredStores);
     };
   }, []);
 

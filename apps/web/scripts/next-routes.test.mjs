@@ -20,7 +20,9 @@ const appFiles = [
   'src/app/store-coverage/page.tsx',
   'src/app/openprices-depth/page.tsx',
   'src/app/settings/page.tsx',
+  'src/app/settings/stores/page.tsx',
   'src/components/market-shell.tsx',
+  'src/components/StoreSelector.tsx',
   'src/components/settings-data-export-actions.tsx',
   'src/components/data-ui.tsx',
   'src/lib/verified-data.ts'
@@ -262,6 +264,28 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
     assert.match(server, /\/api\/settings\/data-export/);
     assert.match(server, /\/api\/settings\/account/);
+  });
+
+  it('ships a preferred stores picker that prioritizes comparison and map rows', async () => {
+    const settings = await read('src/app/settings/page.tsx');
+    const settingsStores = await read('src/app/settings/stores/page.tsx');
+    const selector = await read('src/components/StoreSelector.tsx');
+    const storeMap = await read('src/components/store-map.tsx');
+    const basketCalculator = await read('src/components/basket-calculator.tsx');
+    const apiRoutes = await read('../../apps/api/src/routes/settings.ts');
+
+    assert.match(settings, /\/settings\/stores/);
+    assert.match(settingsStores, /StoreSelector/);
+    assert.match(settingsStores, /initialPreferredStoreIds/);
+    assert.match(selector, /groceryview:preferred-store-ids/);
+    assert.match(selector, /normalizePreferredStoreIds/);
+    assert.match(selector, /slice\(0, 5\)/);
+    assert.match(selector, /orderByPreferredStores/);
+    assert.match(storeMap, /orderByPreferredStores/);
+    assert.match(storeMap, /preferredStoresChangedEvent/);
+    assert.match(basketCalculator, /preferredStoresChangedEvent/);
+    assert.match(apiRoutes, /preferredStores/);
+    assert.match(apiRoutes, /Select 1-5 preferred stores/);
   });
 
 
