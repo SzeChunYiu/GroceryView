@@ -4,16 +4,16 @@ import { products } from '@/lib/demo-data';
 import { formatComparablePriceFromObservation, formatComparableUnitPrice } from '@/lib/formatPrice';
 
 export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
+  return products.map((product) => ({ id: product.slug }));
 }
 
-export default async function ProductPage({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
-  const { slug } = await params;
-  const product = products.find((item) => item.slug === slug);
+export default async function ItemPage({ params }: Readonly<{ params: Promise<{ id: string }> }>) {
+  const { id } = await params;
+  const product = products.find((item) => item.slug === id);
   if (!product) notFound();
-  const apiProductId = product.slug === 'zoegas-coffee-450g' ? 'coffee' : null;
+
   const priceAmount = parsePriceAmount(product.price);
-  const comparableUnitPrice =
+  const normalizedUnitPrice =
     formatComparableUnitPrice(product.unitPrice) ??
     formatComparablePriceFromObservation(priceAmount, product.quantity);
 
@@ -23,12 +23,12 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         GroceryView
       </Link>
       <section className="mt-4 rounded-lg border border-market-ink/10 bg-white p-6">
-        <div className="text-xs font-bold uppercase tracking-widest text-market-ink/50">Product terminal</div>
+        <div className="text-xs font-bold uppercase tracking-widest text-market-ink/50">Item detail</div>
         <h1 className="mt-3 text-4xl font-black">{product.ticker}</h1>
         <p className="mt-2 text-market-ink/65">{product.name}</p>
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           <Metric label="Current price" value={product.price} />
-          <Metric label="Unit price" value={comparableUnitPrice || product.unitPrice} />
+          <Metric label="Price per 100g / litre" value={normalizedUnitPrice || 'Not available'} />
           <Metric label="Store" value={product.store} />
         </div>
         <dl className="mt-6 grid gap-3 text-sm sm:grid-cols-2">
@@ -36,7 +36,6 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <Metadata label="Confidence" value={product.confidence} />
           <Metadata label="Source timestamp" value={product.observedAt} />
           <Metadata label="Source type" value={product.source} />
-          {apiProductId ? <Metadata label="API spread" value={`/products/${apiProductId}/spread`} /> : null}
         </dl>
       </section>
     </main>
@@ -70,3 +69,4 @@ function Metadata({ label, value }: Readonly<{ label: string; value: string }>) 
     </div>
   );
 }
+

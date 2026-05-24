@@ -9,6 +9,8 @@ import { matpriskollenOffers, matpriskollenSource } from '@/lib/ingested/matpris
 import { matsparProducts, matsparSource } from '@/lib/ingested/matspar';
 import { openFoodFactsProducts, openFoodFactsSource } from '@/lib/ingested/openfoodfacts';
 import { willysProducts, willysSource } from '@/lib/ingested/willys';
+import { formatComparablePriceFromObservation } from '@/lib/formatPrice';
+import { ItemCard } from '@/components/ItemCard';
 
 export const dynamic = 'force-static';
 
@@ -70,6 +72,20 @@ export default function ProductsIndexPage() {
           Matpriskollen offers ingest: {matpriskollenSource.rowCount} public offer rows retrieved {matpriskollenSource.retrievedAt.slice(0, 10)}.
         </p>
       </header>
+
+      <section className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {pricedProducts.slice(0, 4).map((product) => (
+          <ItemCard
+            key={product.code}
+            title={product.name}
+            imageUrl={product.image}
+            category={product.category}
+            categoryLabel={categoryLabels[product.category]}
+            subtitle={`${product.brands || 'Unknown brand'} · SEK ${product.priceMedian.toFixed(2)}`}
+            primaryMetric={formatComparablePriceFromObservation(product.priceMedian, product.quantity)}
+          />
+        ))}
+      </section>
 
       <section className="mb-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {ordered.map(([cat, items]) => (
