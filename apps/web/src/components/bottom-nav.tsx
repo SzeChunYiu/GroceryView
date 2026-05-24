@@ -1,15 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { Map, Search, Store, User, Watch } from 'lucide-react';
+import { Flame, Map, Search, Store, Watch } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 const bottomNavItems = [
   { href: '/', label: 'Markets', icon: Store, exact: true },
   { href: '/products', label: 'Search', icon: Search },
+  { href: '/heatmap', label: 'Heatmap', icon: Flame },
   { href: '/map', label: 'Map', icon: Map },
-  { href: '/watchlist', label: 'Watchlist', icon: Watch },
-  { href: '/account', label: 'Me', icon: User }
+  { href: '/watchlist', label: 'Watchlist', icon: Watch }
 ];
 
 export function BottomNav() {
