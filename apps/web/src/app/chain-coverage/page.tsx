@@ -24,6 +24,16 @@ const averageMatchedSpread = matchedChainProducts.length
 const willysLowest = matchedChainProducts.filter((product) => product.lowestChain === 'willys').length;
 const hemkopLowest = matchedChainProducts.filter((product) => product.lowestChain === 'hemkop').length;
 const maxCoverageScore = Math.max(...chainCategoryCoverage.map((category) => category.coverageScore), 1);
+const trackedRetailerTypes = [
+  'grocery',
+  'pharmacy',
+  'fuel',
+  'convenience',
+  'variety',
+  'cosmetics',
+  'household',
+  'online_marketplace'
+];
 
 export default function ChainCoveragePage() {
   return (
@@ -40,6 +50,16 @@ export default function ChainCoveragePage() {
         <Metric label="Average spread" value={formatPct(averageMatchedSpread)} />
         <Metric label="Lowest-price wins" value={`W ${willysLowest} / H ${hemkopLowest}`} />
       </div>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <h2 className="text-2xl font-black tracking-tight text-sky-950">Tracked retailer types</h2>
+        <p className="mt-2 text-sm leading-6 text-sky-900">Coverage now distinguishes every chain by retailer_type so grocery, pharmacy, fuel, convenience, variety, cosmetics, household, and online marketplace coverage can be audited separately.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {trackedRetailerTypes.map((type) => (
+            <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-sky-900 shadow-sm" key={type}>{type.replace(/_/g, ' ')}</span>
+          ))}
+        </div>
+      </Card>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_0.9fr]">
         <Card>
