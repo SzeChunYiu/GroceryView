@@ -5,11 +5,14 @@ import {
   authorizeHumanReviewAction,
   classifyProductMatch,
   compareCommodityUnitPrices,
+  findDuplicateProductCandidates,
   planCommunityReportAbuseControls,
+  planDuplicateProductReconciliation,
   planDietarySubstitutionAssistant,
   planStockoutSubstitutionOptions,
   planHumanReviewAssignments,
   planHumanReviewQueue,
+  productTitleSignature,
   recommendSmartSwaps,
   summarizeHumanReviewSla
 } from '../index.js';
@@ -41,6 +44,64 @@ describe('classifyProductMatch', () => {
 
     assert.equal(match.mode, 'not_recommended');
     assert.equal(match.qualityRisk, 'high');
+  });
+});
+
+describe('duplicate product reconciliation', () => {
+  it('builds stable title signatures from brand-stripped product titles', () => {
+    assert.equal(
+      productTitleSignature({ brand: 'Zoégas', title: 'Zoégas Skånerost 450 g Bryggkaffe' }),
+      productTitleSignature({ brand: 'Zoegas', title: 'Bryggkaffe Skanerost 450g' })
+    );
+  });
+
+  it('detects duplicate products by UPC and brand/title signature', () => {
+    const candidates = findDuplicateProductCandidates([
+      { id: 'coffee-db', title: 'Zoégas Skånerost 450 g Bryggkaffe', brand: 'Zoégas', upc: '731073001234', observationCount: 12 },
+      { id: 'coffee-feed', title: 'Bryggkaffe Skanerost 450g', brand: 'Zoegas', upc: '731073001234', observationCount: 4 },
+      { id: 'milk-a', title: 'Arla Mellanmjölk 1 l', brand: 'Arla', observationCount: 5 },
+      { id: 'milk-b', title: 'Mellanmjolk 1l Arla', brand: 'Arla', observationCount: 2 },
+      { id: 'store-brand-milk', title: 'Mellanmjölk 1 l', brand: 'Garant', observationCount: 8 }
+    ]);
+
+    assert.deepEqual(candidates.map((candidate) => ({
+      canonicalProductId: candidate.canonicalProductId,
+      duplicateProductIds: candidate.duplicateProductIds,
+      confidence: candidate.confidence,
+      reasons: candidate.reasons
+    })), [
+      {
+        canonicalProductId: 'coffee-db',
+        duplicateProductIds: ['coffee-feed'],
+        confidence: 'high',
+        reasons: ['same_upc', 'same_brand_title_signature']
+      },
+      {
+        canonicalProductId: 'milk-a',
+        duplicateProductIds: ['milk-b'],
+        confidence: 'medium',
+        reasons: ['same_brand_title_signature']
+      }
+    ]);
+  });
+
+  it('exposes a human-approved reconcile workflow instead of auto-merging duplicates', () => {
+    const workflow = planDuplicateProductReconciliation([
+      { id: 'banana-a', title: 'Banan Fairtrade Klass 1 Eko', brand: 'Garant', observationCount: 6 },
+      { id: 'banana-b', title: 'Garant Eko Fairtrade Banan klass 1', brand: 'Garant', observationCount: 3 }
+    ]);
+
+    assert.equal(workflow.status, 'ready');
+    assert.deepEqual(workflow.actions, [
+      {
+        action: 'merge_duplicate_product',
+        canonicalProductId: 'banana-a',
+        duplicateProductId: 'banana-b',
+        requiresHumanApproval: true,
+        reason: 'Duplicate candidate via same_brand_title_signature; keep pricing history under banana-a after approval.'
+      }
+    ]);
+    assert.match(workflow.guardrails.join(' '), /must not rewrite price history without human approval/i);
   });
 });
 

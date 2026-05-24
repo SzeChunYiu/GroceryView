@@ -2888,6 +2888,177 @@ export function classifyProductMatch(input: { source: ProductMatchInput; candida
   return { mode: 'not_recommended', confidence: 'low', qualityRisk: 'high', reason: 'Package sizes are not comparable.' };
 }
 
+export type DuplicateProductInput = {
+  id: string;
+  title: string;
+  brand?: string;
+  upc?: string;
+  observationCount?: number;
+};
+
+export type DuplicateProductMatchReason = 'same_upc' | 'same_brand_title_signature';
+
+export type DuplicateProductCandidate = {
+  canonicalProductId: string;
+  duplicateProductIds: string[];
+  confidence: MatchConfidence;
+  reasons: DuplicateProductMatchReason[];
+  brandSignature?: string;
+  titleSignature?: string;
+  upcs: string[];
+};
+
+export type DuplicateProductReconcileAction = {
+  action: 'merge_duplicate_product';
+  canonicalProductId: string;
+  duplicateProductId: string;
+  requiresHumanApproval: true;
+  reason: string;
+};
+
+export type DuplicateProductReconcileWorkflow = {
+  status: 'ready' | 'no_duplicates';
+  candidates: DuplicateProductCandidate[];
+  actions: DuplicateProductReconcileAction[];
+  guardrails: string[];
+};
+
+const duplicateReasonRank: Record<DuplicateProductMatchReason, number> = {
+  same_upc: 0,
+  same_brand_title_signature: 1
+};
+
+function normalizeProductText(value: string): string {
+  return value
+    .toLocaleLowerCase('sv-SE')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/(\d+(?:[,.]\d+)?)\s*(kg|g|l|ml|st|pcs|pack)\b/giu, '$1$2')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+export function productTitleSignature(product: Pick<DuplicateProductInput, 'title' | 'brand'>): string {
+  const brandTokens = new Set(normalizeProductText(product.brand ?? '').split(/\s+/).filter(Boolean));
+  const stopWords = new Set(['klass', 'class', 'ca', 'cirka', 'the', 'with', 'och', 'med']);
+  return normalizeProductText(product.title)
+    .split(/\s+/)
+    .filter((token) => token && !brandTokens.has(token) && !stopWords.has(token))
+    .sort((a, b) => a.localeCompare(b))
+    .join(' ');
+}
+
+function normalizeUpc(value: string | undefined): string {
+  return (value ?? '').replace(/\D+/g, '');
+}
+
+function duplicateCanonicalProductId(products: DuplicateProductInput[]): string {
+  return [...products].sort((a, b) =>
+    (b.observationCount ?? 0) - (a.observationCount ?? 0) ||
+    a.id.localeCompare(b.id)
+  )[0]!.id;
+}
+
+function sortDuplicateReasons(reasons: DuplicateProductMatchReason[]): DuplicateProductMatchReason[] {
+  return [...new Set(reasons)].sort((a, b) => duplicateReasonRank[a] - duplicateReasonRank[b] || a.localeCompare(b));
+}
+
+function duplicateCandidateFromGroup(
+  products: DuplicateProductInput[],
+  reasons: DuplicateProductMatchReason[],
+  brandSignature?: string,
+  titleSignature?: string
+): DuplicateProductCandidate | null {
+  const uniqueProducts = [...new Map(products.map((product) => [product.id, product])).values()];
+  if (uniqueProducts.length < 2) return null;
+  const canonicalProductId = duplicateCanonicalProductId(uniqueProducts);
+  return {
+    canonicalProductId,
+    duplicateProductIds: uniqueProducts.map((product) => product.id).filter((id) => id !== canonicalProductId).sort((a, b) => a.localeCompare(b)),
+    confidence: reasons.includes('same_upc') ? 'high' : 'medium',
+    reasons: sortDuplicateReasons(reasons),
+    ...(brandSignature ? { brandSignature } : {}),
+    ...(titleSignature ? { titleSignature } : {}),
+    upcs: [...new Set(uniqueProducts.map((product) => normalizeUpc(product.upc)).filter(Boolean))].sort((a, b) => a.localeCompare(b))
+  };
+}
+
+function mergeDuplicateCandidates(candidates: DuplicateProductCandidate[]): DuplicateProductCandidate[] {
+  const byCanonicalAndDuplicates = new Map<string, DuplicateProductCandidate>();
+  for (const candidate of candidates) {
+    const key = [candidate.canonicalProductId, ...candidate.duplicateProductIds].sort((a, b) => a.localeCompare(b)).join('::');
+    const existing = byCanonicalAndDuplicates.get(key);
+    if (!existing) {
+      byCanonicalAndDuplicates.set(key, candidate);
+      continue;
+    }
+    byCanonicalAndDuplicates.set(key, {
+      ...existing,
+      confidence: existing.confidence === 'high' || candidate.confidence === 'high' ? 'high' : existing.confidence,
+      reasons: sortDuplicateReasons([...existing.reasons, ...candidate.reasons]),
+      upcs: [...new Set([...existing.upcs, ...candidate.upcs])].sort((a, b) => a.localeCompare(b)),
+      titleSignature: existing.titleSignature ?? candidate.titleSignature,
+      brandSignature: existing.brandSignature ?? candidate.brandSignature
+    });
+  }
+  return [...byCanonicalAndDuplicates.values()].sort((a, b) => a.canonicalProductId.localeCompare(b.canonicalProductId));
+}
+
+export function findDuplicateProductCandidates(products: DuplicateProductInput[]): DuplicateProductCandidate[] {
+  const byUpc = new Map<string, DuplicateProductInput[]>();
+  const byBrandTitle = new Map<string, { brandSignature: string; titleSignature: string; products: DuplicateProductInput[] }>();
+
+  for (const product of products) {
+    const upc = normalizeUpc(product.upc);
+    if (upc) byUpc.set(upc, [...(byUpc.get(upc) ?? []), product]);
+
+    const brandSignature = normalizeProductText(product.brand ?? '');
+    const titleSignature = productTitleSignature(product);
+    if (brandSignature && titleSignature) {
+      const key = `${brandSignature}::${titleSignature}`;
+      const group = byBrandTitle.get(key) ?? { brandSignature, titleSignature, products: [] };
+      group.products.push(product);
+      byBrandTitle.set(key, group);
+    }
+  }
+
+  const candidates: DuplicateProductCandidate[] = [];
+  for (const group of byUpc.values()) {
+    const candidate = duplicateCandidateFromGroup(group, ['same_upc']);
+    if (candidate) candidates.push(candidate);
+  }
+  for (const group of byBrandTitle.values()) {
+    const candidate = duplicateCandidateFromGroup(group.products, ['same_brand_title_signature'], group.brandSignature, group.titleSignature);
+    if (candidate) candidates.push(candidate);
+  }
+
+  return mergeDuplicateCandidates(candidates);
+}
+
+export function planDuplicateProductReconciliation(products: DuplicateProductInput[]): DuplicateProductReconcileWorkflow {
+  const candidates = findDuplicateProductCandidates(products);
+  const actions = candidates.flatMap((candidate) =>
+    candidate.duplicateProductIds.map((duplicateProductId) => ({
+      action: 'merge_duplicate_product' as const,
+      canonicalProductId: candidate.canonicalProductId,
+      duplicateProductId,
+      requiresHumanApproval: true as const,
+      reason: `Duplicate candidate via ${candidate.reasons.join(' + ')}; keep pricing history under ${candidate.canonicalProductId} after approval.`
+    }))
+  );
+
+  return {
+    status: actions.length > 0 ? 'ready' : 'no_duplicates',
+    candidates,
+    actions,
+    guardrails: [
+      'UPC matches are high confidence but still require an auditable reconcile action before merging product ids.',
+      'Brand + title-signature matches are candidates only; they must not rewrite price history without human approval.',
+      'Reconciliation preserves one canonical product id so fragmented prices do not create false comparisons.'
+    ]
+  };
+}
+
 export type SmartSwapInput = {
   source: ProductMatchInput & { unitPrice: number };
   candidates: Array<ProductMatchInput & { unitPrice: number }>;
