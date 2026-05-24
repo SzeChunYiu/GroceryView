@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { categoryPathForSlug } from '@groceryview/db';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
+import { ReportItemDialog } from '@/components/ReportItemDialog';
 
 export const dynamic = 'force-static';
 
@@ -65,6 +66,7 @@ export default async function ItemPage({ params }: Readonly<{ params: Promise<{ 
           </div>
         </dl>
       </section>
+      <ReportItemDialog itemCode={item.code} itemName={item.name} />
     </main>
   );
 }

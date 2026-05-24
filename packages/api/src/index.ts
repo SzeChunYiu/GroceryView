@@ -1363,6 +1363,29 @@ export type FacetedProductSearchResult = {
   };
 };
 
+export const reportItemEndpoint = {
+  method: 'POST',
+  controllerPath: 'reports',
+  actionPath: 'items/:itemId',
+  path: '/reports/items/:itemId',
+  pathParams: ['itemId'],
+  bodyFields: ['issue', 'details']
+} as const;
+
+export type ItemReportIssue = 'wrong_category' | 'wrong_image' | 'incorrect_name';
+
+export type ReportItemResult = {
+  reportId: string;
+  status: 'accepted' | 'queued';
+  reviewQueue: {
+    reviewId: string;
+    assigneeId: string;
+    priority: 'high' | 'medium' | 'low';
+    dueAt: string;
+    reason: string;
+  };
+};
+
 export type RealBasketCompareItem = {
   productId: string;
   quantity: number;

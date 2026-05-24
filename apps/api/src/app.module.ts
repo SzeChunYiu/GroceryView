@@ -24,6 +24,7 @@ import { ReceiptsModule } from './receipts/receipts.module.js';
 import { StoresModule } from './stores/stores.module.js';
 import { UsersModule } from './users/users.module.js';
 import { WatchlistsModule } from './watchlists/watchlists.module.js';
+import { ReportsController } from './routes/reports.js';
 
 @Module({
   imports: [
@@ -51,6 +52,6 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     CategoriesModule,
     AlertsModule
   ],
-  controllers: [AppController]
+  controllers: [AppController, ReportsController]
 })
 export class AppModule {}
