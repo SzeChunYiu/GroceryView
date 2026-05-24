@@ -10,6 +10,8 @@ import {
   buildCoopSearchUrl,
   buildCoopStoreInfoUrl,
   buildCoopStoresUrl,
+  buildArkenZooSeUrl,
+  normalizeArkenZooSeProduct,
   buildCityGrossProductsUrl,
   buildCityGrossStoresUrl,
   buildDailyConnectorConfigsFromEnv,
@@ -188,6 +190,19 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+describe('Arken Zoo SE connector', () => {
+  it('normalizes pet specialty rows with Swedish metadata', () => {
+    assert.equal(buildArkenZooSeUrl('/hund/hundmat'), 'https://www.arkenzoo.se/hund/hundmat');
+    const row = normalizeArkenZooSeProduct({ sku: 'az-1', name: 'Hundmat Lamm', brand: 'Arken Zoo', category: 'Hundmat', price: '249 kr', handle: '/products/hundmat' }, 'https://www.arkenzoo.se/hund/hundmat', '2026-05-24T12:00:00.000Z');
+
+    assert.equal(row?.country, 'SE');
+    assert.equal(row?.currency, 'SEK');
+    assert.equal(row?.chain, 'arkenzoo');
+    assert.equal(row?.retailer_type, 'specialty_pet');
+    assert.equal(row?.price, 249);
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
