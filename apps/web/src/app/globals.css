@@ -38,3 +38,22 @@ button, input, select, textarea { font: inherit; }
     transition-duration: 1ms !important;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    background: #020617;
+    color: #e2e8f0;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  background: #020617;
+  color: #e2e8f0;
+}
+
+:root[data-theme='dark'] body {
+  background: radial-gradient(circle at 15% 8%, rgba(16, 185, 129, 0.16), transparent 28rem), #020617;
+  color: #e2e8f0;
+}
