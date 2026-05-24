@@ -99,6 +99,7 @@ import {
   parseApohemProducts,
   parseApotekHjartatProducts,
   parseIcaReklambladOffers,
+  parseIcaReklambladV2Offers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
   GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL,
@@ -198,6 +199,43 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('ICA reklamblad v2 promotions', () => {
+  it('parses flyer fixture mechanics into structured promotion rows', () => {
+    const weeklyOffers = [
+      {
+        id: 'multi-buy-pasta',
+        details: { name: 'Pasta', brand: 'ICA', mechanicInfo: '2 för 30' },
+        stores: [{ storeMarketingName: 'ICA Focus', BMSStoreId: '1004247', referencePriceText: 'Ord. pris 19:90/st', onlineInd: true, storeInd: true }],
+        eans: [{ id: '731000000001', image: 'https://www.ica.se/pasta.png' }]
+      },
+      {
+        id: 'coffee-percent',
+        details: { name: 'Kaffe', brand: 'ICA', mechanicInfo: '25% rabatt' },
+        stores: [{ storeMarketingName: 'ICA Focus', BMSStoreId: '1004247', referencePriceText: 'Ord. pris 59:90', onlineInd: true, storeInd: true }],
+        eans: [{ id: '731000000002', image: 'https://www.ica.se/coffee.png' }]
+      },
+      {
+        id: 'stammis-member',
+        details: { name: 'Bananer', brand: 'ICA', mechanicInfo: 'Stammispris 19:90/kg' },
+        stores: [{ storeMarketingName: 'ICA Focus', BMSStoreId: '1004247', referencePriceText: 'Ord. pris 24:90/kg', onlineInd: false, storeInd: true }],
+        eans: [{ id: '731000000003', image: 'https://www.ica.se/banana.png' }]
+      }
+    ];
+    const rows = parseIcaReklambladV2Offers(`"weeklyOffers":${JSON.stringify(weeklyOffers)}`, {
+      sourceUrl: 'fixture://ica-reklamblad-v2',
+      retrievedAt: '2026-05-24T12:00:00.000Z'
+    });
+
+    assert.equal(rows[0]!.promotionKind, 'multi_buy');
+    assert.equal(rows[0]!.promotion.quantity, 2);
+    assert.equal(rows[0]!.promotion.bundlePrice, 30);
+    assert.equal(rows[1]!.promotionKind, 'percent_off');
+    assert.equal(rows[1]!.promotion.percentOff, 25);
+    assert.equal(rows[2]!.promotionKind, 'member');
+    assert.equal(rows[2]!.isMemberPrice, true);
   });
 });
 

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@groceryview/catalog": "0.1.0",
+    "@groceryview/core": "0.1.0",
     "@groceryview/db": "0.1.0",
     "@groceryview/image-cache": "0.1.0",
     "pdfjs-dist": "^5.7.284",
