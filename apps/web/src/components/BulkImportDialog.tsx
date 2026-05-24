@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useHaptic } from '@/hooks/useHaptic';
 import type { BulkImportedListItemInput } from '@/hooks/useList';
 
 type BulkImportDialogProps = {
@@ -100,6 +101,7 @@ function itemForLine(line: string, index: number): BulkImportedListItemInput {
 }
 
 export function BulkImportDialog({ onImportItems }: Readonly<BulkImportDialogProps>) {
+  const { success } = useHaptic();
   const [plainText, setPlainText] = useState('');
   const [clipboardStatus, setClipboardStatus] = useState('Paste a list manually or read from the clipboard.');
   const [lastImportSummary, setLastImportSummary] = useState('');
@@ -123,6 +125,7 @@ export function BulkImportDialog({ onImportItems }: Readonly<BulkImportDialogPro
   function importList() {
     if (importItems.length === 0) return;
     onImportItems(importItems);
+    success();
     setLastImportSummary(`Imported ${importItems.length} line(s), ${matchedCount} matched to the product catalog.`);
     setPlainText('');
   }
