@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { AnnouncementBanner } from '@/components/AnnouncementBanner';
 import { Providers } from './providers';
 import './globals.css';
 import '../styles/global.css';
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
+        <AnnouncementBanner />
         <Providers>{children}</Providers>
       </body>
     </html>
