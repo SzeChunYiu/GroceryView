@@ -5,6 +5,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
   Bell,
+  Mail,
   ChevronDown,
   Database,
   Flame,
@@ -77,7 +78,8 @@ const navGroups: NavGroup[] = [
       { href: '/list', label: 'Shopping list', icon: ListChecks },
       { href: '/basket', label: 'Basket', icon: ShoppingBasket },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
-      { href: '/meal-planner', label: 'Meal planner', icon: Utensils }
+      { href: '/meal-planner', label: 'Meal planner', icon: Utensils },
+      { href: '/contact', label: 'Contact', icon: Mail }
     ]
   }
 ];

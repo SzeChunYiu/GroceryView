@@ -2032,7 +2032,8 @@ ${seo}`;
     assert.match(bottomNav, /Search/);
     assert.match(bottomNav, /Map/);
     assert.match(bottomNav, /Watchlist/);
-    assert.match(bottomNav, /Me/);
+    assert.match(bottomNav, /Contact/);
+    assert.match(bottomNav, /href: '\/contact'/);
     assert.match(dataUi, /import \{ BottomNav \} from '\.\/bottom-nav'/);
     assert.match(dataUi, /pb-20/);
     assert.match(dataUi, /lg:pb-6/);
@@ -3790,5 +3791,17 @@ ${seo}`;
     assert.match(compareRoute, /formatComparableUnitPrice/);
     assert.match(productDetailRoute, /formatComparableUnitPrice/);
     assert.match(screenerRoute, /formatLocalizedUnitPrice/);
+  });
+});
+
+describe('contact navigation', () => {
+  it('links the public contact page from desktop and mobile navigation', async () => {
+    const appNav = await read('src/components/app-nav.tsx');
+    const bottomNav = await read('src/components/bottom-nav.tsx');
+
+    assert.match(appNav, /href: '\/contact'/);
+    assert.match(appNav, /label: 'Contact'/);
+    assert.match(bottomNav, /href: '\/contact'/);
+    assert.match(bottomNav, /label: 'Contact'/);
   });
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Map, Search, Store, User, Watch } from 'lucide-react';
+import { Mail, Map, Search, Store, Watch } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 const bottomNavItems = [
@@ -9,7 +9,7 @@ const bottomNavItems = [
   { href: '/products', label: 'Search', icon: Search },
   { href: '/map', label: 'Map', icon: Map },
   { href: '/watchlist', label: 'Watchlist', icon: Watch },
-  { href: '/account', label: 'Me', icon: User }
+  { href: '/contact', label: 'Contact', icon: Mail }
 ];
 
 export function BottomNav() {
