@@ -644,6 +644,21 @@ describe('createGroceryViewApi', () => {
         productSlug: 'standardmjolk-1l',
         productName: 'Standardmjolk 3% 1 l',
         categoryPath: ['Dairy', 'Milk'],
+        comparableUnit: 'ml',
+        price: 10,
+        unitPrice: 0.016,
+        currency: 'SEK',
+        observedAt: '2026-05-21T09:30:00.000Z',
+        chainSlug: 'lidl',
+        chainName: 'Lidl',
+        storeSlug: 'lidl-odenplan',
+        storeName: 'Lidl Odenplan'
+      },
+      {
+        productId: 'product-milk',
+        productSlug: 'standardmjolk-1l',
+        productName: 'Standardmjolk 3% 1 l',
+        categoryPath: ['Dairy', 'Milk'],
         comparableUnit: 'l',
         price: 0,
         unitPrice: 0,
@@ -659,12 +674,13 @@ describe('createGroceryViewApi', () => {
     assert.equal(report?.productId, 'product-milk');
     assert.equal(report?.cheapest?.chain, 'willys');
     assert.equal(report?.cheapest?.storeId, 'willys-odenplan');
-    assert.deepEqual(report?.chainPrices.map((row) => [row.chain, row.packagePrice]), [
-      ['willys', 13.9],
-      ['coop', 15.5]
+    assert.deepEqual(report?.chainPrices.map((row) => [row.chain, row.packagePrice, row.comparableUnitPrice, row.comparableUnit]), [
+      ['willys', 13.9, 13.9, 'l'],
+      ['coop', 15.5, 15.5, 'l'],
+      ['lidl', 10, 16, 'l']
     ]);
-    assert.equal(report?.chainCount, 2);
-    assert.equal(report?.observedPriceCount, 3);
+    assert.equal(report?.chainCount, 3);
+    assert.equal(report?.observedPriceCount, 4);
     assert.equal(report?.lastObservedAt, '2026-05-21T10:00:00.000Z');
     assert.match(report?.guardrails[1] ?? '', /non-positive package\/unit prices/i);
   });
