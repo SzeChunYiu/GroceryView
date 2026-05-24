@@ -97,6 +97,8 @@ import {
   fetchWillysWeeklyDiscountsForAllStores,
   findPharmacyEanMatches,
   parseApohemProducts,
+  parseKronansApotekPriceRows,
+  KRONANS_APOTEK_SE_SOURCE_QUIRKS,
   parseApotekHjartatProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
@@ -7307,5 +7309,35 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('parseKronansApotekPriceRows', () => {
+  it('emits documented channel, member, coupon, and multi-buy pricing fields', () => {
+    const rows = parseKronansApotekPriceRows([
+      {
+        id: 'kronans-linsvatska-355ml',
+        name: 'Kronans Apotek Linsvätska Allt-i-ett 355 ml',
+        price: 79,
+        observedAt: '2026-05-24T12:00:00.000Z',
+        sourceUrl: 'https://www.kronansapotek.se/erbjudanden/klubberbjudande/',
+        channel: 'online',
+        promotions: [{ type: 'member', label: '2 för 140:-', quantity: 2, price: 140 }, { type: 'multi_buy', label: '2 för 140:-', quantity: 2, price: 140 }]
+      },
+      {
+        id: 'rabattkod-online',
+        name: 'Rabattkod online',
+        price: 250,
+        observedAt: '2026-05-24T12:00:00.000Z',
+        sourceUrl: 'https://www.kronansapotek.se/erbjudanden/rabattkoder/',
+        promotions: [{ type: 'coupon', label: 'Uppge koden i kassan' }]
+      }
+    ]);
+
+    assert.equal(KRONANS_APOTEK_SE_SOURCE_QUIRKS.loyalty_program, 'Kundklubben');
+    assert.deepEqual(rows.map((row) => row.channel), ['online', 'online', 'online']);
+    assert.equal(rows[0]?.is_member_price, true);
+    assert.deepEqual(rows[1]?.multi_buy, { quantity: 2, price: 140, label: '2 för 140:-' });
+    assert.equal(rows[2]?.is_coupon_price, true);
   });
 });
