@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { dealBasedMeals, familyMealPlannerFromDeals, freezerBatchCookPlanner, studentDealRecipes } from '@/lib/demo-data';
+import { MEAL_LIST_SYNC_EVENT, MEAL_LIST_SYNC_STORAGE_KEY, mealListSyncPlans } from '@/lib/meal-list-sync';
 import { dietarySubstitutionAssistantContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -19,6 +20,82 @@ function confidenceLevel(value: string): 'high' | 'medium' | 'low' {
 
 export default function MealPlannerPage() {
   const dealMealConfidenceLevel = confidenceLevel(dealBasedMeals.coverage.confidence);
+  const mealListSyncScript = `
+    (() => {
+      const script = document.currentScript;
+      const root = script && script.closest('[data-meal-list-sync-root]');
+      if (!root) return;
+
+      const plans = ${JSON.stringify(mealListSyncPlans)};
+      const storageKey = root.getAttribute('data-storage-key');
+      const eventName = root.getAttribute('data-event-name');
+      const checkboxes = Array.from(root.querySelectorAll('[data-meal-plan-checkbox]'));
+      const count = root.querySelector('[data-meal-list-sync-count]');
+      const preview = root.querySelector('[data-meal-list-sync-preview]');
+      const slug = (value) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const read = () => {
+        try {
+          const parsed = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+          return Array.isArray(parsed) ? parsed.filter((value) => typeof value === 'string') : [];
+        } catch {
+          return [];
+        }
+      };
+      const write = (ids) => {
+        window.localStorage.setItem(storageKey, JSON.stringify(ids));
+        window.dispatchEvent(new CustomEvent(eventName));
+      };
+      const getDeltas = (ids) => {
+        const selected = new Set(ids);
+        const deltas = new Map();
+        plans.filter((plan) => selected.has(plan.id)).forEach((plan) => {
+          plan.ingredients.forEach((ingredient) => {
+            const id = ingredient.productId || slug(ingredient.name);
+            const existing = deltas.get(id);
+            if (existing) {
+              if (!existing.mealTitles.includes(plan.title)) existing.mealTitles.push(plan.title);
+              return;
+            }
+            deltas.set(id, { id, name: ingredient.name, category: ingredient.category, mealTitles: [plan.title] });
+          });
+        });
+        return Array.from(deltas.values()).sort((a, b) => a.name.localeCompare(b.name, 'sv'));
+      };
+      const render = () => {
+        const selected = read();
+        const deltas = getDeltas(selected);
+        checkboxes.forEach((checkbox) => {
+          checkbox.checked = selected.includes(checkbox.value);
+        });
+        if (count) count.textContent = String(deltas.length);
+        if (!preview) return;
+        preview.replaceChildren();
+        if (!deltas.length) {
+          preview.textContent = 'Select meal plans above to add their ingredients to the shopping list sync.';
+          return;
+        }
+        deltas.slice(0, 8).forEach((delta) => {
+          const item = document.createElement('li');
+          item.textContent = delta.name + ' · ' + delta.mealTitles.join(', ');
+          preview.appendChild(item);
+        });
+      };
+
+      checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', () => {
+          const selected = new Set(read());
+          if (checkbox.checked) selected.add(checkbox.value);
+          else selected.delete(checkbox.value);
+          write(Array.from(selected));
+          render();
+        });
+      });
+      window.addEventListener('storage', (event) => {
+        if (event.key === storageKey) render();
+      });
+      render();
+    })();
+  `;
 
   return (
     <PageShell>
@@ -74,6 +151,36 @@ export default function MealPlannerPage() {
               </div>
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <h2 className="text-2xl font-black">Shopping list auto-sync</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          Tick meal plans to add their ingredients to the shopping list sync. Untick a plan to remove that meal&apos;s planned ingredients from the generated deltas.
+        </p>
+        <div
+          className="mt-4"
+          data-event-name={MEAL_LIST_SYNC_EVENT}
+          data-meal-list-sync-root
+          data-storage-key={MEAL_LIST_SYNC_STORAGE_KEY}
+        >
+          <div className="grid gap-3 md:grid-cols-2">
+            {mealListSyncPlans.map((plan) => (
+              <label className="flex gap-3 rounded-2xl border border-emerald-200 bg-white p-4 text-sm font-semibold text-slate-700" key={plan.id}>
+                <input className="mt-1 h-4 w-4 accent-emerald-700" data-meal-plan-checkbox type="checkbox" value={plan.id} />
+                <span>
+                  <span className="block font-black text-slate-950">{plan.title}</span>
+                  <span className="mt-1 block">{plan.source} · {plan.ingredients.length} ingredients</span>
+                </span>
+              </label>
+            ))}
+          </div>
+          <div className="mt-4 rounded-2xl border border-emerald-200 bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800"><span data-meal-list-sync-count>0</span> synced ingredients</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-700" data-meal-list-sync-preview />
+          </div>
+          <script dangerouslySetInnerHTML={{ __html: mealListSyncScript }} />
         </div>
       </Card>
 
