@@ -82,7 +82,8 @@ const navGroups: NavGroup[] = [
   }
 ];
 
-const mobileNavItems = navGroups.flatMap((group) => group.items);
+// Keep the flattened mobile nav list stable across AppNav renders.
+const mobileNavItems: readonly NavItem[] = navGroups.flatMap((group) => group.items);
 
 function readPersistedLocale(): SupportedLocale {
   const localStorageLocale = normalizeLocale(window.localStorage.getItem(localeStorageKey));
