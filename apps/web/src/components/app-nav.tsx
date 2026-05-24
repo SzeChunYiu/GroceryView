@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
@@ -84,6 +85,11 @@ const navGroups: NavGroup[] = [
 
 const mobileNavItems = navGroups.flatMap((group) => group.items);
 
+function isCurrentRoute(pathname: string, href: string) {
+  if (href === '/') return pathname === href;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 function readPersistedLocale(): SupportedLocale {
   const localStorageLocale = normalizeLocale(window.localStorage.getItem(localeStorageKey));
   if (localStorageLocale) return localStorageLocale;
@@ -101,6 +107,8 @@ function readPersistedLocale(): SupportedLocale {
 }
 
 export function AppNav() {
+  const pathname = usePathname() ?? '/';
+
   useEffect(() => {
     document.documentElement.lang = readPersistedLocale();
 
@@ -131,8 +139,14 @@ export function AppNav() {
           <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden">
             {mobileNavItems.map((item) => {
               const Icon = item.icon;
+              const isCurrent = isCurrentRoute(pathname, item.href);
               return (
-                <Link className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 transition hover:border-emerald-700 hover:text-emerald-900" href={item.href} key={`${item.href}-${item.label}`}>
+                <Link
+                  aria-current={isCurrent ? 'page' : undefined}
+                  className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm font-black transition ${isCurrent ? "border-emerald-700 bg-emerald-50 text-emerald-900" : "border-slate-200 bg-white text-slate-700 hover:border-emerald-700 hover:text-emerald-900"}`}
+                  href={item.href}
+                  key={`${item.href}-${item.label}`}
+                >
                   <Icon className="h-4 w-4" aria-hidden="true" />
                   {item.label}
                 </Link>
@@ -156,9 +170,11 @@ export function AppNav() {
                   <div className="invisible absolute right-0 top-full z-30 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 opacity-0 shadow-xl shadow-slate-900/10 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
                     {group.items.map((item) => {
                       const Icon = item.icon;
+                      const isCurrent = isCurrentRoute(pathname, item.href);
                       return (
                         <Link
-                          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-black text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-900 focus:bg-emerald-50 focus:text-emerald-900 focus:outline-none"
+                          aria-current={isCurrent ? 'page' : undefined}
+                          className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-black transition focus:bg-emerald-50 focus:text-emerald-900 focus:outline-none ${isCurrent ? "bg-emerald-50 text-emerald-900" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-900"}`}
                           href={item.href}
                           key={`${group.label}-${item.href}-${item.label}`}
                         >
