@@ -87,6 +87,7 @@ import {
   fetchLidlOffers,
   fetchLidlOffersForAllStores,
   fetchLidlStores,
+  fetchLloydsApotekProducts,
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
@@ -98,6 +99,7 @@ import {
   findPharmacyEanMatches,
   parseApohemProducts,
   parseApotekHjartatProducts,
+  parseLloydsApotekProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -108,6 +110,7 @@ import {
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
+  GROCERYVIEW_DAILY_LLOYDS_APOTEK_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
@@ -7227,6 +7230,117 @@ describe('daily ingestion runner', () => {
       apohemSourceUrl,
       apotekHjartatSourceUrl
     ]);
+  });
+
+  it('parses Lloyds Apotek / DOZ category cards into the shared pharmacy row shape', async () => {
+    const retrievedAt = '2026-05-23T09:15:00.000Z';
+    const sourceUrl = 'https://dozapotek.se/egenvard/feber-och-vark/febernedsattande/paracetamol';
+    const html = `
+      <form class="item product product-item product_addtocart_form">
+        <input type="hidden" name="product" value="100862" />
+        <a class="product photo product-item-photo" href="https://dozapotek.se/paracetamol-apofri-filmdragerad-tablett-500-mg-20-tablett-er-495312">
+          <img class="object-contain" alt="Paracetamol Apofri, filmdragerad tablett 500 mg" src="https://media.dozapotek.se/catalog/product/1/0/10482531991582.jpg?width=360&amp;height=360" />
+        </a>
+        <div class="product-info">
+          <a class="product-item-link" href="https://dozapotek.se/paracetamol-apofri-filmdragerad-tablett-500-mg-20-tablett-er-495312">
+            Paracetamol Apofri, filmdragerad tablett 500 mg, 20 tablett(er)
+          </a>
+          <span>Läkemedel</span>
+          <span data-price-amount="19" data-price-type="finalPrice" class="price-wrapper"><span class="price">19,00 kr</span></span>
+          <span data-price-amount="25.5" data-price-type="oldPrice" class="price-wrapper"><span class="price">25,50 kr</span></span>
+          <button aria-label="Köp">Köp</button>
+        </div>
+      </form>
+      <form class="item product product-item product_addtocart_form">
+        <input type="hidden" name="product" value="missing-ean" />
+        <a class="product-item-link" href="https://dozapotek.se/missing-ean-123456">Missing EAN</a>
+        <span data-price-amount="12" data-price-type="finalPrice"></span>
+      </form>
+    `;
+
+    const parsedRows = parseLloydsApotekProducts(html, sourceUrl, retrievedAt);
+    assert.equal(parsedRows.length, 1);
+    assert.deepEqual(parsedRows[0], {
+      chain: 'lloyds-apotek-se',
+      code: '100862',
+      ean: '10482531991582',
+      name: 'Paracetamol Apofri, filmdragerad tablett 500 mg, 20 tablett(er)',
+      brand: 'Paracetamol Apofri',
+      category: 'otc',
+      price: 19,
+      priceText: '19.00 SEK',
+      originalPrice: 25.5,
+      originalPriceText: '25.50 SEK',
+      vatPercent: null,
+      stockStatus: 'in_stock',
+      productUrl: 'https://dozapotek.se/paracetamol-apofri-filmdragerad-tablett-500-mg-20-tablett-er-495312',
+      imageUrl: 'https://media.dozapotek.se/catalog/product/1/0/10482531991582.jpg?width=360&height=360',
+      isOtc: true,
+      sourceUrl,
+      retrievedAt
+    });
+
+    const requestedUrls: string[] = [];
+    const fetchedRows = await fetchLloydsApotekProducts({
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+      },
+      sourceUrls: [sourceUrl],
+      retrievedAt
+    });
+    assert.deepEqual(requestedUrls, [sourceUrl]);
+    assert.deepEqual(fetchedRows, parsedRows);
+  });
+
+  it('materializes Lloyds Apotek public products as pharmacy-domain daily observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const sourceUrl = 'https://dozapotek.se/kost-halsa/kosttillskott-och-vitaminer';
+    const endpointUrl = `${GROCERYVIEW_DAILY_LLOYDS_APOTEK_PRODUCTS_URL}?sourceUrls=${encodeURIComponent(sourceUrl)}`;
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T09:25:00.000Z',
+      connectors: [{
+        connectorId: 'lloyds-apotek-public-products',
+        chainId: 'lloyds-apotek-se',
+        domain: 'pharmacy',
+        sourceType: 'retailer_online_page',
+        endpointUrl,
+        parserVersion: 'lloyds-apotek-public-products-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async () => new Response(`
+        <form class="item product product-item product_addtocart_form">
+          <input type="hidden" name="product" value="132261" />
+          <a class="product photo product-item-photo" href="https://dozapotek.se/resorb-original-summer-edition-vattenmelon-20-st-790113">
+            <img class="object-contain" alt="Resorb Original Summer Edition Vattenmelon" src="https://media.dozapotek.se/catalog/product/0/8/08445291996113_C1L1.tif.png?width=360&amp;height=360" />
+          </a>
+          <a class="product-item-link" href="https://dozapotek.se/resorb-original-summer-edition-vattenmelon-20-st-790113">
+            Resorb Original Summer Edition Vattenmelon, 20 st
+          </a>
+          <span data-price-amount="59" data-price-type="finalPrice"></span>
+          <button aria-label="Köp">Köp</button>
+        </form>
+      `, { status: 200, headers: { 'content-type': 'text/html' } })
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.domain, 'pharmacy');
+    assert.equal(product.barcode, '08445291996113');
+    assert.equal(product.category_id, 'pharmacy-supplement');
+    assert.equal(product.package_size, 20);
+    assert.equal(product.package_unit, 'piece');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.domain, 'pharmacy');
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.price, 59);
+    assert.equal((observation.provenance as Record<string, unknown>).chainId, 'lloyds-apotek-se');
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {

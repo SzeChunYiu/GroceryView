@@ -58,6 +58,10 @@ import {
   DEFAULT_APOTEK_HJARTAT_SEARCH_URLS
 } from './connectors/apohem.js';
 import {
+  DEFAULT_LLOYDS_APOTEK_SOURCE_URLS,
+  fetchLloydsApotekProducts
+} from './connectors/lloyds-apotek-se.js';
+import {
   fetchLidlOffersForAllStores,
   type LidlStoreOffer
 } from './connectors/lidl.js';
@@ -104,6 +108,7 @@ export * from './connectors/matspar.js';
 export * from './connectors/lidl-bulk.js';
 export * from './connectors/willys-bulk.js';
 export * from './connectors/apohem.js';
+export * from './connectors/lloyds-apotek-se.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
@@ -2280,6 +2285,18 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(pharmacyProductToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_LLOYDS_APOTEK_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_LLOYDS_APOTEK_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchLloydsApotekProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      sourceUrls: dailyNativeStringListParam(url, 'sourceUrls') ?? DEFAULT_LLOYDS_APOTEK_SOURCE_URLS,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(pharmacyProductToDailyItem) });
+  }
+
   return await fetchRetailerConnectorSnapshot(plan, options);
 }
 
@@ -3114,6 +3131,7 @@ export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
+export const GROCERYVIEW_DAILY_LLOYDS_APOTEK_PRODUCTS_URL = 'groceryview://daily/lloyds-apotek-se/products/public';
 
 const requireForDailyIngestion = createRequire(import.meta.url);
 
