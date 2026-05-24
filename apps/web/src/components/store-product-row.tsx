@@ -1,3 +1,28 @@
+/**
+ * StoreProductRow renders a product/store freshness feedback row so shoppers can
+ * review whether a specific store's stock is fresh, outdated, or accompanied by
+ * optional shelf-life context.
+ *
+ * @example
+ * ```tsx
+ * <StoreProductRow
+ *   productId="milk-1l"
+ *   storeId="willys-stockholm"
+ *   productName="Milk 1L"
+ *   storeName="Willys Stockholm"
+ *   priceLabel="12.90 kr"
+ *   shelfLifeDays={3}
+ * />
+ * ```
+ *
+ * @param productId Stable product identifier submitted with the freshness vote.
+ * @param storeId Stable store identifier submitted with the freshness vote.
+ * @param productName Human-readable product name rendered as the row heading.
+ * @param storeName Optional store label shown below the product name.
+ * @param priceLabel Optional current price text shown with the row details.
+ * @param shelfLifeDays Optional initial shelf-life value, in days, for the input.
+ * @param className Optional CSS class applied to the outer article element.
+ */
 "use client";
 
 import { useId, useState } from "react";
