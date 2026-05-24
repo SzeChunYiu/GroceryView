@@ -2,7 +2,9 @@ import Link from 'next/link';
 import { planPantryReplenishment } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { PantryTracker } from '@/components/pantry-tracker';
 import { pantryReplenishmentInput, pantryReplenishmentPlan } from '@/lib/demo-data';
+import { buildPantryStockItems } from '@/lib/pantry';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -26,6 +28,7 @@ export default function PantryPlannerPage() {
   const coverageConfidence = coverage.confidence as 'high' | 'medium' | 'low';
   const alreadyInBasketCount = replenishment.filter((item) => item.alreadyInBasket).length;
   const dealBackedRestocks = replenishment.filter((item) => item.bestDeal).length;
+  const stockItems = buildPantryStockItems(plan.statuses);
 
   return (
     <PageShell>
@@ -92,6 +95,10 @@ export default function PantryPlannerPage() {
               </Link>
             ))}
           </div>
+        </Card>
+
+        <Card>
+          <PantryTracker items={stockItems} />
         </Card>
 
         <Card>
