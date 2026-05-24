@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import { ProductPriceCards } from './product-price-cards';
+import { TrendingCarousel } from './TrendingCarousel';
 import { buildChainIndexTrendSeries } from '@/lib/chain-index-data';
 import { defaultLocale, localeReadiness, localeTranslationGuardrails, localizedShellCopy } from '@/lib/i18n';
 import { basketCostHeatmap } from '@/lib/map-basket-cost-heatmap';
@@ -21,6 +22,7 @@ import {
   formatSek,
   freshestOpenPrices,
   homepageAdaptiveProductCards,
+  homepageTrendingPriceChanges,
   icaStorePromotionEvidence,
   localeFormattingShowcase,
   marketHeatmapTiles,
@@ -168,6 +170,8 @@ export function MarketShell() {
       </section>
 
       <div className="mt-6"><MetricGrid /></div>
+
+      <TrendingCarousel items={homepageTrendingPriceChanges} />
 
       <Card className="mt-6 border-red-200 bg-red-50">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">

@@ -1,0 +1,53 @@
+name: Weekly digest email
+
+on:
+  schedule:
+    - cron: '15 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  send-weekly-digest:
+    name: Send weekly watchlist digest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - name: Preflight required production configuration
+        run: |
+          missing=0
+          if [ -z "${{ secrets.DATABASE_URL }}" ]; then
+            echo "missing production config: DATABASE_URL" >&2
+            missing=1
+          fi
+          if [ -z "${{ secrets.RESEND_API_KEY }}" ]; then
+            echo "missing production config: RESEND_API_KEY" >&2
+            missing=1
+          fi
+          if [ -z "${{ secrets.WEEKLY_DIGEST_FROM_EMAIL }}" ]; then
+            echo "missing production config: WEEKLY_DIGEST_FROM_EMAIL" >&2
+            missing=1
+          fi
+          exit "$missing"
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build weekly digest job
+        run: npm run build -w @groceryview/jobs
+
+      - name: Send weekly digest via Resend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          WEEKLY_DIGEST_FROM_EMAIL: ${{ secrets.WEEKLY_DIGEST_FROM_EMAIL }}
+          GROCERYVIEW_BASE_URL: ${{ vars.GROCERYVIEW_BASE_URL || 'https://groceryview.se' }}
+        run: node apps/jobs/dist/weekly-digest.js

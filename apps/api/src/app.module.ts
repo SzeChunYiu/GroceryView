@@ -11,6 +11,7 @@ import { validateEnvironment } from './config/env.schema.js';
 import { DatabaseModule } from './database/database.module.js';
 import { DealsModule } from './deals/deals.module.js';
 import { ExpiryDealsModule } from './expiry-deals/expiry-deals.module.js';
+import { FavoritesModule } from './favorites/favorites.module.js';
 import { HealthModule } from './health/health.module.js';
 import { HouseholdsModule } from './households/households.module.js';
 import { LoyaltyModule } from './loyalty/loyalty.module.js';
@@ -21,6 +22,9 @@ import { PricesModule } from './prices/prices.module.js';
 import { PrivacyModule } from './privacy/privacy.module.js';
 import { ProductsModule } from './products/products.module.js';
 import { ReceiptsModule } from './receipts/receipts.module.js';
+import { RetailersModule } from './retailers/retailers.module.js';
+import { ScreenerModule } from './screener/screener.module.js';
+import { SettingsModule } from './settings/settings.module.js';
 import { StoresModule } from './stores/stores.module.js';
 import { UsersModule } from './users/users.module.js';
 import { WatchlistsModule } from './watchlists/watchlists.module.js';
@@ -33,6 +37,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     DatabaseModule,
     DealsModule,
     ExpiryDealsModule,
+    FavoritesModule,
     HealthModule,
     HouseholdsModule,
     LoyaltyModule,
@@ -41,6 +46,9 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     PantryModule,
     ProductsModule,
     PrivacyModule,
+    RetailersModule,
+    ScreenerModule,
+    SettingsModule,
     StoresModule,
     PricesModule,
     UsersModule,

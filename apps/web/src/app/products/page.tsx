@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
-import { adaptiveProductCards, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
+import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
@@ -14,6 +14,15 @@ export function generateMetadata() {
 }
 
 type SearchParams = {
+  q?: string | string[];
+  category?: string | string[];
+  label?: string | string[];
+  dietary?: string | string[];
+  chain?: string | string[];
+  minPrice?: string | string[];
+  maxPrice?: string | string[];
+  inStockOnly?: string | string[];
+  minConfidence?: string | string[];
   brand?: string | string[];
   page?: string | string[];
 };
@@ -31,8 +40,34 @@ function normalizeSelectedBrand(brand: string | string[] | undefined) {
   return productBrandFilterOptions.find((option) => option.value.toLocaleLowerCase('sv-SE') === requested.toLocaleLowerCase('sv-SE'))?.value ?? '';
 }
 
-function productsPageUrl(page: number, selectedBrand = '') {
+function setFirstParam(params: URLSearchParams, key: keyof SearchParams, value: string | string[] | undefined) {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (raw?.trim()) params.set(key, raw.trim());
+}
+
+function setAllParams(params: URLSearchParams, key: keyof SearchParams, value: string | string[] | undefined) {
+  const rawValues = Array.isArray(value) ? value : value ? [value] : [];
+  for (const rawValue of rawValues.flatMap((item) => item.split(','))) {
+    const trimmed = rawValue.trim();
+    if (trimmed) params.append(key, trimmed);
+  }
+}
+
+function copySearchParams(params: URLSearchParams, source: SearchParams) {
+  setFirstParam(params, 'q', source.q);
+  setFirstParam(params, 'category', source.category);
+  setFirstParam(params, 'label', source.label);
+  setAllParams(params, 'dietary', source.dietary);
+  setFirstParam(params, 'chain', source.chain);
+  setFirstParam(params, 'minPrice', source.minPrice);
+  setFirstParam(params, 'maxPrice', source.maxPrice);
+  setFirstParam(params, 'inStockOnly', source.inStockOnly);
+  setFirstParam(params, 'minConfidence', source.minConfidence);
+}
+
+function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
   const params = new URLSearchParams();
+  copySearchParams(params, searchParams);
   if (selectedBrand) params.set('brand', selectedBrand);
   if (page > 1) params.set('page', String(page));
   const query = params.toString();
@@ -41,7 +76,8 @@ function productsPageUrl(page: number, selectedBrand = '') {
 
 export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
-  const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = facetedProductSearch;
+  const search = buildProductSearchView(resolvedSearchParams);
+  const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
   const productCards = selectedBrand
@@ -53,6 +89,19 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const pagedResultCards = resultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
+  const defaultSearchCount = facetedProductSearch.resultCards.length;
+
+  function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
+    const params = new URLSearchParams();
+    copySearchParams(params, resolvedSearchParams);
+    for (const [key, value] of Object.entries(overrides)) {
+      if (value?.trim()) params.set(key, value.trim());
+      else params.delete(key);
+    }
+    params.delete('page');
+    const query = params.toString();
+    return query ? `/products?${query}` : '/products';
+  }
 
   return (
     <PageShell>
@@ -82,18 +131,72 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
               This preview calls buildFacetedProductSearch over facetedSearchRows generated from real product, latest_prices, chains, and stores-shaped Axfood rows.
               Shoppers can narrow by category, label/dietary evidence, kr/kg or kr/l range, chain, and the inStockOnly priced-row gate without synthetic product or price filler.
+              The default facetedProductSearch export contains {defaultSearchCount.toLocaleString('sv-SE')} server-backed rows before URL filters are applied.
             </p>
           </div>
           <div className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-violet-950 shadow-sm">
             {inStockOnly.productCount.toLocaleString('sv-SE')} priced products · {inStockOnly.latestPriceCount.toLocaleString('sv-SE')} latest_prices rows
           </div>
         </div>
+        <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_0.6fr_0.6fr_0.6fr_auto]" method="get">
+          {selectedBrand ? <input name="brand" type="hidden" value={selectedBrand} /> : null}
+          {search.filters.categories.length > 0 ? <input name="category" type="hidden" value={search.filters.categories.join(',')} /> : null}
+          {search.labelFilters.length > 0 ? <input name="label" type="hidden" value={search.labelFilters.join(',')} /> : null}
+          {search.filters.chains.length > 0 ? <input name="chain" type="hidden" value={search.filters.chains.join(',')} /> : null}
+          <label className="text-sm font-black text-slate-950" htmlFor="product-search-q">
+            Search
+            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.query} id="product-search-q" name="q" />
+          </label>
+          <label className="text-sm font-black text-slate-950" htmlFor="product-search-min-price">
+            Min unit SEK
+            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.minPrice ?? ''} id="product-search-min-price" min="0" name="minPrice" step="0.01" type="number" />
+          </label>
+          <label className="text-sm font-black text-slate-950" htmlFor="product-search-max-price">
+            Max unit SEK
+            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.maxPrice ?? ''} id="product-search-max-price" min="0" name="maxPrice" step="0.01" type="number" />
+          </label>
+          <label className="text-sm font-black text-slate-950" htmlFor="product-search-confidence">
+            Min confidence
+            <input className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-950" defaultValue={search.filters.minConfidence ?? ''} id="product-search-confidence" max="1" min="0" name="minConfidence" step="0.01" type="number" />
+          </label>
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-3 lg:col-span-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Dietary filters</p>
+            <div className="mt-2 grid gap-2 sm:grid-cols-3">
+              {search.dietaryFilters.map((filter) => (
+                <label className="flex items-start gap-2 rounded-2xl bg-white px-3 py-2 text-sm font-black text-emerald-950 shadow-sm" key={filter.value}>
+                  <input className="mt-1" defaultChecked={filter.checked} name="dietary" type="checkbox" value={filter.value} />
+                  <span>
+                    {filter.label}
+                    <span className="block text-xs font-semibold text-emerald-700">{filter.count.toLocaleString('sv-SE')} evidence rows · {filter.evidenceSummary}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+            <p className="mt-2 text-xs font-semibold leading-5 text-emerald-900">
+              Gluten-free, lactose-free, and vegan filters require verified label metadata or explicit product text; GroceryView does not infer dietary status from shopper profiles.
+            </p>
+          </div>
+          <div className="flex flex-col justify-end gap-2">
+            <label className="flex items-center gap-2 rounded-2xl bg-violet-50 px-3 py-2 text-sm font-black text-violet-950">
+              <input defaultChecked={search.filters.inStockOnly} name="inStockOnly" type="checkbox" value="true" />
+              In-stock only
+            </label>
+            <button className="rounded-full bg-violet-800 px-4 py-3 text-sm font-black text-white" type="submit">Apply filters</button>
+          </div>
+        </form>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {search.activeFilters.length > 0 ? search.activeFilters.map((filter) => (
+            <span className="rounded-full bg-violet-900 px-3 py-1 text-xs font-black text-white" key={filter}>{filter}</span>
+          )) : (
+            <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-violet-900 shadow-sm">No active URL filters</span>
+          )}
+        </div>
         <div className="mt-5 grid gap-3 lg:grid-cols-4">
           <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Category facets</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {categoryFacets.map((facet) => (
-                <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-900" key={facet.value}>{facet.value} · {facet.count}</span>
+                <Link className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-900" href={searchFacetUrl({ category: facet.value })} key={facet.value}>{facet.value} · {facet.count}</Link>
               ))}
             </div>
           </div>
@@ -101,7 +204,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Label / dietary facets</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {labelFacets.map((facet) => (
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900" key={facet.value}>{facet.label} · {facet.count}</span>
+                <Link className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900" href={searchFacetUrl({ label: facet.value })} key={facet.value}>{facet.label} · {facet.count}</Link>
               ))}
             </div>
           </div>
@@ -109,7 +212,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Chain facets</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {chainFacets.map((facet) => (
-                <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" key={facet.value}>{facet.label} · {facet.count}</span>
+                <Link className="rounded-full bg-sky-50 px-3 py-1 text-xs font-black text-sky-900" href={searchFacetUrl({ chain: facet.value })} key={facet.value}>{facet.label} · {facet.count}</Link>
               ))}
             </div>
           </div>
@@ -154,14 +257,14 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             </p>
             <div className="flex gap-3">
               {currentPage > 1 ? (
-                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1, selectedBrand)}>
+                <Link className="rounded-full bg-white px-4 py-2 shadow-sm" href={productsPageUrl(currentPage - 1, selectedBrand, resolvedSearchParams)}>
                   Previous
                 </Link>
               ) : (
                 <span className="rounded-full bg-slate-100 px-4 py-2 font-black text-slate-400">Previous</span>
               )}
               {currentPage < totalPages ? (
-                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1, selectedBrand)}>
+                <Link className="rounded-full bg-indigo-700 px-4 py-2 text-white" href={productsPageUrl(currentPage + 1, selectedBrand, resolvedSearchParams)}>
                   Next
                 </Link>
               ) : (

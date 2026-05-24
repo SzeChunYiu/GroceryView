@@ -1,13 +1,87 @@
 import Link from 'next/link';
-import { calculateMealCostBreakdown } from '@groceryview/core';
+import { calculateMealCostBreakdown, type MealCostIngredient } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { mealCostBreakdown } from '@/lib/demo-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
   return routeMetadata('/meal-cost');
 }
+
+const mealCostIngredients = [
+  {
+    ingredientId: 'bread',
+    label: 'Wholegrain bread',
+    quantityNeeded: 0.25,
+    unit: 'kg',
+    offers: [
+      {
+        chainId: 'coop',
+        storeName: 'Coop Medborgarplatsen',
+        productId: 'pagen-lingongrova-500g',
+        productName: 'Pagen Lingongrova 500g',
+        packageQuantity: 0.5,
+        packageUnit: 'kg',
+        packagePrice: 33.9,
+        confidence: 0.72,
+        source: 'visible shelf product row'
+      }
+    ]
+  },
+  {
+    ingredientId: 'cheese',
+    label: 'Sliced cheese',
+    quantityNeeded: 0.12,
+    unit: 'kg',
+    offers: [
+      {
+        chainId: 'coop',
+        storeName: 'Coop Medborgarplatsen',
+        productId: 'arla-hushallsost-500g',
+        productName: 'Arla Hushallsost 500g',
+        packageQuantity: 0.5,
+        packageUnit: 'kg',
+        packagePrice: 54.9,
+        confidence: 0.7,
+        source: 'visible shelf product row'
+      }
+    ]
+  },
+  {
+    ingredientId: 'cucumber',
+    label: 'Cucumber',
+    quantityNeeded: 0.15,
+    unit: 'kg',
+    offers: [
+      {
+        chainId: 'coop',
+        storeName: 'Coop Medborgarplatsen',
+        productId: 'garant-gurka-300g',
+        productName: 'Garant Gurka 300g',
+        packageQuantity: 0.3,
+        packageUnit: 'kg',
+        packagePrice: 16.9,
+        confidence: 0.66,
+        source: 'visible shelf product row'
+      }
+    ]
+  }
+] satisfies MealCostIngredient[];
+
+const mealCostBreakdown = {
+  persona: 'Meal-preppers / families',
+  title: 'Ingredient-level meal costing',
+  summary: calculateMealCostBreakdown({
+    mealId: 'weekday-lunchbox-bundle',
+    title: 'Weekday lunchbox bundle',
+    servings: 2,
+    ingredients: mealCostIngredients
+  }),
+  coverage: {
+    confidence: 'medium' as const,
+    caveat: 'Calls calculateMealCostBreakdown with only visible product rows and package quantities; missing substitute chains are excluded rather than estimated.'
+  }
+};
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
@@ -24,7 +98,7 @@ function confidenceLevel(value: number): 'high' | 'medium' | 'low' {
 }
 
 export default function MealCostPage() {
-  const summary = calculateMealCostBreakdown(mealCostBreakdown.input);
+  const { summary } = mealCostBreakdown;
   const summaryConfidence = summary.cheapestChain?.averageConfidence ?? summary.coverage.minimumConfidence;
 
   return (
@@ -36,8 +110,8 @@ export default function MealCostPage() {
       </p>
       <div className="mt-4">
         <ConfidenceBadge
-          level={confidenceLevel(summaryConfidence)}
           label={summary.confidenceLabel}
+          level={confidenceLevel(summaryConfidence)}
           sampleSize={summary.coverage.offerCount}
         />
       </div>

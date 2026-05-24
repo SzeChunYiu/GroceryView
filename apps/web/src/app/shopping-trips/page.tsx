@@ -1,6 +1,7 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { basketTripCostContract, budgetCheapestStoreRoutingPlanner, deliveryVsInStoreComparison, elderlyNearestDeliveryPlanner, formatSek, fulfillmentSlotsContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { activeShoppingTripEstimates } from '@/lib/trip-planner';
 
 export function generateMetadata() {
   return routeMetadata('/shopping-trips');
@@ -29,6 +30,45 @@ export default function FeaturePage() {
   return (
     <PageShell>
       <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
+      <Card className="mt-6 border-indigo-200 bg-indigo-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">Time-to-complete estimator</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Active-list aisle traversal and completion time</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          Each active list uses its selected route mode to estimate remaining pick time, walking time, checkout time, and the aisle order a shopper should follow. Picked items are ignored so the time-to-complete stays focused on the current trip.
+        </p>
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
+          {activeShoppingTripEstimates.map((estimate) => (
+            <div className="rounded-2xl bg-white p-4" key={estimate.listId}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-800">{estimate.routeModeLabel}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{estimate.listName}</h3>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{estimate.routeModeDescription}</p>
+              <dl className="mt-3 space-y-2 text-sm">
+                <div className="flex justify-between gap-3">
+                  <dt className="font-semibold text-slate-600">remaining items</dt>
+                  <dd className="font-black text-slate-950">{estimate.remainingItemCount}/{estimate.totalItemCount}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="font-semibold text-slate-600">aisle traversal</dt>
+                  <dd className="font-black text-slate-950">{estimate.aisleTraversal.join(' → ')}</dd>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <dt className="font-semibold text-slate-600">walking + picking</dt>
+                  <dd className="font-black text-slate-950">{estimate.walkingMinutes + estimate.pickingMinutes} min</dd>
+                </div>
+                <div className="flex justify-between gap-3 border-t border-indigo-100 pt-2">
+                  <dt className="font-black text-slate-950">time to complete</dt>
+                  <dd className="font-black text-indigo-900">{estimate.timeToCompleteMinutes} min</dd>
+                </div>
+              </dl>
+              <ul className="mt-3 list-disc space-y-1 pl-5 text-xs font-semibold text-slate-600">
+                {estimate.aisleStops.map((stop) => (
+                  <li key={stop.aisle}>Aisle {stop.aisle}: {stop.items.join(', ')}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </Card>
       <Card className="mt-6 border-sky-200 bg-sky-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Travel-cost optimizer</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight">Basket + trip cost optimizer: {basketTripCostContract.title}</h2>

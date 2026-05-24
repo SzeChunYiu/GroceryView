@@ -1,4 +1,4 @@
-export type PharmacyChain = 'apohem' | 'apotek-hjartat';
+export type PharmacyChain = 'apohem' | 'apotek-hjartat' | 'apoteket';
 
 export type PharmacyProductCategory = 'otc' | 'supplement' | 'beauty';
 
@@ -69,12 +69,14 @@ export type FetchApohemProductsOptions = {
   fetchImpl?: typeof fetch;
   sourcePaths?: readonly string[];
   apotekHjartatUrls?: readonly string[];
+  apoteketUrls?: readonly string[];
   maxRows?: number;
   retrievedAt?: string;
 };
 
 export const APOHEM_BASE_URL = 'https://www.apohem.se';
 export const APOTEK_HJARTAT_BASE_URL = 'https://www.apotekhjartat.se';
+export const APOTEKET_BASE_URL = 'https://www.apoteket.se';
 
 export const DEFAULT_APOHEM_SOURCE_PATHS = [
   '/sok?q=vitamin',
@@ -88,6 +90,12 @@ export const DEFAULT_APOTEK_HJARTAT_SEARCH_URLS = [
   'https://www.apotekhjartat.se/search?q=vitamin',
   'https://www.apotekhjartat.se/search?q=la%20roche',
   'https://www.apotekhjartat.se/search?q=pamol'
+] as const;
+
+export const DEFAULT_APOTEKET_SEARCH_URLS = [
+  'https://www.apoteket.se/sok?q=vitamin',
+  'https://www.apoteket.se/sok?q=la%20roche',
+  'https://www.apoteket.se/sok?q=alvedon'
 ] as const;
 
 export async function fetchApohemProducts(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {

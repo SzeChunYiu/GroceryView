@@ -1,11 +1,20 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
+import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
   return routeMetadata('/compare');
+}
+
+function formatComparableUnitPrice(value: number | null | undefined, unitLabel: string | null | undefined) {
+  return formatLocalizedUnitPrice(value, {
+    locale: defaultLocale,
+    currency: 'SEK',
+    unit: unitLabel?.replace(/^kr\//, '') ?? null
+  });
 }
 
 type SearchParams = {
@@ -16,6 +25,22 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
   const comparison = buildChainComparisonTable(productsParam);
+  const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
+  const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
+  const rowSections = [
+    {
+      id: 'commodity-alias',
+      title: 'Commodity/alias unit-price matches',
+      description: 'Loose produce, meat-style commodities, and other canonical commodity rows rank chains by comparable kr/kg, kr/l, or kr/st evidence. Confidence and coverage stay visible when inputs are partial.',
+      rows: commodityRows
+    },
+    {
+      id: 'packaged-barcode',
+      title: 'Packaged/barcode matches',
+      description: 'Branded or exact packaged rows stay separate and rank by the reported pack price for that product code.',
+      rows: packagedRows
+    }
+  ];
 
   return (
     <PageShell>
@@ -36,46 +61,68 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
             Try sample products
           </Link>
         </div>
-        <div className="mt-5 overflow-x-auto rounded-3xl border border-emerald-100 bg-white shadow-sm">
-          <table className="min-w-full border-collapse text-left text-sm">
-            <caption className="sr-only">Side-by-side product prices across ICA, Willys, and Coop</caption>
-            <thead className="bg-slate-950 text-white">
-              <tr>
-                <th className="px-4 py-3 font-black">Product</th>
-                {COMPARE_CHAIN_ORDER.map((chain) => (
-                  <th className="px-4 py-3 font-black" key={chain.id}>{chain.label}</th>
-                ))}
-                <th className="px-4 py-3 font-black">Best chain</th>
-              </tr>
-            </thead>
-            <tbody>
-              {comparison.products.length === 0 ? (
-                <tr>
-                  <td className="px-4 py-5 font-semibold text-slate-600" colSpan={COMPARE_CHAIN_ORDER.length + 2}>
-                    Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
-                  </td>
-                </tr>
-              ) : null}
-              {comparison.products.map((product) => (
-                <tr className="border-t border-slate-100 align-top" key={product.productSlug}>
-                  <th className="px-4 py-4 font-black text-slate-950">
-                    <Link className="underline decoration-emerald-300 underline-offset-4" href={`/products/${product.productSlug}`}>{product.productName}</Link>
-                    <span className="mt-1 block text-xs font-semibold text-slate-500">{product.brand || 'Brand not reported'} · {product.packageLabel}</span>
-                  </th>
-                  {product.cells.map((cell) => (
-                    <td className="px-4 py-4" key={`${product.productSlug}-${cell.chainId}`}>
-                      <p className={cell.status === 'priced' ? 'font-black text-emerald-900' : 'font-black text-slate-400'}>{cell.priceText}</p>
-                      <p className="mt-1 text-xs font-semibold text-slate-500">{cell.unitLabel}</p>
-                    </td>
-                  ))}
-                  <td className="px-4 py-4">
-                    <p className="rounded-2xl bg-emerald-50 px-3 py-2 font-black text-emerald-950">{product.bestChainName}</p>
-                    <p className="mt-1 text-xs font-semibold text-slate-500">{product.bestPriceText}</p>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="mt-5 grid gap-4">
+          {comparison.products.length === 0 ? (
+            <p className="rounded-3xl border border-emerald-100 bg-white p-5 text-sm font-semibold text-slate-600 shadow-sm">
+              Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
+            </p>
+          ) : null}
+          {rowSections.map((section) => (
+            <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm" key={section.id}>
+              <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-3">
+                <h3 className="text-sm font-black text-emerald-950">{section.title}</h3>
+                <p className="mt-1 text-xs font-semibold leading-5 text-emerald-900">{section.description}</p>
+              </div>
+              {section.rows.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full border-collapse text-left text-sm">
+                    <caption className="sr-only">{section.title} side-by-side prices across ICA, Willys, and Coop</caption>
+                    <thead className="bg-slate-950 text-white">
+                      <tr>
+                        <th className="px-4 py-3 font-black">Product</th>
+                        {COMPARE_CHAIN_ORDER.map((chain) => (
+                          <th className="px-4 py-3 font-black" key={chain.id}>{chain.label}</th>
+                        ))}
+                        <th className="px-4 py-3 font-black">Best chain</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {section.rows.map((product) => (
+                        <tr className="border-t border-slate-100 align-top" key={`${section.id}-${product.productSlug}`}>
+                          <th className="px-4 py-4 font-black text-slate-950">
+                            <Link className="underline decoration-emerald-300 underline-offset-4" href={`/products/${product.productSlug}`}>{product.productName}</Link>
+                            <span className="mt-1 block text-xs font-semibold text-slate-500">{product.brand || 'Brand not reported'} · {product.packageLabel}</span>
+                            <span className="mt-2 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">{product.matchLabel}</span>
+                            <span className="mt-2 block text-xs font-semibold leading-5 text-slate-500">{product.confidenceLabel}</span>
+                          </th>
+                          {product.cells.map((cell) => (
+                            <td className="px-4 py-4" key={`${product.productSlug}-${cell.chainId}`}>
+                              <p className={cell.status === 'priced' ? 'font-black text-emerald-900' : 'font-black text-slate-400'}>{cell.priceText}</p>
+                              <p className="mt-1 text-xs font-semibold text-slate-500">{cell.unitLabel}</p>
+                              {cell.productSlug ? (
+                                <Link className="mt-2 block text-xs font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={`/products/${cell.productSlug}`}>
+                                  {cell.productName ?? cell.productSlug}
+                                </Link>
+                              ) : null}
+                              {cell.sourceConfidence !== null ? (
+                                <p className="mt-1 text-xs font-semibold text-slate-500">sourceConfidence {formatPct(cell.sourceConfidence * 100)}</p>
+                              ) : null}
+                            </td>
+                          ))}
+                          <td className="px-4 py-4">
+                            <p className="rounded-2xl bg-emerald-50 px-3 py-2 font-black text-emerald-950">{product.bestChainName}</p>
+                            <p className="mt-1 text-xs font-semibold text-slate-500">{product.bestPriceText}</p>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="px-4 py-5 text-sm font-semibold text-slate-500">No requested rows used this match type.</p>
+              )}
+            </div>
+          ))}
         </div>
         {comparison.missingProductIds.length > 0 ? (
           <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm font-bold text-amber-950">
@@ -216,7 +263,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               <p className="mt-1 text-sm font-semibold text-slate-600">{dupe.sourceName} → {dupe.dupeName}</p>
               <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
                 <p className="rounded-xl bg-fuchsia-50 p-3 font-black text-fuchsia-950">Save {formatPct(dupe.savingsPercent)}</p>
-                <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">{formatSek(dupe.dupeUnitPrice)} {dupe.unitLabel}</p>
+                <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">{formatComparableUnitPrice(dupe.dupeUnitPrice, dupe.unitLabel)}</p>
               </div>
               <p className="mt-3 text-xs font-semibold text-slate-500">name evidence {dupe.nameEvidence.join(', ')} · confidence {dupe.confidence} · {dupe.reason}</p>
             </Link>
@@ -241,7 +288,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               <h3 className="mt-2 text-lg font-black text-slate-950">{comparison.cheapestChain?.chainName ?? 'Coverage blocked'}</h3>
               <p className="mt-1 text-sm font-semibold text-slate-600">{comparison.cheapestChain?.productName ?? 'No chain clears coverage'}</p>
               <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                <p className="rounded-xl bg-lime-50 p-3 font-black text-lime-950">Cheapest {formatSek(comparison.cheapestChain?.unitPrice)}</p>
+                <p className="rounded-xl bg-lime-50 p-3 font-black text-lime-950">Cheapest {formatComparableUnitPrice(comparison.cheapestChain?.unitPrice, comparison.comparableUnit)}</p>
                 <p className="rounded-xl bg-white p-3 font-black text-slate-950">{formatPct(comparison.cheapestChain?.savingsVsNextPercent)} vs next</p>
               </div>
               <p className="mt-3 text-xs font-semibold text-slate-500">{comparison.confidenceLabel}</p>
@@ -260,6 +307,9 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               and the public script calls the cheapest-now API before showing a cheaper chain. No anonymous shopper profile or retailer account data is stored.
             </p>
             <div className="mt-4 flex flex-wrap gap-2 text-sm">
+              <a className="rounded-full bg-white px-4 py-2 font-black text-sky-950" href={browserExtensionOverlayContract.manifestPath}>
+                Extension manifest
+              </a>
               <a className="rounded-full bg-sky-900 px-4 py-2 font-black text-white" href={browserExtensionOverlayContract.assetPath}>
                 Open overlay script
               </a>
@@ -277,6 +327,9 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
             </div>
             <p className="mt-3 rounded-2xl bg-sky-50 p-3 text-sm font-bold text-sky-950">
               Confidence: {browserExtensionOverlayContract.confidenceRule}
+            </p>
+            <p className="mt-3 text-xs font-semibold text-slate-600">
+              Detection: {browserExtensionOverlayContract.detectionSignals.join(' · ')}
             </p>
           </div>
         </div>

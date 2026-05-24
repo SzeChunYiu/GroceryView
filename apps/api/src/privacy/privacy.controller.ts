@@ -1,9 +1,7 @@
-import { buildPrivacyExport, planAccountDeletion } from '@groceryview/core';
+import { planAccountDeletion } from '@groceryview/core';
 import { Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { groceryApi } from '../demo-data.js';
-
-const demoGeneratedAt = '2026-05-20T12:00:00.000Z';
+import { buildDemoUserDataExport } from '../settings/data-export.js';
 
 @ApiTags('privacy')
 @Controller('users/demo/privacy')
@@ -11,20 +9,7 @@ export class PrivacyController {
   @Get('export')
   @ApiOkResponse({ description: 'Demo user privacy export summary' })
   export() {
-    const householdPlan = groceryApi.getHouseholdPlan('demo');
-    return {
-      ...buildPrivacyExport(
-        {
-          userId: 'demo',
-          favoriteStoreIds: groceryApi.getFavoriteStores('demo').map((store) => store.id),
-          watchlistProductIds: groceryApi.getWatchlist('demo').items.map((item) => item.productId),
-          receiptIds: [],
-          householdIds: householdPlan ? [householdPlan.household.id] : []
-        },
-        demoGeneratedAt
-      ),
-      demo: true
-    };
+    return buildDemoUserDataExport();
   }
 
   @Post('deletion-plan')

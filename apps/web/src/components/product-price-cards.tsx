@@ -1,8 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { LazyItemCard } from './LazyItemCard';
+import { FavouriteProductToggle } from './favourite-product-toggle';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -11,7 +12,7 @@ const storageKey = 'groceryview:product-card-compare-mode';
 const compareModes: Array<{ label: string; value: CompareMode; help: string }> = [
   { label: 'Adaptive', value: 'adaptive', help: 'Commodity cards lead with unit price; branded cards lead with total price.' },
   { label: 'Total', value: 'total', help: 'Sort and lead every card by the observed pack price.' },
-  { label: 'Per kg / l / st', value: 'unit', help: 'Sort and lead every card by comparable unit price when package size is known.' }
+  { label: 'Per kg / l / st / 100 g', value: 'unit', help: 'Sort and lead every card by comparable jämförpris when package size is known.' }
 ];
 
 function resolvedMode(card: AdaptiveProductCard, compareMode: CompareMode): 'total' | 'unit' {
@@ -66,7 +67,8 @@ function PriceHistorySparkline({ card }: Readonly<{ card: AdaptiveProductCard }>
       {path ? (
         <svg
           aria-label={`${card.name} 7-day price history sparkline`}
-          className="mt-2 h-11 w-full overflow-visible"
+          className="mt-2 h-11 w-full overflow-visible motion-reduce:transition-none"
+          data-chart-motion="static"
           preserveAspectRatio="none"
           role="img"
           viewBox="0 0 160 44"
@@ -129,7 +131,7 @@ export function ProductPriceCards({
             {compareModes.map((mode) => (
               <button
                 aria-pressed={compareMode === mode.value}
-                className={`rounded-full px-3 py-2 text-xs font-black transition ${compareMode === mode.value ? 'bg-slate-950 text-white' : 'bg-white text-slate-700 hover:bg-emerald-50'}`}
+                className={`rounded-full px-3 py-2 text-xs font-black motion-safe:transition ${compareMode === mode.value ? 'bg-slate-950 text-white' : 'bg-white text-slate-700 hover:bg-emerald-50'}`}
                 key={mode.value}
                 onClick={() => chooseMode(mode.value)}
                 title={mode.help}
@@ -142,12 +144,21 @@ export function ProductPriceCards({
         </div>
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {sortedCards.map((card) => (
-          <Link
-            className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-emerald-700"
-            href={`/products/${card.slug}`}
-            key={card.slug}
-          >
+        {sortedCards.map((card, index) => (
+          <div className="relative" key={card.slug}>
+            <FavouriteProductToggle
+              className="absolute right-3 top-3 z-10"
+              product={{ slug: card.slug, name: card.name, imageUrl: card.imageUrl }}
+            />
+            <LazyItemCard
+              className="block rounded-2xl border border-slate-200 bg-slate-50 p-4 motion-safe:transition motion-safe:hover:-translate-y-0.5 hover:border-emerald-700"
+              compareMode={compareMode}
+              href={`/products/${card.slug}`}
+              itemId={card.slug}
+              itemName={card.name}
+              listId="adaptive-product-cards"
+              listIndex={index}
+            >
             {card.imageUrl && card.imageAlt ? (
               <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-white bg-white p-3 shadow-sm">
                 <Image
@@ -172,6 +183,15 @@ export function ProductPriceCards({
                 {card.isAvailable === false ? (
                   <span className="rounded-full bg-rose-100 px-3 py-1 text-[0.7rem] font-black text-rose-900">Out of stock</span>
                 ) : null}
+                {card.priceDropBadge ? (
+                  <span
+                    aria-label={`${card.name} ${card.priceDropLabel ?? '30-day price drop from price_history'}`}
+                    className="rounded-full bg-emerald-100 px-3 py-1 text-[0.7rem] font-black text-emerald-950"
+                    title={`30-day price drop from price_history${card.priceDropAnchorDate ? ` since ${card.priceDropAnchorDate}` : ''}`}
+                  >
+                    {card.priceDropBadge}
+                  </span>
+                ) : null}
                 <span className="rounded-full bg-white px-3 py-1 text-[0.7rem] font-black text-slate-700">{resolvedMode(card, compareMode)}</span>
               </div>
             </div>
@@ -185,7 +205,8 @@ export function ProductPriceCards({
             ) : (
               <p className="mt-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">cheapest-per-unit badge waits for cross-chain unit evidence</p>
             )}
-          </Link>
+            </LazyItemCard>
+          </div>
         ))}
       </div>
     </section>

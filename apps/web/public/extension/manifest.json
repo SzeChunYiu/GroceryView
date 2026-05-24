@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "GroceryView retailer overlay",
+  "version": "0.1.0",
+  "description": "Shows verified GroceryView cheaper-chain evidence on ICA, Coop, and Willys product pages without storing shopper identity.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.ica.se/*",
+        "https://*.coop.se/*",
+        "https://*.willys.se/*"
+      ],
+      "js": [
+        "retailer-overlay.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "host_permissions": [
+    "https://grocery-web-mu.vercel.app/*"
+  ]
+}

@@ -9,11 +9,18 @@ import {
   summarizePriceHistoryConfidence,
   type BrandTier
 } from '@groceryview/core';
+import {
+  buildItemSubstitutionSuggestions,
+  detectSeasonalSalePattern,
+  midsommarSeasonalHoliday,
+  type ItemSubstitutionProduct
+} from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
+import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { metadataForProduct } from '@/lib/seo';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
@@ -110,6 +117,36 @@ function productUnitPrice(product: NonNullable<ReturnType<typeof findProduct>>) 
   return 'lowestPrice' in product ? product.lowestPrice : product.priceMedian;
 }
 
+function productCurrentPrice(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product) return product.lowestPrice;
+  return latestObservationFor(product)?.price ?? product.priceMedian;
+}
+
+function productUsualPrice(product: NonNullable<ReturnType<typeof findProduct>>) {
+  return 'lowestPrice' in product ? product.highestPrice : product.priceMedian;
+}
+
+function productIsInStock(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product) {
+    const rows = chainPriceRows(product);
+    return rows.length > 0 && rows.some((row) => row.isAvailable !== false);
+  }
+
+  return product.observationCount > 0;
+}
+
+function itemSubstitutionProductFor(product: NonNullable<ReturnType<typeof findProduct>>): ItemSubstitutionProduct {
+  return {
+    productId: product.slug,
+    productName: product.name,
+    category: product.category,
+    currentPrice: productCurrentPrice(product),
+    usualPrice: productUsualPrice(product),
+    inStock: productIsInStock(product),
+    observedAt: 'lowestPrice' in product ? null : latestObservationFor(product)?.date ?? null
+  };
+}
+
 function productOfferBounds(product: NonNullable<ReturnType<typeof findProduct>>) {
   if ('lowestPrice' in product) {
     const prices = chainPriceRows(product)
@@ -160,6 +197,10 @@ function breadcrumbJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>
 
 function jsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
+function formatComparableUnitPrice(value: number | null | undefined, unit: string | null | undefined) {
+  return formatLocalizedUnitPrice(value, { locale: defaultLocale, currency: 'SEK', unit });
 }
 
 function brandTierFor(brand: string, labels: string[] = []): BrandTier {
@@ -276,6 +317,16 @@ function smartSwapRecommendationsFor(product: NonNullable<ReturnType<typeof find
       ? 'Recommendations require same category, comparable package size, verified lower unit price, and the visible private-label preference.'
       : 'No same-size, lower-price substitute cleared recommendSmartSwaps for this product.'
   };
+}
+
+function itemSubstitutionSuggestionsFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  return buildItemSubstitutionSuggestions({
+    source: itemSubstitutionProductFor(product),
+    candidates: [...axfoodProducts, ...pricedProducts].map(itemSubstitutionProductFor),
+    maxSuggestions: 3,
+    expensiveThresholdPercent: 20,
+    minimumSavingsPercent: 1
+  });
 }
 
 function priceHistoryBadgeFor(product: NonNullable<ReturnType<typeof findProduct>>) {
@@ -767,6 +818,20 @@ function seasonalMonthlyAveragesFor(product: NonNullable<ReturnType<typeof findP
   };
 }
 
+function seasonalSalePatternFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  return detectSeasonalSalePattern({
+    productId: product.slug,
+    productName: product.name,
+    holiday: midsommarSeasonalHoliday,
+    observations: 'lowestPrice' in product
+      ? []
+      : product.observations.map((observation) => ({
+        observedAt: observation.date,
+        price: observation.price
+      }))
+  });
+}
+
 function crossChainHistoryOverlayFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   const emptyCrossChainOverlaySeries: {
     chainLabel: string;
@@ -1004,6 +1069,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const isChain = 'lowestPrice' in product;
   const dealVerdict = dealScoreVerdictFor(product);
   const smartSwaps = smartSwapRecommendationsFor(product);
+  const itemSubstitutions = itemSubstitutionSuggestionsFor(product);
   const priceHistoryBadge = priceHistoryBadgeFor(product);
   const priceHistoryRangeBadges = priceHistoryRangeBadgesFor(product);
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
@@ -1011,6 +1077,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceChangeLog = priceChangeEventLogFor(product);
   const priceMoveNotes = priceMoveNotesFor(product);
   const monthlySeasonality = seasonalMonthlyAveragesFor(product);
+  const seasonalSalePattern = seasonalSalePatternFor(product);
   const crossChainHistoryOverlay = crossChainHistoryOverlayFor(product);
   const intraChainBranchSpread = intraChainBranchSpreadFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
@@ -1027,6 +1094,20 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
       <p className="mt-3 text-lg text-slate-700">{isChain ? product.brand : product.brands || 'Brand not reported'} · {isChain ? product.subline : product.quantity || 'Quantity not reported'}</p>
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card>
+          {product.image ? (
+            <img
+              alt={product.name}
+              className="mb-5 aspect-square w-full rounded-[2rem] border border-slate-100 bg-slate-50 object-contain p-4 shadow-inner"
+              decoding="async"
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              src={product.image}
+            />
+          ) : (
+            <div className="mb-5 rounded-[2rem] border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm font-bold text-slate-500">
+              Product image not reported by the current verified source.
+            </div>
+          )}
           <h2 className="text-2xl font-black">Primary price evidence</h2>
           {isChain ? (
             <div className="mt-4 grid gap-3">
@@ -1090,7 +1171,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
                 <Link className="rounded-2xl border border-lime-100 bg-white p-4 shadow-sm transition hover:border-lime-700" href={`/products/${row.productId}`} key={`${row.chainId}-${row.productId}`}>
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">#{row.rank} · {row.chainName}</p>
                   <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
-                  <p className="mt-2 text-2xl font-black text-emerald-800">{formatSek(row.unitPrice)} / {row.comparableUnit}</p>
+                  <p className="mt-2 text-2xl font-black text-emerald-800">{formatComparableUnitPrice(row.unitPrice, row.comparableUnit)}</p>
                   <p className="mt-2 text-sm font-semibold text-slate-600">sourceConfidence {formatPct(row.sourceConfidence * 100)} · save {formatPct(row.savingsVsNextPercent)} vs next chain</p>
                   <p className="mt-2 text-xs font-semibold text-slate-500">{row.variant ?? 'Variant not reported'} {row.originCountry ? `· origin ${row.originCountry}` : ''}</p>
                 </Link>
@@ -1150,6 +1231,34 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-950">{smartSwaps.caveat}</p>
         )}
         <p className="mt-4 text-xs font-semibold text-slate-500">{smartSwaps.caveat}</p>
+      </Card>
+      <Card className="mt-6 border-amber-200 bg-amber-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-800">Substitution trigger</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Item substitution suggestions</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Calls buildItemSubstitutionSuggestions when this item is out of stock or very expensive, returning up to 3 same-category alternatives with a lower current price.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-amber-900">{itemSubstitutions.trigger.replaceAll('_', ' ')}</p>
+        </div>
+        {itemSubstitutions.available ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {itemSubstitutions.suggestions.map((suggestion) => (
+              <Link className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm transition hover:border-amber-700" href={`/items/${suggestion.productId}`} key={suggestion.productId}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Save {formatPct(suggestion.savingsPercent)}</p>
+                <h3 className="mt-2 text-lg font-black text-slate-950">{suggestion.productName}</h3>
+                <p className="mt-1 text-sm font-semibold text-slate-600">{formatSek(suggestion.currentPrice)} · {labelFromSlug(suggestion.category)}</p>
+                <p className="mt-3 text-sm leading-6 text-slate-700">{suggestion.reason}</p>
+                <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">verified lower current price</p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white p-4 text-sm font-bold text-amber-950">{itemSubstitutions.detail}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold text-slate-600">{itemSubstitutions.guardrail}</p>
       </Card>
       <PriceChartTerminal chart={priceChartTerminal} />
       <Card className="mt-6 overflow-hidden border-cyan-200 bg-cyan-50/80">
@@ -1363,6 +1472,49 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{monthlySeasonality.detail}</p>
         )}
         <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{monthlySeasonality.detail}</p>
+      </Card>
+      <Card className="mt-6 overflow-hidden border-lime-200 bg-lime-50/80">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-lime-800">seasonalSalePattern · Midsommar</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Holiday sale pattern detection</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              {seasonalSalePattern.available
+                ? 'Likely on sale before Midsommar, based on repeated historical holiday-window discounts.'
+                : seasonalSalePattern.detail}
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-lime-900">
+            {seasonalSalePattern.qualifiedSeasonCount}/{seasonalSalePattern.holiday.minSeasonCount} discounted windows · {seasonalSalePattern.windowLabel}
+          </p>
+        </div>
+        {seasonalSalePattern.available ? (
+          <div className="mt-5 grid gap-3 lg:grid-cols-[0.8fr_1.2fr]">
+            <div className="rounded-2xl bg-white/90 p-4 shadow-sm">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">{seasonalSalePattern.hint}</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">{formatPct(seasonalSalePattern.averageDiscountPercent)} avg historical discount</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                Best holiday-window price: {formatSek(seasonalSalePattern.bestObservedPrice)} on {seasonalSalePattern.bestObservedAt ?? 'Not reported'}.
+              </p>
+              <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">{seasonalSalePattern.evidenceLabel}</p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              {seasonalSalePattern.evidence.map((row) => (
+                <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={`${row.year}-${row.observedAt}`}>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">{row.year} · {row.daysBeforeHoliday} days before Midsommar</p>
+                  <p className="mt-2 text-2xl font-black text-slate-950">{formatSek(row.price)}</p>
+                  <p className="mt-2 text-sm font-bold text-slate-700">{formatPct(row.discountPercent)} below non-holiday median</p>
+                  <p className="mt-2 text-xs font-semibold text-slate-500">Observed at {row.observedAt}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-lime-950">{seasonalSalePattern.detail}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">
+          Requires explicit historical holiday-window price evidence before showing a hint. {seasonalSalePattern.guardrail}
+        </p>
       </Card>
       <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">

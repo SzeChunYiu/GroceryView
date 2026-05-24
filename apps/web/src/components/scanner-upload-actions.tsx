@@ -217,7 +217,7 @@ export function ScannerUploadActions() {
           <button className="mt-3 rounded-full bg-indigo-800 px-4 py-2 text-sm font-black text-white" disabled={!contentType.trim() || Number(byteLength) <= 0} type="submit">Request private upload ticket</button>
         </form>
 
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" data-testid="scanner-mobile-camera">
           <h3 className="text-sm font-black text-slate-950">Receipt camera preview</h3>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             Start a local camera preview before requesting an upload ticket. Camera access stays local; GroceryView does not upload frames automatically.
@@ -237,8 +237,11 @@ export function ScannerUploadActions() {
           </div>
         </div>
 
-        <form className="rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:col-span-2" onSubmit={processBarcode}>
+        <form className="rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:col-span-2" data-testid="scanner-barcode-fallback" onSubmit={processBarcode}>
           <label className="text-sm font-black text-slate-950" htmlFor="barcode-payload">Barcode payload</label>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Manual barcode fallback stays available on mobile when camera permission is denied or camera APIs are unavailable.
+          </p>
           <input
             className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-950"
             id="barcode-payload"
@@ -248,7 +251,7 @@ export function ScannerUploadActions() {
           <button className="mt-3 rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" disabled={!barcode.trim()} type="submit">Process barcode scan</button>
         </form>
       </div>
-      <p className="mt-4 rounded-2xl bg-indigo-50 p-3 text-sm font-bold text-indigo-950" data-status={status}>{message}</p>
+      <p aria-live="polite" className="mt-4 rounded-2xl bg-indigo-50 p-3 text-sm font-bold text-indigo-950" data-status={status}>{message}</p>
     </section>
   );
 }
