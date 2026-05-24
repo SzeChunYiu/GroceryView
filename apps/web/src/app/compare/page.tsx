@@ -21,6 +21,24 @@ type SearchParams = {
   products?: string | string[];
 };
 
+const noChainCapabilityLinks = [
+  {
+    id: 'ica',
+    label: 'ICA',
+    detail: 'ICA compare rows stay blocked until the data-sources audit confirms a chain-capable source row.'
+  },
+  {
+    id: 'willys',
+    label: 'Willys',
+    detail: 'Willys coverage can be checked directly against its source capability row before trusting gaps.'
+  },
+  {
+    id: 'coop',
+    label: 'Coop',
+    detail: 'Coop missing coverage links to the exact audit row rather than a generic caveat.'
+  }
+];
+
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
@@ -132,6 +150,32 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
         <p className="mt-3 text-xs font-semibold text-slate-500">
           Source: {comparison.sourceLabel}{comparison.generatedAt ? ` · generated ${comparison.generatedAt}` : ''}.
         </p>
+      </Card>
+      <Card className="mt-6 border-amber-200 bg-amber-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-800">No-chain capabilities</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Missing chain coverage links</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              When ICA, Willys, or Coop does not render a comparable row, jump to the matching data-sources capability audit row before treating the gap as a store or chain claim.
+            </p>
+          </div>
+          <Link className="rounded-full bg-white px-4 py-2 text-sm font-black text-amber-900 shadow-sm" href="/data-sources#chain-capability-audit">
+            Open audit card
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {noChainCapabilityLinks.map((chain) => (
+            <Link
+              className="rounded-2xl border border-amber-100 bg-white p-4 text-sm font-semibold leading-6 text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-700"
+              href={`/data-sources#chain-capability-${chain.id}`}
+              key={chain.id}
+            >
+              <span className="block text-lg font-black text-slate-950">{chain.label}</span>
+              <span className="mt-2 block">{chain.detail}</span>
+            </Link>
+          ))}
+        </div>
       </Card>
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">

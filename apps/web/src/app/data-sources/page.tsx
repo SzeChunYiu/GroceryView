@@ -26,6 +26,27 @@ export function generateMetadata() {
 
 export const dynamic = 'force-static';
 
+const chainCapabilityAudit = [
+  {
+    id: 'ica',
+    label: 'ICA',
+    supported: 'ICA can appear in compare only when a verified ICA-priced source row exists for the requested product.',
+    blocked: 'Do not infer ICA chain coverage from missing rows, names, promotions, or another chain\'s barcode match.'
+  },
+  {
+    id: 'willys',
+    label: 'Willys',
+    supported: 'Willys compare claims require a matching Willys source row with comparable price evidence.',
+    blocked: 'Do not turn Willys catalogue absence into branch-level availability, stock, or shelf-price claims.'
+  },
+  {
+    id: 'coop',
+    label: 'Coop',
+    supported: 'Coop compare coverage is limited to verified Coop source rows for the same requested product.',
+    blocked: 'Do not fill Coop gaps from ICA, Willys, aliases, or shopper-facing assumptions.'
+  }
+];
+
 export default function DataSourcesPage() {
   return (
     <PageShell>
@@ -143,6 +164,32 @@ export default function DataSourcesPage() {
               <p className="mt-2 text-sm font-semibold text-slate-700">{domain.seedItemCount} seed item models · {domain.priceObservationsAvailable.toLocaleString('sv-SE')} price observations available</p>
               <p className="mt-3 rounded-2xl bg-indigo-50 p-3 text-sm font-semibold leading-6 text-indigo-950">{domain.claimBoundary}</p>
             </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50/70" id="chain-capability-audit">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-800">Compare no-chain audit</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Chain capability audit</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Each chain capability row owns a stable anchor so compare gaps for ICA, Willys, and Coop can link to exact source caveats.
+            </p>
+          </div>
+          <Link className="text-sm font-black text-amber-900 underline decoration-amber-300 underline-offset-4" href="/compare">
+            Back to compare
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {chainCapabilityAudit.map((chain) => (
+            <section className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm" id={`chain-capability-${chain.id}`} key={chain.id}>
+              <p className="text-lg font-black text-slate-950">{chain.label}</p>
+              <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Supported capability</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{chain.supported}</p>
+              <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-amber-800">Blocked capability</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{chain.blocked}</p>
+            </section>
           ))}
         </div>
       </Card>
