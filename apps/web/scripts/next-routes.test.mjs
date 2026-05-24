@@ -51,6 +51,23 @@ describe('verified-data UI', () => {
     assert.match(verified, /sourceCoverage/);
   });
 
+  it('ships consent-safe ad slot quality controls with layout guards', async () => {
+    const home = await read('src/app/page.tsx');
+    const slot = await read('src/components/ad-quality-slot.tsx');
+    const controls = await read('src/lib/ad-quality-controls.ts');
+
+    assert.match(home, /AdQualitySlot/);
+    assert.match(slot, /data-ad-consent-mode/);
+    assert.match(slot, /non-personalized mode/);
+    assert.match(slot, /minHeight: placement\.reservedHeight/);
+    assert.match(controls, /allowedAdPlacements/);
+    assert.match(controls, /prices/);
+    assert.match(controls, /confidence badges/);
+    assert.match(controls, /critical shopping actions/);
+    assert.match(controls, /Reserved space prevents CLS/);
+    assert.match(controls, /No dark pattern overlap/);
+  });
+
 
   it('renders the consent banner visible in the first HTML pass to avoid homepage CLS', async () => {
     const consentManager = await read('src/components/consent-manager.tsx');
