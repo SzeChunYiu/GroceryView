@@ -9,6 +9,7 @@
     "perf:lighthouse:ci": "lhci autorun --config=./lighthouserc.cjs",
     "perf:lighthouse:preview": "lhci autorun --config=./lighthouserc.preview.cjs",
     "start": "next start",
+    "test:a11y": "node --test scripts/chain-selector-accessibility.test.mjs",
     "test": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
