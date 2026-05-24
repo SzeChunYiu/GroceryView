@@ -71,7 +71,47 @@ describe('buildPriceChartSeries', () => {
     assert.deepEqual(result.series.map((series) => series.lineStyle), ['dotted', 'dashed', 'solid']);
     assert.equal(result.series[1].markers[0].type, 'promotion');
     assert.equal(result.series[1].markers[0].provenanceLabel, 'Weekly flyer');
+    assert.equal(result.series[2].volatilityBand.length, 1);
+    assert.equal(result.series[2].volatilityLabel, 'Expected band 58.70 SEK-61.10 SEK from observed volatility');
     assert.equal(result.windowStart, '2026-04-20T00:00:00.000Z');
+  });
+
+  it('adds upper and lower expected bounds from observed volatility', () => {
+    const result = buildPriceChartSeries({
+      observations: [
+        {
+          storeId: 'willys-odenplan',
+          storeName: 'Willys Odenplan',
+          observedAt: '2026-05-01T00:00:00.000Z',
+          price: 50,
+          sourceType: 'shelf',
+          confidence: 0.9
+        },
+        {
+          storeId: 'willys-odenplan',
+          storeName: 'Willys Odenplan',
+          observedAt: '2026-05-02T00:00:00.000Z',
+          price: 60,
+          sourceType: 'shelf',
+          confidence: 0.9
+        },
+        {
+          storeId: 'willys-odenplan',
+          storeName: 'Willys Odenplan',
+          observedAt: '2026-05-03T00:00:00.000Z',
+          price: 55,
+          sourceType: 'shelf',
+          confidence: 0.9
+        }
+      ]
+    });
+
+    assert.deepEqual(result.series[0].volatilityBand, [
+      { time: '2026-05-01T00:00:00.000Z', lowerBound: 49, upperBound: 51, volatility: 1, sampleSize: 1 },
+      { time: '2026-05-02T00:00:00.000Z', lowerBound: 50, upperBound: 70, volatility: 10, sampleSize: 2 },
+      { time: '2026-05-03T00:00:00.000Z', lowerBound: 47.5, upperBound: 62.5, volatility: 7.5, sampleSize: 3 }
+    ]);
+    assert.equal(result.series[0].volatilityLabel, 'Expected band 47.50 SEK-62.50 SEK from observed volatility');
   });
 
   it('emits compact chart markers and preserves source labels', () => {

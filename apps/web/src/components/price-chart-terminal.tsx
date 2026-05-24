@@ -25,6 +25,14 @@ export type PriceChartTerminalSeries = {
     confidence: number;
     provenanceLabel?: string;
   }>;
+  volatilityBand?: Array<{
+    time: string;
+    lowerBound: number;
+    upperBound: number;
+    volatility: number;
+    sampleSize: number;
+  }>;
+  volatilityLabel?: string;
   markers: Array<{
     time: string;
     text: string;
@@ -65,6 +73,10 @@ function lineStyleFor(lineStyle: LineStyleName, lineStyles: LightweightChartsVal
 
 function chartColorFor(index: number) {
   return ['#047857', '#0f766e', '#2563eb', '#7c3aed'][index % 4]!;
+}
+
+function chartBandColorFor(index: number) {
+  return ['rgba(4, 120, 87, 0.34)', 'rgba(15, 118, 110, 0.34)', 'rgba(37, 99, 235, 0.3)', 'rgba(124, 58, 237, 0.3)'][index % 4]!;
 }
 
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
@@ -114,6 +126,34 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
         });
 
         activeWindow.series.forEach((series, index) => {
+          const band = series.volatilityBand ?? [];
+          if (band.length > 0) {
+            const bandColor = chartBandColorFor(index);
+            const upperBand = chartApi.addSeries(LineSeries, {
+              color: bandColor,
+              lineWidth: 1,
+              lineStyle: LineStyle.Dashed,
+              lastValueVisible: false,
+              priceLineVisible: false
+            });
+            upperBand.setData(band.map((point) => ({
+              time: point.time.slice(0, 10),
+              value: point.upperBound
+            })));
+
+            const lowerBand = chartApi.addSeries(LineSeries, {
+              color: bandColor,
+              lineWidth: 1,
+              lineStyle: LineStyle.Dashed,
+              lastValueVisible: false,
+              priceLineVisible: false
+            });
+            lowerBand.setData(band.map((point) => ({
+              time: point.time.slice(0, 10),
+              value: point.lowerBound
+            })));
+          }
+
           const line = chartApi.addSeries(LineSeries, {
             color: chartColorFor(index),
             lineWidth: 3,
@@ -206,6 +246,9 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4" key={series.id}>
                 <p className="text-sm font-black text-white">{series.storeName} · {series.sourceType}</p>
                 <p className="mt-1 text-xs font-semibold text-slate-300">lineStyle {series.lineStyle} · {series.points.length} points · {series.markers.length} markers</p>
+                {series.volatilityLabel ? (
+                  <p className="mt-2 text-xs font-bold text-emerald-100">{series.volatilityLabel}</p>
+                ) : null}
                 {series.markers.length > 0 ? (
                   <p className="mt-3 rounded-xl bg-slate-950/70 p-3 text-xs font-bold text-emerald-100">
                     Latest marker: {series.markers.at(-1)?.text} · {series.markers.at(-1)?.time.slice(0, 10)}

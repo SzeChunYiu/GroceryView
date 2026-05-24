@@ -1822,6 +1822,14 @@ export type PriceChartSeriesPoint = {
   provenanceLabel?: string;
 };
 
+export type PriceChartVolatilityBandPoint = {
+  time: string;
+  lowerBound: number;
+  upperBound: number;
+  volatility: number;
+  sampleSize: number;
+};
+
 export type PriceChartMarker = {
   time: string;
   type: PriceChartMarkerType;
@@ -1840,6 +1848,8 @@ export type PriceChartSeries = {
   sourceType: PriceChartSourceType;
   lineStyle: PriceChartLineStyle;
   points: PriceChartSeriesPoint[];
+  volatilityBand: PriceChartVolatilityBandPoint[];
+  volatilityLabel: string;
   markers: PriceChartMarker[];
 };
 
@@ -2152,6 +2162,44 @@ function limitChartMarkers(markers: PriceChartMarker[], limit: number): PriceCha
     .sort((a, b) => Date.parse(a.time) - Date.parse(b.time));
 }
 
+function averageAbsoluteMove(values: number[]): number {
+  if (values.length < 2) return 0;
+  const moves = values.slice(1).map((value, index) => Math.abs(value - values[index]));
+  return moves.reduce((sum, value) => sum + value, 0) / moves.length;
+}
+
+function standardDeviation(values: number[]): number {
+  if (values.length < 2) return 0;
+  const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
+  return Math.sqrt(variance);
+}
+
+function volatilityBandFor(sorted: PriceChartObservation[]): PriceChartVolatilityBandPoint[] {
+  return sorted.map((observation, index) => {
+    const trailing = sorted.slice(Math.max(0, index - 5), index + 1);
+    const trailingPrices = trailing.map((point) => point.price);
+    const priceVolatility = Math.max(standardDeviation(trailingPrices), averageAbsoluteMove(trailingPrices));
+    const confidencePadding = observation.price * (1 - clamp(observation.confidence, 0, 1)) * 0.08;
+    const minimumPadding = observation.price * 0.02;
+    const volatility = roundMoney(Math.max(priceVolatility, confidencePadding, minimumPadding));
+
+    return {
+      time: observation.observedAt,
+      lowerBound: roundMoney(Math.max(0, observation.price - volatility)),
+      upperBound: roundMoney(observation.price + volatility),
+      volatility,
+      sampleSize: trailing.length
+    };
+  });
+}
+
+function volatilityLabelFor(band: PriceChartVolatilityBandPoint[]): string {
+  const latest = band.at(-1);
+  if (!latest) return 'Expected band unavailable';
+  return `Expected band ${formatSek(latest.lowerBound)}-${formatSek(latest.upperBound)} from observed volatility`;
+}
+
 export function buildPriceChartSeries(input: PriceChartAdapterInput): PriceChartAdapterResult {
   const asOfMs = input.asOf ? Date.parse(input.asOf) : undefined;
   if (input.asOf && Number.isNaN(asOfMs)) throw new Error('asOf must be an ISO date.');
@@ -2183,6 +2231,7 @@ export function buildPriceChartSeries(input: PriceChartAdapterInput): PriceChart
         chartLineStyleWeight[candidate] > chartLineStyleWeight[worst] ? candidate : worst
       );
     const rawMarkers = sorted.flatMap((observation) => chartMarkersForObservation(observation, observation.price === lowPrice));
+    const volatilityBand = volatilityBandFor(sorted);
 
     return {
       id: `${storeId}:${sourceType}`,
@@ -2196,6 +2245,8 @@ export function buildPriceChartSeries(input: PriceChartAdapterInput): PriceChart
         confidence: clamp(observation.confidence, 0, 1),
         provenanceLabel: observation.provenanceLabel
       })),
+      volatilityBand,
+      volatilityLabel: volatilityLabelFor(volatilityBand),
       markers: limitChartMarkers(rawMarkers, markerLimitPerSeries)
     } satisfies PriceChartSeries;
   }).sort((a, b) => {
