@@ -2322,4 +2322,20 @@ describe('createHttpHandler', () => {
     const missing = await handle(new Request('http://localhost/api/nope'));
     assert.equal(missing.status, 404);
   });
+
+  it('returns structured error JSON for malformed POST bodies', async () => {
+    const handle = createHttpHandler();
+
+    const response = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
+      method: 'POST',
+      body: '[]'
+    }));
+
+    assert.equal(response.status, 400);
+    assert.deepEqual(await json(response), {
+      error: 'Invalid JSON body.',
+      code: 'malformed_post_body',
+      details: { reason: 'JSON body must be an object.' }
+    });
+  });
 });
