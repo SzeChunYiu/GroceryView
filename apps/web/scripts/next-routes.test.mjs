@@ -1946,6 +1946,8 @@ describe('verified-data UI', () => {
     const homeMetadataSource = `${page}
 ${seo}`;
     assert.match(globals, /radial-gradient/);
+    assert.match(globals, /@media \(prefers-reduced-motion: reduce\)/);
+    assert.match(globals, /transition-duration: 1ms !important/);
     assert.match(nav, /Verified grocery intelligence/);
     assert.match(nav, /href: '\/screener', label: 'Screener'/, 'Screener nav item should point to the dedicated /screener route');
     assert.match(shell, /zero placeholder rows/);
@@ -3331,6 +3333,10 @@ ${seo}`;
     assert.match(cards, /30-day price drop from price_history/);
     assert.match(cards, /bg-emerald-100/);
     assert.match(cards, /<svg/);
+    assert.match(cards, /data-chart-motion="static"/);
+    assert.match(cards, /motion-reduce:transition-none/);
+    assert.match(cards, /motion-safe:transition/);
+    assert.match(cards, /motion-safe:hover:-translate-y-0\.5/);
     assert.match(cards, /7-day price history/);
     assert.match(cards, /Compare by:/);
     assert.match(cards, /localStorage/);
