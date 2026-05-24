@@ -9,6 +9,7 @@ import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner 
 import { planAccountDeletion } from '@groceryview/core';
 
 const notificationSubscriptionEndpoint = '/api/notifications/subscription';
+const alertPreferencesEndpoint = '/api/alerts/preferences';
 const notificationVapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? '';
 const notificationChannelPreferences = ['price-drop-alerts', 'basket-reminders'];
 const notificationSubscriptionScript = `(() => {
@@ -146,6 +147,36 @@ const bestTimeToBuyAlertRules = [
   { label: 'Favorite ICA + dairy', stores: ['ICA Nära', 'ICA Maxi'], categories: ['Dairy', 'Breakfast'], confidence: 0.82 },
   { label: 'Discount stores + pantry', stores: ['Willys', 'Lidl'], categories: ['Pantry', 'Frozen'], confidence: 0.78 },
   { label: 'Weekend produce watch', stores: ['Coop', 'Hemköp'], categories: ['Produce'], confidence: 0.74 }
+];
+const adaptiveAlertProfile = {
+  endpoint: alertPreferencesEndpoint,
+  cadence: 'daily_digest',
+  channels: ['email', 'push'],
+  sensitivity: 'balanced',
+  enabledTypes: ['target_price', 'favorite_store_deal', 'weekly_report'],
+  fatigueGuard: {
+    maxDailyAlerts: 2,
+    minHoursBetweenAlerts: 8,
+    overflowAction: 'roll_into_digest'
+  },
+  quietHours: '21:00-07:00 Europe/Stockholm'
+};
+const adaptiveAlertControls = [
+  {
+    label: 'Cadence',
+    value: adaptiveAlertProfile.cadence,
+    detail: 'Instant, daily digest, weekly digest, or paused delivery keeps high-frequency deal events from becoming noise.'
+  },
+  {
+    label: 'Channels',
+    value: adaptiveAlertProfile.channels.join(' + '),
+    detail: 'Email and push can be saved per account so a shopper can move non-urgent alerts into email-only digests.'
+  },
+  {
+    label: 'Sensitivity',
+    value: adaptiveAlertProfile.sensitivity,
+    detail: 'Low, balanced, or high thresholds tune how strong a price signal must be before it interrupts the shopper.'
+  }
 ];
 
 export function generateMetadata() {
@@ -324,6 +355,50 @@ export default function AccountPage() {
               <p className="mt-3 rounded-full bg-amber-100 px-3 py-2 text-xs font-black text-amber-950">Notify at {(rule.confidence * 100).toFixed(0)}% confidence</p>
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>Adaptive alert preferences</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Cadence, channel, and sensitivity profile</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              Signed-in shoppers can now store a user-specific alert profile through <code className="rounded bg-white/80 px-1 py-0.5 text-fuchsia-900">{adaptiveAlertProfile.endpoint}</code>. The profile keeps cadence, delivery channels, enabled alert types, sensitivity, quiet hours, and fatigue limits together so GroceryView can avoid over-notification before planning email or push delivery.
+            </p>
+          </div>
+          <ConfidenceBadge level="high" label="Fatigue guard" sampleSize={adaptiveAlertProfile.fatigueGuard.maxDailyAlerts} />
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {adaptiveAlertControls.map((control) => (
+            <div className="rounded-2xl bg-white p-4 shadow-sm" key={control.label}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">{control.label}</p>
+              <p className="mt-2 text-2xl font-black text-slate-950">{control.value}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">{control.detail}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-[0.85fr_1fr]">
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-sm font-black text-slate-950">Stored delivery limits</p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              <li className="rounded-lg bg-fuchsia-50 p-3">Quiet hours: {adaptiveAlertProfile.quietHours}</li>
+              <li className="rounded-lg bg-fuchsia-50 p-3">Max daily alerts: {adaptiveAlertProfile.fatigueGuard.maxDailyAlerts}</li>
+              <li className="rounded-lg bg-fuchsia-50 p-3">Minimum spacing: {adaptiveAlertProfile.fatigueGuard.minHoursBetweenAlerts} hours between non-urgent sends</li>
+              <li className="rounded-lg bg-fuchsia-50 p-3">Overflow action: {adaptiveAlertProfile.fatigueGuard.overflowAction.replaceAll('_', ' ')}</li>
+            </ul>
+          </div>
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-sm font-black text-slate-950">Example preference payload</p>
+            <pre className="mt-3 overflow-x-auto rounded-xl bg-slate-950 p-4 text-xs font-bold leading-6 text-fuchsia-50">{JSON.stringify({
+              userId: 'signed-in-user',
+              cadence: adaptiveAlertProfile.cadence,
+              channels: adaptiveAlertProfile.channels,
+              enabledTypes: adaptiveAlertProfile.enabledTypes,
+              sensitivity: adaptiveAlertProfile.sensitivity,
+              quietHours: { startHour: 21, endHour: 7, timezone: 'Europe/Stockholm' }
+            }, null, 2)}</pre>
+          </div>
         </div>
       </Card>
 
