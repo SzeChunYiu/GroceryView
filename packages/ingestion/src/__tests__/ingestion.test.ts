@@ -185,7 +185,9 @@ import {
   scbCoicopFoodCategoryCodes,
   scbPxWebQueryFixtures,
   validateScbPxWebQueryFixtures,
-  validateStoreLocatorFixtures
+  validateStoreLocatorFixtures,
+  buildKrambudinPricingRows,
+  KRAMBUDIN_SOURCE_URLS
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
 
@@ -7307,5 +7309,20 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('Krambúðin IS connector study rows', () => {
+  it('emits only source-justified app member coupon fields', () => {
+    const rows = buildKrambudinPricingRows();
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.channel, 'store');
+    assert.equal(rows[0]?.source_url, KRAMBUDIN_SOURCE_URLS.app);
+    assert.equal(rows[0]?.is_member_price, true);
+    assert.equal(rows[0]?.is_coupon_price, true);
+    assert.equal(rows[0]?.is_subscription_price, undefined);
+    assert.equal(rows[0]?.is_clearance, undefined);
+    assert.equal(rows[0]?.multi_buy, undefined);
+    assert.equal(rows[0]?.format, undefined);
   });
 });
