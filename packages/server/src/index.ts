@@ -43,6 +43,7 @@ import {
 import {
   buildSubscriptionCheckoutPlan,
   buildSubscriptionAccessPolicy,
+  hasActivePremiumEntitlement,
   parseStripeCompatibleSubscriptionEvent,
   processBillingSubscriptionEvent,
   type BillingSubscriptionEntitlementMutation,
@@ -420,12 +421,27 @@ function errorResponse(status: number, error: string): Response {
   return jsonResponse({ error }, { status });
 }
 
+class MalformedPostBodyError extends Error {
+  readonly code = 'malformed_post_body';
+
+  constructor(readonly reason: string) {
+    super('Invalid JSON body.');
+  }
+}
+
+function malformedPostBodyResponse(error: MalformedPostBodyError): Response {
+  return jsonResponse(
+    { error: error.message, code: error.code, details: { reason: error.reason } },
+    { status: 400 }
+  );
+}
+
 async function readJson(request: Request): Promise<JsonRecord> {
   try {
     if (!request.body) return {};
     return parseJsonObject(await request.text());
   } catch (error) {
-    throw new Error(`Invalid JSON: ${error instanceof Error ? error.message : 'parse failed'}`);
+    throw new MalformedPostBodyError(error instanceof Error ? error.message : 'parse failed');
   }
 }
 
@@ -777,6 +793,21 @@ type WatchlistLatestPriceRow = {
 type WatchlistProductIdentityRow = {
   product_id: string;
   product_slug: string;
+};
+
+type BestTimeToBuyAlertRuleRow = {
+  id: string;
+  category_id: string;
+  store_id: string;
+  minimum_confidence: string | number;
+  channel: DeliveryChannel;
+  recipient: string;
+};
+
+type CategorySignalRow = {
+  category_id: string;
+  store_id: string;
+  confidence: string | number;
 };
 
 function iso(value: string | Date): string {
@@ -1829,6 +1860,19 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     return null;
   };
 
+  const requireOcrScanHistoryPremium = async (userId: string): Promise<Response | null> => {
+    const now = (authOptions.now ?? new Date()).toISOString();
+    const entitlement = authOptions.subscriptionEntitlementRepository
+      ? await authOptions.subscriptionEntitlementRepository.getSubscriptionEntitlement(userId)
+      : api.getSubscriptionEntitlement(userId);
+    const access = buildSubscriptionAccessPolicy({ entitlement, now });
+    if (hasActivePremiumEntitlement({ entitlement, now })) return null;
+    return jsonResponse({
+      error: 'Active premium subscription is required for OCR scan history.',
+      access
+    }, { status: 402 });
+  };
+
   const buildAccountDataExport = (user: string) => {
     const householdPlan = api.getHouseholdPlan(user);
     const watchlist = api.getWatchlist(user);
@@ -1845,6 +1889,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     const preferences = budgetSummary.weeklyBudget > 0 || budgetSummary.monthlyBudget > 0
       ? [{ weeklyBudget: budgetSummary.weeklyBudget, monthlyBudget: budgetSummary.monthlyBudget }]
       : [];
+    const apiWithFriendSignals = api as typeof api & { getFriendSharedDealSignals?: (userId: string) => unknown[] };
 
     return buildPrivacyExport(
       {
@@ -1856,7 +1901,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         favoriteStoreIds: api.getFavoriteStores(user).map((store) => store.id),
         watchlistProductIds: watchlist.items.map((item) => item.productId),
         receiptIds: [],
-        householdIds: householdPlan ? [householdPlan.household.id] : []
+        householdIds: householdPlan ? [householdPlan.household.id] : [],
+        friendSharedDealSignals: apiWithFriendSignals.getFriendSharedDealSignals?.(user) ?? []
       },
       (authOptions.now ?? new Date()).toISOString()
     );
@@ -2943,6 +2989,25 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      if (path === '/api/scans/history') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const premiumError = await requireOcrScanHistoryPremium(user);
+        if (premiumError) return premiumError;
+        if (method === 'GET') {
+          return jsonResponse(api.getOcrScanHistory(user));
+        }
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse({
+            userId: user,
+            item: api.upsertOcrScanHistoryItem(user, body, (authOptions.now ?? new Date()).toISOString())
+          }, { status: 201 });
+        }
+      }
+
       if (path === '/api/scans/upload-url') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -3000,6 +3065,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
 
       return errorResponse(404, `Route not found: ${method} ${path}`);
     } catch (error) {
+      if (error instanceof MalformedPostBodyError) return malformedPostBodyResponse(error);
       return errorResponse(400, error instanceof Error ? error.message : 'Bad request.');
     }
   };
@@ -3160,11 +3226,15 @@ export function buildOpenApiDocument(): OpenApiDocument {
       },
       '/api/households/join': { post: protectedOperation('Join an existing household from a signed-in invite token.') },
       '/api/households/current/basket/check': { post: protectedOperation('Check or uncheck a shared household shopping-list item with member attribution.') },
-      '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
+      '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, household, and friend-shared deal signal data.') },
       '/api/settings/account': { delete: protectedOperation('Delete the signed-in account after confirmation, wiping lists, alerts, preferences, and profile rows.') },
       '/api/settings/data-export': { get: protectedOperation('Download my data JSON export with lists, alerts, preferences, and analytics event records.') },
-      '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
+      '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion, including friend-shared deal signals, without performing a destructive delete.') },
       '/api/privacy/request-fulfillment': { post: protectedOperation('Classify privacy export, deletion, and ad opt-out requests by fulfillment deadline.') },
+      '/api/scans/history': {
+        get: protectedOperation('List premium OCR receipt scan history after entitlement enforcement.'),
+        post: protectedOperation('Persist a premium OCR receipt scan history summary after entitlement enforcement.')
+      },
       '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },
       '/api/scans/upload-url': { post: protectedOperation('Create a private upload ticket for barcode or receipt scan payload storage.') },
       '/api/users/{userId}/favorite-stores': {
@@ -3437,26 +3507,95 @@ function buildRuntimeNotificationProviders(config: RuntimeConfig, options: Runti
   };
 }
 
+export async function enqueueBestTimeToBuyAlertRulesFromPostgres(input: {
+  executor: QueryExecutor;
+  repository: Pick<RuntimePersistenceRepository, 'upsertNotificationTask'>;
+  now: string;
+}): Promise<PersistedNotificationTask[]> {
+  const rules = await input.executor.query<BestTimeToBuyAlertRuleRow>(
+    `select id::text,
+            category_id::text,
+            store_id::text,
+            minimum_confidence,
+            channel,
+            recipient
+     from alert_rules
+     where active = true
+       and rule_type = 'best_time_to_buy'
+       and category_id is not null
+       and store_id is not null
+       and minimum_confidence is not null`,
+    []
+  );
+  if (rules.length === 0) return [];
+
+  const signals = await input.executor.query<CategorySignalRow>(
+    `select distinct on (category_id::text, store_id::text)
+            category_id::text,
+            store_id::text,
+            confidence
+     from category_signals
+     where category_id::text = any($1::text[])
+       and store_id::text = any($2::text[])
+     order by category_id::text, store_id::text, observed_at desc`,
+    [
+      [...new Set(rules.map((rule) => rule.category_id))],
+      [...new Set(rules.map((rule) => rule.store_id))]
+    ]
+  );
+  const signalsByTarget = new Map(signals.map((signal) => [`${signal.category_id}:${signal.store_id}`, signal]));
+  const dueTasks: PersistedNotificationTask[] = [];
+
+  for (const rule of rules) {
+    const signal = signalsByTarget.get(`${rule.category_id}:${rule.store_id}`);
+    const confidence = signal ? Number(signal.confidence) : Number.NaN;
+    if (!Number.isFinite(confidence) || confidence < Number(rule.minimum_confidence)) continue;
+
+    const task: PersistedNotificationTask = {
+      id: `best-time-to-buy:${rule.id}:${rule.category_id}:${rule.store_id}`,
+      channel: rule.channel,
+      type: 'price_alert',
+      title: 'Best time to buy',
+      body: `A saved category signal at your target store reached ${Math.round(confidence * 100)}% confidence.`,
+      priority: 'high',
+      sendAt: input.now,
+      recipient: rule.recipient,
+      attemptCount: 0,
+      maxAttempts: 3,
+      status: 'queued'
+    };
+    await input.repository.upsertNotificationTask!(task);
+    dueTasks.push(task);
+  }
+
+  return dueTasks;
+}
+
 function buildRuntimeNotificationWorkerRunner(
   config: RuntimeConfig,
   repository: RuntimePersistenceRepository | undefined,
-  options: RuntimeHandlerOptions = {}
+  options: RuntimeHandlerOptions = {},
+  executor?: QueryExecutor
 ): (() => Promise<RepositoryNotificationWorkerCycleResult>) | undefined {
   if (!repository?.listDueNotificationTasks || !repository.listActiveNotificationSuppressions || !repository.upsertNotificationTask) return undefined;
   const providers = buildRuntimeNotificationProviders(config, options);
   if (!providers.email && !providers.push && !providers.telegram) return undefined;
-  return () => runRepositoryNotificationWorkerCycle({
-    now: (options.now ?? new Date()).toISOString(),
-    retryDelayMinutes: 15,
-    staleAfterMinutes: 60,
-    repository: {
-      listDueNotificationTasks: (now) => repository.listDueNotificationTasks!(now),
-      listActiveNotificationSuppressions: () => repository.listActiveNotificationSuppressions!(),
-      upsertNotificationTask: (task) => repository.upsertNotificationTask!(task)
-    },
-    providers,
-    alertRecipients: []
-  });
+  return async () => {
+    const now = (options.now ?? new Date()).toISOString();
+    if (executor) await enqueueBestTimeToBuyAlertRulesFromPostgres({ executor, repository, now });
+    return runRepositoryNotificationWorkerCycle({
+      now,
+      retryDelayMinutes: 15,
+      staleAfterMinutes: 60,
+      repository: {
+        listDueNotificationTasks: (now) => repository.listDueNotificationTasks!(now),
+        listActiveNotificationSuppressions: () => repository.listActiveNotificationSuppressions!(),
+        upsertNotificationTask: (task) => repository.upsertNotificationTask!(task)
+      },
+      providers,
+      alertRecipients: []
+    });
+  };
 }
 
 function hashHex(value: string): string {
@@ -3672,6 +3811,7 @@ export function buildRuntimeRequestAuthOptions(config: RuntimeConfig, options: R
 
 function createRuntimeRepositoryResource(config: RuntimeConfig, options: RuntimeHandlerOptions): {
   repository?: RuntimePersistenceRepository;
+  executor?: QueryExecutor;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
@@ -3690,6 +3830,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
   const repository = createPostgresRepository(executor);
   return {
     repository,
+    executor,
     postgresReadinessProvider: () => checkPostgresIntegrationReadiness({ executor, repositoryProbes: [] }),
     sourceRunHealthProvider: () =>
       checkSourceRunHealth({
@@ -3727,7 +3868,7 @@ function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: Runt
     ...(resource.repository ? { repository: resource.repository } : {}),
     postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider,
     sourceRunHealthProvider: options.sourceRunHealthProvider ?? resource.sourceRunHealthProvider,
-    notificationWorkerRunner: options.notificationWorkerRunner ?? buildRuntimeNotificationWorkerRunner(config, options.repository ?? resource.repository, options),
+    notificationWorkerRunner: options.notificationWorkerRunner ?? buildRuntimeNotificationWorkerRunner(config, options.repository ?? resource.repository, options, resource.executor),
     catalogCoverageProvider: options.catalogCoverageProvider ?? resource.catalogCoverageProvider,
     scanProviderReadinessProvider: options.scanProviderReadinessProvider,
     flyerOffersProvider: options.flyerOffersProvider ?? resource.flyerOffersProvider,

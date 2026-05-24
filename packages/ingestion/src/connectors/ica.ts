@@ -22,6 +22,7 @@ export type IcaProduct = {
   promoUnitPriceCurrency: string;
   promoUnitPriceUnit: string;
   promotionDescription: string;
+  soldByWeight?: boolean;
   storeAccountId: string;
   storeName: string;
   regionId: string;
@@ -1836,6 +1837,14 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
       const promoPrice = money(product.promoPrice);
       const promoUnitPrice = nestedMoney(product.promoUnitPrice);
       const promotion = arrayOfRecords(product.promotions)[0];
+      const packSizeDescription = text(product.packSizeDescription);
+      const soldByWeight = hasIcaCounterPriceEvidence({
+        name,
+        packSizeDescription,
+        unitPriceUnit: unitPrice.unit,
+        promoUnitPriceUnit: promoUnitPrice.unit,
+        category
+      });
 
       rows.push({
         code: retailerProductId,
@@ -1846,7 +1855,7 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
         categories: [category],
         imageUrl: imageUrl(product.image),
         productUrl: buildIcaStoreProductUrl(options.storeAccountId, retailerProductId),
-        packageSize: text(product.packSizeDescription),
+        packageSize: packSizeDescription,
         countryOfOrigin: text(product.countryOfOrigin),
         price: price.amount,
         priceCurrency: price.currency,
@@ -1859,6 +1868,7 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
         promoUnitPriceCurrency: promoUnitPrice.currency,
         promoUnitPriceUnit: promoUnitPrice.unit,
         promotionDescription: text(promotion?.description),
+        ...(soldByWeight ? { soldByWeight: true } : {}),
         storeAccountId: options.storeAccountId,
         storeName: options.storeName,
         regionId: options.regionId,
@@ -1873,6 +1883,24 @@ export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStore
   }
 
   return rows;
+}
+
+const ICA_COUNTER_CATEGORY_PATTERN = /\b(kött|koett|fisk|skaldjur|chark|delikatess|deli)\b/i;
+const ICA_COUNTER_NAME_PATTERN = /\b(filé|file|lax|torsk|räkor|rakor|skinka|rostbiff|entrec[oô]te|kotlett|färsk fisk|manuell)\b/i;
+const ICA_COUNTER_PACKAGE_EVIDENCE_PATTERN = /(?:\blösvikt\b|\bungefärlig\s+vikt\b|\bca\.?\s*\d+(?:[,.]\d+)?\s*(?:g|gram|kg|kilo)\b|^\s*\/?kg\s*$|^\s*\/?kilo\s*$)/i;
+
+function hasIcaCounterPriceEvidence(input: {
+  name: string;
+  packSizeDescription: string;
+  unitPriceUnit?: string;
+  promoUnitPriceUnit?: string;
+  category?: string;
+}): boolean {
+  if (!input.packSizeDescription || !ICA_COUNTER_PACKAGE_EVIDENCE_PATTERN.test(input.packSizeDescription)) return false;
+  const categoryOrName = `${input.category ?? ''} ${input.name}`;
+  if (!ICA_COUNTER_CATEGORY_PATTERN.test(categoryOrName) && !ICA_COUNTER_NAME_PATTERN.test(categoryOrName)) return false;
+  const unit = `${input.unitPriceUnit ?? ''} ${input.promoUnitPriceUnit ?? ''}`;
+  return /(?:^|[.\s])per\.kg\b|(?:^|\s)(?:kg|kr\s*\/\s*kg)(?:\s|$)/i.test(unit);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

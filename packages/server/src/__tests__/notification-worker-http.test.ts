@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createHttpHandler } from '../index.js';
+import { createHttpHandler, enqueueBestTimeToBuyAlertRulesFromPostgres } from '../index.js';
 
 async function json(response: Response) {
   return response.json() as Promise<unknown>;
@@ -141,5 +141,64 @@ describe('notification worker HTTP route', () => {
     }));
     assert.equal(response.status, 503);
     assert.deepEqual((await json(response) as { report: { blockers: string[] } }).report.blockers, ['notification_worker_run_failed']);
+  });
+
+  it('queues best-time-to-buy alerts only when the target store category signal meets the threshold', async () => {
+    const upserted: unknown[] = [];
+    const queued = await enqueueBestTimeToBuyAlertRulesFromPostgres({
+      now: '2026-05-20T08:00:00.000Z',
+      executor: {
+        query: async <T>(sql: string): Promise<T[]> => {
+          if (sql.includes('from alert_rules')) {
+            return [
+              {
+                id: 'rule-high',
+                category_id: 'coffee',
+                store_id: 'store-a',
+                minimum_confidence: 0.8,
+                channel: 'email',
+                recipient: 'shopper@example.com'
+              },
+              {
+                id: 'rule-low',
+                category_id: 'tea',
+                store_id: 'store-a',
+                minimum_confidence: 0.8,
+                channel: 'email',
+                recipient: 'shopper@example.com'
+              }
+            ] as T[];
+          }
+          if (sql.includes('from category_signals')) {
+            return [
+              { category_id: 'coffee', store_id: 'store-a', confidence: 0.91 },
+              { category_id: 'tea', store_id: 'store-a', confidence: 0.6 }
+            ] as T[];
+          }
+          return [];
+        }
+      },
+      repository: {
+        upsertNotificationTask: async (task) => {
+          upserted.push(task);
+        }
+      }
+    });
+
+    assert.equal(queued.length, 1);
+    assert.equal(upserted.length, 1);
+    assert.deepEqual(queued[0], {
+      id: 'best-time-to-buy:rule-high:coffee:store-a',
+      channel: 'email',
+      type: 'price_alert',
+      title: 'Best time to buy',
+      body: 'A saved category signal at your target store reached 91% confidence.',
+      priority: 'high',
+      sendAt: '2026-05-20T08:00:00.000Z',
+      recipient: 'shopper@example.com',
+      attemptCount: 0,
+      maxAttempts: 3,
+      status: 'queued'
+    });
   });
 });

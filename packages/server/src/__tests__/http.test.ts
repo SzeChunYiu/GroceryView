@@ -1276,6 +1276,9 @@ describe('createHttpHandler', () => {
     api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, favoriteStoresOnly: true });
     api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
     api.updateBudget('user-1', { weeklyBudget: 100, monthlyBudget: 400 });
+    (api as typeof api & { getFriendSharedDealSignals(userId: string): unknown[] }).getFriendSharedDealSignals = (userId) => userId === 'user-1'
+      ? [{ signalId: 'friend-share-1', productId: 'coffee', sharedByUserId: 'friend-1', dealScore: 82 }]
+      : [];
     const handle = createHttpHandler(api, { now: new Date('2026-05-20T12:00:00.000Z') });
 
     const exported = await json(await handle(new Request('http://localhost/api/privacy/export?userId=user-1'))) as {
@@ -1291,6 +1294,9 @@ describe('createHttpHandler', () => {
     assert.equal(exported.sections.find((section) => section.name === 'alerts')?.records.length, 1);
     assert.deepEqual(exported.sections.find((section) => section.name === 'preferences')?.records, [{ weeklyBudget: 100, monthlyBudget: 400 }]);
     assert.deepEqual(exported.sections.find((section) => section.name === 'analytics_events')?.records, []);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'friend_shared_deal_signals')?.records, [
+      { signalId: 'friend-share-1', productId: 'coffee', sharedByUserId: 'friend-1', dealScore: 82 }
+    ]);
 
     const settingsExport = await json(await handle(new Request('http://localhost/api/settings/data-export?userId=user-1'))) as {
       generatedAt: string;
@@ -1305,6 +1311,7 @@ describe('createHttpHandler', () => {
     assert.equal(plan.userId, 'user-1');
     assert.equal(plan.destructiveAction, false);
     assert.ok(plan.deleteFromTables.includes('receipt_uploads'));
+    assert.ok(plan.deleteFromTables.includes('friend_shared_deal_signals'));
     assert.deepEqual(plan.anonymizeTables, ['community_price_reports']);
 
     const fulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
@@ -1631,6 +1638,87 @@ describe('createHttpHandler', () => {
         evidence: ['confidence:0.66', 'total:62.4', 'low_confidence_row:SMUDGED ITEM']
       }
     ]);
+  });
+
+  it('gates OCR scan history reads and writes to active premium entitlements', async () => {
+    const requestedUserIds: string[] = [];
+    const api = createGroceryViewApi();
+    const handle = createHttpHandler(api, {
+      now: new Date('2026-05-20T13:00:00.000Z'),
+      subscriptionEntitlementRepository: {
+        async getSubscriptionEntitlement(userId) {
+          requestedUserIds.push(userId);
+          if (userId !== 'user-1') return null;
+          return {
+            userId,
+            tier: 'premium',
+            plan: 'premium_monthly',
+            status: 'active',
+            currentPeriodEndsAt: '2026-06-20T13:00:00.000Z',
+            provider: 'stripe_compatible',
+            providerCustomerId: 'cus_internal_only',
+            updatedAt: '2026-05-20T13:00:00.000Z'
+          };
+        }
+      }
+    });
+
+    const freeRead = await handle(new Request('http://localhost/api/scans/history?userId=user-2'));
+    assert.equal(freeRead.status, 402);
+    assert.deepEqual((await json(freeRead) as { access: { enforcementReasons: string[] } }).access.enforcementReasons, ['missing_subscription_entitlement']);
+
+    const saved = await handle(new Request('http://localhost/api/scans/history?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({
+        scanId: 'receipt-1',
+        kind: 'receipt',
+        uploadedAt: '2026-05-20T12:59:00.000Z',
+        result: {
+          status: 'parsed',
+          rows: [{ rawName: 'ZOEGAS 450G' }],
+          totalAmount: 49.9,
+          confidence: 0.91,
+          lowConfidenceRows: ['SMUDGED ITEM']
+        }
+      })
+    }));
+    assert.equal(saved.status, 201);
+    assert.deepEqual(await json(saved), {
+      userId: 'user-1',
+      item: {
+        scanId: 'receipt-1',
+        kind: 'receipt',
+        capturedAt: '2026-05-20T12:59:00.000Z',
+        status: 'parsed',
+        itemCount: 1,
+        totalAmount: 49.9,
+        confidence: 0.91,
+        lowConfidenceRows: ['SMUDGED ITEM']
+      }
+    });
+
+    const history = await json(await handle(new Request('http://localhost/api/scans/history?userId=user-1'))) as {
+      userId: string;
+      itemCount: number;
+      items: Array<Record<string, unknown>>;
+      guardrails: string[];
+    };
+    assert.equal(history.userId, 'user-1');
+    assert.equal(history.itemCount, 1);
+    assert.deepEqual(history.items, [
+      {
+        scanId: 'receipt-1',
+        kind: 'receipt',
+        capturedAt: '2026-05-20T12:59:00.000Z',
+        status: 'parsed',
+        itemCount: 1,
+        totalAmount: 49.9,
+        confidence: 0.91,
+        lowConfidenceRows: ['SMUDGED ITEM']
+      }
+    ]);
+    assert.equal(history.guardrails.some((guardrail) => /active premium entitlement/i.test(guardrail)), true);
+    assert.deepEqual(requestedUserIds, ['user-2', 'user-1', 'user-1']);
   });
 
   it('serves account subscription access from user-scoped entitlements', async () => {
@@ -2233,5 +2321,21 @@ describe('createHttpHandler', () => {
 
     const missing = await handle(new Request('http://localhost/api/nope'));
     assert.equal(missing.status, 404);
+  });
+
+  it('returns structured error JSON for malformed POST bodies', async () => {
+    const handle = createHttpHandler();
+
+    const response = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
+      method: 'POST',
+      body: '[]'
+    }));
+
+    assert.equal(response.status, 400);
+    assert.deepEqual(await json(response), {
+      error: 'Invalid JSON body.',
+      code: 'malformed_post_body',
+      details: { reason: 'JSON body must be an object.' }
+    });
   });
 });

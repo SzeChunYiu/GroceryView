@@ -6,6 +6,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "test": "tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
+    "test": "tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js && vitest run src/lib/__tests__/*.test.ts"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.7"
   }
 }

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
+import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -82,6 +83,26 @@ function PriceHistorySparkline({ card }: Readonly<{ card: AdaptiveProductCard }>
       )}
       <p className="mt-2 text-xs font-semibold text-slate-600">{card.sparklineLabel}</p>
     </div>
+  );
+}
+
+function VolatilityMethodologyBadge({ card }: Readonly<{ card: AdaptiveProductCard }>) {
+  const methodology = volatilityBadgeMethodology(card.sparklinePoints);
+
+  return (
+    <details className="mt-2 rounded-xl border border-violet-200 bg-violet-50 p-3 text-xs text-violet-950">
+      <summary
+        aria-label={`${card.name} volatility score methodology`}
+        className="cursor-pointer font-black"
+      >
+        Volatility score {methodology.score}/100 · {methodology.observationCount} historical observations
+      </summary>
+      <div className="mt-2 space-y-1 font-semibold leading-5">
+        <p>{methodology.rangeLabel}</p>
+        <p>{methodology.summary}</p>
+        <p>{methodology.forecastBoundary}</p>
+      </div>
+    </details>
   );
 }
 
@@ -200,6 +221,7 @@ export function ProductPriceCards({
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
             <PriceHistorySparkline card={card} />
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
+            <VolatilityMethodologyBadge card={card} />
             {card.cheapestUnitBadge ? (
               <p className="mt-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950">{card.cheapestUnitBadge}</p>
             ) : (

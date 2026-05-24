@@ -9,6 +9,7 @@ import {
   sourceCoverage
 } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { listedSavingsBoundaryCopy } from '@/lib/content-style';
 
 export function generateMetadata() {
   return routeMetadata('/catalogue-savings');
@@ -126,7 +127,7 @@ export default function CatalogueSavingsPage() {
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <h2 className="text-2xl font-black tracking-tight text-amber-950">Claim boundary</h2>
         <p className="mt-2 max-w-4xl text-sm leading-6 text-amber-950">
-          Catalogue savings are not basket savings. This page can show listed savings present in the chain-wide Axfood catalogue snapshot, but it does not claim live discounts, store-specific availability, loyalty eligibility, or savings on unmatched products.
+          {listedSavingsBoundaryCopy()}
         </p>
       </Card>
 

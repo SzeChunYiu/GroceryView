@@ -1,7 +1,23 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
 
+/**
+ * Renders the interactive price-history terminal for a product, including
+ * timeframe controls, value summaries, series provenance, and a lazy-loaded
+ * lightweight-charts line chart.
+ *
+ * | Prop | Description |
+ * | --- | --- |
+ * | `chart` | Prepared chart view model containing availability, labels, windows, series, and caveat copy. |
+ *
+ * @example
+ * ```tsx
+ * <PriceChartTerminal chart={priceChartModel} />
+ * ```
+ *
+ * @param chart Prepared price chart model used to render terminal copy, windows, series, and fallback state.
+ */
 type LineStyleName = 'solid' | 'dashed' | 'dotted';
 type ChartLoadStatus = 'idle' | 'loading' | 'ready' | 'failed';
 type LightweightChartsModule = typeof import('lightweight-charts');
@@ -23,6 +39,8 @@ export type PriceChartTerminalSeries = {
     time: string;
     value: number;
     confidence: number;
+    lowerBound?: number;
+    upperBound?: number;
     provenanceLabel?: string;
   }>;
   markers: Array<{
@@ -67,10 +85,38 @@ function chartColorFor(index: number) {
   return ['#047857', '#0f766e', '#2563eb', '#7c3aed'][index % 4]!;
 }
 
+function bandColorFor(index: number) {
+  return ['rgba(4, 120, 87, 0.38)', 'rgba(15, 118, 110, 0.38)', 'rgba(37, 99, 235, 0.34)', 'rgba(124, 58, 237, 0.34)'][index % 4]!;
+}
+
+function volatilityBandForPoint(point: PriceChartTerminalSeries['points'][number]) {
+  if (point.lowerBound !== undefined && point.upperBound !== undefined) {
+    return {
+      lower: point.lowerBound,
+      upper: point.upperBound
+    };
+  }
+  const confidence = Math.max(0, Math.min(1, point.confidence));
+  const margin = Math.max(0.03, (1 - confidence) * 0.18);
+  return {
+    lower: Math.max(0, Math.round((point.value * (1 - margin) + Number.EPSILON) * 100) / 100),
+    upper: Math.round((point.value * (1 + margin) + Number.EPSILON) * 100) / 100
+  };
+}
+
+function latestVolatilityBandLabel(series: PriceChartTerminalSeries) {
+  const point = series.points.at(-1);
+  if (!point) return 'no band';
+  const band = volatilityBandForPoint(point);
+  return `${band.lower.toLocaleString('sv-SE')}–${band.upper.toLocaleString('sv-SE')}`;
+}
+
 export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTerminalModel }>) {
   const [activeWindowLabel, setActiveWindowLabel] = useState(chart.defaultWindow);
   const [chartLoadError, setChartLoadError] = useState<string | null>(null);
   const [chartLoadStatus, setChartLoadStatus] = useState<ChartLoadStatus>('idle');
+  const chartRendererStatusId = useId();
+  const chartSelectorDescriptionId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
   const activeWindow = useMemo(
     () => chart.windows.find((window) => window.label === activeWindowLabel) ?? chart.windows[0],
@@ -78,6 +124,14 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
   );
   const firstSeries = activeWindow?.series[0];
   const latestPoint = firstSeries?.points.at(-1);
+  const handleWindowKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    windowLabel: PriceChartTerminalWindow['label']
+  ) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    setActiveWindowLabel(windowLabel);
+  };
 
   useEffect(() => {
     const container = containerRef.current;
@@ -114,6 +168,19 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
         });
 
         activeWindow.series.forEach((series, index) => {
+          const bandColor = bandColorFor(index);
+          const lowerBand = chartApi.addSeries(LineSeries, {
+            color: bandColor,
+            lineWidth: 1,
+            lineStyle: LineStyle.Dashed,
+            lastValueVisible: false,
+            priceLineVisible: false
+          });
+          lowerBand.setData(series.points.map((point) => ({
+            time: point.time.slice(0, 10),
+            value: volatilityBandForPoint(point).lower
+          })));
+
           const line = chartApi.addSeries(LineSeries, {
             color: chartColorFor(index),
             lineWidth: 3,
@@ -124,6 +191,18 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           line.setData(series.points.map((point) => ({
             time: point.time.slice(0, 10),
             value: point.value
+          })));
+
+          const upperBand = chartApi.addSeries(LineSeries, {
+            color: bandColor,
+            lineWidth: 1,
+            lineStyle: LineStyle.Dashed,
+            lastValueVisible: false,
+            priceLineVisible: false
+          });
+          upperBand.setData(series.points.map((point) => ({
+            time: point.time.slice(0, 10),
+            value: volatilityBandForPoint(point).upper
           })));
         });
 
@@ -150,28 +229,43 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-300">Price chart terminal</p>
           <h2 className="mt-2 text-3xl font-black tracking-tight">{chart.title}</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{chart.caveat}</p>
+          <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-200">{chart.sourceLabel}</p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black text-emerald-100">
           crosshair value readout: {latestPoint ? `${activeWindow.latestValueLabel} · ${latestPoint.time.slice(0, 10)}` : 'no point selected'}
         </div>
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-2" aria-label="Price chart timeframe selector">
+      <p id={chartSelectorDescriptionId} className="sr-only">
+        Choose the time range used for the price chart, summary cards, and store series details.
+      </p>
+      <div
+        className="mt-5 flex flex-wrap gap-2"
+        aria-describedby={chartSelectorDescriptionId}
+        aria-label="Price chart timeframe selector"
+        role="group"
+      >
         {chart.windows.map((window) => (
           <button
-            className={`rounded-full px-4 py-2 text-sm font-black motion-safe:transition ${
+            aria-describedby={`${chartSelectorDescriptionId} ${chartRendererStatusId}`}
+            aria-label={`Show ${window.rangeLabel} price chart window`}
+            aria-pressed={window.label === activeWindow?.label}
+            className={`rounded-full px-4 py-2 text-sm font-black motion-safe:transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
               window.label === activeWindow?.label
                 ? 'bg-emerald-300 text-emerald-950'
                 : 'border border-white/15 bg-white/10 text-slate-200 hover:border-emerald-300'
             }`}
             key={window.label}
+            onKeyDown={(event) => handleWindowKeyDown(event, window.label)}
             onClick={() => setActiveWindowLabel(window.label)}
+            role="button"
             type="button"
           >
             {window.label}
           </button>
         ))}
       </div>
+      <p id={chartRendererStatusId} aria-live="polite" className="sr-only" role="status">Chart renderer status: {chartLoadStatus}</p>
 
       {chart.available && activeWindow && activeWindow.pointCount > 0 ? (
         <>
@@ -189,8 +283,13 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
               Points/markers: <span className="text-white">{activeWindow.pointCount}/{activeWindow.markerCount}</span>
             </p>
           </div>
-          <p aria-live="polite" className="sr-only">Chart renderer status: {chartLoadStatus}</p>
-          <div ref={containerRef} className="mt-5 h-[280px] overflow-hidden rounded-3xl border border-white/10 bg-white" />
+          <div
+            ref={containerRef}
+            aria-describedby={chartRendererStatusId}
+            aria-label={`${chart.title} price history chart for ${activeWindow.rangeLabel}`}
+            className="mt-5 h-[280px] overflow-hidden rounded-3xl border border-white/10 bg-white"
+            role="img"
+          />
           {chartLoadStatus === 'loading' ? (
             <p className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 text-xs font-bold text-slate-200">
               Loading interactive lightweight-charts renderer after the product data is visible.
@@ -206,6 +305,9 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4" key={series.id}>
                 <p className="text-sm font-black text-white">{series.storeName} · {series.sourceType}</p>
                 <p className="mt-1 text-xs font-semibold text-slate-300">lineStyle {series.lineStyle} · {series.points.length} points · {series.markers.length} markers</p>
+                <p className="mt-2 text-xs font-bold text-emerald-100">
+                  Expected band: {latestVolatilityBandLabel(series)} around latest observed price.
+                </p>
                 {series.markers.length > 0 ? (
                   <p className="mt-3 rounded-xl bg-slate-950/70 p-3 text-xs font-bold text-emerald-100">
                     Latest marker: {series.markers.at(-1)?.text} · {series.markers.at(-1)?.time.slice(0, 10)}

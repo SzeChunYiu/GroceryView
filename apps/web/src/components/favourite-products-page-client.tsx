@@ -5,9 +5,8 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { FavouriteProductToggle } from '@/components/favourite-product-toggle';
 import {
-  FAVOURITES_STORAGE_KEY,
   FAVOURITES_UPDATED_EVENT,
-  parseFavouriteProductEntries,
+  readFavouriteProductEntries,
   type FavouriteProductEntry
 } from '@/lib/favourites';
 
@@ -37,7 +36,7 @@ function Card({ children, className = '' }: Readonly<{ children: ReactNode; clas
 }
 
 function readSavedProducts(): FavouriteProductEntry[] {
-  return parseFavouriteProductEntries(localStorage.getItem(FAVOURITES_STORAGE_KEY));
+  return readFavouriteProductEntries();
 }
 
 export function FavouriteProductsPageClient({ productCatalogue }: Readonly<{ productCatalogue: FavouriteProductCatalogItem[] }>) {

@@ -1,5 +1,6 @@
 import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { apiRouteTraceSpans, traceApiRoute } from '../instrumentation.js';
 import { screenerRoutes } from '../routes/screener.js';
 import { ScreenerService } from './screener.service.js';
 
@@ -15,11 +16,13 @@ export class ScreenerController {
     @Query('category') category?: string,
     @Query('limit') limit?: string
   ) {
-    return this.screener.discountRows({
+    const parsed = {
       minDiscountPercent: parseBoundedNumber(minDiscount, screenerRoutes.minDiscountParam, screenerRoutes.minDiscountRange[0], screenerRoutes.minDiscountRange[1], 0),
       category: normalizeOptionalText(category),
       limit: parseBoundedNumber(limit, 'limit', 1, screenerRoutes.maxLimit, screenerRoutes.defaultLimit)
-    });
+    };
+
+    return traceApiRoute(apiRouteTraceSpans.screener, { route: screenerRoutes.list, minDiscountPercent: parsed.minDiscountPercent, category: parsed.category, limit: parsed.limit }, () => this.screener.discountRows(parsed));
   }
 }
 

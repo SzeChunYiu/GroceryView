@@ -3,9 +3,11 @@ import assert from 'node:assert/strict';
 import {
   apiContractOpenApiComponents,
   apiContractSchemas,
+  compareResponseSchema,
   fuelPriceObservationSchema,
   notificationInboxResponseSchema,
   priceObservationSchema,
+  type CompareResponseDto,
   type NotificationInboxResponseDto,
   type PriceObservationDto
 } from '../index.js';
@@ -65,12 +67,43 @@ const validNotificationInbox: NotificationInboxResponseDto = {
   guardrails: ['Quiet-hours holds wait for the morning digest unless the alert is critical.']
 };
 
+const validCompareResponse: CompareResponseDto = {
+  itemIds: ['coffee', 'milk'],
+  stores: {
+    'willys-odenplan': {
+      coffee: {
+        price: { amount: 49.9, currency: 'SEK' },
+        unitPrice: { amount: 110.89, currency: 'SEK' },
+        priceType: 'promotion',
+        confidence: 'high',
+        observedAt: '2026-05-21T09:00:00.000Z'
+      }
+    },
+    'lidl-sveavagen': {
+      coffee: {
+        price: { amount: 54.9, currency: 'SEK' },
+        priceType: 'shelf',
+        confidence: 'medium',
+        observedAt: '2026-05-21T08:00:00.000Z'
+      },
+      milk: {
+        price: { amount: 13.9, currency: 'SEK' },
+        priceType: 'shelf',
+        confidence: 'high',
+        observedAt: '2026-05-21T07:00:00.000Z'
+      }
+    }
+  },
+  missingItemIds: ['butter']
+};
+
 describe('api contract schemas', () => {
   it('exports DTO schemas for the Phase 1 API resources', () => {
     assert.deepEqual(Object.keys(apiContractSchemas).sort(), [
       'alert',
       'basket',
       'basketItem',
+      'compareResponse',
       'fuelPriceObservation',
       'fuelPriceSource',
       'fuelPricesResponse',
@@ -83,6 +116,30 @@ describe('api contract schemas', () => {
       'store',
       'watchlist'
     ]);
+  });
+
+  it('models compare responses by requested item ids and store/item price snapshots', () => {
+    const parsed = compareResponseSchema.parse(validCompareResponse);
+
+    assert.deepEqual(parsed.itemIds, ['coffee', 'milk']);
+    assert.equal(parsed.stores['willys-odenplan']?.coffee?.price.amount, 49.9);
+    assert.equal(parsed.stores['lidl-sveavagen']?.milk?.confidence, 'high');
+    assert.deepEqual(parsed.missingItemIds, ['butter']);
+
+    assert.equal(
+      compareResponseSchema.safeParse({
+        ...validCompareResponse,
+        stores: {
+          'willys-odenplan': {
+            coffee: {
+              ...validCompareResponse.stores['willys-odenplan']!.coffee!,
+              observedAt: undefined
+            }
+          }
+        }
+      }).success,
+      false
+    );
   });
 
   it('accepts price observations only when provenance fields are present', () => {

@@ -104,7 +104,9 @@ import {
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
+  normaliseUnitPrice,
   normalizeUnitPrice,
+  parseDiaperPackageClass,
   offerSelectorFixtures,
   offerSelectorFixturesCanEmitOfferFacts,
   parseOpenPricesSnapshot,
@@ -1226,6 +1228,63 @@ describe('fetchCoopProducts', () => {
     assert.deepEqual(rows.map((row) => [row.code, row.name, row.price]), [
       ['2317401100009', 'Banan Styck', 3.95],
       ['7310865005168', 'Svenskt Smör', 45]
+    ]);
+  });
+
+  it('flags only source-backed Coop counter-price catalog rows as sold by weight', async () => {
+    const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({
+      results: {
+        count: 3,
+        items: [{
+          id: '2385912200006',
+          ean: '2385912200006',
+          name: 'Entrecôte i bit',
+          manufacturerName: 'Coop',
+          packageSizeInformation: 'ca 1000 gram/bit ungefärlig vikt',
+          salesPriceData: { b2cPrice: 219 },
+          comparativePriceData: { b2cPrice: 219 },
+          comparativePriceText: 'kr/kg',
+          availableOnline: true,
+          navCategories: [{ name: 'Nötkött', superCategories: [{ name: 'Kött', superCategories: [] }] }]
+        }, {
+          id: '7300206718000',
+          ean: '7300206718000',
+          name: 'Bacon 3-pack',
+          manufacturerName: 'Scan',
+          packageSizeInformation: '420 g',
+          salesPriceData: { b2cPrice: 37.9 },
+          comparativePriceData: { b2cPrice: 90.24 },
+          comparativePriceText: 'kr/kg',
+          availableOnline: true,
+          navCategories: [{ name: 'Chark', superCategories: [{ name: 'Kött', superCategories: [] }] }]
+        }, {
+          id: '2383471000006',
+          ean: '2383471000006',
+          name: 'Laxfilé Harbour',
+          manufacturerName: 'Harbour',
+          packageSizeInformation: '',
+          salesPriceData: { b2cPrice: 269 },
+          comparativePriceData: { b2cPrice: 269 },
+          comparativePriceText: 'kr/kg',
+          availableOnline: true,
+          navCategories: [{ name: 'Fisk', superCategories: [] }]
+        }]
+      }
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+
+    const rows = await fetchCoopProductCatalog({
+      fetchImpl,
+      storeId: '251300',
+      subscriptionKey: 'coop-key',
+      categoryIds: ['meat-counter'],
+      maxRowsPerCategory: 10,
+      retrievedAt: '2026-05-23T09:10:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.code, row.soldByWeight]), [
+      ['2385912200006', true],
+      ['7300206718000', undefined],
+      ['2383471000006', undefined]
     ]);
   });
 });
@@ -2398,6 +2457,54 @@ describe('fetchIcaProducts', () => {
       sourceUrl: buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1),
       retrievedAt: '2026-05-22T08:28:14.000Z'
     }]);
+  });
+
+  it('flags only source-backed ICA counter-price promotion rows as sold by weight', async () => {
+    const fetchImpl: typeof fetch = async () => Response.json({
+      productGroups: [{
+        type: 'Fisk',
+        decoratedProducts: [{
+          productId: 'ica-counter-fish',
+          retailerProductId: '2383471',
+          name: 'Färsk laxfilé',
+          brand: 'ICA Fiskdisken',
+          packSizeDescription: 'ca 1200 g ungefärlig vikt',
+          price: { amount: 249, currency: 'SEK' },
+          unitPrice: { price: { amount: 249, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: []
+        }, {
+          productId: 'ica-packaged-fish',
+          retailerProductId: '5740301203124',
+          name: 'Torskryggfilé 3-pack',
+          brand: 'Royal Greenland',
+          packSizeDescription: '375g',
+          price: { amount: 119, currency: 'SEK' },
+          unitPrice: { price: { amount: 317.33, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: []
+        }, {
+          productId: 'ica-missing-evidence',
+          retailerProductId: '2385912',
+          name: 'Entrecôte',
+          brand: 'ICA',
+          packSizeDescription: '',
+          price: { amount: 199, currency: 'SEK' },
+          unitPrice: { price: { amount: 199, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: []
+        }]
+      }]
+    });
+
+    const rows = await fetchIcaProducts({
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:35:00.000Z',
+      maxRows: 3
+    });
+
+    assert.deepEqual(rows.map((row) => [row.retailerProductId, row.soldByWeight]), [
+      ['2383471', true],
+      ['5740301203124', undefined],
+      ['2385912', undefined]
+    ]);
   });
 
   it('deduplicates repeated ICA store products', async () => {
@@ -4068,6 +4175,45 @@ describe('normalizeUnitPrice', () => {
     assert.deepEqual(normalizeUnitPrice({ price: 14.9, packageSize: 1, packageUnit: 'l' }), { unitPrice: 14.9, comparableUnit: 'l' });
     assert.deepEqual(normalizeUnitPrice({ price: 34.9, packageSize: 12, packageUnit: 'piece' }), { unitPrice: 2.9083, comparableUnit: 'piece' });
   });
+
+
+  it('normalises retailer package strings into comparable unit prices', () => {
+    assert.deepEqual(normaliseUnitPrice(49.9, '500g'), { unitPrice: 99.8, comparableUnit: 'kg' });
+    assert.deepEqual(normaliseUnitPrice(22.5, '1.5L'), { unitPrice: 15, comparableUnit: 'l' });
+    assert.deepEqual(normaliseUnitPrice(29.94, '6-pack'), { unitPrice: 4.99, comparableUnit: 'piece' });
+  });
+
+  it('extracts diaper package counts and supported size classes from retailer text', () => {
+    assert.deepEqual(parseDiaperPackageClass('Strl 4 + 39p'), {
+      diaperCount: 39,
+      declaredSize: 4,
+      diaperSizeClass: 'diaper-size-4'
+    });
+    assert.deepEqual(parseDiaperPackageClass('37 per frp'), {
+      diaperCount: 37,
+      declaredSize: null,
+      diaperSizeClass: null
+    });
+    assert.deepEqual(parseDiaperPackageClass('Comfort2 3-6kg + 47p'), {
+      diaperCount: 47,
+      declaredSize: 2,
+      diaperSizeClass: 'diaper-size-2'
+    });
+    assert.deepEqual(parseDiaperPackageClass('2x37p'), {
+      diaperCount: 74,
+      declaredSize: null,
+      diaperSizeClass: null
+    });
+  });
+
+  it('normalises diaper package strings by diaper count without mapping sizes 7 or 8', () => {
+    assert.deepEqual(normaliseUnitPrice(78, 'Strl 4 + 39p'), { unitPrice: 2, comparableUnit: 'piece' });
+    assert.deepEqual(normaliseUnitPrice(74, '37 per frp'), { unitPrice: 2, comparableUnit: 'piece' });
+    assert.deepEqual(normaliseUnitPrice(94, 'Comfort2 3-6kg + 47p'), { unitPrice: 2, comparableUnit: 'piece' });
+    assert.deepEqual(normaliseUnitPrice(148, '2x37p'), { unitPrice: 2, comparableUnit: 'piece' });
+    assert.deepEqual(parseDiaperPackageClass('Strl 7 + 34p'), { diaperCount: 34, declaredSize: 7, diaperSizeClass: null });
+    assert.deepEqual(parseDiaperPackageClass('Size 8 + 30p'), { diaperCount: 30, declaredSize: 8, diaperSizeClass: null });
+  });
 });
 
 describe('ingestRetailerProduct', () => {
@@ -5554,6 +5700,131 @@ describe('daily ingestion runner', () => {
     assert.equal(executor.calls.filter((call) => call.sql.includes('insert into stores')).length, 1);
     assert.equal(executor.calls.filter((call) => call.sql.includes('insert into products')).length, 1);
     assert.equal(executor.calls.filter((call) => call.sql.includes('insert into aliases')).length, 1);
+  });
+
+  it('deduplicates daily scraped products by EAN barcode before writing dependent rows', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-pasta-1',
+            rawName: 'Ideal Makaroner 750g',
+            canonicalName: 'Ideal Makaroner',
+            productId: 'willys-ideal-makaroner-750g',
+            categoryId: 'pasta',
+            brand: 'Kungsörnen',
+            barcode: '7310130003547',
+            packageSize: 750,
+            packageUnit: 'g',
+            price: 18.9
+          },
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-pasta-2',
+            rawName: 'Kungsörnen Idealmakaroner 750 g',
+            canonicalName: 'Ideal Makaroner',
+            productId: 'willys-kungsornen-idealmakaroner',
+            categoryId: 'pasta',
+            brand: 'Kungsörnen',
+            barcode: '7310130003547',
+            packageSize: 750,
+            packageUnit: 'g',
+            price: 17.9
+          }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.acceptedCount, 2);
+    const productInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into products'));
+    assert.ok(productInsert, 'daily ingestion should batch upsert products');
+    assert.match(productInsert.sql, /left join products existing on existing\.barcode = input\.barcode/);
+    assert.match(productInsert.sql, /batch_barcodes as/);
+    assert.match(productInsert.sql, /coalesce\(existing\.slug, batch_barcodes\.batch_slug, input\.slug\) as target_slug/);
+    const aliasInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into aliases'));
+    assert.ok(aliasInsert, 'daily ingestion should batch upsert aliases');
+    const aliases = JSON.parse(String(aliasInsert.params[0])) as Array<{ product_id: string }>;
+    assert.deepEqual(aliases.map((alias) => alias.product_id), [
+      'product-db-ean-7310130003547',
+      'product-db-ean-7310130003547'
+    ]);
+    const observations = firstBatchObservation(executor);
+    assert.equal(observations.product_id, 'product-db-ean-7310130003547');
+  });
+
+  it('deduplicates daily scraped products by normalized barcode keys', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-case-1',
+            rawName: 'Barcode Case 1',
+            canonicalName: 'Barcode Case',
+            productId: 'willys-barcode-case-1',
+            categoryId: 'test',
+            barcode: ' EAN-CASE-001 ',
+            packageSize: 1,
+            packageUnit: 'piece',
+            price: 10
+          },
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-case-2',
+            rawName: 'Barcode Case 2',
+            canonicalName: 'Barcode Case',
+            productId: 'willys-barcode-case-2',
+            categoryId: 'test',
+            barcode: 'ean-case-001',
+            packageSize: 1,
+            packageUnit: 'piece',
+            price: 11
+          }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.acceptedCount, 2);
+    const aliasInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into aliases'));
+    assert.ok(aliasInsert, 'daily ingestion should batch upsert aliases');
+    const aliases = JSON.parse(String(aliasInsert.params[0])) as Array<{ product_id: string }>;
+    assert.deepEqual(aliases.map((alias) => alias.product_id), [
+      'product-db-ean-ean-case-001',
+      'product-db-ean-ean-case-001'
+    ]);
   });
 
   it('upserts every configured daily store before writing partial store-scoped observations', async () => {

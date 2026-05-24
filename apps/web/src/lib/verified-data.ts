@@ -1,6 +1,6 @@
 import { buildFacetedProductSearch, type RealCatalogSearchPriceRow } from '@groceryview/api';
 import { COMMODITIES, STAPLE_BASKET, SUPPORTED_PRICE_DOMAINS, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildPriceChartSeries, buildWatchlistAlerts, calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planHumanReviewAssignments, planHumanReviewQueue, planRecurringBasketDigest, recommendSmartSwaps, suggestFriendSharedDeals, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type PriceChartObservation, type ProductMatchInput, type WatchlistItem, type WatchlistPriceType, type WatchlistProductSnapshot } from '@groceryview/core';
 import { summarizeTrendingProductPriceChanges, type TrendingPriceChangePoint } from '@groceryview/db';
 import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
@@ -22,6 +22,7 @@ import {
   dbSiteMatpriskollenSource
 } from './generated/db-site-ingested-overrides';
 import { categoryLabels, pricedProducts } from './openprices-products';
+import { allergenRiskBadgesForText } from './search-filters';
 import { osmStores } from './osm-stores';
 import {
   currencyFromObservation,
@@ -158,14 +159,9 @@ function priceDropFromThirtyDayHistory(product: (typeof productUniverse)[number]
   if (!latest) return null;
 
   const anchorDate = new Date(Date.parse(latest.observedAt) - thirtyDaysMs);
-  let anchor: (typeof priceHistory)[number] | null = null;
-  for (let index = priceHistory.length - 1; index >= 0; index -= 1) {
-    const point = priceHistory[index];
-    if (Date.parse(point.observedAt) <= anchorDate.getTime()) {
-      anchor = point;
-      break;
-    }
-  }
+  const anchor = [...priceHistory]
+    .reverse()
+    .find((point) => Date.parse(point.observedAt) <= anchorDate.getTime());
   if (!anchor || anchor.price <= 0) return null;
 
   const currentPrice = latest.price;
@@ -266,6 +262,18 @@ export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice
 export const MAX_ITEM_COMPARISON_ITEMS = 4;
 
 type ItemComparisonProduct = (typeof axfoodProducts)[number] | (typeof pricedProducts)[number];
+type FulfillmentFilterKey = 'coupons' | 'homeDelivery' | 'pickup';
+type FulfillmentFilters = Record<FulfillmentFilterKey, boolean>;
+
+const itemComparisonFulfillmentFilterLabels: Record<FulfillmentFilterKey, string> = {
+  coupons: 'Coupons',
+  homeDelivery: 'Home delivery',
+  pickup: 'Pickup'
+};
+
+// Unknown stores fail closed: item-comparison price rows only pass fulfillment filters when a source
+// records explicit store capability evidence.
+const storeCapabilityEvidence: Record<string, Partial<Record<FulfillmentFilterKey, string>>> = {};
 
 function itemComparisonRequestValues(value: SearchParamValue | undefined) {
   return listSearchValues(value)
@@ -279,21 +287,61 @@ function findItemComparisonProduct(id: string): ItemComparisonProduct | undefine
     ?? pricedProducts.find((product) => product.slug === id || product.code === id);
 }
 
-function storePricesForItemComparison(product: ItemComparisonProduct) {
+function checkboxSearchValue(value: SearchParamValue): boolean {
+  const values = listSearchValues(value).map((item) => item.toLowerCase());
+  return values.some((item) => ['1', 'true', 'on', 'yes'].includes(item));
+}
+
+function checkboxSearchValues(...values: SearchParamValue[]): boolean {
+  return values.some(checkboxSearchValue);
+}
+
+function itemComparisonFulfillmentFilters(searchParams: {
+  coupon?: SearchParamValue;
+  coupons?: SearchParamValue;
+  delivery?: SearchParamValue;
+  'home-delivery'?: SearchParamValue;
+  homeDelivery?: SearchParamValue;
+  pickup?: SearchParamValue;
+}): FulfillmentFilters {
+  return {
+    coupons: checkboxSearchValues(searchParams.coupon, searchParams.coupons),
+    homeDelivery: checkboxSearchValues(searchParams.delivery, searchParams['home-delivery'], searchParams.homeDelivery),
+    pickup: checkboxSearchValue(searchParams.pickup)
+  };
+}
+
+function activeFulfillmentFilterKeys(filters: FulfillmentFilters) {
+  return (Object.keys(filters) as FulfillmentFilterKey[]).filter((key) => filters[key]);
+}
+
+function hasFulfillmentCapabilityEvidence(storeId: string, filters: FulfillmentFilters): boolean {
+  const activeFilters = activeFulfillmentFilterKeys(filters);
+  if (activeFilters.length === 0) return true;
+
+  const evidence = storeCapabilityEvidence[storeId.toLowerCase()];
+  return activeFilters.every((filter) => Boolean(evidence?.[filter]));
+}
+
+function storePricesForItemComparison(product: ItemComparisonProduct, filters: FulfillmentFilters) {
   if (isOpenPricesProduct(product)) {
-    return [
+    const rows = [
       { storeName: 'OpenPrices observed low', price: product.priceMin, priceLabel: formatSek(product.priceMin), unitLabel: 'SEK observed price' },
       { storeName: 'OpenPrices observed median', price: product.priceMedian, priceLabel: formatSek(product.priceMedian), unitLabel: 'SEK observed price' },
       { storeName: 'OpenPrices observed high', price: product.priceMax, priceLabel: formatSek(product.priceMax), unitLabel: 'SEK observed price' }
     ];
+
+    return activeFulfillmentFilterKeys(filters).length > 0 ? [] : rows;
   }
 
-  return chainPriceRows(product).map((row) => ({
-    storeName: String(row.chain),
-    price: row.price,
-    priceLabel: row.priceText,
-    unitLabel: row.priceUnit
-  }));
+  return chainPriceRows(product)
+    .filter((row) => hasFulfillmentCapabilityEvidence(String(row.chain), filters))
+    .map((row) => ({
+      storeName: String(row.chain),
+      price: row.price,
+      priceLabel: row.priceText,
+      unitLabel: row.priceUnit
+    }));
 }
 
 function trendPointsForItemComparison(product: ItemComparisonProduct) {
@@ -333,7 +381,17 @@ function nutritionForItemComparison(product: ItemComparisonProduct) {
   };
 }
 
-export function buildItemComparisonView(searchParams: { items?: SearchParamValue } = {}) {
+export function buildItemComparisonView(searchParams: {
+  items?: SearchParamValue;
+  coupon?: SearchParamValue;
+  coupons?: SearchParamValue;
+  delivery?: SearchParamValue;
+  'home-delivery'?: SearchParamValue;
+  homeDelivery?: SearchParamValue;
+  pickup?: SearchParamValue;
+} = {}) {
+  const fulfillmentFilters = itemComparisonFulfillmentFilters(searchParams);
+  const activeFulfillmentFilters = activeFulfillmentFilterKeys(fulfillmentFilters);
   const requestedItemIds = [...new Set(itemComparisonRequestValues(searchParams.items))];
   const defaultItemIds = [
     ...freshestOpenPrices.slice(0, 2).map((product) => product.slug),
@@ -352,8 +410,13 @@ export function buildItemComparisonView(searchParams: { items?: SearchParamValue
     missingItemIds: itemIds.filter((id) => !matchedIds.has(id)),
     truncatedItemIds: requestedOverflow,
     sourceLabel: 'Axfood chain snapshots + OpenPrices/OpenFoodFacts observed product rows',
+    fulfillmentFilters,
+    activeFulfillmentFilterLabels: activeFulfillmentFilters.map((filter) => itemComparisonFulfillmentFilterLabels[filter]),
+    fulfillmentFilterSummary: activeFulfillmentFilters.length > 0
+      ? `Store prices require verified ${activeFulfillmentFilters.map((filter) => itemComparisonFulfillmentFilterLabels[filter].toLowerCase()).join(' + ')} evidence.`
+      : 'No fulfillment filters applied.',
     items: matchedProducts.map(({ product }) => {
-      const storePrices = storePricesForItemComparison(product);
+      const storePrices = storePricesForItemComparison(product, fulfillmentFilters);
       const trendPoints = trendPointsForItemComparison(product);
       const nutrition = nutritionForItemComparison(product);
       const cheapestPrice = storePrices
@@ -571,7 +634,13 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
       }) : unknownUnitPriceLabel,
       isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
-      sourceTables: searchResult.evidence.sourceTables
+      sourceTables: searchResult.evidence.sourceTables,
+      allergenRiskBadges: allergenRiskBadgesForText([
+        product.canonicalName,
+        product.brand,
+        product.categoryPath.join(' '),
+        product.labels.join(' ')
+      ])
     };
   });
 }
@@ -2944,6 +3013,51 @@ export const categoryDealLeaders = summarizeCategoryDealLeaders({
   evidenceLabel: `${leader.storeName} lowest · ${formatPct(leader.sourceConfidence * 100)} sourceConfidence · cross-chain spread derived`
 }));
 
+const friendSharedDealCandidateProducts = topChainSpreads.slice(0, 8);
+
+export const friendSharedDealShareSignals = friendSharedDealCandidateProducts.slice(0, 4).map((product, index) => ({
+  productId: product.slug,
+  sharedByDisplayName: ['Alex', 'Samira', 'Jonas', 'Mina'][index] ?? 'Household member',
+  relationship: index % 2 === 0 ? 'household' as const : 'friend' as const,
+  sharedAt: `2026-05-${24 - index}T09:30:00.000Z`,
+  sourceConfidence: 0.9,
+  optedIn: true
+}));
+
+export const friendSharedDealSuggestions = suggestFriendSharedDeals({
+  asOf: '2026-05-24T12:00:00.000Z',
+  deals: friendSharedDealCandidateProducts.map((product) => {
+    const pricedRows = chainPriceRows(product).sort((left, right) => left.price - right.price || String(left.chain).localeCompare(String(right.chain), 'sv'));
+    const cheapest = pricedRows[0]!;
+    const regularPrice = pricedRows[pricedRows.length - 1]?.price ?? cheapest.price;
+    const sourceConfidence = clamp(product.inChains.length / 2, 0, 1);
+    return {
+      productId: product.slug,
+      productName: product.name,
+      storeId: `${cheapest.chain}-online-catalog`,
+      storeName: `${chainDisplayNames[cheapest.chain] ?? cheapest.chain} online catalog`,
+      currentPrice: cheapest.price,
+      regularPrice,
+      dealScore: calculateDealScore({
+        currentCityPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+        knownPromoHistoryPercentile: clamp(100 - product.spreadPct * 2, 0, 100),
+        equivalentUnitPricePercentile: product.inChains.length > 1 ? 0 : 50,
+        discountDepthPercent: product.spreadPct,
+        sourceConfidence
+      }),
+      sourceConfidence
+    };
+  }),
+  shares: friendSharedDealShareSignals,
+  minimumDealScore: 60,
+  minimumSourceConfidence: 0.6
+}).map((suggestion) => ({
+  ...suggestion,
+  productSlug: suggestion.productId,
+  socialSignalLabel: `${suggestion.socialSignals.length} opted-in friend/household shares`,
+  socialEvidenceLabel: `socialProofScore ${suggestion.socialProofScore} · no anonymous or non-consented shares`
+}));
+
 export const marketHeatmapSourceSignals = [
   {
     id: 'deal-score',
@@ -3253,14 +3367,31 @@ export const publicApiDirectory = {
       supports: 'observed price history with provenance, price type, source confidence, and no synthetic forecast rows'
     },
     {
+      label: 'Product volatility',
+      path: '/api/products/{id}/volatility',
+      supports: 'volatility score, observed inputWindow, cache contract, ETag revalidation, and no forecast-only rows'
+    },
+    {
       label: 'Nutrition per krona',
       path: '/api/nutrition/value',
       supports: 'nutrition per krona rankings for protein, calories, fiber, sugar, and salt warning guardrails'
     }
   ],
+  volatilityContract: {
+    path: '/api/products/{id}/volatility',
+    cacheContract: 'Cache-Control: public, s-maxage=300, stale-while-revalidate=900 for identical product and inputWindow requests.',
+    etagBehavior: 'ETag varies by product id, normalized inputWindow, source snapshot, and volatility payload; clients should send If-None-Match and accept 304 Not Modified when the observation window is unchanged.',
+    inputWindowFields: [
+      { name: 'inputWindow.startDate', meaning: 'inclusive first observed price date used to compute the volatility score' },
+      { name: 'inputWindow.endDate', meaning: 'inclusive last observed price date used to compute the volatility score' },
+      { name: 'inputWindow.lookbackDays', meaning: 'requested historical observation window after server-side normalization' },
+      { name: 'inputWindow.observationCount', meaning: 'number of verified price observations included in the score' }
+    ]
+  },
   guardrails: [
     'All listed endpoints are unauthenticated public read endpoints in the OpenAPI document.',
     'Account, basket, watchlist, privacy, and human-review APIs stay bearer-auth protected.',
+    'Volatility scores must publish cache, ETag, and inputWindow semantics so clients can revalidate the same historical observation window safely.',
     'Prices and nutrition values are served with provenance/guardrails; missing data remains absent instead of filled with estimates.'
   ]
 };

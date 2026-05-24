@@ -19,6 +19,7 @@ export type CoopProduct = {
   sourceUrl: string;
   productUrl: string;
   imageUrl: string;
+  soldByWeight?: boolean;
   retrievedAt: string;
 };
 
@@ -43,6 +44,7 @@ export type CoopWeeklyDiscount = {
   offerMechanicText: string;
   promotionId: string;
   medMeraRequired: boolean;
+  soldByWeight?: boolean;
   storeId: string;
   storeName: string;
   region: string;
@@ -1690,6 +1692,7 @@ export function normalizeCoopProduct(
 
   const promotion = product.onlinePromotions?.[0];
   const categoryPath = categoryNames(product.navCategories?.[0]);
+  const soldByWeight = hasCoopCounterPriceEvidence(product, categoryPath);
   return {
     code,
     ean,
@@ -1709,8 +1712,20 @@ export function normalizeCoopProduct(
     sourceUrl,
     productUrl: buildCoopProductUrl(categoryPath, name, code),
     imageUrl: text(product.imageUrl),
+    ...(soldByWeight ? { soldByWeight: true } : {}),
     retrievedAt
   };
+}
+
+const COOP_COUNTER_CATEGORY_PATTERN = /\b(kött|koett|fisk|skaldjur|chark|delikatess|deli)\b/i;
+const COOP_COUNTER_PACKAGE_EVIDENCE_PATTERN = /(?:\blösvikt\b|\bungefärlig\s+vikt\b|\bca\.?\s*\d+(?:[,.]\d+)?\s*(?:g|gram|kg|kilo)\b|^\s*\/?kg\s*$|^\s*\/?kilo\s*$)/i;
+
+function hasCoopCounterPriceEvidence(product: CoopSearchProduct, categoryPath: readonly string[] = categoryNames(product.navCategories?.[0])): boolean {
+  const packageText = text(product.packageSizeInformation);
+  if (!packageText || !COOP_COUNTER_PACKAGE_EVIDENCE_PATTERN.test(packageText)) return false;
+  if (!categoryPath.some((category) => COOP_COUNTER_CATEGORY_PATTERN.test(category))) return false;
+  const unitText = text(product.comparativePriceText);
+  return /(?:^|\b)kr\s*\/\s*(?:kg|kilo)\b|^\s*\/\s*(?:kg|kilo)\s*$/i.test(unitText);
 }
 
 export function normalizeCoopStore(
@@ -1773,6 +1788,7 @@ export function normalizeCoopWeeklyDiscount(
     return null;
   }
   const promotion = product.onlinePromotions?.find((candidate) => numberOrNull(candidate.priceData?.b2cPrice) !== null);
+  const soldByWeight = hasCoopCounterPriceEvidence(product);
   const offerPrice = numberOrNull(promotion?.priceData?.b2cPrice) ?? context.flyerOfferHint?.offerPrice ?? null;
   if (!code || !name || ordinaryPrice === null || offerPrice === null || ordinaryPrice <= offerPrice) {
     return null;
@@ -1794,6 +1810,7 @@ export function normalizeCoopWeeklyDiscount(
     offerMechanicText: text(promotion?.message) || context.flyerOfferHint?.offerMechanicText || '',
     promotionId: text(promotion?.id) || `flyer:${context.storeId}:${code}:${context.validFrom.slice(0, 10)}`,
     medMeraRequired: promotion?.medMeraRequired === true || context.flyerOfferHint?.medMeraRequired === true,
+    ...(soldByWeight ? { soldByWeight: true } : {}),
     storeId: context.storeId,
     storeName: context.storeName,
     region: context.region,

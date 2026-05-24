@@ -10,6 +10,12 @@ export function generateMetadata() {
 
 type SearchParams = {
   items?: string | string[];
+  coupon?: string | string[];
+  coupons?: string | string[];
+  delivery?: string | string[];
+  'home-delivery'?: string | string[];
+  homeDelivery?: string | string[];
+  pickup?: string | string[];
 };
 
 function selectedItemsValue(items: string | string[] | undefined) {
@@ -18,7 +24,7 @@ function selectedItemsValue(items: string | string[] | undefined) {
 
 export default async function CompareItemsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
-  const comparison = buildItemComparisonView({ items: resolvedSearchParams.items });
+  const comparison = buildItemComparisonView(resolvedSearchParams);
   const sampleItems = comparison.items.map((item) => item.slug).slice(0, MAX_ITEM_COMPARISON_ITEMS).join(',');
 
   return (
@@ -51,6 +57,24 @@ export default async function CompareItemsPage({ searchParams }: { searchParams?
               placeholder="havredryck-choklad-7340083494406,havregryn-extra-fylliga-101758934-st"
             />
           </label>
+          <fieldset className="grid gap-2 rounded-2xl border border-emerald-100 bg-white/70 p-3 text-sm font-bold text-slate-700 md:col-span-2">
+            <legend className="px-1 text-xs font-black uppercase tracking-[0.14em] text-emerald-900">Fulfillment filters</legend>
+            <div className="flex flex-wrap gap-3">
+              <label className="flex items-center gap-2">
+                <input defaultChecked={comparison.fulfillmentFilters.coupons} name="coupons" type="checkbox" value="1" />
+                Coupons
+              </label>
+              <label className="flex items-center gap-2">
+                <input defaultChecked={comparison.fulfillmentFilters.homeDelivery} name="homeDelivery" type="checkbox" value="1" />
+                Home delivery
+              </label>
+              <label className="flex items-center gap-2">
+                <input defaultChecked={comparison.fulfillmentFilters.pickup} name="pickup" type="checkbox" value="1" />
+                Pickup
+              </label>
+            </div>
+            <p className="text-xs font-semibold text-slate-500">{comparison.fulfillmentFilterSummary}</p>
+          </fieldset>
           <button className="self-end rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white" type="submit">Compare items</button>
         </form>
       </Card>

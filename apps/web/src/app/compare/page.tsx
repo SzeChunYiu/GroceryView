@@ -1,9 +1,12 @@
 import Link from 'next/link';
+import { ChainSelector } from '@/components/chain-selector';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { StorePriceMatrix } from '@/components/store-price-matrix';
 import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { buildStoreDistanceCompare } from '@/lib/store-distance';
 
 export function generateMetadata() {
   return routeMetadata('/compare');
@@ -19,14 +22,23 @@ function formatComparableUnitPrice(value: number | null | undefined, unitLabel: 
 
 type SearchParams = {
   products?: string | string[];
+  routeMode?: string | string[];
 };
 
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
   const comparison = buildChainComparisonTable(productsParam);
+  const storeDistance = buildStoreDistanceCompare(productsParam, resolvedSearchParams.routeMode);
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
+  const sampleProductsHref = '/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st';
+  const chainSelectorOptions = COMPARE_CHAIN_ORDER.map((chain) => ({
+    id: chain.id,
+    label: chain.label,
+    description: 'Shown as a side-by-side comparison column.',
+    selected: true
+  }));
   const rowSections = [
     {
       id: 'commodity-alias',
@@ -57,9 +69,17 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               The table uses packages/db snapshot rows when production exports are present and marks missing chain rows explicitly.
             </p>
           </div>
-          <Link className="rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white shadow-sm" href="/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st">
-            Try sample products
-          </Link>
+          <div className="grid gap-3">
+            <ChainSelector
+              className="rounded-3xl border border-emerald-100 bg-white/80 p-4 shadow-sm"
+              description="All supported chains stay selected so the existing ?products= query string continues to drive the comparison table."
+              label="Compare chains"
+              options={chainSelectorOptions}
+            />
+            <Link className="justify-self-start rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white shadow-sm" href={sampleProductsHref}>
+              Try sample products
+            </Link>
+          </div>
         </div>
         <div className="mt-5 grid gap-4">
           {comparison.products.length === 0 ? (
@@ -67,6 +87,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
             </p>
           ) : null}
+          <StorePriceMatrix chains={COMPARE_CHAIN_ORDER} products={comparison.products} />
           {rowSections.map((section) => (
             <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm" key={section.id}>
               <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-3">
@@ -132,6 +153,43 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
         <p className="mt-3 text-xs font-semibold text-slate-500">
           Source: {comparison.sourceLabel}{comparison.generatedAt ? ` · generated ${comparison.generatedAt}` : ''}.
         </p>
+      </Card>
+      <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-800">Route-time compare</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Fastest store for selected products</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Sorts nearby stores by estimated {storeDistance.mode} time plus basket pickup time, so the practical best choice can beat the cheapest shelf price.
+              {` ${storeDistance.summary}`}
+            </p>
+          </div>
+          <div className="flex gap-2" aria-label="Choose route compare mode">
+            {(['walk', 'drive'] as const).map((mode) => (
+              <Link
+                className={mode === storeDistance.mode ? 'rounded-full bg-cyan-900 px-4 py-2 text-sm font-black text-white shadow-sm' : 'rounded-full bg-white px-4 py-2 text-sm font-black text-cyan-900 shadow-sm'}
+                href={`/compare?routeMode=${mode}${productsParam ? `&products=${Array.isArray(productsParam) ? productsParam[0] : productsParam}` : ''}`}
+                key={mode}
+              >
+                {mode === 'walk' ? 'Walk time' : 'Drive time'}
+              </Link>
+            ))}
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {storeDistance.rows.map((store, index) => (
+            <div className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm" key={store.id}>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-800">#{index + 1} · {store.chainName}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{store.storeName}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{store.areaLabel} · {(store.distanceMeters / 1000).toFixed(1)} km away</p>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                <p className="rounded-xl bg-cyan-50 p-3 font-black text-cyan-950">Total {store.totalMinutes} min</p>
+                <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">Pickup {store.pickupMinutes} min</p>
+              </div>
+              <p className="mt-3 text-xs font-semibold text-slate-500">{store.coverageLabel}</p>
+            </div>
+          ))}
+        </div>
       </Card>
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">

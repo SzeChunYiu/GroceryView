@@ -22,10 +22,13 @@ test('product cards expose a localStorage-backed favourite heart toggle', async 
   assert.match(productCards, /FavouriteProductToggle/);
   assert.match(productCards, /product=\{\{ slug: card\.slug, name: card\.name/);
   assert.match(toggle, /aria-pressed=\{isFavourite\}/);
-  assert.match(toggle, /localStorage\.setItem\(FAVOURITES_STORAGE_KEY/);
+  assert.match(toggle, /readFavouriteProductEntries\(\)/);
+  assert.match(toggle, /saveFavouriteProductEntries\(next\.entries\)/);
   assert.match(toggle, /window\.dispatchEvent\(new CustomEvent\(FAVOURITES_UPDATED_EVENT/);
   assert.match(storage, /groceryview:favourite-products/);
   assert.match(storage, /parseFavouriteProductEntries/);
+  assert.match(storage, /readFavouriteProductEntries/);
+  assert.match(storage, /saveFavouriteProductEntries/);
   assert.match(storage, /toggleFavouriteProduct/);
 });
 
@@ -37,7 +40,7 @@ test('favourites route renders saved localStorage products using current product
   assert.match(page, /routeMetadata\('\/favourites'\)/);
   assert.match(page, /adaptiveProductCards\.map/);
   assert.match(page, /FavouriteProductsPageClient/);
-  assert.match(client, /localStorage\.getItem\(FAVOURITES_STORAGE_KEY\)/);
+  assert.match(client, /readFavouriteProductEntries\(\)/);
   assert.match(client, /productCatalogue\.filter/);
   assert.match(client, /saved product/);
   assert.match(client, /current price/i);

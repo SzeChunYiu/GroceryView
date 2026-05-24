@@ -3,6 +3,7 @@ import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryv
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizerInput } from '@/lib/demo-data';
+import { weeklyRecurringBasketPlan } from '@/lib/recurring-basket';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -19,9 +20,31 @@ const weeklyBasketConfidence = {
   caveat: 'The optimizer uses visible price rows for favorite stores only; missing store-product prices reduce coverage instead of being estimated.'
 };
 
+function WeeklyBasketEmptyState() {
+  return (
+    <PageShell>
+      <Eyebrow>Basket optimizer</Eyebrow>
+      <Card className="mt-6 text-center">
+        <div className="text-5xl" aria-hidden="true">🧺</div>
+        <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950">No weekly basket data yet</h1>
+        <Link className="mt-3 inline-block font-black text-emerald-800 hover:text-emerald-950" href="/products">Browse products to start building a weekly basket.</Link>
+      </Card>
+    </PageShell>
+  );
+}
+
 export default function WeeklyBasketPage() {
+  if (weeklyBasketOptimizerInput.items.length === 0) {
+    return <WeeklyBasketEmptyState />;
+  }
+
   const comparison = compareBasketStrategies(weeklyBasketOptimizerInput);
   const coverage = summarizeStoreBasketCoverage(weeklyBasketOptimizerInput);
+
+  if (comparison.cheapestByProduct.assignments.length === 0 || coverage.stores.length === 0) {
+    return <WeeklyBasketEmptyState />;
+  }
+
   const bestSingleStore = comparison.bestSingleStore;
 
   return (
@@ -168,6 +191,57 @@ export default function WeeklyBasketPage() {
                 </Link>
               ))}
             </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-teal-200 bg-teal-50/70">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-teal-800">Recurring weekly basket</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{weeklyRecurringBasketPlan.templateName}</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Reuse template {weeklyRecurringBasketPlan.reusableTemplateId} every {weeklyRecurringBasketPlan.cadence} cycle, then review the expected date window before saving a duplicated draft.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Next window</span>
+                <span className="mt-1 block text-lg font-black text-teal-900">{weeklyRecurringBasketPlan.nextWindow.label}</span>
+                <span className="mt-1 block text-sm font-semibold text-slate-700">{weeklyRecurringBasketPlan.nextWindow.startsOn} → {weeklyRecurringBasketPlan.nextWindow.endsOn}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Template lines</span>
+                <span className="mt-1 block text-2xl font-black text-teal-900">{weeklyRecurringBasketPlan.lines.length}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Quick duplicates</span>
+                <span className="mt-1 block text-2xl font-black text-slate-950">{weeklyRecurringBasketPlan.duplicateControls.length}</span>
+              </p>
+            </div>
+            <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 sm:grid-cols-3">
+              {weeklyRecurringBasketPlan.lines.map((line) => (
+                <Link className="rounded-2xl bg-white p-3 hover:bg-teal-100" href={`/products/${line.productId}`} key={line.productId}>
+                  <span className="block font-black text-slate-950">{line.productName}</span>
+                  <span className="mt-1 block">Template quantity {line.templateQuantity}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-[1.5rem] border border-teal-100 bg-white p-4 shadow-sm">
+            <h3 className="text-lg font-black text-slate-950">Quick duplication controls</h3>
+            <div className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              {weeklyRecurringBasketPlan.duplicateControls.map((control) => (
+                <p className="rounded-2xl bg-teal-50 p-3" key={control.targetWindow.startsOn}>
+                  <span className="block font-black text-teal-950">{control.label}</span>
+                  <span className="mt-1 block">{control.targetWindow.startsOn} → {control.targetWindow.endsOn}; template reuse {control.preserveTemplate ? 'on' : 'off'}</span>
+                </p>
+              ))}
+            </div>
+            <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              {weeklyRecurringBasketPlan.guardrails.map((guardrail) => (
+                <li className="rounded-2xl bg-slate-50 p-3" key={guardrail}>{guardrail}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </Card>

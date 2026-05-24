@@ -7,6 +7,41 @@ export type StoreAssortmentOverviewQueryOptions = {
   limit?: number;
 };
 
+export type NearbyStoresRadiusQuery = {
+  sql: string;
+  values: [latitude: number, longitude: number, radiusMeters: number, limit: number];
+};
+
+export type NearbyStoresRadiusQueryOptions = {
+  latitude: number;
+  longitude: number;
+  radiusMeters: number;
+  limit?: number;
+};
+
+export type NearbyStoresRadiusRow = {
+  store_id: string;
+  store_slug: string;
+  store_name: string;
+  address_line1: string | null;
+  address_line2: string | null;
+  postal_code: string | null;
+  city: string | null;
+  latitude: string | number;
+  longitude: string | number;
+  distance_meters: string | number;
+};
+
+export type NearbyStoresRadiusItem = {
+  storeId: string;
+  storeSlug: string;
+  storeName: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  distanceMeters: number;
+};
+
 export type StoreAssortmentOverviewRow = {
   store_id: string;
   store_slug: string;
@@ -45,6 +80,11 @@ export type StoreAssortmentOverviewItem = {
 function clampLimit(limit: number | undefined) {
   if (typeof limit !== 'number' || !Number.isFinite(limit)) return 200;
   return Math.min(Math.max(Math.trunc(limit), 1), 500);
+}
+
+function clampRadiusMeters(radiusMeters: number) {
+  if (!Number.isFinite(radiusMeters)) return 5000;
+  return Math.min(Math.max(Math.trunc(radiusMeters), 100), 100000);
 }
 
 function normalizeOpeningHours(value: unknown): string[] {
@@ -94,6 +134,33 @@ export function buildStoreAssortmentOverviewQuery(
   };
 }
 
+export function buildNearbyStoresRadiusQuery(options: NearbyStoresRadiusQueryOptions): NearbyStoresRadiusQuery {
+  const latitude = Number.isFinite(options.latitude) ? options.latitude : 0;
+  const longitude = Number.isFinite(options.longitude) ? options.longitude : 0;
+  const radiusMeters = clampRadiusMeters(options.radiusMeters);
+
+  return {
+    sql: `select stores.id as store_id,
+                 stores.slug as store_slug,
+                 stores.name as store_name,
+                 stores.address_line1,
+                 stores.address_line2,
+                 stores.postal_code,
+                 stores.city,
+                 stores.latitude,
+                 stores.longitude,
+                 earth_distance(ll_to_earth($1, $2), ll_to_earth(stores.latitude, stores.longitude)) as distance_meters
+          from stores
+          where stores.latitude is not null
+            and stores.longitude is not null
+            and ll_to_earth(stores.latitude, stores.longitude) <@ earth_box(ll_to_earth($1, $2), $3)
+            and earth_distance(ll_to_earth($1, $2), ll_to_earth(stores.latitude, stores.longitude)) <= $3
+          order by distance_meters asc, stores.name asc
+          limit $4`,
+    values: [latitude, longitude, radiusMeters, clampLimit(options.limit)]
+  };
+}
+
 export function mapStoreAssortmentOverviewRow(row: StoreAssortmentOverviewRow): StoreAssortmentOverviewItem {
   const category = row.category_path?.find((part) => part.trim().length > 0) ?? 'uncategorized';
   const unitPrice = row.unit_price === null ? null : Number(row.unit_price);
@@ -112,5 +179,17 @@ export function mapStoreAssortmentOverviewRow(row: StoreAssortmentOverviewRow): 
     unitPrice: Number.isFinite(unitPrice) ? unitPrice : null,
     currency: row.currency,
     observedAt: row.observed_at
+  };
+}
+
+export function mapNearbyStoresRadiusRow(row: NearbyStoresRadiusRow): NearbyStoresRadiusItem {
+  return {
+    storeId: row.store_id,
+    storeSlug: row.store_slug,
+    storeName: row.store_name,
+    address: normalizedAddress(row),
+    latitude: Number(row.latitude),
+    longitude: Number(row.longitude),
+    distanceMeters: Number(row.distance_meters)
   };
 }

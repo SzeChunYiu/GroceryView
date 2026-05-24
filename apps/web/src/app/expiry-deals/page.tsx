@@ -104,36 +104,50 @@ export default function ExpiryDealsPage() {
           <p className="rounded-lg bg-white px-3 py-2 text-sm font-black text-emerald-950">Snapshot {now.slice(0, 10)}</p>
         </div>
 
-        <div className="mt-5 space-y-3">
-          {activeItems.map((item) => {
-            const confidence = confidenceFor(item);
-            return (
-              <Link className="block rounded-lg border border-emerald-100 bg-white p-4 shadow-sm hover:border-emerald-700" href={`/products/${item.productId}`} key={item.id}>
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{item.storeName} - {item.category}</p>
-                    <h3 className="mt-2 text-xl font-black text-slate-950">{item.productName}</h3>
-                    <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-600">{item.source}</p>
-                    <div className="mt-3">
-                      <ConfidenceBadge {...confidence} />
+        {activeItems.length > 0 ? (
+          <div className="mt-5 space-y-3">
+            {activeItems.map((item) => {
+              const confidence = confidenceFor(item);
+              return (
+                <Link className="block rounded-lg border border-emerald-100 bg-white p-4 shadow-sm hover:border-emerald-700" href={`/products/${item.productId}`} key={item.id}>
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{item.storeName} - {item.category}</p>
+                      <h3 className="mt-2 text-xl font-black text-slate-950">{item.productName}</h3>
+                      <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-600">{item.source}</p>
+                      <div className="mt-3">
+                        <ConfidenceBadge {...confidence} />
+                      </div>
+                    </div>
+                    <div className="grid min-w-64 grid-cols-2 gap-2 text-sm font-semibold text-slate-700">
+                      <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Now</span>{formatSek(item.currentPrice)}</p>
+                      <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Save</span>{formatSek(item.savings)}</p>
+                      <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Markdown</span>{item.markdownPercent}%</p>
+                      <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Score</span>{item.radarScore}</p>
                     </div>
                   </div>
-                  <div className="grid min-w-64 grid-cols-2 gap-2 text-sm font-semibold text-slate-700">
-                    <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Now</span>{formatSek(item.currentPrice)}</p>
-                    <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Save</span>{formatSek(item.savings)}</p>
-                    <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Markdown</span>{item.markdownPercent}%</p>
-                    <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Score</span>{item.radarScore}</p>
+                  <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 md:grid-cols-3">
+                    <p className="rounded-lg bg-slate-50 p-3">Expires in {formatHours(item.hoursUntilExpiry)} hours</p>
+                    <p className="rounded-lg bg-slate-50 p-3">{item.urgency.replace('_', ' ')}</p>
+                    <p className="rounded-lg bg-slate-50 p-3">{item.verification.replace('_', ' ')}</p>
                   </div>
-                </div>
-                <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 md:grid-cols-3">
-                  <p className="rounded-lg bg-slate-50 p-3">Expires in {formatHours(item.hoursUntilExpiry)} hours</p>
-                  <p className="rounded-lg bg-slate-50 p-3">{item.urgency.replace('_', ' ')}</p>
-                  <p className="rounded-lg bg-slate-50 p-3">{item.verification.replace('_', ' ')}</p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="mt-5 rounded-lg border border-emerald-100 bg-white p-5 shadow-sm">
+            <h3 className="text-xl font-black text-slate-950">No active near-expiry markdowns right now</h3>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              buildExpiryDealRadar returned no activeItems for the current freshness window, so GroceryView is hiding the board instead of implying a deal is available. Radar confidence and the stale evidence audit remain visible for context.
+            </p>
+            <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 md:grid-cols-3">
+              <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Active items</span>{activeItems.length}</p>
+              <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Stale reports kept</span>{radar.staleReportIds.length}</p>
+              <p className="rounded-lg bg-emerald-50 p-3"><span className="block text-xs uppercase text-slate-500">Confidence sample</span>{expiryDealRadarReports.length} reports</p>
+            </div>
+          </div>
+        )}
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_0.85fr]">

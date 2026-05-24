@@ -29,6 +29,16 @@ class SettingsPatchDto {
 export class AuthenticatedSettingsController {
   constructor(private readonly settings: SettingsService) {}
 
+  @Get()
+  @UseGuards(AuthGuard)
+  @ApiOkResponse({ description: settingsRoutes.preferencesReadDescription })
+  async readPreferences(@Req() request: AuthenticatedRequest) {
+    if (!this.settings.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required to read authenticated settings.');
+    }
+    return this.settings.readPreferences(authenticatedUserId(request));
+  }
+
   @Patch()
   @UseGuards(AuthGuard)
   @ApiOkResponse({ description: settingsRoutes.preferencesDescription })

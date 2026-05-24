@@ -17,12 +17,83 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
+export type ShareLinkState = {
+  error: string | null;
+  expiresAt: string | null;
+  isExpired: boolean;
+  isValid: boolean;
+  token: string;
+};
+
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
 };
 
+type SignedSharePayload = {
+  expiresAt?: string | null;
+  listId?: string;
+};
+
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
+const LIST_SHARE_PUBLIC_SECRET = process.env.NEXT_PUBLIC_LIST_SHARE_SECRET || 'local-list-share-development-secret';
+
+export const BUDGET_HISTORY_STORAGE_KEY = 'groceryview:shopping-list:budget-history:v1';
+export const BUDGET_HISTORY_SAVE_DELAY_MS = 400;
+
+export type BudgetHistorySnapshot = {
+  checkedCount: number;
+  remainingCount: number;
+  savedAt: string;
+  total: number;
+  totalCount: number;
+};
+
+export function budgetSnapshotSignature(snapshot: Pick<BudgetHistorySnapshot, 'checkedCount' | 'remainingCount' | 'total' | 'totalCount'>) {
+  return [snapshot.total, snapshot.checkedCount, snapshot.totalCount, snapshot.remainingCount].join(':');
+}
+
+function budgetHistoryFromStorage(value: string | null): BudgetHistorySnapshot[] {
+  if (!value) return [];
+
+  try {
+    const parsed = JSON.parse(value) as BudgetHistorySnapshot[] | null;
+    return Array.isArray(parsed)
+      ? parsed.filter((snapshot): snapshot is BudgetHistorySnapshot => (
+        snapshot !== null
+        && typeof snapshot === 'object'
+        && typeof snapshot.checkedCount === 'number'
+        && typeof snapshot.remainingCount === 'number'
+        && typeof snapshot.savedAt === 'string'
+        && typeof snapshot.total === 'number'
+        && typeof snapshot.totalCount === 'number'
+      ))
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function appendBudgetSnapshotIfChanged(history: BudgetHistorySnapshot[], nextSnapshot: BudgetHistorySnapshot) {
+  const lastSnapshot = history[history.length - 1];
+  if (!lastSnapshot) return [nextSnapshot];
+  if (budgetSnapshotSignature(lastSnapshot) === budgetSnapshotSignature(nextSnapshot)) return history;
+  if (lastSnapshot.total === nextSnapshot.total) return history;
+
+  return [...history, nextSnapshot];
+}
+
+function persistBudgetSnapshot(nextSnapshot: BudgetHistorySnapshot) {
+  try {
+    const history = budgetHistoryFromStorage(localStorage.getItem(BUDGET_HISTORY_STORAGE_KEY));
+    const nextHistory = appendBudgetSnapshotIfChanged(history, nextSnapshot);
+    if (nextHistory !== history) {
+      localStorage.setItem(BUDGET_HISTORY_STORAGE_KEY, JSON.stringify(nextHistory));
+    }
+  } catch {
+    // Keep the list UI usable even if budget history persistence is unavailable.
+  }
+}
 
 const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   {
@@ -107,6 +178,55 @@ function withCheckedState(checkedById: Record<string, boolean>, importedItems: B
   }));
 }
 
+function decodeBase64Url(value: string) {
+  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  return atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '='));
+}
+
+function encodeSignature(buffer: ArrayBuffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+async function hmacSignature(encodedPayload: string) {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(LIST_SHARE_PUBLIC_SECRET),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(encodedPayload));
+  return encodeSignature(signature);
+}
+
+async function verifyShareToken(token: string): Promise<ShareLinkState> {
+  const [encodedPayload, signature, extra] = token.split('.');
+  if (!encodedPayload || !signature || extra !== undefined) {
+    return { token, expiresAt: null, isExpired: false, isValid: false, error: 'Invalid read-only list link signature.' };
+  }
+
+  const expectedSignature = await hmacSignature(encodedPayload);
+  if (signature !== expectedSignature) {
+    return { token, expiresAt: null, isExpired: false, isValid: false, error: 'Invalid read-only list link signature.' };
+  }
+
+  const payload = JSON.parse(decodeBase64Url(encodedPayload)) as SignedSharePayload;
+  const expiresAt = typeof payload.expiresAt === 'string' ? payload.expiresAt : null;
+  const expiresAtMs = expiresAt ? Date.parse(expiresAt) : Number.POSITIVE_INFINITY;
+  const isExpired = Number.isFinite(expiresAtMs) && expiresAtMs <= Date.now();
+
+  return {
+    token,
+    expiresAt,
+    isExpired,
+    isValid: !isExpired,
+    error: isExpired ? 'This read-only shopping list link has expired.' : null
+  };
+}
+
 function persistCheckedState(items: ShoppingListItem[]) {
   try {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
@@ -130,20 +250,37 @@ function persistCheckedState(items: ShoppingListItem[]) {
 export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
+  const [shareLink, setShareLink] = useState<ShareLinkState | null>(null);
 
   useEffect(() => {
-    try {
-      const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
-      setItems(withCheckedState(checkedById, importedItems));
-    } finally {
-      setHasLoadedBrowserState(true);
+    let cancelled = false;
+
+    async function loadBrowserState() {
+      try {
+        const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
+        const token = new URLSearchParams(window.location.search).get('share');
+        if (token) {
+          const verifiedShare = await verifyShareToken(token);
+          if (!cancelled) setShareLink(verifiedShare);
+          if (!verifiedShare.isValid) return;
+        }
+        if (!cancelled) setItems(withCheckedState(checkedById, importedItems));
+      } finally {
+        if (!cancelled) setHasLoadedBrowserState(true);
+      }
     }
+
+    void loadBrowserState();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
-    if (!hasLoadedBrowserState) return;
+    if (!hasLoadedBrowserState || shareLink?.isValid) return;
     persistCheckedState(items);
-  }, [hasLoadedBrowserState, items]);
+  }, [hasLoadedBrowserState, items, shareLink?.isValid]);
 
   const toggleItemChecked = useCallback((itemId: string) => {
     setItems((currentItems) => currentItems.map((item) => (
@@ -169,6 +306,25 @@ export function useList() {
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
+  const budgetSnapshot = useMemo(() => ({
+    checkedCount,
+    remainingCount,
+    total: totalCount,
+    totalCount
+  }), [checkedCount, remainingCount, totalCount]);
+
+  useEffect(() => {
+    if (!hasLoadedBrowserState) return undefined;
+
+    const timeoutId = window.setTimeout(() => {
+      persistBudgetSnapshot({
+        ...budgetSnapshot,
+        savedAt: new Date().toISOString()
+      });
+    }, BUDGET_HISTORY_SAVE_DELAY_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [budgetSnapshot, hasLoadedBrowserState]);
 
   return {
     addImportedItems,
@@ -176,6 +332,7 @@ export function useList() {
     items,
     remainingCount,
     resetCheckedState,
+    shareLink,
     toggleItemChecked,
     totalCount
   };

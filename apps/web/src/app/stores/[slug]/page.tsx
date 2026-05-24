@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { StoreMap } from '@/components/StoreMap';
 import { osmStores } from '@/lib/osm-stores';
 import {
   findStore,
@@ -10,6 +11,7 @@ import {
   storePricePercentileRanks,
   storeUniverse
 } from '@/lib/verified-data';
+import { storePageViewScript } from '@/lib/analytics';
 import { metadataForStore } from '@/lib/seo';
 
 type ConfidenceLevel = 'high' | 'medium' | 'low';
@@ -110,6 +112,20 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
   };
 }
 
+function StoreDetailEmptyState() {
+  return (
+    <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 text-center">
+      <span aria-hidden="true" className="text-3xl">
+        🛒
+      </span>
+      <h3 className="mt-2 text-lg font-black text-slate-950">No branch products or deals yet</h3>
+      <p className="mt-1 text-sm font-semibold text-slate-700">
+        Check product and comparison pages for chain-level prices while store coverage fills in.
+      </p>
+    </div>
+  );
+}
+
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
   const store = findStore(slug);
@@ -128,9 +144,15 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
   const pricePercentileRank = storePricePercentileRankFor(store);
   const openingHoursLabel = storeOpeningHoursLabel(store);
   const assortmentOverview = storeAssortmentOverviewForStore(store);
+  const storeViewAnalyticsScript = storePageViewScript({
+    brand: store.brand,
+    storeName: store.name,
+    storeSlug: store.slug
+  });
 
   return (
     <PageShell>
+      <script dangerouslySetInnerHTML={{ __html: storeViewAnalyticsScript }} />
       <Eyebrow>OSM store record</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">{store.name}</h1>
       <p className="mt-3 text-lg text-slate-700">
@@ -157,6 +179,16 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
               </dd>
             </div>
           </dl>
+        </Card>
+        <Card className="lg:col-span-2">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-slate-500">Google Maps store pin</p>
+          <h2 className="mt-2 text-2xl font-black">Location map and directions</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            Embedded Google Maps uses the verified OSM latitude/longitude for this store and links out to turn-by-turn directions.
+          </p>
+          <div className="mt-4">
+            <StoreMap store={{ name: store.name, address: store.address, lat: store.lat, lng: store.lng }} />
+          </div>
         </Card>
         <Card>
           <h2 className="text-2xl font-black">Opening hours</h2>
@@ -200,7 +232,9 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
                 </div>
               ))}
             </div>
-          ) : null}
+          ) : (
+            <StoreDetailEmptyState />
+          )}
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-700">
             {assortmentOverview.guardrails.map((guardrail) => (
               <li key={guardrail}>{guardrail}</li>

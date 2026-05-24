@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateDealScore, calculateHistoricalDealScore, rankDealOpportunities, scoreBand } from '../index.js';
+import { calculateDealScore, calculateHistoricalDealScore, rankDealOpportunities, scoreBand, suggestFriendSharedDeals } from '../index.js';
 
 describe('calculateDealScore', () => {
   it('uses the MVP weighted formula and never accepts sponsored boosts', () => {
@@ -135,6 +135,85 @@ describe('rankDealOpportunities', () => {
     });
 
     assert.deepEqual(opportunities.map((deal) => deal.productId), ['milk']);
+  });
+});
+
+describe('suggestFriendSharedDeals', () => {
+  it('promotes opted-in household and friend shares without accepting stale or private signals', () => {
+    const suggestions = suggestFriendSharedDeals({
+      asOf: '2026-05-24T12:00:00.000Z',
+      deals: [
+        {
+          productId: 'coffee',
+          productName: 'Zoegas Coffee 450g',
+          storeId: 'willys-odenplan',
+          storeName: 'Willys Odenplan',
+          currentPrice: 49.9,
+          regularPrice: 69.9,
+          dealScore: 84,
+          sourceConfidence: 0.94
+        },
+        {
+          productId: 'butter',
+          productName: 'Butter 600g',
+          storeId: 'coop-odenplan',
+          storeName: 'Coop Odenplan',
+          currentPrice: 42.9,
+          regularPrice: 59.9,
+          dealScore: 88,
+          sourceConfidence: 0.93
+        },
+        {
+          productId: 'rice',
+          productName: 'Rice 1kg',
+          storeId: 'lidl-sveavagen',
+          storeName: 'Lidl Sveavägen',
+          currentPrice: 18.9,
+          regularPrice: 24.9,
+          dealScore: 86,
+          sourceConfidence: 0.92
+        }
+      ],
+      shares: [
+        {
+          productId: 'coffee',
+          sharedByDisplayName: 'Alex',
+          relationship: 'household',
+          sharedAt: '2026-05-24T08:00:00.000Z',
+          sourceConfidence: 0.99,
+          optedIn: true
+        },
+        {
+          productId: 'coffee',
+          sharedByDisplayName: 'Sam',
+          relationship: 'friend',
+          sharedAt: '2026-05-23T18:00:00.000Z',
+          sourceConfidence: 0.9,
+          optedIn: true
+        },
+        {
+          productId: 'butter',
+          sharedByDisplayName: 'No consent',
+          relationship: 'friend',
+          sharedAt: '2026-05-24T08:00:00.000Z',
+          sourceConfidence: 0.95,
+          optedIn: false
+        },
+        {
+          productId: 'rice',
+          sharedByDisplayName: 'Old share',
+          relationship: 'household',
+          sharedAt: '2026-04-01T08:00:00.000Z',
+          sourceConfidence: 0.95,
+          optedIn: true
+        }
+      ]
+    });
+
+    assert.deepEqual(suggestions.map((suggestion) => suggestion.productId), ['coffee']);
+    assert.equal(suggestions[0]?.socialSignals.length, 2);
+    assert.equal(suggestions[0]?.socialProofScore, 100);
+    assert.match(suggestions[0]?.suggestedReason ?? '', /Alex shared this household deal/);
   });
 });
 

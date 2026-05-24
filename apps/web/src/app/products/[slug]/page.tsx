@@ -16,11 +16,14 @@ import {
   type ItemSubstitutionProduct
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
+import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
+import { normalizeUnitPriceForPackageText, packageEvidenceFromText } from '@/lib/normalization';
 import { metadataForProduct } from '@/lib/seo';
 
 export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
@@ -91,18 +94,6 @@ function standardDeviationFor(values: number[]) {
 
 function latestObservationFor(product: (typeof pricedProducts)[number]) {
   return [...product.observations].sort((a, b) => b.date.localeCompare(a.date))[0];
-}
-
-function packageEvidenceFrom(text: string) {
-  const match = text.toLowerCase().replace(',', '.').match(/(\d+(?:\.\d+)?)\s*(kg|g|l|ml|st)\b/);
-  if (!match) return null;
-  const amount = Number(match[1]);
-  const unit = match[2];
-  if (!Number.isFinite(amount) || amount <= 0) return null;
-  if (unit === 'kg') return { packageSize: amount * 1000, packageUnit: 'g' };
-  if (unit === 'l') return { packageSize: amount * 1000, packageUnit: 'ml' };
-  if (unit === 'st') return { packageSize: amount, packageUnit: 'piece' };
-  return { packageSize: amount, packageUnit: unit };
 }
 
 function productPackageText(product: NonNullable<ReturnType<typeof findProduct>>) {
@@ -214,7 +205,7 @@ function brandTierFor(brand: string, labels: string[] = []): BrandTier {
 }
 
 function productMatchInputFor(product: NonNullable<ReturnType<typeof findProduct>>) {
-  const packageEvidence = packageEvidenceFrom(productPackageText(product));
+  const packageEvidence = packageEvidenceFromText(productPackageText(product));
   const unitPrice = productUnitPrice(product);
   if (!packageEvidence || unitPrice <= 0) return null;
   const brand = productBrand(product);
@@ -625,6 +616,60 @@ function priceTypicalRangeBandFor(product: NonNullable<ReturnType<typeof findPro
   };
 }
 
+function bestTimeToBuyCardsFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceIntelligenceScoreCard[] {
+  if ('lowestPrice' in product || product.observations.length < 3) return [];
+
+  const latest = latestObservationFor(product);
+  if (!latest) return [];
+
+  const latestTime = Date.parse(`${latest.date}T00:00:00.000Z`);
+  const windows = [
+    { id: '30d', title: 'Short-term window', rangeDays: 30 },
+    { id: '90d', title: 'Seasonal window', rangeDays: 90 },
+    { id: '365d', title: 'Annual window', rangeDays: 365 }
+  ];
+
+  return windows
+    .map((window) => {
+      const windowStart = latestTime - window.rangeDays * 24 * 60 * 60 * 1000;
+      const points = product.observations
+        .map((observation) => ({
+          observedAt: observation.date,
+          observedTime: Date.parse(`${observation.date}T00:00:00.000Z`),
+          price: observation.price
+        }))
+        .filter((observation) => Number.isFinite(observation.observedTime) && observation.observedTime >= windowStart && observation.observedTime <= latestTime)
+        .sort((a, b) => a.observedTime - b.observedTime);
+
+      if (points.length < 3) return null;
+
+      const baseline = points[0]!;
+      const latestPoint = points.at(-1)!;
+      const prices = points.map((point) => point.price);
+      const averagePrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+      const medianPrice = medianFor(prices) ?? latestPoint.price;
+      const volatility = standardDeviationFor(prices) ?? 0;
+      const volatilityPercent = averagePrice > 0 ? (volatility / averagePrice) * 100 : 0;
+      const trendSlopePercent = baseline.price > 0 ? ((latestPoint.price - baseline.price) / baseline.price) * 100 : 0;
+      const belowMedianPercent = medianPrice > 0 ? ((medianPrice - latestPoint.price) / medianPrice) * 100 : 0;
+      const score = Math.round(clamp(58 + belowMedianPercent * 2 - Math.max(trendSlopePercent, 0) * 1.2 - volatilityPercent * 0.9, 0, 100));
+      const actionLabel = score >= 75 ? 'Buy now' : score >= 55 ? 'Watch closely' : 'Wait';
+
+      return {
+        id: window.id,
+        title: window.title,
+        score,
+        scoreLabel: score >= 75 ? 'strong buy window' : score >= 55 ? 'fair buy window' : 'weak buy window',
+        actionLabel,
+        windowLabel: `${window.rangeDays}-day observed window`,
+        trendSlopeLabel: formatPct(trendSlopePercent),
+        volatilityLabel: formatPct(volatilityPercent),
+        detail: `Latest price ${formatSek(latestPoint.price)} on ${latestPoint.observedAt}; score blends trend slope, median discount, and volatility from ${points.length} dated observations.`
+      };
+    })
+    .filter((card): card is PriceIntelligenceScoreCard => card !== null);
+}
+
 function priceChangeEventLogFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   if ('lowestPrice' in product || product.observations.length < 2) {
     return {
@@ -695,6 +740,71 @@ function priceChangeEventLogFor(product: NonNullable<ReturnType<typeof findProdu
     priceChangeEvents,
     observationCount: orderedPoints.length,
     detail: `Every event compares consecutive dated observations from the product's own price tape. No forecast or seasonal prediction is shown.`
+  };
+}
+
+function bestTimeToBuyScoreCardsFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product || product.observations.length < 3) {
+    return {
+      cards: [] as PriceIntelligenceScoreCard[],
+      summary: 'Best-time-to-buy scoring needs at least three dated OpenPrices observations before it can combine trend slope with volatility.',
+      emptyState: 'Not enough dated OpenPrices observations exist to score likely buying windows for this product.'
+    };
+  }
+
+  const orderedPoints = product.observations
+    .map((observation) => ({
+      observedAt: observation.date,
+      observedTime: Date.parse(`${observation.date}T00:00:00.000Z`),
+      price: observation.price
+    }))
+    .filter((observation) => Number.isFinite(observation.observedTime) && Number.isFinite(observation.price))
+    .sort((a, b) => a.observedTime - b.observedTime);
+
+  if (orderedPoints.length < 3) {
+    return {
+      cards: [] as PriceIntelligenceScoreCard[],
+      summary: 'Best-time-to-buy scoring needs at least three valid dated observations before rendering a score.',
+      emptyState: 'The dated price tape is too sparse to score a buying window.'
+    };
+  }
+
+  const latest = orderedPoints.at(-1)!;
+  const prices = orderedPoints.map((point) => point.price);
+  const medianPrice = medianFor(prices) ?? latest.price;
+  const volatility = standardDeviationFor(prices) ?? 0;
+  const volatilityPercent = medianPrice > 0 ? clamp((volatility / medianPrice) * 100, 0, 999) : 0;
+  const scoreCardForWindow = (rangeDays: number, title: string): PriceIntelligenceScoreCard => {
+    const windowStart = latest.observedTime - rangeDays * 24 * 60 * 60 * 1000;
+    const windowPoints = orderedPoints.filter((point) => point.observedTime >= windowStart && point.observedTime <= latest.observedTime);
+    const baseline = windowPoints[0] ?? orderedPoints[0]!;
+    const trendSlopePercent = baseline.price > 0 ? ((latest.price - baseline.price) / baseline.price) * 100 : 0;
+    const belowMedianPercent = medianPrice > 0 ? ((medianPrice - latest.price) / medianPrice) * 100 : 0;
+    const score = Math.round(clamp(58 + belowMedianPercent * 2 - Math.max(trendSlopePercent, 0) * 1.2 - volatilityPercent * 0.9, 0, 100));
+    const actionLabel = score >= 75 ? 'Buy now' : score >= 55 ? 'Watch closely' : 'Wait';
+    const windowLabel = score >= 75 ? 'Likely best window: this week' : score >= 55 ? 'Likely window: next 1–2 weeks' : 'Wait for a better observed dip';
+
+    return {
+      id: `${rangeDays}-day-window`,
+      title,
+      score,
+      scoreLabel: score >= 75 ? 'strong buy window' : score >= 55 ? 'fair buy window' : 'weak buy window',
+      actionLabel,
+      windowLabel,
+      trendSlopeLabel: `${formatPct(trendSlopePercent)} over ${Math.max(1, windowPoints.length)} observed point(s)`,
+      volatilityLabel: `${formatPct(volatilityPercent)} observed volatility`,
+      detail: `Latest price ${formatSek(latest.price)} on ${latest.observedAt}; score combines trend slope, current price versus median ${formatSek(medianPrice)}, and volatility. No forecast is inferred.`
+    };
+  };
+
+  return {
+    cards: [
+      scoreCardForWindow(30, '30-day buy window'),
+      scoreCardForWindow(90, '90-day buy window'),
+      scoreCardForWindow(365, '365-day buy window')
+    ],
+    summary: 'Likely optimal buying windows are scored from the product’s own dated OpenPrices trend slope and volatility, then labelled as buy, watch, or wait.',
+    emptyState: 'Not enough dated OpenPrices observations exist to score likely buying windows for this product.'
   };
 }
 
@@ -1011,14 +1121,18 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
   const latestObservedAt = latestObservationFor(product)?.date ?? product.lastObservedAt;
   const asOf = `${latestObservedAt}T00:00:00.000Z`;
   const sourceConfidence = clamp(product.observationCount / 30, 0, 1);
+  const packageText = productPackageText(product);
+  const sampleNormalizedPrice = normalizeUnitPriceForPackageText(product.priceMedian, packageText);
+  const comparableUnit = sampleNormalizedPrice?.comparableUnit;
+  const formatTrendValue = (value: number) => comparableUnit ? formatComparableUnitPrice(value, comparableUnit) : formatSek(value);
   const observations = product.observations.map((observation) => ({
     observedAt: `${observation.date}T00:00:00.000Z`,
-    price: observation.price,
+    price: normalizeUnitPriceForPackageText(observation.price, packageText)?.value ?? observation.price,
     storeId: 'openprices-community',
     storeName: 'OpenPrices community',
     sourceType: 'online' as const,
     confidence: sourceConfidence,
-    provenanceLabel: `${product.observationCount} OpenPrices observations · ${product.code}`
+    provenanceLabel: `${product.observationCount} OpenPrices observations · ${product.code}${comparableUnit ? ` · normalized to ${comparableUnit}` : ''}`
   }));
 
   const windows = timeframeWindows.map((window): PriceChartTerminalWindow => {
@@ -1039,20 +1153,22 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
       windowEnd: result.windowEnd,
       pointCount: points.length,
       markerCount: result.series.reduce((total, series) => total + series.markers.length, 0),
-      latestValueLabel: latestPoint ? formatSek(latestPoint.value) : 'Not reported',
+      latestValueLabel: latestPoint ? formatTrendValue(latestPoint.value) : 'Not reported',
       latestObservedAt: latestPoint?.time,
-      lowValueLabel: values.length ? formatSek(Math.min(...values)) : 'Not reported',
-      highValueLabel: values.length ? formatSek(Math.max(...values)) : 'Not reported',
+      lowValueLabel: values.length ? formatTrendValue(Math.min(...values)) : 'Not reported',
+      highValueLabel: values.length ? formatTrendValue(Math.max(...values)) : 'Not reported',
       series: result.series
     };
   });
 
   return {
     available: windows.some((window) => window.pointCount > 0),
-    title: 'Multi-timeframe OpenPrices tape',
-    sourceLabel: 'buildPriceChartSeries · OpenPrices community observations',
+    title: comparableUnit ? `Multi-timeframe OpenPrices tape · normalized per ${comparableUnit}` : 'Multi-timeframe OpenPrices tape',
+    sourceLabel: comparableUnit ? `buildPriceChartSeries · OpenPrices community observations · normalized unit price per ${comparableUnit}` : 'buildPriceChartSeries · OpenPrices community observations',
     confidenceLabel: `${formatPct(sourceConfidence * 100)} chart confidence`,
-    caveat: 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred.',
+    caveat: comparableUnit
+      ? `Every plotted point comes from dated OpenPrices observations normalized by package size (${packageText}) to a unit price per ${comparableUnit}; missing shelf, flyer, and member prices are disclosed instead of inferred.`
+      : 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred.',
     defaultWindow: windows.find((window) => window.label === '1Y' && window.pointCount > 0)?.label ?? 'ALL',
     windows
   };
@@ -1067,6 +1183,25 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const product = findProduct(slug);
   if (!product) notFound();
   const isChain = 'lowestPrice' in product;
+  const primaryEvidenceCount = isChain ? chainPriceRows(product).length : product.observations.length;
+  if (primaryEvidenceCount === 0) {
+    const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
+    return (
+      <PageShell>
+        <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
+        <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
+        <Card className="mt-6 border-dashed border-slate-300 bg-slate-50 text-center">
+          <div aria-hidden="true" className="mx-auto flex size-14 items-center justify-center rounded-full bg-white text-3xl shadow-sm">
+            🛒
+          </div>
+          <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950">No verified product, deal, or store evidence yet for {product.name}</h1>
+          <Link className="mt-4 inline-flex rounded-full bg-emerald-800 px-5 py-3 text-sm font-black text-white" href="/products">
+            Browse verified products while we wait for store data.
+          </Link>
+        </Card>
+      </PageShell>
+    );
+  }
   const dealVerdict = dealScoreVerdictFor(product);
   const smartSwaps = smartSwapRecommendationsFor(product);
   const itemSubstitutions = itemSubstitutionSuggestionsFor(product);
@@ -1074,7 +1209,9 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceHistoryRangeBadges = priceHistoryRangeBadgesFor(product);
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
   const typicalRangeBand = priceTypicalRangeBandFor(product);
+  const bestTimeToBuyCards = bestTimeToBuyCardsFor(product);
   const priceChangeLog = priceChangeEventLogFor(product);
+  const bestTimeToBuyScoreCards = bestTimeToBuyScoreCardsFor(product);
   const priceMoveNotes = priceMoveNotesFor(product);
   const monthlySeasonality = seasonalMonthlyAveragesFor(product);
   const seasonalSalePattern = seasonalSalePatternFor(product);
@@ -1204,6 +1341,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{dealVerdict.evidence}</p>
         </div>
       </Card>
+      <PriceIntelligenceCard cards={bestTimeToBuyCards} />
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
@@ -1232,6 +1370,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         )}
         <p className="mt-4 text-xs font-semibold text-slate-500">{smartSwaps.caveat}</p>
       </Card>
+      <PriceIntelligenceCard cards={bestTimeToBuyScoreCards.cards} emptyState={bestTimeToBuyScoreCards.emptyState} summary={bestTimeToBuyScoreCards.summary} />
       <Card className="mt-6 border-amber-200 bg-amber-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>

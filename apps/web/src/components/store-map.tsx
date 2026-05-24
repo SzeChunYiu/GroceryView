@@ -5,6 +5,7 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
+import { trackStoreDirectionsClick } from '@/lib/analytics';
 
 // Free, no-API-key vector tiles (© OpenMapTiles / OpenFreeMap, data © OSM).
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
@@ -77,6 +78,28 @@ function escapeHtml(value: string): string {
     .replace(/"/g, '&quot;');
 }
 
+function distanceKm(from: [number, number], to: [number, number]): number {
+  const earthRadiusKm = 6371;
+  const toRad = (degrees: number) => (degrees * Math.PI) / 180;
+  const dLat = toRad(to[1] - from[1]);
+  const dLng = toRad(to[0] - from[0]);
+  const lat1 = toRad(from[1]);
+  const lat2 = toRad(to[1]);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  return 2 * earthRadiusKm * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function formatDistance(km: number): string {
+  if (km < 1) return `${Math.round(km * 1000)} m`;
+  return `${km.toFixed(km < 10 ? 1 : 0)} km`;
+}
+
+function storeOpenHoursLabel(store: OsmStore & { openingHours?: string; opening_hours?: string }): string {
+  return store.openingHours || store.opening_hours || 'Open-hours data not published in current OSM snapshot';
+}
+
 function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
   return {
     type: 'FeatureCollection',
@@ -96,6 +119,7 @@ function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
           color: chainIndexColor(chainIndexScore(s.brand || ''), chainColor(s.brand || '')),
           lat: s.lat,
           lng: s.lng,
+          openHours: storeOpenHoursLabel(s),
         },
       })),
   };
@@ -158,6 +182,18 @@ export function StoreMap() {
 
     const data = toFeatureCollection();
     setStoreCount(data.features.length);
+
+    const handleDirectionsClick = (event: MouseEvent) => {
+      const directionsLink = (event.target as HTMLElement | null)?.closest<HTMLAnchorElement>('a[data-store-directions]');
+      if (!directionsLink) return;
+
+      trackStoreDirectionsClick({
+        brand: directionsLink.dataset.storeBrand ?? '',
+        storeName: directionsLink.dataset.storeName ?? '',
+        storeSlug: directionsLink.dataset.storeSlug ?? ''
+      });
+    };
+    containerRef.current.addEventListener('click', handleDirectionsClick);
 
     const map = new maplibregl.Map({
       container: containerRef.current,
@@ -255,9 +291,43 @@ export function StoreMap() {
         const feature = map.queryRenderedFeatures(e.point, { layers: ['clusters'] })[0];
         if (!feature) return;
         const clusterId = feature.properties?.cluster_id;
+        if (typeof clusterId !== 'number') return;
         const source = map.getSource('stores') as maplibregl.GeoJSONSource;
-        source.getClusterExpansionZoom(clusterId).then((zoom) => {
-          const [lng, lat] = (feature.geometry as GeoJSON.Point).coordinates;
+        const [lng, lat] = (feature.geometry as GeoJSON.Point).coordinates;
+        const mapCenter = map.getCenter();
+        const clusterCenter: [number, number] = [lng, lat];
+        Promise.all([
+          source.getClusterExpansionZoom(clusterId),
+          source.getClusterLeaves(clusterId, 5, 0),
+        ]).then(([zoom, leaves]) => {
+          const radius = leaves.reduce((max, leaf) => {
+            const coordinates = (leaf.geometry as GeoJSON.Point).coordinates as [number, number];
+            return Math.max(max, distanceKm(clusterCenter, coordinates));
+          }, 0);
+          const list = leaves
+            .map((leaf) => {
+              const p = leaf.properties as Record<string, string | number | undefined>;
+              const coordinates = (leaf.geometry as GeoJSON.Point).coordinates as [number, number];
+              const distance = formatDistance(distanceKm(clusterCenter, coordinates));
+              return `<li style="margin-top:6px">
+                <strong>${escapeHtml(String(p.name ?? 'Store'))}</strong>
+                <div style="color:#64748b">${distance} from cluster center · ${escapeHtml(String(p.openHours ?? 'Open-hours unavailable'))}</div>
+              </li>`;
+            })
+            .join('');
+          popup
+            .setLngLat(clusterCenter)
+            .setHTML(
+              `<div style="font-family:inherit;min-width:220px">
+                <strong style="font-size:14px">${Number(feature.properties?.point_count ?? leaves.length).toLocaleString()} stores nearby</strong>
+                <div style="font-size:12px;color:#475569;margin-top:2px">
+                  ${formatDistance(distanceKm([mapCenter.lng, mapCenter.lat], clusterCenter))} from map center · ${formatDistance(radius)} visible sample radius
+                </div>
+                <ul style="font-size:12px;list-style:none;margin:8px 0 0;padding:0">${list}</ul>
+                <div style="font-size:11px;color:#64748b;margin-top:8px">Click zooms into the cluster; hours are shown only when source data provides them.</div>
+              </div>`,
+            )
+            .addTo(map);
           map.easeTo({ center: [lng, lat], zoom });
         });
       });
@@ -266,11 +336,12 @@ export function StoreMap() {
       map.on('click', 'store-points', (e) => {
         const f = e.features?.[0];
         if (!f) return;
-        const p = f.properties as Record<string, string>;
+        const p = f.properties as Record<string, string | number | undefined>;
         setSelectedStoreSlug(String(p.slug ?? ''));
         const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
         const directions = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-        const where = [escapeHtml(p.address || ''), escapeHtml(p.district || '')]
+        const mapCenter = map.getCenter();
+        const where = [escapeHtml(String(p.address || '')), escapeHtml(String(p.district || ''))]
           .filter(Boolean)
           .join(' · ');
         popup
@@ -278,13 +349,16 @@ export function StoreMap() {
           .setHTML(
             `<div style="font-family:inherit;min-width:180px">
                <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-                 <span style="width:10px;height:10px;border-radius:50%;background:${escapeHtml(p.color)};display:inline-block"></span>
-                 <strong style="font-size:14px">${escapeHtml(p.name)}</strong>
+                 <span style="width:10px;height:10px;border-radius:50%;background:${escapeHtml(String(p.color || OTHER_COLOR))};display:inline-block"></span>
+                 <strong style="font-size:14px">${escapeHtml(String(p.name || 'Store'))}</strong>
                </div>
-              <div style="font-size:12px;color:#475569">${escapeHtml(p.brand)} · ${escapeHtml(p.format)}</div>
+              <div style="font-size:12px;color:#475569">${escapeHtml(String(p.brand || 'Other'))} · ${escapeHtml(String(p.format || 'store'))}</div>
                ${p.chainIndex ? `<div style="font-size:12px;color:#475569;margin-top:2px">Chain index ${Number(p.chainIndex).toFixed(1)} (100 = market)</div>` : ''}
                ${where ? `<div style="font-size:12px;color:#64748b;margin-top:2px">${where}</div>` : ''}
+               <div style="font-size:12px;color:#64748b;margin-top:2px">${formatDistance(distanceKm([mapCenter.lng, mapCenter.lat], [lng, lat]))} from map center</div>
+               <div style="font-size:12px;color:#64748b;margin-top:2px">Hours: ${escapeHtml(String(p.openHours || 'Open-hours unavailable'))}</div>
                <a href="${directions}" target="_blank" rel="noopener noreferrer"
+                  data-store-directions="true" data-store-slug="${escapeHtml(p.slug || '')}" data-store-name="${escapeHtml(p.name || '')}" data-store-brand="${escapeHtml(p.brand || '')}"
                   style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#1D8649">
                   Directions →</a>
              </div>`,
@@ -299,6 +373,7 @@ export function StoreMap() {
     });
 
     return () => {
+      containerRef.current?.removeEventListener('click', handleDirectionsClick);
       mapRef.current = null;
       map.remove();
     };

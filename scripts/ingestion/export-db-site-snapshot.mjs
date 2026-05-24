@@ -485,6 +485,58 @@ export function buildDbSiteMathemProducts(rows) {
     .sort((left, right) => left.name.localeCompare(right.name, 'sv') || left.price - right.price);
 }
 
+export function buildDbSiteCompareStoreCapabilities(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) return [];
+
+  const byChain = new Map();
+  for (const row of rows) {
+    const chainId = String(row.chainSlug ?? '').trim();
+    if (!chainId || !row.observedAt) continue;
+    const current = byChain.get(chainId) ?? {
+      chainId,
+      coupon: false,
+      delivery: false,
+      pickup: false,
+      evidenceUpdatedAt: row.observedAt,
+      productRows: 0,
+      couponRows: 0,
+      onlineRows: 0,
+      storeRows: 0
+    };
+    current.productRows += 1;
+    if (row.memberRequired === true || row.priceType === 'member' || row.priceType === 'promotion') {
+      current.coupon = true;
+      current.couponRows += 1;
+    }
+    if (row.priceType === 'online') {
+      current.delivery = true;
+      current.onlineRows += 1;
+    }
+    if (row.storeExternalRef || row.storeSlug) {
+      current.pickup = true;
+      current.storeRows += 1;
+    }
+    if (row.observedAt.localeCompare(current.evidenceUpdatedAt) > 0) current.evidenceUpdatedAt = row.observedAt;
+    byChain.set(chainId, current);
+  }
+
+  return [...byChain.values()]
+    .map((row) => ({
+      chainId: row.chainId,
+      coupon: row.coupon,
+      delivery: row.delivery,
+      pickup: row.pickup,
+      evidenceLabel: [
+        `${row.productRows} observed price rows`,
+        row.couponRows > 0 ? `${row.couponRows} member/promotion rows` : null,
+        row.onlineRows > 0 ? `${row.onlineRows} online rows` : null,
+        row.storeRows > 0 ? `${row.storeRows} store rows` : null
+      ].filter(Boolean).join(' · '),
+      evidenceUpdatedAt: row.evidenceUpdatedAt
+    }))
+    .sort((left, right) => left.chainId.localeCompare(right.chainId, 'sv'));
+}
+
 export function renderDbSiteProductsModule({ generatedAt, rows }) {
   const products = buildDbSiteAxfoodProducts(rows);
   return [
@@ -518,6 +570,7 @@ export function renderDbSiteIngestedOverridesModule({ generatedAt, rows }) {
   const lidlStoreOffers = buildDbSiteLidlStoreOffers(rows);
   const icaReklambladOffers = buildDbSiteIcaReklambladOffers(rows);
   const mathemProducts = buildDbSiteMathemProducts(rows);
+  const compareStoreCapabilities = buildDbSiteCompareStoreCapabilities(rows);
   return [
     '// AUTO-GENERATED from postgres.latest_prices/observations by scripts/ingestion/export-db-site-snapshot.mjs.',
     `// Generated at: ${generatedAt}`,
@@ -525,10 +578,20 @@ export function renderDbSiteIngestedOverridesModule({ generatedAt, rows }) {
     `// Lidl-compatible row count: ${lidlStoreOffers.length}`,
     `// ICA flyer-compatible row count: ${icaReklambladOffers.length}`,
     `// Mathem-compatible row count: ${mathemProducts.length}`,
+    `// Compare store capability row count: ${compareStoreCapabilities.length}`,
     "import type { IcaReklambladIngestedOffer } from '../ingested/ica-reklamblad';",
     "import type { LidlIngestedStoreOffer } from '../ingested/lidl';",
     "import type { MathemIngestedProduct } from '../ingested/mathem';",
     "import type { MatpriskollenIngestedOffer } from '../ingested/matpriskollen';",
+    '',
+    'export type DbSiteCompareStoreCapability = {',
+    '  chainId: string;',
+    '  coupon: boolean;',
+    '  delivery: boolean;',
+    '  pickup: boolean;',
+    '  evidenceLabel: string;',
+    '  evidenceUpdatedAt: string | null;',
+    '};',
     '',
     `export const dbSiteIngestedOverridesGeneratedAt = ${JSON.stringify(generatedAt)};`,
     '',
@@ -536,6 +599,7 @@ export function renderDbSiteIngestedOverridesModule({ generatedAt, rows }) {
     `export const dbSiteLidlStoreOffers: LidlIngestedStoreOffer[] = ${JSON.stringify(lidlStoreOffers, null, 2)};`,
     `export const dbSiteIcaReklambladOffers: IcaReklambladIngestedOffer[] = ${JSON.stringify(icaReklambladOffers, null, 2)};`,
     `export const dbSiteMathemProducts: MathemIngestedProduct[] = ${JSON.stringify(mathemProducts, null, 2)};`,
+    `export const dbSiteCompareStoreCapabilities: DbSiteCompareStoreCapability[] = ${JSON.stringify(compareStoreCapabilities, null, 2)};`,
     '',
     `export const dbSiteMatpriskollenSource = ${JSON.stringify({ source: 'postgres.latest_prices/observations Matpriskollen-compatible export', retrievedAt: generatedAt, rowCount: matpriskollenOffers.length }, null, 2)} as const;`,
     `export const dbSiteLidlSource = ${JSON.stringify({ source: 'postgres.latest_prices/observations Lidl-compatible export', retrievedAt: generatedAt, rowCount: lidlStoreOffers.length }, null, 2)} as const;`,

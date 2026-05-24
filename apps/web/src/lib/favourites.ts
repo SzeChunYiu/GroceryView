@@ -64,6 +64,39 @@ export function serializeFavouriteProductEntries(entries: readonly FavouriteProd
   })));
 }
 
+type FavouriteProductStorage = Pick<Storage, 'getItem' | 'setItem'> | null | undefined;
+
+function getFavouriteProductStorage(): FavouriteProductStorage {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+export function readFavouriteProductEntries(storage: FavouriteProductStorage = getFavouriteProductStorage()): FavouriteProductEntry[] {
+  if (!storage) return [];
+  try {
+    return parseFavouriteProductEntries(storage.getItem(FAVOURITES_STORAGE_KEY));
+  } catch {
+    return [];
+  }
+}
+
+export function saveFavouriteProductEntries(
+  entries: readonly FavouriteProductEntry[],
+  storage: FavouriteProductStorage = getFavouriteProductStorage()
+): boolean {
+  if (!storage) return false;
+  try {
+    storage.setItem(FAVOURITES_STORAGE_KEY, serializeFavouriteProductEntries(entries));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function isFavouriteProduct(entries: readonly FavouriteProductEntry[], slug: string): boolean {
   return entries.some((entry) => entry.slug === slug);
 }

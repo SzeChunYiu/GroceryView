@@ -82,6 +82,7 @@ describe('buildOpenApiDocument', () => {
       '/api/readiness/source-runs',
       '/api/receipts/review',
       '/api/retailers',
+      '/api/scans/history',
       '/api/scans/process',
       '/api/scans/upload-url',
       '/api/settings/account',
@@ -156,6 +157,8 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/settings/data-export'].get?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/settings/data-export'].get?.summary ?? '', /download my data|data export/i);
     assert.deepEqual(doc.paths['/api/pantry/replenishment'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/scans/history'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/scans/history'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/scans/process'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/scans/upload-url'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/metrics/notifications'].get?.security, [{ metricsToken: [] }]);

@@ -169,6 +169,24 @@ export type BasketImportReviewDecisionRequest = {
   quantity?: number;
 };
 
+export type OcrScanHistoryItem = {
+  scanId: string;
+  kind: 'receipt';
+  capturedAt: string;
+  status: string;
+  itemCount?: number;
+  totalAmount?: number;
+  confidence?: number;
+  lowConfidenceRows: string[];
+};
+
+export type OcrScanHistoryReport = {
+  userId: string;
+  itemCount: number;
+  items: OcrScanHistoryItem[];
+  guardrails: string[];
+};
+
 export type ProductCheapestNowChainPrice = {
   chain: string;
   storeId: string;
@@ -2381,6 +2399,81 @@ function normalizeSubscriptionEntitlement(input: SubscriptionEntitlementSnapshot
   };
 }
 
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function requiredHistoryString(record: Record<string, unknown>, key: string): string {
+  const value = record[key];
+  if (typeof value !== 'string' || value.trim() === '') throw new Error(`${key} is required`);
+  return value;
+}
+
+function optionalHistoryString(record: Record<string, unknown>, key: string): string | undefined {
+  const value = record[key];
+  if (value === undefined) return undefined;
+  if (typeof value !== 'string') throw new Error(`${key} must be a string`);
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+}
+
+function optionalHistoryNonNegativeNumber(record: Record<string, unknown>, key: string): number | undefined {
+  const value = record[key];
+  if (value === undefined) return undefined;
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) throw new Error(`${key} must be a non-negative number`);
+  return value;
+}
+
+function optionalHistoryStringArray(record: Record<string, unknown>, key: string): string[] | undefined {
+  const value = record[key];
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) throw new Error(`${key} must be an array`);
+  return value.map((item, index) => {
+    if (typeof item !== 'string' || item.trim() === '') throw new Error(`${key}[${index}] is required`);
+    return item;
+  });
+}
+
+function normalizeOcrScanHistoryItem(input: unknown, now: string): OcrScanHistoryItem {
+  requireIsoTimestamp(now, 'now');
+  if (!isPlainRecord(input)) throw new Error('scan history item must be an object');
+  if (input.kind !== undefined && input.kind !== 'receipt') throw new Error('OCR scan history only supports receipt scans');
+  const result = isPlainRecord(input.result) ? input.result : undefined;
+  const rows = result && Array.isArray(result.rows) ? result.rows : undefined;
+  const itemCount = optionalHistoryNonNegativeNumber(input, 'itemCount') ?? (result ? optionalHistoryNonNegativeNumber(result, 'itemCount') : undefined) ?? rows?.length;
+  const totalAmount = optionalHistoryNonNegativeNumber(input, 'totalAmount') ?? (result ? optionalHistoryNonNegativeNumber(result, 'totalAmount') : undefined);
+  const confidence = optionalHistoryNonNegativeNumber(input, 'confidence') ?? (result ? optionalHistoryNonNegativeNumber(result, 'confidence') : undefined);
+  return {
+    scanId: requiredHistoryString(input, 'scanId'),
+    kind: 'receipt',
+    capturedAt: requireIsoTimestamp(
+      optionalHistoryString(input, 'capturedAt') ??
+        optionalHistoryString(input, 'uploadedAt') ??
+        optionalHistoryString(input, 'processedAt') ??
+        now,
+      'capturedAt'
+    ),
+    status: optionalHistoryString(input, 'status') ?? (result ? optionalHistoryString(result, 'status') : undefined) ?? 'saved',
+    ...(itemCount !== undefined ? { itemCount } : {}),
+    ...(totalAmount !== undefined ? { totalAmount } : {}),
+    ...(confidence !== undefined ? { confidence } : {}),
+    lowConfidenceRows: optionalHistoryStringArray(input, 'lowConfidenceRows') ?? (result ? optionalHistoryStringArray(result, 'lowConfidenceRows') : undefined) ?? []
+  };
+}
+
+function buildOcrScanHistoryReport(userId: string, items: OcrScanHistoryItem[]): OcrScanHistoryReport {
+  return {
+    userId,
+    itemCount: items.length,
+    items: [...items],
+    guardrails: [
+      'OCR scan history is account-scoped and only available after the server verifies an active premium entitlement.',
+      'Only receipt OCR summaries are stored; raw receipt images or OCR payload text must remain in private scan storage.',
+      'Canceled, past-due, expired, or missing entitlements must fail closed before reads or writes.'
+    ]
+  };
+}
+
 function sortPricesByValue(prices: StorePrice[]) {
   return [...prices].sort((left, right) => left.price - right.price || left.storeName.localeCompare(right.storeName));
 }
@@ -2473,14 +2566,39 @@ function comparableUnitBasis(product: ProductDetail): { quantity: number; unit: 
   return { quantity: referencePrice / referenceUnitPrice, unit: match[2]! };
 }
 
+function normalizeComparableUnit(unitPrice: number, unit: string): { unitPrice: number; unit: string } | null {
+  const normalized = unit.trim().toLowerCase().replace(/^kr\s*\/\s*/, '').replace(',', '.');
+  const match = normalized.match(/^(?:(\d+(?:\.\d+)?)\s*)?(kg|kilogram|g|gram|l|liter|litre|ml|milliliter|millilitre|st|pcs|pc|piece|pieces|each)$/);
+  if (!match || !Number.isFinite(unitPrice) || unitPrice <= 0) return null;
+
+  const amount = match[1] ? Number(match[1]) : 1;
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+
+  const parsedUnit = match[2]!;
+  if (parsedUnit === 'kg' || parsedUnit === 'kilogram') return { unitPrice: unitPrice / amount, unit: 'kg' };
+  if (parsedUnit === 'g' || parsedUnit === 'gram') return { unitPrice: unitPrice * (1000 / amount), unit: 'kg' };
+  if (parsedUnit === 'l' || parsedUnit === 'liter' || parsedUnit === 'litre') return { unitPrice: unitPrice / amount, unit: 'l' };
+  if (parsedUnit === 'ml' || parsedUnit === 'milliliter' || parsedUnit === 'millilitre') return { unitPrice: unitPrice * (1000 / amount), unit: 'l' };
+  return { unitPrice: unitPrice / amount, unit: 'st' };
+}
+
 function comparableUnitPrice(product: ProductDetail, packagePrice: number): number {
-  const { quantity } = comparableUnitBasis(product);
-  return roundPrice(packagePrice / quantity);
+  const { quantity, unit } = comparableUnitBasis(product);
+  const unitPrice = packagePrice / quantity;
+  return roundPrice(normalizeComparableUnit(unitPrice, unit)?.unitPrice ?? unitPrice);
+}
+
+function compareCheapestUnit(left: ProductCheapestNowChainPrice, right: ProductCheapestNowChainPrice): number {
+  return left.comparableUnitPrice - right.comparableUnitPrice ||
+    left.packagePrice - right.packagePrice ||
+    left.chain.localeCompare(right.chain) ||
+    left.storeName.localeCompare(right.storeName);
 }
 
 function cheapestByChain(product: ProductDetail): ProductCheapestNowChainPrice[] {
   const byChain = new Map<string, ProductCheapestNowChainPrice>();
   const { unit } = comparableUnitBasis(product);
+  const normalizedUnit = normalizeComparableUnit(1, unit)?.unit ?? unit;
   for (const price of product.currentPrices) {
     const store = storeForId(price.storeId);
     if (!store) continue;
@@ -2490,14 +2608,14 @@ function cheapestByChain(product: ProductDetail): ProductCheapestNowChainPrice[]
       storeName: price.storeName,
       packagePrice: roundPrice(price.price),
       comparableUnitPrice: comparableUnitPrice(product, price.price),
-      comparableUnit: unit
+      comparableUnit: normalizedUnit
     };
     const current = byChain.get(store.chain);
-    if (!current || row.packagePrice < current.packagePrice || (row.packagePrice === current.packagePrice && row.storeName.localeCompare(current.storeName) < 0)) {
+    if (!current || compareCheapestUnit(row, current) < 0) {
       byChain.set(store.chain, row);
     }
   }
-  return [...byChain.values()].sort((left, right) => left.packagePrice - right.packagePrice || left.chain.localeCompare(right.chain));
+  return [...byChain.values()].sort(compareCheapestUnit);
 }
 
 function confidenceLabel(confidence: number): ProductLatestPriceConfidence {
@@ -2568,6 +2686,9 @@ export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]
       continue;
     }
 
+    const normalizedUnit = normalizeComparableUnit(row.unitPrice, row.comparableUnit);
+    if (!normalizedUnit) continue;
+
     observedPriceCount += 1;
     if (row.observedAt) observedAtValues.push(row.observedAt);
     const candidate: ProductCheapestNowChainPrice = {
@@ -2575,20 +2696,16 @@ export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]
       storeId: row.storeSlug,
       storeName: row.storeName,
       packagePrice: roundPrice(row.price),
-      comparableUnitPrice: roundPrice(row.unitPrice),
-      comparableUnit: row.comparableUnit
+      comparableUnitPrice: roundPrice(normalizedUnit.unitPrice),
+      comparableUnit: normalizedUnit.unit
     };
     const current = byChain.get(row.chainSlug);
-    if (
-      !current ||
-      candidate.packagePrice < current.packagePrice ||
-      (candidate.packagePrice === current.packagePrice && candidate.storeName.localeCompare(current.storeName) < 0)
-    ) {
+    if (!current || compareCheapestUnit(candidate, current) < 0) {
       byChain.set(row.chainSlug, candidate);
     }
   }
 
-  const chainPrices = [...byChain.values()].sort((left, right) => left.packagePrice - right.packagePrice || left.chain.localeCompare(right.chain));
+  const chainPrices = [...byChain.values()].sort(compareCheapestUnit);
 
   return {
     productId: product.productId,
@@ -2602,8 +2719,8 @@ export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]
     lastObservedAt: observedAtValues.sort().at(-1) ?? null,
     guardrails: [
       'Cheapest-now rows are calculated only from persisted latest_prices observations for the requested product.',
-      'Rows with missing or non-positive package/unit prices are excluded instead of treated as current offers.',
-      'Each chain contributes at most one current lowest package price, preserving the store that supplied it.',
+      'Rows with missing, unsupported, or non-positive package/unit prices are excluded instead of treated as current offers.',
+      'Each chain contributes at most one current lowest normalized unit price, preserving the store that supplied it.',
       'No missing chain or product prices are filled with synthetic estimates.'
     ]
   };
@@ -4306,6 +4423,7 @@ export function createGroceryViewApi() {
   const householdPlans = new Map<string, HouseholdPlan>();
   const householdIdByUserId = new Map<string, string>();
   const basketImportReviews = new Map<string, BasketImportReviewItem[]>();
+  const ocrScanHistory = new Map<string, OcrScanHistoryItem[]>();
 
   const productSnapshots = () =>
     products.map((product) => {
@@ -4392,7 +4510,15 @@ export function createGroceryViewApi() {
       const servings = options.servings ?? 4;
       requirePositiveFinite(maxMealCost, 'maxMealCost');
       requirePositiveFinite(servings, 'servings');
-      const suggestions = suggestDealBasedMeals({ deals: mealDeals, maxMealCost, servings });
+      const savedBudget = budgets.get(userId);
+      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
+      const comparisonStoreIds = favoriteStoreIds.length > 0 ? favoriteStoreIds : stores.map((store) => store.id);
+      const plannedSpend = compareBasketStrategies({
+        favoriteStoreIds: comparisonStoreIds,
+        items: basketInputItems(baskets.get(userId) ?? [])
+      }).cheapestByProduct.total;
+      const suggestions = suggestDealBasedMeals({ deals: mealDeals, maxMealCost, servings })
+        .filter((suggestion) => !savedBudget || roundPrice(plannedSpend + suggestion.estimatedCost) <= savedBudget.weeklyBudget);
       return {
         userId,
         currency: 'SEK',
@@ -4404,7 +4530,8 @@ export function createGroceryViewApi() {
         guardrails: [
           'Meal suggestions use current high-scoring deals but never update a basket without user confirmation.',
           'Diet, allergen, and household rules must be checked before a suggested meal is saved.',
-          'Per-serving cost is advisory and cannot hide stale or missing ingredient price evidence.'
+          'Per-serving cost is advisory and cannot hide stale or missing ingredient price evidence.',
+          'Saved weekly budgets include current planned basket spend before budget-breaking meals are shown.'
         ]
       };
     },
@@ -5298,6 +5425,22 @@ export function createGroceryViewApi() {
         entitlement: subscriptionEntitlements.get(userId) ?? null,
         now: requireIsoTimestamp(now, 'now')
       });
+    },
+
+    upsertOcrScanHistoryItem(userId: string, input: unknown, now = new Date().toISOString()): OcrScanHistoryItem {
+      requireNonEmptyId(userId, 'userId');
+      const item = normalizeOcrScanHistoryItem(input, now);
+      const existing = ocrScanHistory.get(userId) ?? [];
+      ocrScanHistory.set(userId, [
+        item,
+        ...existing.filter((candidate) => candidate.scanId !== item.scanId)
+      ].sort((left, right) => Date.parse(right.capturedAt) - Date.parse(left.capturedAt) || left.scanId.localeCompare(right.scanId)));
+      return item;
+    },
+
+    getOcrScanHistory(userId: string): OcrScanHistoryReport {
+      requireNonEmptyId(userId, 'userId');
+      return buildOcrScanHistoryReport(userId, ocrScanHistory.get(userId) ?? []);
     },
 
     getChainPriceIndices(): ChainPriceIndexSummary {

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { PiggyBank } from 'lucide-react';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
@@ -6,7 +7,24 @@ import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
-  return routeMetadata('/savings-dashboard');
+  const metadata = routeMetadata({
+    path: '/savings-dashboard',
+    title: 'Personal grocery inflation dashboard | GroceryView',
+    description: 'Track grocery inflation, fixed-income budgets, weekly student budgets, and staples price stability from real core summaries.',
+    imagePath: '/pwa-icon.svg',
+    imageAlt: 'GroceryView savings dashboard preview'
+  });
+  const openGraph = metadata.openGraph;
+
+  return {
+    ...metadata,
+    twitter: {
+      card: 'summary_large_image',
+      title: openGraph?.title ?? metadata.title,
+      description: openGraph?.description ?? metadata.description,
+      images: openGraph?.images
+    }
+  };
 }
 
 function formatSek(value: number | null | undefined) {
@@ -28,6 +46,7 @@ export default function SavingsDashboardPage() {
   const topContributions = [...personalGroceryInflation.itemContributions]
     .sort((a, b) => Math.abs(b.changeAmount) - Math.abs(a.changeAmount))
     .slice(0, 5);
+  const visibleWatchpoints = savingsDashboard.watchpoints.slice(0, 4);
 
   return (
     <PageShell>
@@ -87,12 +106,16 @@ export default function SavingsDashboardPage() {
         <Card>
           <h2 className="text-2xl font-black">Category pressure</h2>
           <div className="mt-4 space-y-3">
-            {personalGroceryInflation.categoryContributions.map((category) => (
-              <div className="rounded-2xl bg-slate-50 p-4" key={category.category}>
-                <p className="font-black">{category.category}</p>
-                <p className="text-sm text-slate-600">{formatPercent(category.changePercent)} on {formatSek(category.spend)} baseline spend</p>
-              </div>
-            ))}
+            {personalGroceryInflation.categoryContributions.length > 0 ? (
+              personalGroceryInflation.categoryContributions.map((category) => (
+                <div className="rounded-2xl bg-slate-50 p-4" key={category.category}>
+                  <p className="font-black">{category.category}</p>
+                  <p className="text-sm text-slate-600">{formatPercent(category.changePercent)} on {formatSek(category.spend)} baseline spend</p>
+                </div>
+              ))
+            ) : (
+              <p className="rounded-2xl bg-slate-50 p-4 text-sm font-bold text-slate-700">No category contribution data is available yet.</p>
+            )}
           </div>
           {personalGroceryInflation.missingProductIds.length > 0 ? (
             <p className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm font-bold text-rose-950">Missing from CPI coverage: {personalGroceryInflation.missingProductIds.join(', ')}</p>
@@ -204,14 +227,23 @@ export default function SavingsDashboardPage() {
         <h2 className="text-2xl font-black">Savings watchpoints</h2>
         <p className="mt-2 text-sm font-semibold text-slate-600">Month-to-date planned spend {savingsDashboard.monthToDate.plannedSpend}; avoided spend {savingsDashboard.monthToDate.avoidedSpend}; best district {savingsDashboard.monthToDate.bestDistrict}.</p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {savingsDashboard.watchpoints.slice(0, 4).map((watchpoint) => (
-            <Link className="rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={watchpoint.href} key={watchpoint.label}>
-              <p className="font-black">{watchpoint.label}</p>
-              <p className="mt-1 text-sm text-slate-600">{watchpoint.product} · {watchpoint.store}</p>
-              <p className="mt-2 text-sm font-bold text-emerald-900">{watchpoint.signal}</p>
-              <p className="mt-1 text-sm text-slate-700">{watchpoint.action}</p>
-            </Link>
-          ))}
+          {visibleWatchpoints.length > 0 ? (
+            visibleWatchpoints.map((watchpoint) => (
+              <Link className="rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={watchpoint.href} key={watchpoint.label}>
+                <p className="font-black">{watchpoint.label}</p>
+                <p className="mt-1 text-sm text-slate-600">{watchpoint.product} · {watchpoint.store}</p>
+                <p className="mt-2 text-sm font-bold text-emerald-900">{watchpoint.signal}</p>
+                <p className="mt-1 text-sm text-slate-700">{watchpoint.action}</p>
+              </Link>
+            ))
+          ) : (
+            <div className="rounded-2xl border border-dashed border-emerald-200 bg-emerald-50 p-6 md:col-span-2">
+              <PiggyBank aria-hidden className="h-8 w-8 text-emerald-700" />
+              <p className="mt-3 text-lg font-black text-slate-950">No savings drivers yet</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">Verified price movements will appear here when GroceryView has observed watchpoints.</p>
+              <Link className="mt-4 inline-flex rounded-full bg-emerald-700 px-4 py-2 text-sm font-black text-white hover:bg-emerald-800" href="/products">Browse verified products</Link>
+            </div>
+          )}
         </div>
       </Card>
 
