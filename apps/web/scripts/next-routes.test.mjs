@@ -3926,4 +3926,21 @@ ${seo}`;
     assert.match(review, /status: 'rejected'/);
     assert.match(review, /rejectionReason: reason/);
   });
+
+  it('ships meal-plan checkout autopopulate with quantity estimates', async () => {
+    const page = await read('src/app/meal-planner/page.tsx');
+    const route = await read('src/app/api/meal-planner/checkout/route.ts');
+
+    assert.match(page, /Shopping list autopopulate/);
+    assert.match(page, /\/api\/meal-planner\/checkout/);
+    assert.match(page, /familyMealCheckoutId/);
+    assert.match(page, /quantityEstimateLabel/);
+    assert.match(page, /Autopopulate shopping list/);
+    assert.match(route, /export async function POST/);
+    assert.match(route, /mealIdFromRequest/);
+    assert.match(route, /quantityEstimate/);
+    assert.match(route, /estimatedPackages/);
+    assert.match(route, /selectedProducts/);
+    assert.match(route, /meal_plan_day_not_found/);
+  });
 });

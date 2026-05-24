@@ -18,6 +18,24 @@ function confidenceLevel(value: string): 'high' | 'medium' | 'low' {
   return value === 'high' || value === 'medium' || value === 'low' ? value : 'low';
 }
 
+function slugPart(value: string) {
+  return value.toLowerCase().replace(/å/g, 'a').replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function familyMealCheckoutId(dayLabel: string) {
+  return `family:${slugPart(dayLabel)}`;
+}
+
+const gramsPerServingByCategory = {
+  protein: 150,
+  pantry: 90,
+  vegetables: 125
+} as const;
+
+function quantityEstimateLabel(category: keyof typeof gramsPerServingByCategory, servings: number) {
+  return `${gramsPerServingByCategory[category] * servings} g estimate (${gramsPerServingByCategory[category]} g × ${servings} servings)`;
+}
+
 export default function MealPlannerPage() {
   const dealMealConfidenceLevel = confidenceLevel(dealBasedMeals.coverage.confidence);
   const mealBudgetPlans = [
@@ -28,6 +46,19 @@ export default function MealPlannerPage() {
   ];
   const extractedMealIngredients = extractIngredientsFromMealPlans(mealBudgetPlans);
   const budgetAlternatives = suggestBudgetAlternativesFromMealPlans(mealBudgetPlans);
+  const familyCheckoutPreviews = familyMealPlannerFromDeals.meals.map((meal) => ({
+    mealId: familyMealCheckoutId(meal.weeknightSlot),
+    dayLabel: meal.weeknightSlot,
+    title: meal.title,
+    servings: familyMealPlannerFromDeals.servings,
+    itemCount: meal.ingredients.filter(Boolean).length,
+    items: meal.ingredients.filter(Boolean).map((ingredient) => ({
+      productId: ingredient!.productId,
+      name: ingredient!.name,
+      category: ingredient!.category,
+      quantityLabel: quantityEstimateLabel(ingredient!.category, familyMealPlannerFromDeals.servings)
+    }))
+  }));
 
   return (
     <PageShell>
@@ -106,6 +137,34 @@ export default function MealPlannerPage() {
         </div>
       </Card>
 
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-800">Shopping list autopopulate</p>
+        <h2 className="mt-2 text-2xl font-black">Turn a meal-plan day into selected products</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          The checkout action posts a mealId to <code className="rounded bg-white/80 px-1 py-0.5 text-lime-950">/api/meal-planner/checkout</code> and returns selected product ids with quantity estimates from category portion rules. It does not infer pantry stock, allergens, or live availability.
+        </p>
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
+          {familyCheckoutPreviews.map((preview) => (
+            <form action="/api/meal-planner/checkout" className="rounded-3xl border border-lime-200 bg-white p-5" key={preview.mealId} method="post">
+              <input name="mealId" type="hidden" value={preview.mealId} />
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-lime-800">{preview.dayLabel}</p>
+              <h3 className="mt-2 text-xl font-black text-slate-950">{preview.title}</h3>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{preview.itemCount} selected products · {preview.servings} servings</p>
+              <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+                {preview.items.map((item) => (
+                  <li className="rounded-2xl bg-lime-50 p-3" key={item.productId}>
+                    {item.name}<span className="block text-xs text-slate-500">{item.quantityLabel}</span>
+                  </li>
+                ))}
+              </ul>
+              <button className="mt-4 rounded-full bg-lime-700 px-4 py-2 text-sm font-black text-white" type="submit">
+                Generate shopping list JSON
+              </button>
+            </form>
+          ))}
+        </div>
+      </Card>
+
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">{studentDealRecipes.persona}</p>
         <h2 className="mt-2 text-2xl font-black">Student deal recipes</h2>
@@ -157,6 +216,12 @@ export default function MealPlannerPage() {
                   <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-800">{meal.weeknightSlot}</p>
                   <p className="mt-1 text-2xl font-black text-slate-950">{meal.title}</p>
                   <p className="mt-1 text-sm font-semibold text-slate-700">{meal.reason}</p>
+                  <form action="/api/meal-planner/checkout" className="mt-3" method="post">
+                    <input name="mealId" type="hidden" value={familyMealCheckoutId(meal.weeknightSlot)} />
+                    <button className="rounded-full bg-blue-700 px-4 py-2 text-sm font-black text-white" type="submit">
+                      Autopopulate shopping list
+                    </button>
+                  </form>
                 </div>
                 <div className="text-right">
                   <p className="text-3xl font-black text-blue-800">{formatSek(meal.estimatedCost)}</p>
