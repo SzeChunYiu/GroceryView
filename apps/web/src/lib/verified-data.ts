@@ -266,6 +266,18 @@ export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice
 export const MAX_ITEM_COMPARISON_ITEMS = 4;
 
 type ItemComparisonProduct = (typeof axfoodProducts)[number] | (typeof pricedProducts)[number];
+type FulfillmentFilterKey = 'coupons' | 'homeDelivery' | 'pickup';
+type FulfillmentFilters = Record<FulfillmentFilterKey, boolean>;
+
+const itemComparisonFulfillmentFilterLabels: Record<FulfillmentFilterKey, string> = {
+  coupons: 'Coupons',
+  homeDelivery: 'Home delivery',
+  pickup: 'Pickup'
+};
+
+// Unknown stores fail closed: item-comparison price rows only pass fulfillment filters when a source
+// records explicit store capability evidence.
+const storeCapabilityEvidence: Record<string, Partial<Record<FulfillmentFilterKey, string>>> = {};
 
 function itemComparisonRequestValues(value: SearchParamValue | undefined) {
   return listSearchValues(value)
@@ -279,21 +291,61 @@ function findItemComparisonProduct(id: string): ItemComparisonProduct | undefine
     ?? pricedProducts.find((product) => product.slug === id || product.code === id);
 }
 
-function storePricesForItemComparison(product: ItemComparisonProduct) {
+function checkboxSearchValue(value: SearchParamValue): boolean {
+  const values = listSearchValues(value).map((item) => item.toLowerCase());
+  return values.some((item) => ['1', 'true', 'on', 'yes'].includes(item));
+}
+
+function checkboxSearchValues(...values: SearchParamValue[]): boolean {
+  return values.some(checkboxSearchValue);
+}
+
+function itemComparisonFulfillmentFilters(searchParams: {
+  coupon?: SearchParamValue;
+  coupons?: SearchParamValue;
+  delivery?: SearchParamValue;
+  'home-delivery'?: SearchParamValue;
+  homeDelivery?: SearchParamValue;
+  pickup?: SearchParamValue;
+}): FulfillmentFilters {
+  return {
+    coupons: checkboxSearchValues(searchParams.coupon, searchParams.coupons),
+    homeDelivery: checkboxSearchValues(searchParams.delivery, searchParams['home-delivery'], searchParams.homeDelivery),
+    pickup: checkboxSearchValue(searchParams.pickup)
+  };
+}
+
+function activeFulfillmentFilterKeys(filters: FulfillmentFilters) {
+  return (Object.keys(filters) as FulfillmentFilterKey[]).filter((key) => filters[key]);
+}
+
+function hasFulfillmentCapabilityEvidence(storeId: string, filters: FulfillmentFilters): boolean {
+  const activeFilters = activeFulfillmentFilterKeys(filters);
+  if (activeFilters.length === 0) return true;
+
+  const evidence = storeCapabilityEvidence[storeId.toLowerCase()];
+  return activeFilters.every((filter) => Boolean(evidence?.[filter]));
+}
+
+function storePricesForItemComparison(product: ItemComparisonProduct, filters: FulfillmentFilters) {
   if (isOpenPricesProduct(product)) {
-    return [
+    const rows = [
       { storeName: 'OpenPrices observed low', price: product.priceMin, priceLabel: formatSek(product.priceMin), unitLabel: 'SEK observed price' },
       { storeName: 'OpenPrices observed median', price: product.priceMedian, priceLabel: formatSek(product.priceMedian), unitLabel: 'SEK observed price' },
       { storeName: 'OpenPrices observed high', price: product.priceMax, priceLabel: formatSek(product.priceMax), unitLabel: 'SEK observed price' }
     ];
+
+    return activeFulfillmentFilterKeys(filters).length > 0 ? [] : rows;
   }
 
-  return chainPriceRows(product).map((row) => ({
-    storeName: String(row.chain),
-    price: row.price,
-    priceLabel: row.priceText,
-    unitLabel: row.priceUnit
-  }));
+  return chainPriceRows(product)
+    .filter((row) => hasFulfillmentCapabilityEvidence(String(row.chain), filters))
+    .map((row) => ({
+      storeName: String(row.chain),
+      price: row.price,
+      priceLabel: row.priceText,
+      unitLabel: row.priceUnit
+    }));
 }
 
 function trendPointsForItemComparison(product: ItemComparisonProduct) {
@@ -333,7 +385,17 @@ function nutritionForItemComparison(product: ItemComparisonProduct) {
   };
 }
 
-export function buildItemComparisonView(searchParams: { items?: SearchParamValue } = {}) {
+export function buildItemComparisonView(searchParams: {
+  items?: SearchParamValue;
+  coupon?: SearchParamValue;
+  coupons?: SearchParamValue;
+  delivery?: SearchParamValue;
+  'home-delivery'?: SearchParamValue;
+  homeDelivery?: SearchParamValue;
+  pickup?: SearchParamValue;
+} = {}) {
+  const fulfillmentFilters = itemComparisonFulfillmentFilters(searchParams);
+  const activeFulfillmentFilters = activeFulfillmentFilterKeys(fulfillmentFilters);
   const requestedItemIds = [...new Set(itemComparisonRequestValues(searchParams.items))];
   const defaultItemIds = [
     ...freshestOpenPrices.slice(0, 2).map((product) => product.slug),
@@ -352,8 +414,13 @@ export function buildItemComparisonView(searchParams: { items?: SearchParamValue
     missingItemIds: itemIds.filter((id) => !matchedIds.has(id)),
     truncatedItemIds: requestedOverflow,
     sourceLabel: 'Axfood chain snapshots + OpenPrices/OpenFoodFacts observed product rows',
+    fulfillmentFilters,
+    activeFulfillmentFilterLabels: activeFulfillmentFilters.map((filter) => itemComparisonFulfillmentFilterLabels[filter]),
+    fulfillmentFilterSummary: activeFulfillmentFilters.length > 0
+      ? `Store prices require verified ${activeFulfillmentFilters.map((filter) => itemComparisonFulfillmentFilterLabels[filter].toLowerCase()).join(' + ')} evidence.`
+      : 'No fulfillment filters applied.',
     items: matchedProducts.map(({ product }) => {
-      const storePrices = storePricesForItemComparison(product);
+      const storePrices = storePricesForItemComparison(product, fulfillmentFilters);
       const trendPoints = trendPointsForItemComparison(product);
       const nutrition = nutritionForItemComparison(product);
       const cheapestPrice = storePrices
