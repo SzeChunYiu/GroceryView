@@ -1,0 +1,75 @@
+name: MyFlyer weekly email
+
+on:
+  schedule:
+    # Covers Monday 06:00 in Europe/Stockholm, Europe/Oslo, and Atlantic/Reykjavik.
+    # The sender gates by country-local time before sending.
+    - cron: '0 4,5,6 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: my-flyer-weekly-email-${{ github.ref }}-${{ github.event.schedule || 'manual' }}
+  cancel-in-progress: false
+
+jobs:
+  send-my-flyer:
+    name: Send MyFlyer weekly email (${{ matrix.country }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        country: [SE, NO, IS]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build email sender workspaces
+        run: |
+          npm run build -w @groceryview/db
+          npm run build -w @groceryview/notifications
+          npm run build -w @groceryview/server
+
+      - name: Run country-local Monday 06:00 sender
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          MY_FLYER_FROM_EMAIL: ${{ vars.MY_FLYER_FROM_EMAIL || secrets.MY_FLYER_FROM_EMAIL }}
+          PUBLIC_WEB_URL: ${{ vars.PUBLIC_WEB_URL || secrets.PUBLIC_WEB_URL || 'https://groceryview.se' }}
+          MY_FLYER_COUNTRY: ${{ matrix.country }}
+        run: |
+          node --input-type=module <<'NODE'
+          import pg from 'pg';
+          import { createPgQueryExecutor } from '@groceryview/db';
+          import { createTransactionalEmailClient } from '@groceryview/notifications';
+          import { createPostgresMyFlyerEmailRepository, runMyFlyerWeeklyEmailCron } from '@groceryview/server';
+
+          const required = (name) => {
+            const value = process.env[name]?.trim();
+            if (!value) throw new Error(`${name} is required.`);
+            return value;
+          };
+
+          const pool = new pg.Pool({ connectionString: required('DATABASE_URL') });
+          try {
+            const result = await runMyFlyerWeeklyEmailCron({
+              baseUrl: process.env.PUBLIC_WEB_URL?.trim() || 'https://groceryview.se',
+              country: required('MY_FLYER_COUNTRY'),
+              emailClient: createTransactionalEmailClient({
+                provider: 'resend',
+                apiKey: required('RESEND_API_KEY'),
+                fromEmail: required('MY_FLYER_FROM_EMAIL')
+              }),
+              repository: createPostgresMyFlyerEmailRepository(createPgQueryExecutor(pool))
+            });
+            console.log(JSON.stringify(result, null, 2));
+          } finally {
+            await pool.end();
+          }
+          NODE

@@ -106,6 +106,24 @@ import {
   type ScanUploadStorage
 } from '@groceryview/scanning';
 
+export {
+  buildMyFlyerEmail,
+  createPostgresMyFlyerEmailRepository,
+  isMyFlyerWeeklyEmailCronDue,
+  myFlyerSubscriptionProductId,
+  myFlyerTimezoneForCountry,
+  myFlyerWeekWindow,
+  myFlyerWeeklyEmailCronExpression,
+  runMyFlyerWeeklyEmailCron,
+  type MyFlyerCountry,
+  type MyFlyerEmailCronInput,
+  type MyFlyerEmailCronResult,
+  type MyFlyerEmailInput,
+  type MyFlyerEmailRepository,
+  type MyFlyerEmailSubscription,
+  type MyFlyerOffer
+} from './email/myFlyerEmail.js';
+
 export type HttpHandler = (request: Request) => Promise<Response>;
 
 export type AuthOptions = {
