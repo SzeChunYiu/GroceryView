@@ -9,7 +9,7 @@ describe('CI workflow', () => {
     assert.match(workflow, /pull_request:/);
     assert.match(workflow, /push:/);
     assert.match(workflow, /branches:\s*\[main\]/);
-    for (const command of ['npm ci', 'npm test', 'npm run build', 'npm run typecheck']) {
+    for (const command of ['npm ci', 'npm run lint', 'npm run unit-test', 'npm run integration-test', 'npm run build', 'npm run typecheck']) {
       assert.match(workflow, new RegExp(command.replaceAll(' ', '\\s+')));
     }
   });

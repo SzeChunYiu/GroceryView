@@ -12,12 +12,11 @@ describe('release validation workflow', () => {
     assert.equal(packageLockExists, true, 'release validation should follow the committed npm lockfile');
     assert.equal(pnpmLockExists, false, 'pnpm workflow commands require a committed pnpm-lock.yaml');
 
-    for (const command of ['npm ci', 'npm test', 'npm run build', 'npm run typecheck']) {
+    for (const command of ['npm ci', 'npm test', 'npm run lint', 'npm run build', 'npm run typecheck']) {
       assert.match(workflow, new RegExp(command.replaceAll(' ', '\\s+')));
     }
 
     assert.doesNotMatch(workflow, /pnpm\b/, 'workflow must not use pnpm without packageManager and pnpm lockfile');
-    assert.doesNotMatch(workflow, /npm\s+run\s+lint|pnpm\s+lint/, 'workflow must not call lint until package.json defines a lint script');
-    assert.equal(Object.hasOwn(packageJson.scripts, 'lint'), false);
+    assert.equal(Object.hasOwn(packageJson.scripts, 'lint'), true);
   });
 });
