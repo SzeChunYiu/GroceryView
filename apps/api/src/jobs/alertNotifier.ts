@@ -60,12 +60,7 @@ export async function notifyTriggeredPriceAlerts(
 }
 
 export function isEmailNotifiablePriceAlert(alert: WatchlistAlert): boolean {
-  return (
-    alert.type === 'target_price' &&
-    alert.trigger.metric === 'price' &&
-    typeof alert.trigger.value === 'number' &&
-    typeof alert.trigger.threshold === 'number'
-  );
+  return isTargetPriceAlert(alert) || isPercentageDropAlert(alert);
 }
 
 export function buildTriggeredPriceAlertEmail(
@@ -77,12 +72,14 @@ export function buildTriggeredPriceAlertEmail(
   const itemUrl = notification.itemUrl ?? buildProductUrl(baseUrl, alert.productId);
   const storeSuffix = alert.trigger.storeName ? ` at ${alert.trigger.storeName}` : '';
   const threshold = typeof alert.trigger.threshold === 'number' ? alert.trigger.threshold : undefined;
+  const percentageDrop = isPercentageDropAlert(alert) ? getPercentageDropThreshold(alert) : undefined;
 
   const lines = [
     alert.message,
     '',
     `Current price: ${formatPriceValue(alert.trigger.value)}${storeSuffix}`,
-    threshold === undefined ? undefined : `Alert threshold: ${formatSek(threshold)}`,
+    percentageDrop === undefined ? undefined : `Alert threshold: ${formatPercent(percentageDrop)} cheaper`,
+    percentageDrop !== undefined || threshold === undefined ? undefined : `Alert threshold: ${formatSek(threshold)}`,
     `Open item: ${itemUrl}`,
     '',
     `Sent at: ${now}`
@@ -90,7 +87,7 @@ export function buildTriggeredPriceAlertEmail(
 
   return {
     to: notification.recipientEmail,
-    subject: `${alert.productName} price drop alert`,
+    subject: `${alert.productName} ${percentageDrop === undefined ? 'price drop' : 'percentage drop'} alert`,
     text: lines.join('\n'),
     metadata: {
       type: alert.type,
@@ -100,12 +97,43 @@ export function buildTriggeredPriceAlertEmail(
   };
 }
 
+function isTargetPriceAlert(alert: WatchlistAlert): boolean {
+  return (
+    String(alert.type) === 'target_price' &&
+    String(alert.trigger.metric) === 'price' &&
+    typeof alert.trigger.value === 'number' &&
+    typeof alert.trigger.threshold === 'number'
+  );
+}
+
+function isPercentageDropAlert(alert: WatchlistAlert): boolean {
+  return (
+    String(alert.type) === 'percentage_drop' &&
+    String(alert.trigger.metric) === 'percentage_drop' &&
+    typeof alert.trigger.value === 'number' &&
+    getPercentageDropThreshold(alert) !== undefined
+  );
+}
+
+function getPercentageDropThreshold(alert: WatchlistAlert): number | undefined {
+  const trigger = alert.trigger as WatchlistAlert['trigger'] & {
+    percentageDrop?: number;
+    percentDrop?: number;
+  };
+  const threshold = trigger.percentageDrop ?? trigger.percentDrop ?? trigger.threshold;
+  return typeof threshold === 'number' && threshold > 0 ? threshold : undefined;
+}
+
 function buildProductUrl(baseUrl: string, productId: string): string {
   return `${baseUrl.replace(/\/+$/, '')}/product/${encodeURIComponent(productId)}`;
 }
 
 function formatSek(value: number): string {
   return `${value.toFixed(2)} SEK`;
+}
+
+function formatPercent(value: number): string {
+  return `${value.toFixed(0)}%`;
 }
 
 function formatPriceValue(value: number | string): string {
