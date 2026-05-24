@@ -17,6 +17,7 @@ export type CityGrossProduct = {
   gtin: string;
   name: string;
   brand: string;
+  superCategory: string;
   category: string;
   packageText: string;
   storeId: string;
@@ -50,6 +51,7 @@ type CityGrossProductApiRow = {
   gtin?: unknown;
   name?: unknown;
   brand?: unknown;
+  superCategory?: unknown;
   category?: unknown;
   descriptiveSize?: unknown;
   url?: unknown;
@@ -74,6 +76,22 @@ export const CITY_GROSS_API_BASE_URL = 'https://www.citygross.se/api/v1';
 export const CITY_GROSS_STORES_PATH = 'PageData/stores';
 export const CITY_GROSS_PRODUCTS_PATH = 'Loop54/products';
 export const DEFAULT_CITY_GROSS_PRODUCT_PAGE_SIZE = 100;
+export const CITY_GROSS_GROCERY_SUPER_CATEGORIES = [
+  'Skafferiet',
+  'Mejeri, ost & ägg',
+  'Bröd & bageri',
+  'Bröd & Bageri',
+  'Frukt & grönt',
+  'Godis',
+  'Chark',
+  'Chark & pålägg',
+  'Fryst',
+  'Dryck',
+  'Kyld färdigmat',
+  'Snacks',
+  'Kött & fågel',
+  'Fisk & Skaldjur'
+] as const;
 
 export const DEFAULT_CITY_GROSS_PRODUCT_QUERIES = [
   'kaffe',
@@ -274,9 +292,11 @@ export function normalizeCityGrossProduct(
 ): CityGrossProduct | null {
   const code = text(product.id);
   const name = text(product.name);
+  const superCategory = text(product.superCategory);
   const currentPrice = product.productStoreDetails?.prices?.currentPrice;
   const price = numberOrNull(currentPrice?.price);
   if (!code || !name || price === null) return null;
+  if (superCategory && !isCityGrossGrocerySuperCategory(superCategory)) return null;
   const regularPrice = numberOrNull(product.productStoreDetails?.prices?.ordinaryPrice?.price);
   const productPath = text(product.url);
   const imageUrl = text(product.images?.[0]?.url);
@@ -285,6 +305,7 @@ export function normalizeCityGrossProduct(
     gtin: text(product.gtin),
     name,
     brand: text(product.brand),
+    superCategory,
     category: text(product.category),
     packageText: text(product.descriptiveSize),
     storeId,
@@ -298,6 +319,11 @@ export function normalizeCityGrossProduct(
     sourceUrl,
     retrievedAt
   };
+}
+
+function isCityGrossGrocerySuperCategory(value: string): boolean {
+  const normalized = value.toLocaleLowerCase('sv-SE');
+  return CITY_GROSS_GROCERY_SUPER_CATEGORIES.some((category) => category.toLocaleLowerCase('sv-SE') === normalized);
 }
 
 function parseCoordinates(value: string): [number | null, number | null] {

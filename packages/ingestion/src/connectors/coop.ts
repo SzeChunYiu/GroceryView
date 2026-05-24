@@ -398,6 +398,8 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '184900',
   '123200',
   '136000',
+  '136049',
+  '136050',
   '236464',
   '133900',
   '016195',

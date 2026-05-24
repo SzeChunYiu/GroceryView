@@ -33,6 +33,7 @@ import {
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
+  fetchSt1FuelPrices,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
   BRANDED_FUEL_STATIONS_OVERPASS_URL,
@@ -112,6 +113,7 @@ import {
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
+  parseSt1FuelPriceHtml,
   planIngestionBatch,
   planOfferVisibilityBoundary,
   planRetailerConnectorRun,
@@ -152,6 +154,7 @@ import {
   runOpenFoodFactsProductMetadataEnrichment,
   stockholmStoreLocatorFixtures,
   validateEnumeratedStores,
+  ST1_FUEL_PRICE_URL,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
   scbCoicopFoodCategoryCodes,
@@ -172,7 +175,6 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('estimated'), 0.25);
   });
 });
-
 
 describe('store enumerator', () => {
   const capturedAt = '2026-05-23T13:45:00.000Z';
@@ -409,6 +411,70 @@ describe('OKQ8 fuel price connector', () => {
   });
 });
 
+describe('St1 fuel price connector', () => {
+  const st1ListPriceHtml = `
+    <main>
+      <h1>St1 listpris St1-stationer</h1>
+      <p>Listpriserna gäller oavsett var du tankar och betalar med kortet i Sverige.</p>
+      <h2>St1 -stationer</h2>
+      <p>Listpriser gällande från 23 maj 2026</p>
+      <p>Pris per liter inkl. moms</p>
+      <table>
+        <tr><td>Bensin 98</td><td>20,19 kr</td></tr>
+        <tr><td>Bensin 95</td><td>18,89 kr</td></tr>
+        <tr><td>E85</td><td>15,84 kr</td></tr>
+        <tr><td>Diesel</td><td>21,34 kr</td></tr>
+        <tr><td>HVO100</td><td>29,74 kr</td></tr>
+      </table>
+    </main>
+  `;
+
+  it('parses per-grade real operator prices as fuel-domain observations', () => {
+    const rows = parseSt1FuelPriceHtml(st1ListPriceHtml, {
+      sourceUrl: ST1_FUEL_PRICE_URL,
+      retrievedAt: '2026-05-23T13:42:57.000Z',
+      sourceRunId: 'run-st1-fuel-2026-05-23',
+      rawRecordId: 'raw-st1-fuel-2026-05-23'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.grade, row.pricePerLitre, row.domain, row.currency, row.litreBasis]), [
+      ['98', 20.19, 'fuel', 'SEK', 1],
+      ['95', 18.89, 'fuel', 'SEK', 1],
+      ['E85', 15.84, 'fuel', 'SEK', 1],
+      ['diesel', 21.34, 'fuel', 'SEK', 1],
+      ['HVO100', 29.74, 'fuel', 'SEK', 1]
+    ]);
+    assert.equal(rows[0].observedAt, '2026-05-22T22:01:00.000Z');
+    assert.equal(rows[0].source.kind, 'operator');
+    assert.equal(rows[0].source.operatorName, 'St1 Sverige AB');
+    assert.equal(rows[0].provenance.sourceUrl, ST1_FUEL_PRICE_URL);
+    assert.equal(rows[0].provenance.parserVersion, 'st1-fuel-listpris-v1');
+    assert.match(rows[0].provenance.contentDigest.value, /^[a-f0-9]{64}$/);
+  });
+
+  it('fetches the public St1 page and fails closed on blocked source responses', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(st1ListPriceHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+    };
+
+    const rows = await fetchSt1FuelPrices({
+      fetchImpl,
+      retrievedAt: '2026-05-23T13:42:57.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [ST1_FUEL_PRICE_URL]);
+    assert.equal(rows.length, 5);
+    assert.equal(rows.find((row) => row.grade === '95')?.pricePerLitre, 18.89);
+
+    await assert.rejects(
+      () => fetchSt1FuelPrices({ fetchImpl: async () => new Response('Forbidden', { status: 403 }) }),
+      /blocked or unavailable/
+    );
+  });
+});
+
 describe('fetchOpenFoodFactsProducts', () => {
   it('fetches product rows from the public product API with provenance', async () => {
     const requestedUrls: string[] = [];
@@ -423,7 +489,20 @@ describe('fetchOpenFoodFactsProducts', () => {
           quantity: '1 l',
           categories_tags: ['en:beverages', 'en:dairy-substitutes'],
           labels_tags: ['en:vegan'],
+          allergens_tags: ['en:oats'],
+          traces_tags: ['en:nuts'],
+          additives_tags: ['en:e322'],
+          countries_tags: ['en:sweden'],
+          stores: 'Willys, Hemkop',
+          origins_tags: ['en:sweden'],
+          manufacturing_places_tags: ['se:helsingborg'],
+          packaging_tags: ['en:carton'],
+          ingredients_text_sv: 'Vatten, havre, kakao.',
+          serving_size: '100 ml',
           nutriscore_grade: 'd',
+          nova_group: 3,
+          ecoscore_grade: 'b',
+          data_quality_tags: ['en:ingredients-completed'],
           nutriments: {
             energy_100g: 180,
             'energy-kcal_100g': 43,
@@ -456,7 +535,20 @@ describe('fetchOpenFoodFactsProducts', () => {
       quantity: '1 l',
       categories: ['en:beverages', 'en:dairy-substitutes'],
       labels: ['en:vegan'],
+      allergens: ['en:oats'],
+      traces: ['en:nuts'],
+      additives: ['en:e322'],
+      countries: ['en:sweden'],
+      stores: ['Willys', 'Hemkop'],
+      origins: ['en:sweden'],
+      manufacturingPlaces: ['se:helsingborg'],
+      packaging: ['en:carton'],
+      ingredientsText: 'Vatten, havre, kakao.',
+      servingSize: '100 ml',
       nutriscoreGrade: 'd',
+      novaGroup: 3,
+      ecoscoreGrade: 'b',
+      dataQualityTags: ['en:ingredients-completed'],
       nutritionPer100g: {
         energyKj: 180,
         energyKcal: 43,
@@ -2814,6 +2906,7 @@ describe('fetchCityGrossProducts', () => {
           gtin: '24000124962',
           name: 'Pear Halves In Juice',
           brand: 'DEL MONTE',
+          superCategory: 'Skafferiet',
           category: 'Desserter & glasstillbehör',
           descriptiveSize: '415/230G',
           url: '/matvaror/skafferiet/del-monte-pear-halves-in-juice-p100001971_ST',
@@ -2844,6 +2937,7 @@ describe('fetchCityGrossProducts', () => {
       gtin: '24000124962',
       name: 'Pear Halves In Juice',
       brand: 'DEL MONTE',
+      superCategory: 'Skafferiet',
       category: 'Desserter & glasstillbehör',
       packageText: '415/230G',
       storeId: '21',
@@ -2987,6 +3081,7 @@ describe('fetchCityGrossProducts', () => {
 describe('fetchLidlStores', () => {
   it('discovers Lidl public store detail pages and normalizes branch metadata', async () => {
     const requestedUrls: string[] = [];
+    const detailAttempts = new Map<string, number>();
     const fetchImpl: typeof fetch = async (url) => {
       requestedUrls.push(String(url));
       if (String(url) === buildLidlStoresUrl()) {
@@ -2996,6 +3091,10 @@ describe('fetchLidlStores', () => {
         `, { status: 200, headers: { 'content-type': 'text/html' } });
       }
       if (String(url) === buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/')) {
+        detailAttempts.set(String(url), (detailAttempts.get(String(url)) ?? 0) + 1);
+        if (detailAttempts.get(String(url)) === 1) {
+          return new Response('temporary throttle', { status: 503 });
+        }
         return new Response('<meta name="description" content="Din Lidl-butik vid Vänersborgsvägen 21, 441 37 Alingsås Se öppettider"><a href="https://bing.com/maps/default.aspx?rtp=~pos.57.93452_12.54588_Alings%C3%A5s">Map</a>', { status: 200 });
       }
       return new Response('<meta name="description" content="Din Lidl-butik vid Traktorgatan 3, 424 65 Angered Se öppettider"><a href="https://bing.com/maps/default.aspx?rtp=~pos.57.79633_12.05174_Angered">Map</a>', { status: 200 });
@@ -3004,11 +3103,15 @@ describe('fetchLidlStores', () => {
     const stores = await fetchLidlStores({
       fetchImpl,
       maxRows: 2,
+      storeConcurrency: 1,
+      storeRetryAttempts: 1,
+      storeRetryBaseDelayMs: 0,
       retrievedAt: '2026-05-22T14:10:00.000Z'
     });
 
     assert.deepEqual(requestedUrls, [
       buildLidlStoresUrl(),
+      buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
       buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
       buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/angered/traktorgatan-3/')
     ]);
@@ -4898,7 +5001,20 @@ describe('persistOpenFoodFactsProductMetadata', () => {
       quantity: '750 g',
       categories: ['en:pastas'],
       labels: [],
+      allergens: [],
+      traces: [],
+      additives: [],
+      countries: ['Sweden'],
+      stores: ['Willys'],
+      origins: [],
+      manufacturingPlaces: [],
+      packaging: [],
+      ingredientsText: '',
+      servingSize: '',
       nutriscoreGrade: 'a',
+      novaGroup: null,
+      ecoscoreGrade: 'unknown',
+      dataQualityTags: [],
       nutritionPer100g: {
         energyKj: 1509,
         energyKcal: 361,
@@ -4923,7 +5039,20 @@ describe('persistOpenFoodFactsProductMetadata', () => {
       quantity: '',
       categories: [],
       labels: [],
+      allergens: [],
+      traces: [],
+      additives: [],
+      countries: [],
+      stores: [],
+      origins: [],
+      manufacturingPlaces: [],
+      packaging: [],
+      ingredientsText: '',
+      servingSize: '',
       nutriscoreGrade: 'unknown',
+      novaGroup: null,
+      ecoscoreGrade: 'unknown',
+      dataQualityTags: [],
       nutritionPer100g: {
         energyKj: 1,
         energyKcal: null,

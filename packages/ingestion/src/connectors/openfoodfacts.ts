@@ -10,7 +10,20 @@ export type OpenFoodFactsProduct = {
   quantity: string;
   categories: string[];
   labels: string[];
+  allergens?: string[];
+  traces?: string[];
+  additives?: string[];
+  countries?: string[];
+  stores?: string[];
+  origins?: string[];
+  manufacturingPlaces?: string[];
+  packaging?: string[];
+  ingredientsText?: string;
+  servingSize?: string;
   nutriscoreGrade: string;
+  novaGroup?: number | null;
+  ecoscoreGrade?: string;
+  dataQualityTags?: string[];
   nutritionPer100g: OpenFoodFactsNutritionPer100g;
   imageUrl: string;
   productUrl: string;
@@ -56,7 +69,22 @@ type OpenFoodFactsApiProduct = {
   quantity?: unknown;
   categories_tags?: unknown;
   labels_tags?: unknown;
+  allergens_tags?: unknown;
+  traces_tags?: unknown;
+  additives_tags?: unknown;
+  countries_tags?: unknown;
+  stores?: unknown;
+  origins_tags?: unknown;
+  manufacturing_places_tags?: unknown;
+  packaging_tags?: unknown;
+  ingredients_text?: unknown;
+  ingredients_text_sv?: unknown;
+  serving_size?: unknown;
   nutriscore_grade?: unknown;
+  nova_group?: unknown;
+  ecoscore_grade?: unknown;
+  environmental_score_grade?: unknown;
+  data_quality_tags?: unknown;
   nutriments?: unknown;
   image_front_url?: unknown;
   url?: unknown;
@@ -91,7 +119,22 @@ export const OPENFOODFACTS_FIELDS = [
   'quantity',
   'categories_tags',
   'labels_tags',
+  'allergens_tags',
+  'traces_tags',
+  'additives_tags',
+  'countries_tags',
+  'stores',
+  'origins_tags',
+  'manufacturing_places_tags',
+  'packaging_tags',
+  'ingredients_text',
+  'ingredients_text_sv',
+  'serving_size',
   'nutriscore_grade',
+  'nova_group',
+  'ecoscore_grade',
+  'environmental_score_grade',
+  'data_quality_tags',
   'nutriments',
   'image_front_url',
   'url'
@@ -456,7 +499,20 @@ export async function fetchOpenFoodFactsExportRetailerEnrichments(
         quantity: row.quantity,
         categories: row.categories,
         labels: row.labels,
+        allergens: row.allergens,
+        traces: row.traces,
+        additives: row.additives,
+        countries: row.countries,
+        stores: row.stores,
+        origins: row.origins,
+        manufacturingPlaces: row.manufacturingPlaces,
+        packaging: row.packaging,
+        ingredientsText: row.ingredientsText,
+        servingSize: row.servingSize,
         nutriscoreGrade: row.nutriscoreGrade,
+        novaGroup: row.novaGroup,
+        ecoscoreGrade: row.ecoscoreGrade,
+        dataQualityTags: row.dataQualityTags,
         nutritionPer100g: row.nutritionPer100g,
         imageUrl: row.imageUrl,
         productUrl: row.productUrl,
@@ -522,7 +578,20 @@ export async function fetchOpenFoodFactsRetailerEnrichments(
       quantity: row.quantity,
       categories: row.categories,
       labels: row.labels,
+      allergens: row.allergens,
+      traces: row.traces,
+      additives: row.additives,
+      countries: row.countries,
+      stores: row.stores,
+      origins: row.origins,
+      manufacturingPlaces: row.manufacturingPlaces,
+      packaging: row.packaging,
+      ingredientsText: row.ingredientsText,
+      servingSize: row.servingSize,
       nutriscoreGrade: row.nutriscoreGrade,
+      novaGroup: row.novaGroup,
+      ecoscoreGrade: row.ecoscoreGrade,
+      dataQualityTags: row.dataQualityTags,
       nutritionPer100g: row.nutritionPer100g,
       imageUrl: row.imageUrl,
       productUrl: row.productUrl,
@@ -557,7 +626,20 @@ export function normalizeOpenFoodFactsProduct(
     quantity: asText(product.quantity),
     categories: asTextArray(product.categories_tags),
     labels: asTextArray(product.labels_tags),
+    allergens: asTextArray(product.allergens_tags),
+    traces: asTextArray(product.traces_tags),
+    additives: asTextArray(product.additives_tags),
+    countries: asTextArray(product.countries_tags),
+    stores: splitTextList(product.stores),
+    origins: asTextArray(product.origins_tags),
+    manufacturingPlaces: asTextArray(product.manufacturing_places_tags),
+    packaging: asTextArray(product.packaging_tags),
+    ingredientsText: asText(product.ingredients_text_sv) || asText(product.ingredients_text),
+    servingSize: asText(product.serving_size),
     nutriscoreGrade: asText(product.nutriscore_grade) || 'unknown',
+    novaGroup: numberOrNull(product.nova_group),
+    ecoscoreGrade: asText(product.ecoscore_grade) || asText(product.environmental_score_grade) || 'unknown',
+    dataQualityTags: asTextArray(product.data_quality_tags),
     nutritionPer100g: normalizeOpenFoodFactsNutrition(product.nutriments),
     imageUrl: asText(product.image_front_url),
     productUrl: asText(product.url) || `https://world.openfoodfacts.org/product/${encodeURIComponent(code)}`,
@@ -583,7 +665,20 @@ export function normalizeOpenFoodFactsExportRecord(
     quantity: asText(record.quantity),
     categories: splitTags(record.categories_tags),
     labels: splitTags(record.labels_tags),
+    allergens: splitTags(record.allergens_tags),
+    traces: splitTags(record.traces_tags),
+    additives: splitTags(record.additives_tags),
+    countries: splitTags(record.countries_tags),
+    stores: splitTextList(record.stores),
+    origins: splitTags(record.origins_tags),
+    manufacturingPlaces: splitTags(record.manufacturing_places_tags),
+    packaging: splitTags(record.packaging_tags),
+    ingredientsText: asText(record.ingredients_text),
+    servingSize: asText(record.serving_size),
     nutriscoreGrade: asText(record.nutriscore_grade) || 'unknown',
+    novaGroup: numberOrNull(record.nova_group),
+    ecoscoreGrade: asText(record.ecoscore_grade) || asText(record.environmental_score_grade) || 'unknown',
+    dataQualityTags: splitTags(record.data_quality_tags),
     nutritionPer100g: normalizeOpenFoodFactsNutrition(record),
     imageUrl: asText(record.image_url),
     productUrl: asText(record.url) || `https://world.openfoodfacts.org/product/${encodeURIComponent(code)}`,
@@ -680,6 +775,11 @@ function parseTsvLine(line: string): string[] {
 }
 
 function splitTags(value: unknown): string[] {
+  const text = asText(value);
+  return text ? text.split(',').map((item) => item.trim()).filter(Boolean) : [];
+}
+
+function splitTextList(value: unknown): string[] {
   const text = asText(value);
   return text ? text.split(',').map((item) => item.trim()).filter(Boolean) : [];
 }

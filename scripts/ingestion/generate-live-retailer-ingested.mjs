@@ -112,7 +112,7 @@ await writeMathem(mathemProducts);
 const matsparProducts = await fetchMatsparProducts({
   queries: MATSPAR_QUERIES,
   pages: MATSPAR_PAGES,
-  maxRows: 4000,
+  maxRows: 5000,
   retrievedAt
 });
 await writeMatspar(matsparProducts);

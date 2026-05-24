@@ -84,6 +84,7 @@ export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
 export * from './connectors/apohem.js';
 export * from './connectors/okq8-fuel.js';
+export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
 export * from './store-enumerator.js';
 
@@ -3352,7 +3353,20 @@ function openFoodFactsProductToMetadataRow(row: OpenFoodFactsProduct): OpenFoodF
     quantity: row.quantity,
     categories: row.categories,
     labels: row.labels,
+    allergens: row.allergens,
+    traces: row.traces,
+    additives: row.additives,
+    countries: row.countries,
+    stores: row.stores,
+    origins: row.origins,
+    manufacturingPlaces: row.manufacturingPlaces,
+    packaging: row.packaging,
+    ingredientsText: row.ingredientsText,
+    servingSize: row.servingSize,
     nutriscoreGrade: row.nutriscoreGrade,
+    novaGroup: row.novaGroup,
+    ecoscoreGrade: row.ecoscoreGrade,
+    dataQualityTags: row.dataQualityTags,
     nutritionPer100g: row.nutritionPer100g,
     imageUrl: row.imageUrl,
     productUrl: row.productUrl,

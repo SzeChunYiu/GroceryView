@@ -79,6 +79,9 @@ export const APOTEK_HJARTAT_BASE_URL = 'https://www.apotekhjartat.se';
 export const DEFAULT_APOHEM_SOURCE_PATHS = [
   '/sok?q=vitamin',
   '/sok?q=la%20roche',
+  '/sok?q=solskydd',
+  '/sok?q=tandkram',
+  '/sok?q=munvard',
   '/vitaminer-kosttillskott',
   '/hudvard',
   '/receptfritt'
@@ -87,6 +90,9 @@ export const DEFAULT_APOHEM_SOURCE_PATHS = [
 export const DEFAULT_APOTEK_HJARTAT_SEARCH_URLS = [
   'https://www.apotekhjartat.se/search?q=vitamin',
   'https://www.apotekhjartat.se/search?q=la%20roche',
+  'https://www.apotekhjartat.se/search?q=solskydd',
+  'https://www.apotekhjartat.se/search?q=tandkram',
+  'https://www.apotekhjartat.se/search?q=munvard',
   'https://www.apotekhjartat.se/search?q=pamol'
 ] as const;
 

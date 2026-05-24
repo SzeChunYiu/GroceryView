@@ -84,14 +84,17 @@ export const LIDL_BASE_URL = 'https://www.lidl.se';
 export const LIDL_STORES_PATH = '/s/sv-SE/butiker/';
 export const DEFAULT_LIDL_OFFER_PATHS = [
   '/c/veckans-frukt-groent/a10094676',
-  '/c/veckans-kott-fisk-fagel/a10094677',
-  '/c/veckans-mejeri-ost/a10094678',
-  '/c/veckans-skafferi/a10094679',
-  '/c/veckans-frys/a10094680',
-  '/c/veckans-gott/a10094681',
   '/c/lidl-plus-erbjudanden/a10094682',
-  '/c/veckans-hushall/a10094683',
-  '/c/veckans-blommor/a10094398'
+  '/c/veckans-blommor/a10094398',
+  '/c/bjud-pa-spaennande-smaker/a10094681',
+  '/c/fira-matriket-tre-ar-med-oss/a10094679',
+  '/c/mandag-soendag/a10094677',
+  '/c/torsdag-soendag/a10094678',
+  '/c/superklipp-fran-torsdag/a10094683',
+  '/c/xxl/a10094680',
+  '/c/med-smak-av-alperna/a10094785',
+  '/c/veckans-frukt-groent/a10094782',
+  '/c/lidl-plus-erbjudanden/a10094788'
 ] as const;
 
 export type FetchLidlStoresOptions = AllStoreTaskRunnerControls & {
@@ -164,13 +167,27 @@ export async function fetchLidlStores(options: FetchLidlStoresOptions = {}): Pro
     const reason = failures[0] ? ` ${failures[0].storeId}:${failures[0].error}` : '';
     throw new Error(`Lidl store directory had no usable stores.${reason}`);
   }
-  return rows;
+  const dedupedRows: LidlStore[] = [];
+  const seen = new Set<string>();
+  for (const row of rows) {
+    if (seen.has(row.storeId)) continue;
+    seen.add(row.storeId);
+    dedupedRows.push(row);
+    if (options.maxRows && dedupedRows.length >= options.maxRows) {
+      break;
+    }
+  }
+  if (dedupedRows.length === 0) {
+    const reason = failures[0] ? ` ${failures[0].storeId}:${failures[0].error}` : '';
+    throw new Error(`Lidl store directory had no usable stores.${reason}`);
+  }
+  return dedupedRows;
 }
 
 export async function fetchLidlOffers(options: FetchLidlOffersOptions = {}): Promise<LidlOffer[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const offerPaths = options.offerPaths ?? DEFAULT_LIDL_OFFER_PATHS;
-  const maxRows = options.maxRows ?? 1000;
+  const maxRows = options.maxRows ?? 500;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: LidlOffer[] = [];
   const seen = new Set<string>();

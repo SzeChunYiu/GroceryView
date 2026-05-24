@@ -88,6 +88,19 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 
 ---
 
+## 2F. Fuel prices
+
+### 2F.1 St1 Business listpris ✅ shipped
+- **Endpoint:** `https://st1.se/foretag/listpris`
+- **Method:** GET. **Headers:** browser-style `User-Agent`, `Accept: text/html`. Confirmed HTTP 200 on 2026-05-23 without login, captcha, or 403.
+- **What it returns:** Official St1 station list prices per litre for `Bensin 98`, `Bensin 95`, `E85`, `Diesel`, and `HVO100`; the page states the prices are valid from 23 May 2026.
+- **Per-branch granularity:** ❌ no — operator list price, not station-specific pump evidence.
+- **Source posture:** Operator source. Legal review status in this PR is `approved` for read-only public page capture; crowd fuel reports are modeled separately and require reporter provenance.
+- **Lands in:** `packages/ingestion/src/connectors/st1-fuel.ts`, `infra/db/migrations/010_fuel_price_observations.sql`, and public route `/api/fuel` (also `/fuel` alias).
+- **Evidence:** `docs/ingestion/st1-fuel-evidence.md`.
+
+---
+
 ## 3. Per-branch granularity — what's actually possible
 
 | Source | Per-branch? | How |

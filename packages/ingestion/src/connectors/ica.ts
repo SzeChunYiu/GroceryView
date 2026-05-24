@@ -1528,6 +1528,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     regionId: DEFAULT_ICA_REGION_ID
   },
   {
+    storeAccountId: '1003822',
+    storeName: 'ICA Supermarket Toria',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
     storeAccountId: '1003911',
     storeName: 'ICA Nära Kilafors',
     regionId: DEFAULT_ICA_REGION_ID
