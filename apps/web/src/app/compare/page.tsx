@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { StorePriceDrawer, type StorePriceDrawerRow } from '@/components/compare/store-price-drawer';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
@@ -27,6 +28,24 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const comparison = buildChainComparisonTable(productsParam);
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
+  const drawerRows: StorePriceDrawerRow[] = comparison.products.map((product) => ({
+    productSlug: product.productSlug,
+    productName: product.productName,
+    packageLabel: product.packageLabel,
+    matchLabel: product.matchLabel,
+    bestChainName: product.bestChainName,
+    bestPriceText: product.bestPriceText,
+    latestTimestamp: comparison.generatedAt,
+    stores: product.cells.map((cell) => ({
+      chainId: cell.chainId,
+      status: cell.status,
+      priceText: cell.priceText,
+      unitLabel: cell.unitLabel,
+      productSlug: cell.productSlug,
+      productName: cell.productName,
+      latestTimestamp: comparison.generatedAt
+    }))
+  }));
   const rowSections = [
     {
       id: 'commodity-alias',
@@ -61,6 +80,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
             Try sample products
           </Link>
         </div>
+        <StorePriceDrawer rows={drawerRows} updatedAt={comparison.generatedAt} />
         <div className="mt-5 grid gap-4">
           {comparison.products.length === 0 ? (
             <p className="rounded-3xl border border-emerald-100 bg-white p-5 text-sm font-semibold text-slate-600 shadow-sm">
