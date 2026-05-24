@@ -276,6 +276,16 @@ App repository budget and authenticated settings preferences.
 
 Key columns: `user_id`, `weekly_budget`, `monthly_budget`, `preferred_currency`, `notification_channels`, `updated_at`.
 
+### `substitution_willingness`
+
+Per-user overrides for broad product-class substitution willingness. A row is keyed by `(user_id, class_id)`, and `class_id` is deliberately broad, for example `apple` or `chicken`; subclass/variant IDs such as `apple-granny-smith` are rejected by the migration check.
+
+Key columns: `user_id`, `class_id`, `willingness` (`strict`|`broad`|`narrow`), `created_at`, `updated_at`.
+
+Default policy when a user has no row: produce classes use `broad` (any subclass works), meat classes use `narrow` (only the requested class), and branded items use `strict` (only the exact canonical product).
+
+Helper: `default_substitution_willingness(class_kind text)` returns those fail-closed defaults for `produce`, `meat`, and `branded` class kinds.
+
 ### `watchlist_items`
 
 Legacy app repository watchlist rows used by existing package APIs.

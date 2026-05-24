@@ -18,13 +18,14 @@ const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/mi
 const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/010_basket_import_reviews.sql'), 'utf8').toLowerCase();
 const priceAlertsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/011_price_alerts.sql'), 'utf8').toLowerCase();
 const telegramNotificationsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/018_telegram_notifications.sql'), 'utf8').toLowerCase();
+const substitutionWillingnessMigration = readFileSync(join(repoRoot, 'infra/db/migrations/022_substitution_willingness.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql') && !entry.startsWith('._'))
   .sort()
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}\n${telegramNotificationsMigration}`;
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}\n${telegramNotificationsMigration}\n${substitutionWillingnessMigration}`;
 const sourcePolicyTables = ['retailer_source_policies'];
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
@@ -50,6 +51,7 @@ const repositoryTables = [
   'app_users',
   'favorite_stores',
   'user_preferences',
+  'substitution_willingness',
   'watchlist_items',
   'weekly_baskets',
   'basket_items',
@@ -299,6 +301,16 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('user_preferences'), /preferred_currency text not null default 'sek'/);
     assert.match(repositoryTableDefinition('user_preferences'), /notification_channels text\[\] not null default array\[\]::text\[\]/);
     assert.match(repositoryTableDefinition('user_preferences'), /notification_channels <@ array\['push', 'email', 'telegram'\]::text\[\]/);
+    assert.match(repositoryTableDefinition('substitution_willingness'), /user_id text not null references app_users\(id\) on delete cascade/);
+    assert.match(repositoryTableDefinition('substitution_willingness'), /class_id text not null check/);
+    assert.match(repositoryTableDefinition('substitution_willingness'), /class_id ~ '\^\[a-z0-9\]\[a-z0-9_\]\*\$'/);
+    assert.match(repositoryTableDefinition('substitution_willingness'), /willingness text not null check \(willingness in \('strict', 'broad', 'narrow'\)\)/);
+    assert.match(repositoryTableDefinition('substitution_willingness'), /primary key \(user_id, class_id\)/);
+    assert.match(substitutionWillingnessMigration, /produce=broad, meat=narrow, branded=strict/);
+    assert.match(substitutionWillingnessMigration, /create or replace function default_substitution_willingness\(class_kind text\)/);
+    assert.match(substitutionWillingnessMigration, /when 'produce' then 'broad'/);
+    assert.match(substitutionWillingnessMigration, /when 'meat' then 'narrow'/);
+    assert.match(substitutionWillingnessMigration, /when 'branded' then 'strict'/);
     assert.match(repositoryTableDefinition('weekly_baskets'), /unique \(user_id, week_start\)/);
     assert.match(repositoryTableDefinition('subscription_entitlements'), /user_id text primary key references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('subscription_entitlements'), /provider_subscription_id text/);
@@ -369,6 +381,7 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(householdPlansMigration, /household_members_user_idx on household_members \(user_id, household_id\)/);
     assert.match(householdPlansMigration, /household_basket_items_product_idx on household_basket_items \(product_id, household_id\)/);
     assert.match(householdPlansMigration, /household_watchlist_items_product_idx on household_watchlist_items \(product_id, household_id\)/);
+    assert.match(substitutionWillingnessMigration, /substitution_willingness_class_idx on substitution_willingness \(class_id, willingness, user_id\)/);
   });
 
   it('protects household collaboration tables with Supabase RLS and editor attribution columns', () => {
