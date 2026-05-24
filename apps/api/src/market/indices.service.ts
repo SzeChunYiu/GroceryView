@@ -16,7 +16,9 @@ type ChainIndexSqlRow = {
   product_name: string;
   category_path: string[] | null;
   chain_slug: string | null;
+  country_code: 'SE' | 'NO' | 'IS' | null;
   current_unit_price: string | number | null;
+  current_currency: 'SEK' | 'NOK' | 'ISK' | null;
   current_observed_at: string | Date | null;
 };
 
@@ -43,7 +45,9 @@ function mapChainRow(row: ChainIndexSqlRow): RealPriceIndexRow {
     productName: row.product_name,
     categoryPath: row.category_path ?? [],
     ...(row.chain_slug ? { chainSlug: row.chain_slug } : {}),
+    ...(row.country_code ? { country: row.country_code } : {}),
     ...(numberValue(row.current_unit_price) === undefined ? {} : { currentUnitPrice: numberValue(row.current_unit_price) }),
+    ...(row.current_currency ? { currency: row.current_currency } : {}),
     ...(iso(row.current_observed_at) ? { currentObservedAt: iso(row.current_observed_at) } : {})
   };
 }
@@ -73,6 +77,7 @@ export class IndicesService {
                 latest_prices.product_id,
                 latest_prices.chain_id,
                 latest_prices.unit_price,
+                latest_prices.currency,
                 latest_prices.observed_at
          from latest_prices
          where latest_prices.price_type in ('shelf', 'online', 'member', 'promotion')
@@ -84,7 +89,9 @@ export class IndicesService {
               products.canonical_name as product_name,
               products.category_path,
               chains.slug as chain_slug,
+              chains.country_code,
               current_chain_prices.unit_price as current_unit_price,
+              current_chain_prices.currency as current_currency,
               current_chain_prices.observed_at as current_observed_at
        from current_chain_prices
        join products on products.id = current_chain_prices.product_id
@@ -120,6 +127,7 @@ export class IndicesService {
                 latest_prices.product_id,
                 latest_prices.chain_id,
                 latest_prices.unit_price,
+                latest_prices.currency,
                 latest_prices.observed_at
          from latest_prices
          where latest_prices.price_type in ('shelf', 'online', 'member', 'promotion')
@@ -129,6 +137,7 @@ export class IndicesService {
        base_prices as (
          select distinct on (observations.product_id)
                 observations.product_id,
+                observations.currency,
                 observations.unit_price,
                 observations.observed_at
          from observations
@@ -143,12 +152,15 @@ export class IndicesService {
               products.private_label_owner,
               products.category_path,
               chains.slug as chain_slug,
+              chains.country_code,
               current_prices.unit_price as current_unit_price,
+              current_prices.currency as current_currency,
               current_prices.observed_at as current_observed_at,
               base_prices.unit_price as base_unit_price,
               base_prices.observed_at as base_observed_at
        from current_prices
        join base_prices on base_prices.product_id = current_prices.product_id
+                       and base_prices.currency = current_prices.currency
        join products on products.id = current_prices.product_id
        join chains on chains.id = current_prices.chain_id
        order by products.category_path, products.slug`

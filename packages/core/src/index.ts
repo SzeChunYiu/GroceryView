@@ -1811,14 +1811,26 @@ export function planRecurringBasketDigest(input: RecurringBasketDigestInput): Re
 
 export type IndexComponent = {
   productId: string;
+  country: IndexCountry;
+  currency: IndexCurrency;
   baseUnitPrice: number;
   currentUnitPrice: number;
   weight: number;
 };
 
+export type IndexCountry = 'SE' | 'NO' | 'IS';
+export type IndexCurrency = 'SEK' | 'NOK' | 'ISK';
+
+const indexCurrencyByCountry: Record<IndexCountry, IndexCurrency> = {
+  SE: 'SEK',
+  NO: 'NOK',
+  IS: 'ISK'
+};
+
 export type FixedBasketIndexInput = {
   id: string;
   label: string;
+  country: IndexCountry;
   baseDate: string;
   currentDate: string;
   components: IndexComponent[];
@@ -1827,6 +1839,8 @@ export type FixedBasketIndexInput = {
 export type FixedBasketIndex = {
   id: string;
   label: string;
+  country: IndexCountry;
+  currency: IndexCurrency;
   baseDate: string;
   currentDate: string;
   value: number;
@@ -1836,23 +1850,33 @@ export type FixedBasketIndex = {
 };
 
 export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBasketIndex {
-  if (input.components.length === 0) {
+  const currency = indexCurrencyByCountry[input.country];
+  if (!currency) throw new Error('country must be one of SE, NO, or IS.');
+  const scopedComponents = input.components.filter((component) => component.country === input.country);
+
+  if (scopedComponents.length === 0) {
     throw new Error('At least one component is required to calculate an index.');
   }
-  const base = input.components.reduce((sum, component) => sum + component.baseUnitPrice * component.weight, 0);
-  const current = input.components.reduce((sum, component) => sum + component.currentUnitPrice * component.weight, 0);
+  if (scopedComponents.some((component) => component.currency !== currency)) {
+    throw new Error(`Fixed basket index cannot mix currencies; ${input.country} components must use ${currency}.`);
+  }
+
+  const base = scopedComponents.reduce((sum, component) => sum + component.baseUnitPrice * component.weight, 0);
+  const current = scopedComponents.reduce((sum, component) => sum + component.currentUnitPrice * component.weight, 0);
   if (base <= 0) throw new Error('Base basket value must be positive.');
   const value = roundMoney((current / base) * 100);
 
   return {
     id: input.id,
     label: input.label,
+    country: input.country,
+    currency,
     baseDate: input.baseDate,
     currentDate: input.currentDate,
     value,
     movementPercent: roundMoney(value - 100),
-    confidence: input.components.length >= 5 ? 'high' : input.components.length >= 2 ? 'medium' : 'low',
-    components: input.components
+    confidence: scopedComponents.length >= 5 ? 'high' : scopedComponents.length >= 2 ? 'medium' : 'low',
+    components: scopedComponents
   };
 }
 
@@ -2332,9 +2356,10 @@ export function calculateBrandTierIndices(observations: BrandTierPriceObservatio
     .map(([brandTier, rows]) => calculateFixedBasketIndex({
       id: `${brandTier}-index`,
       label: brandTierLabels[brandTier],
+      country: 'SE',
       baseDate: 'brand-tier-base',
       currentDate: 'brand-tier-current',
-      components: rows.map((row) => ({ productId: row.category, baseUnitPrice: row.baseUnitPrice, currentUnitPrice: row.currentUnitPrice, weight: 1 }))
+      components: rows.map((row) => ({ productId: row.category, country: 'SE', currency: 'SEK', baseUnitPrice: row.baseUnitPrice, currentUnitPrice: row.currentUnitPrice, weight: 1 }))
     }))
     .map((index) => ({
       brandTier: index.id.replace('-index', '') as BrandTier,

@@ -60,6 +60,8 @@ import {
   type HouseholdSnapshot,
   type HouseholdSummary,
   type HouseholdWatchlistItem,
+  type IndexCountry,
+  type IndexCurrency,
   type NutritionMetric,
   type NutritionProduct,
   type NutritionRank,
@@ -328,6 +330,8 @@ export type RealPriceIndexRow = {
   privateLabelOwner?: string;
   baseUnitPrice?: number;
   currentUnitPrice?: number;
+  country?: IndexCountry;
+  currency?: IndexCurrency;
   baseObservedAt?: string;
   currentObservedAt?: string;
 };
@@ -2518,6 +2522,8 @@ function indexComponentFor(product: ProductDetail) {
   if (!first || !current) return null;
   return {
     productId: product.id,
+    country: 'SE',
+    currency: 'SEK',
     baseUnitPrice: first.price,
     currentUnitPrice: current.price,
     weight: 1
@@ -2545,6 +2551,7 @@ function buildStockholmGroceryIndex() {
   return calculateFixedBasketIndex({
     id: 'stockholm-grocery-index',
     label: 'Stockholm Grocery Index',
+    country: 'SE',
     baseDate: indexBaseDate(products),
     currentDate: indexCurrentDate(products),
     components
@@ -2805,10 +2812,13 @@ export function buildRealCategoryPriceIndices(rows: RealPriceIndexRow[]): Catego
     const index = calculateFixedBasketIndex({
       id: `${category}-category-price-index`,
       label: `${category[0]?.toUpperCase() ?? ''}${category.slice(1)} Price Index`,
+      country: 'SE',
       baseDate: earliestIso(categoryRows.map((row) => row.baseObservedAt)),
       currentDate: latestIso(categoryRows.map((row) => row.currentObservedAt)),
       components: categoryRows.map((row) => ({
         productId: row.productSlug || row.productId,
+        country: row.country ?? 'SE',
+        currency: row.currency ?? 'SEK',
         baseUnitPrice: row.baseUnitPrice,
         currentUnitPrice: row.currentUnitPrice,
         weight: 1
@@ -2906,6 +2916,7 @@ function buildCategoryPriceIndices(): CategoryPriceIndexSummary {
     const index = calculateFixedBasketIndex({
       id: `${category}-category-price-index`,
       label: `${category[0]?.toUpperCase() ?? ''}${category.slice(1)} Price Index`,
+      country: 'SE',
       baseDate: indexBaseDate(categoryProducts),
       currentDate: indexCurrentDate(categoryProducts),
       components
