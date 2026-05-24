@@ -22,6 +22,22 @@ type ProductSearchResponse = {
 type SearchStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
 
 const MIN_QUERY_LENGTH = 2;
+const ZERO_RESULT_FALLBACKS = [
+  { categories: ['Dairy', 'Breakfast'], keywords: ['fil', 'milk', 'yogurt', 'cheese', 'lactose'], searches: ['lactosefri mjölk', 'yoghurt', 'ost'] },
+  { categories: ['Fruit', 'Vegetables'], keywords: ['apple', 'banana', 'fruit', 'greens', 'veg'], searches: ['äpplen', 'bananer', 'grönsaker'] },
+  { categories: ['Pantry', 'Breakfast'], keywords: ['oat', 'rice', 'pasta', 'flour', 'cereal'], searches: ['havregryn', 'pasta', 'ris'] },
+  { categories: ['Coffee', 'Drinks'], keywords: ['coffee', 'tea', 'juice', 'drink', 'soda'], searches: ['kaffe', 'te', 'juice'] },
+  { categories: ['Frozen', 'Ready meals'], keywords: ['frozen', 'pizza', 'meal', 'dinner'], searches: ['fryst pizza', 'färdigrätt', 'frysta grönsaker'] }
+];
+
+function zeroResultFallbacks(query: string) {
+  const normalizedQuery = query.toLocaleLowerCase('sv-SE');
+  const matchedFallback = ZERO_RESULT_FALLBACKS.find((fallback) => (
+    fallback.keywords.some((keyword) => normalizedQuery.includes(keyword))
+  )) ?? ZERO_RESULT_FALLBACKS[0];
+
+  return matchedFallback;
+}
 
 export function SearchBar() {
   const inputId = useId();
@@ -30,6 +46,7 @@ export function SearchBar() {
   const [results, setResults] = useState<ProductSearchResult[]>([]);
   const [status, setStatus] = useState<SearchStatus>('idle');
   const trimmedQuery = useMemo(() => query.trim(), [query]);
+  const emptyFallback = useMemo(() => zeroResultFallbacks(trimmedQuery), [trimmedQuery]);
   const shouldShowDropdown = status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH;
 
   useEffect(() => {
@@ -100,7 +117,25 @@ export function SearchBar() {
             <p className="px-4 py-3 text-sm font-bold text-rose-800">Product search is temporarily unavailable.</p>
           ) : null}
           {status === 'empty' ? (
-            <p className="px-4 py-3 text-sm font-bold text-slate-600">No products matched “{trimmedQuery}”.</p>
+            <div className="px-4 py-3">
+              <p className="text-sm font-bold text-slate-700">No products matched “{trimmedQuery}”.</p>
+              <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Try related searches</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {emptyFallback.searches.map((search) => (
+                  <Link className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900" href={`/products?q=${encodeURIComponent(search)}`} key={search}>
+                    {search}
+                  </Link>
+                ))}
+              </div>
+              <p className="mt-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Browse categories</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {emptyFallback.categories.map((category) => (
+                  <Link className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800" href={`/products?category=${encodeURIComponent(category)}`} key={category}>
+                    {category}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ) : null}
           {status === 'ready' ? (
             <div className="max-h-96 divide-y divide-slate-100 overflow-y-auto">
