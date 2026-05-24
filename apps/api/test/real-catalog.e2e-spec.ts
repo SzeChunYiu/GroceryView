@@ -135,6 +135,23 @@ const unpricedProductRows = [
   }
 ];
 
+const pendingAliasRows = [
+  {
+    alias_id: 'alias-pending-milk',
+    normalized_alias: 'mjolk utan resultat',
+    source_ref: 'faceted-search:no-result',
+    product_id: null,
+    reviewed_at: null,
+    created_at: '2026-05-22T10:00:00.000Z'
+  }
+];
+
+const reviewedAliasRow = {
+  ...pendingAliasRows[0],
+  product_id: 'product-milk',
+  reviewed_at: '2026-05-23T10:30:00.000Z'
+};
+
 const productRows = [
   {
     id: 'product-milk',
@@ -346,6 +363,8 @@ class FakePostgresQueryExecutorService {
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
+    if (sql.includes('update aliases') && sql.includes("source_ref = $1")) return [reviewedAliasRow] as T[];
+    if (sql.includes('from aliases') && sql.includes("source_ref = $1")) return pendingAliasRows as T[];
     if (sql.includes('from weekly_baskets')) return [{ product_id: 'product-milk', quantity: '2' }] as T[];
     if (sql.includes('where (products.id::text = any($1::text[]) or products.slug = any($1::text[]))')) {
       const [productRefs, storeSlugs] = params as [string[], string[] | null];
@@ -423,6 +442,8 @@ describe('real catalog API endpoints', () => {
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
 
     assert.ok(docs.body.paths['/products/search/faceted']);
+    assert.ok(docs.body.paths['/products/search/reviewer/aliases']);
+    assert.ok(docs.body.paths['/products/search/reviewer/aliases/{aliasId}/approve']);
     assert.ok(docs.body.paths['/products/{productId}/price-history']);
     assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
     assert.ok(docs.body.paths['/indices/chains']);
@@ -430,6 +451,55 @@ describe('real catalog API endpoints', () => {
     assert.ok(docs.body.paths['/indices/brands']);
     assert.ok(docs.body.paths['/baskets/compare']);
     assert.ok(docs.body.paths['/users/{userId}/basket/compare']);
+  });
+
+  it('requires admin review credentials for pending faceted-search aliases', async () => {
+    await request(app.getHttpServer()).get('/products/search/reviewer/aliases').expect(403);
+    assert.equal(database.calls.length, 0);
+  });
+
+  it('lists pending faceted-search no-result aliases for reviewers', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/products/search/reviewer/aliases?limit=5')
+      .set('x-groceryview-admin', 'reviewer')
+      .expect(200);
+
+    assert.equal(response.body.sourceRef, 'faceted-search:no-result');
+    assert.deepEqual(response.body.aliases, [
+      {
+        aliasId: 'alias-pending-milk',
+        normalizedAlias: 'mjolk utan resultat',
+        sourceRef: 'faceted-search:no-result',
+        createdAt: '2026-05-22T10:00:00.000Z'
+      }
+    ]);
+    assert.deepEqual(response.body.evidence, { pendingCount: 1, sourceTables: ['aliases'] });
+    assert.match(database.calls[0]?.sql ?? '', /from aliases/i);
+    assert.match(database.calls[0]?.sql ?? '', /aliases\.source_ref = \$1/i);
+    assert.match(database.calls[0]?.sql ?? '', /aliases\.product_id is null or aliases\.reviewed_at is null/i);
+    assert.deepEqual(database.calls[0]?.params, ['faceted-search:no-result', 5]);
+  });
+
+  it('lets reviewers attach product_id and reviewed_at to a pending search alias', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/products/search/reviewer/aliases/alias-pending-milk/approve')
+      .set('x-groceryview-admin', 'true')
+      .send({ productId: 'product-milk', reviewedAt: '2026-05-23T10:30:00.000Z' })
+      .expect(201);
+
+    assert.equal(response.body.reviewed, true);
+    assert.equal(response.body.alias.productId, 'product-milk');
+    assert.equal(response.body.alias.reviewedAt, '2026-05-23T10:30:00.000Z');
+    assert.match(database.calls[0]?.sql ?? '', /update aliases/i);
+    assert.match(database.calls[0]?.sql ?? '', /set product_id = \$3/i);
+    assert.match(database.calls[0]?.sql ?? '', /reviewed_at = \$4::timestamptz/i);
+    assert.match(database.calls[0]?.sql ?? '', /aliases\.product_id is null or aliases\.reviewed_at is null/i);
+    assert.deepEqual(database.calls[0]?.params, [
+      'faceted-search:no-result',
+      'alias-pending-milk',
+      'product-milk',
+      '2026-05-23T10:30:00.000Z'
+    ]);
   });
 
   it('serves faceted product search from database rows', async () => {
