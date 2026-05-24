@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildHealthGoalNutritionOptimizer, buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 import { pricedProducts } from './openprices-products';
 
 export const products = [
@@ -2920,6 +2920,7 @@ export const nutritionPerKronaInputs = [
     productId: 'kronfagel-kycklingfile-1kg',
     name: 'Kronfågel Kycklingfilé 1kg',
     price: 109,
+    labels: ['high_protein'],
     nutritionPerPackage: { proteinGrams: 230, calories: 1050, fiberGrams: 0, sugarGrams: 0, saltGrams: 1.6 },
     source: 'visible weekly-deal product row + package nutrition label fixture'
   },
@@ -2927,6 +2928,7 @@ export const nutritionPerKronaInputs = [
     productId: 'icas-egg-15p',
     name: 'ICA Ägg 15-pack',
     price: 39.95,
+    labels: ['keyhole'],
     nutritionPerPackage: { proteinGrams: 95, calories: 1050, fiberGrams: 0, sugarGrams: 1, saltGrams: 2.1 },
     source: 'visible shelf product row + package nutrition label fixture'
   },
@@ -2934,6 +2936,7 @@ export const nutritionPerKronaInputs = [
     productId: 'lindahls-kvarg-500g',
     name: 'Lindahls Kvarg Naturell 500g',
     price: 19.9,
+    labels: ['keyhole', 'high_protein'],
     nutritionPerPackage: { proteinGrams: 55, calories: 300, fiberGrams: 0, sugarGrams: 17.5, saltGrams: 0.5 },
     source: 'visible member-promo product row + package nutrition label fixture'
   },
@@ -2941,6 +2944,7 @@ export const nutritionPerKronaInputs = [
     productId: 'garant-ekologisk-tofu-270g',
     name: 'Garant Ekologisk Tofu 270g',
     price: 21.9,
+    labels: ['vegan', 'plant_based'],
     nutritionPerPackage: { proteinGrams: 35, calories: 335, fiberGrams: 2.7, sugarGrams: 0.8, saltGrams: 0.3 },
     source: 'visible shelf product row + package nutrition label fixture'
   }
@@ -3041,6 +3045,24 @@ export const highProteinDealFinder = {
 const macroProteinRanks = rankNutritionPerKrona(nutritionPerKronaInputs, 'protein');
 const macroCalorieRanks = rankNutritionPerKrona(nutritionPerKronaInputs, 'calories');
 const macroFiberRanks = rankNutritionPerKrona(nutritionPerKronaInputs, 'fiber');
+const healthGoalOptimizerInputs = [
+  ...nutritionPerKronaInputs,
+  {
+    productId: 'barebells-banana-proteinbar-55g',
+    name: 'Barebells Banana Dream Proteinbar 55g',
+    price: 20.72,
+    labels: ['high_protein'],
+    nutritionVerified: false,
+    nutritionPerPackage: { proteinGrams: 0, calories: 0, fiberGrams: 0, sugarGrams: 0, saltGrams: 0 },
+    source: 'visible Axfood product row without verified package macro label'
+  }
+];
+const healthGoalReports = [
+  { label: 'High-protein', report: buildHealthGoalNutritionOptimizer(healthGoalOptimizerInputs, 'high-protein') },
+  { label: 'Low-calorie', report: buildHealthGoalNutritionOptimizer(healthGoalOptimizerInputs, 'low-calorie') },
+  { label: 'Vegan', report: buildHealthGoalNutritionOptimizer(healthGoalOptimizerInputs, 'vegan') },
+  { label: 'Keyhole', report: buildHealthGoalNutritionOptimizer(healthGoalOptimizerInputs, 'keyhole') }
+];
 
 export const healthMacroOptimizer = {
   persona: 'Health & fitness',
@@ -3053,6 +3075,23 @@ export const healthMacroOptimizer = {
   topProtein: macroProteinRanks[0],
   topCalories: macroCalorieRanks[0],
   topFiber: macroFiberRanks[0],
+  goalBoards: healthGoalReports.map(({ label, report }) => ({
+    goal: report.goal,
+    label,
+    rows: report.rows.slice(0, 3).map((row) => ({
+      productId: row.productId,
+      name: row.name,
+      goalScore: row.goalScore,
+      proteinPer10Sek: row.proteinPer10Sek,
+      caloriesPer10Sek: row.caloriesPer10Sek,
+      fiberPer10Sek: row.fiberPer10Sek,
+      matchedLabels: row.matchedLabels,
+      coverageNote: row.coverageNote
+    })),
+    excludedRows: report.excludedRows,
+    coverage: report.coverage
+  })),
+  missingCoverageRows: healthGoalReports[0]?.report.excludedRows.filter((row) => row.reason === 'missing_nutrition') ?? [],
   rows: nutritionPerKronaInputs.map((product) => ({
     productId: product.productId,
     name: product.name,
@@ -3065,7 +3104,8 @@ export const healthMacroOptimizer = {
     source: product.source
   })),
   coverage: {
-    caveat: 'Macro optimization reuses only visible prices and package nutrition-label fixtures; missing macro labels are excluded instead of estimated.'
+    missingNutritionProducts: healthGoalReports[0]?.report.coverage.missingNutritionProducts ?? 0,
+    caveat: 'Macro optimization reuses only visible prices and package nutrition-label fixtures; missing macro labels are excluded instead of estimated and shown as coverage gaps.'
   }
 };
 

@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateMealCostBreakdown, rankNutritionPerKrona, suggestDealBasedMeals } from '../index.js';
+import { buildHealthGoalNutritionOptimizer, calculateMealCostBreakdown, rankNutritionPerKrona, suggestDealBasedMeals } from '../index.js';
 
 describe('rankNutritionPerKrona', () => {
   it('ranks protein deals per 10 SEK and keeps health metadata', () => {
@@ -13,6 +13,31 @@ describe('rankNutritionPerKrona', () => {
       { productId: 'chicken', valuePer10Sek: 22.89 },
       { productId: 'yogurt', valuePer10Sek: 15.76 }
     ]);
+  });
+});
+
+describe('buildHealthGoalNutritionOptimizer', () => {
+  it('supports health goals from verified nutrition and labels while exposing missing coverage', () => {
+    const products = [
+      { productId: 'kvarg', name: 'Kvarg', price: 19.9, labels: ['keyhole'], nutritionPerPackage: { proteinGrams: 55, calories: 300, fiberGrams: 0, sugarGrams: 17.5, saltGrams: 0.5 } },
+      { productId: 'tofu', name: 'Tofu', price: 21.9, labels: ['vegan'], nutritionPerPackage: { proteinGrams: 35, calories: 335, fiberGrams: 2.7, sugarGrams: 0.8, saltGrams: 0.3 } },
+      { productId: 'chips', name: 'Chips', price: 29.9, nutritionVerified: false, nutritionPerPackage: { proteinGrams: 0, calories: 0, fiberGrams: 0, sugarGrams: 0, saltGrams: 0 } }
+    ];
+
+    const highProtein = buildHealthGoalNutritionOptimizer(products, 'high-protein');
+    assert.deepEqual(highProtein.rows.map((row) => row.productId), ['kvarg', 'tofu']);
+    assert.equal(highProtein.excludedRows[0]?.reason, 'missing_nutrition');
+
+    const lowCalorie = buildHealthGoalNutritionOptimizer(products, 'low-calorie');
+    assert.equal(lowCalorie.rows[0]?.productId, 'kvarg');
+
+    const vegan = buildHealthGoalNutritionOptimizer(products, 'vegan');
+    assert.deepEqual(vegan.rows.map((row) => [row.productId, row.matchedLabels]), [['tofu', ['vegan']]]);
+    assert.ok(vegan.excludedRows.some((row) => row.productId === 'kvarg' && row.reason === 'missing_goal_label'));
+
+    const keyhole = buildHealthGoalNutritionOptimizer(products, 'keyhole');
+    assert.equal(keyhole.rows[0]?.productId, 'kvarg');
+    assert.match(keyhole.coverage.caveat, /missing nutrition coverage/i);
   });
 });
 

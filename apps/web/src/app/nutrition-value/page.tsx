@@ -164,6 +164,9 @@ export default function NutritionValuePage() {
             <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-700">{healthMacroOptimizer.persona}</p>
             <h2 className="mt-2 text-2xl font-black">Macro optimizer</h2>
             <p className="mt-2 max-w-2xl text-sm font-semibold text-slate-700">{healthMacroOptimizer.coverage.caveat}</p>
+            <p className="mt-2 max-w-2xl text-sm font-black text-emerald-900">
+              Goals: High-protein, Low-calorie, Vegan, and Keyhole where verified labels exist.
+            </p>
           </div>
           <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-right">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">topProtein</p>
@@ -182,6 +185,47 @@ export default function NutritionValuePage() {
             </div>
           ))}
         </div>
+
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {healthMacroOptimizer.goalBoards.map((board) => (
+            <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4" key={board.goal}>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">goal · {board.goal}</p>
+              <h3 className="mt-2 text-xl font-black text-slate-950">{board.label}</h3>
+              <p className="mt-2 text-sm font-semibold text-slate-700">
+                {board.coverage.labelledProducts} ranked of {board.coverage.visibleProducts} visible rows; {board.coverage.missingNutritionProducts} missing nutrition coverage.
+              </p>
+              <div className="mt-3 space-y-2">
+                {board.rows.map((row) => (
+                  <div className="rounded-2xl bg-white p-3 shadow-sm" key={`${board.goal}-${row.productId}`}>
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <p className="font-black text-slate-950">{row.name}</p>
+                      <p className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950">goalScore {row.goalScore.toFixed(2)}</p>
+                    </div>
+                    <p className="mt-2 text-xs font-semibold text-slate-600">{row.coverageNote}</p>
+                    <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+                      labels {row.matchedLabels.join(', ') || 'nutrition-only'}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 text-xs font-semibold leading-5 text-emerald-950">{board.coverage.caveat}</p>
+            </div>
+          ))}
+        </div>
+
+        {healthMacroOptimizer.missingCoverageRows.length > 0 ? (
+          <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">missing nutrition coverage</p>
+            <p className="mt-2 text-sm font-semibold text-amber-950">
+              These visible products are not optimized because verified macros are missing rather than inferred.
+            </p>
+            <div className="mt-3 grid gap-2 md:grid-cols-2">
+              {healthMacroOptimizer.missingCoverageRows.map((row) => (
+                <p className="rounded-2xl bg-white p-3 text-sm font-black text-slate-950" key={row.productId}>{row.name} · {row.reason}</p>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200">
           {healthMacroOptimizer.rows.map((row) => (

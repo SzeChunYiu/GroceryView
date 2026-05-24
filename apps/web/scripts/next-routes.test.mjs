@@ -1520,10 +1520,16 @@ describe('verified-data UI', () => {
     const source = await read('src/app/nutrition-value/page.tsx');
     const demo = await read('src/lib/demo-data.ts');
     assert.match(demo, /healthMacroOptimizer/);
+    assert.match(demo, /buildHealthGoalNutritionOptimizer/);
     assert.match(demo, /rankNutritionPerKrona/);
     assert.match(source, /healthMacroOptimizer/);
     assert.match(source, /Macro optimizer/);
     assert.match(source, /macroTargets/);
+    assert.match(source, /goalBoards/);
+    assert.match(source, /Low-calorie/);
+    assert.match(source, /Vegan/);
+    assert.match(source, /Keyhole/);
+    assert.match(source, /missing nutrition coverage/i);
     assert.match(source, /topProtein/);
     assert.match(source, /topFiber/);
     assert.doesNotMatch(source, /NoVerifiedData/);

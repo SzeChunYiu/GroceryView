@@ -4281,6 +4281,8 @@ export type NutritionProduct = {
   productId: string;
   name: string;
   price: number;
+  labels?: string[];
+  nutritionVerified?: boolean;
   nutritionPerPackage: {
     proteinGrams: number;
     calories: number;
@@ -4291,6 +4293,7 @@ export type NutritionProduct = {
 };
 
 export type NutritionMetric = 'protein' | 'calories' | 'fiber';
+export type NutritionGoal = 'high-protein' | 'low-calorie' | 'vegan' | 'keyhole';
 
 export type NutritionRank = NutritionProduct & {
   metric: NutritionMetric;
@@ -4310,6 +4313,95 @@ export function rankNutritionPerKrona(products: NutritionProduct[], metric: Nutr
       saltWarning: product.nutritionPerPackage.saltGrams > 2
     }))
     .sort((a, b) => b.valuePer10Sek - a.valuePer10Sek);
+}
+
+export type NutritionGoalRank = NutritionProduct & {
+  goal: NutritionGoal;
+  goalScore: number;
+  proteinPer10Sek: number;
+  caloriesPer10Sek: number;
+  fiberPer10Sek: number;
+  matchedLabels: string[];
+  coverageNote: string;
+};
+
+export type NutritionGoalExcludedProduct = {
+  productId: string;
+  name: string;
+  reason: 'missing_nutrition' | 'missing_goal_label' | 'invalid_price';
+};
+
+function nutritionValuePer10Sek(product: NutritionProduct, metric: NutritionMetric): number {
+  const metricKey = metric === 'protein' ? 'proteinGrams' : metric === 'calories' ? 'calories' : 'fiberGrams';
+  return Math.round((product.nutritionPerPackage[metricKey] / product.price) * 1000) / 100;
+}
+
+function normalizedNutritionLabels(product: NutritionProduct): string[] {
+  return (product.labels ?? []).map((label) => label.trim().toLocaleLowerCase('sv-SE')).filter(Boolean);
+}
+
+function goalLabelMatches(goal: NutritionGoal, labels: string[]): string[] {
+  if (goal === 'vegan') return labels.filter((label) => ['vegan', 'plant_based', 'plant-based', 'vegetarisk'].includes(label));
+  if (goal === 'keyhole') return labels.filter((label) => ['keyhole', 'nyckelhal', 'nyckelhål'].includes(label));
+  return [];
+}
+
+export function buildHealthGoalNutritionOptimizer(products: NutritionProduct[], goal: NutritionGoal) {
+  const rows: NutritionGoalRank[] = [];
+  const excludedRows: NutritionGoalExcludedProduct[] = [];
+
+  for (const product of products) {
+    if (!Number.isFinite(product.price) || product.price <= 0) {
+      excludedRows.push({ productId: product.productId, name: product.name, reason: 'invalid_price' });
+      continue;
+    }
+    if (product.nutritionVerified === false) {
+      excludedRows.push({ productId: product.productId, name: product.name, reason: 'missing_nutrition' });
+      continue;
+    }
+
+    const labels = normalizedNutritionLabels(product);
+    const matchedLabels = goalLabelMatches(goal, labels);
+    if ((goal === 'vegan' || goal === 'keyhole') && matchedLabels.length === 0) {
+      excludedRows.push({ productId: product.productId, name: product.name, reason: 'missing_goal_label' });
+      continue;
+    }
+
+    const proteinPer10Sek = nutritionValuePer10Sek(product, 'protein');
+    const caloriesPer10Sek = nutritionValuePer10Sek(product, 'calories');
+    const fiberPer10Sek = nutritionValuePer10Sek(product, 'fiber');
+    const goalScore = goal === 'low-calorie' ? caloriesPer10Sek : proteinPer10Sek;
+
+    rows.push({
+      ...product,
+      goal,
+      goalScore,
+      proteinPer10Sek,
+      caloriesPer10Sek,
+      fiberPer10Sek,
+      matchedLabels,
+      coverageNote: 'Ranked from visible price rows with verified nutrition labels; missing macro coverage is excluded, not estimated.'
+    });
+  }
+
+  rows.sort((a, b) => {
+    if (goal === 'low-calorie') return a.goalScore - b.goalScore || b.proteinPer10Sek - a.proteinPer10Sek;
+    return b.goalScore - a.goalScore || a.caloriesPer10Sek - b.caloriesPer10Sek;
+  });
+
+  const missingNutritionProducts = excludedRows.filter((row) => row.reason === 'missing_nutrition').length;
+  return {
+    goal,
+    rows,
+    excludedRows,
+    coverage: {
+      visibleProducts: products.length,
+      labelledProducts: rows.length,
+      missingNutritionProducts,
+      confidence: missingNutritionProducts === 0 ? 'high' as const : 'medium' as const,
+      caveat: 'Only visible products with verified nutrition labels and current prices are ranked; missing nutrition coverage and missing goal labels stay visible as exclusions.'
+    }
+  };
 }
 
 export type MealDeal = {
