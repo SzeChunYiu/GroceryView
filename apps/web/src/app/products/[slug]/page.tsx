@@ -18,7 +18,6 @@ import {
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
-import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
