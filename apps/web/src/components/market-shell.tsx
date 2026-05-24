@@ -886,13 +886,13 @@ export function MarketShell() {
           {categoryDealLeaders.slice(0, 8).map((leader) => (
             <Link
               className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
-              href={`/categories/${leader.categorySlug}`}
+              href={`/products/${leader.productSlug}`}
               key={`${leader.categorySlug}-${leader.productSlug}`}
             >
               <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{leader.categoryLabel}</p>
               <p className="mt-2 font-black text-slate-950">{leader.productName}</p>
               <p className="mt-3 text-2xl font-black text-emerald-800">{leader.signal}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-600">{leader.evidenceLabel}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-600">{leader.storeName} lowest · sourceConfidence {(leader.sourceConfidence * 100).toFixed(0)}% · category coverage {leader.categoryLabel}</p>
             </Link>
           ))}
         </div>

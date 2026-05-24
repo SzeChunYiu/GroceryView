@@ -57,7 +57,7 @@ export default async function CategoryPage({ params }: Readonly<{ params: Promis
             >
               <p className="font-black text-slate-950">{leader.productName}</p>
               <p className="mt-2 text-2xl font-black text-emerald-800">{leader.signal}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-700">{leader.storeName} lowest · sourceConfidence {(leader.sourceConfidence * 100).toFixed(0)}%</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{leader.storeName} lowest · sourceConfidence {(leader.sourceConfidence * 100).toFixed(0)}% · coverage {dealLeaders.length} trusted leaders</p>
             </Link>
           ))}
           {dealLeaders.length === 0 ? (
