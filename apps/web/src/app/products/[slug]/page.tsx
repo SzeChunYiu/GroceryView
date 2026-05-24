@@ -18,6 +18,7 @@ import {
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
+import { buyWaitObservedHistoryCopy, historicalPercentileCopy, observedHistoryLimitationCopy } from '@/lib/content-style';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
@@ -246,8 +247,8 @@ function dealScoreVerdictFor(product: NonNullable<ReturnType<typeof findProduct>
       band: scoreBand(score),
       confidence: sourceConfidence,
       evidence: `${rows.length} exact chain price rows`,
-      percentileLabel: `cross-chain spread percentile ${formatPct(crossChainSpreadPercentile)}`,
-      caveat: 'Full promotion history is missing, so calculateDealScore uses percentiles derived only from the observed cross-chain spread.'
+      percentileLabel: historicalPercentileCopy(`cross-chain spread percentile ${formatPct(crossChainSpreadPercentile)}`, 'the current matched chain snapshot'),
+      caveat: observedHistoryLimitationCopy('Full promotion history is missing, so calculateDealScore uses percentiles derived only from the observed cross-chain spread.')
     };
   }
 
@@ -270,8 +271,8 @@ function dealScoreVerdictFor(product: NonNullable<ReturnType<typeof findProduct>
     band: scoreBand(score),
     confidence: sourceConfidence,
     evidence: `${product.observationCount} OpenPrices observations`,
-    percentileLabel: `observed-history percentile ${formatPct(historyPercentile)}`,
-    caveat: 'Uses OpenPrices price observations only; no retailer promotion or unobserved discount is inferred.'
+    percentileLabel: historicalPercentileCopy(`observed-history percentile ${formatPct(historyPercentile)}`, "the product's own observed 1-year history"),
+    caveat: observedHistoryLimitationCopy('Uses OpenPrices price observations only; no retailer promotion or unobserved discount is inferred.')
   };
 }
 
@@ -1002,7 +1003,7 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
       title: 'Multi-timeframe chart withheld',
       sourceLabel: 'No dated OpenPrices tape bundled for this source',
       confidenceLabel: 'chart confidence unavailable',
-      caveat: 'This product source has no dated observation tape, so GroceryView does not render a synthetic chart.',
+      caveat: observedHistoryLimitationCopy('This product source has no dated observation tape, so GroceryView does not render a synthetic chart.'),
       defaultWindow: 'ALL',
       windows: emptyWindows
     };
@@ -1052,7 +1053,7 @@ function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduc
     title: 'Multi-timeframe OpenPrices tape',
     sourceLabel: 'buildPriceChartSeries · OpenPrices community observations',
     confidenceLabel: `${formatPct(sourceConfidence * 100)} chart confidence`,
-    caveat: 'Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred.',
+    caveat: observedHistoryLimitationCopy('Every plotted point comes from dated OpenPrices observations; missing shelf, flyer, and member prices are disclosed instead of inferred.'),
     defaultWindow: windows.find((window) => window.label === '1Y' && window.pointCount > 0)?.label ?? 'ALL',
     windows
   };
@@ -1068,6 +1069,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   if (!product) notFound();
   const isChain = 'lowestPrice' in product;
   const dealVerdict = dealScoreVerdictFor(product);
+  const buyWaitRuleCopy = buyWaitObservedHistoryCopy('calculateDealScore + scoreBand', `${dealVerdict.band.label} · ${dealVerdict.band.verdict}`);
   const smartSwaps = smartSwapRecommendationsFor(product);
   const itemSubstitutions = itemSubstitutionSuggestionsFor(product);
   const priceHistoryBadge = priceHistoryBadgeFor(product);
@@ -1189,7 +1191,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
             <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-800">Buy/Wait signal</p>
             <h2 className="mt-2 text-2xl font-black text-slate-950">Deal Score verdict</h2>
             <p className="mt-2 text-sm leading-6 text-slate-700">
-              Calls calculateDealScore and scoreBand with visible price evidence. {dealVerdict.caveat}
+              {buyWaitRuleCopy} {dealVerdict.caveat}
             </p>
           </div>
           <div className="rounded-3xl bg-white p-5 text-right shadow-sm">

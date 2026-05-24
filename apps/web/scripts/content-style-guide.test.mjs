@@ -32,17 +32,28 @@ describe('honest price intelligence content style', () => {
     }
     assert.match(style, /bannedWithoutEvidence/);
     assert.match(style, /listedSavingsBoundaryCopy/);
+    assert.match(style, /buyWaitObservedHistoryCopy/);
+    assert.match(style, /historicalPercentileCopy/);
+    assert.match(style, /observedHistoryLimitationCopy/);
+    assert.match(style, /observedVolatilityBandCopy/);
   });
 
-  it('wires shared confidence, freshness, savings, and source-limitation wording into rendered UI', async () => {
+  it('wires shared confidence, freshness, savings, buy-wait, historical-percentile, and source-limitation wording into rendered UI', async () => {
     const confidenceBadge = await read('src/components/confidence-badge.tsx');
     const dataUi = await read('src/components/data-ui.tsx');
     const catalogueSavings = await read('src/app/catalogue-savings/page.tsx');
+    const productPage = await read('src/app/products/[slug]/page.tsx');
+    const priceChartTerminal = await read('src/components/price-chart-terminal.tsx');
 
     assert.match(confidenceBadge, /confidenceCopy/);
     assert.match(dataUi, /freshnessCopy/);
     assert.match(dataUi, /sourceLimitationCopy/);
     assert.match(catalogueSavings, /listedSavingsBoundaryCopy/);
+    assert.match(productPage, /buyWaitObservedHistoryCopy/);
+    assert.match(productPage, /historicalPercentileCopy/);
+    assert.match(productPage, /observedHistoryLimitationCopy/);
+    assert.match(priceChartTerminal, /observedVolatilityBandCopy/);
+    assert.doesNotMatch(priceChartTerminal, /Expected band:/);
   });
 
   it('keeps forecast-like language tied to observed or historical source context', async () => {

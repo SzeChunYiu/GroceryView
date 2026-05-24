@@ -104,6 +104,22 @@ export function freshnessCopy(freshness: string) {
   return `Freshness: ${freshness}`;
 }
 
+export function buyWaitObservedHistoryCopy(ruleName: string, outcome: string) {
+  return `Buy/Wait rule outcome: ${outcome} from ${ruleName}, using observed history and dated observations only; no forecast is implied.`;
+}
+
+export function historicalPercentileCopy(percentileLabel: string, lookbackWindow: string) {
+  return `Historical percentile: ${percentileLabel} over ${lookbackWindow} from dated observations; not a prediction.`;
+}
+
+export function observedHistoryLimitationCopy(caveat: string) {
+  return sourceLimitationCopy(`${caveat} Observed-history wording is required whenever Buy/Wait, percentile, or chart copy appears.`);
+}
+
+export function observedVolatilityBandCopy(bandLabel: string) {
+  return `Observed volatility band: ${bandLabel} around the latest dated observation; not an expected future price.`;
+}
+
 export function listedSavingsBoundaryCopy() {
   return 'Listed savings are not basket savings. Values are observed in matched source rows and do not claim live discounts, store-specific availability, loyalty eligibility, or savings on unmatched products.';
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { observedVolatilityBandCopy } from '@/lib/content-style';
 
 type LineStyleName = 'solid' | 'dashed' | 'dotted';
 type ChartLoadStatus = 'idle' | 'loading' | 'ready' | 'failed';
@@ -260,7 +261,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
                 <p className="text-sm font-black text-white">{series.storeName} · {series.sourceType}</p>
                 <p className="mt-1 text-xs font-semibold text-slate-300">lineStyle {series.lineStyle} · {series.points.length} points · {series.markers.length} markers</p>
                 <p className="mt-2 text-xs font-bold text-emerald-100">
-                  Expected band: {latestVolatilityBandLabel(series)} around latest observed price.
+                  {observedVolatilityBandCopy(latestVolatilityBandLabel(series))}
                 </p>
                 {series.markers.length > 0 ? (
                   <p className="mt-3 rounded-xl bg-slate-950/70 p-3 text-xs font-bold text-emerald-100">
