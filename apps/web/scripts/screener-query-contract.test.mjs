@@ -35,6 +35,8 @@ function installScreenerRuntime(nextStubs) {
   const originalResolveFilename = Module._resolveFilename;
   const originalTsLoader = Module._extensions['.ts'];
   const originalTsxLoader = Module._extensions['.tsx'];
+  const originalJsLoader = Module._extensions['.js'];
+  const unitPriceFormattingFile = join(webRoot, 'src/lib/unit-price-formatting.js');
 
   function transpileTypeScript(module, filename) {
     const source = readFileSync(filename, 'utf8');
@@ -65,6 +67,12 @@ function installScreenerRuntime(nextStubs) {
 
   Module._extensions['.ts'] = transpileTypeScript;
   Module._extensions['.tsx'] = transpileTypeScript;
+  Module._extensions['.js'] = function transpileScreenerJavaScript(module, filename) {
+    if (filename === unitPriceFormattingFile) {
+      return transpileTypeScript(module, filename);
+    }
+    return originalJsLoader(module, filename);
+  };
   Module._resolveFilename = function resolveScreenerImports(request, parent, isMain, options) {
     if (request === 'next/link') return nextStubs.link;
     if (request === 'next/navigation') return nextStubs.navigation;
@@ -89,6 +97,8 @@ function installScreenerRuntime(nextStubs) {
     else delete Module._extensions['.ts'];
     if (originalTsxLoader) Module._extensions['.tsx'] = originalTsxLoader;
     else delete Module._extensions['.tsx'];
+    if (originalJsLoader) Module._extensions['.js'] = originalJsLoader;
+    else delete Module._extensions['.js'];
   };
 }
 
