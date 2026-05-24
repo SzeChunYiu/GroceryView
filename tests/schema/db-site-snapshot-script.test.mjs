@@ -161,6 +161,8 @@ describe('DB-backed site snapshot export script', () => {
         validFrom: '2026-05-18T00:00:00.000Z',
         validUntil: '2026-05-24T23:59:59.000Z',
         retailerProductRef: 'willys:bryggkaffe-450g',
+        originCountry: 'SE',
+        certLevel: 'KRAV',
         provenance: { sourceType: 'retailer_page', rawSnapshotRef: 'raw://daily-ingestion/run/sha256-abcd' }
       }]
     });
@@ -200,6 +202,8 @@ describe('DB-backed site snapshot export script', () => {
       validFrom: '2026-05-18T00:00:00.000Z',
       validUntil: '2026-05-24T23:59:59.000Z',
       retailerProductRef: 'willys:bryggkaffe-450g',
+      originCountry: 'SE',
+      certLevel: 'KRAV',
       provenance: { sourceType: 'retailer_page', rawSnapshotRef: 'raw://daily-ingestion/run/sha256-abcd' }
     });
     assert.equal(JSON.stringify(artifact).includes('rawPayload'), false);
@@ -687,6 +691,8 @@ describe('DB-backed site snapshot export script', () => {
         observedAt: '2026-05-20T10:00:00.000Z',
         confidence: 0.91,
         observationId: 'observation-2b',
+        originCountry: 'SE',
+        certLevel: 'KRAV',
         provenance: {}
       },
       {
@@ -706,6 +712,8 @@ describe('DB-backed site snapshot export script', () => {
         observedAt: '2026-05-20T09:05:00.000Z',
         confidence: 0.86,
         observationId: 'observation-3',
+        originCountry: 'SE',
+        certLevel: 'KRAV',
         provenance: {}
       }
     ];
@@ -718,7 +726,9 @@ describe('DB-backed site snapshot export script', () => {
       subline: 'Rosteriet, 450g',
       category: 'pantry',
       image: '',
-      labels: [],
+      labels: ['origin:se', 'cert:krav'],
+      originCountries: ['SE'],
+      certLevels: ['KRAV'],
       chains: {
         hemkop: {
           price: 58.9,
@@ -794,6 +804,8 @@ describe('DB-backed site snapshot export script', () => {
         observedAt: '2026-05-20T09:00:00.000Z',
         confidence: 0.9,
         observationId: 'observation-4',
+        originCountry: 'SE',
+        certLevel: 'KRAV',
         provenance: {}
       }
     ];
@@ -801,7 +813,9 @@ describe('DB-backed site snapshot export script', () => {
     assert.deepEqual(buildDbSiteChainPriceObservations(rows), [{
       chainId: 'Willys',
       category: 'skafferi · kg',
-      unitPrice: 18.1235
+      unitPrice: 18.1235,
+      originCountry: 'SE',
+      certLevel: 'KRAV'
     }]);
 
     const moduleText = renderDbSiteChainObservationsModule({
@@ -814,6 +828,8 @@ describe('DB-backed site snapshot export script', () => {
     assert.match(moduleText, /export const dbSiteChainObservationsGeneratedAt = "2026-05-22T21:20:00.000Z";/);
     assert.match(moduleText, /export const dbSiteSnapshotChainPriceObservations: ChainPriceObservation\[] = \[/);
     assert.match(moduleText, /"category": "skafferi · kg"/);
+    assert.match(moduleText, /"originCountry": "SE"/);
+    assert.match(moduleText, /"certLevel": "KRAV"/);
   });
 
   it('renders ingested fixture override modules consumed by verified-data.ts', () => {
@@ -844,6 +860,7 @@ describe('DB-backed site snapshot export script', () => {
         validUntil: '2026-05-24T21:59:59.000Z',
         retailerProductRef: 'lidl:11029717',
         observationId: 'observation-lidl-1',
+        originCountry: 'ES',
         provenance: { sourceUrl: 'https://www.lidl.se/c/veckans-frukt-groent/a10094676', productUrl: 'https://www.lidl.se/p/rod-paprika/p11029717' }
       },
       {
@@ -908,6 +925,7 @@ describe('DB-backed site snapshot export script', () => {
     assert.match(moduleText, /"storeName": "Lidl Alingsås"/);
     assert.match(moduleText, /"storeName": "ICA Focus"/);
     assert.match(moduleText, /"code": "6448"/);
+    assert.match(moduleText, /"origin": "ES"/);
     assert.match(moduleText, /"rowCount": 3/);
   });
 });

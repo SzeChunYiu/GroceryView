@@ -4947,6 +4947,8 @@ export type ChainPriceObservation = {
   chainId: string;
   category: string;
   unitPrice: number; // SEK per comparable unit (kg / l / pcs)
+  originCountry?: string;
+  certLevel?: string;
 };
 
 export type ChainCategoryIndex = {

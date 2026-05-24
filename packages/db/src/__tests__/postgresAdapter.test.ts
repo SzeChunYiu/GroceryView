@@ -430,6 +430,8 @@ class RecordingQueryExecutor implements QueryExecutor {
       valid_from: null,
       valid_until: null,
       retailer_product_ref: null,
+      origin_country: 'SE',
+      cert_level: 'KRAV',
       provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
     }
   ];
@@ -2067,6 +2069,8 @@ describe('createPostgresSiteSnapshotReader', () => {
         observedAt: '2026-05-20T09:00:00.000Z',
         confidence: 0.88,
         memberRequired: false,
+        originCountry: 'SE',
+        certLevel: 'KRAV',
         provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
       }
     ]);
@@ -2075,6 +2079,8 @@ describe('createPostgresSiteSnapshotReader', () => {
     assert.match(executor.calls[0]!.sql, /join observations on observations\.id = latest_prices\.observation_id/);
     assert.match(executor.calls[0]!.sql, /latest_prices\.is_available/);
     assert.match(executor.calls[0]!.sql, /observations\.is_available/);
+    assert.match(executor.calls[0]!.sql, /origin_country/);
+    assert.match(executor.calls[0]!.sql, /cert_level/);
     assert.match(executor.calls[0]!.sql, /join products on products\.id = latest_prices\.product_id/);
     assert.match(executor.calls[0]!.sql, /join chains on chains\.id = latest_prices\.chain_id/);
     assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);

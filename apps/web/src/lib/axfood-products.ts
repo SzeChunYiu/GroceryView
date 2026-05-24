@@ -9,6 +9,7 @@ export type ChainPrice = { price: number | null; priceText: string; priceUnit: s
 export type AxfoodProduct = {
   code: string; slug: string; name: string; brand: string; subline: string;
   category: string; image: string | null; labels: string[];
+  originCountries?: string[]; certLevels?: string[];
   chains: Record<string, ChainPrice>;
   lowestChain: string; lowestPrice: number; highestPrice: number;
   spreadPct: number; inChains: string[];

@@ -94,6 +94,8 @@ export function buildDbSiteSnapshotArtifact({ generatedAt = new Date().toISOStri
     ...optional(row.validFrom, 'validFrom'),
     ...optional(row.validUntil, 'validUntil'),
     ...optional(row.retailerProductRef, 'retailerProductRef'),
+    ...optional(row.originCountry, 'originCountry'),
+    ...optional(row.certLevel, 'certLevel'),
     provenance: row.provenance ?? {}
   }));
 
@@ -291,8 +293,12 @@ export function buildDbSiteAxfoodProducts(rows) {
       category: categorySlug(row),
       image: row.imageUrl ?? '',
       labels: [],
+      originCountries: [],
+      certLevels: [],
       chains: {}
     };
+    if (row.originCountry && !product.originCountries.includes(row.originCountry)) product.originCountries.push(row.originCountry);
+    if (row.certLevel && !product.certLevels.includes(row.certLevel)) product.certLevels.push(row.certLevel);
     const chainKey = slugPart(row.chainSlug);
     const chainName = chainDisplayName(row);
     const current = product.chains[chainKey];
@@ -323,8 +329,18 @@ export function buildDbSiteAxfoodProducts(rows) {
           return [chain, publicPrice];
         })
       );
+      product.originCountries.sort();
+      product.certLevels.sort();
+      const { originCountries, certLevels, ...publicProduct } = product;
       return {
-        ...product,
+        ...publicProduct,
+        labels: [
+          ...product.labels,
+          ...originCountries.map((country) => `origin:${String(country).toLowerCase()}`),
+          ...certLevels.map((cert) => `cert:${slugPart(cert)}`)
+        ],
+        ...(originCountries.length > 0 ? { originCountries } : {}),
+        ...(certLevels.length > 0 ? { certLevels } : {}),
         chains,
         lowestChain: lowestEntry?.[0] ?? Object.keys(chains)[0],
         lowestPrice,
@@ -347,7 +363,9 @@ export function buildDbSiteChainPriceObservations(rows) {
       return {
         chainId: chainDisplayName(row),
         category: `${categorySlug(row)} · ${unit}`,
-        unitPrice: Math.round(row.unitPrice * 10000) / 10000
+        unitPrice: Math.round(row.unitPrice * 10000) / 10000,
+        ...optional(row.originCountry, 'originCountry'),
+        ...optional(row.certLevel, 'certLevel')
       };
     })
     .filter(Boolean)
@@ -376,7 +394,7 @@ export function buildDbSiteMatpriskollenOffers(rows) {
       regularPriceText: regularPriceText(row),
       packageText: packageText(row),
       condition: row.promotionText ?? '',
-      origin: '',
+      origin: row.originCountry ?? '',
       requiresMembershipCard: row.memberRequired === true,
       requiresCoupon: false,
       validFrom: dateOrObserved(row, row.validFrom || row.promotionStartsOn),
