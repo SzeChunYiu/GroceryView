@@ -1,3 +1,5 @@
+export * from './lib/spendForecast.js';
+
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { forecastNextMonthlyGrocerySpend } from '@groceryview/core';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
@@ -23,6 +24,19 @@ function formatSignedSek(value: number) {
 function formatPercent(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
 }
+
+const purchaseHistoryForecast = forecastNextMonthlyGrocerySpend([
+  { purchasedAt: '2026-01-05', total: 1240.5 },
+  { purchasedAt: '2026-01-22', total: 865.2 },
+  { purchasedAt: '2026-02-07', total: 1318.3 },
+  { purchasedAt: '2026-02-20', total: 902.1 },
+  { purchasedAt: '2026-03-09', total: 1364.8 },
+  { purchasedAt: '2026-03-25', total: 948.7 },
+  { purchasedAt: '2026-04-06', total: 1411.2 },
+  { purchasedAt: '2026-04-21', total: 1004.4 },
+  { purchasedAt: '2026-05-08', total: 1468.9 },
+  { purchasedAt: '2026-05-21', total: 1032.6 }
+], '2026-06');
 
 export default function SavingsDashboardPage() {
   const topContributions = [...personalGroceryInflation.itemContributions]
@@ -61,6 +75,29 @@ export default function SavingsDashboardPage() {
           </div>
         </Card>
       </div>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Next-month forecast</p>
+        <h2 className="mt-2 text-2xl font-black text-slate-950">Projected grocery spend for {purchaseHistoryForecast.forecastMonth}</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Forecast</p>
+            <p className="mt-2 text-3xl font-black text-cyan-900">{formatSek(purchaseHistoryForecast.predictedSpend)}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Expected range</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(purchaseHistoryForecast.lowerBound)}–{formatSek(purchaseHistoryForecast.upperBound)}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">History used</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{purchaseHistoryForecast.monthsUsed} months</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">{purchaseHistoryForecast.confidence} confidence</p>
+          </div>
+        </div>
+        <p className="mt-4 text-sm font-semibold text-slate-700">
+          Forecast uses purchase_history monthly totals with a six-month moving average plus simple trend; no missing trips or cash purchases are estimated.
+        </p>
+      </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <Card>
