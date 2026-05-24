@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 type LineStyleName = 'solid' | 'dashed' | 'dotted';
 type ChartLoadStatus = 'idle' | 'loading' | 'ready' | 'failed';
@@ -99,6 +99,8 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
   const [activeWindowLabel, setActiveWindowLabel] = useState(chart.defaultWindow);
   const [chartLoadError, setChartLoadError] = useState<string | null>(null);
   const [chartLoadStatus, setChartLoadStatus] = useState<ChartLoadStatus>('idle');
+  const chartRendererStatusId = useId();
+  const chartSelectorDescriptionId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
   const activeWindow = useMemo(
     () => chart.windows.find((window) => window.label === activeWindowLabel) ?? chart.windows[0],
@@ -106,6 +108,14 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
   );
   const firstSeries = activeWindow?.series[0];
   const latestPoint = firstSeries?.points.at(-1);
+  const handleWindowKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    windowLabel: PriceChartTerminalWindow['label']
+  ) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    setActiveWindowLabel(windowLabel);
+  };
 
   useEffect(() => {
     const container = containerRef.current;
@@ -210,22 +220,36 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
         </div>
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-2" aria-label="Price chart timeframe selector">
+      <p id={chartSelectorDescriptionId} className="sr-only">
+        Choose the time range used for the price chart, summary cards, and store series details.
+      </p>
+      <div
+        className="mt-5 flex flex-wrap gap-2"
+        aria-describedby={chartSelectorDescriptionId}
+        aria-label="Price chart timeframe selector"
+        role="group"
+      >
         {chart.windows.map((window) => (
           <button
-            className={`rounded-full px-4 py-2 text-sm font-black motion-safe:transition ${
+            aria-describedby={`${chartSelectorDescriptionId} ${chartRendererStatusId}`}
+            aria-label={`Show ${window.rangeLabel} price chart window`}
+            aria-pressed={window.label === activeWindow?.label}
+            className={`rounded-full px-4 py-2 text-sm font-black motion-safe:transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
               window.label === activeWindow?.label
                 ? 'bg-emerald-300 text-emerald-950'
                 : 'border border-white/15 bg-white/10 text-slate-200 hover:border-emerald-300'
             }`}
             key={window.label}
+            onKeyDown={(event) => handleWindowKeyDown(event, window.label)}
             onClick={() => setActiveWindowLabel(window.label)}
+            role="button"
             type="button"
           >
             {window.label}
           </button>
         ))}
       </div>
+      <p id={chartRendererStatusId} aria-live="polite" className="sr-only" role="status">Chart renderer status: {chartLoadStatus}</p>
 
       {chart.available && activeWindow && activeWindow.pointCount > 0 ? (
         <>
@@ -243,8 +267,13 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
               Points/markers: <span className="text-white">{activeWindow.pointCount}/{activeWindow.markerCount}</span>
             </p>
           </div>
-          <p aria-live="polite" className="sr-only">Chart renderer status: {chartLoadStatus}</p>
-          <div ref={containerRef} className="mt-5 h-[280px] overflow-hidden rounded-3xl border border-white/10 bg-white" />
+          <div
+            ref={containerRef}
+            aria-describedby={chartRendererStatusId}
+            aria-label={`${chart.title} price history chart for ${activeWindow.rangeLabel}`}
+            className="mt-5 h-[280px] overflow-hidden rounded-3xl border border-white/10 bg-white"
+            role="img"
+          />
           {chartLoadStatus === 'loading' ? (
             <p className="mt-3 rounded-2xl border border-white/10 bg-white/10 p-3 text-xs font-bold text-slate-200">
               Loading interactive lightweight-charts renderer after the product data is visible.
