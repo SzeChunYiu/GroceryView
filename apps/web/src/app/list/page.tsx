@@ -1,14 +1,48 @@
 'use client';
 
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { CheckableListItem } from '@/components/CheckableListItem';
 import { AppNav } from '@/components/app-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
+import {
+  parseShoppingStoreSelection,
+  SHOPPING_LIST_SELECTED_STORE_EVENT,
+  SHOPPING_LIST_SELECTED_STORE_KEY,
+  shoppingListCategory,
+  shoppingListCategoryLabel,
+  sortShoppingListForStore,
+  type ShoppingStoreSelection,
+} from '@/lib/store-taxonomy';
+
+function readSelectedStore(): ShoppingStoreSelection | null {
+  if (typeof window === 'undefined') return null;
+  return parseShoppingStoreSelection(window.localStorage.getItem(SHOPPING_LIST_SELECTED_STORE_KEY));
+}
 
 export default function ShoppingListPage() {
   const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const [selectedStore, setSelectedStore] = useState<ShoppingStoreSelection | null>(null);
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const sortedItems = useMemo(() => sortShoppingListForStore(items, selectedStore), [items, selectedStore]);
+  const selectedStoreLabel = selectedStore ? `${selectedStore.name} aisle order` : 'default supermarket aisle order';
+
+  useEffect(() => {
+    setSelectedStore(readSelectedStore());
+
+    function refreshSelectedStore() {
+      setSelectedStore(readSelectedStore());
+    }
+
+    window.addEventListener('storage', refreshSelectedStore);
+    window.addEventListener(SHOPPING_LIST_SELECTED_STORE_EVENT, refreshSelectedStore);
+
+    return () => {
+      window.removeEventListener('storage', refreshSelectedStore);
+      window.removeEventListener(SHOPPING_LIST_SELECTED_STORE_EVENT, refreshSelectedStore);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
@@ -36,7 +70,8 @@ export default function ShoppingListPage() {
             <div>
               <h2 className="text-2xl font-black tracking-tight text-slate-950">Today&apos;s basket</h2>
               <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">
-                Tap the checkbox once an item is in your basket. Completed rows are struck through immediately and restored from localStorage on reload.
+                Sorted by {selectedStoreLabel} and grouped by likely aisle so you can collect nearby items together.
+                Completed rows are struck through immediately and restored from localStorage on reload.
               </p>
             </div>
             <button
@@ -60,9 +95,21 @@ export default function ShoppingListPage() {
           </div>
 
           <ul className="mt-5 space-y-3">
-            {items.map((item) => (
-              <CheckableListItem item={item} key={item.id} onToggle={toggleItemChecked} />
-            ))}
+            {sortedItems.map((item, index) => {
+              const category = shoppingListCategory(item);
+              const previousCategory = index > 0 ? shoppingListCategory(sortedItems[index - 1]) : null;
+
+              return (
+                <Fragment key={item.id}>
+                  {category !== previousCategory ? (
+                    <li className="mb-2 mt-4 text-xs font-black uppercase tracking-[0.2em] text-emerald-800">
+                      {shoppingListCategoryLabel(category)}
+                    </li>
+                  ) : null}
+                  <CheckableListItem item={item} onToggle={toggleItemChecked} />
+                </Fragment>
+              );
+            })}
           </ul>
         </section>
       </main>

@@ -5,6 +5,11 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
+import {
+  SHOPPING_LIST_SELECTED_STORE_EVENT,
+  SHOPPING_LIST_SELECTED_STORE_KEY,
+  type ShoppingStoreSelection,
+} from '@/lib/store-taxonomy';
 
 // Free, no-API-key vector tiles (© OpenMapTiles / OpenFreeMap, data © OSM).
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
@@ -50,6 +55,19 @@ function chainIndexColor(score: number | null, fallback: string): string {
 const syncedMapListStores = osmStores
   .filter((store) => Number.isFinite(store.lat) && Number.isFinite(store.lng))
   .slice(0, 8);
+
+function persistSelectedStore(store: ShoppingStoreSelection) {
+  window.localStorage.setItem(SHOPPING_LIST_SELECTED_STORE_KEY, JSON.stringify(store));
+  window.dispatchEvent(new CustomEvent(SHOPPING_LIST_SELECTED_STORE_EVENT));
+}
+
+function storeSelection(store: Pick<OsmStore, 'brand' | 'name' | 'slug'>): ShoppingStoreSelection {
+  return {
+    slug: store.slug,
+    name: store.name,
+    brand: store.brand || 'Store',
+  };
+}
 
 function storeLocationLabel(store: OsmStore): string {
   return [store.district || store.city, store.address].filter(Boolean).join(' · ') || 'Stockholm area';
@@ -146,6 +164,7 @@ export function StoreMap() {
 
   function focusStore(store: OsmStore) {
     setSelectedStoreSlug(store.slug);
+    persistSelectedStore(storeSelection(store));
     mapRef.current?.easeTo({
       center: [store.lng, store.lat],
       zoom: 14,
@@ -154,6 +173,10 @@ export function StoreMap() {
   }
 
   useEffect(() => {
+    if (syncedMapListStores[0]) {
+      persistSelectedStore(storeSelection(syncedMapListStores[0]));
+    }
+
     if (!containerRef.current) return;
 
     const data = toFeatureCollection();
@@ -268,6 +291,11 @@ export function StoreMap() {
         if (!f) return;
         const p = f.properties as Record<string, string>;
         setSelectedStoreSlug(String(p.slug ?? ''));
+        persistSelectedStore({
+          slug: String(p.slug ?? ''),
+          name: String(p.name ?? ''),
+          brand: String(p.brand ?? 'Store'),
+        });
         const [lng, lat] = (f.geometry as GeoJSON.Point).coordinates;
         const directions = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
         const where = [escapeHtml(p.address || ''), escapeHtml(p.district || '')]
@@ -337,7 +365,7 @@ export function StoreMap() {
           <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-200">Synced map + list</p>
           <h3 className="mt-1 text-lg font-black">Linked store selection</h3>
           <p className="mt-1 text-xs font-semibold leading-5 text-slate-200">
-            Click a list row to fly the map; click a marker to update the selected row.
+            Pick a store to tune the shopping list into that chain&apos;s likely aisle order.
           </p>
         </div>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
