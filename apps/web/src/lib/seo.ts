@@ -114,6 +114,11 @@ export const routeMetadataCatalog = {
     description: 'View signed-in bookmarked products with current cheapest price and store evidence.',
     noIndex: true
   },
+  '/favourites': {
+    title: 'Local favourite products | GroceryView',
+    description: 'Save product hearts in browser localStorage and revisit them with current verified product price cards.',
+    noIndex: true
+  },
   '/fuel': {
     title: 'Fuel prices by grade | GroceryView',
     description: 'View source-backed fuel observations by grade with price per litre, domain=fuel modeling, and operator provenance.'
