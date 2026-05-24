@@ -18,6 +18,7 @@ import {
   fetchCityGrossProductsForAllStores,
   type CityGrossProduct
 } from './connectors/citygross.js';
+import { fetchCityGrossBulkProducts } from './connectors/citygross-bulk.js';
 import type { AllStoreTaskRunnerControls } from './connectors/all-store-runner.js';
 import {
   fetchCoopProductsForAllStores,
@@ -85,6 +86,7 @@ export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';
 export * from './connectors/fuel-stations.js';
 export * from './connectors/citygross.js';
+export * from './connectors/citygross-bulk.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
@@ -2181,6 +2183,22 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(lidlStoreOfferToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCityGrossBulkProducts({
+      ...runnerControlsFromUrl(url),
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      minRows: dailyNativeNumberParam(url, 'minRows'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(cityGrossProductToDailyItem) });
+  }
+
   if (sourceUrl === GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL}?`)) {
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
@@ -3063,6 +3081,7 @@ export const GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL = 'groceryview://daily/i
 export const GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL = 'groceryview://daily/lidl/public-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
+export const GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL = 'groceryview://daily/city-gross/products/bulk';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';

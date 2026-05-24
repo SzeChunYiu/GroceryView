@@ -85,11 +85,11 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: true
   },
   {
-    connectorId: 'city-gross-public-products-all-stores',
+    connectorId: 'city-gross-products-bulk',
     chainId: 'city_gross',
     sourceType: 'official_api',
-    endpointUrl: 'groceryview://daily/city-gross/public-products/all-stores',
-    parserVersion: 'citygross-products-native-v1',
+    endpointUrl: 'groceryview://daily/city-gross/products/bulk',
+    parserVersion: 'citygross-bulk-native-v1',
     robotsTxtStatus: 'not_applicable',
     legalReviewStatus: 'approved',
     hasDataAgreement: true
