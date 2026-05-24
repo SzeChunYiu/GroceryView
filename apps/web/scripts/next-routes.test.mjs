@@ -2777,10 +2777,12 @@ ${seo}`;
 
     assert.match(productRoute, /productJsonLdFor/);
     assert.match(productRoute, /'@type': 'Product'/);
-    assert.match(productRoute, /'@type': 'AggregateOffer'/);
-    assert.match(productRoute, /lowPrice/);
-    assert.match(productRoute, /highPrice/);
+    assert.match(productRoute, /'@type': 'Offer'/);
+    assert.match(productRoute, /price: latest\.price/);
+    assert.match(productRoute, /const price = row\?\.price \?\? product\.lowestPrice/);
     assert.match(productRoute, /priceCurrency: 'SEK'/);
+    assert.doesNotMatch(productRoute, /'@type': 'AggregateOffer'|lowPrice:|highPrice:|offerCount:/);
+    assert.doesNotMatch(productRoute, /brand: \{ '@type': 'Brand', name: productBrand\(product\) \}/);
     assert.match(productRoute, /breadcrumbJsonLdFor/);
     assert.match(productRoute, /'@type': 'BreadcrumbList'/);
     assert.match(productRoute, /application\/ld\+json/);

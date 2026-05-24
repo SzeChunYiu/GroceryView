@@ -147,39 +147,52 @@ function itemSubstitutionProductFor(product: NonNullable<ReturnType<typeof findP
   };
 }
 
-function productOfferBounds(product: NonNullable<ReturnType<typeof findProduct>>) {
+function productJsonLdBrand(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const brand = 'lowestPrice' in product ? product.brand : product.brands;
+  return brand ? { '@type': 'Brand', name: brand } : undefined;
+}
+
+function productOfferFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const url = `${siteUrl}/products/${product.slug}`;
+
   if ('lowestPrice' in product) {
-    const prices = chainPriceRows(product)
-      .map((row) => row.price)
-      .filter((price): price is number => typeof price === 'number' && Number.isFinite(price));
+    const row = chainPriceRows(product).find((priceRow) => priceRow.chain === product.lowestChain)
+      ?? [...chainPriceRows(product)].sort((left, right) => left.price - right.price)[0];
+    const price = row?.price ?? product.lowestPrice;
+    if (!Number.isFinite(price) || price <= 0) return undefined;
+
     return {
-      lowPrice: prices.length ? Math.min(...prices) : product.lowestPrice,
-      highPrice: prices.length ? Math.max(...prices) : product.highestPrice,
-      offerCount: Math.max(prices.length, product.inChains.length)
+      '@type': 'Offer',
+      price,
+      priceCurrency: 'SEK',
+      availability: row?.isAvailable === false ? 'https://schema.org/OutOfStock' : row?.isAvailable === true ? 'https://schema.org/InStock' : undefined,
+      seller: row ? { '@type': 'Organization', name: row.chain } : undefined,
+      url
     };
   }
 
-  return { lowPrice: product.priceMin, highPrice: product.priceMax, offerCount: product.observationCount };
+  const latest = latestObservationFor(product);
+  if (!latest || !Number.isFinite(latest.price) || latest.price <= 0) return undefined;
+
+  return {
+    '@type': 'Offer',
+    price: latest.price,
+    priceCurrency: 'SEK',
+    availability: undefined,
+    url
+  };
 }
 
 function productJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>>) {
-  const bounds = productOfferBounds(product);
+  const offer = productOfferFor(product);
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
     image: product.image ? [product.image] : undefined,
-    brand: { '@type': 'Brand', name: productBrand(product) },
+    brand: productJsonLdBrand(product),
     category: labelFromSlug(product.category),
-    offers: {
-      '@type': 'AggregateOffer',
-      priceCurrency: 'SEK',
-      lowPrice: bounds.lowPrice,
-      highPrice: bounds.highPrice,
-      offerCount: bounds.offerCount,
-      availability: 'https://schema.org/InStock',
-      url: `${siteUrl}/products/${product.slug}`
-    }
+    offers: offer
   };
 }
 
