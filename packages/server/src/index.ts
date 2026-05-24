@@ -2035,6 +2035,68 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return cachedJsonResponse(authOptions.apiResponseCache, url, apiHotEndpointCacheTtlSeconds[path], () => authOptions.flyerOffersProvider!(query));
       }
 
+      if (method === 'GET' && path === '/api/my-flyer') {
+        const allowedQueryParams = new Set(['userId', 'asOf', 'storeId', 'productId']);
+        for (const key of url.searchParams.keys()) {
+          if (!allowedQueryParams.has(key)) return errorResponse(400, `Unsupported my-flyer query parameter: ${key}.`);
+        }
+
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+
+        const asOf = optionalIsoTimestamp(url.searchParams.get('asOf') ?? undefined, 'asOf');
+        const storeId = optionalString(url.searchParams.get('storeId') ?? undefined, 'storeId');
+        const productId = optionalString(url.searchParams.get('productId') ?? undefined, 'productId');
+        if (storeId && !api.getStore(storeId)) return errorResponse(404, 'Store not found.');
+        if (productId && !api.getProduct(productId)) return errorResponse(404, 'Product not found.');
+
+        const favoriteStoreIds = api.getFavoriteStores(user).map((store) => store.id);
+        const watchlistProductIds = api.getWatchlist(user).items.map((item) => item.productId);
+        const report = authOptions.flyerOffersProvider
+          ? await authOptions.flyerOffersProvider({ asOf, storeId, productId })
+          : api.getFlyerOffers({ asOf, storeId, productId });
+        const scopedFavoriteStores = storeId ? [storeId] : favoriteStoreIds;
+        const scopedWatchlistProducts = productId ? [productId] : watchlistProductIds;
+        const offers = report.offers.filter((offer) =>
+          (scopedFavoriteStores.length === 0 || scopedFavoriteStores.includes(offer.storeId)) &&
+          (scopedWatchlistProducts.length === 0 || scopedWatchlistProducts.includes(offer.productId))
+        );
+        const stores = report.stores
+          .filter((store) => offers.some((offer) => offer.storeId === store.storeId))
+          .map((store) => {
+            const storeOffers = offers.filter((offer) => offer.storeId === store.storeId);
+            const topOffer = [...storeOffers].sort((left, right) => right.dealScore - left.dealScore || right.savings - left.savings)[0]!;
+            return {
+              ...store,
+              offerCount: storeOffers.length,
+              totalOneEachSavings: Math.round(storeOffers.reduce((sum, offer) => sum + offer.savings, 0) * 100) / 100,
+              topOfferId: topOffer.offerId,
+              topDealScore: topOffer.dealScore
+            };
+          });
+        return jsonResponse({
+          userId: user,
+          generatedAt: asOf ?? (authOptions.now ?? new Date()).toISOString(),
+          filters: {
+            ...(asOf ? { asOf } : {}),
+            ...(storeId ? { storeId } : {}),
+            ...(productId ? { productId } : {})
+          },
+          favoriteStoreIds,
+          watchlistProductIds,
+          offerCount: offers.length,
+          stores,
+          offers,
+          guardrails: [
+            'My Flyer filters public flyer offers to signed-in favorite stores and watchlist products.',
+            'Empty favorite stores or watchlist items widen that dimension instead of inventing offers.',
+            ...report.guardrails
+          ]
+        });
+      }
+
       if (method === 'GET' && path === '/api/deals/discounts') {
         const query = {
           asOf: url.searchParams.get('asOf') ?? undefined,
@@ -3127,6 +3189,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/deals/discounts': { get: publicOperation('Get active weekly discounts by branch, chain, category, or product with source evidence.') },
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
+      '/api/my-flyer': { get: protectedOperation('Get a signed-in shopper flyer filtered to favorite stores and watchlist products.') },
       '/api/retailers': { get: publicOperation('List supported retailers with logo and website metadata.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
