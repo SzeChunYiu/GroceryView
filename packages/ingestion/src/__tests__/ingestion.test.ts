@@ -135,6 +135,11 @@ import {
   parseRetailerProductJsonSnapshot,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
+  parseShellSeFuelListHtml,
+  SHELL_SE_CAR_WASH_STOCKHOLM_URL,
+  SHELL_SE_LIGHT_LIST_PRICE_URL,
+  SHELL_SE_PLOQ_URL,
+  SHELL_SE_STATIC_QUIRK_ROWS,
   planIngestionBatch,
   planOfferVisibilityBoundary,
   planRetailerConnectorRun,
@@ -7307,5 +7312,43 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+describe('Shell SE pricing quirks', () => {
+  it('parses St1-operated Shell SE fuel list prices with channel, format, and region tags', () => {
+    const rows = parseShellSeFuelListHtml(`
+      <h2>St1 -stationer</h2>
+      <p>Listpriser gällande från 24 maj 2026</p>
+      <p>Bensin 98 20,19 kr</p>
+      <p>Bensin 95 18,89 kr</p>
+      <p>E85 15,84 kr</p>
+      <p>Diesel 21,34 kr</p>
+      <p>HVO100 29,74 kr</p>
+    `, { sourceUrl: SHELL_SE_LIGHT_LIST_PRICE_URL });
+
+    assert.equal(rows.length, 5);
+    assert.equal(rows[0].channel, 'store');
+    assert.equal(rows[0].format, 'st1-station');
+    assert.deepEqual(rows[0].store_id, { id: 'SE', region: 'SE-national' });
+    assert.equal(rows.find((row) => row.product_id === 'diesel')?.price, 21.34);
+  });
+
+  it('codifies only source-backed app, subscription, clearance, and multi-buy quirks', () => {
+    const appFika = SHELL_SE_STATIC_QUIRK_ROWS.find((row) => row.source_url === SHELL_SE_PLOQ_URL && row.product_id === 'ploq-weekly-app-fika');
+    assert.equal(appFika?.is_coupon_price, true);
+    assert.equal(appFika?.price, 10);
+
+    const subscription = SHELL_SE_STATIC_QUIRK_ROWS.find((row) => row.product_id === 'wash-subscription-allra-bast');
+    assert.equal(subscription?.is_subscription_price, true);
+    assert.equal(subscription?.source_url, SHELL_SE_CAR_WASH_STOCKHOLM_URL);
+
+    const clearance = SHELL_SE_STATIC_QUIRK_ROWS.find((row) => row.product_id === 'stockholm-night-wash-half-price');
+    assert.equal(clearance?.is_clearance, true);
+    assert.equal(clearance?.discount_percent, 50);
+    assert.equal(clearance?.store_id.region, 'SE-Stockholm');
+
+    const bonustian = SHELL_SE_STATIC_QUIRK_ROWS.find((row) => row.product_id === 'bonustian-fuel-volume-voucher');
+    assert.deepEqual(bonustian?.multi_buy?.map((tier) => [tier.minimum_quantity, tier.reward_value]), [[15, 10], [30, 20], [45, 30]]);
   });
 });
