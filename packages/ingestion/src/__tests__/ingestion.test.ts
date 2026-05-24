@@ -133,6 +133,7 @@ import {
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
+  parseShellNoStations,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
   planIngestionBatch,
@@ -198,6 +199,43 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('Shell NO connector', () => {
+  it('normalizes Norwegian Shell fuel and Select convenience stations', () => {
+    const stations = parseShellNoStations({
+      stations: [
+        {
+          id: 'shell-oslo-select',
+          name: 'Shell Oslo Select',
+          country: 'NO',
+          address: 'Storgata 1',
+          city: 'Oslo',
+          lat: '59.91',
+          lng: '10.75',
+          fuels: ['Bensin 95', 'Diesel'],
+          services: ['Shell Select', 'Car wash']
+        },
+        {
+          id: 'shell-stockholm',
+          name: 'Shell Stockholm',
+          country: 'SE',
+          fuels: ['Bensin 95'],
+          services: ['Shell Select']
+        }
+      ]
+    }, {
+      capturedAt: '2026-05-24T10:00:00.000Z',
+      sourceUrl: 'https://www.shell.no/test'
+    });
+
+    assert.equal(stations.length, 1);
+    assert.equal(stations[0]?.country, 'NO');
+    assert.equal(stations[0]?.chainId, 'shell-no');
+    assert.deepEqual(stations[0]?.fuelGrades, ['95', 'diesel']);
+    assert.equal(stations[0]?.hasSelectConvenience, true);
+    assert.equal(stations[0]?.sourceUrl, 'https://www.shell.no/test');
   });
 });
 
