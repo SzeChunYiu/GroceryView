@@ -7,7 +7,7 @@ import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const { addImportedItems, checkedCount, items, lastImportSnapshotMessage, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -30,6 +30,9 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+        <p aria-live="polite" className="mt-3 rounded-2xl bg-emerald-50 p-3 text-sm font-bold text-emerald-950" role="status">
+          {lastImportSnapshotMessage}
+        </p>
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

@@ -17,6 +17,12 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
+export type BulkImportResult = {
+  addedCount: number;
+  skippedDuplicateCount: number;
+  snapshotMessage: string;
+};
+
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
@@ -127,9 +133,22 @@ function persistCheckedState(items: ShoppingListItem[]) {
   }
 }
 
+function snapshotMessageForImport(addedCount: number, skippedDuplicateCount: number) {
+  const skippedMessage = skippedDuplicateCount > 0
+    ? ` Skipped ${skippedDuplicateCount} duplicate item(s).`
+    : '';
+
+  if (addedCount === 0) {
+    return `Budget totals did not change; skipped ${skippedDuplicateCount} duplicate item(s), so no new budget snapshot was needed.`;
+  }
+
+  return `Auto-saved a new budget snapshot after importing ${addedCount} item(s).${skippedMessage}`;
+}
+
 export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
+  const [lastImportSnapshotMessage, setLastImportSnapshotMessage] = useState('');
 
   useEffect(() => {
     try {
@@ -155,16 +174,23 @@ export function useList() {
     setItems((currentItems) => currentItems.map((item) => ({ ...item, checked: false })));
   }, []);
 
-  const addImportedItems = useCallback((importedItems: BulkImportedListItemInput[]) => {
-    setItems((currentItems) => {
-      const existingIds = new Set(currentItems.map((item) => item.id));
-      const nextImportedItems = importedItems
-        .filter((item) => !existingIds.has(item.id))
-        .map((item) => ({ ...item, importSource: 'bulk-clipboard' as const, checked: false }));
+  const addImportedItems = useCallback((importedItems: BulkImportedListItemInput[]): BulkImportResult => {
+    const existingIds = new Set(items.map((item) => item.id));
+    const nextImportedItems = importedItems
+      .filter((item) => !existingIds.has(item.id))
+      .map((item) => ({ ...item, importSource: 'bulk-clipboard' as const, checked: false }));
+    const skippedDuplicateCount = importedItems.length - nextImportedItems.length;
+    const snapshotMessage = snapshotMessageForImport(nextImportedItems.length, skippedDuplicateCount);
 
-      return [...currentItems, ...nextImportedItems];
-    });
-  }, []);
+    setItems([...items, ...nextImportedItems]);
+    setLastImportSnapshotMessage(snapshotMessage);
+
+    return {
+      addedCount: nextImportedItems.length,
+      skippedDuplicateCount,
+      snapshotMessage
+    };
+  }, [items]);
 
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
   const totalCount = items.length;
@@ -174,6 +200,7 @@ export function useList() {
     addImportedItems,
     checkedCount,
     items,
+    lastImportSnapshotMessage,
     remainingCount,
     resetCheckedState,
     toggleItemChecked,

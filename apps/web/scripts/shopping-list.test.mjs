@@ -20,6 +20,8 @@ describe('shopping list route', () => {
     assert.match(page, /CheckableListItem/);
     assert.match(page, /BulkImportDialog/);
     assert.match(page, /addImportedItems/);
+    assert.match(page, /aria-live="polite"/);
+    assert.match(page, /lastImportSnapshotMessage/);
     assert.match(page, /Shopping list/);
 
     assert.match(row, /'use client'/);
@@ -37,6 +39,8 @@ describe('shopping list route', () => {
     assert.match(hook, /addImportedItems/);
     assert.match(hook, /importSource: 'bulk-clipboard'/);
     assert.match(hook, /matchedProductSlug/);
+    assert.match(hook, /budget snapshot/);
+    assert.match(hook, /skippedDuplicateCount/);
 
     assert.match(bulkImport, /'use client'/);
     assert.match(bulkImport, /parseBulkImportLines/);
@@ -46,6 +50,7 @@ describe('shopping list route', () => {
     assert.match(bulkImport, /one item per line/i);
     assert.match(bulkImport, /matchedProductSlug/);
     assert.match(bulkImport, /unmatchedLines/);
+    assert.match(bulkImport, /snapshotMessage/);
 
     assert.match(searchRoute, /searchRoutes/);
     assert.match(searchRoute, /products\/search\/list-import/);

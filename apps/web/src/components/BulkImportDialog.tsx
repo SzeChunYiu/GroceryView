@@ -1,10 +1,10 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { BulkImportedListItemInput } from '@/hooks/useList';
+import type { BulkImportedListItemInput, BulkImportResult } from '@/hooks/useList';
 
 type BulkImportDialogProps = {
-  onImportItems: (items: BulkImportedListItemInput[]) => void;
+  onImportItems: (items: BulkImportedListItemInput[]) => BulkImportResult;
 };
 
 type ProductCatalogMatch = {
@@ -122,8 +122,8 @@ export function BulkImportDialog({ onImportItems }: Readonly<BulkImportDialogPro
 
   function importList() {
     if (importItems.length === 0) return;
-    onImportItems(importItems);
-    setLastImportSummary(`Imported ${importItems.length} line(s), ${matchedCount} matched to the product catalog.`);
+    const result = onImportItems(importItems);
+    setLastImportSummary(`Imported ${result.addedCount} new line(s), ${matchedCount} matched to the product catalog. ${result.snapshotMessage}`);
     setPlainText('');
   }
 
