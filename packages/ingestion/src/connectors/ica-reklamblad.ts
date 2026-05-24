@@ -86,9 +86,33 @@ export const DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS = [
   'https://www.ica.se/erbjudanden/ica-supermarket-alno-1003652/',
   'https://www.ica.se/erbjudanden/ica-nara-alskog-1004473/',
   'https://www.ica.se/erbjudanden/ica-nara-alsterhallen-1003653/',
-  'https://www.ica.se/erbjudanden/ica-supermarket-alunda-1003654/'
+  'https://www.ica.se/erbjudanden/ica-supermarket-alunda-1003654/',
+  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-hyllinge-1003937/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-munkeback-1004271/',
+  'https://www.ica.se/erbjudanden/ica-nara-alvsjo-1004436/',
+  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-visby-1003730/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-skelleftea-1004002/',
+  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-barkarbystaden-1003408/',
+  'https://www.ica.se/erbjudanden/ica-city-knalleland-1004101/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-grevie-1004106/',
+  'https://www.ica.se/erbjudanden/ica-nara-stora-mellosa-1004150/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-hovas-1003932/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-molndal-1004589/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-vanersborg-1004306/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-gottsunda-1004218/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-tranas-1003829/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-margretelund-1004695/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-lindome-1004578/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-habo-1004429/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-kappala-1003833/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-matpunkten-1004230/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-knalleland-1004048/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-salem-1004689/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-limhamns-sjostad-1051002/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-flygfyren-1003532/',
+  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-kungalv-1004392/'
 ] as const;
-export const DEFAULT_ICA_REKLAMBLAD_MAX_ROWS = 3000;
+export const DEFAULT_ICA_REKLAMBLAD_MAX_ROWS = 5000;
 export const EMAGIN_PDF_API_BASE_URL = 'https://api.e-magin.se/api/pdf/';
 
 export type FetchIcaReklambladOffersOptions = {

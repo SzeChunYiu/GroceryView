@@ -141,7 +141,7 @@ export const OPENFOODFACTS_FIELDS = [
 ] as const;
 
 export const OPENFOODFACTS_EXPORT_URL = 'https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz';
-export const DEFAULT_OPENFOODFACTS_SWEDEN_CATALOG_MAX_PAGES = 30;
+export const DEFAULT_OPENFOODFACTS_SWEDEN_CATALOG_MAX_PAGES = 35;
 
 export const DEFAULT_OPENFOODFACTS_CODES = [
   '7340083494406',
@@ -226,6 +226,7 @@ export type FetchOpenFoodFactsSwedenCatalogOptions = {
   maxRows?: number;
   onPage?: (event: OpenFoodFactsCatalogPageEvent) => void;
   pageDelayMs?: number;
+  pages?: readonly number[];
   pageSize?: number;
   requestRetryAttempts?: number;
   requestRetryBaseDelayMs?: number;
@@ -322,6 +323,29 @@ export async function fetchOpenFoodFactsSwedenCatalog(options: FetchOpenFoodFact
     onPage?.({ page, products: products.length, rows: rows.length, skipped: false, totalPages });
     return products.length;
   };
+
+  const requestedPages = options.pages
+    ? [...new Set(options.pages.map((page) => Math.floor(page)).filter((page) => page >= 1))].sort((a, b) => a - b)
+    : null;
+  if (requestedPages) {
+    for (let index = 0; index < requestedPages.length && rows.length < maxRows; index += concurrency) {
+      const batchPages = requestedPages.slice(index, index + concurrency);
+      const batchResults = await Promise.all(batchPages.map((page) => fetchPage(page)));
+      for (const result of batchResults) {
+        if (!result) {
+          continue;
+        }
+        appendPageRows(result.page, result.payload, result.sourceUrl);
+        if (rows.length >= maxRows) {
+          break;
+        }
+      }
+      if (pageDelayMs > 0 && index + concurrency < requestedPages.length && rows.length < maxRows) {
+        await sleep(pageDelayMs);
+      }
+    }
+    return rows;
+  }
 
   const firstPage = await fetchPage(1);
   if (!firstPage) {

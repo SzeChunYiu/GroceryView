@@ -119,23 +119,10 @@ export const CITY_GROSS_GROCERY_SUPER_CATEGORIES = [
 ] as const;
 
 export const DEFAULT_CITY_GROSS_PRODUCT_QUERIES = [
-  'kaffe',
-  'mjolk',
-  'pasta',
-  'ris',
-  'smor',
-  'ost',
-  'kyckling',
-  'yoghurt',
-  'brod',
-  'frukt',
-  'gronsaker',
-  'fisk',
-  'korv',
-  'glass'
+  ''
 ] as const;
 export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_STORES = 60;
-export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_ROWS_PER_STORE = 340;
+export const DEFAULT_CITY_GROSS_LIVE_PRODUCT_MAX_ROWS_PER_STORE = 720;
 
 export type FetchCityGrossStoresOptions = {
   fetchImpl?: typeof fetch;
