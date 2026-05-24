@@ -28,8 +28,10 @@ import {
   defaultLocale,
   formatLocalizedDate,
   formatLocalizedMoney,
+  formatSourceUnitPriceText,
   formatLocalizedUnitPrice,
-  supportedCurrencies
+  supportedCurrencies,
+  unknownUnitPriceLabel
 } from './i18n';
 
 const icaReklambladOffers = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladOffers : staticIcaReklambladOffers;
@@ -416,7 +418,7 @@ function productSearchResultCards(searchResult: typeof rawFacetedProductSearch) 
         locale: defaultLocale,
         currency: cheapest.currency,
         unit: product.comparableUnit
-      }) : 'No current price row',
+      }) : unknownUnitPriceLabel,
       isAvailable: product.isAvailable,
       chainLabel: cheapest ? `${cheapest.chainName} · ${cheapest.priceType}` : 'Awaiting latest_prices row',
       sourceTables: searchResult.evidence.sourceTables
@@ -556,7 +558,7 @@ export const watchlistHeartProducts = watchlistHeartSourceRows.map(({ product, c
       locale: defaultLocale,
       currency: observedSnapshotCurrency,
       unit: normalizedUnit.unitLabel.replace('kr/', '')
-    }) : 'Unit price not reported',
+    }) : unknownUnitPriceLabel,
     targetPrice: item.targetPrice ?? cheapest.price,
     targetPriceLabel: formatSek(item.targetPrice ?? cheapest.price),
     dealScore,
@@ -1065,7 +1067,10 @@ export const deliveryVsInStoreComparison = {
     onlinePackageText: row.onlineProduct.packageText,
     onlinePrice: row.onlineProduct.price,
     onlinePriceText: row.onlineProduct.priceText,
-    onlineUnitPriceText: row.onlineProduct.unitPriceText,
+    onlineUnitPriceText: formatSourceUnitPriceText(row.onlineProduct.unitPriceText, row.onlineProduct.unitPriceUnit, {
+      locale: 'sv-SE',
+      currency: observedSnapshotCurrency
+    }),
     onlineSourceUrl: row.onlineProduct.sourceUrl,
     inStoreName: row.inStoreProduct.name,
     inStoreBrand: row.inStoreProduct.brand,
@@ -1817,7 +1822,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
       locale: defaultLocale,
       currency: observedSnapshotCurrency,
       unit: normalizedUnit.unitLabel.replace('kr/', '')
-    }) : 'Unit price not reported',
+    }) : unknownUnitPriceLabel,
     packageLabel: normalizedUnit?.packageLabel || packageText || 'Package size not reported',
     sourceLabel: isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
     confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
@@ -1858,7 +1863,7 @@ export const localeFormattingShowcase = supportedCurrencies.map((currency) => {
       ? formatLocalizedMoney(localeFormattingSampleCard?.totalSortPrice, { locale: defaultLocale, currency })
       : 'No observed prices in this currency',
     unitPriceLabel: hasObservedRows
-      ? localeFormattingSampleCard?.unitPriceLabel ?? 'Unit price not reported'
+      ? localeFormattingSampleCard?.unitPriceLabel ?? unknownUnitPriceLabel
       : 'No unit price until observation lands',
     dateLabel: hasObservedRows
       ? formatLocalizedDate(localeFormattingSampleDate, { locale: defaultLocale })
@@ -1880,7 +1885,10 @@ const digitalCatalogueSampleOffers = icaReklambladOffers
     productName: [offer.brand, offer.name].filter(Boolean).join(' · '),
     category: offer.category || 'Category not reported',
     priceText: offer.priceText,
-    comparisonPrice: offer.comparisonPrice || 'Jämförpris not reported',
+    comparisonPrice: formatSourceUnitPriceText(offer.comparisonPrice, offer.comparisonPrice, {
+      locale: 'sv-SE',
+      currency: observedSnapshotCurrency
+    }),
     regularPriceText: offer.regularPriceText || 'Regular price not reported',
     validTo: offer.validTo,
     storeName: offer.storeName,
@@ -2054,7 +2062,10 @@ export const offerExpiryReminderBoard = {
       store: offer.store,
       category: offer.category,
       priceText: offer.priceText,
-      comparePriceText: offer.comparePriceText,
+      comparePriceText: formatSourceUnitPriceText(offer.comparePriceText, offer.comparePriceText, {
+        locale: 'sv-SE',
+        currency: observedSnapshotCurrency
+      }),
       validFrom: offer.validFrom,
       validTo: offer.validTo,
       sourceUrl: offer.sourceUrl,
@@ -2281,7 +2292,10 @@ export function storeAssortmentOverviewForStore(store: (typeof storeUniverse)[nu
       name: offer.name,
       category: offer.category || 'lidl-public-offers',
       priceLabel: formatSek(offer.price),
-      unitPriceLabel: offer.unitPriceText || 'Unit price not reported',
+      unitPriceLabel: formatSourceUnitPriceText(offer.unitPriceText, offer.unitPriceText, {
+        locale: 'sv-SE',
+        currency: observedSnapshotCurrency
+      }),
       packageLabel: offer.packageText || 'Package not reported',
       validWindow: `${formatLocalizedDate(offer.validFrom, { locale: defaultLocale })} – ${formatLocalizedDate(offer.validTo, { locale: defaultLocale })}`,
       sourceLabel: 'Lidl public branch offer row',
