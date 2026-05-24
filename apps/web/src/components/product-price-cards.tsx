@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
+import { appendCampaignParams, collectCampaignParams, getPartnerLinkHref, persistPartnerClick } from '@/lib/partner-links';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -97,13 +98,17 @@ export function ProductPriceCards({
   intro?: string;
 }>) {
   const [compareMode, setCompareMode] = useState<CompareMode>('adaptive');
+  const [campaignSearch, setCampaignSearch] = useState('');
 
   useEffect(() => {
     const stored = window.localStorage.getItem(storageKey);
     if (stored === 'adaptive' || stored === 'total' || stored === 'unit') {
       setCompareMode(stored);
     }
+    setCampaignSearch(window.location.search);
   }, []);
+
+  const campaignParams = useMemo(() => collectCampaignParams(campaignSearch), [campaignSearch]);
 
   const sortedCards = useMemo(() => [...cards].sort((left, right) => {
     const delta = sortValue(left, compareMode) - sortValue(right, compareMode);
@@ -144,7 +149,11 @@ export function ProductPriceCards({
         </div>
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {sortedCards.map((card, index) => (
+        {sortedCards.map((card, index) => {
+          const partnerUrl = getPartnerLinkHref(card as unknown as Record<string, unknown>);
+          const partnerRedirectHref = partnerUrl ? appendCampaignParams(partnerUrl, campaignParams) : null;
+
+          return (
           <div className="relative" key={card.slug}>
             <FavouriteProductToggle
               className="absolute right-3 top-3 z-10"
@@ -198,6 +207,22 @@ export function ProductPriceCards({
             <p className="mt-4 text-3xl font-black text-emerald-800">{primaryLabel(card, compareMode)}</p>
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
+            {partnerRedirectHref ? (
+              <a
+                className="mt-3 inline-flex rounded-full bg-emerald-700 px-4 py-2 text-xs font-black text-white motion-safe:transition hover:bg-emerald-800"
+                href={partnerRedirectHref}
+                onClick={() => persistPartnerClick({
+                  campaignParams,
+                  destinationUrl: partnerRedirectHref,
+                  productName: card.name,
+                  productSlug: card.slug
+                })}
+                rel="noopener noreferrer sponsored"
+                target="_blank"
+              >
+                View store offer
+              </a>
+            ) : null}
             <PriceHistorySparkline card={card} />
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
             {card.cheapestUnitBadge ? (
@@ -207,7 +232,8 @@ export function ProductPriceCards({
             )}
             </LazyItemCard>
           </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
