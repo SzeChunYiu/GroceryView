@@ -8,6 +8,16 @@ type ParsedQuantity = {
   unit: NormalisedUnitPrice['comparableUnit'];
 };
 
+export type DiaperSizeClass = 'diaper-size-1' | 'diaper-size-2' | 'diaper-size-3' | 'diaper-size-4' | 'diaper-size-5' | 'diaper-size-6';
+
+export type ParsedDiaperPackageClass = {
+  diaperCount: number;
+  declaredSize: number | null;
+  diaperSizeClass: DiaperSizeClass | null;
+};
+
+const supportedDiaperSizeClasses = new Set([1, 2, 3, 4, 5, 6]);
+
 const round4 = (value: number): number => Math.round((value + Number.EPSILON) * 10000) / 10000;
 
 export function normaliseUnitPrice(price: number, quantityStr: string): NormalisedUnitPrice {
@@ -20,8 +30,13 @@ export function normaliseUnitPrice(price: number, quantityStr: string): Normalis
 }
 
 function parseQuantityString(quantityStr: string): ParsedQuantity {
-  const normalized = quantityStr.trim().toLowerCase().replace(/\s+/g, ' ');
+  const normalized = normalizeDiaperPackageText(quantityStr);
   if (!normalized) throw new Error('quantityStr must not be empty.');
+
+  const diaperPackage = parseDiaperPackageClass(normalized);
+  if (diaperPackage) {
+    return quantityFromUnit(diaperPackage.diaperCount, 'piece');
+  }
 
   const multiplierMatch = normalized.match(/^(\d+(?:[.,]\d+)?)\s*[x×]\s*(\d+(?:[.,]\d+)?)\s*([a-zåäö]+)\b/u);
   if (multiplierMatch) {
@@ -39,6 +54,58 @@ function parseQuantityString(quantityStr: string): ParsedQuantity {
   const quantityMatch = normalized.match(/(\d+(?:[.,]\d+)?)\s*([a-zåäö]+)\b/u);
   if (!quantityMatch) throw new Error(`Unsupported quantity string: ${quantityStr}`);
   return quantityFromUnit(parseDecimal(quantityMatch[1]!), quantityMatch[2]!);
+}
+
+function normalizeDiaperPackageText(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ');
+}
+
+function diaperSizeClassFor(size: number | null): DiaperSizeClass | null {
+  if (size === null || !supportedDiaperSizeClasses.has(size)) return null;
+  return `diaper-size-${size}` as DiaperSizeClass;
+}
+
+function parseDiaperCount(normalized: string): number | null {
+  const multiPackMatch = normalized.match(/\b(\d+)\s*[x×]\s*(\d+)\s*(?:p|st|pcs|pieces?|blojor|diapers?)\b/u);
+  if (multiPackMatch) return Number(multiPackMatch[1]!) * Number(multiPackMatch[2]!);
+
+  const perPackageMatch = normalized.match(/\b(\d+)\s*(?:per|\/)\s*(?:frp|forp|forpackning|pack|paket)\b/u);
+  if (perPackageMatch) return Number(perPackageMatch[1]!);
+
+  const pieceCountMatch = normalized.match(/\b(\d+)\s*(?:p|st|pcs|pieces?|blojor|diapers?)\b/u);
+  if (pieceCountMatch) return Number(pieceCountMatch[1]!);
+
+  return null;
+}
+
+function parseDiaperDeclaredSize(normalized: string): number | null {
+  const explicitSizeMatch = normalized.match(/\b(?:strl|storlek|size)\s*([1-8])\b/u);
+  if (explicitSizeMatch) return Number(explicitSizeMatch[1]!);
+
+  const comfortSizeMatch = normalized.match(/\bcomfort\s*([1-8])\b/u);
+  if (comfortSizeMatch) return Number(comfortSizeMatch[1]!);
+
+  return null;
+}
+
+export function parseDiaperPackageClass(packageText: string): ParsedDiaperPackageClass | null {
+  const normalized = normalizeDiaperPackageText(packageText);
+  if (!normalized) return null;
+
+  const diaperCount = parseDiaperCount(normalized);
+  if (diaperCount === null || !Number.isFinite(diaperCount) || diaperCount <= 0) return null;
+
+  const declaredSize = parseDiaperDeclaredSize(normalized);
+  return {
+    diaperCount,
+    declaredSize,
+    diaperSizeClass: diaperSizeClassFor(declaredSize)
+  };
 }
 
 function quantityFromUnit(value: number, rawUnit: string): ParsedQuantity {
