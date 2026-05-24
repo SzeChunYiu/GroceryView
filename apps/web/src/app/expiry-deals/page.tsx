@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { buildExpiryDealRadar } from '@groceryview/core';
-import { expiryDealReports } from '@groceryview/api';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { expiryDealRadarReports } from '@/lib/demo-data';
 import { routeMetadata } from '@/lib/seo';
 
+const expiryDealReports = expiryDealRadarReports;
 const now = '2026-05-22T10:00:00.000Z';
 const maxDistanceKm = 5;
 const radar = buildExpiryDealRadar({
@@ -17,7 +18,7 @@ const activeItems = radar.stores.flatMap((store) =>
   store.items.map((item) => ({
     ...item,
     storeName: store.storeName,
-    source: 'timestamped expiry report'
+    source: expiryDealReports.find((report) => report.id === item.id)?.source ?? 'timestamped expiry report'
   }))
 );
 
