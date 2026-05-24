@@ -66,7 +66,7 @@ export function parseApoteksgruppenOfferText(text: string, sourceUrl: string): A
       const percentMatch = line.match(/(.+?)\s+(upp till\s+)?(\d{1,2})\s*%/i);
       const multiBuy = parseMultiBuy(line);
       if (!percentMatch && !multiBuy) return null;
-      const productName = (percentMatch?.[1] ?? line).replace(/för våra klubbmedlemmar/i, '').trim();
+      const productName = (percentMatch?.[1] ?? line).replace(/för våra klubbmedlemmar/i, '').trim() || 'För våra klubbmedlemmar';
       return {
         chainId: 'apoteksgruppen_se',
         successorChainId: 'kronans_apotek',
