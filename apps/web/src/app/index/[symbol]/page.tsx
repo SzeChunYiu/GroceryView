@@ -234,8 +234,7 @@ function fixedBasketChart(index: FixedBasketIndex, rows: CategoryConstituent[]):
     confidenceLabel: `${index.confidence} confidence from ${rows.length} matched rows`,
     caveat: 'Fixed-basket points compare the highest visible matched chain price baseline with the lowest visible matched chain price for the same product codes. No forecast or unmatched SKU estimate is rendered.',
     defaultWindow: 'ALL',
-    windows: chartWindowLabels.map((label) => (label === 'ALL' ? window : emptyWindow(label, 'fixed basket comparison'))
-  )
+    windows: chartWindowLabels.map((label) => (label === 'ALL' ? window : emptyWindow(label, 'fixed basket comparison')))
   };
 }
 
@@ -297,8 +296,7 @@ function chainChart(chain: ChainPriceIndex): PriceChartTerminalModel {
     confidenceLabel: `${chain.confidence} current confidence; ${series.coverageLabel}`,
     caveat: 'Trend points replay dated weekly campaign rows through calculateChainPriceIndex. The current hero number uses the broader normalized chain feed plus matched Axfood rows.',
     defaultWindow: 'ALL',
-    windows: chartWindowLabels.map((label) => (label === 'ALL' ? window : emptyWindow(label, 'campaign trend comparison'))
-  )
+    windows: chartWindowLabels.map((label) => (label === 'ALL' ? window : emptyWindow(label, 'campaign trend comparison')))
   };
 }
 
