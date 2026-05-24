@@ -11,6 +11,8 @@ import {
   buildCoopStoreInfoUrl,
   buildCoopStoresUrl,
   buildCityGrossProductsUrl,
+  extractCityGrossFlyerPdfUrls,
+  parseCityGrossFlyerOffers,
   buildCityGrossStoresUrl,
   buildDailyConnectorConfigsFromEnv,
   buildDailyIngestionPostgresPoolConfig,
@@ -188,6 +190,19 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+describe('City Gross flyer connector', () => {
+  it('parses direct flyer fixture offers with structured promotions and PDF provenance', () => {
+    const html = '<a href="/reklamblad/citygross-vecka.pdf">PDF</a><script type="application/json">{"offers":[{"id":"cg-1","name":"Storpack kyckling","brand":"City Gross","promotionText":"2 för 99:- familjepack","url":"/erbjudanden/kyckling"},{"id":"cg-2","title":"Kaffe","offerText":"30% rabatt"}]}</script>';
+    const rows = parseCityGrossFlyerOffers(html, 'https://www.citygross.se/erbjudanden', '2026-05-24T12:00:00.000Z');
+
+    assert.deepEqual(extractCityGrossFlyerPdfUrls(html), ['https://www.citygross.se/reklamblad/citygross-vecka.pdf']);
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows[0]?.structuredPromotion, { kind: 'bulk_price', quantity: 2, price: 99 });
+    assert.deepEqual(rows[1]?.structuredPromotion, { kind: 'percent_off', pct: 30 });
+    assert.deepEqual(rows[0]?.flyerPdfUrls, ['https://www.citygross.se/reklamblad/citygross-vecka.pdf']);
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {

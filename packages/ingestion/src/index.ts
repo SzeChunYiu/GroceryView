@@ -92,6 +92,7 @@ export * from './connectors/overpass.js';
 export * from './connectors/fuel-stations.js';
 export * from './connectors/citygross.js';
 export * from './connectors/citygross-bulk.js';
+export * from './connectors/citygross-flyer.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
