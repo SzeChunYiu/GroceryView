@@ -35,6 +35,7 @@ import {
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
+  buildSkeljungurFuelPricesUrl,
   fetchSt1FuelPrices,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
@@ -55,6 +56,7 @@ import {
   fetchOpenFoodFactsSwedenCatalog,
   fetchOkq8FuelPrices,
   fetchOpenFoodFactsRetailerEnrichments,
+  fetchSkeljungurFuelPrices,
   fetchBrandedSwedishFuelStations,
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
@@ -133,6 +135,7 @@ import {
   parseBrandedSwedishFuelStations,
   parseCoopDrPdfTextOffers,
   parseRetailerProductJsonSnapshot,
+  parseSkeljungurFuelPriceList,
   persistOpenFoodFactsProductMetadata,
   parseSt1FuelPriceHtml,
   planIngestionBatch,
@@ -198,6 +201,78 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('Skeljungur Iceland connector', () => {
+  const payload = {
+    executiontime: '2026-05-24 15:54:22',
+    items: [
+      { ItemName: 'Bensín 95 okt', Price: '231.30' },
+      { ItemName: 'Bensín 98 okt', Price: '271.20' },
+      { ItemName: 'Gasolía-Diesel', Price: '266.80' },
+      { ItemName: 'Lífdiesel', Price: '348.23' },
+      { ItemName: 'Flugbensín', Price: '421.35' },
+      { ItemName: 'JET A-1', Price: '321.53' },
+      { ItemName: 'Skipagasolía', Price: '226.90' },
+      { ItemName: 'MD olía', Price: '156.83' },
+      { ItemName: 'DMA olía', Price: '225.90' },
+      { ItemName: 'Svartolía blönduð', Price: '71.51' },
+      { ItemName: 'Metan', Price: '238.89' }
+    ]
+  };
+
+  it('maps official Skeljungur fuel list prices without inventing member or coupon quirks', () => {
+    const rows = parseSkeljungurFuelPriceList(payload, {
+      capturedAt: '2026-05-24T16:00:00.000Z',
+      sourceUrl: buildSkeljungurFuelPricesUrl('2026-05-24'),
+      rawSnapshotRef: 'raw://test/skeljungur'
+    });
+
+    assert.equal(rows.length, 11);
+    assert.deepEqual(rows.map((row) => row.channel), Array.from({ length: 11 }, () => 'fuel_list_price'));
+    assert.deepEqual(rows.map((row) => row.customerSegment), Array.from({ length: 11 }, () => 'business'));
+    assert.equal(rows[0]?.chainId, 'skeljungur_is');
+    assert.equal(rows[0]?.country, 'IS');
+    assert.equal(rows[0]?.operatorName, 'Skeljungur');
+    assert.equal(rows[0]?.productId, 'fuel-95');
+    assert.equal(rows[0]?.pricePerUnit, 231.3);
+    assert.equal(rows[0]?.currency, 'ISK');
+    assert.equal(rows[0]?.unit, 'litre');
+    assert.equal(rows[0]?.sourceUrl, buildSkeljungurFuelPricesUrl('2026-05-24'));
+    assert.equal(rows[0]?.observedAt, '2026-05-24T15:54:22.000Z');
+    assert.equal(rows[0]?.capturedAt, '2026-05-24T16:00:00.000Z');
+    assert.equal(rows[0]?.contractDiscountAvailable, true);
+    assert.equal(rows[0]?.excludesContractTerms, true);
+    assert.equal(rows[0]?.is_member_price, false);
+    assert.equal(rows[0]?.is_subscription_price, false);
+    assert.equal(rows[0]?.is_coupon_price, false);
+    assert.equal(rows[0]?.is_clearance, false);
+    assert.equal(rows[0]?.multi_buy, null);
+    assert.equal(rows[0]?.provenance.source, 'skeljungur_fuel_price_list');
+    assert.equal(rows[0]?.provenance.rawSnapshotRef, 'raw://test/skeljungur');
+    assert.equal(rows[0]?.provenance.executionTime, '2026-05-24 15:54:22');
+    assert.equal(rows[0]?.provenance.originalItemName, 'Bensín 95 okt');
+    assert.equal(rows[0]?.provenance.originalPrice, '231.30');
+    assert.equal(rows.find((row) => row.productId === 'fuel-methane')?.unit, 'kg');
+  });
+
+  it('fetches the dated official API endpoint', async () => {
+    const rows = await fetchSkeljungurFuelPrices({
+      date: '2026-05-24',
+      capturedAt: '2026-05-24T16:00:00.000Z',
+      fetchImpl: async (url) => {
+        assert.equal(String(url), buildSkeljungurFuelPricesUrl('2026-05-24'));
+        return {
+          ok: true,
+          status: 200,
+          json: async () => payload
+        } as Response;
+      }
+    });
+
+    assert.equal(rows[5]?.productName, 'JET A-1');
+    assert.equal(rows[5]?.pricePerUnit, 321.53);
   });
 });
 
