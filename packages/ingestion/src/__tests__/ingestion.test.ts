@@ -106,6 +106,7 @@ import {
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
+  GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
@@ -2954,6 +2955,48 @@ describe('fetchMathemProducts', () => {
     });
 
     assert.equal(rows.length, 1);
+  });
+
+  it('fails closed when Mathem search returns fewer than the required real rows', async () => {
+    const nextData = {
+      props: {
+        pageProps: {
+          dehydratedState: {
+            queries: [{
+              state: {
+                data: {
+                  items: [{
+                    id: 1,
+                    type: 'product',
+                    attributes: {
+                      id: 1,
+                      fullName: 'Mathem product',
+                      grossPrice: '10.00',
+                      currency: 'SEK'
+                    }
+                  }]
+                }
+              }
+            }]
+          }
+        }
+      }
+    };
+    const fetchImpl: typeof fetch = async () => new Response(
+      `<script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script>`,
+      { status: 200 }
+    );
+
+    await assert.rejects(
+      () => fetchMathemProducts({
+        queries: ['makaroner'],
+        pages: [1],
+        minRows: 2,
+        fetchImpl,
+        retrievedAt: '2026-05-21T01:00:00.000Z'
+      }),
+      /Mathem fetch returned only 1 rows; minimum required is 2/
+    );
   });
 });
 
@@ -6192,6 +6235,94 @@ describe('daily ingestion runner', () => {
       cadence: 'daily',
       connectorId: 'matspar-public-search',
       runKey: 'matspar:retailer-online-page:matspar-public-search:2026-05-23',
+      domain: 'grocery'
+    });
+  });
+
+  it('materializes native Mathem public search product prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const nextData = {
+      props: {
+        pageProps: {
+          dehydratedState: {
+            queries: [{
+              state: {
+                data: {
+                  items: [{
+                    id: 6448,
+                    type: 'product',
+                    attributes: {
+                      id: 6448,
+                      fullName: 'Kungsörnen Gammaldags Idealmakaroner',
+                      brand: 'Kungsörnen',
+                      nameExtra: '1300 g',
+                      frontUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/',
+                      grossPrice: '22.24',
+                      grossUnitPrice: '17.11',
+                      unitPriceQuantityAbbreviation: 'kg',
+                      currency: 'SEK',
+                      availability: { isAvailable: true },
+                      images: [{ thumbnail: { url: 'https://images.mathem.se/product.jpg' } }]
+                    }
+                  }]
+                }
+              }
+            }]
+          }
+        }
+      }
+    };
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-24T00:30:00.000Z',
+      connectors: [{
+        connectorId: 'mathem-public-search',
+        chainId: 'mathem',
+        sourceType: 'retailer_online_page',
+        endpointUrl: `${GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL}?queries=makaroner&pages=1&minRows=1&maxRows=1`,
+        parserVersion: 'mathem-public-search-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        return new Response(`<script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script>`, {
+          status: 200,
+          headers: { 'content-type': 'text/html' }
+        });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.observationIds.length, 1);
+    assert.deepEqual(requestedUrls, [buildMathemSearchUrl('makaroner')]);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.slug, 'mathem-6448');
+    assert.equal(product.brand, 'Kungsörnen');
+    assert.equal(product.category_id, 'mathem-makaroner');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, null);
+    assert.equal(observation.retailer_product_ref, '6448');
+    assert.equal(observation.price, 22.24);
+    assert.equal(observation.quantity, 1300);
+    assert.equal(observation.quantity_unit, 'g');
+    assert.equal(observation.is_available, true);
+    assert.equal(observation.domain, 'grocery');
+    const provenance = observation.provenance as Record<string, unknown>;
+    assert.deepEqual(provenance, {
+      sourceType: 'retailer_online_page',
+      sourceUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/',
+      parserVersion: 'mathem-public-search-v1',
+      rawSnapshotRef: String(provenance.rawSnapshotRef),
+      chainId: 'mathem',
+      cadence: 'daily',
+      connectorId: 'mathem-public-search',
+      runKey: 'mathem:retailer-online-page:mathem-public-search:2026-05-24',
       domain: 'grocery'
     });
   });

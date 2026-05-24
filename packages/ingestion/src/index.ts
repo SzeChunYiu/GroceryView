@@ -68,6 +68,11 @@ import {
   type MatsparProduct
 } from './connectors/matspar.js';
 import {
+  fetchMathemProducts,
+  MATHEM_MINIMUM_ROWS,
+  type MathemProduct
+} from './connectors/mathem.js';
+import {
   fetchWillysProductsForAllStores,
   fetchWillysWeeklyDiscountsForAllStores,
   type WillysProduct,
@@ -1924,6 +1929,35 @@ function matsparProductToDailyItem(row: MatsparProduct): RetailerConnectorParsed
   };
 }
 
+function mathemCategoryId(row: MathemProduct): string {
+  try {
+    const query = new URL(row.sourceUrl).searchParams.get('q');
+    if (query?.trim()) return `mathem-${stableKeyPart(query)}`;
+  } catch {
+    // Keep a stable category even if a captured row has a malformed source URL.
+  }
+  return 'mathem-public-search';
+}
+
+function mathemProductToDailyItem(row: MathemProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `mathem-${stableKeyPart(row.code)}`,
+    categoryId: mathemCategoryId(row),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    isAvailable: row.available,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.productUrl || row.sourceUrl
+  };
+}
+
 function okq8FuelPriceToDailyItem(row: FuelPriceObservation): RetailerConnectorParsedProduct {
   return {
     sourceType: 'retailer_online_page',
@@ -2175,6 +2209,20 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(matsparProductToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchMathemProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      queries: dailyNativeStringListParam(url, 'queries'),
+      pages: dailyNativeNumberListParam(url, 'pages'),
+      minRows: dailyNativeNumberParam(url, 'minRows') ?? MATHEM_MINIMUM_ROWS,
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(mathemProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL}?`)) {
@@ -3019,6 +3067,7 @@ export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview:/
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
+export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';
 
