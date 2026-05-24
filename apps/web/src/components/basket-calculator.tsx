@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { compareBasketStrategies, summarizeStoreBasketCoverage } from '@groceryview/core';
 
 export type BasketCalculatorPriceRow = {
@@ -41,6 +41,7 @@ function initialBasketIds(products: BasketCalculatorProduct[]) {
 
 export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalculatorProps>) {
   const [selectedProductIds, setSelectedProductIds] = useState(() => initialBasketIds(products));
+  const [, startBasketUpdateTransition] = useTransition();
 
   const selectedProducts = useMemo(
     () => products.filter((product) => selectedProductIds.has(product.id)),
@@ -96,11 +97,13 @@ export function BasketCalculator({ products, sourceLabel }: Readonly<BasketCalcu
   }));
 
   function toggleProduct(productId: string) {
-    setSelectedProductIds((current) => {
-      const next = new Set(current);
-      if (next.has(productId)) next.delete(productId);
-      else next.add(productId);
-      return next;
+    startBasketUpdateTransition(() => {
+      setSelectedProductIds((current) => {
+        const next = new Set(current);
+        if (next.has(productId)) next.delete(productId);
+        else next.add(productId);
+        return next;
+      });
     });
   }
 
