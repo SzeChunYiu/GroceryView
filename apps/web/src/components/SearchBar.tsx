@@ -2,69 +2,15 @@
 
 import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { useEffect, useId, useMemo, useState } from 'react';
-
-type ProductSearchResult = {
-  id: string;
-  slug: string;
-  name: string;
-  brand: string | null;
-  imageUrl: string | null;
-  searchRank: number;
-};
-
-type ProductSearchResponse = {
-  query: string;
-  results: ProductSearchResult[];
-  error?: string;
-};
-
-type SearchStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
-
-const MIN_QUERY_LENGTH = 2;
+import { useId, useState } from 'react';
+import { useSearch } from '@/hooks/useSearch';
 
 export function SearchBar() {
   const inputId = useId();
   const listboxId = useId();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<ProductSearchResult[]>([]);
-  const [status, setStatus] = useState<SearchStatus>('idle');
-  const trimmedQuery = useMemo(() => query.trim(), [query]);
-  const shouldShowDropdown = status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH;
-
-  useEffect(() => {
-    if (trimmedQuery.length < MIN_QUERY_LENGTH) {
-      setResults([]);
-      setStatus('idle');
-      return;
-    }
-
-    const controller = new AbortController();
-    const timeout = window.setTimeout(async () => {
-      setStatus('loading');
-      try {
-        const response = await fetch(`/api/products?q=${encodeURIComponent(trimmedQuery)}`, {
-          signal: controller.signal,
-          headers: { Accept: 'application/json' }
-        });
-        const payload = await response.json() as ProductSearchResponse;
-        if (!response.ok || payload.error) throw new Error(payload.error ?? 'product_search_failed');
-        if (controller.signal.aborted) return;
-        setResults(payload.results ?? []);
-        setStatus((payload.results ?? []).length > 0 ? 'ready' : 'empty');
-      } catch (error) {
-        if (controller.signal.aborted) return;
-        console.error('Product search request failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
-        setResults([]);
-        setStatus('error');
-      }
-    }, 300);
-
-    return () => {
-      window.clearTimeout(timeout);
-      controller.abort();
-    };
-  }, [trimmedQuery]);
+  const { results, status, trimmedQuery, minQueryLength } = useSearch(query);
+  const shouldShowDropdown = status !== 'idle' && trimmedQuery.length >= minQueryLength;
 
   return (
     <div className="relative w-full max-w-xl lg:w-[min(36vw,28rem)]">
@@ -112,7 +58,7 @@ export function SearchBar() {
                   role="option"
                 >
                   <span className="block text-sm font-black text-slate-950">{result.name}</span>
-                  <span className="mt-1 block text-xs font-semibold text-slate-600">{result.brand ?? 'Brand not reported'} · PostgreSQL product search</span>
+                  <span className="mt-1 block text-xs font-semibold text-slate-600">{result.category} · autocomplete suggestion</span>
                 </Link>
               ))}
             </div>
