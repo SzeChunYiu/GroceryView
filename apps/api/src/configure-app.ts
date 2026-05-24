@@ -1,5 +1,7 @@
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { PostgresQueryExecutorService } from './database/postgres-query-executor.service.js';
+import { featureFlagsMiddleware } from './middleware/featureFlags.js';
 
 export function configureApp(app: INestApplication) {
   app.enableCors();
@@ -10,6 +12,9 @@ export function configureApp(app: INestApplication) {
       whitelist: true
     })
   );
+
+  const postgres = app.get(PostgresQueryExecutorService);
+  app.use(featureFlagsMiddleware(postgres ?? null));
 
   const config = new DocumentBuilder()
     .setTitle('GroceryView API')
