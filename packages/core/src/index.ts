@@ -277,6 +277,78 @@ export type BasketComparisonInput = {
   items: BasketInputItem[];
 };
 
+export type MultiWeekStockUpHistoryPoint = {
+  observedAt: string;
+  unitPrice: number;
+  sourceType: DealScoreSourceType;
+  confidence: number;
+};
+
+export type MultiWeekStockUpItemInput = {
+  productId: string;
+  productName: string;
+  storeName: string;
+  weeklyNeedUnits: number;
+  packageUnits: number;
+  comparableUnit: string;
+  currentUnitPrice: number;
+  history: MultiWeekStockUpHistoryPoint[];
+  storageLimitWeeks?: number;
+  seasonalityNote?: string;
+};
+
+export type MultiWeekStockUpInput = {
+  asOf: string;
+  planningWeeks: number;
+  weeklyBudget: number;
+  items: MultiWeekStockUpItemInput[];
+};
+
+export type MultiWeekStockUpConfidence = 'high' | 'medium' | 'low';
+
+export type MultiWeekStockUpRow = {
+  productId: string;
+  productName: string;
+  storeName: string;
+  planningWeeks: number;
+  comparableUnit: string;
+  plannedUnits: number;
+  packagesNeeded: number;
+  currentUnitPrice: number;
+  typicalUnitPrice: number;
+  historicalLowUnitPrice: number;
+  currentVsTypicalPercent: number;
+  currentVsHistoricalLowPercent: number;
+  upfrontCost: number;
+  weeklyEquivalentCost: number;
+  weeklyBudgetSharePercent: number;
+  observationCount: number;
+  observedHistoryWindow: string;
+  historyWindowStart: string;
+  historyWindowEnd: string;
+  confidence: MultiWeekStockUpConfidence;
+  contextLabel: string;
+  reviewTrigger: string;
+  seasonalityNote?: string;
+};
+
+export type MultiWeekStockUpPlan = {
+  asOf: string;
+  planningWeeks: number;
+  weeklyBudget: number;
+  totalUpfrontCost: number;
+  weeklyEquivalentCost: number;
+  weeklyBudgetSharePercent: number;
+  rows: MultiWeekStockUpRow[];
+  coverage: {
+    confidence: MultiWeekStockUpConfidence;
+    observedItemCount: number;
+    totalItemCount: number;
+    caveat: string;
+  };
+  guardrails: string[];
+};
+
 export type BasketComparisonLineStatus =
   | 'matched'
   | 'missing_product_match'
@@ -1258,6 +1330,110 @@ export function summarizeStoreBasketCoverage(input: BasketComparisonInput): Stor
     fullCoverageStoreIds: stores
       .filter((coverage) => coverage.missingProductIds.length === 0)
       .map((coverage) => coverage.storeId)
+  };
+}
+
+function stockUpConfidence(observationCount: number, averageConfidence: number): MultiWeekStockUpConfidence {
+  if (observationCount >= 5 && averageConfidence >= 0.8) return 'high';
+  if (observationCount >= 3 && averageConfidence >= 0.65) return 'medium';
+  return 'low';
+}
+
+function weakestStockUpConfidence(values: MultiWeekStockUpConfidence[]): MultiWeekStockUpConfidence {
+  if (values.includes('low')) return 'low';
+  if (values.includes('medium')) return 'medium';
+  return 'high';
+}
+
+export function planMultiWeekStockUpList(input: MultiWeekStockUpInput): MultiWeekStockUpPlan {
+  if (!Number.isInteger(input.planningWeeks) || input.planningWeeks <= 0) throw new Error('planningWeeks must be a positive integer.');
+  if (input.weeklyBudget <= 0) throw new Error('weeklyBudget must be positive.');
+  const asOf = Date.parse(input.asOf);
+  if (Number.isNaN(asOf)) throw new Error('asOf must be an ISO date.');
+
+  const rows = input.items.map((item): MultiWeekStockUpRow => {
+    requireNonBlank(item.productId, 'productId');
+    requireNonBlank(item.productName, 'productName');
+    requireNonBlank(item.storeName, 'storeName');
+    requireNonBlank(item.comparableUnit, 'comparableUnit');
+    if (item.weeklyNeedUnits <= 0) throw new Error('weeklyNeedUnits must be positive.');
+    if (item.packageUnits <= 0) throw new Error('packageUnits must be positive.');
+    if (item.currentUnitPrice < 0) throw new Error('currentUnitPrice must be non-negative.');
+
+    const parsedHistory = item.history
+      .map((point) => ({ ...point, observedAtMs: Date.parse(point.observedAt) }))
+      .filter((point) => !Number.isNaN(point.observedAtMs) && point.observedAtMs <= asOf)
+      .sort((a, b) => a.observedAtMs - b.observedAtMs);
+    if (parsedHistory.length === 0) throw new Error('At least one historical unit-price point is required.');
+    if (parsedHistory.some((point) => point.unitPrice < 0)) throw new Error('Historical unit prices must be non-negative.');
+
+    const prices = parsedHistory.map((point) => point.unitPrice);
+    const typicalUnitPrice = roundMoney(median(prices));
+    const historicalLowUnitPrice = roundMoney(Math.min(...prices));
+    const plannedWeeks = item.storageLimitWeeks === undefined
+      ? input.planningWeeks
+      : Math.min(input.planningWeeks, Math.max(1, item.storageLimitWeeks));
+    const plannedUnits = roundMoney(item.weeklyNeedUnits * plannedWeeks);
+    const packagesNeeded = Math.ceil(plannedUnits / item.packageUnits);
+    const upfrontCost = roundMoney(packagesNeeded * item.packageUnits * item.currentUnitPrice);
+    const weeklyEquivalentCost = roundMoney(upfrontCost / plannedWeeks);
+    const averageConfidence = parsedHistory.reduce((sum, point) => sum + clamp(point.confidence, 0, 1), 0) / parsedHistory.length;
+    const confidence = stockUpConfidence(parsedHistory.length, averageConfidence);
+    const currentVsTypicalPercent = typicalUnitPrice > 0 ? roundMoney(((item.currentUnitPrice - typicalUnitPrice) / typicalUnitPrice) * 100) : 0;
+    const currentVsHistoricalLowPercent = historicalLowUnitPrice > 0 ? roundMoney(((item.currentUnitPrice - historicalLowUnitPrice) / historicalLowUnitPrice) * 100) : 0;
+
+    return {
+      productId: item.productId,
+      productName: item.productName,
+      storeName: item.storeName,
+      planningWeeks: plannedWeeks,
+      comparableUnit: item.comparableUnit,
+      plannedUnits,
+      packagesNeeded,
+      currentUnitPrice: roundMoney(item.currentUnitPrice),
+      typicalUnitPrice,
+      historicalLowUnitPrice,
+      currentVsTypicalPercent,
+      currentVsHistoricalLowPercent,
+      upfrontCost,
+      weeklyEquivalentCost,
+      weeklyBudgetSharePercent: roundMoney((weeklyEquivalentCost / input.weeklyBudget) * 100),
+      observationCount: parsedHistory.length,
+      observedHistoryWindow: `${parsedHistory[0]!.observedAt} to ${parsedHistory[parsedHistory.length - 1]!.observedAt}`,
+      historyWindowStart: parsedHistory[0]!.observedAt,
+      historyWindowEnd: parsedHistory[parsedHistory.length - 1]!.observedAt,
+      confidence,
+      contextLabel: `${parsedHistory.length} observed unit-price points; typical and low are historical facts, not a forecast.`,
+      reviewTrigger: item.storageLimitWeeks !== undefined && item.storageLimitWeeks < input.planningWeeks
+        ? `Storage limit caps this at ${plannedWeeks} weeks; re-check observed prices before buying the next batch.`
+        : 'Re-check observed prices before the planned weeks are used up or when a new verified row arrives.',
+      ...(item.seasonalityNote ? { seasonalityNote: item.seasonalityNote } : {})
+    };
+  });
+
+  const totalUpfrontCost = roundMoney(rows.reduce((sum, row) => sum + row.upfrontCost, 0));
+  const weeklyEquivalentCost = roundMoney(totalUpfrontCost / input.planningWeeks);
+
+  return {
+    asOf: input.asOf,
+    planningWeeks: input.planningWeeks,
+    weeklyBudget: input.weeklyBudget,
+    totalUpfrontCost,
+    weeklyEquivalentCost,
+    weeklyBudgetSharePercent: roundMoney((weeklyEquivalentCost / input.weeklyBudget) * 100),
+    rows,
+    coverage: {
+      confidence: weakestStockUpConfidence(rows.map((row) => row.confidence)),
+      observedItemCount: rows.length,
+      totalItemCount: input.items.length,
+      caveat: 'Historical low and typical prices use observed unit-price rows only; missing history lowers confidence and no future price is predicted.'
+    },
+    guardrails: [
+      'No price forecast is produced or implied.',
+      'Historical low and typical prices are computed from dated observed unit-price rows.',
+      'Budget impact is the current upfront cost spread across the shopper-selected planning weeks.',
+      'Storage limits can shorten a row horizon, and shoppers should re-check observed prices before restocking.'
+    ]
   };
 }
 
