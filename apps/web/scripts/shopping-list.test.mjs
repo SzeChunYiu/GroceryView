@@ -20,6 +20,12 @@ describe('shopping list route', () => {
     assert.match(page, /CheckableListItem/);
     assert.match(page, /BulkImportDialog/);
     assert.match(page, /addImportedItems/);
+    assert.match(page, /Budget history controls/);
+    assert.match(page, /Copy JSON/);
+    assert.match(page, /Copy CSV/);
+    assert.match(page, /Export JSON/);
+    assert.match(page, /Export CSV/);
+    assert.match(page, /Clear budget history/);
     assert.match(page, /Shopping list/);
 
     assert.match(row, /'use client'/);
@@ -32,6 +38,14 @@ describe('shopping list route', () => {
     assert.match(hook, /'use client'/);
     assert.match(hook, /localStorage\.getItem\(LIST_STORAGE_KEY\)/);
     assert.match(hook, /localStorage\.setItem\(LIST_STORAGE_KEY/);
+    assert.match(hook, /BUDGET_HISTORY_STORAGE_KEY = 'budgetHistory'/);
+    assert.match(hook, /localStorage\.getItem\(BUDGET_HISTORY_STORAGE_KEY\)/);
+    assert.match(hook, /localStorage\.removeItem\(BUDGET_HISTORY_STORAGE_KEY\)/);
+    assert.match(hook, /navigator\.clipboard\.writeText\(budgetHistoryJson\)/);
+    assert.match(hook, /navigator\.clipboard\.writeText\(budgetHistoryCsv\)/);
+    assert.match(hook, /budgetHistoryCsvFromJson/);
+    assert.match(hook, /downloadTextFile\('budgetHistory\.json'/);
+    assert.match(hook, /downloadTextFile\('budgetHistory\.csv'/);
     assert.match(hook, /toggleItemChecked/);
     assert.match(hook, /checked: !item\.checked/);
     assert.match(hook, /addImportedItems/);

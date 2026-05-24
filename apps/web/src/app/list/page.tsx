@@ -7,7 +7,23 @@ import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { useList } from '@/hooks/useList';
 
 export default function ShoppingListPage() {
-  const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
+  const {
+    addImportedItems,
+    budgetHistoryCount,
+    budgetHistoryCsv,
+    checkedCount,
+    clearBudgetHistory,
+    copyBudgetHistoryCsv,
+    copyBudgetHistoryJson,
+    exportBudgetHistoryCsv,
+    exportBudgetHistoryJson,
+    items,
+    refreshBudgetHistoryExport,
+    remainingCount,
+    resetCheckedState,
+    toggleItemChecked,
+    totalCount
+  } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   return (
@@ -30,6 +46,67 @@ export default function ShoppingListPage() {
         </div>
 
         <BulkImportDialog onImportItems={addImportedItems} />
+
+        <section className="mt-6 rounded-[1.75rem] border border-amber-200 bg-white/95 p-5 shadow-sm">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <h2 className="text-2xl font-black tracking-tight text-slate-950">Budget history controls</h2>
+              <p className="mt-1 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+                Copy or export the recent budgetHistory JSON/CSV saved in localStorage, or clear stale saved budget snapshots before a shared grocery trip.
+              </p>
+              <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-amber-800">
+                {budgetHistoryCount} saved snapshot{budgetHistoryCount === 1 ? '' : 's'} ready
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                className="inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 transition hover:border-amber-700 hover:text-amber-900"
+                onClick={refreshBudgetHistoryExport}
+                type="button"
+              >
+                Refresh history
+              </button>
+              <button
+                className="inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 transition hover:border-amber-700 hover:text-amber-900"
+                onClick={() => { void copyBudgetHistoryJson(); }}
+                type="button"
+              >
+                Copy JSON
+              </button>
+              <button
+                className="inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 transition hover:border-amber-700 hover:text-amber-900"
+                onClick={() => { void copyBudgetHistoryCsv(); }}
+                type="button"
+              >
+                Copy CSV
+              </button>
+              <button
+                className="inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 transition hover:border-amber-700 hover:text-amber-900"
+                onClick={exportBudgetHistoryJson}
+                type="button"
+              >
+                Export JSON
+              </button>
+              <button
+                className="inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 transition hover:border-amber-700 hover:text-amber-900"
+                onClick={exportBudgetHistoryCsv}
+                type="button"
+              >
+                Export CSV
+              </button>
+              <button
+                className="inline-flex items-center justify-center rounded-full border border-red-200 px-4 py-2 text-sm font-black text-red-700 transition hover:border-red-700 hover:text-red-900"
+                onClick={clearBudgetHistory}
+                type="button"
+              >
+                Clear budget history
+              </button>
+            </div>
+          </div>
+          <pre className="mt-4 max-h-28 overflow-auto rounded-2xl bg-slate-950 p-3 text-xs font-semibold text-emerald-100">
+            {budgetHistoryCsv || 'No budgetHistory rows found in localStorage.'}
+          </pre>
+        </section>
 
         <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

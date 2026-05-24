@@ -23,6 +23,7 @@ type PersistedListState = {
 };
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
+export const BUDGET_HISTORY_STORAGE_KEY = 'budgetHistory';
 
 const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   {
@@ -127,14 +128,63 @@ function persistCheckedState(items: ShoppingListItem[]) {
   }
 }
 
+function budgetHistoryRowsFromJson(value: string): Record<string, unknown>[] {
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    const rows = Array.isArray(parsed)
+      ? parsed
+      : parsed && typeof parsed === 'object' && Array.isArray((parsed as { budgetHistory?: unknown }).budgetHistory)
+        ? (parsed as { budgetHistory: unknown[] }).budgetHistory
+        : [];
+
+    return rows.filter((row): row is Record<string, unknown> => row !== null && typeof row === 'object' && !Array.isArray(row));
+  } catch {
+    return [];
+  }
+}
+
+function escapeCsvValue(value: unknown): string {
+  const text = value === null || value === undefined
+    ? ''
+    : typeof value === 'object'
+      ? JSON.stringify(value)
+      : String(value);
+  return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function budgetHistoryCsvFromJson(value: string): string {
+  const rows = budgetHistoryRowsFromJson(value);
+  const headers = [...new Set(rows.flatMap((row) => Object.keys(row)))];
+  if (headers.length === 0) return '';
+
+  return [
+    headers.map(escapeCsvValue).join(','),
+    ...rows.map((row) => headers.map((header) => escapeCsvValue(row[header])).join(','))
+  ].join('\n');
+}
+
+function downloadTextFile(filename: string, text: string, type: string): boolean {
+  if (typeof document === 'undefined') return false;
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+  return true;
+}
+
 export function useList() {
   const [items, setItems] = useState<ShoppingListItem[]>(() => withCheckedState({}));
+  const [budgetHistoryJson, setBudgetHistoryJson] = useState('[]');
   const [hasLoadedBrowserState, setHasLoadedBrowserState] = useState(false);
 
   useEffect(() => {
     try {
       const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
       setItems(withCheckedState(checkedById, importedItems));
+      setBudgetHistoryJson(localStorage.getItem(BUDGET_HISTORY_STORAGE_KEY) ?? '[]');
     } finally {
       setHasLoadedBrowserState(true);
     }
@@ -155,6 +205,39 @@ export function useList() {
     setItems((currentItems) => currentItems.map((item) => ({ ...item, checked: false })));
   }, []);
 
+  const refreshBudgetHistoryExport = useCallback(() => {
+    try {
+      setBudgetHistoryJson(localStorage.getItem(BUDGET_HISTORY_STORAGE_KEY) ?? '[]');
+    } catch {
+      setBudgetHistoryJson('[]');
+    }
+  }, []);
+
+  const clearBudgetHistory = useCallback(() => {
+    try {
+      localStorage.removeItem(BUDGET_HISTORY_STORAGE_KEY);
+    } finally {
+      setBudgetHistoryJson('[]');
+    }
+  }, []);
+
+  const copyBudgetHistoryJson = useCallback(async () => {
+    if (!navigator.clipboard) return false;
+    await navigator.clipboard.writeText(budgetHistoryJson);
+    return true;
+  }, [budgetHistoryJson]);
+
+  const budgetHistoryCsv = useMemo(() => budgetHistoryCsvFromJson(budgetHistoryJson), [budgetHistoryJson]);
+
+  const copyBudgetHistoryCsv = useCallback(async () => {
+    if (!navigator.clipboard) return false;
+    await navigator.clipboard.writeText(budgetHistoryCsv);
+    return true;
+  }, [budgetHistoryCsv]);
+
+  const exportBudgetHistoryJson = useCallback(() => downloadTextFile('budgetHistory.json', budgetHistoryJson, 'application/json'), [budgetHistoryJson]);
+  const exportBudgetHistoryCsv = useCallback(() => downloadTextFile('budgetHistory.csv', budgetHistoryCsv, 'text/csv'), [budgetHistoryCsv]);
+
   const addImportedItems = useCallback((importedItems: BulkImportedListItemInput[]) => {
     setItems((currentItems) => {
       const existingIds = new Set(currentItems.map((item) => item.id));
@@ -167,14 +250,24 @@ export function useList() {
   }, []);
 
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
+  const budgetHistoryCount = useMemo(() => budgetHistoryRowsFromJson(budgetHistoryJson).length, [budgetHistoryJson]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
 
   return {
     addImportedItems,
+    budgetHistoryCount,
+    budgetHistoryCsv,
+    budgetHistoryJson,
     checkedCount,
+    clearBudgetHistory,
+    copyBudgetHistoryCsv,
+    copyBudgetHistoryJson,
+    exportBudgetHistoryCsv,
+    exportBudgetHistoryJson,
     items,
     remainingCount,
+    refreshBudgetHistoryExport,
     resetCheckedState,
     toggleItemChecked,
     totalCount
