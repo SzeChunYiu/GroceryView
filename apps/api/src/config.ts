@@ -22,6 +22,30 @@ export type ApiConfig = {
   scrapeScheduler: ScrapeSchedulerConfig;
 };
 
+const productionRequiredEnvVars = [
+  'AUTH_SECRET',
+  'DATABASE_URL',
+  'PUBLIC_WEB_URL',
+  'GROCERYVIEW_SERVER_URL'
+] as const;
+
+export type RequiredApiEnvironmentVariable = (typeof productionRequiredEnvVars)[number];
+
+function isProduction(env: NodeJS.ProcessEnv): boolean {
+  return env.NODE_ENV?.trim().toLowerCase() === 'production';
+}
+
+function missingEnvironmentVariables(env: NodeJS.ProcessEnv, keys: readonly string[]): string[] {
+  return keys.filter((key) => !env[key]?.trim());
+}
+
+export function validateApiEnvironment(env: NodeJS.ProcessEnv = process.env): void {
+  if (!isProduction(env)) return;
+  const missing = missingEnvironmentVariables(env, productionRequiredEnvVars);
+  if (missing.length > 0) {
+    throw new Error(`Missing required API environment variables: ${missing.join(', ')}. Copy .env.example and set production values before startup.`);
+  }
+}
 
 const defaultCorsAllowedOrigins = [
   'https://groceryview.se',
@@ -82,6 +106,7 @@ function loadScrapeSchedulerConfig(env: NodeJS.ProcessEnv): ScrapeSchedulerConfi
 }
 
 export function loadApiConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
+  validateApiEnvironment(env);
   return {
     cors: loadCorsConfig(env),
     requestLogging: {
