@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { trackSearchStreamEvent, trackSearchTelemetry } from '@/lib/telemetry';
 
 type ProductSearchResult = {
   id: string;
@@ -29,18 +30,46 @@ export function SearchBar() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductSearchResult[]>([]);
   const [status, setStatus] = useState<SearchStatus>('idle');
+  const openQueryRef = useRef<string | null>(null);
+  const requestedAtRef = useRef<number | null>(null);
+  const resultCountRef = useRef(0);
   const trimmedQuery = useMemo(() => query.trim(), [query]);
   const shouldShowDropdown = status !== 'idle' && trimmedQuery.length >= MIN_QUERY_LENGTH;
+  const dismissSuggestions = useCallback((reason: string) => {
+    if (!openQueryRef.current) return;
+    trackSearchTelemetry({
+      eventType: 'search_suggestions_dismissed',
+      query: openQueryRef.current,
+      reason,
+      resultCount: resultCountRef.current
+    });
+    openQueryRef.current = null;
+  }, []);
+  const closeSuggestions = useCallback((reason: string) => {
+    dismissSuggestions(reason);
+    setResults([]);
+    setStatus('idle');
+  }, [dismissSuggestions]);
 
   useEffect(() => {
     if (trimmedQuery.length < MIN_QUERY_LENGTH) {
-      setResults([]);
-      setStatus('idle');
+      closeSuggestions('query_too_short');
       return;
+    }
+
+    if (openQueryRef.current && openQueryRef.current !== trimmedQuery) {
+      dismissSuggestions('query_changed');
     }
 
     const controller = new AbortController();
     const timeout = window.setTimeout(async () => {
+      const requestedAt = performance.now();
+      requestedAtRef.current = requestedAt;
+      trackSearchTelemetry({
+        eventType: 'search_suggestions_requested',
+        query: trimmedQuery
+      });
+      trackSearchStreamEvent(trimmedQuery, 'autocomplete_request_started', 0);
       setStatus('loading');
       try {
         const response = await fetch(`/api/products?q=${encodeURIComponent(trimmedQuery)}`, {
@@ -50,13 +79,34 @@ export function SearchBar() {
         const payload = await response.json() as ProductSearchResponse;
         if (!response.ok || payload.error) throw new Error(payload.error ?? 'product_search_failed');
         if (controller.signal.aborted) return;
-        setResults(payload.results ?? []);
-        setStatus((payload.results ?? []).length > 0 ? 'ready' : 'empty');
-      } catch (error) {
+        const nextResults = payload.results ?? [];
+        const elapsedMs = Math.round(performance.now() - requestedAt);
+        openQueryRef.current = trimmedQuery;
+        resultCountRef.current = nextResults.length;
+        setResults(nextResults);
+        setStatus(nextResults.length > 0 ? 'ready' : 'empty');
+        trackSearchTelemetry({
+          elapsedMs,
+          eventType: 'search_suggestions_returned',
+          query: trimmedQuery,
+          resultCount: nextResults.length
+        });
+        trackSearchStreamEvent(trimmedQuery, 'autocomplete_results_rendered', elapsedMs);
+        if (nextResults.length > 0) {
+          trackSearchTelemetry({
+            elapsedMs,
+            eventType: 'search_first_result_time',
+            query: trimmedQuery,
+            resultCount: nextResults.length,
+            resultId: nextResults[0].id,
+            resultRank: 0
+          });
+        }
+      } catch {
         if (controller.signal.aborted) return;
-        console.error('Product search request failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
         setResults([]);
         setStatus('error');
+        trackSearchStreamEvent(trimmedQuery, 'autocomplete_request_failed', requestedAtRef.current === null ? undefined : Math.round(performance.now() - requestedAtRef.current));
       }
     }, 300);
 
@@ -64,7 +114,7 @@ export function SearchBar() {
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [trimmedQuery]);
+  }, [closeSuggestions, dismissSuggestions, trimmedQuery]);
 
   return (
     <div className="relative w-full max-w-xl lg:w-[min(36vw,28rem)]">
@@ -80,6 +130,9 @@ export function SearchBar() {
           className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-slate-950 outline-none placeholder:text-slate-500"
           id={inputId}
           onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') closeSuggestions('escape_key');
+          }}
           placeholder="Search product or brand"
           role="combobox"
           type="search"
@@ -109,6 +162,16 @@ export function SearchBar() {
                   className="block px-4 py-3 transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none"
                   href={`/products/${result.slug}`}
                   key={result.id}
+                  onClick={() => {
+                    trackSearchTelemetry({
+                      eventType: 'search_suggestion_clicked',
+                      query: trimmedQuery,
+                      resultCount: results.length,
+                      resultId: result.id,
+                      resultRank: results.findIndex((candidate) => candidate.id === result.id)
+                    });
+                    openQueryRef.current = null;
+                  }}
                   role="option"
                 >
                   <span className="block text-sm font-black text-slate-950">{result.name}</span>
