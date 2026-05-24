@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export type ShoppingListItem = {
+  category: string;
   checked: boolean;
   detail: string;
+  estimatedPrice: number;
   id: string;
   importSource?: 'starter' | 'bulk-clipboard';
   matchedProductName?: string;
@@ -17,6 +19,15 @@ export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
 };
 
+export type ListBudgetBucket = {
+  budget: number;
+  category: string;
+  itemCount: number;
+  remaining: number;
+  spent: number;
+  status: 'under' | 'over';
+};
+
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
   importedItems?: BulkImportedListItemInput[];
@@ -24,33 +35,53 @@ type PersistedListState = {
 
 export const LIST_STORAGE_KEY = 'groceryview:shopping-list:checked:v1';
 
+export const listCategoryBudgets: Record<string, number> = {
+  breakfast: 50,
+  coffee: 80,
+  dairy: 90,
+  frozen: 70,
+  pantry: 100,
+  produce: 120,
+  uncategorized: 75
+};
+
 const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   {
     id: 'coffee-weekly-top-up',
+    category: 'coffee',
+    estimatedPrice: 49.9,
     name: 'Coffee',
     quantity: '1 package',
     detail: 'Weekly basket top-up item'
   },
   {
     id: 'oats-breakfast-staple',
+    category: 'breakfast',
+    estimatedPrice: 24.9,
     name: 'Oats',
     quantity: '1 bag',
     detail: 'Breakfast staple'
   },
   {
     id: 'milk-dairy-run',
+    category: 'dairy',
+    estimatedPrice: 35.8,
     name: 'Milk or fil',
     quantity: '2 cartons',
     detail: 'Dairy aisle check'
   },
   {
     id: 'frozen-vegetables',
+    category: 'frozen',
+    estimatedPrice: 29.9,
     name: 'Frozen vegetables',
     quantity: '1 bag',
     detail: 'Dinner backup item'
   },
   {
     id: 'fresh-fruit',
+    category: 'produce',
+    estimatedPrice: 64.5,
     name: 'Fresh fruit',
     quantity: '1 basket',
     detail: 'Snack and lunchbox item'
@@ -79,15 +110,21 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       : {};
 
     const importedItems = Array.isArray(maybeImportedItems)
-      ? maybeImportedItems.filter((item): item is BulkImportedListItemInput => (
-        item !== null
-        && typeof item === 'object'
-        && item.importSource === 'bulk-clipboard'
-        && typeof item.id === 'string'
-        && typeof item.name === 'string'
-        && typeof item.quantity === 'string'
-        && typeof item.detail === 'string'
-      ))
+      ? maybeImportedItems
+        .filter((item): item is BulkImportedListItemInput => (
+          item !== null
+          && typeof item === 'object'
+          && item.importSource === 'bulk-clipboard'
+          && typeof item.id === 'string'
+          && typeof item.name === 'string'
+          && typeof item.quantity === 'string'
+          && typeof item.detail === 'string'
+        ))
+        .map((item) => ({
+          ...item,
+          category: typeof item.category === 'string' && item.category.trim() ? item.category : 'uncategorized',
+          estimatedPrice: typeof item.estimatedPrice === 'number' && Number.isFinite(item.estimatedPrice) ? item.estimatedPrice : 0
+        }))
       : [];
 
     return { checkedById, importedItems };
@@ -113,7 +150,9 @@ function persistCheckedState(items: ShoppingListItem[]) {
     const importedItems = items
       .filter((item) => item.importSource === 'bulk-clipboard')
       .map((item) => ({
+        category: item.category,
         detail: item.detail,
+        estimatedPrice: item.estimatedPrice,
         id: item.id,
         importSource: 'bulk-clipboard' as const,
         matchedProductName: item.matchedProductName,
@@ -125,6 +164,34 @@ function persistCheckedState(items: ShoppingListItem[]) {
   } catch {
     // Keep the check-off UI usable even when a browser blocks localStorage.
   }
+}
+
+
+export function summarizeListBudgetBuckets(items: ShoppingListItem[]): ListBudgetBucket[] {
+  const byCategory = new Map<string, { itemCount: number; spent: number }>();
+  for (const item of items) {
+    const category = item.category || 'uncategorized';
+    const current = byCategory.get(category) ?? { itemCount: 0, spent: 0 };
+    byCategory.set(category, {
+      itemCount: current.itemCount + 1,
+      spent: Math.round((current.spent + item.estimatedPrice) * 100) / 100
+    });
+  }
+
+  return [...byCategory.entries()]
+    .map(([category, summary]) => {
+      const budget = listCategoryBudgets[category] ?? listCategoryBudgets.uncategorized;
+      const remaining = Math.round((budget - summary.spent) * 100) / 100;
+      return {
+        budget,
+        category,
+        itemCount: summary.itemCount,
+        remaining,
+        spent: summary.spent,
+        status: remaining < 0 ? 'over' : 'under'
+      } satisfies ListBudgetBucket;
+    })
+    .sort((left, right) => (left.status === right.status ? left.category.localeCompare(right.category) : left.status === 'over' ? -1 : 1));
 }
 
 export function useList() {
@@ -167,12 +234,18 @@ export function useList() {
   }, []);
 
   const checkedCount = useMemo(() => items.filter((item) => item.checked).length, [items]);
+  const budgetBuckets = useMemo(() => summarizeListBudgetBuckets(items), [items]);
+  const budgetAlerts = useMemo(() => budgetBuckets.filter((bucket) => bucket.status === 'over'), [budgetBuckets]);
+  const estimatedTotal = useMemo(() => Math.round(items.reduce((sum, item) => sum + item.estimatedPrice, 0) * 100) / 100, [items]);
   const totalCount = items.length;
   const remainingCount = totalCount - checkedCount;
 
   return {
     addImportedItems,
+    budgetAlerts,
+    budgetBuckets,
     checkedCount,
+    estimatedTotal,
     items,
     remainingCount,
     resetCheckedState,

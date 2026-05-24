@@ -9,6 +9,7 @@ type BulkImportDialogProps = {
 
 type ProductCatalogMatch = {
   category: string;
+  estimatedPrice: number;
   keywords: string[];
   productName: string;
   productSlug: string;
@@ -17,42 +18,49 @@ type ProductCatalogMatch = {
 export const productCatalogMatches: ProductCatalogMatch[] = [
   {
     category: 'breakfast',
+    estimatedPrice: 24.9,
     keywords: ['oats', 'oatmeal', 'havregryn', 'porridge'],
     productName: 'Havregryn Extra Fylliga',
     productSlug: 'havregryn-extra-fylliga-101758934-st'
   },
   {
     category: 'pantry',
+    estimatedPrice: 21.9,
     keywords: ['pasta', 'makaroner', 'macaroni'],
     productName: 'Makaroner Pasta',
     productSlug: 'makaroner-pasta-101302991-st'
   },
   {
     category: 'pantry',
+    estimatedPrice: 46.9,
     keywords: ['honey', 'honung', 'svensk honung'],
     productName: 'Svensk Honung',
     productSlug: 'svensk-honung-101550069-st'
   },
   {
     category: 'coffee',
+    estimatedPrice: 49.9,
     keywords: ['coffee', 'kaffe', 'bryggkaffe'],
     productName: 'Kaffe',
     productSlug: 'kaffe'
   },
   {
     category: 'dairy',
+    estimatedPrice: 17.9,
     keywords: ['milk', 'mjölk', 'fil'],
     productName: 'Mjölk',
     productSlug: 'mjolk'
   },
   {
     category: 'produce',
+    estimatedPrice: 64.5,
     keywords: ['fruit', 'frukt', 'apple', 'äpple', 'banana', 'banan'],
     productName: 'Fresh fruit',
     productSlug: 'fresh-fruit'
   },
   {
     category: 'frozen',
+    estimatedPrice: 29.9,
     keywords: ['frozen vegetables', 'frysta grönsaker', 'vegetables', 'grönsaker'],
     productName: 'Frozen vegetables',
     productSlug: 'frozen-vegetables'
@@ -88,6 +96,8 @@ function itemForLine(line: string, index: number): BulkImportedListItemInput {
   const match = matchBulkImportLineToCatalog(line);
   return {
     id: `bulk-clipboard-${index}-${match?.productSlug ?? slugify(line)}`,
+    category: match?.category ?? 'uncategorized',
+    estimatedPrice: match?.estimatedPrice ?? 0,
     importSource: 'bulk-clipboard',
     matchedProductName: match?.productName,
     matchedProductSlug: match?.productSlug,
