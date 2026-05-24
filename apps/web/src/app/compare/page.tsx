@@ -4,6 +4,7 @@ import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-comp
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
 import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, compareOverlayChart, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
+import { buildStoreDistanceRankings, parseStoreTravelMode } from '@/lib/store-distance';
 
 export function generateMetadata() {
   return routeMetadata('/compare');
@@ -18,13 +19,23 @@ function formatComparableUnitPrice(value: number | null | undefined, unitLabel: 
 }
 
 type SearchParams = {
+  mode?: string | string[];
   products?: string | string[];
+  routeMode?: string | string[];
 };
 
 export default async function ComparePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
   const comparison = buildChainComparisonTable(productsParam);
+  const routeMode = parseStoreTravelMode(resolvedSearchParams.routeMode ?? resolvedSearchParams.mode);
+  const selectedProductQuery = Array.isArray(productsParam) ? productsParam.join(',') : productsParam ?? '';
+  const routeModeHref = (mode: 'walk' | 'drive') => `/compare?${new URLSearchParams({ ...(selectedProductQuery ? { products: selectedProductQuery } : {}), routeMode: mode }).toString()}`;
+  const selectedProductCounts = COMPARE_CHAIN_ORDER.map((chain) => ({
+    chainId: chain.id,
+    selectedProductCount: comparison.products.filter((product) => product.cells.some((cell) => cell.chainId === chain.id && cell.status === 'priced')).length
+  }));
+  const storeDistanceRankings = buildStoreDistanceRankings(routeMode, selectedProductCounts);
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
   const rowSections = [
@@ -132,6 +143,39 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
         <p className="mt-3 text-xs font-semibold text-slate-500">
           Source: {comparison.sourceLabel}{comparison.generatedAt ? ` · generated ${comparison.generatedAt}` : ''}.
         </p>
+      </Card>
+      <Card className="mt-6 border-cyan-200 bg-cyan-50/80">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-800">Route-time compare mode</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Closest stores for selected products</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Sorts chains that stock at least one selected product by estimated {routeMode} time from central Stockholm, so the comparison can favor practical store choice over price alone.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link className={routeMode === 'walk' ? 'rounded-full bg-cyan-900 px-4 py-2 text-sm font-black text-white' : 'rounded-full bg-white px-4 py-2 text-sm font-black text-cyan-900'} href={routeModeHref('walk')}>Walk</Link>
+            <Link className={routeMode === 'drive' ? 'rounded-full bg-cyan-900 px-4 py-2 text-sm font-black text-white' : 'rounded-full bg-white px-4 py-2 text-sm font-black text-cyan-900'} href={routeModeHref('drive')}>Drive</Link>
+          </div>
+        </div>
+        {storeDistanceRankings.length > 0 ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {storeDistanceRankings.map((store, index) => (
+              <div className="rounded-2xl border border-cyan-100 bg-white p-4 shadow-sm" key={store.chainId}>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-800">#{index + 1} · {store.chainLabel}</p>
+                <h3 className="mt-2 text-lg font-black text-slate-950">{store.storeName}</h3>
+                <p className="mt-1 text-sm font-semibold text-slate-600">{store.address}</p>
+                <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                  <p className="rounded-xl bg-cyan-50 p-3 font-black text-cyan-950">{store.routeMinutes} min {store.travelMode}</p>
+                  <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">{store.distanceKm} km</p>
+                </div>
+                <p className="mt-3 text-xs font-semibold text-slate-500">{store.selectedProductCount} selected products priced in this chain.</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white p-4 text-sm font-semibold text-slate-600">Add ?products=... to rank nearby stores with matching selected products.</p>
+        )}
       </Card>
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
