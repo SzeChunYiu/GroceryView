@@ -59,6 +59,7 @@ import {
   fetchOverpassFuelStations,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
+  fetchApotek1Products,
   fetchCityGrossBulkProducts,
   fetchCityGrossProducts,
   fetchCityGrossProductsForAllStores,
@@ -97,6 +98,7 @@ import {
   fetchWillysWeeklyDiscountsForAllStores,
   findPharmacyEanMatches,
   parseApohemProducts,
+  parseApotek1Products,
   parseApotekHjartatProducts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
@@ -6953,7 +6955,8 @@ describe('daily ingestion runner', () => {
     const executor = new DailyIngestionExecutor();
     const requestedUrls: string[] = [];
     const apotekHjartatUrl = 'https://www.apotekhjartat.se/search?q=pamol';
-    const endpointUrl = `${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?sourcePaths=/receptfritt&apotekHjartatUrls=${encodeURIComponent(apotekHjartatUrl)}`;
+    const apotek1Url = 'https://www.apotek1.no/search/resources/store/10151/productview/bySearchTerm/vitamin?pageSize=1&pageNumber=1';
+    const endpointUrl = `${GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL}?sourcePaths=/receptfritt&apotekHjartatUrls=${encodeURIComponent(apotekHjartatUrl)}&apotek1Urls=${encodeURIComponent(apotek1Url)}`;
     const result = await runDailyIngestion({
       executor,
       requestedAt: '2026-05-23T08:40:34.000Z',
@@ -7000,13 +7003,31 @@ describe('daily ingestion runner', () => {
             ]};</script>
           `, { status: 200, headers: { 'content-type': 'text/html' } });
         }
+        if (String(url).startsWith('https://www.apotek1.no/')) {
+          return new Response(JSON.stringify({
+            recordSetCount: 1,
+            recordSetTotal: 1,
+            catalogEntryView: [{
+              partNumber: '817619p',
+              name: 'COSRX The Vitamin C 13 serum 20 ml',
+              manufacturer: 'Apini AS',
+              seotoken: 'cosrx-the-vitamin-c-13-817619p',
+              thumbnail: '/wcsstore/ApoProductMaster/media/cosrx/200/250',
+              buyable: 'true',
+              price: [
+                { usage: 'Display', value: '329.90' },
+                { usage: 'Offer', value: '309.90' }
+              ]
+            }]
+          }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
         return new Response(`<script>window.INITIAL_DATA = JSON.parse('{"products":[]}');</script>`, { status: 200, headers: { 'content-type': 'text/html' } });
       }
     });
 
     assert.equal(result.status, 'succeeded');
-    assert.equal(result.acceptedCount, 1);
-    assert.deepEqual(requestedUrls, ['https://www.apohem.se/receptfritt', apotekHjartatUrl]);
+    assert.equal(result.acceptedCount, 2);
+    assert.deepEqual(requestedUrls, ['https://www.apohem.se/receptfritt', apotekHjartatUrl, apotek1Url]);
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into stores')), false);
     const product = firstBatchProduct(executor);
     assert.equal(product.domain, 'pharmacy');
@@ -7135,6 +7156,77 @@ describe('daily ingestion runner', () => {
       apohemSourceUrl,
       apotekHjartatSourceUrl
     ]);
+  });
+
+  it('paginates Apotek 1 search fixtures by recordSetCount/pageSize while preserving maxRows and dedupe', async () => {
+    const retrievedAt = '2026-05-23T08:40:34.000Z';
+    const firstPageUrl = 'https://www.apotek1.no/search/resources/store/10151/productview/bySearchTerm/vitamin?pageSize=2&pageNumber=1';
+    const secondPageUrl = 'https://www.apotek1.no/search/resources/store/10151/productview/bySearchTerm/vitamin?pageSize=2&pageNumber=2';
+    const requestedUrls: string[] = [];
+    const apotek1Product = (partNumber: string, name: string, price: string) => ({
+      partNumber,
+      name,
+      manufacturer: 'Apotek 1 Fixture',
+      seotoken: `${partNumber}-fixture`,
+      thumbnail: `/wcsstore/ApoProductMaster/media/${partNumber}/200/250`,
+      buyable: 'true',
+      price: [
+        { usage: 'Display', value: String(Number(price) + 20) },
+        { usage: 'Offer', value: price }
+      ]
+    });
+
+    const rows = await fetchApotek1Products({
+      apotek1Urls: [firstPageUrl],
+      maxRows: 3,
+      retrievedAt,
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        const catalogEntryView = String(url).includes('pageNumber=2')
+          ? [
+              apotek1Product('a1-b', 'Duplicate Vitamin B 60 stk', '129.90'),
+              apotek1Product('a1-c', 'Vitamin C 20 tabletter', '79.90')
+            ]
+          : [
+              apotek1Product('a1-a', 'Vitamin A 30 kapsler', '99.90'),
+              apotek1Product('a1-b', 'Vitamin B 60 stk', '129.90')
+            ];
+        return new Response(JSON.stringify({
+          recordSetCount: 2,
+          recordSetTotal: 6,
+          catalogEntryView
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.deepEqual(requestedUrls, [firstPageUrl, secondPageUrl]);
+    assert.deepEqual(rows.map((row) => row.code), ['a1-a', 'a1-b', 'a1-c']);
+    assert.deepEqual(rows.map((row) => row.chain), ['apotek-1', 'apotek-1', 'apotek-1']);
+    assert.equal(rows[2].sourceUrl, secondPageUrl);
+
+    const parsed = parseApotek1Products({
+      recordSetCount: 1,
+      catalogEntryView: [apotek1Product('817619p', 'COSRX The Vitamin C 13 serum 20 ml', '309.90')]
+    }, firstPageUrl, retrievedAt);
+    assert.deepEqual(parsed[0], {
+      chain: 'apotek-1',
+      code: '817619p',
+      ean: '',
+      name: 'COSRX The Vitamin C 13 serum 20 ml',
+      brand: 'Apotek 1 Fixture',
+      category: 'beauty',
+      price: 309.9,
+      priceText: '309.90 NOK',
+      originalPrice: 329.9,
+      originalPriceText: '329.90 NOK',
+      vatPercent: null,
+      stockStatus: 'buyable',
+      productUrl: 'https://www.apotek1.no/produkter/817619p-fixture',
+      imageUrl: 'https://www.apotek1.no/wcsstore/ApoProductMaster/media/817619p/200/250',
+      isOtc: false,
+      sourceUrl: firstPageUrl,
+      retrievedAt
+    });
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {

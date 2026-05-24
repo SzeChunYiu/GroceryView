@@ -55,7 +55,8 @@ import {
   fetchPharmacyProducts,
   type ApohemProduct,
   DEFAULT_APOHEM_SOURCE_PATHS,
-  DEFAULT_APOTEK_HJARTAT_SEARCH_URLS
+  DEFAULT_APOTEK_HJARTAT_SEARCH_URLS,
+  DEFAULT_APOTEK1_SEARCH_URLS
 } from './connectors/apohem.js';
 import {
   fetchLidlOffersForAllStores,
@@ -2274,6 +2275,7 @@ export async function fetchDailyConnectorSnapshot(
       fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
       sourcePaths: dailyNativeStringListParam(url, 'sourcePaths') ?? DEFAULT_APOHEM_SOURCE_PATHS,
       apotekHjartatUrls: dailyNativeStringListParam(url, 'apotekHjartatUrls') ?? DEFAULT_APOTEK_HJARTAT_SEARCH_URLS,
+      apotek1Urls: dailyNativeStringListParam(url, 'apotek1Urls') ?? DEFAULT_APOTEK1_SEARCH_URLS,
       maxRows: dailyNativeNumberParam(url, 'maxRows'),
       retrievedAt
     });

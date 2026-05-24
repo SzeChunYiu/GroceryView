@@ -1,4 +1,4 @@
-export type PharmacyChain = 'apohem' | 'apotek-hjartat';
+export type PharmacyChain = 'apohem' | 'apotek-hjartat' | 'apotek-1';
 
 export type PharmacyProductCategory = 'otc' | 'supplement' | 'beauty';
 
@@ -65,16 +65,41 @@ type ApotekHjartatProduct = {
   };
 };
 
+type Apotek1SearchResponse = {
+  catalogEntryView?: unknown;
+  recordSetCount?: unknown;
+  recordSetTotal?: unknown;
+  recordSetTotalMatches?: unknown;
+  pageSize?: unknown;
+  resourceId?: unknown;
+};
+
+type Apotek1Product = {
+  uniqueID?: unknown;
+  partNumber?: unknown;
+  singleSKUCatalogEntryID?: unknown;
+  name?: unknown;
+  manufacturer?: unknown;
+  seotoken?: unknown;
+  thumbnail?: unknown;
+  fullImage?: unknown;
+  buyable?: unknown;
+  price?: Array<{ usage?: unknown; value?: unknown }>;
+  sKUs?: Apotek1Product[];
+};
+
 export type FetchApohemProductsOptions = {
   fetchImpl?: typeof fetch;
   sourcePaths?: readonly string[];
   apotekHjartatUrls?: readonly string[];
+  apotek1Urls?: readonly string[];
   maxRows?: number;
   retrievedAt?: string;
 };
 
 export const APOHEM_BASE_URL = 'https://www.apohem.se';
 export const APOTEK_HJARTAT_BASE_URL = 'https://www.apotekhjartat.se';
+export const APOTEK1_BASE_URL = 'https://www.apotek1.no';
 
 export const DEFAULT_APOHEM_SOURCE_PATHS = [
   '/sok?q=vitamin',
@@ -94,6 +119,12 @@ export const DEFAULT_APOTEK_HJARTAT_SEARCH_URLS = [
   'https://www.apotekhjartat.se/search?q=tandkram',
   'https://www.apotekhjartat.se/search?q=munvard',
   'https://www.apotekhjartat.se/search?q=pamol'
+] as const;
+
+export const DEFAULT_APOTEK1_SEARCH_URLS = [
+  'https://www.apotek1.no/search/resources/store/10151/productview/bySearchTerm/vitamin?pageSize=24&pageNumber=1',
+  'https://www.apotek1.no/search/resources/store/10151/productview/bySearchTerm/solkrem?pageSize=24&pageNumber=1',
+  'https://www.apotek1.no/search/resources/store/10151/productview/bySearchTerm/tannkrem?pageSize=24&pageNumber=1'
 ] as const;
 
 export async function fetchApohemProducts(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {
@@ -137,16 +168,43 @@ export async function fetchApotekHjartatProducts(options: FetchApohemProductsOpt
   return rows;
 }
 
+export async function fetchApotek1Products(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const rows: ApohemProduct[] = [];
+  const seen = new Set<string>();
+
+  for (const firstPageUrl of options.apotek1Urls ?? DEFAULT_APOTEK1_SEARCH_URLS) {
+    let sourceUrl: string | null = firstPageUrl;
+    while (sourceUrl) {
+      const response = await fetchImpl(sourceUrl, jsonHeaders());
+      if (!response.ok) {
+        throw new Error(`Apotek 1 request failed for ${sourceUrl}: ${response.status}`);
+      }
+      const payload = await response.json() as Apotek1SearchResponse;
+      addRows(rows, seen, parseApotek1Products(payload, sourceUrl, retrievedAt), options.maxRows);
+      if (options.maxRows && rows.length >= options.maxRows) {
+        return rows;
+      }
+      sourceUrl = nextApotek1PageUrl(payload, sourceUrl);
+    }
+  }
+
+  return rows;
+}
+
 export async function fetchPharmacyProducts(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
-  const [apohemRows, hjartatRows] = await Promise.all([
+  const [apohemRows, hjartatRows, apotek1Rows] = await Promise.all([
     fetchApohemProducts({ ...options, retrievedAt }),
-    fetchApotekHjartatProducts({ ...options, retrievedAt })
+    fetchApotekHjartatProducts({ ...options, retrievedAt }),
+    fetchApotek1Products({ ...options, retrievedAt })
   ]);
   const rows: ApohemProduct[] = [];
   const seen = new Set<string>();
   addRows(rows, seen, apohemRows, options.maxRows);
   addRows(rows, seen, hjartatRows, options.maxRows);
+  addRows(rows, seen, apotek1Rows, options.maxRows);
   return rows;
 }
 
@@ -177,6 +235,14 @@ export function parseApotekHjartatProducts(html: string, sourceUrl: string, retr
 
   return products
     .map((product) => normalizeApotekHjartatProduct(product, sourceUrl, retrievedAt))
+    .filter((product): product is ApohemProduct => product !== null);
+}
+
+export function parseApotek1Products(payload: Apotek1SearchResponse, sourceUrl: string, retrievedAt: string): ApohemProduct[] {
+  const products = Array.isArray(payload.catalogEntryView) ? payload.catalogEntryView as Apotek1Product[] : [];
+  return products
+    .flatMap((product) => product.sKUs?.length ? product.sKUs.map((sku) => ({ ...product, ...sku })) : [product])
+    .map((product) => normalizeApotek1Product(product, sourceUrl, retrievedAt))
     .filter((product): product is ApohemProduct => product !== null);
 }
 
@@ -254,9 +320,45 @@ export function normalizeApotekHjartatProduct(
   };
 }
 
+export function normalizeApotek1Product(
+  product: Apotek1Product,
+  sourceUrl: string,
+  retrievedAt: string
+): ApohemProduct | null {
+  const price = apotek1Price(product.price, 'Offer') ?? apotek1Price(product.price, 'Display');
+  const name = text(product.name);
+  const code = text(product.partNumber) || text(product.singleSKUCatalogEntryID) || text(product.uniqueID);
+  if (!name || !code || price === null) {
+    return null;
+  }
+  const originalPrice = apotek1Price(product.price, 'Display');
+  const seotoken = text(product.seotoken);
+
+  return {
+    chain: 'apotek-1',
+    code,
+    ean: eanText(code),
+    name,
+    brand: text(product.manufacturer),
+    category: apotek1Category(sourceUrl, name),
+    price,
+    priceText: `${price.toFixed(2)} NOK`,
+    originalPrice,
+    originalPriceText: originalPrice === null ? '' : `${originalPrice.toFixed(2)} NOK`,
+    vatPercent: null,
+    stockStatus: text(product.buyable) === 'false' ? 'unavailable' : 'buyable',
+    productUrl: seotoken ? absoluteUrl(`/produkter/${seotoken}`, APOTEK1_BASE_URL) : '',
+    imageUrl: absoluteUrl(product.thumbnail ?? product.fullImage, APOTEK1_BASE_URL),
+    isOtc: false,
+    sourceUrl,
+    retrievedAt
+  };
+}
+
 export function findPharmacyEanMatches(products: readonly ApohemProduct[]): ApohemProduct[] {
   const chainsByEan = new Map<string, Set<PharmacyChain>>();
   for (const product of products) {
+    if (!product.ean) continue;
     if (!chainsByEan.has(product.ean)) {
       chainsByEan.set(product.ean, new Set());
     }
@@ -272,7 +374,7 @@ function addRows(
   maxRows: number | undefined
 ): void {
   for (const product of products) {
-    const key = `${product.chain}:${product.ean}`;
+    const key = `${product.chain}:${product.ean || product.code}`;
     if (seen.has(key)) {
       continue;
     }
@@ -306,6 +408,41 @@ function apotekHjartatCategory(product: ApotekHjartatProduct, sourceUrl: string)
     return 'beauty';
   }
   return 'supplement';
+}
+
+function apotek1Category(sourceUrl: string, name: string): PharmacyProductCategory {
+  const haystack = `${sourceUrl} ${name}`.toLowerCase();
+  if (haystack.includes('sol') || haystack.includes('hud') || haystack.includes('serum') || haystack.includes('la roche')) {
+    return 'beauty';
+  }
+  if (haystack.includes('paracetamol') || haystack.includes('ibuprofen') || haystack.includes('smert') || haystack.includes('feber')) {
+    return 'otc';
+  }
+  return 'supplement';
+}
+
+function nextApotek1PageUrl(payload: Apotek1SearchResponse, currentUrl: string): string | null {
+  const pageSize = positiveInteger(payload.pageSize) ?? positiveInteger(new URL(currentUrl).searchParams.get('pageSize'));
+  const currentPage = positiveInteger(new URL(currentUrl).searchParams.get('pageNumber')) ?? 1;
+  const currentCount = positiveInteger(payload.recordSetCount) ?? 0;
+  const total = positiveInteger(payload.recordSetTotal) ?? positiveInteger(payload.recordSetTotalMatches);
+  if (!pageSize || !currentCount || !total || currentPage * pageSize >= total) {
+    return null;
+  }
+
+  const nextUrl = new URL(currentUrl);
+  nextUrl.searchParams.set('pageNumber', String(currentPage + 1));
+  return nextUrl.toString();
+}
+
+function apotek1Price(prices: Apotek1Product['price'], usage: string): number | null {
+  if (!Array.isArray(prices)) return null;
+  return numberFromText(prices.find((price) => text(price.usage).toLowerCase() === usage.toLowerCase())?.value);
+}
+
+function positiveInteger(value: unknown): number | null {
+  const parsed = typeof value === 'number' ? value : Number.parseInt(text(value), 10);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
 function extractWindowJsonObject(html: string, name: string): unknown {
@@ -436,6 +573,15 @@ function htmlHeaders(): RequestInit {
   return {
     headers: {
       accept: 'text/html,application/xhtml+xml',
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  };
+}
+
+function jsonHeaders(): RequestInit {
+  return {
+    headers: {
+      accept: 'application/json',
       'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
     }
   };
