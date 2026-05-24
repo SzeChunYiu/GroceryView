@@ -75,15 +75,20 @@ GroceryView ingestion layer pulls from (or could pull from). Each entry lists
 - `coop.se/handla` rendered via Hybris commerce platform (`/ws/v2/coop/...` pattern; first probe returned 404, needs more discovery).
 - Coop pricing is **regional**, not always per-store. Konsum (consumer-owned coops) sub-chain has independent prices.
 
-### 2.6 Mathem ⏳ pending
+### 2.6 City Gross 🟡 partial store-scoped product API
+- **Connector doc:** [`docs/connectors/citygross.md`](connectors/citygross.md) covers the public store catalog, Loop54 product search endpoint, emitted store/product fields, quirks, edge cases, and last verified generated snapshot (`2026-05-23T21:33:46.069Z`).
+- **Per-branch granularity:** ✅ yes when the Loop54 request includes a concrete `siteId`; rows must keep `storeId` and `sourceUrl` and should not be treated as chain-wide prices.
+- **Lands in:** `packages/ingestion/src/connectors/citygross.ts`, `packages/ingestion/src/connectors/citygross-bulk.ts`, and `apps/web/src/lib/ingested/citygross.ts`.
+
+### 2.7 Mathem ⏳ pending
 - `mathem.se/sv-se/api/products/search` (returned 308 to trailing-slash variant). Online-only retailer, postcode-dependent prices.
 
-### 2.7 Weekly flyer PDFs ⏳ pending
+### 2.8 Weekly flyer PDFs ⏳ pending
 - `reklamblad.ica.se` — ICA per-region weekly deals.
 - `coop.se/erbjudanden` — Coop offers.
 - `willys.se/erbjudanden`, `hemkop.se/erbjudanden` — already exposed as JSON at `/_next/data/{buildId}/sv/erbjudanden.json` per willys-mcp repo.
 
-### 2.8 Matspar ✅ shipped / Matpriskollen ⏳ pending (competitor aggregators)
+### 2.9 Matspar ✅ shipped / Matpriskollen ⏳ pending (competitor aggregators)
 - **Matspar endpoint:** public search pages at `https://www.matspar.se/kategori?q={query}` with embedded `window.__PAGEDATA__` product rows.
 - **What Matspar returns:** Matspar product id, product name, brand, package text, current aggregate SEK price, median price, warehouse price coverage count, search URL, and product URL.
 - **Per-branch granularity:** ❌ no — this is an aggregate public search price, not a specific store or branch price.
