@@ -106,6 +106,13 @@ export type MobilePriceTerminalSummary = {
   guardrails: string[];
 };
 
+export type ShelfOccupancyDropContext = {
+  status: 'temporary_clearance' | 'stable_campaign' | 'observed_drop' | 'no_recent_drop';
+  label: string;
+  detail: string;
+  purchaseTiming: string;
+};
+
 export type MobileProductTerminalLoadInput = {
   apiBase: string;
   productId: string;
@@ -141,6 +148,116 @@ function mobilePriceTerminalSummaryFromReport(terminal: ProductPriceTerminalRepo
       isNewLow: Boolean(terminal.historySummary?.isNewLow)
     },
     guardrails: [...terminal.evidenceGuardrails]
+  };
+}
+
+function sortedPricePoints(points: Array<{ time: string; value: number }>) {
+  return [...points]
+    .filter((point) => Number.isFinite(point.value))
+    .sort((left, right) => Date.parse(left.time) - Date.parse(right.time));
+}
+
+function hasCampaignMarker(
+  series: {
+    markers: Array<{ time: string; type?: string }>;
+  },
+  latestTime: string
+) {
+  return series.markers.some((marker) =>
+    marker.time === latestTime && (marker.type === 'promotion' || marker.type === 'member')
+  );
+}
+
+function daysBetween(left: string, right: string) {
+  const leftMs = Date.parse(left);
+  const rightMs = Date.parse(right);
+  if (Number.isNaN(leftMs) || Number.isNaN(rightMs)) return Number.POSITIVE_INFINITY;
+  return Math.abs(rightMs - leftMs) / (24 * 60 * 60 * 1000);
+}
+
+function nearPrice(left: number, right: number) {
+  if (right === 0) return left === 0;
+  return Math.abs(left - right) / right <= 0.03;
+}
+
+type MobilePriceTerminalChartSeriesInput = Array<{
+  sourceType: string;
+  points: Array<{
+    time: string;
+    value: number;
+  }>;
+  markers: Array<{
+    time: string;
+    type?: string;
+  }>;
+}>;
+
+function shelfOccupancyContextForDrop(series: MobilePriceTerminalChartSeriesInput): ShelfOccupancyDropContext {
+  const candidates = series
+    .flatMap((entry) => {
+      const points = sortedPricePoints(entry.points);
+      return points
+        .slice(1)
+        .map((point, index) => {
+          const previous = points[index]!;
+          if (point.value >= previous.value) return null;
+          return { entry, latest: point, previous, points };
+        });
+    })
+    .filter((candidate): candidate is { entry: (typeof series)[number]; latest: { time: string; value: number }; previous: { time: string; value: number }; points: Array<{ time: string; value: number }> } => candidate !== null)
+    .sort((left, right) => Date.parse(right.latest.time) - Date.parse(left.latest.time));
+
+  const latestDrop = candidates[0];
+  if (!latestDrop) {
+    return {
+      status: 'no_recent_drop',
+      label: 'No fresh drop',
+      detail: 'The latest visible observation did not move below the prior price.',
+      purchaseTiming: 'Wait for a confirmed drop before treating this as a buy signal.'
+    };
+  }
+
+  const dropPercent = ((latestDrop.previous.value - latestDrop.latest.value) / latestDrop.previous.value) * 100;
+  const repeatedLow = latestDrop.points.some(
+    (point) =>
+      point.time !== latestDrop.latest.time &&
+      daysBetween(point.time, latestDrop.latest.time) <= 14 &&
+      nearPrice(point.value, latestDrop.latest.value)
+  );
+  const campaignSource =
+    latestDrop.entry.sourceType === 'flyer' ||
+    latestDrop.entry.sourceType === 'member' ||
+    hasCampaignMarker(latestDrop.entry, latestDrop.latest.time);
+  const shelfOnlySource =
+    latestDrop.entry.sourceType === 'shelf' ||
+    latestDrop.entry.sourceType === 'shelf_photo' ||
+    latestDrop.entry.sourceType === 'receipt';
+
+  if (campaignSource || repeatedLow) {
+    return {
+      status: 'stable_campaign',
+      label: 'Stable campaign price',
+      detail: repeatedLow
+        ? 'The latest lower price repeats within the visible window, which is more consistent with a campaign than a one-off shelf clearance.'
+        : 'The latest lower price is backed by campaign or member-price evidence.',
+      purchaseTiming: 'Reasonable to compare baskets and buy during the campaign window.'
+    };
+  }
+
+  if (shelfOnlySource || dropPercent >= 15) {
+    return {
+      status: 'temporary_clearance',
+      label: 'Temporary store clearance',
+      detail: `The latest drop is a one-observation ${dropPercent.toFixed(0)}% move without repeated campaign evidence.`,
+      purchaseTiming: 'Buy only if the local shelf still shows the price; do not assume it will hold.'
+    };
+  }
+
+  return {
+    status: 'observed_drop',
+    label: 'Observed drop',
+    detail: `The latest visible price is ${dropPercent.toFixed(0)}% below the prior observation, but campaign stability is not yet proven.`,
+    purchaseTiming: 'Check the store or wait for another observation before stocking up.'
   };
 }
 
@@ -645,6 +762,7 @@ export type MobileProductPriceTerminalViewModel = {
     latestPrice: number | null;
     markerCount: number;
   }>;
+  priceDropContext: ShelfOccupancyDropContext;
   actions: Array<'add_to_watchlist' | 'add_to_weekly_basket' | 'compare_stores' | 'scan_receipt_to_verify'>;
 };
 
@@ -708,6 +826,11 @@ export function createMobileProductPriceTerminalViewModel(
       latestPrice: series.points.at(-1)?.value ?? null,
       markerCount: series.markers.length
     })),
+    priceDropContext: shelfOccupancyContextForDrop(terminal.chart.series.map((series) => ({
+      sourceType: series.sourceType,
+      points: series.points.map((point) => ({ time: point.time, value: point.value })),
+      markers: series.markers.map((marker) => ({ time: marker.time, type: marker.type }))
+    }))),
     actions: ['add_to_watchlist', 'add_to_weekly_basket', 'compare_stores', 'scan_receipt_to_verify']
   };
 }
@@ -1853,6 +1976,16 @@ export function composeMobileProductTerminalScreen(
           label: series.storeName,
           value: `${series.pointCount} points, latest ${series.latestPrice?.toFixed(2) ?? 'n/a'} SEK, ${series.markerCount} markers`
         }))
+      },
+      {
+        type: 'section',
+        key: 'price-drop-context',
+        title: 'Price-drop context',
+        children: [
+          { type: 'row', key: 'drop-status', label: 'Context', value: terminal.priceDropContext.label },
+          { type: 'row', key: 'drop-detail', label: 'Detail', value: terminal.priceDropContext.detail },
+          { type: 'row', key: 'drop-timing', label: 'Purchase timing', value: terminal.priceDropContext.purchaseTiming }
+        ]
       },
       {
         type: 'section',
