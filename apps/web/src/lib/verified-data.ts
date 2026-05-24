@@ -34,6 +34,9 @@ import {
   supportedCurrencies,
   unknownUnitPriceLabel
 } from './i18n';
+import { normalizeComparableUnitPrice, normalizePackageAmount, type ComparableUnitKey } from './unit-normalizer';
+
+export { normalizeComparableUnitPrice };
 
 const icaReklambladOffers = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladOffers : staticIcaReklambladOffers;
 const icaReklambladSource = dbSiteIcaReklambladOffers.length > 0 ? dbSiteIcaReklambladSource : staticIcaReklambladSource;
@@ -71,48 +74,6 @@ function median(values: number[]) {
   const sorted = [...values].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
   return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
-}
-
-function unitAmountFromPackage(packageText: string): { amount: number; unit: 'kg' | 'l' | 'st'; packageLabel: string } | null {
-  const normalized = packageText.replace(',', '.').toLowerCase();
-  const multiplied = normalized.match(/(\d+)\s*x\s*(\d+(?:\.\d+)?)\s*(kg|g|l|ml|cl|st)\b/);
-  if (multiplied) {
-    const count = Number(multiplied[1]);
-    const each = Number(multiplied[2]);
-    const unit = multiplied[3];
-    if (Number.isFinite(count) && Number.isFinite(each) && count > 0 && each > 0) {
-      if (unit === 'kg') return { amount: count * each, unit: 'kg', packageLabel: multiplied[0] };
-      if (unit === 'g') return { amount: (count * each) / 1000, unit: 'kg', packageLabel: multiplied[0] };
-      if (unit === 'l') return { amount: count * each, unit: 'l', packageLabel: multiplied[0] };
-      if (unit === 'cl') return { amount: (count * each) / 100, unit: 'l', packageLabel: multiplied[0] };
-      if (unit === 'ml') return { amount: (count * each) / 1000, unit: 'l', packageLabel: multiplied[0] };
-      return { amount: count * each, unit: 'st', packageLabel: multiplied[0] };
-    }
-  }
-
-  const matches = [...normalized.matchAll(/(\d+(?:\.\d+)?)\s*(kg|g|l|ml|cl|st)\b/g)];
-  const match = matches.at(-1);
-  if (!match) return null;
-  const value = Number(match[1]);
-  const unit = match[2];
-  if (!Number.isFinite(value) || value <= 0) return null;
-  if (unit === 'kg') return { amount: value, unit: 'kg', packageLabel: match[0] };
-  if (unit === 'g') return { amount: value / 1000, unit: 'kg', packageLabel: match[0] };
-  if (unit === 'l') return { amount: value, unit: 'l', packageLabel: match[0] };
-  if (unit === 'cl') return { amount: value / 100, unit: 'l', packageLabel: match[0] };
-  if (unit === 'ml') return { amount: value / 1000, unit: 'l', packageLabel: match[0] };
-  return { amount: value, unit: 'st', packageLabel: match[0] };
-}
-
-export function normalizeComparableUnitPrice(totalPrice: number, packageText: string) {
-  const packageAmount = unitAmountFromPackage(packageText);
-  if (!packageAmount || !Number.isFinite(totalPrice) || totalPrice <= 0) return null;
-  return {
-    packageLabel: packageAmount.packageLabel,
-    unitLabel: `kr/${packageAmount.unit}`,
-    unitPrice: totalPrice / packageAmount.amount,
-    unitSortPrice: totalPrice / packageAmount.amount
-  };
 }
 
 function adaptiveProductKind(category: string) {
@@ -537,7 +498,7 @@ function productLabelsWithDietaryEvidence(product: (typeof axfoodProducts)[numbe
 }
 
 export const facetedSearchRows: RealCatalogSearchPriceRow[] = axfoodProducts.flatMap((product) => {
-  const packageAmount = unitAmountFromPackage(product.subline);
+  const packageAmount = normalizePackageAmount(product.subline);
   return chainPriceRows(product).flatMap((priceRow) => {
     const price = priceRow.price;
     if (typeof price !== 'number') return [];
@@ -1602,7 +1563,7 @@ function brandTierForAxfoodProduct(product: (typeof axfoodProducts)[number]): Br
 }
 
 function privateLabelDupeMatchInput(product: (typeof axfoodProducts)[number]): (ProductMatchInput & { unitPrice: number }) | null {
-  const packageAmount = unitAmountFromPackage(product.subline);
+  const packageAmount = normalizePackageAmount(product.subline);
   const unitPrice = normalizeComparableUnitPrice(product.lowestPrice, product.subline);
   if (!packageAmount || !unitPrice) return null;
   const packageSize = packageAmount.unit === 'kg'
@@ -1978,6 +1939,7 @@ export type AdaptiveProductCard = {
   confidenceLabel: string;
   totalSortPrice: number;
   unitSortPrice: number | null;
+  unitCompareKey: ComparableUnitKey | null;
   defaultCompareMode: 'total' | 'unit';
   cheapestUnitBadge: string | null;
   priceDropPercent: number | null;
@@ -2057,6 +2019,7 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
     confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
     totalSortPrice: totalPrice,
     unitSortPrice: normalizedUnit?.unitSortPrice ?? null,
+    unitCompareKey: normalizedUnit?.unitKey ?? null,
     defaultCompareMode: productKind === 'commodity' ? 'unit' : 'total',
     cheapestUnitBadge: normalizedUnit ? cheapestUnitBadge(normalizedUnit.unitPrice, peerUnitPrices, normalizedUnit.unitLabel) : null,
     priceDropPercent: priceDrop?.percent ?? null,

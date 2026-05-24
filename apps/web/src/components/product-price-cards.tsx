@@ -6,6 +6,7 @@ import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
 import { volatilityBadgeMethodology } from '@/lib/price-intelligence';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
+import { compareNormalizedUnitEntries } from '@/lib/unit-normalizer';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
 
@@ -25,6 +26,17 @@ function sortValue(card: AdaptiveProductCard, compareMode: CompareMode) {
   const mode = resolvedMode(card, compareMode);
   if (mode === 'unit') return card.unitSortPrice ?? Number.POSITIVE_INFINITY;
   return card.totalSortPrice;
+}
+
+function compareCards(left: AdaptiveProductCard, right: AdaptiveProductCard, compareMode: CompareMode) {
+  const leftMode = resolvedMode(left, compareMode);
+  const rightMode = resolvedMode(right, compareMode);
+  if (leftMode === 'unit' && rightMode === 'unit') {
+    return compareNormalizedUnitEntries(left, right);
+  }
+
+  const delta = sortValue(left, compareMode) - sortValue(right, compareMode);
+  return delta === 0 ? left.name.localeCompare(right.name, 'sv') : delta;
 }
 
 function primaryLabel(card: AdaptiveProductCard, compareMode: CompareMode) {
@@ -126,10 +138,7 @@ export function ProductPriceCards({
     }
   }, []);
 
-  const sortedCards = useMemo(() => [...cards].sort((left, right) => {
-    const delta = sortValue(left, compareMode) - sortValue(right, compareMode);
-    return delta === 0 ? left.name.localeCompare(right.name, 'sv') : delta;
-  }), [cards, compareMode]);
+  const sortedCards = useMemo(() => [...cards].sort((left, right) => compareCards(left, right, compareMode)), [cards, compareMode]);
 
   function chooseMode(value: CompareMode) {
     setCompareMode(value);
@@ -143,7 +152,8 @@ export function ProductPriceCards({
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">{eyebrow}</p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{title}</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{intro}</p>
-          <p className="mt-2 text-xs font-bold text-amber-800">No synthetic unit prices: unit rows are derived only from observed price plus reported package size.</p>
+          <p className="mt-2 text-xs font-bold text-amber-800">No synthetic unit prices: unit rows are derived only from observed price plus normalized package size.</p>
+          <p className="mt-1 text-xs font-bold text-amber-800">Cheapest-unit sorting normalizes kg/g and l/ml first, then keeps kg, l, and st comparisons in separate compatible groups.</p>
           <p className="mt-1 text-xs font-bold text-amber-800">No synthetic product images: cards render only source image URLs from Axfood, OpenPrices, or OpenFoodFacts rows.</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-2">
