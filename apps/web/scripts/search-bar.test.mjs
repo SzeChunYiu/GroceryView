@@ -45,3 +45,18 @@ test('web product search API is backed by PostgreSQL full-text search', async ()
   assert.match(route, /product_search_database_unconfigured/);
   assert.match(route, /NextResponse\.json\(\{ query, results/);
 });
+
+test('web product search auto-archives stale latest prices before ranking', async () => {
+  assert.equal(await exists('src/lib/freshness.ts'), true);
+  const freshness = await read('src/lib/freshness.ts');
+  const route = await read('src/app/api/products/route.ts');
+
+  assert.match(freshness, /DEFAULT_STALE_PRICE_THRESHOLD_DAYS = 14/);
+  assert.match(freshness, /update latest_prices/);
+  assert.match(freshness, /is_available = false/);
+  assert.match(freshness, /latest_prices\.domain = 'grocery'/);
+  assert.match(freshness, /latest_prices\.observed_at < \$1::timestamptz/);
+  assert.match(route, /archiveStalePricesIfDue/);
+  assert.match(route, /archiveStalePrices\(executor\)/);
+  assert.match(route, /searchProductsByText\(executor, query/);
+});

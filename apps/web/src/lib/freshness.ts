@@ -12,6 +12,9 @@ const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const AGING_AFTER_DAYS = 2;
 const STALE_AFTER_DAYS = 7;
 
+export const DEFAULT_STALE_PRICE_THRESHOLD_DAYS = 14;
+export const STALE_PRICE_THRESHOLD_DAYS_ENV = "GROCERYVIEW_STALE_PRICE_THRESHOLD_DAYS";
+
 export function getScrapeAgeInDays(
   scrapedAt: string | number | Date | null | undefined,
   now: Date = new Date(),
@@ -87,5 +90,80 @@ export function getPriceFreshness(
     ageInDays,
     refreshHint: "Recently refreshed price.",
     isStale: false,
+  };
+}
+
+export type StalePriceArchiveExecutor = {
+  query<T>(sql: string, params?: unknown[]): Promise<T[]>;
+};
+
+export type StalePriceArchiveResult = {
+  archivedCount: number;
+  cutoffAt: string;
+  thresholdDays: number;
+};
+
+type StalePriceArchiveRow = {
+  archived_count: string | number;
+  cutoff_at: string | Date;
+};
+
+function numberFromEnv(value: string | undefined): number | null {
+  if (value === undefined || value.trim() === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+export function stalePriceThresholdDays(env: NodeJS.ProcessEnv = process.env): number {
+  return numberFromEnv(env[STALE_PRICE_THRESHOLD_DAYS_ENV]) ?? DEFAULT_STALE_PRICE_THRESHOLD_DAYS;
+}
+
+export function stalePriceCutoffDate(asOf: Date = new Date(), thresholdDays = stalePriceThresholdDays()): Date {
+  return new Date(asOf.getTime() - thresholdDays * DAY_IN_MS);
+}
+
+function iso(value: string | Date): string {
+  return value instanceof Date ? value.toISOString() : value;
+}
+
+/**
+ * Marks old grocery latest-price rows unavailable so existing best-price reads
+ * that filter on `is_available` stop ranking stale observations by default.
+ */
+export async function archiveStalePrices(
+  executor: StalePriceArchiveExecutor,
+  options: { asOf?: Date; thresholdDays?: number } = {},
+): Promise<StalePriceArchiveResult> {
+  const asOf = options.asOf ?? new Date();
+  const thresholdDays = options.thresholdDays ?? stalePriceThresholdDays();
+  const cutoffAt = stalePriceCutoffDate(asOf, thresholdDays).toISOString();
+
+  const rows = await executor.query<StalePriceArchiveRow>(
+    `with archived as (
+       update latest_prices
+          set is_available = false,
+              updated_at = now(),
+              provenance = coalesce(latest_prices.provenance, '{}'::jsonb)
+                || jsonb_build_object(
+                  'staleAutoArchivedAt', $2::timestamptz,
+                  'staleAutoArchiveCutoffAt', $1::timestamptz,
+                  'staleAutoArchiveThresholdDays', $3::int
+                )
+        where latest_prices.domain = 'grocery'
+          and coalesce(latest_prices.is_available, true) = true
+          and latest_prices.observed_at < $1::timestamptz
+        returning latest_prices.id
+     )
+     select count(*)::int as archived_count, $1::timestamptz as cutoff_at
+       from archived`,
+    [cutoffAt, asOf.toISOString(), thresholdDays],
+  );
+
+  const row = rows[0];
+
+  return {
+    archivedCount: Number(row?.archived_count ?? 0),
+    cutoffAt: iso(row?.cutoff_at ?? cutoffAt),
+    thresholdDays,
   };
 }

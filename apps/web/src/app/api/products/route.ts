@@ -1,4 +1,5 @@
 import { createPgQueryExecutor, searchProductsByText, type ProductSearchResult } from '@groceryview/db';
+import { archiveStalePrices } from '@/lib/freshness';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
@@ -15,6 +16,9 @@ type PgModuleLike = {
 
 let cachedDatabaseUrl: string | null = null;
 let cachedPool: PgPoolLike | null = null;
+let lastStalePriceArchiveAttemptAt = 0;
+
+const STALE_PRICE_ARCHIVE_INTERVAL_MS = 15 * 60 * 1000;
 
 async function importPgModule(): Promise<PgModuleLike> {
   const loadModule = new Function('specifier', 'return import(specifier)') as (specifier: string) => Promise<unknown>;
@@ -42,6 +46,26 @@ function responsePayload(query: string, results: ProductSearchResult[], error?: 
   };
 }
 
+async function archiveStalePricesIfDue(executor: Awaited<ReturnType<typeof executorForDatabaseUrl>>) {
+  const now = Date.now();
+  if (now - lastStalePriceArchiveAttemptAt < STALE_PRICE_ARCHIVE_INTERVAL_MS) return;
+
+  lastStalePriceArchiveAttemptAt = now;
+
+  try {
+    const result = await archiveStalePrices(executor);
+    if (result.archivedCount > 0) {
+      console.info('Archived stale grocery prices before product search', {
+        archivedCount: result.archivedCount,
+        cutoffAt: result.cutoffAt,
+        thresholdDays: result.thresholdDays
+      });
+    }
+  } catch (error) {
+    console.error('Stale grocery price auto-archive failed', error instanceof Error ? { name: error.name } : { name: 'unknown' });
+  }
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = (searchParams.get('q') ?? '').trim();
@@ -60,6 +84,7 @@ export async function GET(request: Request) {
 
   try {
     const executor = await executorForDatabaseUrl(databaseUrl);
+    await archiveStalePricesIfDue(executor);
     const results = await searchProductsByText(executor, query, { limit: 8 });
     return NextResponse.json({ query, results, source: 'postgres.products_tsvector' });
   } catch (error) {
