@@ -1,3 +1,6 @@
+export { PRODUCT_MATCH_AUDIT_SAMPLE_SIZE, nordicProductMatchAuditReport, summarizeProductMatchAudit } from './lib/productMatch.js';
+export type { NordicCountryCode, ProductMatchAuditCase, ProductMatchAuditReport, ProductMatchPrecisionRow } from './lib/productMatch.js';
+
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
