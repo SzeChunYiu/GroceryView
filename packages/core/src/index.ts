@@ -5077,3 +5077,4 @@ export function calculateChainPriceIndex(observations: ChainPriceObservation[]):
 
   return { chains, categories, marketReferenceByCategory, generatedFrom: usable.length };
 }
+export { isOrganicFlyerOffer, organicSignalsForFlyerOffer, rankOrganicFlyerOffers, savingsPercentForFlyerOffer, type OrganicFlyerOfferInput, type RankedOrganicFlyerOffer, type RankOrganicFlyerOfferOptions } from './lib/rankers/organic.js';
