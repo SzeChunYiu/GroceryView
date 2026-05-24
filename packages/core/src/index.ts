@@ -1,3 +1,5 @@
+export * from './lib/consumerCPI.js';
+
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
