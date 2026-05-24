@@ -38,6 +38,11 @@ function jsonLd(value: unknown) {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="sv">
+      <head>
+        <link href="https://tiles.openfreemap.org" rel="preconnect" />
+        <link href="https://tiles.openfreemap.org" rel="dns-prefetch" />
+        <link as="image" href="/logo.svg" rel="prefetch" />
+      </head>
       <body>
         <script
           dangerouslySetInnerHTML={{ __html: jsonLd([organizationJsonLd, websiteJsonLd]) }}

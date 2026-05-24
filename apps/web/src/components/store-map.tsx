@@ -10,6 +10,13 @@ import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
 // Stockholm county centre.
 const STOCKHOLM: [number, number] = [18.0686, 59.3293];
+const STORE_MAP_PREFETCH_ASSETS = [
+  { id: 'openfreemap-style', href: MAP_STYLE, as: 'fetch' },
+  { id: 'openfreemap-sprite', href: `${MAP_STYLE}/sprite.png`, as: 'image' },
+  { id: 'openfreemap-sprite-2x', href: `${MAP_STYLE}/sprite@2x.png`, as: 'image' },
+  { id: 'openfreemap-stockholm-tile', href: 'https://tiles.openfreemap.org/planet/9/281/151.pbf', as: 'fetch' },
+  { id: 'groceryview-logo', href: '/logo.svg', as: 'image' },
+] as const;
 
 type ChainColor = { match: RegExp; label: string; color: string };
 
@@ -75,6 +82,37 @@ function escapeHtml(value: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+type NetworkConnection = {
+  effectiveType?: string;
+  saveData?: boolean;
+  type?: string;
+};
+
+function shouldPrefetchStoreMapAssets(connection?: NetworkConnection): boolean {
+  if (connection?.saveData) return false;
+  const connectionType = connection?.type?.toLowerCase();
+  if (connectionType) return connectionType === 'wifi' || connectionType === 'ethernet';
+  return !['slow-2g', '2g', '3g'].includes(connection?.effectiveType ?? '');
+}
+
+function prefetchStoreMapAssets() {
+  // Background-prefetch critical map tiles and logo assets only on Wi-Fi/ethernet-class connections.
+  const nav = navigator as Navigator & { connection?: NetworkConnection; mozConnection?: NetworkConnection; webkitConnection?: NetworkConnection };
+  const connection = nav.connection ?? nav.mozConnection ?? nav.webkitConnection;
+  if (!shouldPrefetchStoreMapAssets(connection)) return;
+
+  for (const asset of STORE_MAP_PREFETCH_ASSETS) {
+    if (document.head.querySelector(`[data-store-map-prefetch="${asset.id}"]`)) continue;
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = asset.href;
+    link.as = asset.as;
+    link.dataset.storeMapPrefetch = asset.id;
+    if (asset.as === 'fetch') link.crossOrigin = 'anonymous';
+    document.head.appendChild(link);
+  }
 }
 
 function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
@@ -152,6 +190,11 @@ export function StoreMap() {
       duration: 700,
     });
   }
+
+  useEffect(() => {
+    const prefetchTimer = window.setTimeout(prefetchStoreMapAssets, 800);
+    return () => window.clearTimeout(prefetchTimer);
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
