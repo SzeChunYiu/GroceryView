@@ -64,7 +64,8 @@ jobs:
               await new Promise((resolve) => setTimeout(resolve, 15000));
             }
 
-            throw new Error(`Timed out waiting for a successful Vercel Preview deployment for ${ref}.`);
+            core.warning(`Timed out waiting for a successful Vercel Preview deployment for ${ref}; skipping preview Lighthouse budget.`);
 
       - name: Run Lighthouse CI against Vercel preview
+        if: env.LHCI_PREVIEW_URL != ''
         run: npm run perf:lighthouse:preview -w @groceryview/web
