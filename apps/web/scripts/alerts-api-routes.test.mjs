@@ -16,6 +16,9 @@ describe('price alert API routes', () => {
     assert.match(listCreateRoute, /export async function POST/);
     assert.match(listCreateRoute, /export const runtime = 'nodejs'/);
     assert.match(listCreateRoute, /await listPriceAlerts/);
+    assert.match(listCreateRoute, /await listStalePriceWarnings/);
+    assert.match(listCreateRoute, /staleAfterHours/);
+    assert.match(listCreateRoute, /stalePriceWarnings/);
     assert.match(listCreateRoute, /await createPriceAlert/);
     assert.match(listCreateRoute, /searchParams\.get\('userEmail'\)/);
     assert.match(deleteRoute, /export async function DELETE/);
@@ -23,6 +26,12 @@ describe('price alert API routes', () => {
     assert.match(deleteRoute, /await deletePriceAlert/);
     assert.match(deleteRoute, /searchParams\.get\('userEmail'\)/);
     assert.match(store, /type PriceAlert =/);
+    assert.match(store, /type StalePriceWarning =/);
+    assert.match(store, /buildStalePriceWarnings/);
+    assert.match(store, /channel: 'push'/);
+    assert.match(store, /latest_prices/);
+    assert.match(store, /products\.slug = watched\.product_id/);
+    assert.match(store, /max\(latest_prices\.observed_at\) < \$2::timestamptz/);
     assert.match(store, /userEmail: string/);
     assert.match(store, /productId: string/);
     assert.match(store, /targetPrice: number/);

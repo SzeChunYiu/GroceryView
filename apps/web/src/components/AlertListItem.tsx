@@ -11,6 +11,16 @@ export type ManagedPriceAlert = {
   createdAt: string;
 };
 
+export type ManagedStalePriceWarning = {
+  productId: string;
+  productName: string;
+  lastObservedAt: string | null;
+  staleAfterHours: number;
+  channel: 'push';
+  title: string;
+  body: string;
+};
+
 export type AlertProductSummary = {
   productId: string;
   productName: string;
@@ -67,6 +77,7 @@ export function AlertListItem({ alert, product, onDelete }: Readonly<AlertListIt
 export function AlertManagementPanel({ products }: Readonly<{ products: AlertProductSummary[] }>) {
   const [userEmail, setUserEmail] = useState('');
   const [alerts, setAlerts] = useState<ManagedPriceAlert[]>([]);
+  const [stalePriceWarnings, setStalePriceWarnings] = useState<ManagedStalePriceWarning[]>([]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'deleted' | 'blocked' | 'error'>('idle');
   const [message, setMessage] = useState('Enter the email used for price alerts. No anonymous alert rows are loaded.');
   const productsById = useMemo(() => new Map(products.map((product) => [product.productId, product])), [products]);
@@ -90,10 +101,11 @@ export function AlertManagementPanel({ products }: Readonly<{ products: AlertPro
       setMessage('The alert API rejected the list request. Check the email and try again.');
       return;
     }
-    const body = (await response.json()) as { alerts: ManagedPriceAlert[] };
+    const body = (await response.json()) as { alerts: ManagedPriceAlert[]; stalePriceWarnings?: ManagedStalePriceWarning[] };
     setAlerts(body.alerts);
+    setStalePriceWarnings(body.stalePriceWarnings ?? []);
     setStatus('ready');
-    setMessage(`Loaded ${body.alerts.length} active price alert${body.alerts.length === 1 ? '' : 's'}.`);
+    setMessage(`Loaded ${body.alerts.length} active price alert${body.alerts.length === 1 ? '' : 's'} and ${body.stalePriceWarnings?.length ?? 0} stale-price push warning${body.stalePriceWarnings?.length === 1 ? '' : 's'}.`);
   }
 
   async function deleteAlert(alertId: string) {
@@ -127,6 +139,21 @@ export function AlertManagementPanel({ products }: Readonly<{ products: AlertPro
         <button className="rounded-full bg-emerald-800 px-5 py-3 text-sm font-black text-white" type="submit">Load active alerts</button>
       </form>
       <p className="mt-4 rounded-2xl bg-white p-3 text-sm font-bold text-emerald-950" data-alert-management-status={status}>{message}</p>
+
+      {stalePriceWarnings.length > 0 ? (
+        <div className="mt-5 grid gap-3">
+          {stalePriceWarnings.map((warning) => (
+            <article className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950" data-stale-price-warning={warning.productId} key={warning.productId}>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">Push reliability warning</p>
+              <h2 className="mt-1 text-lg font-black text-slate-950">{warning.title}</h2>
+              <p className="mt-1">{warning.body}</p>
+              <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-amber-800">
+                Window {warning.staleAfterHours}h · channel {warning.channel} · last observed {warning.lastObservedAt ?? 'never'}
+              </p>
+            </article>
+          ))}
+        </div>
+      ) : null}
 
       {alerts.length > 0 ? (
         <div className="mt-5 grid gap-4">

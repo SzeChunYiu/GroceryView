@@ -14,6 +14,17 @@ const accountDeletionConfirmations = [
   'Acknowledge that receipt, basket, watchlist, and preference history cannot be restored after execution.',
   'Type DELETE ACCOUNT before the destructive job can be queued.'
 ];
+const stalePriceWarningContract = {
+  endpoint: '/api/alerts?staleAfterHours=48',
+  warningSource: 'price_alerts joined to latest_prices',
+  channel: 'push',
+  staleAfterHours: 48,
+  guardrails: [
+    'Only products already watched by the signed-in alert email are evaluated.',
+    'Warnings fire when no grocery latest_prices row has been observed inside the configured window.',
+    'Missing observations are reported as reliability warnings, not synthetic prices or price-change claims.'
+  ]
+};
 
 export function generateMetadata() {
   return routeMetadata('/account');
@@ -101,6 +112,26 @@ export default function AccountPage() {
                 <p className="rounded-2xl border border-sky-100 p-3 text-sm font-bold text-sky-950" key={blocker.productId}>{blocker.productName}: {blocker.blocker}</p>
               ))}
             </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.8fr] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Push reliability warnings</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Stale watched prices are flagged before alerts lose trust</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              The alert API now returns <code className="rounded bg-white/80 px-1 py-0.5 text-amber-900">stalePriceWarnings</code> alongside active price alerts from <code className="rounded bg-white/80 px-1 py-0.5 text-amber-900">{stalePriceWarningContract.endpoint}</code>. It checks watched products against <code className="rounded bg-white/80 px-1 py-0.5 text-amber-900">{stalePriceWarningContract.warningSource}</code> and marks stale entries for {stalePriceWarningContract.channel} delivery after {stalePriceWarningContract.staleAfterHours} hours without verified grocery price evidence.
+            </p>
+          </div>
+          <div className="rounded-lg border border-amber-100 bg-white p-4">
+            <p className="text-sm font-black text-slate-950">Reliability guardrails</p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              {stalePriceWarningContract.guardrails.map((guardrail) => (
+                <li className="rounded-lg bg-amber-50 p-3" key={guardrail}>{guardrail}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </Card>

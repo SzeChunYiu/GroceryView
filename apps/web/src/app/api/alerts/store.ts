@@ -6,6 +6,17 @@ export type PriceAlert = {
   createdAt: string;
 };
 
+export type StalePriceWarning = {
+  productId: string;
+  productName: string;
+  lastObservedAt: string | null;
+  staleAfterHours: number;
+  staleSince: string;
+  channel: 'push';
+  title: string;
+  body: string;
+};
+
 export type PriceAlertInput = {
   userEmail: string;
   productId: string;
@@ -18,6 +29,23 @@ type PriceAlertRow = {
   product_id: string;
   target_price: string | number;
   created_at: string | Date;
+};
+
+type StalePriceWarningRow = {
+  product_id: string;
+  product_name: string | null;
+  last_observed_at: string | Date | null;
+};
+
+export type StalePriceWarningSnapshot = {
+  productId: string;
+  productName?: string | null;
+  lastObservedAt?: string | Date | null;
+};
+
+export type StalePriceWarningConfig = {
+  now?: string | Date;
+  staleAfterHours?: number;
 };
 
 type PgPoolLike = {
@@ -75,6 +103,58 @@ function priceAlertFromRow(row: PriceAlertRow): PriceAlert {
   };
 }
 
+function normalizeStaleAfterHours(value: unknown): number {
+  const parsed = typeof value === 'string' ? Number(value) : value;
+  if (typeof parsed !== 'number' || !Number.isFinite(parsed) || parsed <= 0) return 48;
+  return Math.min(24 * 14, Math.max(1, Math.round(parsed)));
+}
+
+function normalizeNow(value: string | Date | undefined): Date {
+  const now = value ? new Date(value) : new Date();
+  if (Number.isNaN(now.getTime())) throw new Error('now must be an ISO date.');
+  return now;
+}
+
+function staleSince(now: Date, staleAfterHours: number): Date {
+  return new Date(now.getTime() - staleAfterHours * 60 * 60 * 1000);
+}
+
+function isoOrNull(value: string | Date | null | undefined): string | null {
+  if (!value) return null;
+  return value instanceof Date ? value.toISOString() : value;
+}
+
+export function buildStalePriceWarnings(
+  snapshots: StalePriceWarningSnapshot[],
+  config: StalePriceWarningConfig = {}
+): StalePriceWarning[] {
+  const staleAfterHours = normalizeStaleAfterHours(config.staleAfterHours);
+  const cutoff = staleSince(normalizeNow(config.now), staleAfterHours);
+  const cutoffIso = cutoff.toISOString();
+
+  return snapshots
+    .filter((snapshot) => {
+      const observedAt = isoOrNull(snapshot.lastObservedAt);
+      return !observedAt || Date.parse(observedAt) < cutoff.getTime();
+    })
+    .map((snapshot) => {
+      const productName = snapshot.productName?.trim() || snapshot.productId;
+      const lastObservedAt = isoOrNull(snapshot.lastObservedAt);
+      return {
+        productId: snapshot.productId,
+        productName,
+        lastObservedAt,
+        staleAfterHours,
+        staleSince: cutoffIso,
+        channel: 'push',
+        title: `${productName} price feed is stale`,
+        body: lastObservedAt
+          ? `No verified price update for ${productName} since ${lastObservedAt}; alert reliability may be reduced.`
+          : `No verified price update has been observed for ${productName}; alert reliability may be reduced.`
+      };
+    });
+}
+
 async function importPgModule(): Promise<PgModuleLike> {
   const loadModule = new Function('specifier', 'return import(specifier)') as (specifier: string) => Promise<unknown>;
   const pgModule = await loadModule('pg') as Partial<PgModuleLike>;
@@ -114,6 +194,44 @@ export async function listPriceAlerts(userEmail: string): Promise<PriceAlert[]> 
   return [...priceAlerts.values()]
     .filter((alert) => alert.userEmail === normalizedEmail)
     .sort((left, right) => right.createdAt.localeCompare(left.createdAt) || left.id.localeCompare(right.id));
+}
+
+export async function listStalePriceWarnings(userEmail: string, config: StalePriceWarningConfig = {}): Promise<StalePriceWarning[]> {
+  const normalizedEmail = normalizeEmail(userEmail);
+  const staleAfterHours = normalizeStaleAfterHours(config.staleAfterHours);
+  const cutoff = staleSince(normalizeNow(config.now), staleAfterHours).toISOString();
+  const configuredDatabaseUrl = databaseUrl();
+  if (!configuredDatabaseUrl) return [];
+
+  const pool = await poolForDatabaseUrl(configuredDatabaseUrl);
+  const result = await pool.query(
+    `select watched.product_id,
+            coalesce(products.name, watched.product_id) as product_name,
+            max(latest_prices.observed_at) as last_observed_at
+       from (select distinct product_id
+             from price_alerts
+             where user_email = $1) watched
+       left join products
+         on products.slug = watched.product_id
+         or products.id::text = watched.product_id
+       left join latest_prices
+         on latest_prices.product_id = products.id
+        and latest_prices.domain = 'grocery'
+       group by watched.product_id, products.name
+       having max(latest_prices.observed_at) is null
+          or max(latest_prices.observed_at) < $2::timestamptz
+       order by last_observed_at nulls first, watched.product_id`,
+    [normalizedEmail, cutoff]
+  );
+
+  return buildStalePriceWarnings(
+    (result.rows as StalePriceWarningRow[]).map((row) => ({
+      productId: row.product_id,
+      productName: row.product_name,
+      lastObservedAt: row.last_observed_at
+    })),
+    { ...config, staleAfterHours }
+  );
 }
 
 export async function createPriceAlert(input: unknown): Promise<PriceAlert> {

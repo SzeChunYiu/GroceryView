@@ -22,6 +22,10 @@ describe('price alert management page', () => {
     assert.match(page, /AlertManagementPanel/);
     assert.match(page, /currentPriceText/);
     assert.match(page, /No synthetic prices/);
+    assert.match(item, /ManagedStalePriceWarning/);
+    assert.match(item, /stalePriceWarnings/);
+    assert.match(item, /Push reliability warning/);
+    assert.match(item, /data-stale-price-warning/);
     assert.match(item, /export function AlertListItem/);
     assert.match(item, /fetch\(`\/api\/alerts\?userEmail=/);
     assert.match(item, /method: 'DELETE'/);

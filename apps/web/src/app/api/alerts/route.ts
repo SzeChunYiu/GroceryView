@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createPriceAlert, listPriceAlerts } from './store';
+import { createPriceAlert, listPriceAlerts, listStalePriceWarnings } from './store';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -7,7 +7,12 @@ export const runtime = 'nodejs';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    return NextResponse.json({ alerts: await listPriceAlerts(searchParams.get('userEmail') ?? '') });
+    const userEmail = searchParams.get('userEmail') ?? '';
+    const staleAfterHours = searchParams.get('staleAfterHours') ?? undefined;
+    const now = searchParams.get('now') ?? undefined;
+    const alerts = await listPriceAlerts(userEmail);
+    const stalePriceWarnings = await listStalePriceWarnings(userEmail, { staleAfterHours: staleAfterHours ? Number(staleAfterHours) : undefined, now });
+    return NextResponse.json({ alerts, stalePriceWarnings });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Invalid alert request.' },
