@@ -38,6 +38,7 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
       cheaperThanKommunLabel: matchedRank.cheaperThanKommunLabel,
       averageRelativeIndexLabel: matchedRank.averageRelativeIndexLabel,
       coverageLabel: matchedRank.coverageLabel,
+      sourceLabel: matchedRank.source,
       confidenceLabel: matchedRank.confidenceLabel,
       matchedPerBranchObservationCount: matchedRank.matchedPerBranchObservationCount,
       confidenceLevel: confidenceLevelForRank(matchedRank),
@@ -83,6 +84,7 @@ function storePricePercentileRankFor(store: (typeof storeUniverse)[number]) {
     cheaperThanKommunLabel: 'Not reported',
     averageRelativeIndexLabel: 'Not reported',
     coverageLabel: `${storePricePercentileRanks.length.toLocaleString('sv-SE')} matched Lidl stores have per-branch offer ranks; this OSM record is not matched.`,
+    sourceLabel: 'No matched branch-offer price index row for this OSM store.',
     confidenceLabel: 'coverage blocker',
     confidenceLevel,
     matchedPerBranchObservationCount: 0,
@@ -250,6 +252,7 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-700">confidence/coverage</p>
                 <p className="mt-2 text-lg font-black text-cyan-950">{pricePercentileRank.confidenceLabel}</p>
                 <p className="mt-1 text-sm font-bold text-cyan-900">{pricePercentileRank.coverageLabel}</p>
+                <p className="mt-1 text-xs font-bold text-cyan-800">Source: {pricePercentileRank.sourceLabel}</p>
               </div>
             </div>
           ) : null}
