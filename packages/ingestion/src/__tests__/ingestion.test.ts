@@ -185,9 +185,55 @@ import {
   scbCoicopFoodCategoryCodes,
   scbPxWebQueryFixtures,
   validateScbPxWebQueryFixtures,
-  validateStoreLocatorFixtures
+  validateStoreLocatorFixtures,
+  normalizeSevenElevenSeRows,
+  SEVEN_ELEVEN_SE_APP_TERMS_URL,
+  SEVEN_ELEVEN_SE_CLICK_AND_COLLECT_TERMS_URL
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+
+describe('seven-eleven SE pricing quirks', () => {
+  it('emits separate store and online rows with channel, member, coupon, format, region, and subscription flags', () => {
+    const rows = normalizeSevenElevenSeRows({
+      category: 'food',
+      format: 'standard',
+      isAppCoupon: true,
+      isMemberOffer: true,
+      name: 'Wrap Caesar',
+      onlinePrice: 84,
+      regionTag: 'stockholm',
+      sourceUrl: SEVEN_ELEVEN_SE_CLICK_AND_COLLECT_TERMS_URL,
+      storeId: 'se-7e-stockholm-demo',
+      storePrice: 82
+    });
+
+    assert.deepEqual(rows.map((row) => row.channel), ['store', 'online']);
+    assert.equal(rows[0].is_member_price, true);
+    assert.equal(rows[0].is_coupon_price, true);
+    assert.equal(rows[0].is_subscription_price, false);
+    assert.equal(rows[0].is_clearance, false);
+    assert.equal(rows[0].format, 'standard');
+    assert.equal(rows[0].region_tag, 'stockholm');
+    assert.equal(rows[0].store_id, 'se-7e-stockholm-demo');
+  });
+
+  it('keeps airport format rows distinct and keeps app member rows distinct', () => {
+    const rows = normalizeSevenElevenSeRows({
+      category: 'fika',
+      format: 'airport',
+      isMemberOffer: true,
+      name: 'Coffee treat',
+      sourceUrl: SEVEN_ELEVEN_SE_APP_TERMS_URL,
+      storePrice: 39
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].format, 'airport');
+    assert.equal(rows[0].is_member_price, true);
+    assert.equal(rows[0].is_coupon_price, false);
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
