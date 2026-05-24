@@ -77,7 +77,8 @@ const navGroups: NavGroup[] = [
       { href: '/list', label: 'Shopping list', icon: ListChecks },
       { href: '/basket', label: 'Basket', icon: ShoppingBasket },
       { href: '/weekly-basket', label: 'Weekly basket', icon: ShoppingBasket },
-      { href: '/meal-planner', label: 'Meal planner', icon: Utensils }
+      { href: '/meal-planner', label: 'Meal planner', icon: Utensils },
+      { href: '/pantry-inventory', label: 'Pantry inventory', icon: ShoppingBasket }
     ]
   }
 ];
