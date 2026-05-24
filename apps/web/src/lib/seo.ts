@@ -77,6 +77,10 @@ export const routeMetadataCatalog = {
     title: 'Willys and Hemkop category coverage | GroceryView',
     description: 'Inspect verified chain category coverage, matched products, source confidence, and per-category savings boundaries.'
   },
+  '/coverage': {
+    title: 'Coverage and fresh lag QA | GroceryView',
+    description: 'Inspect chain category coverage plus perishable fresh-class lag reporting for observations younger than seven days.'
+  },
   '/chain-index': {
     title: 'Swedish grocery chain price index | GroceryView',
     description: 'Track chain price indices, brand-tier gaps, and matched-basket refinements on a 100-centred confidence-labelled scale.'

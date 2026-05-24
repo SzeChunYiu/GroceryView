@@ -2892,6 +2892,42 @@ export const openPriceObservationDepth = Object.values(
   .sort((a, b) => b.observationTotal - a.observationTotal || a.label.localeCompare(b.label, 'sv'))
   .slice(0, 6);
 
+export const FRESH_LAG_STALE_AFTER_DAYS = 7;
+export const freshLagReportAsOf = '2026-05-25';
+const freshLagFreshAfterDate = '2026-05-18';
+const perishableClassSlugs = ['produce', 'meat', 'fish', 'dairy'] as const;
+
+export const freshLagClassReport = perishableClassSlugs.map((slug) => {
+  const products = pricedProducts.filter((product) => product.category === slug);
+  const observations = products.flatMap((product) => product.observations.map((observation) => observation.date));
+  const freshObservations = observations.filter((date) => date > freshLagFreshAfterDate).length;
+  const observationCount = observations.length;
+  const freshPercent = observationCount > 0 ? (freshObservations / observationCount) * 100 : 0;
+  const latestObservation = observations.reduce((latest, date) => date > latest ? date : latest, '');
+  return {
+    slug,
+    label: labelFromSlug(slug),
+    productCount: products.length,
+    observationCount,
+    freshObservations,
+    staleObservations: observationCount - freshObservations,
+    freshPercent,
+    latestObservation,
+    status: freshPercent >= 80 ? 'healthy' : freshPercent >= 50 ? 'watch' : 'stale'
+  };
+});
+
+export const freshLagSummary = {
+  asOf: freshLagReportAsOf,
+  staleAfterDays: FRESH_LAG_STALE_AFTER_DAYS,
+  totalObservations: freshLagClassReport.reduce((sum, row) => sum + row.observationCount, 0),
+  freshObservations: freshLagClassReport.reduce((sum, row) => sum + row.freshObservations, 0),
+  get freshPercent() {
+    return this.totalObservations > 0 ? (this.freshObservations / this.totalObservations) * 100 : 0;
+  },
+  caveat: 'Fresh classes use OpenPrices dated observations only; observations older than 7 days are stale and must not be treated as current perishable prices.'
+};
+
 export const priceDropMoversBoard = pricedProducts
   .flatMap((product) => {
     const historyPoints = dailyObservedPricePoints(product);

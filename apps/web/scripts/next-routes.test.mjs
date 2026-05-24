@@ -16,6 +16,7 @@ const appFiles = [
   'src/app/catalogue-savings/page.tsx',
   'src/app/chain-index/page.tsx',
   'src/app/chain-coverage/page.tsx',
+  'src/app/coverage/page.tsx',
   'src/app/map/page.tsx',
   'src/app/data-sources/page.tsx',
   'src/app/store-coverage/page.tsx',
@@ -3044,6 +3045,7 @@ ${seo}`;
       'src/app/compare-items/page.tsx',
       'src/app/coupon-stacks/page.tsx',
       'src/app/cookies/page.tsx',
+      'src/app/coverage/page.tsx',
       'src/app/data-sources/page.tsx',
       'src/app/deals/page.tsx',
       'src/app/fuel/page.tsx',
@@ -3624,6 +3626,8 @@ ${seo}`;
     assert.match(route, /chainCategoryCoverage\.map/);
     assert.match(route, /matchedChainProducts\.length/);
     assert.match(route, /topChainSpreads\.slice/);
+    assert.match(route, /freshLagClassReport\.map/);
+    assert.match(route, /observations younger than 7 days/);
     assert.match(route, /SourceCoverage/);
     assert.match(route, /Willys\/Hemkop category coverage/);
     assert.match(route, /Claim boundary/);
