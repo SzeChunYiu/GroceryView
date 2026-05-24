@@ -1,5 +1,6 @@
 import { Card, Eyebrow, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { HouseholdPlanActions } from '@/components/household-plan-actions';
+import { DEFAULT_HOUSEHOLD_PRICE_PREFERENCES, HOUSEHOLD_PRICE_PREFERENCE_STORAGE_KEY, sortByHouseholdPricePreferences } from '@/lib/user-preferences';
 import { formatPct, formatSek, shareableHouseholdListContract, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -45,7 +46,8 @@ const householdEvidence = [
 
 export default function FeaturePage() {
   const route = 'household';
-  const planningRows = topChainSpreads.slice(0, 4);
+  const householdPricePreferences = DEFAULT_HOUSEHOLD_PRICE_PREFERENCES;
+  const planningRows = sortByHouseholdPricePreferences(topChainSpreads.slice(0, 4), householdPricePreferences);
 
   return (
     <PageShell>
@@ -61,6 +63,24 @@ export default function FeaturePage() {
           </Card>
         ))}
       </section>
+
+      <Card className="mt-6">
+        <Eyebrow>Household preference learning</Eyebrow>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">preferred stores and brands bias household price ordering</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+          Store and brand choices are persisted per household under <span className="font-black">{HOUSEHOLD_PRICE_PREFERENCE_STORAGE_KEY}</span>, then used to lift matching products in search and compare surfaces without hiding cheaper verified alternatives.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Preferred stores</p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">{householdPricePreferences.preferredStores.join(', ')}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Preferred brands</p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">{householdPricePreferences.preferredBrands.join(', ')}</p>
+          </div>
+        </div>
+      </Card>
 
       <Card className="mt-6">
         <Eyebrow>Shareable household lists</Eyebrow>
