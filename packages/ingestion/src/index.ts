@@ -94,6 +94,7 @@ export * from './connectors/citygross.js';
 export * from './connectors/citygross-bulk.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
+export * from './connectors/halal-center-se.js';
 export * from './connectors/ica.js';
 export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
@@ -109,6 +110,7 @@ export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';
+export * from './overlapCategories.js';
 
 export type SourceType =
   | 'official_api'

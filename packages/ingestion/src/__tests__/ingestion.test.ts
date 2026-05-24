@@ -185,7 +185,9 @@ import {
   scbCoicopFoodCategoryCodes,
   scbPxWebQueryFixtures,
   validateScbPxWebQueryFixtures,
-  validateStoreLocatorFixtures
+  validateStoreLocatorFixtures,
+  HALAL_CENTER_SE_VERIFICATION,
+  normalizeHalalCenterSeRows
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
 
@@ -7307,5 +7309,14 @@ describe('daily ingestion runner', () => {
     assert.equal(result.status, 'blocked');
     assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
     assert.equal(executor.calls.length, 0);
+  });
+});
+
+
+describe('Halal Center SE connector verification', () => {
+  it('does not emit kosher_halal rows without three verified stores or national online presence', () => {
+    assert.equal(HALAL_CENTER_SE_VERIFICATION.canEmitRows, false);
+    assert.equal(HALAL_CENTER_SE_VERIFICATION.verifiedStoreCount, 0);
+    assert.deepEqual(normalizeHalalCenterSeRows([{ category: 'meat', product_name: 'Fixture', price: 10, source_url: 'https://example.invalid' }]), []);
   });
 });
