@@ -3089,6 +3089,26 @@ ${seo}`;
     assert.doesNotMatch(seo, /NoVerifiedData/);
   });
 
+  it('keeps programmatic city/product SEO pages canonicalized behind coverage guards', async () => {
+    const seo = await read('src/lib/seo.ts');
+    const landing = await read('src/lib/seo-landing-pages.ts');
+
+    assert.match(seo, /canonicalPath\?: string/);
+    assert.match(seo, /const alternatePath = config\.canonicalPath \?\? config\.path/);
+    assert.match(seo, /canonical: canonical, languages: languageAlternateUrls\(alternatePath\)/);
+    assert.match(seo, /follow: config\.noIndexFollow \?\? false/);
+
+    assert.match(landing, /programmaticSeoIndexingGuard/);
+    assert.match(landing, /minimumVerifiedChainRows: 2/);
+    assert.match(landing, /minimumCityVerifiedChainRows: 3/);
+    assert.match(landing, /hasCitySpecificAvailability: false/);
+    assert.match(landing, /cityCheapestLandingSeoDecision/);
+    assert.match(landing, /canonicalPath: indexable \? cityPath : fallbackCanonicalPath/);
+    assert.match(landing, /noIndex: !indexable/);
+    assert.match(landing, /metadataForCityCheapestLanding/);
+    assert.match(landing, /noIndexFollow: seoDecision\.noIndexFollow/);
+  });
+
   it('ships an installable PWA-first web manifest for mobile grocery checks', async () => {
     const manifestPath = 'src/app/manifest.ts';
     assert.equal(await fileExists(manifestPath), true, 'App Router should expose /manifest.webmanifest');

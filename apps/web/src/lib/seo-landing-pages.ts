@@ -6,9 +6,16 @@ export const seoLandingCities = [
   {
     slug: 'stockholm',
     label: 'Stockholm',
+    hasCitySpecificAvailability: false,
     evidence: 'Stockholm landing pages use verified chain catalogue prices plus the public Stockholm grocery context; no branch availability is inferred.'
   }
 ] as const;
+
+export const programmaticSeoIndexingGuard = {
+  minimumVerifiedChainRows: 2,
+  minimumCityVerifiedChainRows: 3,
+  duplicateCityCanonicalReason: 'City/product pages stay noindex and canonicalize to the root product landing until city-specific store availability clears coverage.'
+} as const;
 
 function displayChain(chain: string) {
   return chain.charAt(0).toUpperCase() + chain.slice(1).replace(/-/g, ' ');
@@ -67,26 +74,59 @@ export function findSeoLandingCity(slug: string) {
   return seoLandingCities.find((city) => city.slug === slug);
 }
 
+function verifiedChainRowCount(product: SeoLandingProduct) {
+  return product.chainRows.filter((row) => typeof row.price === 'number').length;
+}
+
+function hasIndexableProductCoverage(product: SeoLandingProduct) {
+  return verifiedChainRowCount(product) >= programmaticSeoIndexingGuard.minimumVerifiedChainRows;
+}
+
+export function cityCheapestLandingSeoDecision(product: SeoLandingProduct, city: SeoLandingCity) {
+  const cityPath = `/${city.slug}/billigaste/${product.slug}`;
+  const fallbackCanonicalPath = `/billigaste/${product.slug}`;
+  const hasEnoughCityCoverage = verifiedChainRowCount(product) >= programmaticSeoIndexingGuard.minimumCityVerifiedChainRows;
+  const indexable = hasEnoughCityCoverage && city.hasCitySpecificAvailability;
+
+  return {
+    path: cityPath,
+    canonicalPath: indexable ? cityPath : fallbackCanonicalPath,
+    noIndex: !indexable,
+    noIndexFollow: true,
+    guardrail: indexable ? city.evidence : programmaticSeoIndexingGuard.duplicateCityCanonicalReason
+  };
+}
+
 export function metadataForCheapestLanding(product: SeoLandingProduct): Metadata {
+  const noIndex = !hasIndexableProductCoverage(product);
   return routeMetadata({
     path: `/billigaste/${product.slug}`,
+    noIndex,
+    noIndexFollow: noIndex,
     title: `Billigaste ${product.name} | GroceryView`,
     description: `Billigaste ${product.name}: ${product.cheapestChainLabel} is lowest at ${product.cheapestPriceLabel} from ${product.evidenceLabel}. Compare verified chain prices with no synthetic prices.`
   });
 }
 
 export function metadataForPriceComparisonLanding(product: SeoLandingProduct): Metadata {
+  const noIndex = !hasIndexableProductCoverage(product);
   return routeMetadata({
     path: `/prisjamforelse/${product.slug}`,
+    noIndex,
+    noIndexFollow: noIndex,
     title: `${product.name} prisjämförelse | GroceryView`,
     description: `${product.name} prisjämförelse across verified Swedish grocery chain rows: cheapest ${product.cheapestPriceLabel}, spread ${product.spreadPctLabel}, confidence labelled.`
   });
 }
 
 export function metadataForCityCheapestLanding(product: SeoLandingProduct, city: SeoLandingCity): Metadata {
+  const seoDecision = cityCheapestLandingSeoDecision(product, city);
   return routeMetadata({
-    path: `/${city.slug}/billigaste/${product.slug}`,
+    path: seoDecision.path,
+    canonicalPath: seoDecision.canonicalPath,
+    noIndex: seoDecision.noIndex,
+    noIndexFollow: seoDecision.noIndexFollow,
     title: `Billigaste ${product.name} i ${city.label} | GroceryView`,
-    description: `Find the cheapest verified chain price for ${product.name} in the ${city.label} GroceryView landing page. Uses chain catalogue evidence and clear local-availability caveats.`
+    description: `Find the cheapest verified chain price for ${product.name} in the ${city.label} GroceryView landing page. Uses chain catalogue evidence and clear local-availability caveats. ${seoDecision.guardrail}`
   });
 }
