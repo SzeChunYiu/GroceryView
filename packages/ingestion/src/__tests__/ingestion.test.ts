@@ -32,6 +32,7 @@ import {
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
+  buildTigerIsProductsUrl,
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
@@ -90,6 +91,7 @@ import {
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
+  fetchTigerIsProducts,
   fetchWillysProducts,
   fetchWillysProductsForAllStores,
   fetchWillysStores,
@@ -3761,6 +3763,37 @@ describe('fetchCoopProductsForAllStores', () => {
     assert.deepEqual(requestedProductUrls, [buildHemkopCategoryUrl('mejeri-ost-och-agg', 100, 0, '4003')]);
   });
 
+});
+
+describe('fetchTigerIsProducts', () => {
+  it('normalizes Tiger Iceland Shopify product rows with ISK metadata', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        products: [{
+          id: 123,
+          handle: 'household-box',
+          title: 'Household Box',
+          vendor: 'Flying Tiger Copenhagen',
+          product_type: 'Household',
+          variants: [{ id: 456, price: '499', compare_at_price: '699', available: true }],
+          images: [{ src: 'https://tigerstores.is/box.jpg' }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchTigerIsProducts({
+      fetchImpl,
+      maxRows: 1,
+      retrievedAt: '2026-05-24T15:30:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildTigerIsProductsUrl(1, 250));
+    assert.deepEqual(rows.map((row) => [row.country, row.currency, row.chain, row.id, row.price, row.compareAtPrice]), [
+      ['IS', 'ISK', 'tiger', '123', 499, 699]
+    ]);
+  });
 });
 
 describe('fetchWillysProductsForAllStores', () => {
