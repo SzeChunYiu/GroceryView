@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 type LineStyleName = 'solid' | 'dashed' | 'dotted';
 type ChartLoadStatus = 'idle' | 'loading' | 'ready' | 'failed';
 type LightweightChartsModule = typeof import('lightweight-charts');
-type LightweightChartsValues = Pick<LightweightChartsModule, 'ColorType' | 'LineSeries' | 'LineStyle' | 'createChart'>;
+type LightweightChartsValues = Pick<LightweightChartsModule, 'ColorType' | 'LineSeries' | 'LineStyle' | 'createChart' | 'createSeriesMarkers'>;
 
 let lightweightChartsModulePromise: Promise<LightweightChartsModule> | null = null;
 
@@ -89,7 +89,7 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
     setChartLoadStatus('loading');
 
     loadLightweightCharts()
-      .then(({ ColorType, LineSeries, LineStyle, createChart }: LightweightChartsValues) => {
+      .then(({ ColorType, LineSeries, LineStyle, createChart, createSeriesMarkers }: LightweightChartsValues) => {
         if (isDisposed || !container.isConnected) return;
         const chartApi = createChart(container, {
           autoSize: true,
@@ -124,6 +124,13 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           line.setData(series.points.map((point) => ({
             time: point.time.slice(0, 10),
             value: point.value
+          })));
+          createSeriesMarkers(line, series.markers.map((marker) => ({
+            time: marker.time.slice(0, 10),
+            position: 'aboveBar' as const,
+            shape: 'circle' as const,
+            color: marker.color,
+            text: marker.text
           })));
         });
 
