@@ -10,6 +10,8 @@ import {
   buildCoopSearchUrl,
   buildCoopStoreInfoUrl,
   buildCoopStoresUrl,
+  buildBeirutMarketSeUrl,
+  normalizeBeirutMarketSeProduct,
   buildCityGrossProductsUrl,
   buildCityGrossStoresUrl,
   buildDailyConnectorConfigsFromEnv,
@@ -188,6 +190,19 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+describe('Beirut Market SE connector', () => {
+  it('normalizes whitelisted Middle Eastern grocery rows with Swedish metadata', () => {
+    assert.equal(buildBeirutMarketSeUrl('/collections/matvaror'), 'https://beirutmarket.se/collections/matvaror');
+    const row = normalizeBeirutMarketSeProduct({ id: 'bm-1', title: 'Tahini', vendor: 'Beirut Market', productType: 'Basvaror', price: '39,90 kr', handle: '/products/tahini' }, 'https://beirutmarket.se/collections/matvaror', '2026-05-24T12:00:00.000Z');
+
+    assert.equal(row?.country, 'SE');
+    assert.equal(row?.currency, 'SEK');
+    assert.equal(row?.chain, 'beirut-market');
+    assert.equal(row?.retailer_type, 'ethnic_middle_eastern');
+    assert.equal(row?.price, 39.9);
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {

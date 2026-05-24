@@ -91,6 +91,7 @@ export * from './connectors/all-store-runner.js';
 export * from './connectors/overpass.js';
 export * from './connectors/fuel-stations.js';
 export * from './connectors/citygross.js';
+export * from './connectors/beirut-market-se.js';
 export * from './connectors/citygross-bulk.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
