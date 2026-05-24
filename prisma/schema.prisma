@@ -33,6 +33,25 @@ model Product {
   imageUrl       String?  @map("image_url")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
+  priceSnapshots PriceSnapshot[]
 
   @@map("products")
+}
+
+model PriceSnapshot {
+  id        String   @id @default(uuid()) @db.Uuid
+  productId String   @map("product_id") @db.Uuid
+  storeId   String   @map("store_id")
+  price     Decimal  @db.Decimal(10, 2)
+  unitPrice Decimal? @map("unit_price") @db.Decimal(10, 2)
+  currency  String   @default("SEK")
+  isOnSale  Boolean  @default(false) @map("is_on_sale")
+  scrapedAt DateTime @map("scraped_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, scrapedAt])
+  @@index([storeId, scrapedAt])
+  @@map("price_snapshots")
 }
