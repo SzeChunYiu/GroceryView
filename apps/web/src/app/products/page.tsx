@@ -24,6 +24,8 @@ type SearchParams = {
   inStockOnly?: string | string[];
   minConfidence?: string | string[];
   brand?: string | string[];
+  preferredBrands?: string | string[];
+  hiddenBrands?: string | string[];
   page?: string | string[];
 };
 
@@ -38,6 +40,23 @@ function normalizeSelectedBrand(brand: string | string[] | undefined) {
   const requested = (Array.isArray(brand) ? brand[0] : brand)?.trim();
   if (!requested) return '';
   return productBrandFilterOptions.find((option) => option.value.toLocaleLowerCase('sv-SE') === requested.toLocaleLowerCase('sv-SE'))?.value ?? '';
+}
+
+function normalizeSelectedBrands(brands: string | string[] | undefined) {
+  const requestedBrands = (Array.isArray(brands) ? brands : brands ? [brands] : [])
+    .flatMap((brand) => brand.split(','))
+    .map((brand) => brand.trim())
+    .filter(Boolean);
+  const normalized = requestedBrands
+    .map((requestedBrand) => productBrandFilterOptions.find((option) => option.value.toLocaleLowerCase('sv-SE') === requestedBrand.toLocaleLowerCase('sv-SE'))?.value)
+    .filter((brand): brand is string => Boolean(brand));
+  return Array.from(new Set(normalized));
+}
+
+function pinPreferredBrands<T extends { brand: string }>(cards: T[], preferredBrands: string[]) {
+  if (preferredBrands.length === 0) return cards;
+  const preferredBrandSet = new Set(preferredBrands);
+  return [...cards].sort((a, b) => Number(preferredBrandSet.has(b.brand)) - Number(preferredBrandSet.has(a.brand)));
 }
 
 function setFirstParam(params: URLSearchParams, key: keyof SearchParams, value: string | string[] | undefined) {
@@ -63,6 +82,8 @@ function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'maxPrice', source.maxPrice);
   setFirstParam(params, 'inStockOnly', source.inStockOnly);
   setFirstParam(params, 'minConfidence', source.minConfidence);
+  setAllParams(params, 'preferredBrands', source.preferredBrands);
+  setAllParams(params, 'hiddenBrands', source.hiddenBrands);
 }
 
 function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchParams = {}) {
@@ -80,15 +101,22 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
   const selectedBrand = normalizeSelectedBrand(resolvedSearchParams.brand);
-  const productCards = selectedBrand
-    ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
-    : adaptiveProductCards;
-  const totalPages = Math.max(1, Math.ceil(resultCards.length / PRODUCTS_PER_PAGE));
+  const preferredBrands = normalizeSelectedBrands(resolvedSearchParams.preferredBrands);
+  const hiddenBrands = normalizeSelectedBrands(resolvedSearchParams.hiddenBrands);
+  const hiddenBrandSet = new Set(hiddenBrands);
+  const visibleResultCards = pinPreferredBrands(resultCards.filter((card) => !hiddenBrandSet.has(card.brand)), preferredBrands);
+  const productCards = pinPreferredBrands(
+    (selectedBrand
+      ? adaptiveProductCards.filter((card) => card.brand === selectedBrand)
+      : adaptiveProductCards).filter((card) => !hiddenBrandSet.has(card.brand)),
+    preferredBrands
+  );
+  const totalPages = Math.max(1, Math.ceil(visibleResultCards.length / PRODUCTS_PER_PAGE));
   const currentPage = Math.min(requestedPage, totalPages);
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE;
-  const pagedResultCards = resultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
-  const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
-  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
+  const pagedResultCards = visibleResultCards.slice(pageStart, pageStart + PRODUCTS_PER_PAGE);
+  const rangeStart = visibleResultCards.length === 0 ? 0 : pageStart + 1;
+  const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, visibleResultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
@@ -140,6 +168,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         </div>
         <form action="/products" className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_0.6fr_0.6fr_0.6fr_auto]" method="get">
           {selectedBrand ? <input name="brand" type="hidden" value={selectedBrand} /> : null}
+          {preferredBrands.map((brand) => <input key={`preferred-${brand}`} name="preferredBrands" type="hidden" value={brand} />)}
+          {hiddenBrands.map((brand) => <input key={`hidden-${brand}`} name="hiddenBrands" type="hidden" value={brand} />)}
           {search.filters.categories.length > 0 ? <input name="category" type="hidden" value={search.filters.categories.join(',')} /> : null}
           {search.labelFilters.length > 0 ? <input name="label" type="hidden" value={search.labelFilters.join(',')} /> : null}
           {search.filters.chains.length > 0 ? <input name="chain" type="hidden" value={search.filters.chains.join(',')} /> : null}
@@ -187,9 +217,16 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
         <div className="mt-4 flex flex-wrap gap-2">
           {search.activeFilters.length > 0 ? search.activeFilters.map((filter) => (
             <span className="rounded-full bg-violet-900 px-3 py-1 text-xs font-black text-white" key={filter}>{filter}</span>
-          )) : (
+          )) : null}
+          {preferredBrands.map((brand) => (
+            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-900 shadow-sm" key={`preferred-${brand}`}>Pinned brand: {brand}</span>
+          ))}
+          {hiddenBrands.map((brand) => (
+            <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black text-rose-900 shadow-sm" key={`hidden-${brand}`}>Hidden brand: {brand}</span>
+          ))}
+          {search.activeFilters.length === 0 && preferredBrands.length === 0 && hiddenBrands.length === 0 ? (
             <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-violet-900 shadow-sm">No active URL filters</span>
-          )}
+          ) : null}
         </div>
         <div className="mt-5 grid gap-3 lg:grid-cols-4">
           <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
@@ -250,10 +287,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             </Link>
           ))}
         </div>
-        {resultCards.length > PRODUCTS_PER_PAGE ? (
+        {visibleResultCards.length > PRODUCTS_PER_PAGE ? (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="font-black text-slate-700">
-              Showing {rangeStart}-{rangeEnd} of {resultCards.length} instant products (page {currentPage}/{totalPages})
+              Showing {rangeStart}-{rangeEnd} of {visibleResultCards.length} instant products (page {currentPage}/{totalPages})
             </p>
             <div className="flex gap-3">
               {currentPage > 1 ? (
@@ -432,6 +469,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
       <div className="mt-6">
         <Card className="mb-4 border-emerald-200 bg-emerald-50/70">
           <form action="/products" className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end" method="get">
+            {preferredBrands.map((brand) => <input key={`brand-form-preferred-${brand}`} name="preferredBrands" type="hidden" value={brand} />)}
+            {hiddenBrands.map((brand) => <input key={`brand-form-hidden-${brand}`} name="hiddenBrands" type="hidden" value={brand} />)}
             <div>
               <label className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800" htmlFor="products-brand-filter">Brand filter</label>
               <select
@@ -454,6 +493,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             {selectedBrand
               ? `Showing ${productCards.length.toLocaleString('sv-SE')} verified product card${productCards.length === 1 ? '' : 's'} for ${selectedBrand}.`
               : 'Brand options are reused from the shared verified product option set so homepage and catalogue filters stay consistent.'}
+            {preferredBrands.length > 0 ? ` Pinned brands appear first: ${preferredBrands.join(', ')}.` : ''}
+            {hiddenBrands.length > 0 ? ` Hidden brands are excluded: ${hiddenBrands.join(', ')}.` : ''}
           </p>
         </Card>
         <ProductPriceCards

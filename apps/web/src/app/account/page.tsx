@@ -4,10 +4,17 @@ import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
-import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
+import { accountSavedShoppingContract, formatSek, productBrandFilterOptions, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
 
 const accountDeletionPlan = planAccountDeletion('signed-in-user');
+const brandPreferenceOptions = productBrandFilterOptions.slice(0, 8);
+
+function productsBrandPreferenceUrl(key: 'preferredBrands' | 'hiddenBrands', value: string) {
+  const params = new URLSearchParams([[key, value]]);
+  return `/products?${params.toString()}`;
+}
+
 const accountDeletionConfirmations = [
   'Confirm the active session belongs to the account owner.',
   'Review every account-owned table scheduled for deletion.',
@@ -53,6 +60,43 @@ export default function AccountPage() {
               {accountSavedShoppingContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
             </ul>
           </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Brand preferences</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Pin favorites and hide banned brands</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              Account shoppers can carry preferredBrands and hiddenBrands into the product catalogue URL state. Preferred brands are pinned first, while hidden brands are removed from product-search and product-card surfaces.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-emerald-900 shadow-sm">{productBrandFilterOptions.length} verified brand options</p>
+        </div>
+        <form action="/products" className="mt-4 grid gap-3 rounded-2xl bg-white p-4 shadow-sm md:grid-cols-[1fr_1fr_auto]" method="get">
+          <label className="text-sm font-black text-slate-950" htmlFor="account-preferred-brand">
+            Preferred brand
+            <select className="mt-2 w-full rounded-xl border border-emerald-200 px-3 py-2 text-sm font-bold" id="account-preferred-brand" name="preferredBrands">
+              {brandPreferenceOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+            </select>
+          </label>
+          <label className="text-sm font-black text-slate-950" htmlFor="account-hidden-brand">
+            Banned brand
+            <select className="mt-2 w-full rounded-xl border border-rose-200 px-3 py-2 text-sm font-bold" id="account-hidden-brand" name="hiddenBrands">
+              <option value="">None</option>
+              {brandPreferenceOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+            </select>
+          </label>
+          <button className="rounded-xl bg-emerald-700 px-5 py-3 text-sm font-black text-white md:self-end" type="submit">Apply in products</button>
+        </form>
+        <div className="mt-4 flex flex-wrap gap-2 text-xs font-black">
+          {brandPreferenceOptions.slice(0, 4).map((option) => (
+            <a className="rounded-full bg-white px-3 py-2 text-emerald-900 shadow-sm" href={productsBrandPreferenceUrl('preferredBrands', option.value)} key={`preferred-${option.value}`}>Pin {option.label}</a>
+          ))}
+          {brandPreferenceOptions.slice(0, 4).map((option) => (
+            <a className="rounded-full bg-rose-100 px-3 py-2 text-rose-900 shadow-sm" href={productsBrandPreferenceUrl('hiddenBrands', option.value)} key={`hidden-${option.value}`}>Hide {option.label}</a>
+          ))}
         </div>
       </Card>
 
