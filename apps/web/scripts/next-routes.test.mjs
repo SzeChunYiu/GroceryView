@@ -69,12 +69,20 @@ describe('verified-data UI', () => {
   it('surfaces latest_prices availability as an out-of-stock product card badge', async () => {
     const productCards = await read('src/components/product-price-cards.tsx');
     const productsPage = await read('src/app/products/page.tsx');
+    const priceIntelligence = await read('src/lib/price-intelligence.ts');
     const verified = await read('src/lib/verified-data.ts');
 
     assert.match(productCards, /card\.isAvailable === false/);
     assert.match(productCards, /Out of stock/);
+    assert.match(productCards, /Volatility filters/);
+    assert.match(productCards, /matchesVolatilityFilter/);
     assert.match(productsPage, /product\.isAvailable === false/);
     assert.match(productsPage, /Out of stock/);
+    assert.match(productsPage, /volatilityFilterOptions/);
+    assert.match(priceIntelligence, /stable/);
+    assert.match(priceIntelligence, /watch/);
+    assert.match(priceIntelligence, /volatile/);
+    assert.match(priceIntelligence, /sparklinePoints/);
     assert.match(verified, /isAvailable/);
     assert.match(verified, /outOfStockLatestPriceCount/);
   });

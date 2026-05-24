@@ -4,6 +4,7 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
+import { volatilityFilterOptions } from '@/lib/price-intelligence';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
 
@@ -90,6 +91,10 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
   const rangeStart = resultCards.length === 0 ? 0 : pageStart + 1;
   const rangeEnd = Math.min(pageStart + PRODUCTS_PER_PAGE, resultCards.length);
   const defaultSearchCount = facetedProductSearch.resultCards.length;
+  const volatilityFilterLabel = volatilityFilterOptions
+    .filter((option) => option.value !== 'all')
+    .map((option) => option.label.toLocaleLowerCase('sv-SE'))
+    .join(' / ');
 
   function searchFacetUrl(overrides: Partial<Record<'category' | 'label' | 'dietary' | 'chain' | 'q' | 'minPrice' | 'maxPrice' | 'inStockOnly' | 'minConfidence', string>>) {
     const params = new URLSearchParams();
@@ -460,7 +465,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           cards={productCards}
           eyebrow="Product-card display"
           title={selectedBrand ? `${selectedBrand} adaptive total ⇄ per-unit price cards` : 'Adaptive total ⇄ per-unit price cards'}
-          intro="Branded products lead with the actual pack price, commodity-like produce leads with comparable unit price, and the toggle flips the sort key across every card."
+          intro={`Branded products lead with the actual pack price, commodity-like produce leads with comparable unit price, and the toggle flips the sort key across every card. Volatility controls can focus ${volatilityFilterLabel} cards using already-loaded price-history badges.`}
         />
       </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

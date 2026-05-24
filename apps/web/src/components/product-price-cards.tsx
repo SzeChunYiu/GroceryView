@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { LazyItemCard } from './LazyItemCard';
 import { FavouriteProductToggle } from './favourite-product-toggle';
+import { matchesVolatilityFilter, volatilityBadgeForProductCard, volatilityFilterOptions, type VolatilityBand, type VolatilityFilter } from '@/lib/price-intelligence';
 import type { AdaptiveProductCard } from '@/lib/verified-data';
 
 type CompareMode = 'adaptive' | 'total' | 'unit';
@@ -37,6 +38,12 @@ function secondaryLabel(card: AdaptiveProductCard, compareMode: CompareMode) {
     ? card.totalPriceLabel
     : card.unitPriceLabel;
   return `${alternatePrice} · ${card.packageLabel}`;
+}
+
+function volatilityBadgeClass(band: VolatilityBand) {
+  if (band === 'stable') return 'bg-emerald-100 text-emerald-950';
+  if (band === 'volatile') return 'bg-rose-100 text-rose-950';
+  return 'bg-amber-100 text-amber-950';
 }
 
 function sparklinePath(points: AdaptiveProductCard['sparklinePoints'], width = 160, height = 44) {
@@ -97,6 +104,7 @@ export function ProductPriceCards({
   intro?: string;
 }>) {
   const [compareMode, setCompareMode] = useState<CompareMode>('adaptive');
+  const [volatilityFilter, setVolatilityFilter] = useState<VolatilityFilter>('all');
 
   useEffect(() => {
     const stored = window.localStorage.getItem(storageKey);
@@ -105,10 +113,17 @@ export function ProductPriceCards({
     }
   }, []);
 
-  const sortedCards = useMemo(() => [...cards].sort((left, right) => {
-    const delta = sortValue(left, compareMode) - sortValue(right, compareMode);
-    return delta === 0 ? left.name.localeCompare(right.name, 'sv') : delta;
-  }), [cards, compareMode]);
+  const volatilityCounts = useMemo(() => volatilityFilterOptions.reduce<Record<VolatilityFilter, number>>((counts, option) => ({
+    ...counts,
+    [option.value]: option.value === 'all' ? cards.length : cards.filter((card) => matchesVolatilityFilter(card, option.value)).length
+  }), { all: 0, stable: 0, watch: 0, volatile: 0 }), [cards]);
+
+  const sortedCards = useMemo(() => cards
+    .filter((card) => matchesVolatilityFilter(card, volatilityFilter))
+    .sort((left, right) => {
+      const delta = sortValue(left, compareMode) - sortValue(right, compareMode);
+      return delta === 0 ? left.name.localeCompare(right.name, 'sv') : delta;
+    }), [cards, compareMode, volatilityFilter]);
 
   function chooseMode(value: CompareMode) {
     setCompareMode(value);
@@ -116,7 +131,7 @@ export function ProductPriceCards({
   }
 
   return (
-    <section className="rounded-[1.75rem] border border-emerald-200 bg-white/90 p-5 shadow-sm" data-compare-mode={compareMode}>
+    <section className="rounded-[1.75rem] border border-emerald-200 bg-white/90 p-5 shadow-sm" data-compare-mode={compareMode} data-volatility-filter={volatilityFilter}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">{eyebrow}</p>
@@ -143,6 +158,26 @@ export function ProductPriceCards({
           </div>
         </div>
       </div>
+      <div className="mt-4 rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Volatility filters</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {volatilityFilterOptions.map((option) => (
+            <button
+              aria-pressed={volatilityFilter === option.value}
+              className={`rounded-full px-3 py-2 text-xs font-black motion-safe:transition ${volatilityFilter === option.value ? 'bg-amber-900 text-white' : 'bg-white text-amber-950 hover:bg-amber-100'}`}
+              key={option.value}
+              onClick={() => setVolatilityFilter(option.value)}
+              title={option.help}
+              type="button"
+            >
+              {option.label} · {volatilityCounts[option.value]}
+            </button>
+          ))}
+        </div>
+        <p className="mt-2 text-xs font-semibold leading-5 text-amber-950">
+          Stable/watch/volatile filters use the 7-day observed price-history badge data already loaded for these cards; no forecasted prices are added.
+        </p>
+      </div>
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {sortedCards.map((card, index) => (
           <div className="relative" key={card.slug}>
@@ -159,6 +194,10 @@ export function ProductPriceCards({
               listId="adaptive-product-cards"
               listIndex={index}
             >
+            {(() => {
+              const volatilityBadge = volatilityBadgeForProductCard(card);
+              return (
+                <>
             {card.imageUrl && card.imageAlt ? (
               <div className="mb-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-white bg-white p-3 shadow-sm">
                 <Image
@@ -192,6 +231,12 @@ export function ProductPriceCards({
                     {card.priceDropBadge}
                   </span>
                 ) : null}
+                <span
+                  className={`rounded-full px-3 py-1 text-[0.7rem] font-black ${volatilityBadgeClass(volatilityBadge.band)}`}
+                  title={volatilityBadge.detail}
+                >
+                  {volatilityBadge.label}
+                </span>
                 <span className="rounded-full bg-white px-3 py-1 text-[0.7rem] font-black text-slate-700">{resolvedMode(card, compareMode)}</span>
               </div>
             </div>
@@ -199,12 +244,16 @@ export function ProductPriceCards({
             <p className="mt-1 text-sm font-semibold text-slate-700">{secondaryLabel(card, compareMode)}</p>
             <p className="mt-3 text-sm leading-6 text-slate-600">{card.sourceLabel}</p>
             <PriceHistorySparkline card={card} />
+            <p className="mt-2 rounded-xl bg-amber-50 p-3 text-xs font-bold text-amber-950">{volatilityBadge.detail}</p>
             <p className="mt-2 rounded-xl bg-blue-50 p-3 text-xs font-bold text-blue-950">{card.confidenceLabel}</p>
             {card.cheapestUnitBadge ? (
               <p className="mt-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-950">{card.cheapestUnitBadge}</p>
             ) : (
               <p className="mt-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">cheapest-per-unit badge waits for cross-chain unit evidence</p>
             )}
+                </>
+              );
+            })()}
             </LazyItemCard>
           </div>
         ))}
