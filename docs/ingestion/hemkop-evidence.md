@@ -164,7 +164,7 @@ Sample rows:
 - Retrieved: 2026-05-23T19:16:15.751Z
 - Store count: 205
 - Source URLs fetched: 615
-- Real weekly discount rows fetched and wired: 51059
+- Real weekly discount rows fetched and wired: 51058
 - Web wire: apps/web/src/lib/ingested/hemkop.ts
 - Connector: packages/ingestion/src/connectors/hemkop.ts
 
