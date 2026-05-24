@@ -100,31 +100,41 @@ const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
     id: 'coffee-weekly-top-up',
     name: 'Coffee',
     quantity: '1 package',
-    detail: 'Weekly basket top-up item'
+    detail: 'Weekly basket top-up item',
+    matchedProductName: 'Havregryn Extra Fylliga',
+    matchedProductSlug: 'havregryn-extra-fylliga-101758934-st'
   },
   {
     id: 'oats-breakfast-staple',
     name: 'Oats',
     quantity: '1 bag',
-    detail: 'Breakfast staple'
+    detail: 'Breakfast staple',
+    matchedProductName: 'Havregryn',
+    matchedProductSlug: 'havregryn-100132296-st'
   },
   {
     id: 'milk-dairy-run',
     name: 'Milk or fil',
     quantity: '2 cartons',
-    detail: 'Dairy aisle check'
+    detail: 'Dairy aisle check',
+    matchedProductName: 'Mjölk 3%',
+    matchedProductSlug: 'mj-lk-3-101205891-st'
   },
   {
     id: 'frozen-vegetables',
     name: 'Frozen vegetables',
     quantity: '1 bag',
-    detail: 'Dinner backup item'
+    detail: 'Dinner backup item',
+    matchedProductName: 'Morötter Ärter Hela',
+    matchedProductSlug: 'mor-tter-rter-hela-100435138-st'
   },
   {
     id: 'fresh-fruit',
     name: 'Fresh fruit',
     quantity: '1 basket',
-    detail: 'Snack and lunchbox item'
+    detail: 'Snack and lunchbox item',
+    matchedProductName: 'Banana Dream Proteinbar',
+    matchedProductSlug: 'banana-dream-proteinbar-101418694-st'
   }
 ];
 

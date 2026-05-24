@@ -8,10 +8,11 @@ async function read(relative) {
 
 describe('shopping list route', () => {
   it('ships the requested route, checkable row component, and localStorage-backed hook', async () => {
-    const [page, row, hook, shareRoute, bulkImport, searchRoute] = await Promise.all([
+    const [page, row, hook, reorderSuggestions, shareRoute, bulkImport, searchRoute] = await Promise.all([
       read('src/app/list/page.tsx'),
       read('src/components/CheckableListItem.tsx'),
       read('src/hooks/useList.ts'),
+      read('src/lib/reorder-suggestions.ts'),
       read('src/app/api/list/share/route.ts'),
       read('src/components/BulkImportDialog.tsx'),
       read('../../apps/api/src/routes/search.ts')
@@ -22,6 +23,9 @@ describe('shopping list route', () => {
     assert.match(page, /BulkImportDialog/);
     assert.match(page, /addImportedItems/);
     assert.match(page, /Shopping list/);
+    assert.match(page, /buildReorderSuggestions/);
+    assert.match(page, /matchedProductSlug!/);
+    assert.match(page, /Verified reorder warnings/);
 
     assert.match(row, /'use client'/);
     assert.match(row, /type="checkbox"/);
@@ -38,10 +42,19 @@ describe('shopping list route', () => {
     assert.match(hook, /addImportedItems/);
     assert.match(hook, /importSource: 'bulk-clipboard'/);
     assert.match(hook, /matchedProductSlug/);
+    assert.match(hook, /matchedProductSlug: 'havregryn-extra-fylliga-101758934-st'/);
+    assert.match(hook, /matchedProductSlug: 'mj-lk-3-101205891-st'/);
     assert.match(hook, /verifyShareToken/);
     assert.match(hook, /crypto.subtle.sign/);
     assert.match(hook, /Invalid read-only list link signature/);
     assert.match(hook, /shareLink/);
+
+    assert.match(reorderSuggestions, /export type ReorderSuggestion/);
+    assert.match(reorderSuggestions, /buildReorderSuggestions/);
+    assert.match(reorderSuggestions, /findProduct\(input\.productSlug\)/);
+    assert.match(reorderSuggestions, /chainPriceRows\(product as AxfoodProduct\)/);
+    assert.match(reorderSuggestions, /verified latest price row/);
+    assert.doesNotMatch(reorderSuggestions, /stapleReorderSignals/);
 
     assert.match(shareRoute, /createHmac/);
     assert.match(shareRoute, /hmac-sha256/);

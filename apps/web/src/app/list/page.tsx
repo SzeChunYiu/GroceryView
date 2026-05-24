@@ -7,10 +7,15 @@ import { BottomNav } from '@/components/bottom-nav';
 import { BulkImportDialog } from '@/components/BulkImportDialog';
 import { PullRefreshWrapper } from '@/components/PullRefreshWrapper';
 import { useList } from '@/hooks/useList';
+import { buildReorderSuggestions } from '@/lib/reorder-suggestions';
 
 export default function ShoppingListPage() {
   const { addImportedItems, checkedCount, items, remainingCount, resetCheckedState, toggleItemChecked, totalCount } = useList();
   const progress = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const reorderSuggestions = buildReorderSuggestions(items
+    .filter((item) => item.matchedProductSlug)
+    .map((item) => ({ productSlug: item.matchedProductSlug!, listItemName: item.name }))
+  );
   const refreshLatestPrices = useCallback(async () => {
     const productUrls = items
       .map((item) => item.matchedProductSlug)
@@ -42,6 +47,31 @@ export default function ShoppingListPage() {
           </div>
 
           <BulkImportDialog onImportItems={addImportedItems} />
+
+
+          <section className="mt-6 rounded-[1.75rem] border border-amber-200 bg-amber-50/95 p-5 shadow-sm" aria-label="Verified reorder warnings">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">Verified reorder warnings</p>
+                <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950">Latest price-backed reorder signals</h2>
+                <p className="mt-1 max-w-3xl text-sm font-semibold leading-6 text-amber-950">
+                  Suggestions use matchedProductSlug values from the list and verified latest chain price rows; name-only items stay silent.
+                </p>
+              </div>
+              <p className="rounded-full bg-white px-3 py-1 text-sm font-black text-amber-900">{reorderSuggestions.length} matched</p>
+            </div>
+            <ul className="mt-4 grid gap-3 lg:grid-cols-2">
+              {reorderSuggestions.map((suggestion) => (
+                <li className="rounded-2xl border border-amber-200 bg-white p-4" key={suggestion.productSlug}>
+                  <p className="text-sm font-black text-slate-950">{suggestion.listItemName}: {suggestion.productName}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{suggestion.latestPrice} at {suggestion.cheapestChain} · {suggestion.chainSpreadPercent}% spread</p>
+                  <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-amber-800">{suggestion.reorderSignal}</p>
+                  <p className="mt-1 text-sm leading-6 text-slate-700">{suggestion.reason}</p>
+                  <p className="mt-2 text-xs font-semibold text-slate-500">{suggestion.source}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
 
           <section className="mt-6 rounded-[1.75rem] border border-emerald-200 bg-white/95 p-5 shadow-sm">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
