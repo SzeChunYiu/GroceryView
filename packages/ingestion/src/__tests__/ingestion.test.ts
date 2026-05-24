@@ -32,6 +32,8 @@ import {
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
+  buildTempoSearchUrl,
+  buildTempoStoresUrl,
   buildOpenFoodFactsProductUrl,
   buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
@@ -90,6 +92,8 @@ import {
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
+  fetchTempoProducts,
+  fetchTempoProductsForAllStores,
   fetchWillysProducts,
   fetchWillysProductsForAllStores,
   fetchWillysStores,
@@ -3761,6 +3765,79 @@ describe('fetchCoopProductsForAllStores', () => {
     assert.deepEqual(requestedProductUrls, [buildHemkopCategoryUrl('mejeri-ost-och-agg', 100, 0, '4003')]);
   });
 
+});
+
+describe('fetchTempoProducts', () => {
+  it('normalizes Tempo SE Axfood search rows with country, currency, and chain metadata', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          code: 'tempo-101',
+          name: 'Tempo Bryggkaffe',
+          manufacturer: 'Tempo',
+          productLine2: '450g',
+          googleAnalyticsCategory: 'skafferi|kaffe',
+          priceValue: 49.9,
+          price: '49,90 kr',
+          comparePrice: '110,89 kr',
+          comparePriceUnit: 'kg',
+          image: { url: 'https://assets.axfood.se/tempo-kaffe.png' },
+          labels: ['campaign'],
+          online: true,
+          outOfStock: false
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchTempoProducts({
+      queries: ['kaffe'],
+      fetchImpl,
+      retrievedAt: '2026-05-24T12:00:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildTempoSearchUrl('kaffe', 100, 0));
+    assert.deepEqual(rows.map((row) => [row.country, row.currency, row.chain, row.code, row.price]), [
+      ['SE', 'SEK', 'tempo', 'tempo-101', 49.9]
+    ]);
+  });
+
+  it('fans Tempo products across store-specific Axfood requests', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '9001', name: 'Tempo Testbyn', address: { line1: 'Storgatan 1', town: 'Testbyn' } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(JSON.stringify({
+        results: [{
+          code: 'tempo-store-product',
+          name: 'Tempo Mjölk',
+          priceValue: 17.5,
+          price: '17,50 kr'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchTempoProductsForAllStores({
+      fetchImpl,
+      queries: ['mjölk'],
+      maxStores: 1,
+      maxRowsPerStore: 1,
+      retrievedAt: '2026-05-24T12:00:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildTempoStoresUrl({ online: true }),
+      buildTempoSearchUrl('mjölk', 1, 0, '9001')
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.storeName, row.chain, row.currency]), [
+      ['9001', 'Tempo Testbyn', 'tempo', 'SEK']
+    ]);
+  });
 });
 
 describe('fetchWillysProductsForAllStores', () => {
