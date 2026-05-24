@@ -119,6 +119,26 @@ describe('GroceryView API app', () => {
       .expect(400);
   });
 
+  it('returns structured validation errors for invalid basket and watchlist bodies', async () => {
+    const basket = await request(app.getHttpServer())
+      .post('/users/demo/basket/items')
+      .send({ productId: 'coffee', quantity: -1 })
+      .expect(400);
+
+    assert.equal(basket.body.message, 'Request body validation failed');
+    assert.equal(basket.body.statusCode, 400);
+    assert.ok(Array.isArray(basket.body.issues));
+    assert.ok(basket.body.issues.some((issue: { path: string }) => issue.path === 'quantity'));
+
+    const watchlist = await request(app.getHttpServer())
+      .post('/users/demo/watchlist')
+      .send({ productId: 'coffee', targetPrice: -10, favoriteStoresOnly: 'nope' })
+      .expect(400);
+    assert.equal(watchlist.body.message, 'Request body validation failed');
+    assert.ok(watchlist.body.issues.some((issue: { path: string }) => issue.path === 'targetPrice'));
+    assert.ok(watchlist.body.issues.some((issue: { path: string }) => issue.path === 'favoriteStoresOnly'));
+  });
+
   it('returns 404 for missing product terminal data', async () => {
     await request(app.getHttpServer()).get('/products/missing-product/terminal').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/spread').expect(404);

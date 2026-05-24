@@ -1,33 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { IsArray, IsBoolean, IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { groceryApi } from '../demo-data.js';
-
-const allowedWatchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const;
-
-class WatchlistItemDto {
-  @IsString()
-  productId!: string;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  targetPrice?: number;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  alertDealScoreAt?: number;
-
-  @IsOptional()
-  @IsBoolean()
-  favoriteStoresOnly = false;
-
-  @IsOptional()
-  @IsArray()
-  @IsIn(allowedWatchlistPriceTypes, { each: true })
-  allowedPriceTypes?: Array<(typeof allowedWatchlistPriceTypes)[number]>;
-}
+import { validateBody } from '../middleware/validate.js';
+import { type WatchlistItemInput, watchlistItemSchema } from '../routes/alerts.js';
 
 @ApiTags('watchlists')
 @Controller('users/demo/watchlist')
@@ -40,7 +15,7 @@ export class WatchlistsController {
 
   @Post()
   @ApiCreatedResponse({ description: 'Watchlist item created' })
-  create(@Body() body: WatchlistItemDto) {
+  create(@Body(validateBody(watchlistItemSchema)) body: WatchlistItemInput) {
     const item = { ...body, favoriteStoresOnly: body.favoriteStoresOnly ?? false };
     groceryApi.addWatchlistItem('demo', item);
     return item;
