@@ -9,7 +9,9 @@ import {
   summarizePriceHistoryConfidence,
   type BrandTier
 } from '@groceryview/core';
+import { categoryPathForSlug } from '@groceryview/db';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { Breadcrumb } from '@/components/Breadcrumb';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
@@ -156,6 +158,15 @@ function breadcrumbJsonLdFor(product: NonNullable<ReturnType<typeof findProduct>
       { '@type': 'ListItem', position: 3, name: product.name, item: `${siteUrl}/products/${product.slug}` }
     ]
   };
+}
+
+function productBreadcrumbItemsFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const hierarchy = categoryPathForSlug(product.category);
+  const hierarchyItems = hierarchy.map((node, index, all) => ({
+    label: index === all.length - 1 ? labelFromSlug(product.category) : node.label,
+    href: node.routable && node.slug !== product.category ? `/categories/${node.slug}` : undefined
+  }));
+  return [{ label: 'Home', href: '/' }, { label: 'Products', href: '/products' }, ...hierarchyItems, { label: product.name }] as const;
 }
 
 function jsonLd(value: unknown) {
@@ -1020,6 +1031,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const breadcrumbJsonLd = breadcrumbJsonLdFor(product);
   return (
     <PageShell>
+      <Breadcrumb items={productBreadcrumbItemsFor(product)} />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(productJsonLd) }} type="application/ld+json" />
       <script dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} type="application/ld+json" />
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
