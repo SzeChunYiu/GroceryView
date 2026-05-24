@@ -17,6 +17,7 @@ const appFiles = [
   'src/app/chain-index/page.tsx',
   'src/app/chain-coverage/page.tsx',
   'src/app/map/page.tsx',
+  'src/app/admin/search-aliases/page.tsx',
   'src/app/data-sources/page.tsx',
   'src/app/store-coverage/page.tsx',
   'src/app/openprices-depth/page.tsx',
@@ -24,7 +25,8 @@ const appFiles = [
   'src/components/market-shell.tsx',
   'src/components/settings-data-export-actions.tsx',
   'src/components/data-ui.tsx',
-  'src/lib/verified-data.ts'
+  'src/lib/verified-data.ts',
+  'src/lib/search-alias-review.ts'
 ];
 
 async function read(relative) {
@@ -41,6 +43,15 @@ async function fileExists(relative) {
 }
 
 describe('verified-data UI', () => {
+  it('adds structured rejection reasons to search alias review', async () => {
+    const page = await read('src/app/admin/search-aliases/page.tsx');
+    const review = await read('src/lib/search-alias-review.ts');
+    for (const reason of ['bad query', 'wrong product', 'duplicate alias', 'insufficient confidence']) {
+      assert.match(page.toLowerCase(), new RegExp(reason));
+      assert.match(review.toLowerCase(), new RegExp(reason.replaceAll(' ', '_') + '|' + reason));
+    }
+  });
+
   it('keeps core routes backed by generated verified datasets', async () => {
     for (const file of appFiles) assert.ok((await read(file)).length > 0, `${file} should not be empty`);
     const verified = await read('src/lib/verified-data.ts');
