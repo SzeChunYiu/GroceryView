@@ -63,6 +63,15 @@ function lineStyleFor(lineStyle: LineStyleName, lineStyles: LightweightChartsVal
   return lineStyles.Solid;
 }
 
+const yAxisCurrencyFormatter = new Intl.NumberFormat('sv-SE', {
+  style: 'currency',
+  currency: 'SEK'
+});
+
+export function formatPriceChartCurrencyTick(value: number) {
+  return yAxisCurrencyFormatter.format(value);
+}
+
 function chartColorFor(index: number) {
   return ['#047857', '#0f766e', '#2563eb', '#7c3aed'][index % 4]!;
 }
@@ -97,6 +106,9 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           layout: {
             background: { type: ColorType.Solid, color: 'transparent' },
             textColor: '#334155'
+          },
+          localization: {
+            priceFormatter: formatPriceChartCurrencyTick
           },
           grid: {
             vertLines: { color: 'rgba(148, 163, 184, 0.16)' },
