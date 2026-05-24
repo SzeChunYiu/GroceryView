@@ -63,6 +63,7 @@ import {
   fetchCityGrossProducts,
   fetchCityGrossProductsForAllStores,
   fetchCityGrossStores,
+  parseCasaLatinaSeRows,
   fetchCoopPublicServiceAccess,
   fetchCoopCategoryIds,
   fetchCoopProducts,
@@ -188,6 +189,30 @@ import {
   validateStoreLocatorFixtures
 } from '../index.js';
 import type { QueryExecutor } from '@groceryview/db';
+
+describe('Casa Latina SE connector', () => {
+  it('emits ethnic Latin SEK rows only for whitelisted overlap categories after verifying three stores', () => {
+    const rows = parseCasaLatinaSeRows([
+      { store_id: 'casa-latina-stockholm', name: 'Harina PAN', brand: 'PAN', category: 'corn-tortillas-masa', price: '39,90', unit: '1 kg' },
+      { store_id: 'casa-latina-malmo', name: 'Dulce de leche', category: 'sweets-snacks', price: 45 },
+      { store_id: 'casa-latina-goteborg', name: 'Yerba mate', category: 'soft-drinks-juices', price: 59 },
+      { store_id: 'casa-latina-stockholm', name: 'Ceramic bowl', category: 'homewares', price: 99 }
+    ], {
+      capturedAt: '2026-05-24T10:00:00.000Z'
+    });
+
+    assert.equal(rows.length, 3);
+    assert.ok(rows.every((row) => row.country === 'SE'));
+    assert.ok(rows.every((row) => row.currency === 'SEK'));
+    assert.ok(rows.every((row) => row.chain === 'casa-latina'));
+    assert.ok(rows.every((row) => row.retailer_type === 'ethnic_latin'));
+    assert.deepEqual([...new Set(rows.map((row) => row.store_id))].sort(), [
+      'casa-latina-goteborg',
+      'casa-latina-malmo',
+      'casa-latina-stockholm'
+    ]);
+  });
+});
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
