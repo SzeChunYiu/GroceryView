@@ -1,6 +1,7 @@
 'use client';
 
 import type { ShoppingListItem } from '@/hooks/useList';
+import { useHaptic } from '@/hooks/useHaptic';
 
 type CheckableListItemProps = {
   item: ShoppingListItem;
@@ -8,6 +9,13 @@ type CheckableListItemProps = {
 };
 
 export function CheckableListItem({ item, onToggle }: Readonly<CheckableListItemProps>) {
+  const { selection } = useHaptic();
+
+  function toggleItem() {
+    if (!item.checked) selection();
+    onToggle(item.id);
+  }
+
   return (
     <li
       className={`rounded-2xl border p-4 transition ${
@@ -18,7 +26,7 @@ export function CheckableListItem({ item, onToggle }: Readonly<CheckableListItem
         <input
           checked={item.checked}
           className="mt-1 h-5 w-5 rounded border-slate-300 text-emerald-800 focus:ring-emerald-700"
-          onChange={() => onToggle(item.id)}
+          onChange={toggleItem}
           type="checkbox"
         />
         <span className="min-w-0 flex-1">
