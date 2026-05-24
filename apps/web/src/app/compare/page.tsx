@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ChainSelector } from '@/components/chain-selector';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { COMPARE_CHAIN_ORDER, buildChainComparisonTable } from '@/lib/chain-compare';
 import { defaultLocale, formatLocalizedUnitPrice } from '@/lib/i18n';
@@ -27,6 +28,13 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const comparison = buildChainComparisonTable(productsParam);
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
+  const sampleProductsHref = '/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st';
+  const chainSelectorOptions = COMPARE_CHAIN_ORDER.map((chain) => ({
+    id: chain.id,
+    label: chain.label,
+    description: 'Shown as a side-by-side comparison column.',
+    selected: true
+  }));
   const rowSections = [
     {
       id: 'commodity-alias',
@@ -57,9 +65,17 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
               The table uses packages/db snapshot rows when production exports are present and marks missing chain rows explicitly.
             </p>
           </div>
-          <Link className="rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white shadow-sm" href="/compare?products=makaroner-pasta-101302991-st,havregryn-extra-fylliga-101758934-st">
-            Try sample products
-          </Link>
+          <div className="grid gap-3">
+            <ChainSelector
+              className="rounded-3xl border border-emerald-100 bg-white/80 p-4 shadow-sm"
+              description="All supported chains stay selected so the existing ?products= query string continues to drive the comparison table."
+              label="Compare chains"
+              options={chainSelectorOptions}
+            />
+            <Link className="justify-self-start rounded-full bg-emerald-900 px-4 py-2 text-sm font-black text-white shadow-sm" href={sampleProductsHref}>
+              Try sample products
+            </Link>
+          </div>
         </div>
         <div className="mt-5 grid gap-4">
           {comparison.products.length === 0 ? (
