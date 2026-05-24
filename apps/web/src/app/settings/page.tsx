@@ -1,4 +1,5 @@
 import { buildPrivacyExport } from '@groceryview/core';
+import { PriceAlertDialog } from '@/components/PriceAlertDialog';
 import { SettingsDataExportActions } from '@/components/settings-data-export-actions';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
@@ -32,6 +33,7 @@ export default function SettingsPage() {
       </p>
 
       <SettingsDataExportActions />
+      <PriceAlertDialog productName="watchlist items" />
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
