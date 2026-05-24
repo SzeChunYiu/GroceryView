@@ -77,6 +77,28 @@ export default function WatchlistPage() {
       </Card>
 
 
+      <Card className="mt-6 border-rose-200 bg-rose-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-rose-800">Real-time push</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Immediate price-drop alerts</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          POST /api/alerts now compares previousPrice/currentPrice against thresholdPercent and returns an urgent push payload as soon as a watchlist item beats the shopper's drop threshold.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Trigger</p>
+            <p className="mt-2 text-sm font-semibold text-slate-700">previousPrice to currentPrice drop meets thresholdPercent.</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Delivery</p>
+            <p className="mt-2 text-sm font-semibold text-slate-700">pushSubscription.endpoint queues the urgent push immediately.</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Fallback</p>
+            <p className="mt-2 text-sm font-semibold text-slate-700">Without a push endpoint the API still returns ready_for_subscription.</p>
+          </div>
+        </div>
+      </Card>
+
       <NotificationInboxActions />
 
       <Card className="mt-6 border-indigo-200 bg-indigo-50">
