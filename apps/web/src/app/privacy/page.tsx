@@ -1,80 +1,81 @@
-import { Database, Download, MapPin, ReceiptText, ShieldCheck } from "lucide-react";
-import { privacyControls } from "@/components/sample-data";
-
-const auditEvents = [
-  { label: "Receipt image purge", detail: "3 files scheduled after review", tone: "good" },
-  { label: "Location downgrade", detail: "2 observations stored at district precision", tone: "good" },
-  { label: "Contribution export", detail: "Anonymous price rows ready for catalog backfill", tone: "neutral" },
-];
-
 export default function PrivacyPage() {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-6 py-8">
-      <section className="grid gap-6 lg:grid-cols-[1fr_0.8fr]">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Privacy</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-zinc-950">Data sharing guardrails</h1>
-          <p className="mt-4 max-w-2xl leading-7 text-zinc-600">
-            Review what is retained, shared, anonymized, and exported before household or catalog workflows use the data.
+    <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-6 px-6 py-10">
+      <p className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Integritet</p>
+      <h1 className="text-4xl font-semibold tracking-tight text-zinc-950">Personuppgiftspolicy</h1>
+      <p className="max-w-3xl leading-7 text-zinc-600">
+        Denna policy beskriver hur GroceryView behandlar personuppgifter för hushåll och användare i Sverige, i enlighet med GDPR,
+        svensk tillämpning av dataskyddsregler och gällande konsumenträtt.
+      </p>
+
+      <section className="grid gap-6 rounded-lg border border-zinc-200 bg-white p-6">
+        <article>
+          <h2 className="text-lg font-semibold text-zinc-950">1. Personuppgiftsansvar</h2>
+          <p className="mt-2 text-sm leading-7 text-zinc-600">
+            GroceryView är personuppgiftsansvarig för den personliga information som registreras i konton, budgetfunktioner, inställningar och
+            den metadata som skapas vid inläsning av kvitton.
           </p>
-        </div>
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
-          <ShieldCheck className="h-6 w-6 text-emerald-700" aria-hidden="true" />
-          <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-emerald-800">Current posture</p>
-          <p className="mt-2 text-2xl font-semibold text-emerald-950">Minimal retention</p>
-          <p className="mt-2 text-sm leading-6 text-emerald-900">Raw receipt media is separated from price facts and removed after review windows close.</p>
-        </div>
-      </section>
+        </article>
 
-      <section className="grid gap-4 md:grid-cols-2">
-        {privacyControls.map((control) => (
-          <article className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm" key={control.label}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="font-semibold text-zinc-950">{control.label}</p>
-                <p className="mt-2 text-sm text-zinc-500">{control.detail}</p>
-              </div>
-              <span className="rounded-lg bg-zinc-100 px-3 py-1 text-sm font-semibold text-zinc-700">{control.state}</span>
-            </div>
-          </article>
-        ))}
-      </section>
+        <article>
+          <h2 className="text-lg font-semibold text-zinc-950">2. Vilka uppgifter vi behandlar</h2>
+          <ul className="mt-2 list-disc space-y-2 pl-6 text-sm leading-7 text-zinc-600">
+            <li>E-post och kontoidentifierare.</li>
+            <li>Inläggna hushållsval och sparade budgetinställningar.</li>
+            <li>Strukturerad sammanställning från uppladdade kvitton.</li>
+            <li>Platsuppgifter på områdesnivå för butiks- och jämförelsesammanhang.</li>
+            <li>Tekniska loggar för säkerhet, drift och bedrägeriövervakning.</li>
+          </ul>
+        </article>
 
-      <section className="grid gap-4 lg:grid-cols-[0.75fr_1.25fr]">
-        <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Export controls</p>
-          <div className="mt-5 grid gap-3">
-            <Action icon={Download} label="Download household data" detail="Receipt summaries and budget allocations" />
-            <Action icon={Database} label="Catalog contribution log" detail="Anonymous price observations only" />
-            <Action icon={MapPin} label="Location precision report" detail="Store district, never exact route history" />
-          </div>
-        </div>
-        <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
-          {auditEvents.map((event) => (
-            <article className="grid gap-2 border-b border-zinc-200 px-5 py-4 last:border-b-0 sm:grid-cols-[1fr_auto]" key={event.label}>
-              <div>
-                <p className="font-semibold text-zinc-950">{event.label}</p>
-                <p className="mt-1 text-sm text-zinc-500">{event.detail}</p>
-              </div>
-              <span className={`h-fit rounded-lg px-3 py-1 text-sm font-semibold ${event.tone === "good" ? "bg-emerald-50 text-emerald-800" : "bg-zinc-100 text-zinc-700"}`}>
-                {event.tone === "good" ? "Protected" : "Ready"}
-              </span>
-            </article>
-          ))}
-        </div>
+        <article>
+          <h2 className="text-lg font-semibold text-zinc-950">3. Ändamål och rättslig grund</h2>
+          <p className="mt-2 text-sm leading-7 text-zinc-600">
+            Uppgifterna används för prisjämförelser, budgetverktyg och drift av tjänsten. Behandlingen grundas på avtal och berättigat intresse
+            enligt dataskyddsförordningen (EU 2016/679), samt samtycke där det krävs av särskilda regler för marknadsföring och analyser.
+          </p>
+        </article>
+
+        <article>
+          <h2 className="text-lg font-semibold text-zinc-950">4. Datalagring och gallring</h2>
+          <p className="mt-2 text-sm leading-7 text-zinc-600">
+            Råa bilagor (originalbilder) och känsliga tekniska attribut hålls skilt från analytiska resultat. Materialradering görs enligt interna
+            tidsgränser och lagstadgade krav.
+          </p>
+        </article>
+
+        <article>
+          <h2 className="text-lg font-semibold text-zinc-950">5. Dina rättigheter</h2>
+          <p className="mt-2 text-sm leading-7 text-zinc-600">
+            Du har rätt till tillgång, rättelse, radering, begränsning, dataportabilitet, invändning och att återkalla samtycke. Förfrågningar
+            behandlas skyndsamt inom de frister som gäller enligt svensk och EU-rätt.
+          </p>
+        </article>
+
+        <article>
+          <h2 className="text-lg font-semibold text-zinc-950">6. Kakor och loggning</h2>
+          <p className="mt-2 text-sm leading-7 text-zinc-600">
+            Endast nödvändiga cookies och lokal session används för autentisering och säker användning. Eventuella icke-essentiella verktyg och
+            statistik redovisas separat i konto-/inställningsflödet.
+          </p>
+        </article>
+
+        <article>
+          <h2 className="text-lg font-semibold text-zinc-950">7. Överföring och säkerhet</h2>
+          <p className="mt-2 text-sm leading-7 text-zinc-600">
+            Datatrafik krypteras med TLS, åtkomst styrs med behörighetskontroller, och överföring utanför EES sker endast via godkända rättsliga
+            mekanismer där så krävs.
+          </p>
+        </article>
+
+        <article>
+          <h2 className="text-lg font-semibold text-zinc-950">8. Kontakt</h2>
+          <p className="mt-2 text-sm leading-7 text-zinc-600">
+            För frågor om integritet: använd kontaktvägen i appen eller skriv till vårt dataskyddsansvariga med den e-postadress som
+            används i ditt konto.
+          </p>
+        </article>
       </section>
     </main>
-  );
-}
-
-function Action({ icon: Icon, label, detail }: { icon: typeof ReceiptText; label: string; detail: string }) {
-  return (
-    <div className="flex items-start gap-3 rounded-lg bg-zinc-50 p-3">
-      <Icon className="mt-0.5 h-5 w-5 text-emerald-700" aria-hidden="true" />
-      <div>
-        <p className="font-semibold text-zinc-950">{label}</p>
-        <p className="mt-1 text-sm text-zinc-500">{detail}</p>
-      </div>
-    </div>
   );
 }
