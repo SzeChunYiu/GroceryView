@@ -12,6 +12,7 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@groceryview/analytics": ["packages/analytics/src/index.ts"],
       "@groceryview/api": ["packages/api/src/index.ts"],
       "@groceryview/api-contracts": ["packages/api-contracts/src/index.ts"],
       "@groceryview/auth": ["packages/auth/src/index.ts"],
