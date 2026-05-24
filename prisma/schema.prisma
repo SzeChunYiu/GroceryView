@@ -7,6 +7,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Store latitude/longitude radius lookups use an earthdistance GiST expression
+// index defined in SQL migrations because Prisma does not model functional GiST indexes.
 model Category {
   id        String     @id
   slug      String     @unique
