@@ -1,0 +1,8 @@
+{
+  "description": "Playwright visual regression baseline manifest for the top-25 public pages. PNG baselines are stored in this directory using <route-slug>-<viewport>.png after running Playwright with --update-snapshots.",
+  "viewports": ["desktop", "mobile"],
+  "pages": [
+    "/", "/products", "/search", "/deals", "/categories", "/stores", "/basket", "/list", "/compare", "/favorites", "/watchlist", "/alerts", "/weekly-basket", "/shopping-trips", "/savings-dashboard", "/coupon-stacks", "/meal-planner", "/pantry-planner", "/nutrition-value", "/scanner", "/pharmacy", "/chain-index", "/store-coverage", "/account", "/privacy"
+  ],
+  "expectedSnapshotCount": 50
+}
