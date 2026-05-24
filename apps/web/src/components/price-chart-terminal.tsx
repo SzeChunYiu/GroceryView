@@ -78,6 +78,9 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
   );
   const firstSeries = activeWindow?.series[0];
   const latestPoint = firstSeries?.points.at(-1);
+  const readoutSourceLabel =
+    latestPoint?.provenanceLabel ??
+    (firstSeries ? `${firstSeries.storeName} · ${firstSeries.sourceType}` : 'No source available');
 
   useEffect(() => {
     const container = containerRef.current;
@@ -151,9 +154,28 @@ export function PriceChartTerminal({ chart }: Readonly<{ chart: PriceChartTermin
           <h2 className="mt-2 text-3xl font-black tracking-tight">{chart.title}</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{chart.caveat}</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black text-emerald-100">
-          crosshair value readout: {latestPoint ? `${activeWindow.latestValueLabel} · ${latestPoint.time.slice(0, 10)}` : 'no point selected'}
-        </div>
+        <dl className="grid gap-2 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-black text-emerald-100 sm:grid-cols-2">
+          <div>
+            <dt className="text-[0.65rem] uppercase tracking-[0.18em] text-emerald-300">Source</dt>
+            <dd>{readoutSourceLabel}</dd>
+          </div>
+          <div>
+            <dt className="text-[0.65rem] uppercase tracking-[0.18em] text-emerald-300">Date</dt>
+            <dd>{latestPoint ? latestPoint.time.slice(0, 10) : 'No point selected'}</dd>
+          </div>
+          <div>
+            <dt className="text-[0.65rem] uppercase tracking-[0.18em] text-emerald-300">Price</dt>
+            <dd>{latestPoint ? activeWindow?.latestValueLabel : 'No point selected'}</dd>
+          </div>
+          <div>
+            <dt className="text-[0.65rem] uppercase tracking-[0.18em] text-emerald-300">Lower bound</dt>
+            <dd>{activeWindow?.lowValueLabel ?? 'No point selected'}</dd>
+          </div>
+          <div>
+            <dt className="text-[0.65rem] uppercase tracking-[0.18em] text-emerald-300">Upper bound</dt>
+            <dd>{activeWindow?.highValueLabel ?? 'No point selected'}</dd>
+          </div>
+        </dl>
       </div>
 
       <div className="mt-5 flex flex-wrap gap-2" aria-label="Price chart timeframe selector">
