@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { CategoryFilter } from '@/components/category-filter';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
@@ -192,14 +193,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           )}
         </div>
         <div className="mt-5 grid gap-3 lg:grid-cols-4">
-          <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Category facets</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {categoryFacets.map((facet) => (
-                <Link className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-900" href={searchFacetUrl({ category: facet.value })} key={facet.value}>{facet.value} · {facet.count}</Link>
-              ))}
-            </div>
-          </div>
+          <CategoryFilter facets={categoryFacets} hrefForCategory={(category) => searchFacetUrl({ category })} statusMessage={search.statusMessage} />
           <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-700">Label / dietary facets</p>
             <div className="mt-3 flex flex-wrap gap-2">

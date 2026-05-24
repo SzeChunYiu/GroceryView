@@ -589,6 +589,11 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
   const minConfidence = confidenceSearchValue(searchParams.minConfidence);
   const filters = { query, categories, labels, chains, minPrice, maxPrice, inStockOnly, minConfidence, limit: 100 };
   const searchResult = buildFacetedProductSearch({ rows: facetedSearchRows, filters });
+  const resultCount = searchResult.products.length;
+  const productCountLabel = `${resultCount.toLocaleString('sv-SE')} ${resultCount === 1 ? 'product' : 'products'}`;
+  const statusMessage = categories.length > 0
+    ? `${productCountLabel} remain after category ${categories.join(', ')} and the current product filters.`
+    : `${productCountLabel} remain after the current product filters across all categories.`;
 
   const activeFilters = [
     query ? `q=${query}` : null,
@@ -611,6 +616,8 @@ export function buildProductSearchView(searchParams: ProductSearchUrlParams = {}
     categoryFacets: searchResult.facets.categories.slice(0, 6),
     chainFacets: searchResult.facets.chains,
     labelFacets: searchResult.facets.labels.map((facet) => ({ ...facet, label: readableLabel(facet.value) })).slice(0, 8),
+    resultCount,
+    statusMessage,
     labelFilters,
     dietaryFilters: commonDietaryFilterOptions.map((option) => {
       const facet = searchResult.facets.labels.find((candidate) => candidate.value === option.value);
