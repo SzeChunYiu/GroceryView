@@ -36,3 +36,16 @@ model Product {
 
   @@map("products")
 }
+
+model AnalyticsEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  sessionId String   @map("session_id")
+  event     String
+  payload   Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([sessionId])
+  @@index([event])
+  @@index([createdAt])
+  @@map("analytics_events")
+}
