@@ -32,6 +32,10 @@ describe('shopping list route', () => {
     assert.match(hook, /'use client'/);
     assert.match(hook, /localStorage\.getItem\(LIST_STORAGE_KEY\)/);
     assert.match(hook, /localStorage\.setItem\(LIST_STORAGE_KEY/);
+    assert.match(hook, /LIST_OFFLINE_QUEUE_STORAGE_KEY/);
+    assert.match(hook, /navigator\.onLine === false/);
+    assert.match(hook, /window\.addEventListener\('online'/);
+    assert.match(hook, /replayQueuedListMutations/);
     assert.match(hook, /toggleItemChecked/);
     assert.match(hook, /checked: !item\.checked/);
     assert.match(hook, /addImportedItems/);
