@@ -17,6 +17,7 @@ import {
 } from '@groceryview/analytics';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { PriceChartTerminal, type PriceChartTerminalModel, type PriceChartTerminalWindow } from '@/components/price-chart-terminal';
+import { PriceIntelligenceCard, type PriceIntelligenceScoreCard } from '@/components/price-intelligence-card';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
 import { chainPriceRows, commodityComparisonForProduct, dataFreshnessBadges, findProduct, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
@@ -698,6 +699,71 @@ function priceChangeEventLogFor(product: NonNullable<ReturnType<typeof findProdu
   };
 }
 
+function bestTimeToBuyScoreCardsFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product || product.observations.length < 3) {
+    return {
+      cards: [] as PriceIntelligenceScoreCard[],
+      summary: 'Best-time-to-buy scoring needs at least three dated OpenPrices observations before it can combine trend slope with volatility.',
+      emptyState: 'Not enough dated OpenPrices observations exist to score likely buying windows for this product.'
+    };
+  }
+
+  const orderedPoints = product.observations
+    .map((observation) => ({
+      observedAt: observation.date,
+      observedTime: Date.parse(`${observation.date}T00:00:00.000Z`),
+      price: observation.price
+    }))
+    .filter((observation) => Number.isFinite(observation.observedTime) && Number.isFinite(observation.price))
+    .sort((a, b) => a.observedTime - b.observedTime);
+
+  if (orderedPoints.length < 3) {
+    return {
+      cards: [] as PriceIntelligenceScoreCard[],
+      summary: 'Best-time-to-buy scoring needs at least three valid dated observations before rendering a score.',
+      emptyState: 'The dated price tape is too sparse to score a buying window.'
+    };
+  }
+
+  const latest = orderedPoints.at(-1)!;
+  const prices = orderedPoints.map((point) => point.price);
+  const medianPrice = medianFor(prices) ?? latest.price;
+  const volatility = standardDeviationFor(prices) ?? 0;
+  const volatilityPercent = medianPrice > 0 ? clamp((volatility / medianPrice) * 100, 0, 999) : 0;
+  const scoreCardForWindow = (rangeDays: number, title: string): PriceIntelligenceScoreCard => {
+    const windowStart = latest.observedTime - rangeDays * 24 * 60 * 60 * 1000;
+    const windowPoints = orderedPoints.filter((point) => point.observedTime >= windowStart && point.observedTime <= latest.observedTime);
+    const baseline = windowPoints[0] ?? orderedPoints[0]!;
+    const trendSlopePercent = baseline.price > 0 ? ((latest.price - baseline.price) / baseline.price) * 100 : 0;
+    const belowMedianPercent = medianPrice > 0 ? ((medianPrice - latest.price) / medianPrice) * 100 : 0;
+    const score = Math.round(clamp(58 + belowMedianPercent * 2 - Math.max(trendSlopePercent, 0) * 1.2 - volatilityPercent * 0.9, 0, 100));
+    const actionLabel = score >= 75 ? 'Buy now' : score >= 55 ? 'Watch closely' : 'Wait';
+    const windowLabel = score >= 75 ? 'Likely best window: this week' : score >= 55 ? 'Likely window: next 1–2 weeks' : 'Wait for a better observed dip';
+
+    return {
+      id: `${rangeDays}-day-window`,
+      title,
+      score,
+      scoreLabel: score >= 75 ? 'strong buy window' : score >= 55 ? 'fair buy window' : 'weak buy window',
+      actionLabel,
+      windowLabel,
+      trendSlopeLabel: `${formatPct(trendSlopePercent)} over ${Math.max(1, windowPoints.length)} observed point(s)`,
+      volatilityLabel: `${formatPct(volatilityPercent)} observed volatility`,
+      detail: `Latest price ${formatSek(latest.price)} on ${latest.observedAt}; score combines trend slope, current price versus median ${formatSek(medianPrice)}, and volatility. No forecast is inferred.`
+    };
+  };
+
+  return {
+    cards: [
+      scoreCardForWindow(30, '30-day buy window'),
+      scoreCardForWindow(90, '90-day buy window'),
+      scoreCardForWindow(365, '365-day buy window')
+    ],
+    summary: 'Likely optimal buying windows are scored from the product’s own dated OpenPrices trend slope and volatility, then labelled as buy, watch, or wait.',
+    emptyState: 'Not enough dated OpenPrices observations exist to score likely buying windows for this product.'
+  };
+}
+
 function priceMoveNotesFor(product: NonNullable<ReturnType<typeof findProduct>>) {
   const priceChangeLog = priceChangeEventLogFor(product);
   const sourceProvenance = 'lowestPrice' in product
@@ -1075,6 +1141,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
   const typicalRangeBand = priceTypicalRangeBandFor(product);
   const priceChangeLog = priceChangeEventLogFor(product);
+  const bestTimeToBuyScoreCards = bestTimeToBuyScoreCardsFor(product);
   const priceMoveNotes = priceMoveNotesFor(product);
   const monthlySeasonality = seasonalMonthlyAveragesFor(product);
   const seasonalSalePattern = seasonalSalePatternFor(product);
@@ -1232,6 +1299,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         )}
         <p className="mt-4 text-xs font-semibold text-slate-500">{smartSwaps.caveat}</p>
       </Card>
+      <PriceIntelligenceCard cards={bestTimeToBuyScoreCards.cards} emptyState={bestTimeToBuyScoreCards.emptyState} summary={bestTimeToBuyScoreCards.summary} />
       <Card className="mt-6 border-amber-200 bg-amber-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
