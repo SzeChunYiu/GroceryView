@@ -20,5 +20,10 @@
     "label": "Language",
     "persisted": "The language preference is stored locally and in the NEXT_LOCALE cookie.",
     "guardrail": "Arabic and Somali stay blocked until reviewed translations are available."
+  },
+  "product-row": {
+    "imageAltSuffix": "product image",
+    "outOfStock": "Out of stock",
+    "sourceTables": "sourceTables"
   }
 }

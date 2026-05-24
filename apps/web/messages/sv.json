@@ -20,5 +20,10 @@
     "label": "Språk",
     "persisted": "Språkvalet sparas lokalt och i NEXT_LOCALE-kakan.",
     "guardrail": "Arabiska och somaliska öppnas först efter granskade översättningar."
+  },
+  "product-row": {
+    "imageAltSuffix": "produktbild",
+    "outOfStock": "Slut i lager",
+    "sourceTables": "källtabeller"
   }
 }
