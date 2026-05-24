@@ -140,8 +140,8 @@ export const DEFAULT_MATSPAR_SEARCH_QUERIES = [
   'lingonsylt',
   'apotek'
 ] as const;
-export const DEFAULT_MATSPAR_SEARCH_PAGES = [1, 2, 3, 4] as const;
-export const DEFAULT_MATSPAR_MAX_ROWS = 9000;
+export const DEFAULT_MATSPAR_SEARCH_PAGES = [1, 2, 3, 4, 5, 6] as const;
+export const DEFAULT_MATSPAR_MAX_ROWS = 12000;
 
 export type FetchMatsparProductsOptions = {
   fetchImpl?: typeof fetch;

@@ -86,7 +86,7 @@ export const DEFAULT_MATPRISKOLLEN_REGIONS = [
 ] as const;
 export const DEFAULT_MATPRISKOLLEN_STORE_LIMIT = 60;
 export const DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE = 200;
-export const DEFAULT_MATPRISKOLLEN_MAX_ROWS = 6000;
+export const DEFAULT_MATPRISKOLLEN_MAX_ROWS = 7000;
 export const DEFAULT_MATPRISKOLLEN_GROCERY_STORE_PATTERN = /(willys|lidl|coop|ica|hemk[oö]p|city gross)/i;
 
 export type MatpriskollenRegion = {

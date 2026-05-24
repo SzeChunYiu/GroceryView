@@ -88,7 +88,14 @@ export const DEFAULT_APOHEM_SOURCE_PATHS = [
   '/sok?q=omega',
   '/sok?q=magnesium',
   '/sok?q=forband',
-  '/sok?q=allergi'
+  '/sok?q=allergi',
+  '/sok?q=smartlindring',
+  '/sok?q=nasal',
+  '/sok?q=hosta',
+  '/sok?q=probiotika',
+  '/sok?q=ansiktskram',
+  '/sok?q=schampo',
+  '/sok?q=deodorant'
 ] as const;
 
 export const DEFAULT_APOTEK_HJARTAT_SEARCH_URLS = [
@@ -100,7 +107,14 @@ export const DEFAULT_APOTEK_HJARTAT_SEARCH_URLS = [
   'https://www.apotekhjartat.se/search?q=pamol',
   'https://www.apotekhjartat.se/search?q=omega',
   'https://www.apotekhjartat.se/search?q=magnesium',
-  'https://www.apotekhjartat.se/search?q=allergi'
+  'https://www.apotekhjartat.se/search?q=allergi',
+  'https://www.apotekhjartat.se/search?q=smartlindring',
+  'https://www.apotekhjartat.se/search?q=nasal',
+  'https://www.apotekhjartat.se/search?q=hosta',
+  'https://www.apotekhjartat.se/search?q=probiotika',
+  'https://www.apotekhjartat.se/search?q=ansiktskram',
+  'https://www.apotekhjartat.se/search?q=schampo',
+  'https://www.apotekhjartat.se/search?q=deodorant'
 ] as const;
 
 export async function fetchApohemProducts(options: FetchApohemProductsOptions = {}): Promise<ApohemProduct[]> {

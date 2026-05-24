@@ -185,11 +185,31 @@ export const DEFAULT_MATHEM_SEARCH_QUERIES = [
   'kapris',
   'kikartor',
   'kidneybonor',
-  'kokosmjolk'
+  'kokosmjolk',
+  'glutenfri',
+  'laktosfri',
+  'ekologisk',
+  'vegansk',
+  'vegetarisk',
+  'fardigmat',
+  'fryst',
+  'matolja',
+  'bakning',
+  'frukost',
+  'mejeri',
+  'tacos',
+  'asiatiskt',
+  'indiskt',
+  'barn',
+  'apotek',
+  'stad',
+  'rengoring',
+  'hund',
+  'katt'
 ] as const;
 export const DEFAULT_MATHEM_SEARCH_PAGES = [1, 2, 3] as const;
 export const DEFAULT_MATHEM_MAX_ROWS = 9000;
-const MATHEM_REQUEST_TIMEOUT_MS = 20_000;
+const MATHEM_REQUEST_TIMEOUT_MS = 45_000;
 
 export type FetchMathemProductsOptions = {
   fetchImpl?: typeof fetch;
