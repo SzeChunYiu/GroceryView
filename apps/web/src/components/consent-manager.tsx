@@ -7,6 +7,10 @@ declare global {
   interface Window {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
+    groceryviewConsent?: {
+      policyVersion: string;
+      categories: Record<'necessary' | 'analytics' | 'ads' | 'personalisation', boolean>;
+    };
   }
 }
 
@@ -45,6 +49,12 @@ function consentModeFor(consent: ConsentState) {
   } as const;
 }
 
+function publishConsentState(consent: ConsentState) {
+  if (typeof window === 'undefined') return;
+  window.groceryviewConsent = { policyVersion: CONSENT_POLICY_VERSION, categories: consent };
+  window.dispatchEvent(new CustomEvent('groceryview:consent-updated', { detail: window.groceryviewConsent }));
+}
+
 function applyConsentDefault() {
   if (typeof window === 'undefined') return;
   window.dataLayer = window.dataLayer || [];
@@ -52,6 +62,7 @@ function applyConsentDefault() {
   window.gtag('consent', 'default', deniedConsentMode);
   window.gtag('set', 'ads_data_redaction', true);
   window.gtag('set', 'allow_ad_personalization_signals', false);
+  publishConsentState({ necessary: true, analytics: false, ads: false, personalisation: false });
 }
 
 function applyConsentUpdate(consent: ConsentState) {
@@ -59,6 +70,7 @@ function applyConsentUpdate(consent: ConsentState) {
   window.gtag = window.gtag || gtag;
   window.gtag('consent', 'update', consentModeFor(consent));
   window.gtag('set', 'allow_ad_personalization_signals', consent.ads && consent.personalisation);
+  publishConsentState(consent);
 }
 
 function persistConsent(choice: ConsentState, action: 'accept all' | 'reject all' | 'manage') {
