@@ -244,6 +244,26 @@ Sample rows:
 4. 2500298388 | 2110 | Hushållspapper 12-pack, toalettpapper 18-pack | 59,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500301201 | 2110 | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
 
+## Willys weekly discounts full public-store refresh 2026-05-24
+
+- Source: www.willys.se public Axfood campaign JSON
+- Store catalog source: https://www.willys.se/axfood/rest/store
+- Source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-24T06:34:30.556Z
+- Public store IDs with wired rows: 254
+- Source URLs fetched and cited in metadata: 646
+- Real weekly discount rows fetched and wired: 44241
+- Web wire: apps/web/src/lib/ingested/willys.ts
+- Connector: packages/ingestion/src/connectors/willys.ts
+- Verification: `node scripts/ingestion/verify-ingested-provenance.mjs` reported rowCount 44241, 0 missing sourceUrl, 0 missing retrievedAt, and 0 duplicate provenance/content keys for `willysWeeklyDiscounts`.
+
+Sample source inspection on 2026-05-24:
+- `curl -A "GroceryView/0.1" https://www.willys.se/axfood/rest/store` returned public JSON with 255 store rows; the first inspected row had store id 2002.
+- `curl -A "GroceryView/0.1" "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100"` returned public JSON with 100 result rows and 3 pages.
+
+Sample campaign row from the inspected endpoint:
+1. 2500306014 | 2149 | Grön sparris 250g | 29,90/st | https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100
+
 ## Willys weekly discounts 60-store expansion 2026-05-22
 
 - Source: willys.se public Axfood campaign JSON
