@@ -89,9 +89,14 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
                   </p>
                 ))}
               </div>
-              <p className="mt-4 text-xs font-semibold leading-5 text-slate-500">
-                Generated {noChainState.generatedAt ?? 'not generated'} · {noChainState.guardrails.join(' ')}
-              </p>
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs font-semibold leading-5 text-slate-500">
+                  Generated {noChainState.generatedAt ?? 'not generated'} · {noChainState.guardrails.join(' ')}
+                </p>
+                <Link className="rounded-full bg-amber-900 px-4 py-2 text-center text-xs font-black text-white shadow-sm" href="/data-sources#compare-chain-capabilities">
+                  Audit capability source in data sources
+                </Link>
+              </div>
             </div>
           ) : null}
           {rowSections.map((section) => (

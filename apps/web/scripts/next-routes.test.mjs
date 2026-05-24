@@ -2533,6 +2533,7 @@ ${seo}`;
 
   it('surfaces generated no-chain compare capability evidence', async () => {
     const route = await read('src/app/compare/page.tsx');
+    const dataSources = await read('src/app/data-sources/page.tsx');
     const compareLib = await read('src/lib/chain-compare.ts');
     const generated = await read('src/lib/generated/db-site-ingested-overrides.ts');
 
@@ -2544,6 +2545,11 @@ ${seo}`;
     assert.match(route, /No-chain match state/);
     assert.match(route, /noChainState\.evidenceUpdatedAt/);
     assert.match(route, /capability\.evidenceUpdatedAt/);
+    assert.match(route, /\/data-sources#compare-chain-capabilities/);
+    assert.match(dataSources, /compare-chain-capabilities/);
+    assert.match(dataSources, /buildChainComparisonTable\(null\)\.noChainState/);
+    assert.match(dataSources, /No-chain compare evidence audit/);
+    assert.match(dataSources, /compareNoChainState\.capabilitySource/);
   });
 
   it('surfaces an item comparison route with four-item nutrition, store price, and trend coverage', async () => {

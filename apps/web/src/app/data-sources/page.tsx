@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { buildChainComparisonTable } from '@/lib/chain-compare';
 import {
   allStoreDailyRunnerReadiness,
   apiPerformanceReadiness,
@@ -27,6 +28,8 @@ export function generateMetadata() {
 export const dynamic = 'force-static';
 
 export default function DataSourcesPage() {
+  const compareNoChainState = buildChainComparisonTable(null).noChainState;
+
   return (
     <PageShell>
       <Eyebrow>Data sources</Eyebrow>
@@ -40,6 +43,35 @@ export default function DataSourcesPage() {
         <Metric label="Source groups" value={sourceCoverage.length.toLocaleString('sv-SE')} />
         <Metric label="Brand ledgers" value={storeBrandLedger.length.toLocaleString('sv-SE')} />
       </div>
+
+
+      <section id="compare-chain-capabilities">
+      <Card className="mt-6 border-amber-200 bg-amber-50/70">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-800">Compare chain capability source</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">No-chain compare evidence audit</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+              The compare route links here when no chain clears coverage. Capability source {compareNoChainState.capabilitySource} generated {compareNoChainState.generatedAt ?? 'not generated'} with evidence updated {compareNoChainState.evidenceUpdatedAt ?? 'no evidence timestamp'}.
+            </p>
+          </div>
+          <Link className="rounded-full bg-amber-900 px-4 py-2 text-sm font-black text-white shadow-sm" href="/compare">
+            Back to compare
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {compareNoChainState.capabilities.map((capability) => (
+            <section className="rounded-2xl border border-amber-100 bg-white p-4 shadow-sm" key={capability.chainId}>
+              <p className="text-sm font-black text-slate-950">{capability.chainName}</p>
+              <p className="mt-2 text-2xl font-black text-amber-900">{capability.rowCount.toLocaleString('sv-SE')}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{capability.canCompare ? 'compare enabled' : 'compare pending'}</p>
+              <p className="mt-2 text-xs font-bold leading-5 text-slate-500">evidenceUpdatedAt {capability.evidenceUpdatedAt ?? 'none'}</p>
+              <p className="mt-1 text-xs font-bold leading-5 text-slate-500">source {capability.source}</p>
+            </section>
+          ))}
+        </div>
+      </Card>
+      </section>
 
       <Card className="mt-6 border-lime-200 bg-lime-50/70">
         <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
