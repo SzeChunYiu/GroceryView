@@ -88,6 +88,7 @@ import {
   fetchLidlOffersForAllStores,
   fetchLidlStores,
   fetchMathemProducts,
+  fetchMathemPrenumerationProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
   fetchWillysProducts,
@@ -109,6 +110,7 @@ import {
   GROCERYVIEW_DAILY_ICA_STORE_PROMOTIONS_URL,
   GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
   GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_MATHEM_PRENUMERATION_PRODUCTS_URL,
   GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL,
   GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL,
   GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL,
@@ -3009,6 +3011,10 @@ describe('fetchMathemProducts', () => {
 
     assert.equal(requestedUrls[0], buildMathemSearchUrl('makaroner'));
     assert.deepEqual(rows, [{
+      country: 'SE',
+      currency: 'SEK',
+      chain: 'mathem',
+      mathem_tier: 'spot',
       code: '6448',
       name: 'Kungsörnen Gammaldags Idealmakaroner',
       brand: 'Kungsörnen',
@@ -3063,6 +3069,53 @@ describe('fetchMathemProducts', () => {
     });
 
     assert.equal(rows.length, 1);
+  });
+
+  it('tags Mathem prenumeration rows as subscription prices', async () => {
+    const nextData = {
+      props: {
+        pageProps: {
+          dehydratedState: {
+            queries: [{
+              state: {
+                data: {
+                  items: [{
+                    id: 6448,
+                    type: 'product',
+                    attributes: {
+                      id: 6448,
+                      fullName: 'Kungsörnen Gammaldags Idealmakaroner',
+                      brand: 'Kungsörnen',
+                      nameExtra: '1300 g',
+                      frontUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/',
+                      grossPrice: '21.24',
+                      currency: 'SEK',
+                      availability: { isAvailable: true }
+                    }
+                  }]
+                }
+              }
+            }]
+          }
+        }
+      }
+    };
+
+    const rows = await fetchMathemPrenumerationProducts({
+      queries: ['makaroner'],
+      maxRows: 1,
+      retrievedAt: '2026-05-21T01:00:00.000Z',
+      fetchImpl: async () => new Response(`<script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script>`, {
+        status: 200,
+        headers: { 'content-type': 'text/html' }
+      })
+    });
+
+    assert.equal(rows[0]?.country, 'SE');
+    assert.equal(rows[0]?.currency, 'SEK');
+    assert.equal(rows[0]?.chain, 'mathem-prenumeration');
+    assert.equal(rows[0]?.mathem_tier, 'subscription');
+    assert.equal(rows[0]?.price, 21.24);
   });
 });
 
@@ -6692,6 +6745,71 @@ describe('daily ingestion runner', () => {
       runKey: 'mathem:retailer-online-page:mathem-public-search:2026-05-23',
       domain: 'grocery'
     });
+  });
+
+  it('materializes native Mathem subscription prices with prenumeration chain and tier tags', async () => {
+    const executor = new DailyIngestionExecutor();
+    const nextData = {
+      props: {
+        pageProps: {
+          dehydratedState: {
+            queries: [{
+              state: {
+                data: {
+                  items: [{
+                    id: 6448,
+                    type: 'product',
+                    attributes: {
+                      id: 6448,
+                      fullName: 'Kungsörnen Gammaldags Idealmakaroner',
+                      brand: 'Kungsörnen',
+                      nameExtra: '1300 g',
+                      frontUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/',
+                      grossPrice: '21.24',
+                      currency: 'SEK',
+                      availability: { isAvailable: true }
+                    }
+                  }]
+                }
+              }
+            }]
+          }
+        }
+      }
+    };
+
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-23T18:05:00.000Z',
+      connectors: [{
+        connectorId: 'mathem-prenumeration-public-search',
+        chainId: 'mathem-prenumeration',
+        sourceType: 'retailer_online_page',
+        endpointUrl: `${GROCERYVIEW_DAILY_MATHEM_PRENUMERATION_PRODUCTS_URL}?queries=makaroner&maxRows=1`,
+        parserVersion: 'mathem-prenumeration-public-search-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: false,
+        requireStoreScopedPrices: false,
+        stores: []
+      }],
+      fetchImpl: async () => new Response(`<script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script>`, {
+        status: 200,
+        headers: { 'content-type': 'text/html' }
+      })
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    const product = firstBatchProduct(executor);
+    assert.equal(product.slug, 'mathem-prenumeration-6448');
+    assert.equal(product.category_id, 'mathem-prenumeration-makaroner');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.retailer_product_ref, '6448');
+    assert.equal(observation.price, 21.24);
+    assert.equal(observation.domain, 'grocery');
+    assert.equal(observation.chain_id, 'mathem-prenumeration');
+    assert.equal(observation.price_type, 'member');
   });
 
   it('materializes native Coop all-store branch product prices into daily database observations', async () => {

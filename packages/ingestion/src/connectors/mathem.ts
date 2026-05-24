@@ -1,4 +1,10 @@
+export type MathemTier = 'spot' | 'subscription';
+
 export type MathemProduct = {
+  country: 'SE';
+  currency: 'SEK';
+  chain: 'mathem' | 'mathem-prenumeration';
+  mathem_tier: MathemTier;
   code: string;
   name: string;
   brand: string;
@@ -212,6 +218,7 @@ export const DEFAULT_MATHEM_MAX_ROWS = 9000;
 
 export type FetchMathemProductsOptions = {
   fetchImpl?: typeof fetch;
+  tier?: MathemTier;
   queries?: readonly string[];
   pages?: readonly number[];
   maxRows?: number;
@@ -231,6 +238,7 @@ export async function fetchMathemProducts(options: FetchMathemProductsOptions = 
   const pages = options.pages ?? DEFAULT_MATHEM_SEARCH_PAGES;
   const maxRows = options.maxRows ?? DEFAULT_MATHEM_MAX_ROWS;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const tier = options.tier ?? 'spot';
   const rows: MathemProduct[] = [];
   const seenCodes = new Set<string>();
 
@@ -249,7 +257,7 @@ export async function fetchMathemProducts(options: FetchMathemProductsOptions = 
       }
 
       for (const product of parseMathemSearchProducts(await response.text())) {
-        const row = normalizeMathemProduct(product, sourceUrl, retrievedAt);
+        const row = normalizeMathemProduct(product, sourceUrl, retrievedAt, tier);
         if (!row || seenCodes.has(row.code)) {
           continue;
         }
@@ -280,7 +288,8 @@ export function parseMathemSearchProducts(html: string): MathemSearchProduct[] {
 export function normalizeMathemProduct(
   product: MathemSearchProduct,
   sourceUrl: string,
-  retrievedAt: string
+  retrievedAt: string,
+  tier: MathemTier = 'spot'
 ): MathemProduct | null {
   const attributes = product.attributes;
   const code = text(attributes?.id ?? product.id);
@@ -293,6 +302,10 @@ export function normalizeMathemProduct(
   const unitPrice = numberFromText(attributes.grossUnitPrice);
   const unit = text(attributes.unitPriceQuantityAbbreviation);
   return {
+    country: 'SE',
+    currency: 'SEK',
+    chain: tier === 'subscription' ? 'mathem-prenumeration' : 'mathem',
+    mathem_tier: tier,
     code,
     name,
     brand: text(attributes.brand),

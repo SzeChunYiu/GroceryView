@@ -73,6 +73,10 @@ import {
   type MathemProduct
 } from './connectors/mathem.js';
 import {
+  fetchMathemPrenumerationProducts,
+  type MathemPrenumerationProduct
+} from './connectors/mathem-prenumeration-se.js';
+import {
   fetchMatsparProducts,
   MATSPAR_MINIMUM_ROWS,
   type MatsparProduct
@@ -99,6 +103,7 @@ export * from './connectors/ica-bulk.js';
 export * from './connectors/ica-reklamblad.js';
 export * from './connectors/lidl.js';
 export * from './connectors/mathem.js';
+export * from './connectors/mathem-prenumeration-se.js';
 export * from './connectors/matpriskollen.js';
 export * from './connectors/matspar.js';
 export * from './connectors/lidl-bulk.js';
@@ -1945,13 +1950,14 @@ function matsparProductToDailyItem(row: MatsparProduct): RetailerConnectorParsed
 }
 
 function mathemCategoryId(row: MathemProduct): string {
+  const prefix = row.chain === 'mathem-prenumeration' ? 'mathem-prenumeration' : 'mathem';
   try {
     const query = new URL(row.sourceUrl).searchParams.get('q');
-    if (query?.trim()) return `mathem-${stableKeyPart(query)}`;
+    if (query?.trim()) return `${prefix}-${stableKeyPart(query)}`;
   } catch {
     // Keep a stable category even if a captured row has a malformed source URL.
   }
-  return 'mathem-public-search';
+  return `${prefix}-public-search`;
 }
 
 function mathemProductToDailyItem(row: MathemProduct): RetailerConnectorParsedProduct {
@@ -1960,17 +1966,27 @@ function mathemProductToDailyItem(row: MathemProduct): RetailerConnectorParsedPr
     retailerProductId: row.code,
     rawName: row.name,
     canonicalName: row.name,
-    productId: `mathem-${stableKeyPart(row.code)}`,
+    productId: `${row.chain}-${stableKeyPart(row.code)}`,
+    chainId: row.chain,
     categoryId: mathemCategoryId(row),
     brand: row.brand || undefined,
     packageSize: quantity.packageSize,
     packageUnit: quantity.packageUnit,
     price: row.price,
-    memberOnly: false,
+    memberOnly: row.mathem_tier === 'subscription',
     isAvailable: row.available,
     observedAt: row.retrievedAt,
     sourceUrl: row.productUrl || row.sourceUrl,
     imageUrl: row.imageUrl || undefined
+  };
+}
+
+function mathemPrenumerationProductToDailyItem(row: MathemPrenumerationProduct): RetailerConnectorParsedProduct {
+  return {
+    ...mathemProductToDailyItem(row),
+    chainId: 'mathem-prenumeration',
+    memberOnly: true,
+    promoText: 'MatHem subscription price'
   };
 }
 
@@ -2241,6 +2257,22 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(mathemProductToDailyItem) });
+  }
+
+  if (
+    sourceUrl === GROCERYVIEW_DAILY_MATHEM_PRENUMERATION_PRODUCTS_URL
+    || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_MATHEM_PRENUMERATION_PRODUCTS_URL}?`)
+  ) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchMathemPrenumerationProducts({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      queries: dailyNativeStringListParam(url, 'queries'),
+      pages: dailyNativeNumberListParam(url, 'pages'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(mathemPrenumerationProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL}?`)) {
@@ -3111,6 +3143,7 @@ export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://dail
 export const GROCERYVIEW_DAILY_CITY_GROSS_BULK_PRODUCTS_URL = 'groceryview://daily/city-gross/products/bulk';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
 export const GROCERYVIEW_DAILY_MATHEM_PRODUCTS_URL = 'groceryview://daily/mathem/products/public-search';
+export const GROCERYVIEW_DAILY_MATHEM_PRENUMERATION_PRODUCTS_URL = 'groceryview://daily/mathem-prenumeration/products/public-search';
 export const GROCERYVIEW_DAILY_MATSPAR_PRODUCTS_URL = 'groceryview://daily/matspar/products/public-search';
 export const GROCERYVIEW_DAILY_OKQ8_FUEL_PRICES_URL = OKQ8_FUEL_PRICES_URL;
 export const GROCERYVIEW_DAILY_PHARMACY_PRODUCTS_URL = 'groceryview://daily/pharmacy/products/public';

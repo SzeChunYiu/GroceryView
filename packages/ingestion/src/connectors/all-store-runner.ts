@@ -11,6 +11,10 @@ export type AllStoreTaskFailure = {
   error: string;
 };
 
+export const ALL_STORE_RUNNER_CONNECTOR_IDS = [
+  'mathem-prenumeration-public-search'
+] as const;
+
 function normalizeRunnerInteger(value: number | undefined, fallback: number): number {
   if (value === undefined || !Number.isFinite(value)) return fallback;
   return Math.max(0, Math.floor(value));
