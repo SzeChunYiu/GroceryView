@@ -22,6 +22,7 @@ import { PricesModule } from './prices/prices.module.js';
 import { PrivacyModule } from './privacy/privacy.module.js';
 import { ProductsModule } from './products/products.module.js';
 import { ReceiptsModule } from './receipts/receipts.module.js';
+import { RecipesController } from './routes/recipes.js';
 import { RetailersModule } from './retailers/retailers.module.js';
 import { ScreenerModule } from './screener/screener.module.js';
 import { SettingsModule } from './settings/settings.module.js';
@@ -59,6 +60,6 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     CategoriesModule,
     AlertsModule
   ],
-  controllers: [AppController]
+  controllers: [AppController, RecipesController]
 })
 export class AppModule {}

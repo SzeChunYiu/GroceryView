@@ -6,7 +6,7 @@ export type ShoppingListItem = {
   checked: boolean;
   detail: string;
   id: string;
-  importSource?: 'starter' | 'bulk-clipboard';
+  importSource?: 'starter' | 'bulk-clipboard' | 'recipe';
   matchedProductName?: string;
   matchedProductSlug?: string;
   name: string;
@@ -15,6 +15,21 @@ export type ShoppingListItem = {
 
 export type BulkImportedListItemInput = Omit<ShoppingListItem, 'checked'> & {
   importSource: 'bulk-clipboard';
+};
+
+export type RecipeListIngredientInput = {
+  detail?: string;
+  id: string;
+  matchedProductName?: string;
+  matchedProductSlug?: string;
+  name: string;
+  quantity: string;
+  recipeId: string;
+  recipeTitle: string;
+};
+
+export type RecipeListItemInput = Omit<ShoppingListItem, 'checked'> & {
+  importSource: 'recipe';
 };
 
 export type ShareLinkState = {
@@ -27,7 +42,7 @@ export type ShareLinkState = {
 
 type PersistedListState = {
   checkedById?: Record<string, boolean>;
-  importedItems?: BulkImportedListItemInput[];
+  importedItems?: Array<BulkImportedListItemInput | RecipeListItemInput>;
 };
 
 type SignedSharePayload = {
@@ -128,6 +143,27 @@ const baseListItems: Omit<ShoppingListItem, 'checked'>[] = [
   }
 ];
 
+export function recipeIngredientToListItem(ingredient: RecipeListIngredientInput): RecipeListItemInput {
+  return {
+    detail: ingredient.detail ?? `Recipe: ${ingredient.recipeTitle}`,
+    id: `recipe:${ingredient.recipeId}:${ingredient.id}`,
+    importSource: 'recipe',
+    matchedProductName: ingredient.matchedProductName,
+    matchedProductSlug: ingredient.matchedProductSlug,
+    name: ingredient.name,
+    quantity: ingredient.quantity
+  };
+}
+
+export function appendRecipeIngredientsToStoredList(ingredients: RecipeListIngredientInput[]) {
+  const { checkedById, importedItems } = listStateFromStorage(localStorage.getItem(LIST_STORAGE_KEY));
+  const nextItems = ingredients.map(recipeIngredientToListItem);
+  const existingIds = new Set(importedItems.map((item) => item.id));
+  const mergedItems = [...importedItems, ...nextItems.filter((item) => !existingIds.has(item.id))];
+  localStorage.setItem(LIST_STORAGE_KEY, JSON.stringify({ checkedById, importedItems: mergedItems }));
+  return { addedCount: mergedItems.length - importedItems.length, totalRecipeItems: nextItems.length };
+}
+
 function listStateFromStorage(value: string | null): Required<PersistedListState> {
   const empty = { checkedById: {}, importedItems: [] };
   if (!value) return empty;
@@ -150,10 +186,10 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
       : {};
 
     const importedItems = Array.isArray(maybeImportedItems)
-      ? maybeImportedItems.filter((item): item is BulkImportedListItemInput => (
+      ? maybeImportedItems.filter((item): item is BulkImportedListItemInput | RecipeListItemInput => (
         item !== null
         && typeof item === 'object'
-        && item.importSource === 'bulk-clipboard'
+        && (item.importSource === 'bulk-clipboard' || item.importSource === 'recipe')
         && typeof item.id === 'string'
         && typeof item.name === 'string'
         && typeof item.quantity === 'string'
@@ -167,7 +203,7 @@ function listStateFromStorage(value: string | null): Required<PersistedListState
   }
 }
 
-function withCheckedState(checkedById: Record<string, boolean>, importedItems: BulkImportedListItemInput[] = []): ShoppingListItem[] {
+function withCheckedState(checkedById: Record<string, boolean>, importedItems: Array<BulkImportedListItemInput | RecipeListItemInput> = []): ShoppingListItem[] {
   const uniqueItems = new Map<string, Omit<ShoppingListItem, 'checked'>>();
   for (const item of baseListItems) uniqueItems.set(item.id, item);
   for (const item of importedItems) uniqueItems.set(item.id, item);
@@ -231,11 +267,11 @@ function persistCheckedState(items: ShoppingListItem[]) {
   try {
     const checkedById = Object.fromEntries(items.map((item) => [item.id, item.checked]));
     const importedItems = items
-      .filter((item) => item.importSource === 'bulk-clipboard')
+      .filter((item) => item.importSource === 'bulk-clipboard' || item.importSource === 'recipe')
       .map((item) => ({
         detail: item.detail,
         id: item.id,
-        importSource: 'bulk-clipboard' as const,
+        importSource: item.importSource === 'recipe' ? 'recipe' as const : 'bulk-clipboard' as const,
         matchedProductName: item.matchedProductName,
         matchedProductSlug: item.matchedProductSlug,
         name: item.name,
