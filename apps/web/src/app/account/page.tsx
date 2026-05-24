@@ -4,6 +4,7 @@ import { AdDisclosureActions } from '@/components/ad-disclosure-actions';
 import { ConfidenceBadge } from '@/components/confidence-badge';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { routeMetadata } from '@/lib/seo';
+import { accountAllergenAvoidanceCookieName, accountAllergenAvoidanceOptions, accountAllergenAvoidanceStorageKey } from '@/lib/search-filters';
 import { accountSavedShoppingContract, formatSek, savedBasketAutoReorderPlanner } from '@/lib/verified-data';
 import { planAccountDeletion } from '@groceryview/core';
 
@@ -14,6 +15,76 @@ const accountDeletionConfirmations = [
   'Acknowledge that receipt, basket, watchlist, and preference history cannot be restored after execution.',
   'Type DELETE ACCOUNT before the destructive job can be queued.'
 ];
+
+const accountAllergenAvoidanceScript = `
+(() => {
+  const form = document.getElementById('account-allergen-avoidance');
+  if (!form) return;
+  const storageKey = form.dataset.storageKey || '';
+  const cookieName = form.dataset.cookieName || '';
+  const status = document.getElementById('account-allergen-avoidance-status');
+  const saveButton = form.querySelector('[data-action="save-account-allergens"]');
+  const inputs = Array.from(form.querySelectorAll('input[name="accountAllergenAvoidance"]'));
+
+  function readSession() {
+    return {
+      accessToken: sessionStorage.getItem('groceryview:accessToken') || '',
+      userId: sessionStorage.getItem('groceryview:userId') || ''
+    };
+  }
+
+  function readValues(raw) {
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+      if (parsed && Array.isArray(parsed.allergenAvoidance)) return parsed.allergenAvoidance;
+    } catch {
+      return raw.split(',');
+    }
+    return [];
+  }
+
+  function setStatus(message) {
+    if (status) status.textContent = message;
+  }
+
+  function applySavedValues() {
+    const session = readSession();
+    const raw = (session.userId && localStorage.getItem(storageKey + ':' + session.userId)) || localStorage.getItem(storageKey) || '';
+    const savedValues = new Set(readValues(raw));
+    inputs.forEach((input) => {
+      input.checked = savedValues.has(input.value);
+    });
+  }
+
+  applySavedValues();
+
+  saveButton?.addEventListener('click', () => {
+    const session = readSession();
+    if (!session.accessToken || !session.userId) {
+      setStatus('Sign in first. Allergen avoidance defaults are account preferences and were not saved anonymously.');
+      return;
+    }
+
+    const allergenAvoidance = inputs.filter((input) => input.checked).map((input) => input.value);
+    const payload = JSON.stringify({ userId: session.userId, allergenAvoidance, updatedAt: new Date().toISOString() });
+    localStorage.setItem(storageKey + ':' + session.userId, payload);
+    localStorage.setItem(storageKey, payload);
+    sessionStorage.setItem(storageKey + ':' + session.userId, payload);
+
+    if (allergenAvoidance.length > 0) {
+      document.cookie = cookieName + '=' + encodeURIComponent(allergenAvoidance.join(',')) + '; Path=/; Max-Age=31536000; SameSite=Lax';
+    } else {
+      document.cookie = cookieName + '=; Path=/; Max-Age=0; SameSite=Lax';
+    }
+
+    setStatus(allergenAvoidance.length > 0
+      ? 'Saved allergen avoidance defaults for this signed-in account. Products search will use them until a dietary URL filter overrides them.'
+      : 'Saved no allergen avoidance defaults for this signed-in account.');
+  });
+})();
+`;
 
 export function generateMetadata() {
   return routeMetadata('/account');
@@ -54,6 +125,36 @@ export default function AccountPage() {
             </ul>
           </div>
         </div>
+      </Card>
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <Eyebrow>Account allergen defaults</Eyebrow>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Persist allergen avoidance for product search</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+          Signed-in shoppers can save account-level allergen avoidance defaults. The products page reads this preference as the default dietary toggle state, while any <code className="rounded bg-white/80 px-1 py-0.5 text-amber-900">dietary</code> URL parameter still wins for that visit.
+        </p>
+        <form className="mt-4 grid gap-3 md:grid-cols-3" data-cookie-name={accountAllergenAvoidanceCookieName} data-storage-key={accountAllergenAvoidanceStorageKey} id="account-allergen-avoidance">
+          {accountAllergenAvoidanceOptions.map((option) => (
+            <label className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-700 shadow-sm" key={option.value}>
+              <span className="flex items-start gap-2">
+                <input className="mt-1" name="accountAllergenAvoidance" type="checkbox" value={option.value} />
+                <span>
+                  <span className="block font-black text-slate-950">{option.label}</span>
+                  <span className="mt-1 block leading-5">{option.description}</span>
+                </span>
+              </span>
+            </label>
+          ))}
+          <div className="md:col-span-3">
+            <button className="rounded-full bg-amber-800 px-4 py-2 text-sm font-black text-white" data-action="save-account-allergens" type="button">
+              Save allergen defaults
+            </button>
+            <p className="mt-3 rounded-2xl bg-white p-3 text-sm font-bold text-amber-950" id="account-allergen-avoidance-status">
+              Sign in before saving; anonymous allergen defaults are not persisted.
+            </p>
+          </div>
+        </form>
+        <script dangerouslySetInnerHTML={{ __html: accountAllergenAvoidanceScript }} />
       </Card>
 
       <Card className="mt-6 border-sky-200 bg-sky-50">

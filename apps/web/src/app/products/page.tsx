@@ -1,11 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { apohemSource } from '@/lib/ingested/apohem';
 import { adaptiveProductCards, buildProductSearchView, facetedProductSearch, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productBrandFilterOptions, topChainSpreads, freshestOpenPrices, watchlistHeartProducts } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 import { seoLandingProducts } from '@/lib/seo-landing-pages';
+import { accountAllergenAvoidanceCookieName, applyAccountAllergenDefaultsToSearchParams, normalizeAccountAllergenAvoidance, searchParamsHaveDietaryOverride } from '@/lib/search-filters';
 
 const PRODUCTS_PER_PAGE = 50;
 
@@ -45,19 +47,24 @@ function setFirstParam(params: URLSearchParams, key: keyof SearchParams, value: 
   if (raw?.trim()) params.set(key, raw.trim());
 }
 
-function setAllParams(params: URLSearchParams, key: keyof SearchParams, value: string | string[] | undefined) {
+function setAllParams(params: URLSearchParams, key: keyof SearchParams, value: string | string[] | undefined, preserveEmptyOverride = false) {
   const rawValues = Array.isArray(value) ? value : value ? [value] : [];
+  let appended = 0;
   for (const rawValue of rawValues.flatMap((item) => item.split(','))) {
     const trimmed = rawValue.trim();
-    if (trimmed) params.append(key, trimmed);
+    if (trimmed) {
+      params.append(key, trimmed);
+      appended += 1;
+    }
   }
+  if (preserveEmptyOverride && value !== undefined && appended === 0) params.set(key, '');
 }
 
 function copySearchParams(params: URLSearchParams, source: SearchParams) {
   setFirstParam(params, 'q', source.q);
   setFirstParam(params, 'category', source.category);
   setFirstParam(params, 'label', source.label);
-  setAllParams(params, 'dietary', source.dietary);
+  setAllParams(params, 'dietary', source.dietary, true);
   setFirstParam(params, 'chain', source.chain);
   setFirstParam(params, 'minPrice', source.minPrice);
   setFirstParam(params, 'maxPrice', source.maxPrice);
@@ -75,7 +82,11 @@ function productsPageUrl(page: number, selectedBrand = '', searchParams: SearchP
 }
 
 export default async function ProductsPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
-  const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
+  const urlSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
+  const accountAllergenAvoidance = normalizeAccountAllergenAvoidance((await cookies()).get(accountAllergenAvoidanceCookieName)?.value);
+  const hasDietaryUrlOverride = searchParamsHaveDietaryOverride(urlSearchParams);
+  const accountAllergenDefaultsActive = !hasDietaryUrlOverride && accountAllergenAvoidance.length > 0;
+  const resolvedSearchParams = applyAccountAllergenDefaultsToSearchParams(urlSearchParams, accountAllergenAvoidance);
   const search = buildProductSearchView(resolvedSearchParams);
   const { categoryFacets, labelFacets, chainFacets, priceRange, inStockOnly, resultCards } = search;
   const requestedPage = toPageNumber(resolvedSearchParams.page);
@@ -161,6 +172,7 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
           </label>
           <div className="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-3 lg:col-span-4">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Dietary filters</p>
+            <input name="dietary" type="hidden" value="" />
             <div className="mt-2 grid gap-2 sm:grid-cols-3">
               {search.dietaryFilters.map((filter) => (
                 <label className="flex items-start gap-2 rounded-2xl bg-white px-3 py-2 text-sm font-black text-emerald-950 shadow-sm" key={filter.value}>
@@ -174,6 +186,8 @@ export default async function ProductsPage({ searchParams }: { searchParams?: Pr
             </div>
             <p className="mt-2 text-xs font-semibold leading-5 text-emerald-900">
               Gluten-free, lactose-free, and vegan filters require verified label metadata or explicit product text; GroceryView does not infer dietary status from shopper profiles.
+              {accountAllergenDefaultsActive ? ` Signed-in account defaults pre-selected ${accountAllergenAvoidance.join(', ')}; change the checkboxes to create a dietary URL override.` : null}
+              {hasDietaryUrlOverride ? ' The current dietary URL filter overrides any saved account allergen defaults.' : null}
             </p>
           </div>
           <div className="flex flex-col justify-end gap-2">
