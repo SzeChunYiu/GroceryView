@@ -1812,6 +1812,26 @@ describe('verified-data UI', () => {
     assert.match(itemsRoute, /holidayWindow/);
   });
 
+  it('surfaces item substitution suggestions for out-of-stock or very expensive items', async () => {
+    const analytics = await read('../../packages/analytics/src/substitutions.ts');
+    const itemPage = await read('src/app/items/[id]/page.tsx');
+    const productPage = await read('src/app/products/[slug]/page.tsx');
+    const itemsRoute = await read('../../apps/api/src/routes/items.ts');
+
+    assert.match(analytics, /export function buildItemSubstitutionSuggestions/);
+    assert.match(analytics, /maxSuggestions/);
+    assert.match(analytics, /same-category, in-stock candidates with a verified lower current price/i);
+    assert.match(itemPage, /products\/\[slug\]\/page/);
+    assert.match(productPage, /buildItemSubstitutionSuggestions/);
+    assert.match(productPage, /itemSubstitutionSuggestionsFor/);
+    assert.match(productPage, /Item substitution suggestions/);
+    assert.match(productPage, /out of stock or very expensive/i);
+    assert.match(productPage, /up to 3/);
+    assert.match(productPage, /lower current price/i);
+    assert.match(itemsRoute, /substitutionSuggestions/);
+    assert.match(itemsRoute, /maxSuggestions: 3/);
+  });
+
   it('surfaces eco-conscious local and seasonal picks without origin or carbon invention', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/seasonal-calendar/page.tsx');
