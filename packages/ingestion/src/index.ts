@@ -107,6 +107,7 @@ export * from './connectors/apohem.js';
 export * from './connectors/okq8-fuel.js';
 export * from './connectors/st1-fuel.js';
 export * from './connectors/willys.js';
+export * from './connectors/halal-center-se.js';
 export * from './store-enumerator.js';
 export * from './unit-price.js';
 
