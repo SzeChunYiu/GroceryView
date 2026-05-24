@@ -81,6 +81,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
     entry('/', 1, 'daily'),
     entry('/products', 0.95, 'daily'),
+    // Public entry points that alias the product discovery and item lookup surfaces.
+    entry('/items', 0.9, 'daily'),
+    entry('/search', 0.9, 'daily'),
     entry('/compare', 0.9, 'daily'),
     entry('/deals', 0.9, 'daily'),
     entry('/screener', 0.9, 'daily'),
