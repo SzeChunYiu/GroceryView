@@ -2860,6 +2860,25 @@ ${seo}`;
     assert.doesNotMatch(sitemap, /osmStores\.slice\(0,\s*80\)/);
   });
 
+  it('keeps public item and search entry points in sitemap and canonical metadata coverage', async () => {
+    const seo = await read('src/lib/seo.ts');
+    const sitemap = await read('src/app/sitemap.ts');
+    const itemsPage = await read('src/app/items/page.tsx');
+    const searchPage = await read('src/app/search/page.tsx');
+
+    assert.match(seo, /'\/items'/);
+    assert.match(seo, /'\/search'/);
+    assert.match(seo, /Item detail lookup/);
+    assert.match(seo, /Product search/);
+    assert.match(sitemap, /entry\('\/items'/);
+    assert.match(sitemap, /entry\('\/search'/);
+    assert.match(sitemap, /public entry points/i);
+    assert.match(itemsPage, /routeMetadata\('\/items'\)/);
+    assert.match(itemsPage, /ProductsPage/);
+    assert.match(searchPage, /routeMetadata\('\/search'\)/);
+    assert.match(searchPage, /ProductsPage/);
+  });
+
   it('ships canonical generateMetadata coverage for every app route', async () => {
     const routePages = [
       'src/app/page.tsx',
@@ -2880,6 +2899,7 @@ ${seo}`;
       'src/app/fuel/page.tsx',
       'src/app/favorites/page.tsx',
       'src/app/household/page.tsx',
+      'src/app/items/page.tsx',
       'src/app/login/page.tsx',
       'src/app/map/page.tsx',
       'src/app/meal-planner/page.tsx',
@@ -2894,6 +2914,7 @@ ${seo}`;
       'src/app/products/[slug]/page.tsx',
       'src/app/savings-dashboard/page.tsx',
       'src/app/scanner/page.tsx',
+      'src/app/search/page.tsx',
       'src/app/screener/page.tsx',
       'src/app/seasonal-calendar/page.tsx',
       'src/app/shopping-trips/page.tsx',

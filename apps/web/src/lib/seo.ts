@@ -57,6 +57,14 @@ export const routeMetadataCatalog = {
     title: 'Cross-chain cheapest basket calculator | GroceryView',
     description: 'Add verified grocery products and compare the cheapest complete chain basket with a split basket built from current DB-backed price rows.'
   },
+  '/items': {
+    title: 'Item detail lookup | GroceryView',
+    description: 'Open crawlable item entry points backed by verified product slugs, source evidence, and canonical GroceryView product metadata.'
+  },
+  '/search': {
+    title: 'Product search | GroceryView',
+    description: 'Search verified grocery products with crawlable category, dietary, chain, price, stock, and confidence filters.'
+  },
   '/catalogue-savings': {
     title: 'Matched catalogue savings ledger | GroceryView',
     description: 'Compare matched Willys and Hemkop catalogue rows with savings totals, source caveats, and chain-level confidence.'
