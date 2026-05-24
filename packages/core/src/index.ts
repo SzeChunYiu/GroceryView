@@ -225,6 +225,58 @@ export type DealOpportunity = DealOpportunityInput & {
   reason: string;
 };
 
+export type SinglePortionWasteRisk = 'low' | 'medium' | 'high';
+
+export type SinglePortionAlternativeInput = {
+  productId: string;
+  productName: string;
+  storeName: string;
+  currentPrice: number;
+  servingCount: number;
+  packageLabel: string;
+  sourceLabel: string;
+};
+
+export type SinglePortionDealInput = DealOpportunityInput & {
+  packageLabel: string;
+  servingCount: number;
+  servingSizeLabel: string;
+  wasteRisk: SinglePortionWasteRisk;
+  sourceLabel: string;
+  alternatives?: SinglePortionAlternativeInput[];
+  bulkOnly?: boolean;
+  wasteAssumption?: string;
+};
+
+export type SinglePortionAlternative = SinglePortionAlternativeInput & {
+  perServingCost: number;
+  savingsVsSelectedPerServing: number;
+};
+
+export type SinglePortionDeal = DealOpportunity & {
+  packageLabel: string;
+  servingCount: number;
+  servingSizeLabel: string;
+  perServingCost: number;
+  wasteRisk: Exclude<SinglePortionWasteRisk, 'high'>;
+  sourceLabel: string;
+  cheaperAlternatives: SinglePortionAlternative[];
+  bulkCaveat?: string;
+};
+
+export type SinglePortionDealFinderResult = {
+  rankedDeals: SinglePortionDeal[];
+  coverage: {
+    evaluatedCount: number;
+    rankedCount: number;
+    excludedHighWasteCount: number;
+    excludedBulkWithoutAssumptionCount: number;
+    excludedServingCount: number;
+    confidence: 'low' | 'medium' | 'high';
+    caveat: string;
+  };
+};
+
 export function rankDealOpportunities(input: {
   deals: DealOpportunityInput[];
   minimumDealScore?: number;
@@ -255,6 +307,107 @@ export function rankDealOpportunities(input: {
       if (b.discountPercent !== a.discountPercent) return b.discountPercent - a.discountPercent;
       return a.productName.localeCompare(b.productName);
     });
+}
+
+export function rankSinglePortionDeals(input: {
+  deals: SinglePortionDealInput[];
+  minimumDealScore?: number;
+  minimumSourceConfidence?: number;
+  maxServingCount?: number;
+}): SinglePortionDealFinderResult {
+  const maxServingCount = input.maxServingCount ?? 4;
+  let excludedHighWasteCount = 0;
+  let excludedBulkWithoutAssumptionCount = 0;
+  let excludedServingCount = 0;
+
+  const eligible = input.deals.filter((deal) => {
+    if (!Number.isFinite(deal.servingCount) || deal.servingCount <= 0 || deal.servingCount > maxServingCount) {
+      excludedServingCount += 1;
+      return false;
+    }
+    if (deal.wasteRisk === 'high') {
+      excludedHighWasteCount += 1;
+      return false;
+    }
+    if (deal.bulkOnly && !deal.wasteAssumption?.trim()) {
+      excludedBulkWithoutAssumptionCount += 1;
+      return false;
+    }
+    return true;
+  });
+
+  const rankedBaseDeals = rankDealOpportunities({
+    deals: eligible.map((deal) => ({
+      productId: deal.productId,
+      productName: deal.productName,
+      storeId: deal.storeId,
+      storeName: deal.storeName,
+      currentPrice: deal.currentPrice,
+      regularPrice: deal.regularPrice,
+      dealScore: deal.dealScore,
+      sourceConfidence: deal.sourceConfidence,
+      sponsoredPlacement: deal.sponsoredPlacement
+    })),
+    minimumDealScore: input.minimumDealScore,
+    minimumSourceConfidence: input.minimumSourceConfidence
+  });
+
+  const rankedDeals = rankedBaseDeals.map((deal): SinglePortionDeal => {
+    const source = eligible.find((candidate) => candidate.productId === deal.productId && candidate.storeId === deal.storeId);
+    if (!source) throw new Error('ranked single-portion deal source is missing.');
+    if (source.wasteRisk === 'high') throw new Error('ranked single-portion deal still has high waste risk.');
+    const perServingCost = roundMoney(deal.currentPrice / source.servingCount);
+    const cheaperAlternatives = (source.alternatives ?? [])
+      .filter((alternative) => Number.isFinite(alternative.servingCount) && alternative.servingCount > 0)
+      .map((alternative) => ({
+        ...alternative,
+        perServingCost: roundMoney(alternative.currentPrice / alternative.servingCount),
+        savingsVsSelectedPerServing: roundMoney(perServingCost - alternative.currentPrice / alternative.servingCount)
+      }))
+      .filter((alternative) => alternative.savingsVsSelectedPerServing > 0)
+      .sort((left, right) => {
+        if (right.savingsVsSelectedPerServing !== left.savingsVsSelectedPerServing) {
+          return right.savingsVsSelectedPerServing - left.savingsVsSelectedPerServing;
+        }
+        return left.productName.localeCompare(right.productName);
+      });
+
+    return {
+      ...deal,
+      packageLabel: source.packageLabel,
+      servingCount: source.servingCount,
+      servingSizeLabel: source.servingSizeLabel,
+      perServingCost,
+      wasteRisk: source.wasteRisk,
+      sourceLabel: source.sourceLabel,
+      cheaperAlternatives,
+      bulkCaveat: source.bulkOnly ? source.wasteAssumption : undefined
+    };
+  });
+
+  const averageConfidence = rankedDeals.length === 0
+    ? 0
+    : rankedDeals.reduce((sum, deal) => sum + deal.sourceConfidence, 0) / rankedDeals.length;
+  const confidence = averageConfidence >= 0.8 && rankedDeals.length >= 3
+    ? 'high'
+    : averageConfidence >= 0.55 ? 'medium' : 'low';
+
+  return {
+    rankedDeals,
+    coverage: {
+      evaluatedCount: input.deals.length,
+      rankedCount: rankedDeals.length,
+      excludedHighWasteCount,
+      excludedBulkWithoutAssumptionCount,
+      excludedServingCount,
+      confidence,
+      caveat: [
+        `${rankedDeals.length} of ${input.deals.length} visible deal rows passed single-shopper serving, source-confidence, and deal-score filters.`,
+        `${excludedBulkWithoutAssumptionCount} bulk-only rows were blocked because no explicit waste assumption was available.`,
+        'Per-serving costs use only observed current price divided by reported serving count; alternatives appear only when their own visible serving evidence is cheaper.'
+      ].join(' ')
+    }
+  };
 }
 
 export type StorePrice = {

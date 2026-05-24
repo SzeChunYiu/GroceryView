@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateDealScore, calculateHistoricalDealScore, rankDealOpportunities, scoreBand } from '../index.js';
+import { calculateDealScore, calculateHistoricalDealScore, rankDealOpportunities, rankSinglePortionDeals, scoreBand } from '../index.js';
 
 describe('calculateDealScore', () => {
   it('uses the MVP weighted formula and never accepts sponsored boosts', () => {
@@ -135,6 +135,132 @@ describe('rankDealOpportunities', () => {
     });
 
     assert.deepEqual(opportunities.map((deal) => deal.productId), ['milk']);
+  });
+});
+
+describe('rankSinglePortionDeals', () => {
+  it('keeps small-pack one-person deals, calculates per-serving cost, and surfaces cheaper alternatives', () => {
+    const result = rankSinglePortionDeals({
+      deals: [
+        {
+          productId: 'drink-kvarg-350ml',
+          productName: 'Yalla Drickkvarg 350ml',
+          storeId: 'willys',
+          storeName: 'Willys',
+          currentPrice: 14.5,
+          regularPrice: 17.93,
+          dealScore: 78,
+          sourceConfidence: 0.74,
+          packageLabel: '350ml',
+          servingCount: 1,
+          servingSizeLabel: '350ml bottle',
+          wasteRisk: 'low',
+          sourceLabel: 'Axfood visible row, Willys lowest chain price',
+          alternatives: [
+            {
+              productId: 'tomatoes-250g',
+              productName: 'Tomater Cocktail 250g',
+              storeName: 'Willys',
+              currentPrice: 17.9,
+              servingCount: 2,
+              packageLabel: '250g',
+              sourceLabel: 'Axfood visible row'
+            },
+            {
+              productId: 'juice-1l',
+              productName: 'Bravo Juice 1l',
+              storeName: 'Willys',
+              currentPrice: 21.67,
+              servingCount: 4,
+              packageLabel: '1l',
+              sourceLabel: 'Axfood visible row'
+            }
+          ]
+        }
+      ]
+    });
+
+    assert.equal(result.rankedDeals.length, 1);
+    assert.equal(result.rankedDeals[0].perServingCost, 14.5);
+    assert.deepEqual(result.rankedDeals[0].cheaperAlternatives.map((deal) => deal.productId), ['juice-1l', 'tomatoes-250g']);
+    assert.equal(result.rankedDeals[0].cheaperAlternatives[0].perServingCost, 5.42);
+    assert.equal(result.coverage.confidence, 'medium');
+  });
+
+  it('blocks high-waste, oversize, and bulk-only rows unless bulk assumptions are explicit', () => {
+    const result = rankSinglePortionDeals({
+      deals: [
+        {
+          productId: 'party-pack',
+          productName: 'Family Party Pack',
+          storeId: 'willys',
+          storeName: 'Willys',
+          currentPrice: 99,
+          regularPrice: 140,
+          dealScore: 90,
+          sourceConfidence: 0.9,
+          packageLabel: '2kg',
+          servingCount: 8,
+          servingSizeLabel: 'family tray',
+          wasteRisk: 'medium',
+          sourceLabel: 'visible row'
+        },
+        {
+          productId: 'wilting-greens',
+          productName: 'Wilting Salad 500g',
+          storeId: 'coop',
+          storeName: 'Coop',
+          currentPrice: 12,
+          regularPrice: 24,
+          dealScore: 88,
+          sourceConfidence: 0.9,
+          packageLabel: '500g',
+          servingCount: 2,
+          servingSizeLabel: 'two salads',
+          wasteRisk: 'high',
+          sourceLabel: 'visible row'
+        },
+        {
+          productId: 'bulk-rice',
+          productName: 'Bulk Rice 5kg',
+          storeId: 'hemkop',
+          storeName: 'Hemköp',
+          currentPrice: 79,
+          regularPrice: 99,
+          dealScore: 82,
+          sourceConfidence: 0.8,
+          packageLabel: '5kg',
+          servingCount: 4,
+          servingSizeLabel: 'four planned portions',
+          wasteRisk: 'medium',
+          sourceLabel: 'visible row',
+          bulkOnly: true
+        },
+        {
+          productId: 'bulk-pasta-explicit',
+          productName: 'Bulk Pasta 1kg',
+          storeId: 'willys',
+          storeName: 'Willys',
+          currentPrice: 24,
+          regularPrice: 35,
+          dealScore: 80,
+          sourceConfidence: 0.8,
+          packageLabel: '1kg',
+          servingCount: 4,
+          servingSizeLabel: 'four meal-prep portions',
+          wasteRisk: 'medium',
+          sourceLabel: 'visible row',
+          bulkOnly: true,
+          wasteAssumption: 'Only recommended when the student is meal-prepping four portions this week.'
+        }
+      ]
+    });
+
+    assert.deepEqual(result.rankedDeals.map((deal) => deal.productId), ['bulk-pasta-explicit']);
+    assert.equal(result.rankedDeals[0].bulkCaveat, 'Only recommended when the student is meal-prepping four portions this week.');
+    assert.equal(result.coverage.excludedServingCount, 1);
+    assert.equal(result.coverage.excludedHighWasteCount, 1);
+    assert.equal(result.coverage.excludedBulkWithoutAssumptionCount, 1);
   });
 });
 

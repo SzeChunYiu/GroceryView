@@ -2,7 +2,8 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildExpiryDealRadar, buildPriceChartSeries, buildWatchlistAlerts, calculateMealCostBreakdown, calculatePersonalGroceryInflation, compareBasketStrategies, planGroceryAlertChannelDefault, planMultiWeekStockUpList, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, rankSinglePortionDeals, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizePriceHistory, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type PriceChartObservation, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { axfoodProducts, type AxfoodProduct } from './axfood-products';
 import { pricedProducts } from './openprices-products';
 
 export const products = [
@@ -2783,76 +2784,101 @@ export const expiryDealRadar = {
   }
 };
 
-export const singlePortionDealInputs = [
-  {
-    productId: 'lindahls-kvarg-500g',
-    productName: 'Lindahls Kvarg Naturell 500g',
-    storeId: 'willys-fridhemsplan',
-    storeName: 'Willys Fridhemsplan',
-    currentPrice: 19.9,
-    regularPrice: 26.9,
-    dealScore: 82,
-    sourceConfidence: 0.74,
-    portionLabel: '1 protein breakfast / snack',
-    source: 'visible member-promo product row sized for one-person use'
-  },
-  {
-    productId: 'garant-korsbarstomater-250g',
-    productName: 'Garant Körsbärstomater 250g',
-    storeId: 'coop-daglivs-fridhemsplan',
-    storeName: 'Coop Daglivs Fridhemsplan',
-    currentPrice: 19.9,
-    regularPrice: 29.9,
-    dealScore: 79,
-    sourceConfidence: 0.72,
-    portionLabel: '2 pasta or salad portions',
-    source: 'visible shelf product row with small-pack markdown evidence'
-  },
-  {
-    productId: 'garant-ekologisk-tofu-270g',
-    productName: 'Garant Ekologisk Tofu 270g',
-    storeId: 'coop-medborgarplatsen',
-    storeName: 'Coop Medborgarplatsen',
-    currentPrice: 21.9,
-    regularPrice: 28.9,
-    dealScore: 76,
-    sourceConfidence: 0.68,
-    portionLabel: '2 dinner portions',
-    source: 'visible shelf product row sized below family-pack quantity'
-  },
-  {
-    productId: 'bravo-apelsinjuice-1l',
-    productName: 'Bravo Apelsinjuice 1L',
-    storeId: 'hemkop-hornstull',
-    storeName: 'Hemköp Hornstull',
-    currentPrice: 22.9,
-    regularPrice: 27.9,
-    dealScore: 64,
-    sourceConfidence: 0.59,
-    portionLabel: '4 breakfast servings',
-    source: 'visible shelf product row retained as a lower-confidence comparison deal'
+const chainStoreLabel = (chain: string) => chain === 'willys' ? 'Willys visible Axfood row' : chain === 'hemkop' ? 'Hemköp visible Axfood row' : chain;
+const axfoodSinglePortionSource = 'Willys + Hemköp Axfood backend /search rows';
+const axfoodSinglePortionRetrieved = '2026-05-20/21';
+const clampNumber = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+function singlePortionDealFromAxfood(
+  slug: string,
+  spec: {
+    servingCount: number;
+    servingSizeLabel: string;
+    wasteRisk: 'low' | 'medium' | 'high';
+    bulkOnly?: boolean;
+    wasteAssumption?: string;
   }
-];
+) {
+  const product = axfoodProducts.find((row) => row.slug === slug) as AxfoodProduct | undefined;
+  if (!product) throw new Error(`Missing Axfood product for single-portion finder: ${slug}`);
+  const storeId = product.lowestChain;
+  const regularPrice = product.highestPrice > product.lowestPrice ? product.highestPrice : product.lowestPrice;
+  return {
+    productId: product.slug,
+    productName: `${product.brand} ${product.name}`.trim(),
+    storeId,
+    storeName: chainStoreLabel(storeId),
+    currentPrice: product.lowestPrice,
+    regularPrice,
+    dealScore: Math.round(clampNumber(62 + product.spreadPct * 0.9, 60, 86)),
+    sourceConfidence: Math.round((0.58 + Math.min(product.inChains.length, 2) * 0.08 + Math.min(product.spreadPct, 25) / 200) * 100) / 100,
+    packageLabel: product.subline,
+    servingCount: spec.servingCount,
+    servingSizeLabel: spec.servingSizeLabel,
+    wasteRisk: spec.wasteRisk,
+    sourceLabel: `${axfoodSinglePortionSource} · ${product.inChains.join('/')} prices · retrieved ${axfoodSinglePortionRetrieved}`,
+    bulkOnly: spec.bulkOnly,
+    wasteAssumption: spec.wasteAssumption
+  };
+}
+
+export const singlePortionDealInputs = [
+  singlePortionDealFromAxfood('jordgubb-granat-pple-drickkvarg-laktosfri-101267027-st', {
+    servingCount: 1,
+    servingSizeLabel: '350ml bottle',
+    wasteRisk: 'low'
+  }),
+  singlePortionDealFromAxfood('tomater-cocktail-klass-1-100814709-st', {
+    servingCount: 2,
+    servingSizeLabel: '125g salad topping',
+    wasteRisk: 'medium'
+  }),
+  singlePortionDealFromAxfood('tropisk-juice-101200166-st', {
+    servingCount: 4,
+    servingSizeLabel: '250ml breakfast glass',
+    wasteRisk: 'medium'
+  }),
+  singlePortionDealFromAxfood('varmr-kt-lax-citronpeppar-portionsbit-101289231-st', {
+    servingCount: 1,
+    servingSizeLabel: '125g dinner protein',
+    wasteRisk: 'low'
+  }),
+  singlePortionDealFromAxfood('l-ngkornigt-ris-boil-in-bag-4x125g-101352149-st', {
+    servingCount: 4,
+    servingSizeLabel: 'one 125g pouch per meal-prep portion',
+    wasteRisk: 'medium',
+    bulkOnly: true,
+    wasteAssumption: 'Recommended only when the shopper plans four boil-in-bag portions this week; unopened pouches reduce waste risk.'
+  }),
+  singlePortionDealFromAxfood('apelsinjuice-utan-fruktk-tt-101263331-st', {
+    servingCount: 4,
+    servingSizeLabel: '438ml large pour',
+    wasteRisk: 'medium',
+    bulkOnly: true
+  })
+].map((deal, _index, rows) => ({
+  ...deal,
+  alternatives: rows
+    .filter((alternative) => alternative.productId !== deal.productId && !alternative.bulkOnly)
+    .map((alternative) => ({
+      productId: alternative.productId,
+      productName: alternative.productName,
+      storeName: alternative.storeName,
+      currentPrice: alternative.currentPrice,
+      servingCount: alternative.servingCount,
+      packageLabel: alternative.packageLabel,
+      sourceLabel: alternative.sourceLabel
+    }))
+}));
 
 export const singlePortionDealFinder = {
   persona: 'Students / young singles',
   title: 'Single-portion deals',
-  rankedDeals: rankDealOpportunities({
-    deals: singlePortionDealInputs.map(({ portionLabel: _portionLabel, source: _source, ...deal }) => deal),
+  ...rankSinglePortionDeals({
+    deals: singlePortionDealInputs,
     minimumDealScore: 60,
     minimumSourceConfidence: 0.55
-  }).map((deal) => {
-    const sourceRow = singlePortionDealInputs.find((input) => input.productId === deal.productId && input.storeId === deal.storeId);
-    return {
-      ...deal,
-      portionLabel: sourceRow?.portionLabel ?? 'single-person portion',
-      source: sourceRow?.source ?? 'visible deal row'
-    };
-  }),
-  coverage: {
-    confidence: 'medium',
-    caveat: 'Filters visible small-pack deals through rankDealOpportunities; family-size bulk offers and sponsored placements are excluded from this student view.'
-  }
+  })
 };
 
 export const kidsSnackLunchboxInputs = [

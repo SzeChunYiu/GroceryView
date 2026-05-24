@@ -252,24 +252,46 @@ export default function DealsPage() {
         <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">Students / young singles</p>
         <h2 className="mt-2 text-2xl font-black">Single-portion deals</h2>
         <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
-          This student view calls rankDealOpportunities, then keeps only visible small-pack deals that make sense for one-person baskets instead of family-size bulk buys.
+          This student view calls rankSinglePortionDeals over real Axfood rows, then keeps only visible small-pack deals that make sense for one-person baskets instead of family-size bulk buys.
         </p>
+        <div className="mt-4 grid gap-2 text-sm text-emerald-950 md:grid-cols-4">
+          <p className="rounded-2xl bg-white p-3 font-black">{singlePortionDealFinder.coverage.rankedCount} recommended</p>
+          <p className="rounded-2xl bg-white p-3 font-black">{singlePortionDealFinder.coverage.excludedBulkWithoutAssumptionCount} bulk rows blocked</p>
+          <p className="rounded-2xl bg-white p-3 font-black">{singlePortionDealFinder.coverage.excludedHighWasteCount} high-waste rows blocked</p>
+          <p className="rounded-2xl bg-white p-3 font-black">{singlePortionDealFinder.coverage.confidence} confidence</p>
+        </div>
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
           {singlePortionDealFinder.rankedDeals.map((deal) => (
             <Link className="block rounded-2xl border border-emerald-200 bg-white p-4 hover:border-emerald-700" href={`/products/${deal.productId}`} key={`${deal.storeId}-${deal.productId}`}>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-lg font-black text-slate-950">{deal.productName}</p>
-                  <p className="mt-1 text-sm text-slate-600">{deal.storeName} · {deal.portionLabel}</p>
+                  <p className="mt-1 text-sm text-slate-600">{deal.storeName} · {deal.packageLabel} · {deal.servingCount} serving{deal.servingCount === 1 ? '' : 's'}</p>
                 </div>
                 <p className="text-2xl font-black text-emerald-800">{formatSek(deal.currentPrice)}</p>
               </div>
               <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-3">
-                <p className="rounded-2xl bg-emerald-100 p-3 font-semibold">{deal.discountPercent}% below regular</p>
-                <p className="rounded-2xl bg-emerald-100 p-3 font-semibold">{deal.band.label}</p>
+                <p className="rounded-2xl bg-emerald-100 p-3 font-semibold">{formatSek(deal.perServingCost)} / serving</p>
+                <p className="rounded-2xl bg-emerald-100 p-3 font-semibold">Waste risk {deal.wasteRisk}</p>
                 <p className="rounded-2xl bg-emerald-100 p-3 font-semibold">Deal Score {deal.dealScore}</p>
               </div>
-              <p className="mt-3 text-xs font-semibold text-slate-600">{deal.source}</p>
+              <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-700">{deal.servingSizeLabel}</p>
+              {deal.bulkCaveat ? (
+                <p className="mt-3 rounded-2xl bg-amber-100 p-3 text-xs font-black text-amber-950">{deal.bulkCaveat}</p>
+              ) : null}
+              <div className="mt-3 rounded-2xl bg-emerald-50 p-3">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Cheaper per-serving alternatives</p>
+                {deal.cheaperAlternatives.length > 0 ? (
+                  <ul className="mt-2 space-y-1 text-xs font-semibold text-slate-700">
+                    {deal.cheaperAlternatives.slice(0, 2).map((alternative) => (
+                      <li key={alternative.productId}>{alternative.productName} · {alternative.storeName} · {formatSek(alternative.perServingCost)} / serving</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-xs font-semibold text-slate-600">No cheaper visible single-portion alternative in this evidence set.</p>
+                )}
+              </div>
+              <p className="mt-3 text-xs font-semibold text-slate-600">{deal.sourceLabel}</p>
             </Link>
           ))}
         </div>

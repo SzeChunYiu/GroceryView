@@ -1492,10 +1492,15 @@ describe('verified-data UI', () => {
 
   it('surfaces a student single-portion deal finder using real deal ranking output', async () => {
     const source = await read('src/app/deals/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
     assert.match(source, /singlePortionDealFinder/);
-    assert.match(source, /rankDealOpportunities/);
+    assert.match(source, /rankSinglePortionDeals/);
+    assert.match(demo, /rankSinglePortionDeals/);
+    assert.match(demo, /axfoodProducts/);
     assert.match(source, /Single-portion deals/);
-    assert.match(source, /portionLabel/);
+    assert.match(source, /perServingCost/);
+    assert.match(source, /cheaperAlternatives/);
+    assert.match(source, /excludedBulkWithoutAssumptionCount/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
