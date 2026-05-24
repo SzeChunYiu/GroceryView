@@ -25,6 +25,7 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
   const resolvedSearchParams = (await (searchParams ?? Promise.resolve({}))) as SearchParams;
   const productsParam = resolvedSearchParams.products;
   const comparison = buildChainComparisonTable(productsParam);
+  const noChainState = comparison.noChainState;
   const packagedRows = comparison.products.filter((product) => product.matchType === 'packaged_barcode');
   const commodityRows = comparison.products.filter((product) => product.matchType === 'commodity_alias');
   const rowSections = [
@@ -63,9 +64,35 @@ export default async function ComparePage({ searchParams }: { searchParams?: Pro
         </div>
         <div className="mt-5 grid gap-4">
           {comparison.products.length === 0 ? (
-            <p className="rounded-3xl border border-emerald-100 bg-white p-5 text-sm font-semibold text-slate-600 shadow-sm">
-              Add ?products=product-slug-1,product-slug-2 to render DB-backed comparison rows. Missing product ids: {comparison.missingProductIds.join(', ') || 'none yet'}.
-            </p>
+            <div className="rounded-3xl border border-amber-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-800">No-chain match state</p>
+              <h3 className="mt-2 text-xl font-black text-slate-950">{noChainState.title}</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{noChainState.description}</p>
+              <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+                <p className="rounded-2xl bg-amber-50 p-3 font-bold text-amber-950">
+                  Active filters <span className="mt-1 block font-black text-slate-950">{noChainState.activeFilters}</span>
+                </p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-bold text-slate-600">
+                  Evidence updated <span className="mt-1 block font-black text-slate-950">{noChainState.evidenceUpdatedAt ?? 'No DB capability timestamp'}</span>
+                </p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-bold text-slate-600">
+                  Capability source <span className="mt-1 block font-black text-slate-950">{noChainState.capabilitySource}</span>
+                </p>
+              </div>
+              <div className="mt-4 grid gap-2 md:grid-cols-3">
+                {noChainState.capabilities.map((capability) => (
+                  <p className="rounded-2xl border border-slate-100 bg-slate-50 p-3 text-xs font-semibold text-slate-600" key={capability.chainId}>
+                    <span className="block text-sm font-black text-slate-950">{capability.chainName}</span>
+                    {capability.canCompare ? 'compare enabled' : 'compare pending'} · {capability.rowCount.toLocaleString('sv-SE')} rows
+                    <span className="mt-1 block">evidenceUpdatedAt {capability.evidenceUpdatedAt ?? 'none'}</span>
+                    <span className="mt-1 block">source {capability.source}</span>
+                  </p>
+                ))}
+              </div>
+              <p className="mt-4 text-xs font-semibold leading-5 text-slate-500">
+                Generated {noChainState.generatedAt ?? 'not generated'} · {noChainState.guardrails.join(' ')}
+              </p>
+            </div>
           ) : null}
           {rowSections.map((section) => (
             <div className="overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm" key={section.id}>
