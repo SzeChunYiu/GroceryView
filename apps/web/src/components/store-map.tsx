@@ -5,11 +5,13 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStores, type OsmStore } from '@/lib/osm-stores';
 import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
+import { formatStoreDistanceCopy } from './store-locator';
 
 // Free, no-API-key vector tiles (© OpenMapTiles / OpenFreeMap, data © OSM).
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
 // Stockholm county centre.
 const STOCKHOLM: [number, number] = [18.0686, 59.3293];
+const EARTH_RADIUS_KM = 6371;
 
 type ChainColor = { match: RegExp; label: string; color: string };
 
@@ -24,6 +26,28 @@ const CHAIN_COLORS: ChainColor[] = [
   { match: /tempo|handlarn|matöppet|matoppet/i, label: 'Tempo / local', color: '#0EA5E9' },
 ];
 const OTHER_COLOR = '#64748B';
+
+function degreesToRadians(value: number): number {
+  return (value * Math.PI) / 180;
+}
+
+function distanceInKilometers(from: [number, number], to: [number, number]): number {
+  const [fromLng, fromLat] = from;
+  const [toLng, toLat] = to;
+  const deltaLat = degreesToRadians(toLat - fromLat);
+  const deltaLng = degreesToRadians(toLng - fromLng);
+  const lat1 = degreesToRadians(fromLat);
+  const lat2 = degreesToRadians(toLat);
+  const a =
+    Math.sin(deltaLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLng / 2) ** 2;
+
+  return EARTH_RADIUS_KM * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function storeDistanceFromStockholm(store: OsmStore): number {
+  return distanceInKilometers(STOCKHOLM, [store.lng, store.lat]);
+}
 
 function chainColor(brand: string): string {
   for (const c of CHAIN_COLORS) if (c.match.test(brand)) return c.color;
@@ -361,6 +385,9 @@ export function StoreMap() {
                   <div>
                     <p className="font-black leading-5 text-slate-950">{store.name}</p>
                     <p className="mt-1 text-xs font-semibold text-slate-500">{storeLocationLabel(store)}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">
+                      {formatStoreDistanceCopy(storeDistanceFromStockholm(store))}
+                    </p>
                   </div>
                   <span
                     aria-hidden="true"
