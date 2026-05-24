@@ -653,9 +653,11 @@ describe('St1 fuel price connector', () => {
     ]);
     assert.equal(rows[0].observedAt, '2026-05-22T22:01:00.000Z');
     assert.equal(rows[0].source.kind, 'operator');
+    assert.equal(rows.every((row) => row.channel === 'store'), true);
+    assert.equal(rows.every((row) => row.format === 'st1_station'), true);
     assert.equal(rows[0].source.operatorName, 'St1 Sverige AB');
     assert.equal(rows[0].provenance.sourceUrl, ST1_FUEL_PRICE_URL);
-    assert.equal(rows[0].provenance.parserVersion, 'st1-fuel-listpris-v1');
+    assert.equal(rows[0].provenance.parserVersion, 'st1-fuel-listpris-v2');
     assert.match(rows[0].provenance.contentDigest.value, /^[a-f0-9]{64}$/);
   });
 

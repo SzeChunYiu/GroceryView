@@ -5,6 +5,8 @@ export const ST1_FUEL_PRICE_URL = 'https://st1.se/foretag/listpris';
 export type St1FuelGrade = '95' | '98' | 'diesel' | 'HVO100' | 'E85';
 export type St1FuelObservationDomain = 'fuel';
 export type St1FuelSourceKind = 'operator' | 'crowd';
+export type St1FuelPriceChannel = 'store';
+export type St1FuelStationFormat = 'st1_station';
 
 export type St1FuelPriceSource = {
   id: string;
@@ -23,6 +25,8 @@ export type St1FuelPriceObservation = {
   pricePerLitre: number;
   currency: 'SEK';
   litreBasis: 1;
+  channel: St1FuelPriceChannel;
+  format: St1FuelStationFormat;
   observedAt: string;
   validFrom: string;
   confidence: number;
@@ -125,6 +129,8 @@ export function parseSt1FuelPriceHtml(
       pricePerLitre,
       currency: 'SEK',
       litreBasis: 1,
+      channel: 'store',
+      format: 'st1_station',
       observedAt: validFrom,
       validFrom,
       confidence: 0.95,
@@ -133,7 +139,7 @@ export function parseSt1FuelPriceHtml(
         sourceRunId: context.sourceRunId ?? `st1-fuel-${validFrom.slice(0, 10)}`,
         sourceUrl,
         capturedAt: context.retrievedAt,
-        parserVersion: 'st1-fuel-listpris-v1',
+        parserVersion: 'st1-fuel-listpris-v2',
         ...(context.rawRecordId ? { rawRecordId: context.rawRecordId } : {}),
         contentDigest: {
           algorithm: 'sha-256',
