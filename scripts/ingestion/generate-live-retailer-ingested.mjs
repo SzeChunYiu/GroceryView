@@ -3,7 +3,6 @@ import {
   DEFAULT_CITY_GROSS_PRODUCT_QUERIES,
   DEFAULT_HEMKOP_SEARCH_QUERIES,
   DEFAULT_LIDL_OFFER_PATHS,
-  DEFAULT_WILLYS_SEARCH_QUERIES,
   fetchCityGrossProductsForAllStores,
   fetchHemkopProducts,
   fetchHemkopWeeklyDiscountsForAllStores,
@@ -16,7 +15,6 @@ const REPO_ROOT = new URL('../../', import.meta.url);
 const INGESTED_DIR = new URL('apps/web/src/lib/ingested/', REPO_ROOT);
 
 const CITY_GROSS_QUERIES = [DEFAULT_CITY_GROSS_PRODUCT_QUERIES[0]];
-const WILLYS_QUERIES = DEFAULT_WILLYS_SEARCH_QUERIES;
 const HEMKOP_QUERIES = DEFAULT_HEMKOP_SEARCH_QUERIES;
 const LIDL_OFFER_PATHS = DEFAULT_LIDL_OFFER_PATHS;
 
@@ -34,7 +32,6 @@ const cityGrossProducts = await fetchCityGrossProductsForAllStores({
 await writeCityGross(cityGrossProducts);
 
 const willysProducts = await fetchWillysProducts({
-  queries: WILLYS_QUERIES,
   maxRows: 1200,
   retrievedAt
 });
@@ -127,11 +124,11 @@ async function writeWillys(products, weeklyDiscounts) {
   const weeklySourceUrls = unique(weeklyDiscounts.map((row) => row.sourceUrl));
   const weeklyStoreIds = unique(weeklyDiscounts.map((row) => row.storeId));
   await writeGeneratedFile('willys.ts', [
-    '// AUTO-GENERATED from public Willys search JSON and public Axfood campaign JSON.',
-    `// Product source URL pattern: https://www.willys.se/search?q={query}`,
+    '// AUTO-GENERATED from public Willys category JSON and public Axfood campaign JSON.',
+    `// Product category source URL pattern: https://www.willys.se/c/{categoryPath}?page={page}&size=100`,
     `// Product source URLs: ${productSourceUrls.join('; ')}`,
     `// Product retrieved: ${retrievedAt}`,
-    `// Product row count: ${products.length} real product rows fetched from willys.se search.`,
+    `// Product row count: ${products.length} real product rows fetched from willys.se category pages.`,
     `// Weekly discount store catalog source URL: https://www.willys.se/axfood/rest/store`,
     `// Weekly discount source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100`,
     `// Weekly discount source URLs: ${weeklySourceUrls.join('; ')}`,
@@ -185,11 +182,10 @@ async function writeWillys(products, weeklyDiscounts) {
     '};',
     '',
     `export const willysSource = ${literal({
-      source: 'willys.se public search JSON',
+      source: 'willys.se public category JSON',
       retrievedAt,
       rowCount: products.length,
-      sourceUrlPattern: 'https://www.willys.se/search?q={query}',
-      queries: WILLYS_QUERIES,
+      sourceUrlPattern: 'https://www.willys.se/c/{categoryPath}?page={page}&size=100',
       sourceUrls: productSourceUrls
     })} as const;`,
     '',
