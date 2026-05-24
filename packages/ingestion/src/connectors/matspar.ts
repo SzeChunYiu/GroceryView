@@ -98,10 +98,18 @@ export const DEFAULT_MATSPAR_SEARCH_QUERIES = [
   'diskmedel',
   'nudlar',
   'falukorv',
-  'havredryck'
+  'havredryck',
+  'filmjolk',
+  'leverpastej',
+  'kaviar',
+  'sill',
+  'bulgur',
+  'couscous',
+  'linser',
+  'bonor'
 ] as const;
-export const DEFAULT_MATSPAR_SEARCH_PAGES = [1, 2] as const;
-export const DEFAULT_MATSPAR_MAX_ROWS = 4000;
+export const DEFAULT_MATSPAR_SEARCH_PAGES = [1, 2, 3] as const;
+export const DEFAULT_MATSPAR_MAX_ROWS = 5000;
 export const MATSPAR_MINIMUM_ROWS = 100;
 
 export type FetchMatsparProductsOptions = {

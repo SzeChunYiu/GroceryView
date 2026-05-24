@@ -4,7 +4,7 @@
 - Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C
 - Store locator retrieved: 2026-05-23T00:16:08.083Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 93229
+- Real rows fetched: 93109
 - Stores fetched: 324
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
@@ -12,7 +12,7 @@
 
 ## Source URLs
 
-- Source URL (1003822 ICA Supermarket Toria, retrieved 2026-05-24T00:56:17.000Z, rows 145): https://handlaprivatkund.ica.se/stores/1003822/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=145&maxPageSize=145
+- Source URL (1003822 ICA Supermarket Toria, retrieved 2026-05-23T20:42:39.000Z, rows 25): https://handlaprivatkund.ica.se/stores/1003822/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=25&maxPageSize=25
 
 - Source URL (1004070 ICA Kvantum Tomelilla, retrieved 2026-05-23T13:26:35.000Z, rows 10): https://handlaprivatkund.ica.se/stores/1004070/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=10&maxPageSize=10
 

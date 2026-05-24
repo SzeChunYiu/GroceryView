@@ -63,6 +63,30 @@ const lidlStoreOffers = await fetchLidlOffersForAllStores({
 });
 await writeLidl(lidlStoreOffers);
 
+const mathemProducts = await fetchMathemProducts({
+  queries: MATHEM_QUERIES,
+  pages: MATHEM_PAGES,
+  maxRows: 9000,
+  retrievedAt
+});
+await writeMathem(mathemProducts);
+
+const matsparProducts = await fetchMatsparProducts({
+  queries: MATSPAR_QUERIES,
+  pages: MATSPAR_PAGES,
+  maxRows: 5000,
+  retrievedAt
+});
+await writeMatspar(matsparProducts);
+
+const pharmacyProducts = await fetchPharmacyProducts({
+  sourcePaths: APOHEM_SOURCE_PATHS,
+  apotekHjartatUrls: APOTEK_HJARTAT_SEARCH_URLS,
+  maxRows: 900,
+  retrievedAt
+});
+await writeApohem(pharmacyProducts);
+
 console.log(JSON.stringify({
   retrievedAt,
   cityGrossProducts: cityGrossProducts.length,

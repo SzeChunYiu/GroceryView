@@ -17,13 +17,13 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 
 ## Weekly flyer discount evidence
 
-- Source: Coop public store API current flyer metadata plus public personalization product search promotions
+- Source: Coop public store API current flyer metadata plus public personalization product search promotions and public DR flyer PDF text
 - Store API URLs: per-branch `https://proxy.api.coop.se/external/store/stores/<storeId>?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true`, listed in `apps/web/src/lib/ingested/coop.ts`
 - Flyer PDF URLs: per-branch `https://dr.coop.se/Butik/<store-slug>`, listed in `apps/web/src/lib/ingested/coop.ts`
 - Product search URLs: per-branch `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1`, listed in `apps/web/src/lib/ingested/coop.ts`
 - Request body: weekly flyer item queries listed in `DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES`, resultsOptions take 8, empty sort/facets, relatedResultsOptions take 0
 - Required public headers: `storeApiSubscriptionKey` for store metadata and `personalizationApiSubscriptionKey` for product search, both exposed in `window.coopSettings.serviceAccess` on https://www.coop.se/handla/
-- Retrieved: 2026-05-23T18:24:33.749Z for 170 added rows at Coop Funäsdalen, Coop Sveg, Coop Vindeln, Coop Sala, Coop Partille, Coop Mellerud, Coop Björna, Stora Coop Kållered, Coop Träkvista; previous latest retrieval 2026-05-23T17:42:43.341Z for 37 added rows at Coop Bräcke and Coop Ullånger; previous retained rows retrieved 2026-05-23T14:31:15.709Z, 2026-05-23T13:02:38.339Z, 2026-05-22T15:07:27.837Z, 2026-05-22T16:05:03.230Z, 2026-05-22T16:34:51.000Z, 2026-05-22T16:55:10.087Z, 2026-05-22T18:13:24.527Z, 2026-05-22T18:46:18.919Z, 2026-05-22T19:36:22.255Z, 2026-05-22T20:44:26.622Z, 2026-05-22T21:07:45.585Z, 2026-05-22T23:08:48.345Z, 2026-05-22T23:37:11.938Z, 2026-05-23T00:07:02.085Z
+- Retrieved: 2026-05-24T06:34:30.556Z for 10 added rows at X:-Tra Töreboda and X:-Tra Mariestad; previous latest retrieval 2026-05-23T18:24:33.749Z for 170 added rows at Coop Funäsdalen, Coop Sveg, Coop Vindeln, Coop Sala, Coop Partille, Coop Mellerud, Coop Björna, Stora Coop Kållered, Coop Träkvista; previous retained rows retrieved 2026-05-23T17:42:43.341Z, 2026-05-23T14:31:15.709Z, 2026-05-23T13:02:38.339Z, 2026-05-22T15:07:27.837Z, 2026-05-22T16:05:03.230Z, 2026-05-22T16:34:51.000Z, 2026-05-22T16:55:10.087Z, 2026-05-22T18:13:24.527Z, 2026-05-22T18:46:18.919Z, 2026-05-22T19:36:22.255Z, 2026-05-22T20:44:26.622Z, 2026-05-22T21:07:45.585Z, 2026-05-22T23:08:48.345Z, 2026-05-22T23:37:11.938Z, 2026-05-23T00:07:02.085Z
 - Added this iteration: 015320 Coop Västerhaninge Centrum; 245200 Coop Haparanda; 163900 Coop Sunne; 163500 Coop Hagfors; 136251 Coop Hunnebostrand; 135220 Coop Kungshamn; 205150 Coop Sandviken; 066452 Coop Torup; 075220 Coop Sävsjö; 086811 Coop Högsby; 165500 Coop Sysslebäck; 196311 Coop Sollerön; 235160 Coop Byske; 235180 Coop Norsjö; 235200 Coop Malå
 - Added this iteration (worker B follow-up): 235300 Coop Tärnaby; 235380 Coop Burträsk; 235420 Coop Nordmaling; 235430 Coop Storuman; 235480 Coop Robertsfors; 235920 Coop Hammarstrand; 235960 Coop Åre; 235980 Coop Järpen; 236030 Coop Bjurholm; 235600 Coop Kramfors; 235900 Coop Strömsund; 235410 Coop Vännäs; 235510 Coop Ånge; 135030 Coop Lysekil
 - Added this iteration (worker B second follow-up): 074400 Coop Tranås; 245040 Coop Älvsbyn; 086804 Coop Kolberga; 083700 Coop Flanaden
@@ -38,203 +38,145 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 - Added this iteration (worker B eleventh follow-up): 056030 Coop Linden Motala; 056215 Coop Stockholmsvägen; 056212 Coop Ullstämma; 016041 Coop Hagastaden; 026828 Coop Bålsta; 126400 Coop Kolla Parkstad; 123300 Coop Öjersjö; 235970 Coop Vemdalen; 016170 Stora Coop Spånga; 055030 Stora Coop Ingelsta; 015480 Stora Coop Barkarby; 232400 Stora Coop Avion; 245270 Coop Arvidsjaur, 267 real discount rows (056030:21, 056215:16, 056212:17, 016041:19, 026828:20, 126400:17, 123300:23, 235970:19, 016170:25, 055030:25, 015480:26, 232400:18, 245270:21). Store API validity and flyer URLs came from matching `https://proxy.api.coop.se/external/store/stores/<storeId>?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true` responses retrieved at 2026-05-23T14:31:15.709Z. Ordinary and offer prices came from matching store-scoped `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1` responses. Candidate stores 242300, 235660, 093300, 206402, 236420, 236451, 236023, 235440, 055240, 235650, 236020, 106441, 093400, 232200, 104210, and 236013 were inspected but excluded because they only yielded flyer-PDF fallback rows without a verified ordinary-price-greater-than-offer-price discount.
 - Added this iteration (worker B thirteenth follow-up): 225360 Coop Funäsdalen (Funäsdalen) 15; 225340 Coop Sveg (Sveg) 16; 235490 Coop Vindeln (Vindeln) 18; 184900 Coop Sala (Sala) 21; 123200 Coop Partille (Partille) 22; 136000 Coop Mellerud (Mellerud) 22; 236464 Coop Björna (Björna) 10; 133900 Stora Coop Kållered (Kållered) 26; 016195 Coop Träkvista (Ekerö) 20. Store API validity and flyer URLs came from matching `https://proxy.api.coop.se/external/store/stores/<storeId>?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true` responses retrieved at 2026-05-23T18:24:33.749Z. Ordinary and offer prices came from matching store-scoped `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1` responses; only product-search rows with ordinaryPrice greater than offerPrice were emitted.
 - Added this iteration (worker B fourteenth follow-up): 246549 Coop Vittangi (Vittangi) 13; 246550 Coop Svappavaara (Svappavaara) 14; 245030 Coop Övertorneå (Övertorneå) 17; 085130 Coop Mönsterås (Mönsterås) 21; 085320 Coop Hultsfred (Hultsfred) 15. Store API validity and flyer URLs came from matching `https://proxy.api.coop.se/external/store/stores/<storeId>?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true` responses retrieved at 2026-05-23T19:59:28.767Z. Ordinary and offer prices came from matching store-scoped `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1` responses; only product-search rows with ordinaryPrice greater than offerPrice were emitted. Candidate stores 246030, 245010, 245090, 085210, and 086820 were inspected but excluded because they returned no qualifying ordinary-price-greater-than-offer-price discount rows in this probe.
+- Added this iteration (worker B fifteenth follow-up): 136049 X:-Tra Töreboda and 136050 X:-Tra Mariestad, 10 real current-week discount rows (5 each). Store API validity and flyer URLs came from matching `https://proxy.api.coop.se/external/store/stores/<storeId>?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true` responses retrieved at 2026-05-24T06:34:30.556Z. Offer and ordinary prices came from public DR flyer PDF text at `https://dr.coop.se/Butik/X%3Atra-T%C3%B6reboda` and `https://dr.coop.se/Butik/X%3Atra-Mariestad`; only rows with ordinaryPrice greater than offerPrice and validity 2026-05-18T00:00:00 through 2026-05-24T23:59:59 were emitted. Candidate stores 196183, 176310, 136048, 136051, 136057, 136022, 136038, 136041, 136027, 136044, 136045, 056231, 056214, and 216544 were inspected but returned no qualifying current-week discount rows in this probe.
 - Added this iteration (worker B twelfth follow-up): 235990 Coop Bräcke; 236401 Coop Ullånger, 37 real discount rows (235990:18, 236401:19). Store API validity and flyer URLs came from matching `https://proxy.api.coop.se/external/store/stores/<storeId>?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true` responses retrieved at 2026-05-23T17:42:43.341Z. Ordinary and offer prices came from matching store-scoped `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1` responses. Candidate stores outside the connector default list were probed directly against the public personalization API; most returned 403 or only non-qualifying/no promotion rows, and only these two stores returned verified ordinary-price-greater-than-offer-price discounts.
 - Stores:
-  - 176211, Stora Coop Ladugårdsängen, Örebro, 25 real discount rows
-  - 106436, Coop Örkelljunga, Örkelljunga, 22 real discount rows
-  - 135060, Stora Coop Tanumshede, Tanum, 25 real discount rows
-  - 086815, Coop Målilla, Målilla, 14 real discount rows
-  - 192500, Coop Leksand, Leksand, 18 real discount rows
-  - 056095, Stora Coop Risängen, Norrköping, 22 real discount rows
-  - 235620, Coop Vilhelmina, Vilhelmina, 15 real discount rows
-  - 245020, Coop Överkalix, Överkalix, 16 real discount rows
-  - 183500, Coop Sveaplan Eskilstuna, Eskilstuna, 22 real discount rows
-  - 065050, Coop Hyltebruk, Hyltebruk, 21 real discount rows
-  - 072700, Coop Västervik, Västervik, 18 real discount rows
-  - 236085, Coop Ånäset, Ånäset, 11 real discount rows
-  - 106114, Stora Coop Falkenberg, Falkenberg, 25 real discount rows
-  - 122000, Coop Kongahälla, Kungälv, 22 real discount rows
-  - 251300, Stora Coop Boländerna, Uppsala, 26 real discount rows
-  - 252700, Stora Coop Bromma, Bromma, 24 real discount rows
-  - 256600, Stora Coop Västberga, Hägersten, 24 real discount rows
-  - 255700, Stora Coop Häggvik, Sollentuna, 22 real discount rows
-  - 015700, Stora Coop Danderyd, Danderyd, 24 real discount rows
-  - 015810, Stora Coop Sundby Park, Sundbyberg, 25 real discount rows
-  - 015350, Stora Coop Huddinge, Huddinge, 23 real discount rows
-  - 026000, Stora Coop Märsta, Märsta, 25 real discount rows
-  - 015220, Stora Coop Stuvsta, Huddinge, 24 real discount rows
-  - 016141, Stora Coop Orminge, Saltsjö-Boo, 23 real discount rows
-  - 255400, Stora Coop Värmdö, Gustavsberg, 24 real discount rows
-  - 250800, Stora Coop Södertälje, Södertälje, 24 real discount rows
-  - 015400, Stora Coop Åkersberga, Åkersberga, 22 real discount rows
-  - 015470, Stora Coop Arninge, Täby, 25 real discount rows
-  - 250400, Stora Coop Haninge, Haninge, 25 real discount rows
-  - 163400, Stora Coop Kristinehamn, Kristinehamn, 24 real discount rows
-  - 231400, Stora Coop Ersboda, Umeå, 23 real discount rows
-  - 231500, Stora Coop Härnösand, Härnösand, 24 real discount rows
-  - 231800, Stora Coop Örnsköldsvik, Örnsköldsvik, 26 real discount rows
-  - 093200, Stora Coop Karlshamn, Karlshamn, 23 real discount rows
-  - 133100, Stora Coop Överby, Trollhättan, 22 real discount rows
-  - 231900, Stora Coop Östersund, Östersund, 24 real discount rows
-  - 030500, Stora Coop Vinsta, Vällingby, 21 real discount rows
-  - 075800, Stora Coop Norremark, Växjö, 24 real discount rows
-  - 022500, Stora Coop Visby, Visby, 25 real discount rows
-  - 201700, Stora Coop Valbo, Valbo, 20 real discount rows
-  - 242200, Stora Coop Storheden, Luleå, 24 real discount rows
-  - 255500, Stora Coop Sisjön, Askim, 24 real discount rows
-  - 253200, Stora Coop Skara, Skara, 26 real discount rows
-  - 252600, Stora Coop Backaplan, Göteborg, 24 real discount rows
-  - 252500, Stora Coop Bäckebol, Hisings Backa, 22 real discount rows
-  - 231300, Stora Coop Sörböle, Skellefteå, 17 real discount rows
-  - 241200, Stora Coop Kiruna, Kiruna, 24 real discount rows
-  - 176110, Coop City Hallsberg, Hallsberg, 21 real discount rows
-  - 112000, Stora Coop Varberg, Varberg, 26 real discount rows
-  - 254800, Stora Coop Nolhaga Skövde, Skövde, 23 real discount rows
-  - 255900, Stora Coop Kungsbacka, Kungsbacka, 25 real discount rows
-  - 162000, Stora Coop Bergvik, Karlstad, 22 real discount rows
-  - 241800, Stora Coop Kalix, Kalix, 25 real discount rows
-  - 205180, Stora Coop Hudiksvall, Hudiksvall, 21 real discount rows
-  - 072000, Stora Coop Jönköping, Jönköping, 23 real discount rows
-  - 241100, Stora Coop Gällivare, Gällivare, 22 real discount rows
-  - 056230, Coop Fiskaregatan Vimmerby, Vimmerby, 13 real discount rows
+  - 176110, Coop City Hallsberg, Hallsberg, 22 real discount rows
+  - 216502, X:-Tra Kirseberg, Malmö, 3 real discount rows
+  - 136049, X:-Tra Töreboda, Töreboda, 5 real discount rows
+  - 136050, X:-Tra Mariestad, Mariestad, 5 real discount rows
+  - 136058, X:-Tra Herrljunga, Herrljunga, 3 real discount rows
+  - 136055, X:-Tra Lidköping, Lidköping, 3 real discount rows
+  - 136028, X:-Tra Svenljunga, Svenljunga, 3 real discount rows
+  - 136029, X:-Tra Hisingen, Göteborg, 3 real discount rows
+  - 136021, X:-Tra Borås, Borås, 3 real discount rows
+  - 136040, X:-Tra Lilla Edet, Lilla Edet, 3 real discount rows
+  - 056217, X:-Tra Ljura, Norrköping, 3 real discount rows
+  - 186116, X:-Tra Stengatan, Västerås, 3 real discount rows
+  - 186311, X:-Tra Surahammar, Surahammar, 3 real discount rows
+  - 176215, X:-Tra Haga Örebro, Örebro, 3 real discount rows
+  - 176217, X:-Tra Markbacken, Örebro, 3 real discount rows
+  - 186370, X:-Tra Arboga, Arboga, 3 real discount rows
+  - 176311, X:-Tra Askersund, Askersund, 3 real discount rows
+  - 176111, X:-Tra Hallsberg, Hallsberg, 3 real discount rows
+  - 056219, X:-Tra Motala, Motala, 3 real discount rows
+  - 216532, X:-Tra Söderkulla, Malmö, 3 real discount rows
+  - 216527, X:-Tra Arlövsvägen, Arlöv, 3 real discount rows
+  - 216528, X:-Tra Dalbyvägen, Arlöv, 3 real discount rows
+  - 216517, X:-Tra Remigatan, Landskrona, 3 real discount rows
+  - 106118, X:-Tra Snöstorpsvägen, Halmstad, 3 real discount rows
+  - 106116, X:-Tra Arvidstorp, Falkenberg, 3 real discount rows
+  - 216508, X:-Tra Örkelljunga, Örkelljunga, 3 real discount rows
+  - 216516, X:-Tra Vasatorp, Helsingborg, 3 real discount rows
+  - 216539, X:-Tra Sjöbo, Sjöbo, 3 real discount rows
+  - 216545, X:-Tra Perstorp, Perstorp, 3 real discount rows
+  - 056230, Coop Fiskaregatan Vimmerby, Vimmerby, 14 real discount rows
+  - 056313, Coop Östermalmshallen, Finspång, 4 real discount rows
+  - 136037, X:-Tra Vetlanda, Vetlanda, 3 real discount rows
+  - 136006, X:-Tra Ljungby, Ljungby, 3 real discount rows
+  - 136010, X:-Tra Alvesta, Alvesta, 3 real discount rows
+  - 216548, X:-Tra Sölvesborg, Sölvesborg, 3 real discount rows
+  - 216554, X:-Tra Karlskrona, Karlskrona, 3 real discount rows
+  - 136019, X:-Tra Mullsjö, Mullsjö, 3 real discount rows
+  - 216503, X:-Tra Höör, Höör, 3 real discount rows
+  - 216538, X:-Tra Hörby, Hörby, 3 real discount rows
+  - 216540, X:-Tra Eslöv, Eslöv, 3 real discount rows
+  - 216547, X:-Tra Hässleholm, Hässleholm, 3 real discount rows
+  - 216549, X:-Tra Österäng, Kristianstad, 3 real discount rows
+  - 216550, X:-Tra Näsby, Kristianstad, 3 real discount rows
+  - 216555, X:-Tra Osby, Osby, 3 real discount rows
+  - 016712, X:-Tra Aspudden, Hägersten, 3 real discount rows
+  - 136043, X:-Tra Hisings Backa, Hising Backa, 3 real discount rows
+  - 216512, X:-Tra Elineberg, Helsingborg, 3 real discount rows
   - 026500, Coop Bredden, Upplands Väsby, 16 real discount rows
-  - 175010, Coop Forum Marieberg, Örebro, 22 real discount rows
-  - 254700, Stora Coop Nyköping, Nyköping, 24 real discount rows
-  - 036968, Stora Coop Norrteljeporten, Norrtälje, 24 real discount rows
-  - 257400, Stora Coop Strängnäs, Strängnäs, 25 real discount rows
-  - 253000, Stora Coop Eskilstuna, Eskilstuna, 20 real discount rows
-  - 252200, Stora Coop Borås, Borås, 25 real discount rows
-  - 205140, Stora Coop Bollnäs, Bollnäs, 25 real discount rows
-  - 163300, Stora Coop Palmviken Arvika, Arvika, 24 real discount rows
-  - 165400, Stora Coop Styckåsen, Arvika, 25 real discount rows
-  - 163800, Stora Coop Hammarö, Hammarö, 22 real discount rows
-  - 185510, Stora Coop Stenby Västerås, Västerås, 26 real discount rows
-  - 232000, Stora Coop Sundsvall, Sundsvall, 24 real discount rows
-  - 254900, Stora Coop Enköping, Enköping, 20 real discount rows
-  - 054000, Stora Coop Finspång, Finspång, 25 real discount rows
-  - 105610, Stora Coop Halmstad, Halmstad, 26 real discount rows
-  - 195020, Stora Coop Norra Backa, Borlänge, 26 real discount rows
-  - 163000, Stora Coop Välsviken, Karlstad, 21 real discount rows
-  - 196000, Stora Coop Ludvika, Ludvika, 21 real discount rows
-  - 026810, Stora Coop Kungsängen, Kungsängen, 26 real discount rows
-  - 056010, Stora Coop Garnisonen Linköping, Linköping, 21 real discount rows
-  - 195030, Stora Coop Falun, Falun, 23 real discount rows
-  - 015430, Stora Coop Tumba, Tumba, 24 real discount rows
-  - 133800, Stora Coop Torp, Uddevalla, 24 real discount rows
-  - 201510, Stora Coop Ljusdal, Ljusdal, 23 real discount rows
-  - 165270, Stora Coop Kil, Kil, 26 real discount rows
-  - 165290, Stora Coop Torsby, Torsby, 20 real discount rows
-  - 015320, Coop Västerhaninge Centrum, Västerhaninge, 17 real discount rows
-  - 245200, Coop Haparanda, Haparanda, 20 real discount rows
-  - 163900, Coop Sunne, Sunne, 22 real discount rows
-  - 163500, Coop Hagfors, Hagfors, 17 real discount rows
-  - 136251, Coop Hunnebostrand, Hunnebostrand, 20 real discount rows
-  - 135220, Coop Kungshamn, Kungshamn, 18 real discount rows
-  - 205150, Coop Sandviken, Sandviken, 21 real discount rows
-  - 066452, Coop Torup, Torup, 17 real discount rows
-  - 075220, Coop Sävsjö, Sävsjö, 20 real discount rows
-  - 086811, Coop Högsby, Högsby, 17 real discount rows
-  - 165500, Coop Sysslebäck, Sysslebäck, 15 real discount rows
-  - 196311, Coop Sollerön, Sollerön, 13 real discount rows
-  - 235160, Coop Byske, Byske, 10 real discount rows
-  - 235180, Coop Norsjö, Norsjö, 16 real discount rows
-  - 235200, Coop Malå, Malå, 13 real discount rows
-  - 235300, Coop Tärnaby, Tärnaby, 14 real discount rows
-  - 235380, Coop Burträsk, Burträsk, 17 real discount rows
-  - 235420, Coop Nordmaling, Nordmaling, 18 real discount rows
-  - 235430, Coop Storuman, Storuman, 15 real discount rows
-  - 235480, Coop Robertsfors, Robertsfors, 16 real discount rows
-  - 235920, Coop Hammarstrand, Hammarstrand, 13 real discount rows
-  - 235960, Coop Åre, Åre, 14 real discount rows
-  - 235980, Coop Järpen, Järpen, 16 real discount rows
-  - 236030, Coop Bjurholm, Bjurholm, 12 real discount rows
-  - 235600, Coop Kramfors, Kramfors, 20 real discount rows
-  - 235900, Coop Strömsund, Strömsund, 14 real discount rows
-  - 235410, Coop Vännäs, Vännäs, 17 real discount rows
-  - 235510, Coop Ånge, Ånge, 20 real discount rows
-  - 135030, Coop Lysekil, Lysekil, 22 real discount rows
-  - 074400, Coop Tranås, Tranås, 20 real discount rows
-  - 245040, Coop Älvsbyn, Älvsbyn, 17 real discount rows
-  - 086804, Coop Kolberga, Oskarshamn, 17 real discount rows
-  - 083700, Coop Flanaden, Oskarshamn, 20 real discount rows
+  - 136635, X:-Tra Ljungskile, Ljungskile, 3 real discount rows
+  - 136039, X:-Tra Trollhättan, Trollhättan, 3 real discount rows
+  - 136046, X:-Tra Sävsjö, Sävsjö, 3 real discount rows
+  - 136015, X:-Tra Eksjö, Eksjö, 3 real discount rows
+  - 136013, X:-Tra Smålandsstenar, Smålandsstenar, 3 real discount rows
+  - 163400, Stora Coop Kristinehamn, Kristinehamn, 25 real discount rows
+  - 231400, Stora Coop Ersboda, Umeå, 24 real discount rows
+  - 231500, Stora Coop Härnösand, Härnösand, 25 real discount rows
+  - 231800, Stora Coop Örnsköldsvik, Örnsköldsvik, 27 real discount rows
+  - 093200, Stora Coop Karlshamn, Karlshamn, 24 real discount rows
+  - 133100, Stora Coop Överby, Trollhättan, 23 real discount rows
+  - 231900, Stora Coop Östersund, Östersund, 25 real discount rows
+  - 030500, Stora Coop Vinsta, Vällingby, 23 real discount rows
+  - 252700, Stora Coop Bromma, Bromma, 25 real discount rows
+  - 075800, Stora Coop Norremark, Växjö, 25 real discount rows
+  - 022500, Stora Coop Visby, Visby, 26 real discount rows
+  - 201700, Stora Coop Valbo, Valbo, 21 real discount rows
+  - 242200, Stora Coop Storheden, Luleå, 25 real discount rows
+  - 255500, Stora Coop Sisjön, Askim, 25 real discount rows
+  - 253200, Stora Coop Skara, Skara, 27 real discount rows
+  - 252600, Stora Coop Backaplan, Göteborg, 25 real discount rows
+  - 252500, Stora Coop Bäckebol, Hisings Backa, 23 real discount rows
+  - 175010, Coop Forum Marieberg, Örebro, 23 real discount rows
+  - 231300, Stora Coop Sörböle, Skellefteå, 18 real discount rows
+  - 241200, Stora Coop Kiruna, Kiruna, 25 real discount rows
+  - 256600, Stora Coop Västberga, Hägersten, 25 real discount rows
+  - 112000, Stora Coop Varberg, Varberg, 27 real discount rows
   - 105860, Stora Coop Stadion, Malmö, 6 real discount rows
+  - 255700, Stora Coop Häggvik, Sollentuna, 24 real discount rows
+  - 015350, Stora Coop Huddinge, Huddinge, 25 real discount rows
+  - 026000, Stora Coop Märsta, Märsta, 26 real discount rows
+  - 254800, Stora Coop Nolhaga Skövde, Skövde, 25 real discount rows
+  - 255900, Stora Coop Kungsbacka, Kungsbacka, 26 real discount rows
   - 105760, Stora Coop Lund, Lund, 5 real discount rows
+  - 162000, Stora Coop Bergvik, Karlstad, 23 real discount rows
+  - 241800, Stora Coop Kalix, Kalix, 26 real discount rows
+  - 015810, Stora Coop Sundby Park, Sundbyberg, 27 real discount rows
+  - 205180, Stora Coop Hudiksvall, Hudiksvall, 22 real discount rows
+  - 251300, Stora Coop Boländerna, Uppsala, 27 real discount rows
+  - 015700, Stora Coop Danderyd, Danderyd, 26 real discount rows
+  - 072000, Stora Coop Jönköping, Jönköping, 24 real discount rows
+  - 241100, Stora Coop Gällivare, Gällivare, 23 real discount rows
+  - 254700, Stora Coop Nyköping, Nyköping, 25 real discount rows
+  - 036968, Stora Coop Norrteljeporten, Norrtälje, 25 real discount rows
+  - 015220, Stora Coop Stuvsta, Huddinge, 25 real discount rows
+  - 016141, Stora Coop Orminge, Saltsjö-Boo, 24 real discount rows
+  - 255400, Stora Coop Värmdö, Gustavsberg, 25 real discount rows
+  - 250800, Stora Coop Södertälje, Södertälje, 25 real discount rows
   - 105740, Stora Coop Råå Hbg, Helsingborg, 4 real discount rows
   - 105710, Stora Coop Väla Hbg, Ödåkra, 6 real discount rows
+  - 257400, Stora Coop Strängnäs, Strängnäs, 26 real discount rows
+  - 253000, Stora Coop Eskilstuna, Eskilstuna, 21 real discount rows
+  - 252200, Stora Coop Borås, Borås, 27 real discount rows
+  - 205140, Stora Coop Bollnäs, Bollnäs, 26 real discount rows
+  - 163300, Stora Coop Palmviken Arvika, Arvika, 25 real discount rows
+  - 165400, Stora Coop Styckåsen, Arvika, 26 real discount rows
+  - 163800, Stora Coop Hammarö, Hammarö, 23 real discount rows
+  - 015400, Stora Coop Åkersberga, Åkersberga, 24 real discount rows
+  - 254900, Stora Coop Enköping, Enköping, 21 real discount rows
+  - 054000, Stora Coop Finspång, Finspång, 27 real discount rows
+  - 185510, Stora Coop Stenby Västerås, Västerås, 27 real discount rows
+  - 232000, Stora Coop Sundsvall, Sundsvall, 25 real discount rows
+  - 105610, Stora Coop Halmstad, Halmstad, 27 real discount rows
+  - 195020, Stora Coop Norra Backa, Borlänge, 27 real discount rows
+  - 163000, Stora Coop Välsviken, Karlstad, 22 real discount rows
+  - 196000, Stora Coop Ludvika, Ludvika, 22 real discount rows
+  - 026810, Stora Coop Kungsängen, Kungsängen, 27 real discount rows
+  - 056010, Stora Coop Garnisonen Linköping, Linköping, 22 real discount rows
+  - 195030, Stora Coop Falun, Falun, 25 real discount rows
+  - 015430, Stora Coop Tumba, Tumba, 25 real discount rows
   - 105830, Stora Coop Trelleborg, Trelleborg, 5 real discount rows
+  - 133800, Stora Coop Torp, Uddevalla, 25 real discount rows
+  - 015470, Stora Coop Arninge, Täby, 26 real discount rows
+  - 201510, Stora Coop Ljusdal, Ljusdal, 24 real discount rows
   - 105630, Stora Coop Burlöv, Arlöv, 4 real discount rows
+  - 015320, Coop Västerhaninge Centrum, Västerhaninge, 19 real discount rows
   - 105810, Coop Forum Jägersro, Malmö, 6 real discount rows
   - 163120, Stora Coop Karlskoga, Karlskoga, 14 real discount rows
-  - 055500, Coop Stenbärsvägen Nyköping, Nyköping, 21 real discount rows
-  - 075600, Coop Kristinedal, Jönköping, 18 real discount rows
-  - 135040, Coop Älvängen, Älvängen, 21 real discount rows
-  - 235610, Coop Sollefteå, Sollefteå, 18 real discount rows
-  - 165250, Coop Charlottenberg, Charlottenberg, 17 real discount rows
-  - 196170, Coop Sälen, Sälen, 15 real discount rows
-  - 195520, Coop Rättvik, Rättvik, 19 real discount rows
-  - 195070, Coop Orsa, Orsa, 19 real discount rows
-  - 195040, Coop Säter, Säter, 16 real discount rows
-  - 185261, Coop Skinnskatteberg, Skinnskatteberg, 18 real discount rows
-  - 184400, Coop Fagersta, Fagersta, 19 real discount rows
-  - 035440, Coop Tierp, Tierp, 18 real discount rows
-  - 035400, Stora Coop Östhammar, Östhammar, 18 real discount rows
-  - 156000, Coop Änghagen Lidköping, Lidköping, 20 real discount rows
-  - 155550, Coop Vipans Gränd Skövde, Skövde, 21 real discount rows
-  - 155000, Coop Sydport Mariestad, Mariestad, 22 real discount rows
-  - 154900, Coop Tidaholm, Tidaholm, 22 real discount rows
-  - 154000, Coop Falköping, Falköping, 18 real discount rows
-  - 126406, Coop Gamlestaden, Göteborg, 16 real discount rows
-  - 126350, Coop Eriksberg, Göteborg, 22 real discount rows
-  - 123000, Coop Stenungsund, Stenungsund, 20 real discount rows
-  - 030760, Coop Tyresö Centrum, Tyresö, 21 real discount rows
-  - 185010, Coop Pilgatan Västerås, Västerås, 21 real discount rows
-  - 106433, Coop Simrishamn, Simrishamn, 20 real discount rows
-  - 035000, Coop Daglivs, Stockholm, 21 real discount rows
-  - 133700, Coop Kronhjorten, Trollhättan, 20 real discount rows
-  - 056313, Coop Östermalmshallen, Finspång, 4 real discount rows
+  - 250400, Stora Coop Haninge, Haninge, 26 real discount rows
+  - 245200, Coop Haparanda, Haparanda, 21 real discount rows
+  - 163900, Coop Sunne, Sunne, 23 real discount rows
+  - 163500, Coop Hagfors, Hagfors, 18 real discount rows
+  - 136251, Coop Hunnebostrand, Hunnebostrand, 21 real discount rows
   - 196231, Coop Bjursås, Bjursås, 5 real discount rows
   - 245080, Coop Arjeplog, Arjeplog, 5 real discount rows
-  - 245050, Coop Pajala, Pajala, 5 real discount rows
-  - 116385, Coop Getinge, Getinge, 3 real discount rows
-  - 116418, Coop Knäred, Knäred, 5 real discount rows
-  - 135120, Coop Åmål Mellanbrogatan, Åmål, 12 real discount rows
-  - 086802, Coop Fårbo, Fårbo, 5 real discount rows
-  - 245060, Coop Harads, Harads, 6 real discount rows
-  - 235190, Coop Sorsele, Sorsele, 4 real discount rows
-  - 235220, Coop Dorotea, Dorotea, 5 real discount rows
-  - 235400, Coop Åsele, Åsele, 5 real discount rows
-  - 235460, Coop Hörnefors, Hörnefors, 17 real discount rows
-  - 235540, Coop Bollstabruk, Bollstabruk, 14 real discount rows
-  - 236075, Coop Jörn, Jörn, 10 real discount rows
-  - 236077, Coop Lövånger, Lövånger, 12 real discount rows
-  - 236402, Coop Köpmanholmen, Köpmanholmen, 12 real discount rows
-  - 236404, Coop Mellansel, Mellansel, 12 real discount rows
-  - 236405, Coop Bredbyn, Bredbyn, 13 real discount rows
-  - 236708, Coop Torpshammar, Torpshammar, 12 real discount rows
-  - 236742, Coop Fränsta, Fränsta, 15 real discount rows
-  - 236788, Coop Näsåker, Näsåker, 12 real discount rows
-  - 235580, Coop Lycksele, Lycksele, 17 real discount rows
-  - 126500, Coop Alingsås, Alingsås, 20 real discount rows
-  - 235990, Coop Bräcke, Bräcke, 18 real discount rows
-  - 236401, Coop Ullånger, Ullånger, 19 real discount rows
-  - 225360, Coop Funäsdalen, Funäsdalen, 15 real discount rows
-  - 225340, Coop Sveg, Sveg, 16 real discount rows
-  - 235490, Coop Vindeln, Vindeln, 18 real discount rows
-  - 184900, Coop Sala, Sala, 21 real discount rows
-  - 123200, Coop Partille, Partille, 22 real discount rows
-  - 136000, Coop Mellerud, Mellerud, 22 real discount rows
-  - 236464, Coop Björna, Björna, 10 real discount rows
-  - 133900, Stora Coop Kållered, Kållered, 26 real discount rows
-  - 016195, Coop Träkvista, Ekerö, 20 real discount rows
-  - 246549, Coop Vittangi, Vittangi, 13 real discount rows
-  - 246550, Coop Svappavaara, Svappavaara, 14 real discount rows
-  - 245030, Coop Övertorneå, Övertorneå, 17 real discount rows
-  - 085130, Coop Mönsterås, Mönsterås, 21 real discount rows
-  - 085320, Coop Hultsfred, Hultsfred, 15 real discount rows
-- Flyer validity: 2026-05-18T00:00:00 through 2026-05-24T23:59:59
-- Real current flyer discount rows fetched: 3874
-
-Every weekly discount row includes Coop product id/EAN, product name, brand, package label, ordinary B2C SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL, and retrieval timestamp.
+- Flyer validity: 2026-05-18T00:00:00 through 2026-05-31T23:59:59
+- Real current flyer discount rows fetched: 1974
+Every weekly discount row includes a stable Coop product or flyer-derived code, product name, brand/package labels when available, ordinary SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL or flyer text URL, and retrieval timestamp.
 
 ## Sample Weekly Discount Rows
 

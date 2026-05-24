@@ -1,6 +1,6 @@
 // AUTO-GENERATED from public Apohem SSR pages and Apotek Hjärtat search HTML.
 // Source URLs: https://www.apohem.se/sok?q=vitamin, https://www.apohem.se/sok?q=la%20roche, https://www.apohem.se/sok?q=solskydd, https://www.apohem.se/sok?q=tandkram, https://www.apohem.se/sok?q=munvard, https://www.apohem.se/vitaminer-kosttillskott, https://www.apohem.se/hudvard, https://www.apohem.se/receptfritt, https://www.apotekhjartat.se/search?q=vitamin, https://www.apotekhjartat.se/search?q=la%20roche, https://www.apotekhjartat.se/search?q=solskydd, https://www.apotekhjartat.se/search?q=tandkram, https://www.apotekhjartat.se/search?q=munvard
-// Retrieved: 2026-05-23T21:31:56.766Z
+// Retrieved: 2026-05-23T21:28:23.249Z
 // Row count: 858 real OTC, supplement, and beauty pharmacy rows; all include EAN and exclude prescription products.
 
 export type PharmacyChain = 'apohem' | 'apotek-hjartat';
@@ -29,7 +29,7 @@ export type ApohemIngestedProduct = {
 
 export const apohemSource = {
   "source": "apohem.se public SSR CURRENT_PAGE + apotekhjartat.se public INITIAL_DATA search HTML",
-  "retrievedAt": "2026-05-23T21:31:56.766Z",
+  "retrievedAt": "2026-05-23T21:28:23.249Z",
   "rowCount": 858,
   "sourceUrls": [
     "https://www.apohem.se/sok?q=vitamin",
@@ -55,7 +55,7 @@ export const apohemSource = {
     "otc",
     "supplement"
   ],
-  "eanMatchCount": 64
+  "eanMatchCount": 63
 } as const;
 
 export const apohemEanMatches = [
@@ -134,17 +134,6 @@ export const apohemEanMatches = [
     "names": [
       "BioSalma B12-vitamin 1 mg + Folsyra 100 st tuggtabletter",
       "BioSalma B12-vitamin 1mg + Folsyra 100 tabletter"
-    ]
-  },
-  {
-    "ean": "7350027854319",
-    "chains": [
-      "apohem",
-      "apotek-hjartat"
-    ],
-    "names": [
-      "Monkids Multivitamin Barn Jordgubb 60 st",
-      "Monkids Multivitamin Jordgubb Barn 60 tuggtabletter"
     ]
   },
   {
@@ -718,16 +707,6 @@ export const apohemEanMatches = [
     ]
   },
   {
-    "ean": "5054563099617",
-    "chains": [
-      "apohem",
-      "apotek-hjartat"
-    ],
-    "names": [
-      "Parodontax Ultra Clean Tandkräm 75 ml"
-    ]
-  },
-  {
     "ean": "7038513866304",
     "chains": [
       "apohem",
@@ -758,6 +737,16 @@ export const apohemEanMatches = [
     "names": [
       "Sensodyne Extra Fresh Gel Tandkräm 75 ml"
     ]
+  },
+  {
+    "ean": "5054563099617",
+    "chains": [
+      "apohem",
+      "apotek-hjartat"
+    ],
+    "names": [
+      "Parodontax Ultra Clean Tandkräm 75 ml"
+    ]
   }
 ] as const;
 
@@ -779,7 +768,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350012338510_0.jpg?ref=60C7DB9CF3",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -798,7 +787,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350014910585.png?ref=8DEA1DCCA4",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -817,7 +806,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350014910547.jpg?ref=608B6B315D",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -836,7 +825,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350095270028_1.png?ref=2A88E7926E",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -855,7 +844,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350014910561.jpg?ref=A543EEDBD9",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -874,7 +863,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7315695704656_1.png?ref=9A09799148",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -893,7 +882,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7042760010007.png?ref=DBAF4C3566",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -912,7 +901,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7042760010052.png?ref=0A62C2DA08",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -931,7 +920,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350014910882_c1n1.jpg?ref=9D30CD88BC",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -950,7 +939,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350014910356_c1n1.jpg?ref=27ECFC272D",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -969,7 +958,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350014910264_c1n1.jpg?ref=40ACA09E22",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -988,26 +977,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350014910462_c1n1.jpg?ref=1B288C6621",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
-  },
-  {
-    "chain": "apohem",
-    "code": "A123628",
-    "ean": "6430013130489",
-    "name": "Berocca Energy Orange 45 brustabletter",
-    "brand": "Berocca",
-    "category": "supplement",
-    "price": 108,
-    "priceText": "108.00 SEK",
-    "originalPrice": 108,
-    "originalPriceText": "108.00 SEK",
-    "vatPercent": 6,
-    "stockStatus": "",
-    "productUrl": "https://www.apohem.se/vitaminer-kosttillskott/energi-fokus/berocca-energy-orange-45-brustabletter",
-    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/6430013130489_original.jpg?ref=6BE9C3225C",
-    "isOtc": false,
-    "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1026,7 +996,26 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350012335816.jpg?ref=B7303F3AD3",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
+  },
+  {
+    "chain": "apohem",
+    "code": "A123628",
+    "ean": "6430013130489",
+    "name": "Berocca Energy Orange 45 brustabletter",
+    "brand": "Berocca",
+    "category": "supplement",
+    "price": 108,
+    "priceText": "108.00 SEK",
+    "originalPrice": 108,
+    "originalPriceText": "108.00 SEK",
+    "vatPercent": 6,
+    "stockStatus": "",
+    "productUrl": "https://www.apohem.se/vitaminer-kosttillskott/energi-fokus/berocca-energy-orange-45-brustabletter",
+    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/6430013130489_original.jpg?ref=6BE9C3225C",
+    "isOtc": false,
+    "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1045,7 +1034,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350014910271_base.jpg?ref=C31107FA94",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1064,7 +1053,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350012337940.png?ref=825FF39357",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1083,7 +1072,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350012335663_9.png?ref=8045B564C5",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1102,7 +1091,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/boc_kork_ge_2022_magnesium_100_tabl_150cc_clean.png?ref=3D56C2370B",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1121,7 +1110,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/vitamin-d3k2-ean-7350107070400.png?ref=645CA2BC20",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1140,7 +1129,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350012335441.jpg?ref=CD6E0C0257",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1159,7 +1148,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350064280201_base.jpg?ref=37275FE7BA",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1178,26 +1167,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/jarn_frilagd.png?ref=80606BE8E0",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
-  },
-  {
-    "chain": "apohem",
-    "code": "A131986",
-    "ean": "7350027854319",
-    "name": "Monkids Multivitamin Jordgubb Barn 60 tuggtabletter",
-    "brand": "Monkids",
-    "category": "supplement",
-    "price": 112,
-    "priceText": "112.00 SEK",
-    "originalPrice": 0,
-    "originalPriceText": "0.00 SEK",
-    "vatPercent": 6,
-    "stockStatus": "",
-    "productUrl": "https://www.apohem.se/baby-barn-foralder/vitaminer-kosttillskott-for-barn/vitaminer-for-barn/multivitamin-for-barn/monkids-multivitamin-jordgubb-barn-60-tuggtabletter",
-    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350027854319.png?ref=E4566FC6CE",
-    "isOtc": false,
-    "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1216,7 +1186,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350023030687-1.png?ref=83DBF7782F",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1235,7 +1205,26 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7201-1.png?ref=FA3DAF5AB1",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
+  },
+  {
+    "chain": "apohem",
+    "code": "A123775",
+    "ean": "7394098900025",
+    "name": "Maxosol 90 tabletter",
+    "brand": "Maxosol",
+    "category": "supplement",
+    "price": 174,
+    "priceText": "174.00 SEK",
+    "originalPrice": 0,
+    "originalPriceText": "0.00 SEK",
+    "vatPercent": 6,
+    "stockStatus": "",
+    "productUrl": "https://www.apohem.se/vitaminer-kosttillskott/hud-har-naglar/maxosol-90-tabletter",
+    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/maxosol_90tabl_a01.jpg?ref=9AEE18F0E9",
+    "isOtc": false,
+    "sourceUrl": "https://www.apohem.se/sok?q=vitamin",
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1254,7 +1243,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/03337875816847_c1c1.jpg?ref=BF275C9308",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1273,7 +1262,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875797597_0.jpg?ref=4746ED307D",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1292,7 +1281,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875757515_0.jpg?ref=78AEE3332C",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1311,7 +1300,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875797719_0.jpg?ref=36532935FA",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1330,7 +1319,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875578486_base.png?ref=B5A9BDF03A",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1349,7 +1338,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875757614.png?ref=658987968F",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1368,7 +1357,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875806961_0.jpg?ref=BCDA6A5560",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1387,7 +1376,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875816809_1.jpg?ref=2116F05712",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1406,7 +1395,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3433422406599_1.png?ref=C01EA608A6",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1425,7 +1414,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875588348_1.jpg?ref=537C935F37",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1444,7 +1433,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875863377_0.jpg?ref=9C869DC412",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1463,7 +1452,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875549530_1.png?ref=843271CA76",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1482,7 +1471,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875876940_0.jpg?ref=614DF990AA",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1501,7 +1490,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/03337872419904_c1n1.jpg?ref=48835753E3",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1520,7 +1509,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/03337872420269_c1n1.png?ref=11AEDBA7AA",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1539,7 +1528,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337872411083_0.jpg?ref=093BBC7915",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1558,7 +1547,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/c7fc208401e8c60ae17d0dc25ed05e381ca88c24.jpg?ref=55D47E7A05",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1577,7 +1566,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875777797_0.jpg?ref=0E22D77CFE",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1596,7 +1585,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875761123_0.jpg?ref=6F769A33A1",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1615,7 +1604,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875545822_0.jpg?ref=890B807B70",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1634,7 +1623,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337872413575_base.jpg?ref=A9460C5F5F",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1653,7 +1642,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875761116_0.jpg?ref=E1EABA827F",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1672,7 +1661,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875528092_2.jpg?ref=73ADEFADA7",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1691,7 +1680,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875777759_0.jpg?ref=6F63C90703",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1710,7 +1699,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/03433422408159_c1n1.jpg?ref=1F7897E006",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1729,7 +1718,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/8809782555508.jpg?ref=153EB9DE06",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1748,7 +1737,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7319861021363_base.jpg?ref=A6AA07DA4D",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1767,7 +1756,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/4005800033094.jpg?ref=364D75B351",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1786,7 +1775,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/4005800323874_0.jpg?ref=6492D5AEB2",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1805,7 +1794,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/4005900370617_11.jpg?ref=ABF9D54279",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1824,7 +1813,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7319861018585_base.jpg?ref=3F2F4C4260",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1843,7 +1832,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/5099821001407_0.jpg?ref=E660C14307",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1862,7 +1851,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/4005800264887.jpg?ref=EE9660D9A3",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1881,7 +1870,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7319861023640_0.jpg?ref=4077992004",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1900,7 +1889,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7319861018547_base.jpg?ref=32A2E3FAC4",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1919,7 +1908,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875945738_0.jpg?ref=C779CCC3FC",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1938,7 +1927,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/4005800005596_0.jpg?ref=34CBBBDF45",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1957,7 +1946,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7319861019780_base.jpg?ref=7C77C813D8",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1976,7 +1965,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/4005800238963.jpg?ref=E938A68534",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -1995,7 +1984,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/namnlos-design-87.png?ref=D25662C424",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2014,7 +2003,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/4005900605498_1.jpg?ref=6FD47EF51C",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2033,7 +2022,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/42494843_1.jpg?ref=14E0185C84",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2052,7 +2041,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/5694230167203_11.jpg?ref=1EA2B0C98B",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2071,7 +2060,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/namnlos-design---2025-08-04t132508.253.png?ref=F7091BEA25",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2090,7 +2079,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/08850029013671_c1n1.jpg?ref=B6DD6B4A3B",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2109,7 +2098,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/4005900702661_base.jpg?ref=B2E5926DE1",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2128,7 +2117,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/4005800264856.jpg?ref=9ABC2EE39A",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2147,7 +2136,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/8809598454354.jpg?ref=0CF07221AB",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2166,7 +2155,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/1220000220683.jpg?ref=7A19DC3168",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2185,7 +2174,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7319861025330.png?ref=6943C62210",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2204,7 +2193,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/05054563097620_h1n0.png?ref=AD264FE781",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2223,7 +2212,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7640170370058.jpg?ref=682A79234D",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2242,7 +2231,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7317400000428_1.jpg?ref=A9BEA68143",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2261,7 +2250,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7319861025323.png?ref=DC8619887B",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2280,7 +2269,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/dentotape.jpeg?ref=EFED372458",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2299,7 +2288,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/08710908843044_ny.jpg?ref=61BC38CB95",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2318,7 +2307,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/855933000746_base.jpg?ref=80231E0C91",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2337,7 +2326,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7317400027722.jpg?ref=00CC56BE10",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2356,7 +2345,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/5054563098696_11.png?ref=447F46687B",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2375,7 +2364,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/8718951559011.png?ref=13F52AE032",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2394,7 +2383,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7317400022079_1.jpeg?ref=92FE1AFAA4",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2413,7 +2402,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/05054563270689_0.jpg?ref=9FD6F3C589",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2432,7 +2421,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/duraphat-tptube2024_se-2000px.jpg?ref=48D0C06F66",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2451,7 +2440,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/splat-biocalcium-tandkram-hydroxiapatit-100-ml.png?ref=D6B8884AA7",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2470,7 +2459,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7317400000374_1.jpeg?ref=EB269B2E53",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2489,7 +2478,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7640170370096.jpg?ref=E042E2DB62",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2508,26 +2497,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350087735221_0.jpg?ref=6737521AC6",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
-  },
-  {
-    "chain": "apohem",
-    "code": "A118377",
-    "ean": "5054563099617",
-    "name": "Parodontax Ultra Clean Tandkräm 75 ml",
-    "brand": "Parodontax",
-    "category": "supplement",
-    "price": 38,
-    "priceText": "38.00 SEK",
-    "originalPrice": 31,
-    "originalPriceText": "31.00 SEK",
-    "vatPercent": 25,
-    "stockStatus": "",
-    "productUrl": "https://www.apohem.se/munvard/tandkram/parodontax-ultra-clean-tandkram-75-ml",
-    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/5054563099617_11.png?ref=0551661148",
-    "isOtc": false,
-    "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2546,7 +2516,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07038513866304_c1n1.jpg?ref=9A56ACF4F7",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2565,7 +2535,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/5054563094766_1.png?ref=8FFAAFCD2A",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2584,7 +2554,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/5054563076083_111.png?ref=36F13F7AA8",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2603,7 +2573,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350087735214_0.jpg?ref=8206BE1496",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2622,7 +2592,26 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350121251830.jpg?ref=917484268C",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
+  },
+  {
+    "chain": "apohem",
+    "code": "A118377",
+    "ean": "5054563099617",
+    "name": "Parodontax Ultra Clean Tandkräm 75 ml",
+    "brand": "Parodontax",
+    "category": "supplement",
+    "price": 38,
+    "priceText": "38.00 SEK",
+    "originalPrice": 31,
+    "originalPriceText": "31.00 SEK",
+    "vatPercent": 25,
+    "stockStatus": "",
+    "productUrl": "https://www.apohem.se/munvard/tandkram/parodontax-ultra-clean-tandkram-75-ml",
+    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/5054563099617_11.png?ref=0551661148",
+    "isOtc": false,
+    "sourceUrl": "https://www.apohem.se/sok?q=munvard",
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2641,26 +2630,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7317400000244_1.jpeg?ref=35E8D55729",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/sok?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
-  },
-  {
-    "chain": "apohem",
-    "code": "A117128",
-    "ean": "7350015520011",
-    "name": "MedicineGarden KSM66 120 kapslar",
-    "brand": "MedicineGarden",
-    "category": "supplement",
-    "price": 155,
-    "priceText": "155.00 SEK",
-    "originalPrice": 155,
-    "originalPriceText": "155.00 SEK",
-    "vatPercent": 6,
-    "stockStatus": "",
-    "productUrl": "https://www.apohem.se/vitaminer-kosttillskott/energi-fokus/medicinegarden-ksm66-120-kapslar",
-    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/ksm66_stressbalans_120k_art6601_ean7350015520011_produktbild.jpg?ref=EC7CECCCF7",
-    "isOtc": false,
-    "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2679,7 +2649,26 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350014910202_c1n1.jpg?ref=F70F4EF55A",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
+  },
+  {
+    "chain": "apohem",
+    "code": "A117128",
+    "ean": "7350015520011",
+    "name": "MedicineGarden KSM66 120 kapslar",
+    "brand": "MedicineGarden",
+    "category": "supplement",
+    "price": 155,
+    "priceText": "155.00 SEK",
+    "originalPrice": 155,
+    "originalPriceText": "155.00 SEK",
+    "vatPercent": 6,
+    "stockStatus": "",
+    "productUrl": "https://www.apohem.se/vitaminer-kosttillskott/energi-fokus/medicinegarden-ksm66-120-kapslar",
+    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/ksm66_stressbalans_120k_art6601_ean7350015520011_produktbild.jpg?ref=EC7CECCCF7",
+    "isOtc": false,
+    "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2698,7 +2687,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350053314085_c1n1.jpg?ref=384BE3EC3A",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2717,7 +2706,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350000520279_base.jpg?ref=CC454279A3",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2736,7 +2725,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350069386335.jpg?ref=BD7D8B9045",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2755,7 +2744,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350012335731.jpg?ref=52A401EADA",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2774,7 +2763,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350014910172_1.png?ref=9BBF77D468",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2793,7 +2782,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350012335854.jpg?ref=DFEF7F93D1",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2812,7 +2801,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350023030915.png?ref=DCE57575F3",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2831,7 +2820,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350095270080_1-1.png?ref=E54D99112E",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2850,7 +2839,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350159940102_20.png?ref=2B267FDB64",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2869,7 +2858,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350023036412_11.png?ref=A8951C85B8",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2888,7 +2877,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350023030670-1.png?ref=366753F499",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -2907,83 +2896,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350023030694.1.png?ref=3067C8C3B5",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/vitaminer-kosttillskott",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
-  },
-  {
-    "chain": "apohem",
-    "code": "A155543",
-    "ean": "8809700320812",
-    "name": "Celimax The Vita-A Retinal Shot Tightening Booster 15 ml",
-    "brand": "Celimax",
-    "category": "beauty",
-    "price": 187,
-    "priceText": "187.00 SEK",
-    "originalPrice": 187,
-    "originalPriceText": "187.00 SEK",
-    "vatPercent": 25,
-    "stockStatus": "",
-    "productUrl": "https://www.apohem.se/hudvard/ansiktsvard/ansiktskram/nattkram/celimax-the-vita-a-retinal-shot-tightening-booster-15-ml",
-    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/8809700320812_1.png?ref=634A86585A",
-    "isOtc": false,
-    "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
-  },
-  {
-    "chain": "apohem",
-    "code": "A143855",
-    "ean": "7393481008164",
-    "name": "Topz Bomullspads 80st",
-    "brand": "Topz",
-    "category": "beauty",
-    "price": 14,
-    "priceText": "14.00 SEK",
-    "originalPrice": 14,
-    "originalPriceText": "14.00 SEK",
-    "vatPercent": 25,
-    "stockStatus": "",
-    "productUrl": "https://www.apohem.se/hudvard/ansiktsvard/tillbehor/bomullspads/topz-bomullspads-80st",
-    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7393481008164_0.jpg?ref=46CC85E494",
-    "isOtc": false,
-    "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
-  },
-  {
-    "chain": "apohem",
-    "code": "A148861",
-    "ean": "8809447256221",
-    "name": "Dr. Althea 345 Relief Cream 50 ml",
-    "brand": "Dr. Althea",
-    "category": "beauty",
-    "price": 262,
-    "priceText": "262.00 SEK",
-    "originalPrice": 262,
-    "originalPriceText": "262.00 SEK",
-    "vatPercent": 25,
-    "stockStatus": "",
-    "productUrl": "https://www.apohem.se/hudvard/ansiktsvard/ansiktskram/24-timmarskram/dr.-althea-345-relief-cream-50-ml",
-    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/8809447251394_1.png?ref=454300EC05",
-    "isOtc": false,
-    "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
-  },
-  {
-    "chain": "apohem",
-    "code": "A143403",
-    "ean": "8809563102136",
-    "name": "PURITO Luminous Ceramide Sleeping Pack 100 ml",
-    "brand": "PURITO",
-    "category": "beauty",
-    "price": 206,
-    "priceText": "206.00 SEK",
-    "originalPrice": 206,
-    "originalPriceText": "206.00 SEK",
-    "vatPercent": 25,
-    "stockStatus": "",
-    "productUrl": "https://www.apohem.se/hudvard/ansiktsvard/ansiktsmask/nattmask/purito-luminous-ceramide-sleeping-pack-100-ml",
-    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/8809563102136_12.png?ref=279CAC3AAF",
-    "isOtc": false,
-    "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3002,7 +2915,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046265357131_base.jpg?ref=39C9690686",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3021,7 +2934,45 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/namnlos-design-84.png?ref=2C447B21F3",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
+  },
+  {
+    "chain": "apohem",
+    "code": "A155543",
+    "ean": "8809700320812",
+    "name": "Celimax The Vita-A Retinal Shot Tightening Booster 15 ml",
+    "brand": "Celimax",
+    "category": "beauty",
+    "price": 187,
+    "priceText": "187.00 SEK",
+    "originalPrice": 187,
+    "originalPriceText": "187.00 SEK",
+    "vatPercent": 25,
+    "stockStatus": "",
+    "productUrl": "https://www.apohem.se/hudvard/ansiktsvard/ansiktskram/nattkram/celimax-the-vita-a-retinal-shot-tightening-booster-15-ml",
+    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/8809700320812_1.png?ref=634A86585A",
+    "isOtc": false,
+    "sourceUrl": "https://www.apohem.se/hudvard",
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
+  },
+  {
+    "chain": "apohem",
+    "code": "A143855",
+    "ean": "7393481008164",
+    "name": "Topz Bomullspads 80st",
+    "brand": "Topz",
+    "category": "beauty",
+    "price": 14,
+    "priceText": "14.00 SEK",
+    "originalPrice": 14,
+    "originalPriceText": "14.00 SEK",
+    "vatPercent": 25,
+    "stockStatus": "",
+    "productUrl": "https://www.apohem.se/hudvard/ansiktsvard/tillbehor/bomullspads/topz-bomullspads-80st",
+    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7393481008164_0.jpg?ref=46CC85E494",
+    "isOtc": false,
+    "sourceUrl": "https://www.apohem.se/hudvard",
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3040,7 +2991,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350087736983_c1_c1.png?ref=8E42A6F0FC",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3059,7 +3010,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350105620089_1.jpg?ref=13B7086733",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3078,7 +3029,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7319861020168_1.png?ref=7E3B86575C",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3097,7 +3048,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3663555006520_1.png?ref=122155FE82",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3116,7 +3067,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337875684118_1.png?ref=FD68C815DA",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3135,7 +3086,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3337871324599_10.jpg?ref=020AB6477E",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3154,7 +3105,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7350073862450_11.png?ref=19BF23E119",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3173,26 +3124,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3663555002225_1.jpg?ref=17689F63FA",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
-  },
-  {
-    "chain": "apohem",
-    "code": "A143226",
-    "ean": "8809598456242",
-    "name": "COSRX Ultra Light Invisible Sun Screen SPF50 50ml",
-    "brand": "COSRX",
-    "category": "beauty",
-    "price": 125,
-    "priceText": "125.00 SEK",
-    "originalPrice": 134,
-    "originalPriceText": "134.00 SEK",
-    "vatPercent": 25,
-    "stockStatus": "",
-    "productUrl": "https://www.apohem.se/hudvard/ansiktsvard/ansiktskram/dagkram-med-spf/cosrx-ultra-light-invisible-sun-screen-spf50-50ml",
-    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/8809598456242-1.jpg?ref=AFF9DAE3CB",
-    "isOtc": false,
-    "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3211,7 +3143,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/5060449040383.png?ref=505939C81C",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3230,7 +3162,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7319861019148_base.jpg?ref=06C88B36C3",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3249,7 +3181,64 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350008050129_c1c1.jpg?ref=F1EF6F8DE1",
     "isOtc": false,
     "sourceUrl": "https://www.apohem.se/hudvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
+  },
+  {
+    "chain": "apohem",
+    "code": "A110448",
+    "ean": "5705728044101",
+    "name": "Bepanthen Salva 100g",
+    "brand": "Bepanthen",
+    "category": "beauty",
+    "price": 128,
+    "priceText": "128.00 SEK",
+    "originalPrice": 0,
+    "originalPriceText": "0.00 SEK",
+    "vatPercent": 25,
+    "stockStatus": "",
+    "productUrl": "https://www.apohem.se/hudvard/hudbesvar/torr-irriterad-hud/bepanthen-salva-100g",
+    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/1-bepanthen-salva-100g-ecomm-5705728044101.png?ref=373B8FAF32",
+    "isOtc": false,
+    "sourceUrl": "https://www.apohem.se/hudvard",
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
+  },
+  {
+    "chain": "apohem",
+    "code": "A121062",
+    "ean": "7350008050136",
+    "name": "The Skin Agent Move Anti Chafe Balm 75 ml",
+    "brand": "The Skin Agent",
+    "category": "beauty",
+    "price": 202,
+    "priceText": "202.00 SEK",
+    "originalPrice": 202,
+    "originalPriceText": "202.00 SEK",
+    "vatPercent": 25,
+    "stockStatus": "",
+    "productUrl": "https://www.apohem.se/hudvard/hudbesvar/skavsar/the-skin-agent-move-anti-chafe-balm-75-ml",
+    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350008050136_c1c1.jpg?ref=435A664F69",
+    "isOtc": false,
+    "sourceUrl": "https://www.apohem.se/hudvard",
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
+  },
+  {
+    "chain": "apohem",
+    "code": "A143226",
+    "ean": "8809598456242",
+    "name": "COSRX Ultra Light Invisible Sun Screen SPF50 50ml",
+    "brand": "COSRX",
+    "category": "beauty",
+    "price": 125,
+    "priceText": "125.00 SEK",
+    "originalPrice": 134,
+    "originalPriceText": "134.00 SEK",
+    "vatPercent": 25,
+    "stockStatus": "",
+    "productUrl": "https://www.apohem.se/hudvard/ansiktsvard/ansiktskram/dagkram-med-spf/cosrx-ultra-light-invisible-sun-screen-spf50-50ml",
+    "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/8809598456242-1.jpg?ref=AFF9DAE3CB",
+    "isOtc": false,
+    "sourceUrl": "https://www.apohem.se/hudvard",
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3268,7 +3257,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046260604841_base.jpg?ref=182AABEDCC",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3287,7 +3276,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/ibuprofen-orifarm-30-tabletter.png?ref=80B81AC10A",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3306,7 +3295,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046260976108_1.png?ref=5A2E7BC570",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3325,7 +3314,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07046260885349_c1c1.png?ref=29A401D19F",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3344,7 +3333,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/naproxen-orifarm-20-tabletter.jpg?ref=5A70968E38",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3363,7 +3352,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/5054563073181_2.jpg?ref=14C7C52D4D",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3382,7 +3371,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046261461948---mrhi-1.png?ref=DD5B0B44D9",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3401,7 +3390,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046260074873_11.png?ref=EA77711D46",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3420,7 +3409,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046260070127_11.png?ref=4C1F12DDBA",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3439,7 +3428,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046264739679.jpg?ref=780A215DE7",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3458,7 +3447,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046261563413_1.png?ref=DA48B14906",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3477,7 +3466,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046261565479_1.png?ref=0FC28A58B0",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3496,7 +3485,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046261960144_1.png?ref=239C2F6A3F",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3515,7 +3504,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350041582274_c1n1.png?ref=369F7F15CF",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3534,7 +3523,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046260427426_base.jpg?ref=7D88DCD60A",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3553,7 +3542,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07350041585251_0.jpg?ref=2CB89D7A9D",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3572,7 +3561,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3574661276151_base.jpg?ref=D69FE01A97",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3591,7 +3580,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/treo-citrus-brustablett-500mg-50mg-3-pack---7046261214810-mrhi-1.png?ref=2CD87812B3",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3610,7 +3599,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3614810010462_3.png?ref=8F46C72D56",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3629,7 +3618,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/3574660707991_base.jpg?ref=2B733FC106",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3648,7 +3637,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/treo-hallon-brustablett-500mg-50mg-3-pack---7046261816472-mrhi-1.png?ref=C367A50181",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3667,7 +3656,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046264457757_1.png?ref=DF229B83A4",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3686,7 +3675,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046264617946---mrhi-1.png?ref=8521D62DC1",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3705,7 +3694,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/7046260885424_base.jpg?ref=5A19A2FDE2",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apohem",
@@ -3724,7 +3713,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://www.apohem.se/globalassets/raderas-ej/produktbilder-radera-ej/07046264609491_c1c1-1.png?ref=8068A03136",
     "isOtc": true,
     "sourceUrl": "https://www.apohem.se/receptfritt",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3743,7 +3732,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771949003/7315695704656_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3762,7 +3751,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771949012/7315695704670_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3781,7 +3770,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771948997/7315695704632_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3800,7 +3789,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738165898/7340160909090.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3819,7 +3808,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738165904/7340160909113.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3838,7 +3827,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771949006/7315695704649_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3857,7 +3846,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715234244/1061434_uegf4x.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3876,7 +3865,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715228392/1056125_s8qvpc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3895,7 +3884,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716365974/1065987_hg1qjz.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3914,7 +3903,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716364793/1065985_sc942e.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3933,7 +3922,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738165892/7340160909106.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3952,7 +3941,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715214116/1056120_sq4oee.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3971,7 +3960,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771949000/7315695589994_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -3990,7 +3979,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716364790/1065984_elr8uv.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4009,7 +3998,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715249385/1056123_nak1ho.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4028,7 +4017,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717394107/07350046340077_C1R1_s02_rgjoyx.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4047,7 +4036,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715264701/1056122_qpto48.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4066,7 +4055,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738165910/7340160909120.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4085,7 +4074,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769443591/6430013130489.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4104,7 +4093,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715255906/1056121_jj2mjp.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4123,7 +4112,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1750337874/1050738_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4142,7 +4131,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1734619070/07350027854319_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4161,7 +4150,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715168306/1040697_C1N1_lbztn1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4180,7 +4169,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715245194/1038004_C1N1_sg4tfu.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4199,7 +4188,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715169781/41462_1_dh9tlg.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4218,7 +4207,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738165915/7340160909137.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4237,7 +4226,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715242186/1040252_i7ixn6.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4256,7 +4245,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1756997374/1053467_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4275,7 +4264,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715178467/1027515_4_tlxnkf.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4294,7 +4283,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1747034536/7340160909427.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4313,7 +4302,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715165998/1045808_pmawf9.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4332,7 +4321,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715255972/1010156_8_bok7cq.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4351,7 +4340,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716364824/1065986_eevkjn.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4370,7 +4359,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1734618989/7350027854432_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4389,7 +4378,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715259206/1045809_xfncgj.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4408,7 +4397,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715170836/1009003_G1N1_tzocxl.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4427,7 +4416,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715192665/1051487_ihnsum.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4446,7 +4435,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771860264/7340160910430.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4465,7 +4454,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715233722/1050175_d1evyl.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4484,7 +4473,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1725866359/1058755_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4503,7 +4492,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738165921/7340160909144.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4522,7 +4511,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715261487/1040702_3_yopqzl.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4541,7 +4530,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715222119/1045146_C1N1_xti8np.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4560,7 +4549,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771332984/6430013130670.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4579,7 +4568,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715154502/57900_C1L1_pdufdb.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4598,7 +4587,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738165874/7340160909076.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4617,7 +4606,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1747034530/7340160909403.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4636,7 +4625,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1752056370/7350076867766.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4655,7 +4644,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715234258/1056124_zc3yxl.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4674,7 +4663,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1751295072/1040448_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4693,7 +4682,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715210445/1040688_C1N1_haouhs.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4712,7 +4701,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715255301/1045202_C1N1_uemd9i.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4731,7 +4720,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769443594/6430013130847.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4750,7 +4739,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738572807/1076881.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4769,7 +4758,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715264691/1054068_1_rvjwtm.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4788,7 +4777,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738164742/1076277.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4807,7 +4796,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715190317/65901_xxnfcn.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4826,7 +4815,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1765194915/1093112.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4845,7 +4834,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771332992/6430013130816.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4864,7 +4853,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715252264/1052282_t2g9hj.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4883,7 +4872,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715162985/29618_2_tdw7ee.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4902,7 +4891,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715237228/1058705_2_kfrmp1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4921,7 +4910,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762181777/63592_7.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4940,7 +4929,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769443598/6430013130991.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4959,7 +4948,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716475189/7340160908208_1_unun8h.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4978,7 +4967,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715179108/1045150_C1N1_nkbhop.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -4997,7 +4986,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715199748/1066308_yk2ujy.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5016,7 +5005,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771949015/7315695706414_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5035,7 +5024,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769780831/1086503_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5054,7 +5043,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715186497/1058728_wjo2dn.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5073,7 +5062,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770727184/7350031362565.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5092,7 +5081,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769780828/1086502.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5111,7 +5100,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715245234/1040255_rvbuwe.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5130,7 +5119,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715261226/1002527_C1N1_1_efhcdx.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5149,7 +5138,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715255800/1058729_lg0nyo.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5168,7 +5157,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769673929/1087169.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5187,7 +5176,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715154331/1001761_C1R1_qwat0x.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5206,7 +5195,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769693707/1086510_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5225,7 +5214,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715222129/1045149_C1N1_v42agm.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5244,7 +5233,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715171824/1002523_C1N1_1_peprr4.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5263,7 +5252,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716364827/1065988_z6fwfh.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5282,7 +5271,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715262056/1040903_C1N1_gquer5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5301,7 +5290,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715177382/1001951_x7kmlr.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5320,7 +5309,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715258351/1043288_eylvqc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5339,7 +5328,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1734618954/07350027854708_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5358,7 +5347,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715225666/1058751_t9hhdp.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5377,7 +5366,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715221715/1022562_3_u3yhqi.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5396,7 +5385,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738164747/1076276.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5415,7 +5404,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1745839627/1083658.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5434,7 +5423,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1734619018/07350027854470_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5453,7 +5442,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1723021834/1072120.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5472,7 +5461,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1718707644/1067148.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5491,7 +5480,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1739548446/1080016.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5510,7 +5499,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1733123299/1076647_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5529,7 +5518,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715182733/1052281_x03uz9.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5548,7 +5537,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1741095990/1041495_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5567,7 +5556,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715252294/1049183_C1N1_dlv5aa.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5586,7 +5575,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715252400/29597_5_ubuy3x.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5605,7 +5594,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717485598/1070153_v3ghgy.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5624,7 +5613,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1747139015/1083804.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5643,7 +5632,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715257696/1025873_i0qhuu.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5662,7 +5651,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715182277/1041476_alrjgl.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5681,7 +5670,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1727347453/1071389.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5700,7 +5689,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715192712/1008594_2_zikk0i.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5719,7 +5708,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770883977/7350143100505_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5738,7 +5727,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715258954/1052918_C1N1_dvf6zt.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5757,7 +5746,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715188677/1038220_C1N1_fvpe0i.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5776,7 +5765,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715248069/1032720_C1R1_sgrevn.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5795,7 +5784,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1719919284/1024622_9.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5814,7 +5803,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1725866351/1058753_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5833,7 +5822,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1758199137/1087949.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5852,7 +5841,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1725868298/1037574_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5871,7 +5860,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1739548421/1080011.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5890,7 +5879,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1759820366/1040900_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5909,7 +5898,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715165065/1039873_re4yoh.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5928,7 +5917,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1757586807/1087030_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5947,7 +5936,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1723636640/1072102.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5966,7 +5955,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715252357/1054069_zfwn5w.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -5985,7 +5974,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715239666/1052922_C1N1_lrfqro.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6004,7 +5993,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1772805700/1095675.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6023,7 +6012,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715233805/1049182_C1N1_slagpn.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6042,7 +6031,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1778851980/7350076867971.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6061,7 +6050,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715237091/1058734_o43eqb.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6080,7 +6069,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715168697/1045204_C1N1_alygum.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6099,7 +6088,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715179800/1061205_C1N1_tsi4ed.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6118,7 +6107,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769443609/6430013130472.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6137,7 +6126,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1723636628/1072105.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6156,7 +6145,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715199743/1066766_1_fzaku7.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6175,7 +6164,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715222043/1045142_C1N1_1_rch3qk.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6194,7 +6183,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1728468510/1070806.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6213,7 +6202,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715165974/1057276_kfwxld.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6232,7 +6221,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715175617/1045147_C1N1_o100fa.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6251,7 +6240,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1759839375/1056329_7.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6270,7 +6259,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1741868869/1066307_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6289,7 +6278,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770883973/7350143100499_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6308,7 +6297,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715186341/1052920_C1N1_htiwkd.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6327,7 +6316,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1751373636/07350014910530_C1N1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6346,7 +6335,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771332977/6430013130663.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6365,7 +6354,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715234037/1058190_kyg5kf.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6384,7 +6373,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715225439/1056650_1_n2eqrl.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6403,7 +6392,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715232429/1001714_C1R1_vd7znh.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6422,7 +6411,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1739548391/1080000.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6441,7 +6430,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715172622/1052287_warrxz.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6460,7 +6449,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1727850762/1074057.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6479,7 +6468,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715241228/1001811_C1R1_wckg8i.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6498,7 +6487,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1726756627/6417927106618_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6517,7 +6506,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715205126/1052296_cazozm.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6536,7 +6525,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715249155/1052921_C1N1_ybnrcc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6555,7 +6544,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715169181/1053459_1_fckqr1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6574,7 +6563,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715252789/1061433_qcrsju.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6593,7 +6582,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715213485/1045056_C1L1_gnl1l0.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6612,7 +6601,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715159195/1052923_C1N1_voz3gj.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6631,7 +6620,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715189159/1045148_C1N1_t6r7r6.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6650,7 +6639,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1779454167/5021807015283.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6669,7 +6658,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715222409/1040905_C1N1_yeoctp.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6688,7 +6677,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1764834149/7350053314313.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6707,7 +6696,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738572803/1076880.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6726,7 +6715,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715252728/1037011_8_g1oohb.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6745,7 +6734,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715199218/1055153_C1N1_yc2k3w.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6764,7 +6753,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715225661/1055988_8_gre0g5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6783,7 +6772,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1742205853/1063355_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6802,7 +6791,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1748589016/07350031365672.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6821,7 +6810,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715243176/1061207_C1N1_kmgpzc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6840,7 +6829,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715162465/1052919_C1N1_xfpwr3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6859,7 +6848,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1757326801/7350143100208_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6878,7 +6867,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715199081/1052288_wqbb3k.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6897,7 +6886,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1747313540/7350012337933_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6916,7 +6905,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1772701232/7331985041928.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6935,7 +6924,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1777300674/07350012338244_C1N1_s01.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6954,7 +6943,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715185777/1044458_C1N1_hjhexi.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6973,7 +6962,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1751629944/7350076867728.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -6992,7 +6981,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1724239287/1072880.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7011,7 +7000,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715249726/43089_6_hdzamc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7030,7 +7019,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715214201/1061206_C1N1_poqpym.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7049,7 +7038,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771332996/6430013130694.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7068,7 +7057,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715261416/1039871_C1N1_rc5z8r.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7087,7 +7076,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715195799/1040701_C1N1_uwfkw6.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7106,7 +7095,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1778859859/7350071063453.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7125,7 +7114,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715189743/1058187_m9no19.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7144,7 +7133,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1736259667/7350026473160.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7163,7 +7152,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1722840807/07394098031248_C1N1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7182,7 +7171,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1724239297/1072881.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7201,7 +7190,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771332981/6430013130687.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7220,7 +7209,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715178894/1045203_C1N1_ws2ncu.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=vitamin",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7239,7 +7228,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731682288/03337875797597_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7258,7 +7247,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731682326/03337875797719_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7277,7 +7266,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1765465730/3337875816847.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7296,7 +7285,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1740752598/1052987.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7315,7 +7304,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731919102/03337875888851_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7334,7 +7323,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732115266/03337875761116_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7353,7 +7342,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1777471665/03337875917407_15.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7372,7 +7361,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715236081/1038560_C1N1_byexpt.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7391,7 +7380,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731668717/03337875578486_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7410,7 +7399,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762337067/03337875816809.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7429,7 +7418,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731667375/03337872419904_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7448,7 +7437,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732096213/03337875757515_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7467,7 +7456,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731682358/03337875806961_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7486,7 +7475,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732106662/03337875777797_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7505,7 +7494,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732106676/03433422406599_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7524,7 +7513,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715242016/1038557_C1N1_destqv.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7543,7 +7532,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732106691/03337872420269_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7562,7 +7551,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769434985/3337875932349_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7581,7 +7570,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731919076/03337875886055_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7600,7 +7589,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731917843/03337875863377_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7619,7 +7608,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731659997/31594_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7638,7 +7627,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769435014/3337875917568_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7657,7 +7646,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732115285/03337875845489_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7676,7 +7665,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731673659/03337875588348_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7695,7 +7684,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769435006/3337875930239_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7714,7 +7703,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732106686/03337875757614_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7733,7 +7722,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715200679/74009_C1N1_nzvchr.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7752,7 +7741,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732096222/03337872413575_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7771,7 +7760,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769434994/3337875940412_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7790,7 +7779,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732096218/03433422408159_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7809,7 +7798,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732096239/03337875777759_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7828,7 +7817,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1759153870/1087988.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7847,7 +7836,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731668668/03337875545822_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7866,7 +7855,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732115257/03337875761031_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7885,7 +7874,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732106681/03337872412158_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7904,7 +7893,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732115280/03337875876940_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7923,7 +7912,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731667344/03337872412646_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7942,7 +7931,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732106657/59838_1b.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7961,7 +7950,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731666070/03337872411991_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7980,7 +7969,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1737727666/1076856.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -7999,7 +7988,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731667413/03337875537315_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8018,7 +8007,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731682337/03337875800853_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8037,7 +8026,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732107890/03433422404397_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8056,7 +8045,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732107885/03337875890021_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8075,7 +8064,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731667417/03337875528092_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8094,7 +8083,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731681048/03337875766326_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8113,7 +8102,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732115245/03337875549615_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8132,7 +8121,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731673672/03337875613491_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8151,7 +8140,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732096243/03337875722827_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8170,7 +8159,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769435008/3337875930338_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8189,7 +8178,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732107880/03337872414145_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8208,7 +8197,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773056507/1094731.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8227,7 +8216,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731919115/03337875890113_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8246,7 +8235,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732115298/03337872413629_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8265,7 +8254,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762337064/03337875943963_4.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8284,7 +8273,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732097429/3337872410321_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8303,7 +8292,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1756468297/03337875921336_C1N1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8322,7 +8311,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731674953/03337875708289_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8341,7 +8330,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769086464/03337875922043_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8360,7 +8349,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731919130/03337875909235_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8379,7 +8368,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731919151/03337875909303_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8398,7 +8387,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731917823/03337875846097_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8417,7 +8406,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738335620/1076867_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8436,7 +8425,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769086474/03337875920667_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8455,7 +8444,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715206787/85356_C1N0_lzyybe.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8474,7 +8463,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738335592/1076868.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8493,7 +8482,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769434991/3337875930048_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8512,7 +8501,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732032932/03337875586269_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8531,7 +8520,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1746522564/03337875924887_C1N1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8550,7 +8539,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732115294/03337875911184_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8569,7 +8558,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1756468301/03337875922029_C1L1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8588,7 +8577,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769086469/03337875941143_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8607,7 +8596,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1759153874/1087982.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8626,7 +8615,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1756468305/03337875920698_C1N1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8645,7 +8634,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769435020/3337875930307_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8664,7 +8653,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732115289/03337875893626_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8683,7 +8672,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731917831/03337875846110_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8702,7 +8691,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738335645/1076859_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8721,7 +8710,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732114055/03433422406728_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8740,7 +8729,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762334366/03337875943901_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8759,7 +8748,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769434978/3337875932301_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8778,7 +8767,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732115249/03337872412684_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8797,7 +8786,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732096235/03337875807043_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=la%20roche",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8816,7 +8805,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717432337/04005800323874_C1N1_s01_jadp5q.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8835,7 +8824,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715210769/1045812_okxueq.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8854,7 +8843,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717328378/04005800264856_C1N1_s03_yw7l7f.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8873,7 +8862,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717350526/04251778100041_C1N1_s01_asa0vh.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8892,7 +8881,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715202664/1063252_tz2ntw.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8911,7 +8900,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717432301/04005800238963_C1N1_s01_drcno0.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8930,7 +8919,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1742373020/42467045_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8949,7 +8938,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1751636024/1065631_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8968,7 +8957,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715178049/1023183_qchudf.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -8987,7 +8976,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715165809/1023182_2_boz1rc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9006,7 +8995,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717304327/04005900480392_C1N1_s02_krxnnq.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9025,7 +9014,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715209889/1023134_s73lnb.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9044,7 +9033,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715194764/1023254_1_n6kgza.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9063,7 +9052,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717400014/04005800033094_C1N1_s01_my9czl.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9082,7 +9071,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715261029/1023132_1_lunhwv.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9101,7 +9090,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715222946/1063254_tdsibm.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9120,7 +9109,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715158039/1023253_1_z5cpg7.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9139,7 +9128,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715168610/1043514_bs67gr.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9158,7 +9147,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715185054/1023251_1_mo9gbd.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9177,7 +9166,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715237246/1063253_uvfba1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9196,7 +9185,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715241555/1023136_frlnrn.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9215,7 +9204,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715218516/1023135_swno1l.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9234,7 +9223,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1742379875/1076354.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9253,7 +9242,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715256144/1063256_5_qvhhdf.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9272,7 +9261,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1742373401/4006000132273_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9291,7 +9280,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1722496612/91657_4.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9310,7 +9299,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715247844/91654_C1N1_cd084y.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9329,7 +9318,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1776271462/8809782555508_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9348,7 +9337,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1748331020/99213_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9367,7 +9356,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715178623/1038562_C1N1_tvdqua.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9386,7 +9375,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1722496617/91655_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9405,7 +9394,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1722512282/1025120_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9424,7 +9413,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1748329748/1046685_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9443,7 +9432,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1722510870/91552_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9462,7 +9451,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1748329694/99212_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9481,7 +9470,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717327859/04005800264887_C1N1_s03_fd0455.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9500,7 +9489,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715171232/88806_C1N1_xlq1dx.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9519,7 +9508,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1774275141/1096147_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9538,7 +9527,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715255115/1044765_C1N1_vhebk0.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9557,7 +9546,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1748336091/1065633_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9576,7 +9565,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715157672/88857_C1N1_y4wwua.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9595,7 +9584,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715186568/1027514_h0jo4r.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9614,7 +9603,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1722435441/91653_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9633,7 +9622,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1775736875/5099821002800_15.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9652,7 +9641,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1768317122/04006000233888_C1C1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9671,7 +9660,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717297356/07319861018523_C1N1_s03_m0i5ds.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9690,7 +9679,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715209707/88604_C1N1_bp44aq.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9709,7 +9698,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1774275174/1096149_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9728,7 +9717,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715237212/88813_1_kg5hob.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9747,7 +9736,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769680134/1092754.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9766,7 +9755,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715217968/1008971_C1N1_g54vkm.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9785,7 +9774,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715214037/98889_7_ifrw6f.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9804,7 +9793,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715159532/1044755_10_arbpxu.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9823,7 +9812,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715154435/88858_C1N1_wezmld.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9842,7 +9831,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1748329784/99211_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9861,7 +9850,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1723209156/1066568_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9880,7 +9869,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715173300/1066572_uxveia.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9899,7 +9888,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715181789/88908_C1N1_kx2xks.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9918,7 +9907,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715176692/88901_2_uihytw.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9937,7 +9926,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715194643/1025336_C1N1_xbgkzp.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9956,7 +9945,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715208627/88814_1_mwosbz.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9975,7 +9964,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1750688633/04005800302312_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -9994,7 +9983,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715189817/1040138_xde8nx.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10013,7 +10002,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1722435475/91700_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10032,7 +10021,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773850202/5099821002817.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10051,7 +10040,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1750340305/04005900911711_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10070,7 +10059,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715189831/1040137_hzoh2n.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10089,7 +10078,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1742373030/42467069_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10108,7 +10097,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1722510897/1048228_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10127,7 +10116,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715176632/1052992_2_d5s1ao.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10146,7 +10135,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715190125/72319_6_h50ijl.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10165,7 +10154,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769434998/3337875945738_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10184,7 +10173,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715202315/98885_7_idbycw.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10203,7 +10192,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715243300/1064015_3_fkk6nu.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10222,7 +10211,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1723209160/1066569_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10241,7 +10230,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1772529731/4005900601933_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10260,7 +10249,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715237178/1064016_zl4yhi.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10279,7 +10268,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1753787128/87801_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10298,7 +10287,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1742373383/4006000132242_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10317,7 +10306,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1772529680/4006000103488_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10336,7 +10325,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1723209166/1066573_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10355,7 +10344,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1768317134/04006000250243_C1N1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10374,7 +10363,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715236751/1052995_1_bm4afc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10393,7 +10382,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1751025486/3574661192833.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10412,7 +10401,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715240033/1052956_pjmkai.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10431,7 +10420,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1723207841/88819_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10450,7 +10439,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1741857377/1076854%20_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10469,7 +10458,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715177498/1009555_C1N1_nzhbig.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10488,7 +10477,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773993575/3337871321826.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10507,7 +10496,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715180071/1052955_7_idlkyj.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10526,7 +10515,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715179782/1046686_syumtt.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10545,7 +10534,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1723209151/1066567_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10564,7 +10553,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1747732964/1000390_9.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10583,7 +10572,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715184371/1009016_C1N1_x4qudo.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10602,7 +10591,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715211520/1065509_fl1urz.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10621,7 +10610,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1774354834/8809968130277.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10640,7 +10629,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1722512287/1025009_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10659,7 +10648,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715256291/1052993_2_e9z9e0.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10678,7 +10667,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715193266/1064210_nv70qu.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10697,7 +10686,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1775735515/5099821002824_10.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10716,7 +10705,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1748356039/1068195_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10735,7 +10724,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715239661/1052996_1_z1wibe.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10754,7 +10743,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715233923/98886_6_pkfw9p.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10773,7 +10762,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770817359/5709954038552.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10792,7 +10781,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715217039/1046688_x2h4jg.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10811,7 +10800,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715208693/1066571_j7ps5b.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10830,7 +10819,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770817363/5709954039719.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10849,7 +10838,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769435017/3337875945790_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10868,7 +10857,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1768317131/04005900485533_C1N1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10887,7 +10876,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1768982435/1092933_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10906,7 +10895,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715185772/1044757_hxxa9f.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10925,7 +10914,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1776353035/3600542656122_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10944,7 +10933,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715164183/54554_C1C0_mkuxnh.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10963,7 +10952,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1740758912/53451_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -10982,7 +10971,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770817344/5709954015317.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11001,7 +10990,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1727950330/53253_1UR.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11020,7 +11009,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715246109/1057360_whf6yr.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11039,7 +11028,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715196946/97342_C1N1_d78e2d.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11058,7 +11047,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1737564122/1076774.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11077,7 +11066,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1774354753/8809968135999.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11096,7 +11085,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715176118/1052986_1_f2wzjr.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11115,7 +11104,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715264895/1064209_coe1y0.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11134,7 +11123,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715166384/1066574_bvdblt.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11153,7 +11142,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715166307/1067018_asqsjx.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11172,7 +11161,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1734962486/1077853.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11191,7 +11180,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1775134255/8809968130987_20.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11210,7 +11199,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715172212/1044764_C1N1_lier68.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11229,7 +11218,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1742373491/4006000138237_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11248,7 +11237,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1753975414/9005800391854_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11267,7 +11256,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715252478/1057357_ovhvvc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11286,7 +11275,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1742373435/4006000137933_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11305,7 +11294,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715239892/1000407_8_fdfdrz.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11324,7 +11313,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769664761/04006000137964_C1N1_s02.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11343,7 +11332,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1734962460/1077858.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11362,7 +11351,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715227744/1044761_C1N1_vnxdou.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11381,7 +11370,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770817340/5709954016406.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11400,7 +11389,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770641640/3337875945707.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11419,7 +11408,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1755688717/04005900982568_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11438,7 +11427,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769773408/3337875795265_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11457,7 +11446,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769435001/3337875945622_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11476,7 +11465,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715212865/98864_C1N1_gtbkw2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11495,7 +11484,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1740059637/1078140.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11514,7 +11503,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1774275183/1096150.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11533,7 +11522,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715192954/1057216_1_b3wkxx.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11552,7 +11541,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762510682/3600542624954_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11571,7 +11560,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715189155/1046135_C1N1_yqm7d6.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11590,7 +11579,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1775130290/3264680045257.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11609,7 +11598,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1742373577/4006000171159_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11628,7 +11617,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1765804774/0083078018986_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11647,7 +11636,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715169363/1057218_1_n4p4dg.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11666,7 +11655,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715169482/94518_1_brceet.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11685,7 +11674,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1748356042/1068196_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11704,7 +11693,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769176648/1092782_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11723,7 +11712,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769664697/04006000128689_C1N0_s03.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11742,7 +11731,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715211146/1057361_rlnnjm.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11761,7 +11750,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715203765/98029_C1N1_n1mgym.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11780,7 +11769,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771922094/7350145710122.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11799,7 +11788,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1745414814/7340020103484_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11818,7 +11807,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769435026/3337875945660_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11837,7 +11826,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773828779/8806133615966_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11856,7 +11845,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1749039659/1068191_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11875,7 +11864,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1776696027/3600542681506_20.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11894,7 +11883,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1748356011/1068185_1a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11913,7 +11902,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1750691179/4033981742818.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11932,7 +11921,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1720015367/1039263_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11951,7 +11940,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715155185/1039265_2_ftjepk.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11970,7 +11959,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769435022/3337875940214_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -11989,7 +11978,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738049936/1076837_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12008,7 +11997,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769435011/3337875940993_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12027,7 +12016,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1745414782/7340020103392_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12046,7 +12035,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715265577/1057519_bjmnzq.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12065,7 +12054,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1745414794/7340020103491_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12084,7 +12073,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715249295/98888_7_c2gljs.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12103,7 +12092,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769176641/1092778.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12122,7 +12111,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1720017986/1039266_4.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12141,7 +12130,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1776352948/3600542657990_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12160,7 +12149,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716365744/1069031_2_t0c6z3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=solskydd",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12179,7 +12168,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1733759632/39764_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12198,7 +12187,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773926371/5054563097620_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12217,7 +12206,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1730108337/43063_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12236,7 +12225,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1759414484/1032716_11.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12255,7 +12244,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1736838046/1052959_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12274,7 +12263,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715173228/29483_9_usaetf.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12293,7 +12282,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771343374/5054563097545.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12312,7 +12301,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773926240/8710464116446_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12331,7 +12320,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1741697172/90017_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12350,7 +12339,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1759414493/1032763_11.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12369,7 +12358,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715157265/1007365_xihtoc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12388,7 +12377,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1772808227/7046110075562_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12407,7 +12396,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1730108347/87778_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12426,7 +12415,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1726736355/1038516_6.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12445,7 +12434,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762864488/5054563118240_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12464,7 +12453,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1741697194/1052942_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12483,7 +12472,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715208356/1056126_sttxzs.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12502,7 +12491,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771343370/5054563102751.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12521,7 +12510,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762864482/5054563219091_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12540,7 +12529,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1759241518/1052960_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12559,7 +12548,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773926337/5054563219619_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12578,7 +12567,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1741697164/90076_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12597,7 +12586,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1741697161/90075_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12616,7 +12605,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1756208012/1087794.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12635,7 +12624,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1764933638/7350028703715.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12654,7 +12643,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715212620/64601_C1L1_itlxv5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12673,7 +12662,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1741697168/94791_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12692,7 +12681,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770045312/7350121253810_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12711,7 +12700,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715251686/1036832_1_ssoxlq.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12730,7 +12719,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715195637/1043521_lztxme.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12749,7 +12738,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715161226/29481_C1L1_o5tld3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12768,7 +12757,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1741697191/1052941_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12787,7 +12776,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715218509/1025732_C1N1_dfw4s9.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12806,7 +12795,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770900297/8718951553224.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12825,7 +12814,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715227715/1003404_1_ugu392.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12844,7 +12833,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715155746/1043520_ix6hgu.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12863,7 +12852,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773926313/5054563233868_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12882,7 +12871,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715181393/64600_C1L1_kncwzn.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12901,7 +12890,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773926388/5054563039989_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12920,7 +12909,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1720787508/1068652.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12939,7 +12928,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715246123/1003406_3_hqwxiq.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12958,7 +12947,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773926405/5054563032119_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12977,7 +12966,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715193251/1045875_2_mhxkfp.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -12996,7 +12985,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715234182/1031810_1_t2k4oa.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13015,7 +13004,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716365413/63176_C1N1_ontefj.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13034,7 +13023,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1758605964/1043522_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13053,7 +13042,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1725871450/1058355_6.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13072,7 +13061,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715201552/1038510_C1N1_dtswk7.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13091,7 +13080,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773926286/5054563234674_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13110,7 +13099,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715169373/1058263_arl4l7.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13129,7 +13118,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1736769285/1050495_4.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13148,7 +13137,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773926357/5054563219572_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13167,7 +13156,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770045336/7350121254176_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13186,7 +13175,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773926378/5054563076083_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13205,7 +13194,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769098486/8700216089258_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13224,7 +13213,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1756298207/5054563270689.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13243,7 +13232,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1736769274/1043871_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13262,7 +13251,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1756207995/1087796.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13281,7 +13270,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1741697184/90112_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13300,7 +13289,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1744362912/29519.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13319,7 +13308,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1772804401/07350121259973_C1N1_s01.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13338,7 +13327,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1742978401/92990_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13357,7 +13346,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1720172548/07392222101706_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13376,7 +13365,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1763653682/8001090558145.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13395,7 +13384,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1720625387/1068769.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13414,7 +13403,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715169337/1056703_mojy98.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13433,7 +13422,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715165128/1042059_C1C1_agvqux.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13452,7 +13441,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1720625390/1068770.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13471,7 +13460,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762864492/5054563110855_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13490,7 +13479,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715236388/1003315_1_awpaah.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13509,7 +13498,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770045339/7350121256880_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13528,7 +13517,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715189682/1056343_kywmr3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13547,7 +13536,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715233620/1043878_C1N0_aixhrg.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13566,7 +13555,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715176392/1003280_3_hxkcmd.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13585,7 +13574,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1757688775/1090951.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13604,7 +13593,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715187165/93155_Front_Right_obz7k8.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13623,7 +13612,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1772524299/8001090559890_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13642,7 +13631,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1773926273/5054563238948_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13661,7 +13650,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1758534660/70942304795_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13680,7 +13669,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715171659/1007299_C1R1_1_xhagjr.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13699,7 +13688,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715158669/1031907_2_wtzkit.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13718,7 +13707,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761301920/8700216667166_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13737,7 +13726,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1769098481/8006530024303_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13756,7 +13745,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761301915/8700216666367_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13775,7 +13764,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770045323/7350121253995_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13794,7 +13783,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1747645641/8718951683990.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13813,7 +13802,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715228020/1002941_C1N0_lfszwx.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13832,7 +13821,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761301924/8700216667142_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13851,7 +13840,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715158866/1043523_d3pfbs.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13870,7 +13859,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1721387114/1070001_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13889,7 +13878,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715192214/1003283_1_ynamee.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13908,7 +13897,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1757688764/1090950.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13927,7 +13916,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1757688768/1090948.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13946,7 +13935,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716383727/5060606270165_wxlost.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13965,7 +13954,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1756207989/1087790.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -13984,7 +13973,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1757688772/1090949.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14003,7 +13992,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715189367/1002912_C1N0_sklspe.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14022,7 +14011,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715250672/28973_2_xdzvtv.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14041,7 +14030,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715194329/28972_2_zhistc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14060,7 +14049,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715233310/1040437_1_hbeioo.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14079,7 +14068,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715243209/99581_3_wxfelh.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14098,7 +14087,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1720439344/7640118831221.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14117,7 +14106,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1720439337/7640118831344.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14136,7 +14125,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715239129/1040440_lh6ltz.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14155,7 +14144,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771317366/08711231153121.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14174,7 +14163,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715258960/74168_5_pfy0vy.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14193,7 +14182,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715218897/1036841_xtkfqw.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14212,7 +14201,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715201005/1027505_C1N1_rotunj.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14231,7 +14220,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715222659/99921_1_vqseil.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14250,7 +14239,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716365376/1065961_evejsy.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14269,7 +14258,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717746391/1065652_6_zb8097.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14288,7 +14277,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1763132047/1092231_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14307,7 +14296,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1751616449/5000198124446_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14326,7 +14315,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715192530/1041624_C1L1%282%29_ujyron.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14345,7 +14334,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715230538/1041623_o9rsvj.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14364,7 +14353,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1750086642/1015276_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14383,7 +14372,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771317379/08711231212682.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14402,7 +14391,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1771317383/08711231212712.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14421,7 +14410,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715201504/1040438_evuaky.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14440,7 +14429,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715157122/810969001051_s9obdk.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14459,7 +14448,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715226285/810969000382_xxpbur.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14478,7 +14467,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715263059/810969000719_ozrcsc.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14497,7 +14486,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715252977/1068262_1_del5oe.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14516,7 +14505,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715239114/1040315_C1R0_fkps2l.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14535,7 +14524,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1716365417/1067257_C1C1_ntc0zy.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14554,7 +14543,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1772808212/7046110071519_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14573,7 +14562,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715256264/1065172_qungzw.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14592,7 +14581,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715165224/1044448_C1N1_qxrlqb.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14611,7 +14600,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715211561/99838_4_h17amf.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14630,7 +14619,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715201807/1031798_3_wehknt.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14649,7 +14638,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1741697181/1045872_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=tandkram",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14668,7 +14657,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1732607032/38116_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14687,7 +14676,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1737379728/28915_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14706,7 +14695,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715238652/1002540_C1L1_y3hrym.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14725,7 +14714,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715248974/29558_1_qrnvxg.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14744,7 +14733,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715186482/1043515_itbnnq.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14763,7 +14752,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715246284/70777_1_alrjwm.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14782,7 +14771,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715216933/29567_nae7fo.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14801,7 +14790,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761912002/8006540894293_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14820,7 +14809,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715242776/29564_C1N1_vloeii.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14839,7 +14828,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1737039829/47305_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14858,7 +14847,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715162006/73951_C1R1_ltolim.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14877,7 +14866,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715256098/1064011_1_lvjv25.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14896,7 +14885,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715189310/1025993_2_g2exl7.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14915,7 +14904,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1738078777/1077062.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14934,7 +14923,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1733146108/1004752_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14953,7 +14942,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1737039804/37448_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14972,7 +14961,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715227027/1027504_C1R1_ra1bim.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -14991,7 +14980,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715203861/29566_C1N1_rzfowt.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15010,7 +14999,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715198932/85411_10_hiopzx.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15029,7 +15018,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762168877/8006540805374_7.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15048,7 +15037,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770823669/5708657219275_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15067,7 +15056,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1737379712/43062_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15086,7 +15075,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715198979/29549_1_hmwj2a.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15105,7 +15094,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715231209/1058264_vzjihf.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15124,7 +15113,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715224165/76852_l2sua3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15143,7 +15132,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715193669/94798_Front_NoPlunge_e16qop.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15162,7 +15151,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715262380/93012_voeihk.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15181,7 +15170,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1776687970/7392222116410.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15200,7 +15189,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715240137/73995_5_qyp7mu.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15219,7 +15208,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715155644/76250_C1R1_n771wr.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15238,7 +15227,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715171552/1025733_C1N1_dt7pgj.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15257,7 +15246,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715219462/1050496_1_yece8s.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15276,7 +15265,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1730990838/1059767_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15295,7 +15284,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715171872/1036821_C1L0_omnftb.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15314,7 +15303,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1737038593/54560_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15333,7 +15322,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715162183/29575_1_hcmlra.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15352,7 +15341,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715240134/1064010_1_khbn64.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15371,7 +15360,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715262394/1060169_C1N1_aih2to.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15390,7 +15379,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715228454/70821_1_h1wqmg.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15409,7 +15398,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762168923/8006540804087_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15428,7 +15417,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715252167/1025994_2_kakofi.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15447,7 +15436,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715162682/74081_5_y4ka6e.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15466,7 +15455,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1742978418/82511_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15485,7 +15474,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715242907/1052363_ulgb3k.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15504,7 +15493,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761919123/8006540893432_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15523,7 +15512,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715230773/29576_1_cwpovf.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15542,7 +15531,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715234308/39765_2_jxcg23.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15561,7 +15550,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715225374/1056339_C1L1_i5rsdu.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15580,7 +15569,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715193082/1060167_C1N1_xtdlnh.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15599,7 +15588,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715225094/29579_1_cavo4o.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15618,7 +15607,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715234104/1059540_qw6nrq.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15637,7 +15626,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715172485/29470_2_eieoxs.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15656,7 +15645,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1746539261/07392222116755.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15675,7 +15664,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761916224/8700216456876_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15694,7 +15683,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1776425296/07311620016337_C1N1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15713,7 +15702,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715204708/1043517_vf2wo8.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15732,7 +15721,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715198557/1031908_1_tdac43.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15751,7 +15740,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715164529/1027433_C1N1_c0wobs.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15770,7 +15759,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715171464/1003408_C1N1_pczcck.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15789,7 +15778,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1765187357/7350075692734.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15808,7 +15797,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715243068/1059562_werxbz.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15827,7 +15816,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1774602315/7038513866304_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15846,7 +15835,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715183293/1065857_qjuihl.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15865,7 +15854,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761914836/1043423_7.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15884,7 +15873,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761918988/8006540892480_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15903,7 +15892,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770047748/7350075690846.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15922,7 +15911,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1731067037/1041467_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15941,7 +15930,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715224007/29500_C1N1_goytlp.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15960,7 +15949,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715168472/1011328_3_biiudb.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15979,7 +15968,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1737038583/37469_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -15998,7 +15987,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715228477/1060171_C1N1_z6ldk8.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16017,7 +16006,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715205128/87820_C1N1_alrgk0.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16036,7 +16025,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715162068/28924_C1N1_1_nuboma.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16055,7 +16044,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715241572/1022508_1_gsjv7e.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16074,7 +16063,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1751543403/1050498_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16093,7 +16082,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761912072/8700216195829_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16112,7 +16101,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715219262/1043518_sdx4t3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16131,7 +16120,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762164968/8006540893814_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16150,7 +16139,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715224702/1038437_ggmbyz.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16169,7 +16158,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715245655/41138_1_vyhist.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16188,7 +16177,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1730990835/1070805.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16207,7 +16196,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715162711/1060759_d8mrze.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16226,7 +16215,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761919069/8006540893104_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16245,7 +16234,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715231759/67806_Front_Right_zo1dwa.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16264,7 +16253,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1770113243/5012616267147.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16283,7 +16272,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1730465294/28956.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16302,7 +16291,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715162961/1064012_1_z4fd0n.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16321,7 +16310,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715208316/1056338_bqqrpi.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16340,7 +16329,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1756279026/7317400028309_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16359,7 +16348,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1776687927/7392222116618.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16378,7 +16367,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715195378/1031809_1_wk9yz1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16397,7 +16386,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715250687/94799_Front_NoPlunge_gz8ylh.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16416,7 +16405,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715222232/67621_1_x7jplk.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16435,7 +16424,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1748608006/8006540771501_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16454,7 +16443,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715198981/29577_1_wfyxcw.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16473,7 +16462,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761918956/8006540892367_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16492,7 +16481,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1737041008/47306_5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16511,7 +16500,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1759489900/5425012535336_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16530,7 +16519,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1776948468/8720689036900_3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16549,7 +16538,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1717192048/07392222160208_C1N1_s02_zva0rg.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16568,7 +16557,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715252655/1060758_minxri.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16587,7 +16576,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715216650/1050492_1_qehwoq.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16606,7 +16595,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1730990842/1059768_4.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16625,7 +16614,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1758633164/1087931_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16644,7 +16633,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1776930843/8006540731536_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16663,7 +16652,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761914800/8700216196178_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16682,7 +16671,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715168516/1032770_1_jmg4vh.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16701,7 +16690,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715230259/1036845_C1N1_dxbezo.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16720,7 +16709,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715187662/1009777_Front_NoPlunge_uzsa1f.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16739,7 +16728,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715242527/29578_1_gyimkb.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16758,7 +16747,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715237181/1064009_1_jpmfna.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16777,7 +16766,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715181770/1031808_pevvpk.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16796,7 +16785,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1762864485/5054563126450_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16815,7 +16804,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1777288898/08718951724181_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16834,7 +16823,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761914862/8700216456869_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16853,7 +16842,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1730108342/1058252_2.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16872,7 +16861,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715261091/1032709_C1N1_pjpqsi.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16891,7 +16880,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1737042159/1060053_7.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16910,7 +16899,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1772095432/07392222101904_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16929,7 +16918,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1761910678/8006540894088_1.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16948,7 +16937,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715262397/1060168_ox9vkr.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16967,7 +16956,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715221217/29548_C1N1_zzzotq.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -16986,7 +16975,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715159444/1060166_C1N1_vwfjd4.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -17005,7 +16994,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715264337/1032768_cbnhp5.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -17024,7 +17013,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715172921/1054489_jiwatl.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -17043,7 +17032,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715213995/1026719_5_eccqeu.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   },
   {
     "chain": "apotek-hjartat",
@@ -17062,7 +17051,7 @@ export const apohemProducts: ApohemIngestedProduct[] = [
     "imageUrl": "https://assets.icanet.se/image/upload/v1715263612/75166_C1L1_k3hky3.webp",
     "isOtc": false,
     "sourceUrl": "https://www.apotekhjartat.se/search?q=munvard",
-    "retrievedAt": "2026-05-23T21:31:56.766Z"
+    "retrievedAt": "2026-05-23T21:28:23.249Z"
   }
 ];
 
