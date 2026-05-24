@@ -53,6 +53,18 @@ const DATASETS = [
     key: ['sourceUrl', 'code', 'storeId', 'price']
   },
   {
+    file: 'okq8-fuel-prices.ts',
+    rows: 'okq8FuelPriceObservations',
+    source: 'okq8FuelPriceSource',
+    key: ['sourceUrl', 'productId', 'effectiveFrom', 'pricePerLitre']
+  },
+  {
+    file: 'st1-fuel-prices.ts',
+    rows: 'st1FuelPriceObservations',
+    source: 'st1FuelPriceSource',
+    key: ['sourceUrl', 'grade', 'validFrom', 'pricePerLitre']
+  },
+  {
     file: 'mathem.ts',
     rows: 'mathemProducts',
     source: 'mathemSource',
