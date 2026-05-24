@@ -1,3 +1,4 @@
+export * from './lib/activePromotions.js';
 export type DealScoreInput = {
   currentCityPercentile: number;
   knownPromoHistoryPercentile: number;
