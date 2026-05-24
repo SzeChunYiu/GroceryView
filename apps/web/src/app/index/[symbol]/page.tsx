@@ -164,6 +164,30 @@ function confidenceLabel(level: 'high' | 'medium' | 'low') {
   return `${level} confidence`;
 }
 
+function jsonLd(data: unknown) {
+  return JSON.stringify(data).replace(/</g, '\\u003c');
+}
+
+function categoryItemListJsonLd(definition: CategoryDefinition, rows: CategoryConstituent[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: definition.label,
+    description: definition.description,
+    numberOfItems: rows.length,
+    itemListElement: rows.slice(0, 36).map((row, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Product',
+        name: row.productName,
+        sku: row.id,
+        ...(row.brand === 'Brand not reported' ? {} : { brand: { '@type': 'Brand', name: row.brand } })
+      }
+    }))
+  };
+}
+
 function fixedBasketForChain(chain: ChainPriceIndex): FixedBasketIndex {
   return calculateFixedBasketIndex({
     id: chainSlug(chain.chainId),
@@ -304,6 +328,10 @@ function CategoryIndexPage({ definition, index, rows }: Readonly<{ definition: C
   const averageSaving = rows.reduce((sum, row) => sum + Math.abs(row.movementPercent), 0) / rows.length;
   return (
     <PageShell>
+      <script
+        dangerouslySetInnerHTML={{ __html: jsonLd(categoryItemListJsonLd(definition, rows)) }}
+        type="application/ld+json"
+      />
       <Eyebrow>Index symbol</Eyebrow>
       <div className="mt-2 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
