@@ -1220,6 +1220,35 @@ describe('createPostgresCatalogReader', () => {
     assert.deepEqual(executor.calls[0]!.params, ['kaffe', ['Pantry', 'Coffee'], 25, 0]);
   });
 
+  it('prioritizes exact barcode matches before title matches', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.productRows = [
+      {
+        ...executor.productRows[0],
+        id: 'product-barcode-match',
+        slug: 'canonical-matched',
+        canonical_name: 'zzz not preferred by title',
+        barcode: '0731000000000'
+      },
+      {
+        ...executor.productRows[0],
+        id: 'product-title-only',
+        slug: 'alpha-only-title',
+        canonical_name: 'Aardvark Beans',
+        barcode: null,
+        created_at: new Date('2026-05-20T06:30:00.000Z')
+      }
+    ];
+    const reader = createPostgresCatalogReader(executor);
+
+    const products = await reader.listProducts({ search: '0731000000000' });
+
+    assert.equal(products.length, 2);
+    assert.equal(products[0]?.productId, 'product-barcode-match');
+    assert.match(executor.calls[0]!.sql, /case\s+when query\.term is null then 5\s+when products\.barcode = query\.term then 0/);
+    assert.equal(executor.calls[0]!.params[0], '0731000000000');
+  });
+
   it('supports page-based offsets for product listings', async () => {
     const executor = new RecordingQueryExecutor();
     const reader = createPostgresCatalogReader(executor);

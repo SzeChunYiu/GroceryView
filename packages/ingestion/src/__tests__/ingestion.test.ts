@@ -6093,6 +6093,92 @@ describe('daily ingestion runner', () => {
     assert.equal(observations.product_id, 'product-db-ean-7310130003547');
   });
 
+  it('resolves duplicate barcodes to one product upsert key before observation linking', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-cheese-1',
+            rawName: 'Mild Cheese 400g',
+            canonicalName: 'Mild Cheese',
+            productId: 'willys-mild-cheese-400g',
+            categoryId: 'dairy',
+            brand: 'Willys',
+            barcode: '5000000000001',
+            packageSize: 400,
+            packageUnit: 'g',
+            price: 12.9
+          },
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-cheese-2',
+            rawName: 'Willys Mild Cheese 400g',
+            canonicalName: 'Mild Cheese',
+            productId: 'willys-mild-cheese-alt',
+            categoryId: 'dairy',
+            brand: 'Willys',
+            barcode: '5000000000001',
+            packageSize: 400,
+            packageUnit: 'g',
+            price: 12.5
+          },
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-cheese-3',
+            rawName: 'Other Cheese 500g',
+            canonicalName: 'Other Cheese',
+            productId: 'willys-other-cheese-500g',
+            categoryId: 'dairy',
+            brand: 'Willys',
+            packageSize: 500,
+            packageUnit: 'g',
+            price: 15.4
+          }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.acceptedCount, 3);
+    const productInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into products'));
+    assert.ok(productInsert, 'daily ingestion should batch upsert products');
+    assert.match(productInsert.sql, /with input as \(/);
+    assert.match(productInsert.sql, /select distinct on \(target_slug\)/);
+    assert.match(productInsert.sql, /left join batch_barcodes on batch_barcodes\.barcode = input\.barcode/);
+    const products = JSON.parse(String(productInsert.params[0])) as Array<{ barcode: string | null; slug: string }>;
+    assert.deepEqual(products.map((product) => product.barcode), ['5000000000001', '5000000000001', null]);
+
+    const aliases = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into aliases'));
+    assert.ok(aliases, 'daily ingestion should batch upsert aliases');
+    const aliasRows = JSON.parse(String(aliases.params[0])) as Array<{ product_id: string }>;
+    assert.equal(aliasRows[0]?.product_id, 'product-db-ean-5000000000001');
+    assert.equal(aliasRows[1]?.product_id, 'product-db-ean-5000000000001');
+    assert.equal(aliasRows[2]?.product_id, 'product-db-other-cheese-500g');
+
+    const observationInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into observations'));
+    assert.ok(observationInsert, 'daily ingestion should persist observations for deduplicated products');
+    const observations = JSON.parse(String(observationInsert.params[0])) as Array<Record<string, string>>;
+    assert.equal(observations[0]?.product_id, 'product-db-ean-5000000000001');
+    assert.equal(observations[1]?.product_id, 'product-db-ean-5000000000001');
+    assert.equal(observations[2]?.product_id, 'product-db-other-cheese-500g');
+  });
+
   it('upserts every configured daily store before writing partial store-scoped observations', async () => {
     const executor = new DailyIngestionExecutor();
     const result = await runDailyIngestion({
